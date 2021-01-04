@@ -20,3 +20,19 @@ If you have spotted a mistake, have a suggestion or improvement in mind or think
 * Numerical Recipes
 * Principles of Quantum Mechanics
 * Thermal Physics
+
+### Year 2
+* Dynamics and Vector Calculus - Composed of two parts:
+    * Dynamics
+    * Vector Calculus
+* Linear Algebra and Several Variable Calculus (LASVC)
+* Modern Physics
+* Physics of Fields and Matter - Composed of two parts:
+    * Fields
+    * Matter
+
+As well as these courses, which are a compulsory part of the theoretical physics degree, I also took two courses with the School of Engineering:
+* Analogue Circuits 2
+* Fluid Mechanics 2
+
+In both cases the '2' refers to the fact that this course is delivered in second year, there is no corresponding '1' course but some knowledge of previous engineering courses is assumed, however first year physics courses are sufficient prerequisits to enter these courses.
