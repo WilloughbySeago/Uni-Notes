@@ -53,3 +53,45 @@ In both cases the '2' refers to the fact that this course is delivered in second
 As well as these courses, which are a compulsory part of the theoretical physics degree, I also took one course with the School of Mathematics, and one course with the School of Chemistry:
 * Proofs and Problem Soloving 
 * Chemistry 1A \[No notes\]
+
+
+## Sources
+While this material is based mostly on material delivered by lecturers in lecture form and also as lecture notes these notes are created by me.
+Where appropriate I have cited sources but any unsourced material is either my own or that of the lecturer/textbook mentioned at the start of the document.
+Any mistakes in these notes are my own, as are any views expressed within.
+
+#### Lecturers
+As the main source of this material I would like to thank the following people who lectured for at least one course, in no particular order:
+* [Dr Ross Galloway](https://www.ph.ed.uk/people/ross-galloway)
+* [Dr Will Hossack](https://www.ph.ed.uk/people/will-hossack)
+* [Dr John Loveday](https://www.ph.ed.uk/people/john-loveday)
+* [Dr Kristel Torokoff](https://www.ph.ed.uk/people/kristel-torokoff)
+* [Dr Joe Zuntz](https://www.ph.ed.uk/people/joe-zuntz)
+* [Prof Victorial Martin](https://www.ph.ed.uk/people/victoria-martin)
+* [Prof Alex Murphy](https://www.ph.ed.uk/people/alex-murphy)
+* [Prof Philip Clark](https://www.ph.ed.uk/people/philip-clark)
+* [Prof Judy Hardy](https://www.ph.ed.uk/people/judy-hardy)
+* [Dr David Laurenson](https://www.eng.ed.ac.uk/about/people/dr-david-laurenson)
+* [Prof Rebecca Cheung](https://www.eng.ed.ac.uk/about/people/prof-rebecca-cheung)
+* [Prof Romeel Dave](https://www.ph.ed.uk/people/romeel-dave)
+* [Prof Roman Zwicky](https://www.ph.ed.uk/people/roman-zwicky)
+* [Dr Stewart Williams](https://www.ph.ed.uk/people/stewart-williams)
+* [Dr Simon Titmuss](https://www.ph.ed.uk/people/simon-titmuss)
+* [Dr Andreas Hermann](https://www.ph.ed.uk/people/andreas-hermann)
+* [Dr Jamie Cole](https://www.ph.ed.uk/people/jamie-cole)
+* [Prof Jorge Peñarrubia](https://www.ph.ed.uk/people/jorge-penarrubia)
+* [Prof Andy Lawrence](https://www.ph.ed.uk/people/andy-lawrence)
+* [Dr Bartlomiej Waclaw](https://www.ph.ed.uk/people/bartlomiej-waclaw)
+* [Dr Britton Smith](https://www.ph.ed.uk/people/britton=smith)
+* [Prof Luigi Del Debio](https://www.ph.ed.uk/people/luigi-del-debio)
+* [Prof Arjun Berera](https://www.ph.ed.uk/people/arjun-berera)
+* [Prof Graeme Ackland](https://www.ph.ed.uk/people/graeme-ackland)
+* [Prof Alexander Morozov](https://www.ph.ed.uk/people/ross-galloway)
+
+### Bibliography
+* Liebeck, M. _A Concise Introduction To Pure Mathematics_, fourth edition (CRC Press, Boca Raton, 2016)
+* Griffiths, D. J. _Introduction to Electrodynamics_, fourth edition (Cambridge University Press, Cambridge, 2017)
+* Press, W. H. et al. _Numerical Recipes_, third edition (Cambridge University Press, Cambridge, 2007)
+* Riley, K. F. et al. _Mathematical Methods for Physics and Engineering_, third edition (Cambridge University Press, Cambridge, 2006)
+* Halliday, D. _Principles of Physics_, tenth edition (Wiley, Hoboken, 2014)
+* Rex, A. _Finn's Thermal Physics_, third edition (CRC Press, Boca Raton, 2017)
