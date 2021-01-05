@@ -19,40 +19,43 @@ For this reason the notes becomes more verbose for later courses.
 If you have spotted a mistake, have a suggestion or improvement in mind or think something is badly written/explained please contact me, either by creating an issue or emailing me at s1824487@ed.ac.uk.
 
 ## Courses
+Here are all the courses I took.
+(y) denotes a year long course, (s1) a course that was only in semester 1 and (s2) a course that was only in semester 2.
 ### Year 3
-* Electromagnetism
-* Fourier Analysis and Statistics - Composed of two parts:
-    * Fourier Analysis
-    * Statistics
-* Numerical Recipes
-* Principles of Quantum Mechanics
-* Thermal Physics
+* [Electromagnetism](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Electromagnetism) (y)
+* [Principles of Quantum Mechanics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Principles-of-Quantum-Mechanics) (y)
+* [Thermal Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Thermal-Physics) (y)
+* [Fourier Analysis and Statistics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Fourier-Analysis-and-Statistics) (s1) - Composed of two parts:
+    * [Fourier Analysis](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Fourier-Analysis-and-Statistics/Fourier-Analysis)
+    * [Statistics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Fourier-Analysis-and-Statistics/Statistics)
+* Numerical Recipes (s1)
+
 
 ### Year 2
-* Dynamics and Vector Calculus - Composed of two parts:
-    * Dynamics
-    * Vector Calculus
-* Linear Algebra and Several Variable Calculus (LASVC)
-* Modern Physics
-* Physics of Fields and Matter - Composed of two parts:
-    * Fields
-    * Matter
+* [Linear Algebra and Several Variable Calculus (LASVC)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-2/LASVC) (s1)
+* [Modern Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-2/Modern-Physics) (s1)
+* [Dynamics and Vector Calculus](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-2/Dynamics-and-Vector-Calculus) (s2) - Composed of two parts:
+    * [Dynamics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-2/Dynamics-and-Vector-Calculus/Dynamics)
+    * [Vector Calculus](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-2/Dynamics-and-Vector-Calculus/Vector-Calculus)
+* [Physics of Fields and Matter](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-2/Physics-of-Fields-and-Matter) (s2) - Composed of two parts:
+    * [Fields](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-2/Physics-of-Fields-and-Matter/Fields)
+    * [Matter](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-2/Physics-of-Fields-and-Matter/Matter)
 
 As well as these courses, which are a compulsory part of the theoretical physics degree, I also took two courses with the School of Engineering:
-* Analogue Circuits 2
-* Fluid Mechanics 2
+* [Analogue Circuits 2](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-2/Optional-Courses/Analogue-Circuits-2) (s1)
+* [Fluid Mechanics 2](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-2/Optional-Courses/Fluid-Mechanics-2) (s1)
 
 In both cases the '2' refers to the fact that this course is delivered in second year, there is no corresponding '1' course but some knowledge of previous engineering courses is assumed, however first year physics courses are sufficient prerequisits to enter these courses.
 
 ### Year 1
-* Maths for Physics 1 (MFP1) \[Summary, no full notes\]
-* Physics 1A \[Summary, no full notes\]
-* Maths for Physics 2 (MFP2)
-* Physics 1B
+* [Maths for Physics 1 (MFP1)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-1/MFP1) (s1) \[Summary, no full notes\]
+* [Physics 1A](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-1/Physics-1A) (s1) \[Summary, no full notes\]
+* [Maths for Physics 2 (MFP2)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-1/MFP2) (s2)
+* [Physics 1B](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-1/Physics-1B) (s2)
 
-As well as these courses, which are a compulsory part of the theoretical physics degree, I also took one course with the School of Mathematics, and one course with the School of Chemistry:
-* Proofs and Problem Soloving 
-* Chemistry 1A \[No notes\]
+As well as these courses, which are a compulsory part of the theoretical physics degree, I also took one course with the School of Chemistry, and one course with the School of Mathematics:
+* Chemistry 1A (s1) \[No notes\]
+* [Proofs and Problem Soloving](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-1/Optional-Courses/PPS) (s2)
 
 
 ## Sources
