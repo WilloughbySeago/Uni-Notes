@@ -9,6 +9,13 @@ Please inform me if you find any sort of mistake or if you simply think that the
 The notes assume knowledge of the courses from previous years and possibly of other courses run at the same time.
 That said the notes should be fairly standalone for anyone with an equivalent amount of maths and/or physics education as I had at the time that I took the course.
 
+The original purpose of making these notes was to learn LaTeX.
+This means that for the first few courses (in particular physics 1A and maths for physics 1) I didn't take proper notes I just wrote down formulae without much explanation.
+These may still be useful for revision or looking up formulae but only if you are familiar with the content.
+For later courses these notes became part of how I learned the course, I would watch a lecture and take messy notes that where just enough for me to understand and recall the importamt parts of the lecture.
+After the lecture I would then write up my notes compiling my own notes, the lecture notes, and any other relevant sources.
+For this reason the notes becomes more verbose for later courses.
+
 If you have spotted a mistake, have a suggestion or improvement in mind or think something is badly written/explained please contact me, either by creating an issue or emailing me at s1824487@ed.ac.uk.
 
 ## Courses
@@ -36,3 +43,13 @@ As well as these courses, which are a compulsory part of the theoretical physics
 * Fluid Mechanics 2
 
 In both cases the '2' refers to the fact that this course is delivered in second year, there is no corresponding '1' course but some knowledge of previous engineering courses is assumed, however first year physics courses are sufficient prerequisits to enter these courses.
+
+### Year 1
+* Maths for Physics 1 (MFP1) \[Summary, no full notes\]
+* Physics 1A \[Summary, no full notes\]
+* Maths for Physics 2 (MFP2)
+* Physics 1B
+
+As well as these courses, which are a compulsory part of the theoretical physics degree, I also took one course with the School of Mathematics, and one course with the School of Chemistry:
+* Proofs and Problem Soloving 
+* Chemistry 1A \[No notes\]
