@@ -28,7 +28,7 @@ Here are all the courses I took.
 * [Fourier Analysis and Statistics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Fourier-Analysis-and-Statistics) (s1) - Composed of two parts:
     * [Fourier Analysis](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Fourier-Analysis-and-Statistics/Fourier-Analysis)
     * [Statistics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Fourier-Analysis-and-Statistics/Statistics)
-* Numerical Recipes (s1)
+* [Numerical Recipes](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Numerical-Recipes) (s1)
 
 
 ### Year 2
@@ -59,7 +59,7 @@ As well as these courses, which are a compulsory part of the theoretical physics
 
 
 ## Sources
-While this material is based mostly on material delivered by lecturers in lecture form and also as lecture notes these notes are created by me.
+While this material is based mostly on material delivered by lecturers in lecture form and also as lecture notes these notes were created by me.
 Where appropriate I have cited sources but any unsourced material is either my own or that of the lecturer/textbook mentioned at the start of the document.
 Any mistakes in these notes are my own, as are any views expressed within.
 
