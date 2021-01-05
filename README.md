@@ -1,5 +1,5 @@
 # Uni-Notes
-These are my notes for the five year theoretical physics MPyhs degree taught at the University of Edinburgh.
+These are my notes for the five year [theoretical physics MPyhs degree](https://www.ph.ed.ac.uk/studying/undergraduate/our-degrees/degree-programmes/theoretical-physics) taught at the [University of Edinburgh](https://www.ed.ac.uk/).
 I started this course in 2018 and will graduate in 2023.
 
 These notes are compiled based material delivered in lectures as well as the lecture notes provided, various textbooks, and other sources.
