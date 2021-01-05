@@ -1,0 +1,557 @@
+\part{Observables}
+    \section{Observables}
+    In \acrshort{qm} the outcome of a measurement is the outcome of a stochastic variable.
+    The theory can only predict the \acrfull{pdf} of the outcome of a given experiment.
+    \subsection{Some Statistics}
+    A continuous random, or stochastic, variable is one that can take on a different value every time we measure it.
+    The values that it can take can be characterised by a \define{\acrfull{pdf}}.
+    If \(x\) is a continuous random variable and can take any value in some set \(S\) then the \acrshort{pdf} of \(x\) is a function
+    \[p\colon S\to[0, 1]\]
+    such that the probability that \(x\) is between \(x\) and \(x + \dd{x}\) is given by \(p(x)\dd{x}\).
+    Using this we have that the probability that \(x\) is in the interval \(\mathcal{I} = [a, b]\) is
+    \[P(x\in\mathcal{I}) = \int_a^b \dd{x} p(x).\]
+    Since probabilities should add up to one we require \(p\) to be properly normalised so that
+    \[P(x\in S) = \int_S\dd{x}p(x) = 1.\]
+    As a way of characterising a \acrshort{pdf} we define its \define{\(\mathdefine{n}\)th moment} as
+    \[\mu_n = \int\dd{x}p(x)x^n.\]
+    Clearly if \(p\) is properly normalised then \(\mu_0 = 1\).
+    The \define{mean} value of the random variable, \(x\), is
+    \[\mu_1 = \expected{x} = \int\dd{x}p(x)x.\]
+    The \define{variance} of the variable, \(x\), is
+    \[\Var[x] = \mu_2 - (\mu_1)^2 = \expected{x^2} - \expected{x}^2.\]
+    
+    \subsection{Position Operator}
+    The state of the system is described by \(\psi(x) = \braket{x}{\psi}\) where \(\ket{\psi}\in\hilbert\), with \(\hilbert\) being some infinite dimensional vector space that has \(\{\ket{x}\}\) as a basis.
+    The \acrshort{pdf} for finding a system in the state \(\ket{\psi}\in\hilbert\) at position \(x\) is
+    \[p(x) = \abs{\psi(x)}^2.\]
+    The \define{expected value} of \(x\) is
+    \[\expected{x} = \int_{-\infty}^{\infty} \dd{x}p(x)x.\]
+    We introduce an operator, \(\operator{X}\colon\hilbert\to\hilbert\), defined by
+    \[\bra{x}\operator{X}\ket{\psi} = x\braket{x}{\psi},\]
+    or, equivalently,
+    \[\operator{X}\psi(x) = x\psi(x).\]
+    This allows us to write the mean value as
+    \begin{align*}
+        \expected{x} &= \int\dd{x}\abs{\psi(x)}^2x\\
+        &= \int\dd{x}\psi(x)^*x\psi(x)\\
+        &= \int\dd{x}\braket{\psi}{x}x\braket{x}{\psi}\\
+        &= \int\dd{x}\braket{\psi}{x}\bra{x}\operator{X}\ket{\psi}\\
+        &= \bra{\psi}\operator{X}\ket{\psi}\\
+        &= \expected{\operator{X}}.
+    \end{align*}
+    Here we used the completeness relation to get rid of the integral and projection operators.
+    Note that \(\expected{\operator{X}}\) is just a short hand for \(\bra{\psi}\operator{X}\ket{\psi}\) when the state \(\psi\) is clear.
+    It is not the expected value of the operator \(\operator{X}\) per se but the expected value of \(x\) which is in some way related to the operator \(\operator{X}\).
+    
+    There is a theorem that states that if we know all the moments of a \acrshort{pdf} then this uniquely determines the \acrshort{pdf}.
+    We can find the \(n\)th moment fairly easily:
+    \begin{align*}
+        \bra{\psi}\operator{X}^n\ket{\psi} &= \int \dd{x} \braket{\psi}{x}\bra{x}\operator{X}^n\ket{\psi}\\
+        &= \int \dd{x} \braket{\psi}{x}x^n\braket{x}{\psi}\\
+        &= \int \dd{x} \psi(x)^* x^n \psi(x)\\
+        &= \int \dd{x} \abs{\psi(x)}^2x^n\\
+        &= \int \dd{x} p(x)x^n\\
+        &= \mu_n.
+    \end{align*}
+    So by taking the matrix elements of \(\operator{X}^n\) we can fully describe the \acrshort{pdf}.
+    
+    Here we have used the following theorem.
+    \begin{theorem}\label{thm:op^n ket = eigenvalue^n ket}
+        If \(\operator{O}\colon\hilbert\to\hilbert\) is an operator and acts on \(\ket{\psi}\in\hilbert\) as \(\operator{O}\ket{\psi} = z\ket{\psi}\) where \(z\in\complex\) then \(\operator{O}^n\ket{\psi} = z^n\ket{\psi}\).
+    \end{theorem}
+    \begin{proof}
+        We will prove this by induction.
+        The basis case of \(n = 0\) holds as by definition \(\operator{O}^0 = \ident\) so
+        \[\operator{O}^0\ket{\psi} = \ident\ket{\psi} = \ket{\psi} = 1\ket{\psi} = z^0\ket{\psi}.\]
+        Now suppose that this holds for \(n = k\), that is
+        \[\operator{O}^k\ket{\psi} = z^k\ket{\psi}.\]
+        Then
+        \begin{align*}
+            \operator{O}^{k+1}\ket{\psi} &= \operator{O}(\operator{O}^k\ket{\psi})\\
+            &= \operator{O}(z^k\ket{\psi})\\
+            &= z^k(\operator{O}\ket{\psi})\\
+            &= z^k(z\ket{\psi})\\
+            &= z^{k+1}\ket{\psi}.
+        \end{align*}
+        So it holds for \(n = k + 1\).
+        Thus by induction this holds for all \(n \in\naturals\).
+    \end{proof}
+    
+    \subsection{Generic Observables}
+    We define an \define{observable} as a quantity that can be measured in an experiment.
+    Here an experiment is a black box that we provide somehow with a prepared state, \(\ket{\psi}\), and after the experiment we are given a value for the observable that we were measuring.
+    One important thing that we assume is that the experiment is reproducible, that is that we can prepare the system in the same way and perform the same measurement as many times as needed.
+    
+    This gives rise to the second postulate of \acrshort{qm}:
+    \begin{postulate}
+        In quantum mechanics each observable, \(O\), is associated to a linear operator, \(\operator{O}\colon\hilbert\to\hilbert\).
+    \end{postulate}
+    The naive approach to find the expected value of an observable, \(O\), given a specific state, \(\ket{\psi}\), might be to try \(\operator{O}\ket{\psi}\).
+    However this gives us another vector and we expect real numbers as the results of measurements.
+    It turns out that the expected value of \(O\) for a system in the state \(\ket{\psi}\) is given by the matrix elements of \(\operator{O}\):
+    \[\expected{O} = \bra{\psi}O\ket{\psi}.\]
+    
+    \subsubsection{Observing Observables}
+    When we say that the value of an observable \(O\) is a stochastic variable is that if we set up the system in state \(\ket{\psi}\) and measure \(O\) and get a result \(O^{(1)}\), and then set up the system in state \(\ket{\psi}\) and measure \(O\) and get a result \(O^{(2)}\), and so on, then we end up with a set of values \(\{O^{(1)}, O^{(2)}, \dotsc, O^{(n)}\}\).
+    The important thing is that it is possible that \(O^{(i)}\ne O^{(j)}\), even accounting for experimental error.
+    This is very different to classical mechanics where we would expect that a measurement gives the same result every time, up to some level of precision.
+    
+    The expectation value of \(O\) is then
+    \[\expected{O} = \lim_{n\to\infty} \frac{1}{n}\sum_{k=1}^{n} O^{(k)}.\]
+    So far we have focused on the value of the observable but with \acrshort{qm} we can predict more than this.
+    Given an observable, \(O\), we can predict
+    \begin{itemize}
+        \item the possible outcomes of a measurement of \(O\),
+        \item the probability of obtaining each of these possible outcomes.
+    \end{itemize}
+    All questions in \acrshort{qm} need to be phrased in terms of possible outcomes and their probabilities, these are the only things that the theory predicts.
+    
+    \subsection{Eigenvalues and Eigenstates}
+    The possible outcomes of measuring an observable, \(O\), are given by the third postulate of \acrshort{qm}:
+    \begin{postulate}
+        When measuring an observable, \(O\), the possible outcomes, \(O_k\), are the eigenvalues of the operator, \(\operator{O}\).
+    \end{postulate}
+    If \(\operator{O}\colon\hilbert\to\hilbert\) and \(\ket{\psi_k}\in\hilbert\) then \(\ket{\psi_k}\) is an \define{eigenvector} or \define{eigenstate} with \define{eigenvalue} \(O_k\) if these are solutions to the following:
+    \[\operator{O}\ket{\psi_k} = O_k\ket{\psi_k}.\]
+    That is the only result of \(\operator{O}\) when acting on \(\ket{\psi_k}\) is to scale \(\ket{\psi_k}\) by some amount.
+    In general in a complex vector space eigenvalues are complex, we will see later that this does not give rise to the correct physics.
+    
+    If \(O_k\) is an eigenvalue of the operator, \(\operator{O}\), then we say that \(O_k\) is \(g\)-fold degenerate if there are exactly \(g\) linearly independent eigenvectors, \(\ket{u_k^{(n)}}\in\hilbert\) such that
+    \[\operator{O}\ket{u_k^{(n)}} = O_k\ket{u_k^{(n)}}\]
+    for \(n = 1, \dotsc, g\).
+    That is that \(O_k\) is an eigenvalue for \(g\) fundamentally different eigenvectors (as opposed to scaled versions of the same eigenvector).
+    
+    Any linear combination of the form
+    \[\sum_{n=1}^{g}c_n\ket{u_k^{(n)}}\]
+    where \(c_k\in\complex\) is also an eigenstate of \(\operator{O}\), this is fairly easy to show using the linearity of \(\operator{O}\):
+    \begin{align*}
+        \operator{O}\sum_{n=1}^{g}c_n\ket{u_k^{(n)}} &= \sum_{n=1}^{g}c_n\operator{O}\ket{u_k^{(n)}}\\
+        &= \sum_{n=1}^{g}c_nO_k\ket{u_k^{(n)}}\\
+        &= O_k\sum_{n=1}^{g}c_n\ket{u_k^{(n)}}.
+    \end{align*}
+    In fact any set of eigenvectors with degenerate eigenvalues forms a \(g\)-dimensional vector subspace of \(\hilbert\).
+    
+    One logical question that we may ask now is what do the eigenstates represent?
+    We can try to measure the expected value of \(O\) in a system that is the state \(\ket{\psi_k}\) which is an eigenstate of \(\operator{O}\) with eigenvalue \(O_k\).
+    We get
+    \begin{align*}
+        \expected{O} &= \bra{\psi_k}\operator{O}\ket{\psi_k}\\
+        &= \bra{\psi_k}O_k\ket{\psi_k}\\
+        &= O_k\braket{\psi_k}{\psi_k}\\
+        &= O_k.
+    \end{align*}
+    So the expected value of \(O\) measured on its eigenstate, \(\ket{\psi_k}\), is \(O_k\).
+    We can also compute the variance:
+    \begin{align*}
+        \Var_{\psi_k}[O] &= \expected{O^2} - \expected{O}^2\\
+        &= \bra{\psi_k}\operator{O}^2\ket{\psi_k} - [\bra{\psi_k}\operator{O}\ket{\psi_k}]^2\\
+        &= \bra{\psi_k}O_k^2\ket{\psi_k} - [\bra{\psi_k}O_k\ket{\psi_k}]^2\\
+        &= O_k^2\braket{\psi_k}{\psi_k} - [O_k\braket{\psi_k}{\psi_k}]^2\\
+        &= O_k^2 - O_k^2\\
+        &= 0.
+    \end{align*}
+    where we have used the result of theorem~\ref{thm:op^n ket = eigenvalue^n ket}, which states \(\operator{O}^2\ket{\psi_k} = O_k^2\ket{\psi_k}\) so
+    \[\bra{\psi_k}\operator{O}^2\ket{\psi_k} = \bra{\psi_k}O_k^2\ket{\psi_k} = O_k^2\braket{\psi_k}{\psi_k}.\]
+    The important thing is that the expected value is \(O_k\) and the variance is zero.
+    This means that there is no spread in the values measured and so \(O^{(i)} = O_k\) for all \(i\).
+    This means that in the state \(\ket{\psi_k}\) when we measure \(O\) we get \(O_k\) with probability 1.
+    
+    \subsection{Hermitian Operators}
+    \subsubsection{Hermitian Conjugate}
+    Let \(\operator{O}\colon\hilbert\to\hilbert\).
+    Then we define the \define{hermitian conjugate} of \(\operator{O}\), denoted \(\operator{O}\hermit\), to be another operator, \(\operator{O}\hermit\colon\hilbert\to\hilbert\), defined such that for all \(\ket{\varphi}, \ket{\psi}\in\hilbert\)
+    \[\bra{\varphi}\operator{O}\hermit\ket{\psi} = [\bra{\psi}\operator{O}\ket{\varphi}]^*.\]
+    Compare this to the usual linear algebra definition:
+    \[O_{ij}\hermit = O_{ji}^*.\]
+    We see that since \(\bra{\varphi}\operator{O}\hermit\ket{\psi}\) gives the matrix elements of \(\operator{O}\hermit\) these two definitions are equivalent.
+    
+    \begin{example}\label{exa:hermitian conjugate of the derivative}
+        Consider the operator \(\operator{O} = \dv{x}\) defined by
+        \begin{align*}
+            \bra{x}\operator{O}\ket{\psi} &= \bra{x}\dv{x}\ket{\psi}\\
+            &= \dv{x}\braket{x}{\psi}\\
+            &= \dv{x}\psi(x).
+        \end{align*}
+        Compute \(\operator{O}\hermit\).
+        \begin{align*}
+            \bra{\varphi}\operator{O}\hermit\ket{\psi} &= [\bra{\psi}\operator{O}\ket{\varphi}]^*
+            \shortintertext{inserting completeness gives}
+            &= \left[ \int_{-\infty}^{\infty} \dd{x} \braket{\psi}{x}\bra{x}\operator{O}\ket{\varphi} \right]^*\\
+            &= \left[ \int_{-\infty}^{\infty} \dd{x} \psi(x)^*\dv{x}\varphi(x) \right]^*.\stepcounter{equation}\tag{\theequation}\label{eqn:int psi d/dx phi}
+        \end{align*}
+        We can now integrate by parts:
+        \[
+            \begin{array}{ll}
+                u = \psi(x)^*, & v = \varphi(x),\\
+                u' = \dv{x}\psi(x)^*, & v' = \dv{x}\varphi(x).
+            \end{array}
+        \]
+        \begin{align*}
+            \bra{\varphi}\operator{O}\hermit\ket{\psi} &= \left[ [\psi(x)^*\varphi(x)]_{-\infty}^{\infty} - \int_{-\infty}^{\infty} \dd{x} \varphi(x)\dv{x}\psi(x)^* \right]^*
+            \shortintertext{this first term is zero as \(\psi\) and \(\varphi\) are wave functions so are square integrable so they vanish at infinity leaving us with}
+            &= \left[ -\int_{-\infty}^{\infty} \dd{x} \varphi(x)\dv{x}\psi(x)^* \right]^*\\
+            &= -\int_{-\infty}^{\infty} \dd{x} \varphi(x)^*\dv{x}\psi(x)\\
+            &= -\int_{-\infty}^{\infty} \dd{x} \braket{\varphi}{x}\bra{x}\operator{O}\ket{\psi}\\
+            &= -\bra{\varphi}\operator{O}\ket{\psi}.
+        \end{align*}
+        So we can identify
+        \[\left(\dv{x}\right)\hermit = -\dv{x}.\]
+    \end{example}
+    
+    \subsubsection{Hermitian Operator}
+    An operator, \(\operator{O}\colon\hilbert\to\hilbert\), is \define{hermitian} if \(\operator{O}\hermit = \operator{O}\).
+    We saw in example~\ref{exa:hermitian conjugate of the derivative} that \(\dv{x}\) is \emph{not} hermitian as \(\operator{O}\hermit = -\operator{O}\), this property is actually called being \define{anti-hermitian}.
+    \begin{example}\label{exa:momentum operator hermitian}
+        Show that \(\operator{O} = -i\hbar\dv{x}\) is hermitian.
+        This operator will be important later.
+        \begin{align*}
+            \bra{\varphi}\operator{O}\hermit\ket{\psi} &= [\bra{\psi}\operator{O}\ket{\varphi}]^*\\
+            &= \left[ \int_{-\infty}^{\infty} \dd{x} \braket{\psi}{x}\bra{x}\operator{O}\ket{\varphi} \right]^*\\
+            &= \left[ \int_{-\infty}^{\infty} \dd{x} \psi(x)\left(-i\hbar\dv{x}\right) \ket{\varphi}\right]^*\\
+            &= \left[ -i\hbar\int_{-\infty}^{\infty} \dd{x} \psi(x)\dv{x} \varphi(x)\right]^*\\
+            &= i\hbar \int_{-\infty}^{\infty} \dd{x} \psi(x)^*\dv{x}\varphi(x)\\
+            \shortintertext{see equation~\ref{eqn:int psi d/dx phi} for how to do this integral}
+            &= -i\hbar \int_{-\infty}^{\infty} \dd{x} \varphi(x)^*\dv{x}\psi(x)\\
+            &= \int_{-\infty}^{\infty} \dd{x} \varphi(x)^*\left(-i\hbar\dv{x}\right) \psi(x)\\
+            &= \int_{-\infty}^{\infty} \dd{x} \braket{\varphi}{x}\bra{x}\operator{O}\ket{\psi}\\
+            &= \bra{\varphi}\operator{O}\ket{\psi}.
+        \end{align*}
+        So we can identify that
+        \[\left(-i\hbar\dv{x}\right)\hermit = -i\hbar\dv{x}\]
+        so this is a hermitian operator.
+    \end{example}
+    \subsubsection{Properties of Hermitian Operators}
+    The following important properties of hermitian operators make incredibly important to \acrshort{qm}:
+    \begin{enumerate}
+        \item Hermitian operators have real eigenvalues.
+        That is if \(\operator{O}\colon\hilbert\to\hilbert\) and
+        \[\operator{O}\ket{\psi_k} = O_k\ket{\psi_k}\]
+        then
+        \[\operator{O} = \operator{O}\hermit \implies O_k\in\reals.\]
+        
+        \item The eigenstates of a hermitian operator that belong to different eigenvalues are orthogonal.
+        That is if \(\operator{O}\colon\hilbert\to\hilbert\),
+        \[\operator{O}\ket{\psi_k} = O_k\ket{\psi_k}, \qquad\text{and}\qquad \operator{O}\ket{\psi_l} = O_l\ket{\psi_l}\]
+        where \(O_k \ne O_l\) then
+        \[\braket{\psi_k}{\psi_l} = 0.\]
+        
+        \item If \(\operator{O}\colon\hilbert\to\hilbert\) then there exists an orthogonal basis of \(\hilbert\) made of eigenvectors of \(\operator{O}\).
+        In other words \(\ket{\psi}\in\hilbert\) can be written as
+        \[\ket{\psi} = \sum_k c_k\ket{\psi_k}\]
+        where \(c_k\in\complex\) are given by
+        \[c_k = \braket{\psi_k}{\psi}.\]
+    \end{enumerate}
+    We can prove these fairly easily:
+    \begin{theorem}
+        Hermitian operators have real eigenvalues.
+    \end{theorem}
+    \begin{proof}
+        Suppose \(\operator{O}\) is a hermitian operator on \(\hilbert\).
+        Let \(\ket{\psi_k}\) be a normalised eigenvector of \(\operator{O}\) with eigenvalue \(O_k\).
+        Then
+        \[\operator{O}\ket{\psi_k} = O_k\ket{\psi_k}.\]
+        Taking an inner product with \(\bra{\psi_k}\) we get
+        \begin{equation}\label{eqn:psi_k O psi_k = O_k}
+            \bra{\psi_k}\operator{O}\ket{\psi_k} = \bra{\psi_k}O_k\ket{\psi_k} = O_k\braket{\psi_k}{\psi_k} = O_k
+        \end{equation}
+        where we have used the fact that \(\ket{\psi_k}\) is normalised so \(\braket{\psi_k}{\psi_k} = 1\).
+        Taking the complex conjugate of this equation gives us
+        \[[\bra{\psi_k}\operator{O}\ket{\psi_k}]^* = O_k^*.\]
+        Using the definition of the hermitian conjugate the left hand side is equivalent to
+        \[\bra{\psi_k}\operator{O}\hermit\ket{\psi_k}.\]
+        Since \(\operator{O}\) is hermitian this in turn is equivalent to
+        \[\bra{\psi_k}\operator{O}\ket{\psi_k},\]
+        which, as we saw in equation~\ref{eqn:psi_k O psi_k = O_k}, is just \(O_k\).
+        This means that we have
+        \[O_k = O_k^*\]
+        which can only be true if \(O_k\in\reals\).
+    \end{proof}
+    \begin{theorem}
+        The eigenfunctions of a hermitian operator which belong to different eigenvalues are orthogonal.
+    \end{theorem}
+    \begin{proof}
+        Let \(\operator{O}\) be an operator on \(\hilbert\).
+        Suppose that
+        \[\operator{O}\ket{\psi_1} = O_1\ket{\psi_1}, \qquad\text{and}\qquad \operator{O}\ket{\psi_2} = O_2\ket{\psi_2}\]
+        where \(O_1 \ne O_2\).
+        Taking the inner product of the first of these equations with \(\bra{\psi_2}\) we have
+        \begin{equation}\label{eqn:psi_2 O psi_1 = O_1 psi_2 psi_1}
+            \bra{\psi_2}\operator{O}\ket{\psi_1} = O_1\braket{\psi_2}{\psi_1}.
+        \end{equation}
+        Instead taking the inner product of the second equation with \(\bra{\psi_1}\) we have
+        \[\bra{\psi_1}\operator{O}\ket{\psi_2} = O_2\braket{\psi_1}{\psi_2}.\]
+        Taking the complex conjugate, using the definition of the hermitian conjugate, and then using the fact that \(\operator{O}\hermit = \operator{O}\) the left hand side of the above equation gives us
+        \[[\bra{\psi_1}\operator{O}\ket{\psi_2}]^* = \bra{\psi_2}\operator{O}\hermit\ket{\psi_1} = \bra{\psi_2}\operator{O}\ket{\psi_1}.\]
+        The right hand side gives
+        \[O_2^*\braket{\psi_1}{\psi_2} = O_2\braket{\psi_1}{\psi_2},\]
+        where we have used the fact that \(\operator{O}\) is hermitian so its eigenvalues are real and therefore \(O_2^* = O_2\).
+        Comparing this with equation~\ref{eqn:psi_2 O psi_1 = O_1 psi_2 psi_1} we see that
+        \[O_2\braket{\psi_2}{\psi_1} = O_1\braket{\psi_2}{\psi_1}\]
+        which gives us
+        \[(O_2 - O_1)\braket{\psi_2}{\psi_1} = 0.\]
+        Given that \(\complex\) is a field and so has no zero divisors either \(O_2 - O_1 = 0\) or \(\braket{\psi_2}{\psi_1} = 0\).
+        By our assumption \(O_2 - O_1\ne 0\) so we must have \(\braket{\psi_2}{\psi_1} = 0\).
+        This means that \(\ket{\psi_1}\) and \(\ket{\psi_2}\) are orthogonal.
+    \end{proof}
+    
+    The reason that the first of these properties, that the eigenvalues are real, is important is that we expect real results from an experiment and therefore it only makes sense to have the eigenvalues of an observable be real.
+    The other two properties become useful when doing theory as working in the basis given by the eigenvectors, called the eigenbasis, can simplify a lot of equations.
+    The process of moving into this eigenbasis is called spectral decomposition.
+    
+    \subsubsection{Spectral Decomposition}
+    \begin{postulate}
+        An observable, \(O\), has an associated hermitian linear operator, \(\operator{O}\colon\hilbert\to\hilbert\), which has a nondegenerate eigenvalue \(O_k\) and associated eigenvector \(\ket{\psi_k}\).
+        Given a normalised state, \(\ket{\psi}\in\hilbert\), the probability of measuring \(O\) to be \(O_k\) is
+        \[P_k = \abs{c_k}^2 = \abs{\braket{\psi_k}{\psi}}^2\]
+        where \(c_k\in\complex\) are the coordinates of \(\ket{\psi}\) in the basis made of the eigenvectors of \(\operator{O}\):
+        \[\ket{\psi} = \sum_{k}c_k\ket{\psi_k}.\]
+        In the case that \(O_k\) is \(g\)-fold degenerate and has the vectors \(\{\ket{u_k^{(n)}}\}\) as its eigenvectors then the probability of measuring \(O\) to be \(O_k\) is instead the sum of the contributions from the whole subspace spanned by \(\{\ket{u_k^{(n)}}\}\):
+        \[P_k = \sum_{n=1}^{g} \abs{\braket{u_k^{(n)}}{\psi}}^2.\]
+    \end{postulate}
+    This postulate is the reason that we require states be normalised because this means that
+    \[\sum_k P_k = \sum_k\sum_{n=1}^{g_k}\abs{\braket{u_k^{(n)}}{\psi}}^2 = 1,\]
+    where \(g_k\) is the degeneracy of the eigenvalue \(O_k\).
+    In the case of non-degenerate eigenvalues the second sum has only one term and we recover the more familiar requirement that
+    \[\sum_k \abs{\braket{\psi_k}{\psi}}^2 = 1.\]
+    
+    
+    \section{Collapse of the State Vector}
+    Suppose we have a state \(\ket{\psi}\) and we measure the observable \(O\) and get a value of \(O_k\) which has the associated eigenvector \(\ket{\psi_k}\).
+    Immediately after performing this measurement we know that the value of \(O\) is \(O_k\) with probability 1.
+    This must mean that the system is in state \(\ket{\psi_k}\).
+    The act of measuring changes the state of the system.
+    This is true for all measurements we could make.
+    \begin{postulate}
+        Immediately after a measurement that gives the result \(O_k\), where \(O_k\) is a non-degenerate eigenvalue of \(\operator{O}\), the state of the system is \(\ket{\psi_k}\), which is the eigenvector associated with \(O_k\).
+        The state vector has been projected onto the eigenstate by the process of performing the measurement.
+    \end{postulate}
+    Mathematically what this looks like is we start with a state, \(\ket{\psi}\), and perform some sort of measurement.
+    The outcome of the measurement is \(O_k\) with probability \(\abs{\braket{\psi_k}{\psi}}^2\).
+    After the experiment the state is
+    \[\frac{1}{\sqrt{\bra{\psi}\operator{\proj}_k\ket{\psi}}}\operator{\proj}_k\ket{\psi}.\]
+    Here \(\operator{\proj}_k = \ketbra{\psi_k}{\psi_k}\) is the projection operator onto the eigenspace of \(\ket{\psi_k}\).
+    
+    If instead \(O_k\) has degeneracy \(g_k\) then
+    \[\operator{\proj}_k = \sum_{n=1}^{g_k} \ketbra{u_k^{n}}{u_k^{(n)}}\]
+    where \(\ket{u_k^{(n)}}\) are the eigenvectors with eigenvalue \(O_k\) for \(n = 1, \dotsc, g_k\).
+    The state after measurement is then
+    \[\frac{1}{\sqrt{\sum_{n=1}^{g_k}\abs{c_k^{(n)}}^2}} \sum_{n=1}^{g_k}c_k^{(n)} \abs{u_k^{(n)}}.\]
+    
+    \subsection{Compatible Observables}
+    Suppose \(A\) and \(B\) are observables.
+    If we take three measurements, first measuring \(A\), then \(B\), then \(A\) again, \(A\) and \(B\) are said to be \define{compatible} if and only if the result of the third measurement is equal to the result of the first measurement with probability one.
+    That is measuring \(B\) doesn't change the outcome of measuring \(A\).
+    
+    Suppose that \(A\) and \(B\) have associated operators \(\operator{A}\) and \(\operator{B}\) respectively, which have no degenerate eigenvalues.
+    Suppose also that
+    \[\operator{A}\ket{u_i} = A_i\ket{u_i}, \qquad\text{and}\qquad \operator{B}\ket{v_i} = B_i\ket{v_i}.\]
+    After we measure \(A\) if we get a value of \(A_j\) then the state of the system is \(\ket{u_j}\).
+    Next we measure \(B\) and we get \(B_k\) meaning that the system is in the state \(\ket{v_k}\).
+    The only way that we can guarantee another measurement of \(A\) will yield the same value as the first is if \(\ket{v_k} = \ket{u_j}\).
+    For this to hold for all possible values of the measurement we must have that \(\ket{v_k} = \ket{v_j}\) for all possible values of \((i, j)\).
+    If there is no degeneracy then we have a one to one correspondence between eigenvectors of \(\operator{A}\) and eigenvectors of \(\operator{B}\).
+    We say that \(\operator{A}\) and \(\operator{B}\) have a common eigenbasis.
+    
+    The conditions under which \(A\) and \(B\) are compatible are summarised in the compatibility theorem:
+    \begin{theorem}[The Compatibility Theorem]
+        Given two observables, \(A\) and \(B\), with associated operators \(\operator{A}\) and \(\operator{B}\), then the following are equivalent:
+        \begin{enumerate}
+            \item \(A\) and \(B\) are compatible observables,
+            \item \(\operator{A}\) and \(\operator{B}\) have a common eigenbasis,
+            \item The operators \(\operator{A}\) and \(\operator{B}\) commute: \([\operator{A}, \operator{B}] = 0\).
+        \end{enumerate}
+    \end{theorem}
+    Due to the third condition compatible observables are sometimes called \define{commuting observables}.
+    
+    \subsection{Complete Sets of Compatible observables}
+    Consider an observable \(A\) with associated operator \(\operator{A}\).
+    Let the eigenbasis of \(\operator{A}\) be \(\{u_i\}\).
+    In the case of no degeneracy we have
+    \[\operator{A}\ket{u_k} = a_k\ket{u_k}.\]
+    We can identify the eigenvector \(\ket{u_k}\) by its eigenvalue, which we do by writing it \(\ket{a_k}\).
+    \(A\) is then trivially a \gls{csco} by itself.
+    
+    In the case where there is degeneracy we can introduce another observable, \(B\), which is compatible with \(A\).
+    It is possible to find a common eigenbasis of \(\operator{A}\) and \(\operator{B}\).
+    Call this eigenbasis \(\{\ket{v_k^{(n)}}\}\) where \(n=1,\dotsc, g_k\).
+    Suppose that
+    \[\operator{A}\ket{v_k^{(n)}} = a_i\ket{v_k^{(n)}}, \qquad\text{and}\qquad \operator{B}\ket{v_k^{(n)}} = b_j\ket{v_k^{(n)}}.\]
+    If \((a_i, b_j)\) uniquely identifies this eigenstate then \(A\) and \(B\) are a \gls{csco}.
+    We then write \(\ket{v_{k}^{(n)}} = \ket{a_i, b_j}\).
+    
+    If \((a_i, b_j)\) does not uniquely identify \(\ket{v_k^{(n)}}\) then we simply keep introducing observables that are compatible with all previously introduced observables until we have a tuple of eigenvalues that does uniquely identify each eigenvector.
+    
+    That is \(\{A, B, C, \dotsc\}\) is a \define{\acrfull{csco}} if and only if:
+    \begin{itemize}
+        \item All observables commute in pairs,
+        \item Specifying all the eigenvalues of the operators identifies a unique eigenvector in the common eigenbasis.
+    \end{itemize}
+
+    Given a \gls{csco}, for example, \(\{A, B, C\}\), we can expand a state in the common eigenbasis as
+    \[\ket{\psi} = \sum_{n, p, q}c_{npq}\ket{a_n,b_p,c_q}.\]
+    The probability of measuring \(a_n\), \(b_p\), and \(c_q\) simultaneously is then \(\abs{c_{npq}}^2\).
+    
+    \section{Continuous Spectra}
+    Up to now we have only considered eigenvalues and eigenvectors that can be identified by a discrete variable, \(k\).
+    We can also have eigenvalues that are represented by a continuous variable, \(f\).
+    For example
+    \[\operator{f}\ket{f} = f\ket{f}\]
+    where we follow the convention of identifying an eigenvector by the associated eigenvalue.
+    Assuming that \(\operator{f}\) is hermitian then \(f\in\reals\).
+    The completeness relation for a continuous basis set is
+    \[\int\dd{f}\ketbra{f}{f} = \ident.\]
+    We can expand a generic state, \(\ket{\psi}\), in this basis:
+    \[\ket{\psi} = \int\dd{f} c(f)\ket{f}.\]
+    Here \(c(f)\) plays the role of the coordinates of \(\ket{\psi}\) in the same way that \(c_k\) did in the discrete case.
+    The method for computing \(c(f)\) is the same as in the discrete case:
+    \begin{align*}
+        c(f) &= \braket{f}{\psi}\\
+        &= \int\dd{x} \braket{f}{x}\braket{x}{\psi}\\
+        &= \int\dd{x} f^*(x)\psi(x).
+    \end{align*}
+    Since we now have a continuous variable the probability of any one particular value has to be zero.
+    However \(\abs{c(f)}^2\) does give the probability density such that
+    \[P(f\in[f_-, f_+]) = \int_{f_-}^{f_+} \dd{f} \abs{c(f)}^2.\]
+    To be properly normalised we demand that
+    \[\int_{-\infty}^{\infty} \dd{f}\abs{c(f)}^2 = 1.\]
+    
+    Perhaps the most common continuous observable to consider is the position.
+    The operator for position is \(\operator{X}\) and its action on \(\ket{\psi}\) is
+    \[\operator{X}\ket{\psi} = x\ket{\psi}.\]
+    Note that this is \emph{not} an eigenvalue equation, \(x\) is a variable not a constant and this holds for all \(\ket{\psi}\).
+    This is simply a statement that the action of \(\operator{X}\) is to multiply the state by \(x\).
+    The effect that this has on the wave function is as we would expect:
+    \begin{align*}
+        \operator{X}\ket{\psi} &= \operator{X}\left[\int\dd{x} \psi(x)\ket{x}\right]\\
+        &= \int\dd{x} \psi(x)\operator{X}\ket{x}\\
+        &= \int\dd{x} \psi(x)x\ket{x}\\
+        &= \int\dd{x} \varphi(x)\ket{x}\\
+        &= \ket{\varphi}
+    \end{align*}
+    where \(\ket{\varphi}\) is defined to be such that \(\braket{x}{\varphi} = \varphi(x) = x\psi(x)\).
+    Being slightly lazy with notation we will sometimes write things like
+    \[\operator{X}\psi(x) = x\psi(x)\]
+    which is not, strictly speaking, defined as operators can only act on elements of \(\hilbert\), not on the coordinates of these vectors.
+    However the meaning should be clear enough that it doesn't matter.
+    
+    \subsection{Orthonormality}
+    Suppose that \(f\) and \(f'\) distinct eigenvalues of \(\operator{f}\).
+    Then by definition
+    \[\operator{f}\ket{f} = f\ket{f},\qquad\text{and}\qquad \operator{f}\ket{f'} = f'\ket{f'}.\]
+    We can compute matrix elements of \(\operator{f}\):
+    \[\bra{f'}\operator{f}\ket{f} = f\braket{f'}{f},\]
+    or using the hermitian property of \(\operator{f}\):
+    \begin{align*}
+        \bra{f'}\operator{f}\ket{f} &= (\bra{f}\operator{f}\hermit\ket{f'})^*\\
+        &= (\bra{f}\operator{f}\ket{f'})^*\\
+        &= (f'\braket{f}{f'})^*\\
+        &= {f'}^*(\braket{f}{f'})^*\\
+        &= f'\braket{f'}{f}.
+    \end{align*}
+    Hence
+    \[(f - f')\braket{f'}{f} = 0.\]
+    Assuming that \(f \ne f'\) then \(f - f' \ne 0\) so \(\braket{f'}{f} = 0\).
+    
+    Consider the state \(\ket{\psi}\) expanded in this basis:
+    \[\ket{\psi} = \int\dd{f} c(f)\ket{f}.\]
+    We can compute \(\norm{\psi}\):
+    \begin{align*}
+        \norm{\psi}^2 &= \braket{\psi}{\psi}\\
+        &= \int\dd{f'}f^*(f')\bra{f'}\int\dd{f}c(f)\ket{f}\\
+        &= \int\dd{f'}\dd{f}c^*(f)c(f)\braket{f'}{f}\\
+        &= \int\dd{f}c^*(f)c(f)\braket{f}{f}\\
+        &= \int\dd{f}\abs{c(f)}^2\braket{f}{f}
+    \end{align*}
+    Here we have used that \(\braket{f'}{f}\) is zero apart from when \(f = f'\) to replace \(f'\) with \(f\) while removing one of the integrals.
+    We also require that \(\norm{\psi} = 1\) and we already have that
+    \[\int\abs{c(f)}^2 = 1\]
+    so we must have
+    \[\int\dd{f}\braket{f}{f} = 1.\]
+    The properties that we have described so far for \(\braket{f'}{f}\) are exactly the definition of the Dirac delta function:
+    \[\braket{f'}{f} = \delta(f - f').\]
+    
+    \begin{example}
+        Consider a system on a line.
+        The position operator, \(\operator{X}\), is defined as
+        \[\operator{X}\ket{x} = x\ket{x}.\]
+        A generic state is
+        \[\ket{\psi} = \int\dd{x}\psi(x)\ket{x}\]
+        where
+        \[\psi(x) = \braket{x}{\psi}.\]
+        By definition
+        \[\braket{x}{x'} = \delta(x - x').\]
+        Thus
+        \begin{align*}
+            \braket{\psi}{\psi} &= \int\dd{x}\dd{x'}\psi^*(x)\psi(x')\braket{x}{x'}\\
+            &= \int\dd{x}\dd{x'}\psi^*(x)\psi(x')\delta(x - x')\\
+            &= \int\dd{x}\psi^*(x)\psi(x)\\
+            &= \int\dd{x}\abs{\psi(x)}^2.
+        \end{align*}
+        Consider now the state that has a wave function given by
+        \[\psi(x) = c\exp\left[\frac{i}{\hbar}p_0x - \frac{(x - x_0)^2}{2\xi^2}\right]\]
+        where \(x_0\), \(p_0\), and \(\xi\) are constants and \(c\in\reals\) is a normalisation factor.
+        \begin{align*}
+            \braket{\psi}{\psi} &= \int_{-\infty}^{\infty} \abs{\psi(x)}^2\\
+            &= \int_{-\infty}^{\infty} c^2\exp\left[-\frac{(x - x_0)^2}{2\xi^2}\right]\\
+            &= c^2\xi\sqrt{\pi}.
+        \end{align*}
+        Requiring a normalised state we then have
+        \[c = \frac{1}{\pi^{1/4}\sqrt{\xi}}.\]
+        The expected position is given by
+        \begin{align*}
+            \expected{x} &= \int\dd{x} x\abs{\psi(x)}^2\\
+            &= \frac{1}{\xi\sqrt{\pi}}\int\dd{x} x\exp\left[-\frac{(x - x_0)^2}{2\xi^2}\right]\\
+            &= x_0.
+        \end{align*}
+        Similarly it can be shown that
+        \[\expected{\Delta x^2} = \expected{(x - x_0)^2} = \xi^2.\]
+        This can be shown by computing the integrals or recognising the integrands as Gaussians and hence we are simply computing the moments of this distribution.
+    \end{example}
+    \subsection{Momentum Operator}
+    The momentum operator, \(\operator{P}\colon\hilbert\to\hilbert\), is defined by
+    \[\bra{x}\operator{P}\ket{\psi} = \operator{P}\psi(x) = -i\hbar\dv{x}\psi(x).\]
+    We saw in example~\ref{exa:momentum operator hermitian} that this is a hermitian operator.
+    One justification for calling this a momentum operator comes from a plane wave with momentum \(p\):
+    \[\psi_p(x) = \exp\left[\frac{ipx}{\hbar}\right].\]
+    When we act on this with the momentum operator we get
+    \begin{align*}
+        \operator{P}\psi_p(x) &= -i\hbar\dv{x}\exp\left[\frac{ipx}{\hbar}\right]\\
+        &= -i\hbar\frac{ip}{\hbar}\exp\left[\frac{ipx}{\hbar}\right]\\
+        &= p\psi_p(x)
+    \end{align*}
+    So, at least in this case, the momentum is an eigenvalue of \(\operator{P}\).
+    
+    Momentum is a conserved variable.
+    By Noether's every conserved variable has a related transformation.
+    The transformation related to momentum is translations.
+    We can describe a small translation about the coordinate \(x\) by an amount \(a\) as
+    \[\psi(x + a) = \psi(x) + a\dv{x}\psi(x) + \order{a^2}.\]
+    However \(\inlinedv{}{x}\) is an anti-hermitian operator.
+    Fortunately there is an easy fix for this, if \(A\) is anti-hermitian then \(iA\) is hermitian.
+    This means we can write
+    \[\psi(x + a) = \psi(x) + \frac{i}{\hbar}\left(-i\hbar\dv{x}\right)\psi(x) + \order{a^2}.\]
+    The factor of \(\hbar\) is convention and ensures that we have the correct units.
+    In this way the momentum operator is the generator of translations.
+    
+    \subsection{The Canonical Commutation Relation}
+    Consider the two operators that we have met so far that are related to actual observables, the position, \(\operator{X}\), and momentum, \(\operator{P}\).
+    The commutator of these two operators is fairly easy to compute:
+    \begin{align*}
+        \operator{X}\operator{P}\psi(x) &= \operator{X}\left[-i\hbar\dv{x}\psi(x)\right]\\
+        &= -i\hbar x\dv{x}\psi(x)\\
+        \operator{P}\operator{X}\psi &= \operator{P}x\psi(x)\\
+        &= -i\hbar\dv{x}[x\psi(x)]\\
+        &= -i\hbar x\dv{x}\psi(x) - i\hbar\psi(x)\\
+        [\operator{X}, \operator{P}]\psi &= \operator{X}\operator{P} - \operator{P}\operator{X}\\
+        &= -i\hbar x\dv{x}\psi(x) + i\hbar x\dv{x}\psi(x) + i\hbar\psi(x)\\
+        &= i\hbar\psi(x)
+    \end{align*}
+    This holds for all \(\psi\) therefore we conclude that
+    \begin{empheq}[box=\equationBox]{equation*}
+        [\operator{X}, \operator{P}] = i\hbar.
+    \end{empheq}
+    This is called the \define{canonical commutation relation}.
+    From this we can derive the \define{\gls{hup}}:
+    \begin{empheq}[box=\equationBox]{equation*}
+        \Delta x\Delta p \ge \frac{\hbar}{2}.
+    \end{empheq}
