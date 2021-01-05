@@ -60,7 +60,7 @@ While this material is based mostly on material delivered by lecturers in lectur
 Where appropriate I have cited sources but any unsourced material is either my own or that of the lecturer/textbook mentioned at the start of the document.
 Any mistakes in these notes are my own, as are any views expressed within.
 
-#### Lecturers
+### Lecturers
 As the main source of this material I would like to thank the following people who lectured for at least one course, in no particular order:
 * [Dr Ross Galloway](https://www.ph.ed.uk/people/ross-galloway)
 * [Dr Will Hossack](https://www.ph.ed.uk/people/will-hossack)
