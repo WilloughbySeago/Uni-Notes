@@ -1,0 +1,150 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{NotesPackage2}[2020/08/28]
+
+% ams
+\RequirePackage{amsmath}  % lots of maths symbols
+\RequirePackage{amsthm}  % theorem/definition/proof environments
+\RequirePackage{amssymb}  % more maths symbols
+% Figures
+\RequirePackage{tikz}  % Draw things
+\RequirePackage{graphicx}  % Import images
+% Other
+\RequirePackage{mathtools}  % Even more maths commands
+\RequirePackage{enumitem}  % Allows for more control over lists
+\RequirePackage{physics}  % Lots of physics and maths stuff
+\RequirePackage{tensor}  % For typesetting indices
+\RequirePackage{siunitx}  % Easy unit typesetting
+\RequirePackage{centernot}  % Put a slash through anything
+\RequirePackage{bm}  % Bold but still looks nice and slanty
+\RequirePackage{csquotes}  % For including displayqoutes
+% Page set up
+\RequirePackage[justification=centering]{caption}  % centre captions
+\RequirePackage{fancyhdr}  % headers and footers
+\RequirePackage{tocloft}  % table of contents
+\RequirePackage{titlesec}  % titles
+\RequirePackage{parskip}  % no indent
+\RequirePackage[a4paper, margin=1in]{geometry}  % smaller margins
+\RequirePackage[section]{placeins}  % make all figures show before the start of the next section
+\RequirePackage{tocbibind}
+% Fonts
+\RequirePackage{dsfont}  % like blackboard bold but more characters
+\RequirePackage{mathrsfs}  % adds \mathsrc font for Lagrangian density
+% hyperref should be last
+\RequirePackage{hyperref}  % links within (and out of) document
+% glossaries needs to be after hyperref for links to work
+\RequirePackage[nonumberlist, toc, nogroupskip]{glossaries}  % For setting up glossaries and list of acronyms
+
+% setting up table of contents
+\cftsetindents{section}{0.75em}{1.5em}  % control how much sections are indented in the contents table
+\renewcommand{\cftdot}{.}  % set the line marker from title to page number in the contents table
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}  % fill the space with the line marker declared above
+
+% Numbering of figures/tables/equations restarts each section
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+\counterwithin{equation}{section}
+
+% set up for glossaries
+\setlength\LTleft{0pt}
+\setlength\LTright{0pt}
+\setlength\glsdescwidth{0.8\hsize}
+\renewcommand{\glsnamefont}[1]{\textbf{#1}}
+ 
+ % Set up for some of the other packages
+\allowdisplaybreaks  % allows grouped maths like align to go over multiple pages
+\graphicspath{ {./Images/} }  % tells graphicx where images are stored relative to this file
+\hypersetup{hidelinks}  % makes links invisible
+
+\newcommand{\notespackage}{\textbf{\Huge You are using notespackage2}}  % Check what version is being used
+
+% define commands to bold words being defined
+\newcommand{\define}[1]{\textbf{#1}}
+\newcommand{\mathdefine}[1]{\bm{#1}}
+
+% Vectors
+\newcommand{\vv}[1]{\bm{#1}}  % For writing vectors as bold
+\newcommand{\vh}[1]{\vv{\hat{#1}}}  % For writing unit vectors as bold with a hat `^' accent
+\newcommand{\ve}[1]{\vv{e_{#1}}}  % for writing basis vectors as a bold e with subscript
+\newcommand{\vi}{\vh{\imath}}  % i basis unit vector
+\newcommand{\vj}{\vh{\jmath}}  % j basis unit vector
+\newcommand{\vk}{\vh{k}}  % k basis unit vector
+
+% matrices 
+\newcommand{\trans}{^{\mkern-1.5mu\mathsf{T}}}  % Transpose ^T
+\newcommand{\hermit}{^\dagger}  % Hermitian conjugate ^dagger
+\newcommand{\ident}{\mathds{1}}  % identity matrix as a double struck 1, change in the document with \renewcommand for local changes
+\DeclareMathOperator{\diag}{diag}  % shorthand for diagonal matrices eg identity in 3D = \diag(1, 1, 1) or Minkowski metric in (+---) = \diag(1, -1, -1, -1)
+
+% Tensors
+\newcommand{\preindex}[2]{\tensor[{#1}]{{#2}}{}}  % for adding indices only infront of an object
+
+% Quantifiers
+\newcommand{\A}{\,\forall\,}  % for all upside down A with better spacing
+\newcommand{\E}{\,\exists\,}  % exists symbol backwards E with better spacing
+
+% The following are for type setting sets of numbers such as natural numbers, real numbers, compex numbers, etc.
+% \numset is the style, set to \mathhbb{} for double struck numbers, set it to \mathrm{\mathbf{}} for bold uprigt etc.
+% \numset can be changed in the document with \renewcommand for local control
+\newcommand{\numset}[1]{\mathbb{#1}}
+\newcommand{\naturals}{\numset{N}}
+\newcommand{\integers}{\numset{Z}}
+\newcommand{\rationals}{\numset{Q}}
+\newcommand{\reals}{\numset{R}}
+\newcommand{\complex}{\numset{C}}
+\newcommand{\quaternions}{\numset{H}}
+\newcommand{\bb}[1]{\mathbb{#1}}  % for notating natural/rational/real/complex numbers, integers etc.
+
+% The Lagrangian/Lagrangian density/Hamiltonian in their fancy fonts
+\newcommand{\lagrangian}{\mathcal{L}}
+\newcommand{\lagrangianDensity}{\mathscr{L}}
+\newcommand{\hamiltonian}{\mathcal{H}}
+
+% derivatives
+% inline derivatives look like dy/dx
+\newcommand{\inlinedv}[3][]{\mathrm{d}^{#1}{#2}/\mathrm{d}{#3}^{#1}}
+\newcommand{\inlinepdv}[3][]{\partial^{#1}{#2}/\partial{#3}^{#1}}
+% pdv const is (dy/dx)_z for partial derivative of y wrt x holding z constant
+\newcommand{\pdvconst}[4][]{\left(\pdv[#1]{#2}{#3}\right)_{\!\!{#4}}}
+% pdvsec is a mixed second order partial derivative, for example dy/dxdz but partial derivatives
+\newcommand{\pdvsec}[3]{\frac{\partial^2{#1}}{\partial{#2}\partial{#3}}}
+% blahat is the same as blah|_{extra argument here} for derivatives evaluated at a point
+\newcommand{\pdvsecat}[4][]{\pdvsec{#1}{#2}{#3}\biggr|_{#4}}
+\newcommand{\dvat}[4][]{\dv[#1]{#2}{#3}\biggr|_{#4}}
+\newcommand{\pdvat}[4][]{\pdv[#1]{#2}{#3}\biggr|_{#4}}
+
+
+% grad/div/curl/laplacian operators
+\renewcommand{\grad}{\nabla}
+\renewcommand{\div}{\nabla\cdot}
+\renewcommand{\curl}{\nabla\times}
+\renewcommand{\laplacian}{\nabla^2}
+
+% QM commands
+\newcommand{\expected}[1]{\langle{#1}\rangle}
+\newcommand{\expectedNoResize}[1]{\langle {#1} \rangle}
+\newcommand{\expectedResize}[1]{\left\langle {#1} \right\rangle}
+\newcommand{\operator}[1]{\hat{#1}}
+
+% amsthm set up
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{corollary}{Corollary}[section]
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\theoremstyle{remark}
+\newtheorem{exampleInner}{Example}[section]
+
+% this environment is for examples, it produces a line along the top and bottom, the rest including starting with `Example x.y' is handeled by th amsthm environment `exampleInner' defined above
+\newenvironment{example}{\vspace{0.5em}\hrule\begin{exampleInner}}{\end{exampleInner}\vspace{0.5em}\hrule}
+
+
+\pagestyle{fancy}  % creates header and footer
+\lhead{Willoughby Seago}  % appears in top left
+\cfoot{Page \thepage}  % page number bottom right
+\renewcommand{\headrulewidth}{0.4pt}  % line at top
+\renewcommand{\footrulewidth}{0pt}  % line at bottom
+\setlength{\parindent}{0pt}  % no paragraph indent (surplus as using parskip) but it really is ugly so I want to be sure
+
+\newcommand{\testtest}{TEST THIS IS A TEST}  % just used to make sure that the correct package is in use
+
+\endinput
