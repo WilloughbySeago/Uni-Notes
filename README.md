@@ -93,6 +93,8 @@ As the main source of this material I would like to thank the following people w
 * [Prof Arjun Berera](https://www.ph.ed.uk/people/arjun-berera)
 * [Prof Graeme Ackland](https://www.ph.ed.uk/people/graeme-ackland)
 * [Prof Alexander Morozov](https://www.ph.ed.uk/people/ross-galloway)
+* [Dr Miguel Martinez-Canales](https://www.ph.ed.ac.uk/people/miguel-martinez-canales)
+* [Dr Mehdi Bouzid](https://mehdibouzid.com/)
 
 ### Bibliography
 * Liebeck, M. _A Concise Introduction To Pure Mathematics_, fourth edition (CRC Press, Boca Raton, 2016)
