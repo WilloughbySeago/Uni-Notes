@@ -29,6 +29,9 @@ Here are all the courses I took.
     * [Fourier Analysis](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Fourier-Analysis-and-Statistics/Fourier-Analysis)
     * [Statistics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Fourier-Analysis-and-Statistics/Statistics)
 * [Numerical Recipes](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Numerical-Recipes) (s1)
+* [Methods of Theoretical Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Methods-of-Theoretical-Physics) (s2)
+    * [Vectors, Tensors, and Continuum Mechanics (VTCM)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Methods-of-Theoretical-Physics/Vectors-Tensors-and-Continuum-Mechanics)
+    * [Complex Analysis (CA)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Methods-of-Theoretical-Physics/Complex-Analysis)
 
 
 ### Year 2
