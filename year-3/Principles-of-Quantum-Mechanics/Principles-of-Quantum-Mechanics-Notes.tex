@@ -1,0 +1,1043 @@
+\documentclass[a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{NotesPackage2}
+\usepackage{empheq}
+% \usepackage[most]{tcolorbox}
+\usepackage{slashbox}
+\usepackage{subcaption}
+\usepackage[version=4]{mhchem}
+\usepackage{contour}
+\usepackage{blochsphere}
+\usepackage{circuitikz}
+\usepackage{xspace}
+\usepackage{pgfplots}
+
+% Packages used by mathematica
+\usepackage{amsmath, amssymb, graphics, setspace}
+
+\usetikzlibrary{calc}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{external}
+\usetikzlibrary{angles}
+
+\tikzexternalize[prefix=tikz-external/]
+
+\pgfplotsset{compat=1.17}
+
+\author{Willoughby Seago}
+\date{September 22, 2020}
+\title{Principles of Quantum Mechanics}
+
+% Dirac notation
+\renewcommand{\ket}[1]{\vert {#1} \rangle}
+\renewcommand{\bra}[1]{\langle {#1} \vert}
+\renewcommand{\braket}[2]{\langle {#1} \vert {#2} \rangle}
+\renewcommand{\ketbra}[2]{\vert {#1}\rangle\langle {#2} \vert}
+\newcommand{\ketResize}[1]{\left| {#1} \right\rangle}
+\newcommand{\braResize}[1]{\left\langle {#1} \right\vert}
+\newcommand{\braketResize}[2]{\left\langle {#1} \middle\vert {#2} \right\rangle}
+\newcommand{\ketbraResize}[2]{\left\vert {#1} \middle\rangle\middle\langle {#2} \right\vert}
+
+% Letters for specific things where a weird font is needed
+\newcommand{\hilbert}{\mathcal{H}}
+\newcommand{\basis}{\mathcal{B}}
+\newcommand{\proj}{\mathcal{P}}
+\newcommand{\parity}{\mathscr{P}}
+\newcommand{\observable}[1]{\mathcal{#1}}
+\newcommand{\complexityClass}[1]{\ensuremath{\mathsf{#1}}\xspace}
+\newcommand{\NPcomplexity}{\complexityClass{NP}}
+\newcommand{\Pcomplexity}{\complexityClass{P}}
+\renewcommand{\order}{\mathcal{O}}
+\newcommand{\shannonEntropy}{S_{\mathrm{Sh}}}
+\newcommand{\vonNeumannEntropy}{S_{\mathrm{vN}}}
+\newcommand{\Efield}{\mathcal{E}}
+\newcommand{\Bfield}{\mathcal{B}}
+\newcommand{\Pe}{\mathrm{e}}
+\newcommand{\Pp}{\mathrm{p}}
+\newcommand{\gerade}{\mathrm{g}}
+\newcommand{\ungerade}{\mathrm{u}}
+
+% dimensions
+\newcommand{\lengthUnit}{\mathrm{length}}
+\newcommand{\energyUnit}{\mathrm{energy}}
+\newcommand{\timeUnit}{\mathrm{time}}
+\newcommand{\massUnit}{\mathrm{mass}}
+\newcommand{\momentumUnit}{\mathrm{momentum}}
+\DeclareSIUnit{\bitSI}{bit}
+\DeclareSIUnit{\bitsSI}{bits}
+\DeclareSIUnit{\symbolSI}{symbol} 
+
+% other
+\newcommand{\notesVersion}{1.1}
+\newcommand{\notesDate}{07/03/2021}
+% \renewcommand{\ident}{1}
+\newcommand{\st}{\mid}
+\newcommand{\tensorProd}{\otimes}
+\DeclareMathOperator{\squareIntegrable}{L^2}
+\DeclareMathOperator{\Var}{Var}
+\newtcbox{\equationBox}[1][]{%
+    nobeforeafter, math upper, tcbox raise base,
+    enhanced, colframe=lightgray,
+    colback=lightgray!25!white, boxrule=1pt,
+    #1}
+\newcommand{\vecoperator}[1]{\vv{\operator{#1}}}
+\newcommand{\eff}{{\mathrm{eff}}}
+\newcommand{\spinUp}{\uparrow}
+\newcommand{\spinDown}{\downarrow}
+\newcommand{\representation}{\mathrel{\rightarrow}}
+\DeclareMathOperator{\sign}{sign}
+\newcommand{\angmomsquared}[1]{{\tensor{\operator{J}}{^{(#1)}}}^2}
+\DeclareSIUnit{\rydberg}{Ry}
+\newcommand{\termNotation}[4][]{{#1}\tensor[^{#2}]{\mathrm{{#3}}}{_{#4}}}
+\newcommand{\twoVec}[2]{%
+    \begin{pmatrix}
+        {#1} \\ {#2}
+    \end{pmatrix}
+}
+\newcommand{\twoMat}[4]{%
+    \begin{pmatrix}
+        {#1} & {#2}\\
+        {#3} & {#4}
+    \end{pmatrix}
+}
+\newcommand{\fourVec}[4]{%
+    \begin{pmatrix}
+        {#1}\\ {#2}\\ {#3}\\ {#4}
+    \end{pmatrix}
+}
+\newcommand{\CNOT}{
+    \begin{pmatrix}
+        1 & 0 & 0 & 0\\
+        0 & 1 & 0 & 0\\
+        0 & 0 & 0 & 1\\
+        0 & 0 & 1 & 0
+    \end{pmatrix}
+}
+\newcommand{\boltzmann}{k_\mathrm{B}}
+\newcommand{\represents}{\mathrel{\leftarrow}}
+\newcommand{\union}{\cup}
+\newcommand{\intersect}{\cap}
+\newcommand{\mean}[1]{\overline{#1}}
+\def\centerarc[#1](#2)(#3:#4:#5)% Syntax: [draw options] (center) (initial angle:final angle:radius)
+{ \draw[#1] ($(#2)+({#5*cos(#3)},{#5*sin(#3)})$) arc (#3:#4:#5); }
+
+\makeglossaries  % Add glossary entries here
+\newacronym{qm}{QM}{quantum mechanics}
+\newacronym{pdf}{PDF}{probability density function}
+\newacronym{csco}{CSCO}{complete set of commuting/compatible observables}
+\newacronym{hup}{HUP}{Heisenberg's uncertainty principle}
+\newacronym{tise}{TISE}{time independent Schr\"odinger equation}
+\newacronym{stm}{STM}{scanning tunnelling microscope}
+\newacronym{tdse}{TDSE}{time dependent Schr\"odinger equation}
+\newacronym{qed}{QED}{quantum electrodynamics}
+\newacronym{epr}{EPR}{Einstein--Podolsky--Rosen}
+\newacronym{cm}{CM}{centre of mass}
+\newacronym{lcao}{LCAO}{linear combinations of atomic orbitals}
+
+%\theoremstyle{definition}
+%\newtheorem{postulate}{Postulate}
+%\declaretheorem[name=Postulate, style=definition]{postulate}
+\newcounter{postulateCounter}
+\newtcbtheorem[use counter=postulateCounter]{postulate}{Postulate}{colback=green!5, colframe=green!50!black, fonttitle=\bfseries, breakable, description delimiters parenthesis, separator sign none}{pos}
+
+\tcbset{highlight math style={}}
+
+\includeonly{parts/states, parts/observables, parts/dynamics, parts/angular_momentum, parts/recap, parts/approximation_methods, parts/applications_of_quantum_theory}
+
+\begin{document}
+    \pagenumbering{roman}  % Number contents pages and glossaries with roman numerals
+    \maketitle
+    These are my notes for the \textit{principles of quantum mechanics} course from the University of Edinburgh as part of the third year of the theoretical physics degree.
+    When I took this course in the 2020/21 academic year it was taught by Professor Luigi Del Debbio\footnote{\url{https://www.ph.ed.ac.uk/people/luigi-del-debbio}} and Professor Arjun Berera\footnote{\url{https://www.ph.ed.ac.uk/people/arjun-berera}}.
+    These notes are based on the lectures delivered as part of this course, and the notes provided as part of this course, which are in the process of being published as a textbook.
+    The content within is correct to the best of my knowledge but if you find a mistake or just disagree with something or think it could be improved please let me know.
+    
+    These notes were produced using \LaTeX\footnote{\url{https://www.latex-project.org/}}.
+    Graphs where plotted using Python\footnote{\url{https://www.python.org/}}, Matplotlib\footnote{\url{https://matplotlib.org/}}, NumPy\footnote{\url{https://numpy.org/}}, and SciPy\footnote{\url{https://scipy.org/scipylib/}}.
+    Diagrams were drawn with tikz\footnote{\url{https://www.ctan.org/pkg/pgf}}.
+    
+    This is version \notesVersion~of these notes, which is up to date as of \notesDate.
+    \begin{flushright}
+        Willoughby Seago
+        
+        s1824487@ed.ac.uk
+    \end{flushright}
+    \clearpage
+    \tableofcontents
+    \listoffigures
+    \listoftables
+    \printglossary[type=\acronymtype, title=Acronyms, style=long]
+    \clearpage
+    \pagenumbering{arabic}  % Number rest of document with numbers
+    \begingroup
+    \let\clearpage\relax  % "\begingroup, \let\clearpage\relax, \endgroup" stops automatic pagebreaks after each include
+    \include{parts/states}
+    \include{parts/observables}
+    \include{parts/dynamics}
+    \include{parts/angular_momentum}
+    \include{parts/recap}
+    \include{parts/approximation_methods}
+    \include{parts/applications_of_quantum_theory}
+    \endgroup
+    
+    \part{Time Dependent Perturbation Theory}
+    \section{Time Dependent Perturbation Theory}
+    Suppose \(\operator{H}_0\) is a time independent Hamiltonian.
+    Then the state of a system at time \(t\) satisfies the time dependent Schr\"odinger equation,
+    \[\operator{H}_0\ket{\Psi(t)} = i\hbar\pdv{t}\ket{\Psi(t)}.\]
+    The solution to this equation gives us an orthonormal eigenbasis, \(\{\ket{n^{(0)}}\}\), with corresponding eigenvalues \(\{E_n^{(0)}\}\), which satisfy the time independent Schr\"odinger equation:
+    \[\operator{H}_0\ket{n^{(0)}} = E_n^{(0)}\ket{n^{(0)}}.\]
+    
+    A generic state, \(\ket{\Psi(t)}\in\hilbert\), can then be expanded in this basis as
+    \[\ket{\Psi(t)} = \sum_n c_n^{(0)}\exp[-iE_n^{(0)}t/\hbar]\ket{n^{(0)}} = \sum_n c_n^{(0)}\exp[-i\omega_nt]\ket{n^{(0)}}\]
+    where \(\omega_n = E_n/\hbar\).
+    The coefficients, \(c_n^{(0)}\), are time independent and the time dependence of the system is entirely given by the exponential factor, which is the result of the time evolution operator.
+    
+    Suppose we introduce a perturbation, \(\operator{H}'\), which depends in some way on time.
+    The Hamiltonian for the entire system is then
+    \[\operator{H} = \operator{H}_0 + \operator{H}'(t).\]
+    Now a generic state, \(\ket{\Psi(t)}\in\hilbert\), can be expanded as
+    \[\ket{\Psi(t)} = \sum_{n} c_n(t) \exp(-i\omega_n t)\ket{n^{(0)}}\]
+    where the coefficients, \(c_n(t)\), are now time dependent.
+    
+    For a given state, \(\ket{m^{(0)}}\) in the eigenbasis of \(\operator{H}_0\) the probability that we find the perturbed system in this state is
+    \[\abs{\braket{m^{(0)}}{\Psi(t)}}^2 = \abs{c_m(t)\exp[-i\omega_n\hbar]}^2 = \abs{c_m(t)}^2.\]
+    Here we rely on the fact that since \(\operator{H}_0\) is Hermitian it has an orthonormal eigenbasis.
+    
+    The state must satisfy the \gls{tdse}.
+    One side of the \gls{tdse} gives
+    \begin{align*}
+        i\hbar \pdv{t}\ket{\Psi(t)} &= i\hbar\pdv{t} \sum_n c_n(t) \exp[-i\omega_n t]\ket{n^{(0)}}\\
+        &= i\hbar [\dot{c}_n(t) - i\omega_n c_n(t)]\exp[-i\omega_nt]\ket{n^{(0)}}\\
+        &= \sum_{n} [i\hbar\dot{c}_n(t) + \hbar\omega_nc_n(t)]\ket{n^{(0)}}.
+    \end{align*}
+    The other side gives
+    \begin{align*}
+        \operator{H}\ket{\Psi(t)} &= [\operator{H}_0 + \operator{H}']\sum_n c_n(t) \exp[-i\omega_n t]\ket{n^{(0)}}\\
+        &= \sum_n \left[  c_n(t) \exp[-i\omega_n t]\operator{H}_0\ket{n^{(0)}} + c_n(t) \exp[-i\omega_n t]\operator{H}'\ket{n^{(0)}}\right]\\
+        &= \sum_n \left[  c_n(t) \exp[-i\omega_n t]\hbar\omega_n\ket{n^{(0)}} + c_n(t) \exp[-i\omega_n t]\operator{H}'\ket{n^{(0)}}\right].\\
+    \end{align*}
+    Setting these equal to each other and rearranging we have
+    \[\sum_{n} (i\hbar\dot{c}_n(t) - c_n(t)\operator{H}')\exp[-i\omega_nt]\ket{n^{(0)}} = 0.\]
+    Now taking the inner product with \(\bra{m^{(0)}}\) we have
+    \[i\hbar\dot{c}_m(t)\exp[-i\omega_nt] + \sum_n c_n(t)H'_{mn}\exp[-i\omega_nt] = 0\]
+    where \(H'_{mn} = \bra{m^{(0)}}\operator{H}'\ket{n^{(0)}}\).
+    We can rearrange this to get
+    \[\dot{c}_n(t) = \frac{1}{i\hbar} \sum_n c_n(t)H'_{mn}\exp(-i\omega_{mn}t),\]
+    where \(\omega_{mn} = \omega_m - \omega_n\).
+    This gives us a set of coupled first order differential equations which we can solve for the coefficients.
+    However this is easier said than done and in general we cannot analytically solve this system.
+    This is why we need perturbation theory.
+    
+    \subsection{Perturbation Theory}
+    Starting with the same Hamiltonian as we had in the last section but introducing a bookkeeping parameter, \(\lambda\), the preceding analysis is still valid but now we have
+    \[\dot{c}_n = \frac{\lambda}{i\hbar}\sum_n c_n H'_{mn}\exp(-i\omega_{mn}t).\]
+    We expand the coefficients in a power series of increasingly small corrections:
+    \[c_n = c_n^{(0)} + \lambda c_n^{(1)} + \lambda^2 c_n^{(2)} + \dotsb.\]
+    Substituting this into the equation for \(\dot{c}_m\) we have
+    \[\dot{c}_m^{(0)} + \lambda\dot{c}_m^{(1)} + \dotsb = \frac{\lambda}{i\hbar} \sum_n c_n^{(0)}H'_{mn}\exp(i\omega_{mn}t) + \dotsb.\]
+    Equating coefficients of \(\lambda\) at zeroth order we have
+    \[\dot{c}_m^{(0)} = 0,\]
+    which follows from \(c_m\) being time independent at zeroth order and therefore we recover the unperturbed state.
+    At first order we have
+    \[\dot{c}_m^{(1)} = \frac{1}{i\hbar}\sum_n c_n^{(0)}H'_{mn}\exp(i\omega_{mn}t).\]
+    Integrating this we have
+    \[c_m^{(1)}(t) = c_m^{(1)}(t_0) + \frac{1}{i\hbar} \sum_n c_n^{(0)}\int_{t_0}^{t} H'_{mn}\exp(i\omega_{mn}t')\dd{t'}.\]
+    
+    Suppose that the system is in an eigenstate of \(\operator{H}_0\), say \(\ket{k^{(0)}}\), for all \(t \le t_0\).
+    Then in this time period \(c_k^{(0)} = 1\) and all other coefficients, \(c_n^{(0)} = 0\) for \(n \ne k\), i.e. \(c_n^{(0)} = \delta_{kn}\),
+    In this case the sum reduces to a single term.
+    Further assume that we are interested the probability of finding the system in a state \(\ket{m^{(0)}}\) at some time \(t\) with \(m \ne k\).
+    Then at \(t = t_0\) we have \(c_m^{(1)}(t_0) = 0\) and so
+    \[c_m^{(1)}(t) = \frac{1}{i\hbar} \int_{t_0}^{t} H'_{mk}\exp(i\omega_{mn}t')\dd{t}, \qquad m\ne k.\]
+    This allows us to compute the \define{transition probability}.
+    That is the probability of finding the system, at some later time \(t\), in the state \(\ket{m^{(0)}}\) with \(m\ne k\).
+    To first order it is
+    \[p_{mk}(t) = \abs{c_m^{(1)}}^2 = \frac{1}{\hbar^2} \abs{\int_{t_0}^{t} H'_{mk}\exp(i\omega_{mn}t')\dd{t'}}^2.\]
+    
+    \subsection{Time Independent Perturbations}
+    Suppose that \(\operator{H}'\) doesn't depend on time.
+    Then we can pull it outside of the integral.
+    Setting our clocks such that \(t_0 = 0\) we have
+    \begin{align*}
+        c_m^{(1)} &= \frac{H'_{mn}}{i\hbar} \int_0^t \exp(i\omega_{mn}t')\dd{t'}\\
+        &= \frac{H'_{mk}}{\hbar\omega_{mk}}[1 - \exp(i\omega_{mk}t)].
+    \end{align*}
+    Hence the transition probability is
+    \begin{align*}
+        p_{mk}(t) &= \abs{c_m^{(1)}}^2\\
+        &= \frac{2}{\hbar^2}\abs{H'_{mk}}^2\frac{1 - \cos(\omega_{mk}t)}{\omega_{mk}^2}\\
+        &= \frac{2\abs{H'_{mk}}^2}{\hbar^2}f(t, \omega_{mk})
+    \end{align*}
+    where
+    \[f(t, \omega_{mk}) = \frac{1 - \cos(\omega_{mk}t)}{\omega_{mk}^2} = \frac{2\sin^2(\omega_{mk}t/2)}{\omega_{mk}^2}.\]
+    This corresponds to a peak centred on \(\omega_{mk} = 0\) with height proportional to \(t^2\) and width \(\sim 2\pi/t\).
+    This means that there is only a significant chance of transition to states that have energy within a bandwidth, \(\delta E \approx 2\pi\hbar/t\), of the initial energy, \(E_k^{(0)}\).
+    
+    These properties of \(f\) can be seen if we consider the standard integral
+    \[\int_{-\infty}^{\infty} \frac{\sin^2x}{x}\dd{x} = \pi\]
+    which leads to the properties
+    \[\int_{-\infty}^{\infty} f(t, \omega) \dd{\omega} = \pi t\]
+    and
+    \[\lim_{t\to\infty} f(t, \omega) \sim \pi t\delta(\omega).\]
+    
+    \subsection{Applicability}
+    In the non-degenerate case \(\omega_{mk}\ne 0\) and so the probability that at time \(t\) the system has transitioned to a state other than \(\ket{k}^{(0)}\) is
+    \[P^{(1)}(t) = \sum_{m\ne k}p_{mk}^{(1)}(t) = \sum_{m\ne k}\frac{4\abs{H'_{mk}}^2}{\hbar^2\omega_{mk}^2} \sin^2(\omega_{mk}t/2).\]
+    For perturbation theory to be valid we must have \(P^{(1)}(t) \ll 1\).
+    Since \(\sin^2\) is bounded to \([0, 1]\) it is sufficient to have
+    \[\sum_{m\ne k}\frac{4\abs{H'_{mk}}^2}{\hbar^2\omega_{mk}^2} \ll 1.\]
+    For sufficiently small \(H'_{mk}\) this is always possible.
+    
+    In the degenerate case if \(\ket{k^{(0)}}\) and \(\ket{m^{(0)}}\) have the same energy then \(\omega_{mk} = 0\) and so
+    \[c_m^{(1)}(t) = -\frac{i}{\hbar}H'_{mk}t\]
+    which means that the transition probability is
+    \[p_{mk}^{(1)}(t) = \frac{\abs{H'_{mk}}^2}{\hbar^2}t.\]
+    The requirement for perturbation theory to be valid here is that \(p_{mk}^{((1))(t)} \ll 1\).
+    Clearly after some time has passed this will no longer be the case meaning that perturbation theory for a degenerate system with a time dependent perturbation can only be applied in the near future.
+    
+    \section{Fermi's Golden Rule}
+    Often we are interested not in the transition to a specific state but to one of a group of states, \(G\), with energy
+    \[E_k^{(0)} - \Delta E \le E_m^{(0)} \le E_k^{(0)} + \Delta E.\]
+    This is especially the case if the energy eigenvalue spectrum is continuous.
+    The probability of transitioning to this group is given by summing (or integrating) over the contributions from each state in the group.
+    The number of states in the range \([E_m, E_m + \dd{E_m}]\) is given by \(E_m\rho(E_m)\dd{E_m}\) where \(\rho\) is the density of final states.
+    With the constant perturbation that we considered in the last section the probability of transitioning into one of the states in \(G\) is given by
+    \[p_G(t) = \frac{2}{\hbar^2} \int_{E_k^{(0)} - \Delta E}^{E_k^{(0)} + \Delta E} \abs{H'_{mk}}^2 f(t, \omega_{mk}) \rho(E_m)\dd{E_m}.\]
+    It is common now to assume that \(\Delta E\) is small enough that \(\rho\) and \(H'_{mk}\) are approximately constant within the range of integration and therefore can be approximated by their values at \(E_{k}^{(0)}\).
+    Thus the transition probability is
+    \[p_G(t) = \frac{2\abs{H'_{mk}}}{\hbar^2}\rho(E_k^{(0)}) \int_{E_k^{(0)} - \Delta E}^{E_k^{(0)} + \Delta E} f(t, \omega_{mk})\dd{E_m}.\]
+    Suppose now that \(t\) is sufficiently large that \(\Delta E \gg 2\pi \hbar/t\) and then the only significant contributions of \(f\) to the integral come from the energy range given.
+    We then approximate \(f\) as zero outside of this region and we extend the integration to be over all of \(\reals\).
+    Recall that
+    \[\int_{-\infty}^{\infty} f(t, \omega) \dd{\omega} = \pi t\]
+    and we can make a simple change of variables from \(E_m\) to \(\hbar\omega_{mk}\) so \(\dd{E_m} = \hbar\dd{\omega_{mk}}\).
+    Then we find that
+    \[p_G(t) = \frac{2\pi t}{\hbar} \abs{H'_{mk}}^2\rho(E)\]
+    Where \(E = E_k^{(0)} = E_m^{(0)}\).
+    
+    An important value that we may consider is the \define{transition rate} which is the average number of transitions per unit time.
+    It is simply the derivative of the transition probability with respect to time and for this constant perturbation is given by
+    \[R = \frac{2\pi}{\hbar} \abs{H'_{mk}}^2\rho(E).\]
+    This equation, and other's like it, are referred to as \define{Fermi's golden rule}.
+    
+    \subsection{Harmonic Perturbations}
+    Consider a perturbation of the form
+    \[\operator{H}'(t) = \operator{\mathscr{H}}'\sin(\omega t)\]
+    where \(\operator{\mathscr{H}}'\) is a time independent Hermitian operator.
+    As so often happens trigonometry calculations become easier if we write this in terms of exponentials:
+    \[\operator{H}'(t) = \operator{A}\exp(i\omega t) + \operator{A}\hermit\exp(-i\omega t)\]
+    where \(\operator{A} = \operator{\mathscr{H}}'/2i\).
+    
+    As an initial condition suppose that for \(t \le 0\) the system is in the state \(\ket{k^{(0)}}\) with energy \(E_k^{(0)}\) meaning that \(c_n(0) = \delta_{nk}\).
+    We then have
+    \[c_m^{(0)}(t) = \frac{1}{i\hbar}\left[ A_{mk}\int_0^t \exp[i(\omega_{mk} + \omega)t']\dd{t'} + A_{mk}\hermit \int_0^t \exp[i(\omega_{mk} - \omega)t']\dd{t'} \right]\]
+    with \(A_{mk} = \mathscr{H}'/2i\) and \(A_{mk}\hermit = A_{km}^*\).
+    Computing these integrals we get
+    \[c_m^{(1)}(t) = A_{mk}\left( \frac{1 - \exp[i(\omega_{mk} + \omega)t]}{\hbar(\omega_{mk} + \omega)} \right) + A_{mk}\hermit \left( \frac{1 - \exp[i(\omega_{mk} - \omega)]}{\hbar(\omega_{mk} - \omega)} \right).\]
+    The transition probability is then
+    \[p_{mk}^{(1)}(t) = \abs{A_{mk}\left( \frac{1 - \exp[i(\omega_{mk} + \omega)t]}{\hbar(\omega_{mk} + \omega)} \right) + A_{mk}\hermit \left( \frac{1 - \exp[i(\omega_{mk} - \omega)]}{\hbar(\omega_{mk} - \omega)} \right)}^2.\]
+    There are two conditions under which this can become large which we need to consider:
+    \begin{enumerate}
+        \item If \(E_m^{(0)} \approx E_k^{(0)} + \hbar\omega\) then the denominator of the second term will be approximately zero so the second term will dominate.
+        The transition probability will be about
+        \[p_{mk}^{(1)}(t) \approx \frac{2}{\hbar^2}\abs{A\hermit_{mk}}^2 f(t, \omega_{mk} - \omega).\]
+        This is sharply peaked at \(\omega_{mk} = \omega\).
+        This case corresponds to the system absorbing energy
+        \[\hbar\omega = E_m^{(0)} - E_k^{(0)},\]
+        to within \(2\pi\hbar/t\).
+        When this condition applies exactly we say we have achieved resonance.
+        
+        \item If \(E_m^{(0)} \approx E_k^{(0)} - \hbar\omega\) then the denominator of the first term will be approximately zero so the first term will dominate.
+        The transition probability will be about
+        \[p_{mk}^{(1)}(t) \approx \frac{2}{\hbar^2} \abs{A_{mk}}^2 f(t, \omega_{mk} + \omega).\]
+        This is sharply peaked at \(\omega_{mk} = -\omega\).
+        This case corresponds to the system emitting energy
+        \[\hbar = E_k^{(0)} - E_m^{(0)}.\]
+        When this condition applies exactly we say we have achieved resonance.
+    \end{enumerate}
+    This can be seen as the reason why an electromagnetic field, which oscillates sinusoidally, can excite an electron in an atom.
+    
+    Again we consider the case of transition to a group of states with energy in
+    \[(E_k^{(0)} \pm \hbar\omega) - \Delta E \le E_m^{(0)} \le (E_k^{(0)} \pm \hbar\omega) + \Delta E.\]
+    If the density of states is \(\rho\) then in the case where we have absorption making the same approximations as we did for the constant perturbation the transition rate, \(R_{mk}\), is given by
+    \[R_{mk} = \frac{2\pi}{\hbar}\abs{A_{mk}\hermit}^2\rho(E)\]
+    where \(E = E_k^{(0)} + \hbar\omega\).
+    Similarly for transitions corresponding to emission the transition rate is
+    \[R_{mk} = \frac{2\pi}{\hbar} \abs{A_{mk}}^2\rho(E)\]
+    where \(E = E_k^{(0)} - \hbar\omega\).
+    
+    Since any perturbation can be expanded as a Fourier series (under some mild conditions) having solved the harmonic case we have actually solved all perturbations by simply expanding the perturbation as
+    \[\operator{H}'(t) = \sum_{n=1}^{\infty} [\operator{A}_n \exp(i\omega_nt) + \operator{A}\hermit\exp(-i\omega_nt)].\]
+    
+    \section{Electromagnetic Radiation and Quantum Systems}
+    Most particles of interest (i.e. electrons) have a charge and therefore interact with electromagnetic fields.
+    This should come as no suprise as it is the mechanism behind absorption and emission spectra.
+    A full treatment of quantum systems and electromagnetic fields requires us to quantise the electromagnetic field which leads us to \gls{qed}.
+    This is vastly beyond the scope of this course however and it turns out that if we only consider harmonic electromagnetic waves then we can still get a reasonable answer from the semi-classical treatment where we take electrons to be quantum objects but electromagnetic waves are thought of classically.
+    This is what we will do in this section.
+    
+    \subsection{Electromagnetic Radiation Recap}
+    We will consider transverse monochromatic plane waves in a vacuum.
+    These are the simplest solution to Maxwell's equation in the absence of charge and current distributions.
+    It can be shown that\footnote{see the electromagnetism course}
+    \begin{align*}
+        \vv{\Efield}(\vv{r}, t) &= \Efield_0 \vv{\varepsilon}\sin(\vv{k}\cdot\vv{r} - \omega t + \delta_{\omega})\\
+        \vv{\Bfield}(\vv{r}, t) &= \Efield_0 \frac{\vv{k}\times\vv{\varepsilon}}{\omega} \sin(\vv{k}\cdot\vv{r} - \omega t + \delta_{\omega}).
+    \end{align*}
+    Here \(\vv{\Efield}\) and \(\vv{\Bfield}\) are the electric and magnetic fields, \(\Efield_0\) is the amplitude of the electric field, \(\vv{\varepsilon}\) is the polarisation vector, which is a unit vector perpendicular to \(\vv{k}\), the propagation vector.
+    The angular frequency of the wave is \(\omega\) which is related to \(k\) by the dispersion relation \(\omega = ck\).
+    The phase factor \(\delta_{\omega}\) is a real constant.
+    Two important things to notice here are that \(\vv{\Efield}\), \(\vv{\Bfield}\), and \(\vv{k}\) are mutually perpendicular and \(\abs{\vv{\Bfield}} \propto \Efield_0 k/\omega = \Efield/c\).
+    
+    The energy density of the electromagnetic field is
+    \[\frac{1}{2}\left( \varepsilon_{0}\abs{\vv{\Efield}} + \frac{1}{\mu_0}\abs{\vv{\Bfield}} \right) = \varepsilon\Efield_0^2 \sin^2(\vv{k}\cdot\vv{r} - \omega t + \delta_{\omega}).\]
+    Here \(\varepsilon_{0}\) and \(\mu_{0}\) are the electric and magnetic constants and we have used \(c^2 = 1/(\varepsilon_0\mu_0)\).
+    The average of \(\sin^2(\vv{k}\cdot\vv{r} - \omega t + \delta_{\omega})\) over a period of \(T = 2\pi/\omega\) is
+    \[\frac{1}{T}\int_{0}^{T}\sin^2(\vv{k}\cdot\vv{r} - \omega t + \delta_{\omega})\dd{t} = \frac{1}{2}.\]
+    The average energy density is then
+    \[\rho = \frac{1}{2}\varepsilon_0\Efield_0^2.\]
+    
+    The intensity, \(I\), is defined as the average energy flux, that is the average rate of energy flow per unit area normal to the propagation direction.
+    The velocity of the wave is \(c\) and therefore we simply have \(I = \rho c\).
+    
+    \subsection{Incoherent Radiation}
+    We have assumed so far monochromatic radiation but this is not achievable in reality.
+    However we can think of non-monochromatic radiation as a superposition of monochromatic plane waves so it is still a useful mathematical construct.
+    In general the amplitude at different frequencies is dependent on the frequency and so if all components propagate in the most direction then a more general electromagnetic field has
+    \begin{align*}
+        \vv{\Efield}(\vv{r}, t) &= \vv{\varepsilon}\int_{0}^{\infty} \Efield_0(\omega) \sin(\vv{k}\cdot\vv{r} - \omega t + \delta_{\omega}) \dd{\omega}\\
+        \vv{\Bfield}(\vv{r}, t) &= \vv{k}\times\vv{\varepsilon} \int_{0}^{\infty} \frac{\Efield(\omega)}{\omega}\sin(\vv{k}\cdot\vv{r} - \omega t + \delta_{\omega})\dd{\omega}.
+    \end{align*}
+    Now \(\Efield_0(\omega)\) is the amplitude per unit angular frequency.
+    In general \(\delta_{\omega}\) also depends on \(\delta_{\omega}\).
+    If \(\delta_{\omega}\) are randomly distributed then we say that the radiation is \define{incoherent}.
+    It can be shown that in the calculations for average intensity and energy density the cross terms cancel out for incoherent light and so the average energy density is
+    \[\mean{\rho} = \int_{0}^{\infty} \rho(\omega)\dd{\omega}\]
+    and the average intensity is
+    \[\mean{I} = \int_{0}^{\infty} I(\omega)\dd{\omega}\]
+    where \(\rho(\omega)\) and \(I(\omega)\) are the energy density and intensity per unit angular frequency which are given by
+    \[\rho(\omega) = \frac{1}{2}\varepsilon_0\Efield_0^2(\omega)\]
+    and
+    \[I(\omega) = \rho(\omega)c.\]
+    
+    \subsection{Interaction With Single Electron Atom}
+    The (classical) force on a charge is given by the Lorentz force equation.
+    For an electron with charge \(-e\) the force is
+    \[\vv{F} = -e[\vv{\Efield} + \vv{v}\times\vv{\Bfield}]\]
+    where \(\vv{v}\) is the velocity of the electron.
+    We assume that since the nucleus is much more massive than the electron the force on the nucleus is negligible.
+    For light atoms also \(v/c \ll 1\) and since \(\abs{\vv{\Bfield}} = \abs{\Efield}/c\) we ignore the magnetic term as it is much smaller.
+    So
+    \[\vv{F} \approx -e\vv{\Efield}.\]
+    
+    \subsection{Dipole Approximation}
+    We will study the interaction of a monochromatic plane wave with a one electron atom.
+    The typical wavelength of an electromagnetic wave is greater than the size of the atom\footnotemark{} and so we can approximate the spatial distribution to be uniform across the atom.
+    \footnotetext{an atom is \(\sim \SI{e-10}{\metre}\) and a photon with this wavelength has energy \(\SI{12}{\kilo\electronvolt}\) (cf. binding energy of \ce{H}: \(\SI{13.6}{\electronvolt}\)). This photon would be far into the gamma ray section of the EM spectrum and given its large energy we would be more interested in ionisation than absorption/emission.}
+    In particular we take the nucleus to be at \(\vv{r} = \vv{0}\) and we take the the electromagnetic field to take on the value at \(\vv{r} = \vv{0}\) everywhere within the atom.
+    The force is then
+    \[\vv{F}(t) = -e\vv{\Efield} = e\Efield\vv{\varepsilon}\sin(\omega t - \delta_{\omega}).\]
+    We can then think of this corresponding to an electromagnetic interaction Hamiltonian
+    \[\operator{H}' = e\vv{\Efield}\cdot\vv{r} = -\vv{\Efield}\cdot\vv{D}\]
+    where \(\vv{D} = -e\vv{r}\) is the \define{electric dipole operator} for a one electron atom.
+    This is known as the \define{dipole approximation}.
+    It is equivalent to assuming that \(\exp(i\vv{k}\cdot\vv{r}) \approx 1\).
+    
+    \subsection{Absorption}\label{sec:absorption}
+    We will consider in detail the mathematics of absorption and then briefly the mathematics of emission since there is very little difference.
+    
+    We are interested in the probability that an atom in the state \(\ket{k^{(0)}}\) initially is in the state \(\ket{m^{(0)}}\) at some later time \(t\) after irradiation started.
+    We assume monochromatic radiation with frequency \(\omega\) and since we are considering absorption we expect \(E_m^{(0)} > E_k^{(0)}\) as the atom gains energy when it absorbs a photon.
+    We have seen that the probability of transition is, to first order, given by
+    \begin{align*}
+        p_{mk}^{(1)}(t) &= \frac{2}{\hbar^2} \abs{A_{mk}\hermit}^2 f(t, \omega_{mk} - \omega)\\
+        &= \frac{1}{2\hbar^2}\abs{\mathcal{H}'_{mk}}^2 f(t, \omega_{mk} - \omega)\\
+        &= \frac{1}{2}\left( \frac{\Efield_0}{\hbar} \right)^2 \abs{\bra{m^{(0)}} \vv{\varepsilon}\cdot\vv{D}\ket{k^{(0)}}}^2 f(t, \omega_{mk} - \omega)\\
+        &= \frac{1}{2}\left( \frac{\Efield_0}{\hbar} \right)^2 \abs{\vv{\varepsilon}\cdot\vv{D_{mk}}}^2f(t, \omega_{mk} - \omega)
+    \end{align*}
+    where \(\vv{D_{mk}} = \bra{m^{(0)}}\vv{D}\ket{k^{(0)}}\) is the \define{dipole matrix element}.
+    We can rewrite the transition probability in terms of the intensity, \(I\) and the angle, \(\vartheta\), between \(\vv{\varepsilon}\) and \(\vv{D}\):
+    \begin{align*}
+        p_{mk}^{(1)}(t) &= \frac{I}{c\hbar^2\varepsilon_0} \abs{\vv{\varepsilon} \cdot\vv{D_{mk}}}^2 f(t, \omega_{mk} - \omega)\\
+        &= \frac{I}{c\hbar^2\varepsilon_0} \cos^2\vartheta\abs{D_{mk}}^2 f(t, \omega_{mk} - \omega).
+    \end{align*}
+    We can expand \(\abs{D_{mk}}\) in Cartesian coordinates as
+    \[\abs{D_{mk}}^2 = e^2 \left( \abs{\bra{m^{(0)}} x \ket{k^{(0)}}}^2 + \abs{\bra{m^{(0)}} y \ket{k^{(0)}}}^2 + \abs{\bra{m^{(0)}} z \ket{k^{(0)}}}^2 \right).\]
+    If instead our radiation is an incoherent superposition of different frequencies then we have
+    \[p_{mk}^{(1)}(t) = \frac{1}{c\hbar^2\varepsilon_0} \cos^2\vartheta\abs{D_{mk}}^2 \int_{0}^{\infty} I(\omega)f(t, \omega_{mk} - \omega)\dd{\omega}.\]
+    We assume that \(I\) is slowly varying over the peak of \(f\) at \(\omega_{mk} - \omega\) and therefore we can replace \(I(\omega)\) by \(I(\omega_{mk})\).
+    We also assume that the integrand is negligible apart from in the region where \(\omega \approx \omega_{mk}\) and so we can extend the limits to \((-\infty, \infty)\) so
+    \begin{align*}
+        [p_{mk}^{(1)}(t) &\approx \frac{I(\omega_{mk})}{c\hbar^2\varepsilon_0} \cos^2\vartheta\abs{D_{mk}}^2 \int_{-\infty}^{\infty} f(t, \omega_{mk} - \omega)\dd{\omega}\\
+        &= \frac{I(\omega_{mk})}{c\hbar^2\varepsilon_0} \cos^2\vartheta \abs{D_{mk}}^2\pi t.
+    \end{align*}
+    This is only valid for a given \(t\) if \(p_{mk}^{(1)}(t) \ll 1\).
+    If this is the case then we define the transition rate for absorption in the dipole approximation as
+    \[R_{mk} = \frac{\pi I(\omega_{mk})}{c\hbar^2\varepsilon_0}\cos^2\vartheta\abs{D_{mk}}^2.\]
+    For isotropic, unpolarised radiation we can replace \(\cos^2\vartheta\) by its average,
+    \[\frac{1}{2}\int_{-1}^{1}\cos^2\vartheta\dd{(\cos\vartheta)} = \frac{1}{3}\]
+    and we have
+    \[R_{mk} = \frac{\pi I(\omega_{mk})}{3c\hbar^2\varepsilon_0}\abs{D_{mk}}^2.\]
+    
+    \subsection{Stimulated Emission}
+    For emission the calculations in the previous section can be repeated but starting with
+    \[p_{mk}^{(1)}(t) = \frac{2}{\hbar^2} \abs{A_{mk}}f(t, \omega_{mk} + \omega).\]
+    We find that for incoherent radiation we have
+    \[p_{mk}^{(1)}(t) = \frac{I(-\omega_{mk})}{c\hbar^2\varepsilon_0} \cos^2\vartheta \abs{D_{mk}}^2\pi t.\]
+    Notice that for emission we have \(E_{m}^{(0)} < E_k^{(0)}\) and so \(\omega_{mk} < 0\).
+    The transition rate is then
+    \[R_{mk} = \frac{\pi I(-\omega_{mk})}{c\hbar^2\varepsilon_0}\cos^2\vartheta \abs{D_{mk}}^2\]
+    or for isotropic, unpolarised radiation
+    \[R_{mk} = \frac{\pi I(-\omega_{mk})}{3c\hbar^2\varepsilon_0}\abs{D_{mk}}^2.\]
+    
+    \subsection{Detailed Balance}
+    Notice that \(\vv{D_{mk}} = \vv{D_{km}}^*\) and therefore \(\abs{D_{mk}} = \abs{D_{km}}\).
+    This means that for a given pair of states \(\ket{k^{(0)}}\) and \(\ket{m^{(0)}}\) we have
+    \[R_{mk}^{\mathrm{abs}} = R_{km}^{\mathrm{emit}}.\]
+    Therefore the number of excitations per unit time is equal to the number of de-excitations per unit time.
+    This is required for the energy of the average atom to remain constant.
+    This principle, that in equilibrium the rate of a process is equal to the rate of the reverse process, is common in thermodynamics and is called the \define{principle of detailed balance}.
+    
+    \section{Spontaneous Transitions and Selection Rules}
+    \subsection{Spontaneous Transitions}
+    A full treatment of spontaneous transitions requires \gls{qed} but we can apply a thermodynamic argument proposed by Einstein to get the same solution.
+    Consider a box of atoms of a single species in equilibrium with radiation at temperature \(T\).
+    Let \(k\) and \(m\) label states with energies \(E_k\) and \(E_m\) respectively.
+    
+    \subsubsection{Absorption}
+    The rate of transition from state \(k\) to \(m\) by absorption of radiation with angular frequency \(\omega = \omega_{mk}\) is proportional to the number of atoms in the state \(k\) and the energy density per unit angular frequency, \(\rho(\omega_{mk})\).
+    That is
+    \[\dot{N}_{mk} = B_{mk}N_k\rho(\omega_{mk})\]
+    where \(B_{mk}\) is known as the \define{Einstein coefficient for absorption}, \(N_k\) is the number of atoms in state \(k\) and \(\dot{N}_{mk}\) is the rate of transition from state \(k\) to state \(m\).
+    We can write this in terms of the absorption rate, \(R_{mk}\), from the previous section:
+    \[\dot{N}_{mk} = R_{mk}N_k.\]
+    Equating these we have
+    \[B_{mk} = \frac{R_{mk}}{\rho(\omega_{mk})} = \frac{cR_{mk}}{I(\omega_{mk})}.\]
+    In the dipole approximation using the form of \(R_{mk}\) derived in section~\ref{sec:absorption} this is
+    \[B_{mk} = \frac{\pi}{3\hbar^2\varepsilon_0}\abs{D_{mk}}^2.\]
+    
+    \subsubsection{Emission}
+    The rate of transitions from \(m\) to \(k\) by emission of radiation has two terms.
+    The first is proportional to the energy density per unit angular frequency, \(\rho(\omega_{mk})\) the second is proportional independent of this quantity and exists as \(E_m > E_k\) so it is possible to spontaneously move from state \(m\) to state \(k\).
+    Both terms are proportional to the number of atoms in state \(m\):
+    \[\dot{N}_{km} = A_{km}N_m + B_{km}N_m\rho(\omega_{mk}).\]
+    Here \(A_{km}\) is the \define{Einstein coefficient for spontaneous emission}, \(B_{km}\) is the \define{Einstein coefficient for stimulated emission}, \(\dot{N}_{km}\) is the rate of transition from \(m\) to \(k\) and \(N_m\) is the number of atoms in state \(m\).
+    
+    In thermal equilibrium we must have \(\dot{N}_{mk} = \dot{N}_{km}\) as the net energy of the atoms cannot change.
+    Therefore
+    \[\frac{N_k}{N_m} = \frac{A_{km} + B_{km}\rho(\omega_{mk})}{B_{mk}\rho(\omega_{mk})}.\]
+    From thermodynamics we know that the fraction of atoms in a state with a given energy level is given by the Boltzmann factor and so
+    \[\frac{N_k}{N_m} = \exp[-(E_k - E_m)/\boltzmann T] = \exp(\hbar\omega_{mk}/\boltzmann T).\]
+    Hence we find that
+    \begin{equation}\label{eqn:energy density per unit angular frequency}
+        \rho(\omega_{mk}) = \frac{A_{km}}{B_{mk}\exp(\hbar\omega_{mk}/\boltzmann T) - B_{mk}}.
+    \end{equation}
+    Planck's law states that at temperature \(T\) the energy density per unit wavelength is given by
+    \[n(\lambda) = \frac{8\pi hc}{\lambda^5}\frac{1}{\exp[hc/\lambda \boltzmann T] - 1}.\]
+    We can express this in terms of the angular frequency using \(\lambda = 2\pi c/\omega\) and \(\abs{n(\lambda)\dd{\lambda}} = \abs{\rho(\omega)\dd{\omega}}\) which means
+    \[\rho(\omega) = n(\lambda)\abs{\dv{\lambda}{\omega}} = n(\lambda)\frac{2\pi c}{\omega^2}.\]
+    Using this we have
+    \[\rho(\omega_{mk}) = \frac{\hbar\omega_{mk}^3}{\pi^2c^3}\frac{1}{\exp[\hbar\omega_{mk}/\boltzmann T] - 1}.\]
+    Equating this with equation~\ref{eqn:energy density per unit angular frequency} we have
+    \[B_{km} = B_{mk}, \qquad\text{and}\qquad A_{km} = \frac{\hbar\omega_{mk}^3}{\pi^2c^3}B_{km}.\]
+    Therefore in the dipole approximation the transition rate for spontaneous emission is
+    \[R_{mk}^{\mathrm{spon}} = \frac{\omega_{mk}^3}{3\pi c^3\hbar\varepsilon_0}\abs{D_{mk}}^2.\]
+    This is the same result the we get from a full \gls{qed} treatment.
+    
+    \subsection{Selection Rules}
+    Since transition rates are proportional to \(\vv{D_{mk}}\) if the dipole matrix element vanishes then there will be no transitions at that point regardless of other details about the system.
+    We say that a selection rule applies.
+    There are many such selection rules that can be justified by some symmetry of the system.
+    We show them to be true usually by considering a commutator and showing that it leads to a selection rule.
+    
+    The first selection rule we consider follows from the following commutator:
+    \[[\operator{L}_z, \operator{z}] = [\operator{x}\operator{p}_y - \operator{y}\operator{p}_x, \operator{z}] = 0.\]
+    This holds since \(\operator{z}\) commutes with all of \(\operator{x}\), \(\operator{y}\), \(\operator{p}_x\), and \(\operator{p}_y\).
+    Consider two states, \(\ket{n\ell m}\) and \(\ket{n'\ell'm'}\).
+    Taking the matrix elements of \([\operator{L}_z, \operator{z}]\) between these states we have
+    \[\bra{n'\ell'm'}[\operator{L}_z, \operator{z}]\ket{n\ell m} = 0,\]
+    which follows from \([\operator{L}_z, \operator{z}] = 0\).
+    If we expand out the left hand side and use the fact that \(\operator{L}_z\ket{n\ell m} = m\hbar\ket{n\ell m}\) and \(\bra{n'\ell'm'}\operator{L}_z = m'\hbar\bra{n'\ell'm'}\) we get
+    \[\bra{n'\ell'm'}[\operator{L}_z, \operator{z}]\ket{n\ell m} = \bra{n'\ell'm'}(\operator{L}_z\operator{z} - \operator{z}\operator{L}_z)\ket{n\ell m} = (m' - m)\hbar\bra{n'\ell'm'}\operator{z}\ket{n\ell m} = 0.\]
+    From this we either have
+    \[\bra{n'\ell'm'}\operator{z}\ket{n\ell m} = 0\]
+    or
+    \[m' - m = \Delta m = 0.\]
+    Of course there is nothing special about the \(z\) direction.
+    The same logic means that either
+    \[\bra{n'\ell'm'}\operator{x}\ket{n\ell m} = 0, \qquad \bra{n'\ell'm'}\operator{y}\ket{n\ell m} = 0, \qquad\text{and}\qquad \bra{n'\ell'm'}\operator{z}\ket{n\ell m} = 0,\]
+    or \(\Delta m = 0\).
+    
+    Now consider the following commutator:
+    \begin{align*}
+        [\operator{L}_z, \operator{x} \pm i\operator{y}] &= [\operator{L}_z, \operator{x}] \pm i[\operator{L}_z, \operator{y}]\\
+        &= [\operator{x}\operator{p}_y - \operator{y}\operator{p}_x, \operator{x}] \pm i[\operator{x}\operator{p}_y - \operator{y}\operator{p}_x, \operator{y}]\\
+        &= \underbrace{[\operator{x}\operator{p}_y, \operator{x}]}_{=0} - [\operator{y}\operator{p}_x, \operator{x}] \pm i[\operator{x}\operator{p}_y, \operator{y}] \mp i\underbrace{[\operator{y}\operator{p}_x, \operator{y}]}_{=0}\\
+        &= -\operator{y}[\operator{p}_x, \operator{x}] - [\operator{y}, \operator{x}]\operator{p}_y \pm i\operator{x}[\operator{p}_y,\operator{y}] \pm i[\operator{y}, \operator{y}]\operator{p_y}\\
+        &= -\operator{y}[\operator{p}_x, \operator{x}] \pm i\operator{x}[\operator{p}_y, \operator{y}]\\
+        &= -\operator{y}(-i\hbar) \pm i\operator{x}(-i\hbar)\\
+        &= i\hbar\operator{y} \pm \hbar\operator{x}\\
+        &= \pm\hbar(\operator{x}\pm i\operator{y}).
+    \end{align*}
+    To reach this result we have used the canonical commutation relation: \([\operator{x}_i, \operator{p}_j] = i\hbar\delta_{ij}\) and the following identity which can be proven easily by expanding both sides:
+    \[[AB, C] = A[B, C] + [A, C]B.\]
+    Now take the matrix elements of this commutator.
+    We have
+    \[\bra{n'\ell'm'}[\operator{L}_z, \operator{x} \pm i\operator{y}]\ket{n\ell m} = \pm\hbar\bra{n'\ell'm'}(\operator{x} \pm i\operator{y})\ket{n\ell m}.\]
+    Expanding the left hand side we get
+    \[(m' - m)\bra{n'\ell'm'}(\operator{x} \pm i\operator{y})\ket{n\ell m}.\]
+    Rearranging then gives us
+    \[(m' - m \mp 1)\hbar\bra{n'\ell'm'}(\operator{x} \pm i\operator{y})\ket{n\ell m} = 0.\]
+    So either
+    \[\bra{n'\ell'm'}(\operator{x} \pm i\operator{y})\ket{n\ell m} = 0\]
+    or
+    \[m' - m \mp 1 = 0 \implies \Delta m = \pm 1.\]
+    So in general electric dipole transitions can only take place if
+    \[\Delta m = 0, \pm 1.\]
+    
+    \subsubsection{Parity Selection Rule}
+    Consider the parity reversal operator which takes \(\vv{r}\) to \(-\vv{r}\).
+    The electric dipole operator is odd under parity inversion and so for the matrix elements, \(\vv{D_{km}}\), to be non-zero the initial and final states must have opposite parities so that
+    \[(-1)^{\ell'} = -(-1)^{\ell}.\]
+    This means that \(\Delta \ell = \ell' - \ell\) is odd so \(\Delta \ell = \pm 1, \pm 2, \pm 3, \dotsc\).
+    
+    \subsubsection{Orbital Angular Momentum Selection Rules}
+    It can be shown using the techniques demonstrated above that
+    \[[\operator{L}^2, [\operator{L}^2, \operator{z}]] = 2\hbar^2(\operator{L}^2\operator{z} + \operator{z}\operator{L}^2).\]
+    Taking the matrix elements we then have
+    \[\bra{n'\ell'm'}[\operator{L}^2, [\operator{L}^2, \operator{z}]]\ket{n\ell m} = 2\hbar^2\bra{n'\ell'm'}(\operator{L}^2\operator{z} + \operator{z}\operator{L}^2)\ket{n\ell m}.\]
+    Expanding the left hand side, using \(\operator{L}^2\ket{n\ell m} = \ell(\ell + 1)\hbar^2\ket{n\ell m}\) and \(\bra{n'\ell'm'}\operator{L}^2 = \ell'(\ell' + 1)\hbar^2\bra{n'\ell'm'}\), we get
+    \[[\ell'(\ell' + 1) - \ell(\ell + 1)]\hbar^4\bra{n'\ell'm'}\operator{z}\ket{n\ell m}.\]
+    Expanding the right hand side gives
+    \[2\hbar^4[\ell'(\ell' + 1) + \ell(\ell + 1)]\bra{n'\ell'm'}\operator{z}\ket{n\ell m}.\]
+    Therefore if \(\bra{n'\ell'm'}\operator{z}\ket{n\ell m} \ne 0\) we must have
+    \[\ell'^2(\ell' + 1)^2 - 2\ell'\ell(\ell' + )(\ell + 1) + \ell^2(\ell + 1)^2 - 2\ell'(\ell' + 1) - 2\ell(\ell + 1) = 0.\]
+    It can be shown that this is equivalent to
+    \[(\ell' + \ell + 2)(\ell' + \ell)(\ell' - \ell + 1)(\ell' - \ell - 1) = 0.\]
+    The first factor is non-zero as \(\ell, \ell' \ge 0\).
+    The second factor is 0 only if \(\ell = \ell' = 0\) but in this case we already have \(m = m'\) and \(\Delta\ell\) being even so learn nothing new.
+    So suppose that this doesn't happen, then
+    \[(\ell' - \ell + 1)(\ell' - \ell - 1) = 0.\]
+    This gives us the selection rule
+    \[\Delta\ell = \ell' - \ell = \pm 1.\]
+    
+    \section{Quantum Scattering Theory}
+    
+    \begin{figure}[ht]
+        \centering
+        \tikzsetnextfilename{scattering}
+        \begin{tikzpicture}
+            \draw[fill=blue!25, draw=blue!25] (0, 0) circle [radius=1.5cm];
+            \draw (0, 0) -- (30:4);
+            \draw (0, 0) -- (40:4);
+            \draw[->, >=latex, very thick] (0, 0) -- (35:5) node[above right] {\(\vv{p'}\)};
+            \draw[fill=yellow, draw=yellow, rotate around={-55:(35:4)}] (35:4) circle[x radius=0.348cm, y radius=0.1cm];
+            \draw[rotate around={-55:(35:3)}] (35:3) circle[x radius=0.261cm, y radius=0.08cm];
+            \node at (25:3) {\(\dd{\Omega}\)};
+            \draw[ultra thick] (35:4) -- (35:4.2);
+            \draw[->, >=latex, ultra thick] (-4, 0) -- (-2.5, 0) node[below] {\(\vv{p}\)};
+            \draw[ultra thick] (-4, 0) -- (0, 0) -- (35:1);
+            \draw[->] (0, 0) -- (4, 0) node[right] {\(z\)};
+            \begin{scope}[xscale=0.5]
+                \centerarc[white, ultra thick](7, 0)(25:340:0.5)
+                \centerarc[->](7, 0)(25:340:0.5)
+            \end{scope}
+            \node[below] at (3.5, -0.5) {\(\varphi\)};
+            \begin{scope}
+                \clip (0, 0) -- (4, 0) -- (35:4) -- cycle;
+                \draw (0, 0) circle [radius=0.75cm];
+            \end{scope}
+            \node at (17.5:1) {\(\vartheta\)};
+        \end{tikzpicture}
+        \caption{A beam of particles with momentum \(\vv{p} = \hbar\vv{k}\) incident on a scattering centre at \(\vv{r} = 0\). We model this as a repulsive potential in the shaded area. The deflected beam has momentum \(\vv{p'} = \hbar\vv{k'}\) and intersects a detector of solid angle \(\dd{\Omega}\).}
+        \label{fig:scattering setup}
+    \end{figure}
+    Figure~\ref{fig:scattering setup} shows the set up for a scattering experiment.
+    A beam of particles with momentum \(\vv{p} = \hbar\vv{k}\) is incident on a scattering centre, which we define to be at the origin, \(\vv{r} = 0\).
+    The beam is then scattered at an angle \(\vartheta\) and has momentum \(\vv{p'} = \hbar\vv{k'}\).
+    The scattering process is characterised by two quantities:
+    \begin{itemize}
+        \item The incident flux, that is the number of incident particles crossing unit area perpendicular to the beam direction per unit time.
+        This has dimensions of \([L]^{-2}[T]^{-1}\).
+        \item The scattered flux, that is the number of scattered particles scattered into an element of solid angle \(\dd{\Omega}\) about the direction \(\vartheta, \varphi\) per unit time per unit solid angle.
+        This has dimensions of \([T]^{-1}\).
+    \end{itemize}
+    We define the differential cross section as
+    \[\dv{\sigma}{\Omega} = \frac{\text{scattered flux}}{\text{incident flux}}.\]
+    This has dimensions of \([L]^2\) so is, as expected, an area.
+    The total cross section is then found by integrating over all directions:
+    \[\sigma_{T} = \int_{S^2} \dv{\sigma}{\Omega}\dd{\Omega} = \int_{0}^{2\pi}\int_{0}^{\pi} \dv{\sigma}{\Omega} \dd{\vartheta}\dd{\varphi}.\]
+    Here \(S^2\) is the unit sphere.
+    
+    \subsection{The Born Approximation}
+    If the interaction between the particle and the scattering centre is localised to the location of the scattering centre at \(\vv{r} = \vv{0}\) then we can consider the incoming particles as free (with momentum \(\vv{p}\) and when they reach the scattering centre they are in a potential which we can model as a constant perturbation.
+    The particles are then scattered and become free again (with momentum \(\vv{p'}\).
+    The Hamiltonian for the system is then
+    \[\operator{H} = \operator{H}_0 + \operator{V}(\vv{r})\]
+    where \(\operator{H}_0\) is the free Hamiltonian,
+    \[\operator{H}_0 = \frac{\operator{p}^2}{2m}\]
+    and \(\operator{V}(\vv{r})\) is the interaction potential that we treat as a perturbation inducing transitions between the eigenstates of \(\operator{H}_0\).
+    
+    It is better to work with the wave-vectors, \(\vv{k}\), than the momenta, \(\vv{p} = \hbar\vv{k}\).
+    The transition rate is then
+    \[R = \frac{2\pi}{\hbar} \abs{\bra{\vv{k'}} \operator{V} \ket{\vv{k}}} \rho(E_{k'})\]
+    where \(\rho(E_{k'})\) is the density of final states which is defined such that \(\rho(E_{k'})\dd{E_{k'}}\) is the number of final states with energy in \([E_{k'}, E_{k'} + \dd{E_{k'}}]\).
+    As usual
+    \[V_{\vv{k'}\vv{k}} = \bra{\vv{k'}}\operator{V}\ket{\vv{k}} = \int u_{\vv{k'}}^*(\vv{r}) V(\vv{r}) u_{\vv{k}}(\vv{r}) \dd[3]{r}\]
+    are the matrix elements of the operator \(\operator{V}\) in the momentum basis.
+    
+    \subsubsection{Technical Aside}
+    The eigenstates of \(\operator{H}_{0}\) are plane waves of the form
+    \[u_{\vv{k}}(\vv{r}) = C\exp(i\vv{k}\cdot\vv{r}) = C\exp(i\vv{p}\cdot\vv{r}/\hbar).\]
+    The problem with this is that these are not properly normalisable as \(u\notin\squareIntegrable(\reals^3)\).
+    The solution for this is to consider the system to be in a cubic box of side length \(L\).
+    This solves the problem as \(u\in\squareIntegrable([-L/2, L/2]^3)\).
+    We then take the limit as \(L \to \infty\).
+    
+    We can use therefore calculate the normalisation constant, \(C\), by requiring that
+    \[1 = \int_{[-L/2, L/2]^{3}} u_{\vv{k}}^*(\vv{r}) u_{\vv{k}}(\vv{r}) \dd[3]{r} = \abs{C}^2 \int_{[-L/2, L/2]^3} \dd[3]{r} = \abs{C}^2L^3 \implies C = L^{-3/2},\]
+    where we have used the fact that states are only defined up to a constant phase factor to choose \(C \in \reals_{\ge 0}\).
+    Hence the properly normalised eigenstates are
+    \[u_{\vv{k}}(\vv{r}) = L^{-3/2} \exp(i\vv{k}\cdot\vv{r}).\]
+    We choose here to use periodic boundary conditions such that
+    \[u(-L/2, y, z) = u(L/2, y, z)\]
+    and similar in the \(y\) and \(z\) directions.
+    The momentum eigenvalues are then
+    \[\vv{p} = \hbar\vv{k} = \frac{2\pi\hbar}{L}(n_{x}, n_{y}, n_{z})\]
+    where \(n_i \in \integers\).
+    By choosing \(L\) to be very large we can approximate this as a continuous spectrum.
+    
+    \subsubsection{Density of Final States}
+    \textit{For more detail on density of states see the statistical mechanics part of the thermal physics course.}
+    
+    Any wave vector \(\vv{k}\) can be viewed as a point in \(k\)-space with coordinates \((k_x, k_y, k_z)\).
+    The allowed momentum states form a cubic lattice with spacing \(2\pi/L\).
+    The density of states is the number of states per unit volume in \(k\)-space.
+    In this case the density of states is \((L/2\pi)^3\).
+    The number of states in a volume element of \(k\)-space, \(\dd[3]{k'}\), is
+    \[\left( \frac{L}{2\pi} \right)^3 \dd[3]{k'} = \left( \frac{L}{2\pi} \right)^3 k'{^2} \dd{k'}\dd{\Omega}.\]
+    We want to know the density of states per unit energy.
+    We can do this using the following relationship as a transformation of variables:
+    \[E_{k'} = \frac{\hbar^2 k'{^2}}{2m},\]
+    which is the energy associated with a state of wave vector \(\vv{k'}\).
+    We then have
+    \[\rho(E_{k'})\dd{E_{k'}} = \left( \frac{L}{2\pi} \right)^3 k'{^2}\dd{k'}\dd{\Omega}\]
+    which is the number of states with energy in \([E_{k'}, E_{k'} + \dd{E_{k'}}]\) or equivalently with wave vector in \([k'_{i}, k'_{i} + \dd{k'_i}]\).
+    We can transform the differential using
+    \[\dd{E_{k'}} = \abs{\dv{E_{k'}}{k'}}\dd{k'} = \frac{\hbar^2k'}{m}\dd{k'}.\]
+    So we can identify \(\rho(E_{k'})\) as
+    \[\rho(E_{k'}) = \frac{L^3mk'}{8\pi^3\hbar^2}\dd{\Omega}.\]
+    
+    \subsubsection{Incident Flux}
+    By normalising the system in a box we have a system with a particle density of one particle per volume \(L^3\).
+    This particle has a velocity \(\vv{v} = \vv{p}/m = \hbar\vv{k}/m\) and so the flux per unit area per unit time perpendicular to the beam is
+    \[\text{incident flux} = \frac{\abs{\vv{v}}}{L^3} = \frac{\hbar k}{mL^3}.\]
+    
+    \subsubsection{Scattered Flux}
+    The rate of transition between the initial state, \(\vv{k}\), and final state, \(\vv{k'}\), which corresponds to a wave vector pointing into the solid angle \(\dd{\Omega}\) about the direction \((\vartheta, \varphi)\), is given, via the golden rule, by
+    \[R = \frac{2\pi}{\hbar} \abs{V_{\vv{k'}\vv{k}}}^2 \frac{L^3}{8\pi^3}\frac{mk'}{\hbar^2}\dd{\Omega}.\]
+    This is the number of particles scattered into \(\dd{\Omega}\) per unit time.
+    The flux is then given by dividing by \(\dd{\Omega}\):
+    \[\text{scattered flux} = \frac{2\pi}{\hbar} \abs{V_{\vv{k'}\vv{k}}}^2 \frac{L^3}{8\pi^3}\frac{mk'}{\hbar^2}.\]
+    
+    \subsubsection{Differential Cross Section}
+    The differential cross section is then
+    \[\dv{\sigma}{\Omega} = \frac{\text{scattered flux}}{\text{incident flux}} = \frac{mL^3}{\hbar k}\frac{2\pi}{\hbar} \abs{V_{\vv{k'}\vv{k}}}^2 \frac{L^3}{8\pi^3} \frac{mk'}{\hbar^2}.\]
+    For a real potential with elastic scattering we have \(k = k'\) and so we obtain the \define{Born approximation} of the differential cross section:
+    \[\dv{\sigma}{\Omega} = \frac{m^2}{4\pi^2\hbar^4} L^6 \abs{\bra{\vv{k'}} \operator{V} \ket{\vv{k}}}^2\]
+    where the matrix element is given by
+    \[\bra{\vv{k'}}\operator{V}\ket{\vv{k}} = \frac{1}{L^3} \int V(\vv{r}) \exp(-i\vv{q}\cdot\vv{r}) \dd[3]{r}\]
+    where \(\vv{q} = \vv{k'} - \vv{k}\) (sometimes also \(\vv{K}\)) is the \define{wave vector transfer}.
+    The integral is over the entire box but we take \(L \to \infty\) such that the integral is over all space.
+    Notice that this is simply the Fourier transform of the potential, \(V\).
+    Also notice the factor of \(L^{-3}\) so that in the resulting differential cross section the explicit \(L\) dependence cancels out.
+    
+    \section{Central Potentials and Two Body Scattering}
+    A central potential is of the form \(V(\vv{r}) = V(r)\), meaning it is spherically symmetric.
+    This allows us to simplify the Born approximation by partly evaluating the matrix element using this symmetry.
+    To do this we work in a spherical polar system with coordinates \((K, \Theta, \Phi)\) where \(\vv{K} = (K, 0, 0) = \vv{k'} - \vv{k}\) is the wave transfer vector.
+    This means that \(\vv{K}\cdot\vv{r} = Kr\cos\Theta\).
+    Considering the integral defining the matrix element we have
+    \begin{align*}
+        \bra{\vv{k'}} \operator{V} \ket{\vv{k}} &= \int V(r) \exp(-i\vv{K}\cdot\vv{r}) \dd[3]{r}\\
+        &= \int_{0}^{2\pi} \dd{\Phi} \int_{0}^{\pi} \dd{\Theta} \int_{0}^{\infty} \dd{r} r^2 \sin\Theta V(r) \exp(-iKr\cos\Theta)\\
+        &= 2\pi \int_{-1}^{1} \int_{0}^{\infty} r^2 V(r) \exp(-iKr\cos\Theta) \dd{r} \dd{(\cos\Theta)}\\
+        &= 2\pi \int_{0}^{\infty} r^2V(r) \left[ \frac{\exp(-iKr\cos\Theta)}{-iKr} \right]_{-1}^{1} \dd{r}\\
+        &= 2\pi \int_{0}^{\infty } rV(r) \left[ \frac{\exp(-iKr) - \exp(iKr)}{iK} \right] \dd{r}\\
+        &= \frac{4\pi}{K} \int_{0}^{\infty} r V(r) \sin(K r) \dd{r}.
+    \end{align*}
+    Here we have used a trick substituting for \(\cos\Theta\), see appendix~\ref{app:cos theta substitution} for more details.
+    The Born approximation for a central potential is then
+    \[\dv{\sigma}{\Omega} = \frac{4m^2}{\hbar^4K^2} \abs{\int_{0}^{\infty} rV(r) \sin(Kr) \dd{r}}^2.\]
+    Notice that this is independent of \(\varphi\) as the system is rotationally symmetric about the \(z\) axis but depends on \(\vartheta\) through the direction of \(\vv{K}\).
+    We can write this result in terms of the spherical coordinate system \((k, \vartheta, \varphi)\) which has its polar axis aligned with the incoming beam.
+    We simply need a bit of trigonometry and the fact that \(k = k'\).
+    Then it can be seen from figure~\ref{fig:geometry of elastic scattering} that
+    \[K = 2k\sin\frac{\vartheta}{2}.\]
+    \begin{figure}[ht]
+        \centering
+        \tikzsetnextfilename{geometry-of-elastic-scattering}
+        \begin{tikzpicture}[rotate={atan(0.5)}, scale=1.5]
+            \draw[->, >=latex, thick] (0, 0) -- (2, 1) node[above left, midway] {\(\vv{k}\)};
+            \draw[->, >=latex, thick] (0, 0) -- (2, -1) node[below, midway] {\(\vv{k}\)};
+            \draw[->, >=latex, thick] (2, -1) -- (2, 1) node[right, midway] {\(\vv{K}\)};
+            \draw[dashed] (0, 0) -- (2, 0);
+            \draw (2, -0.15) rectangle (1.85, 0.15);
+            \begin{scope}
+                \clip (0, 0) -- (2, 1) -- (2, -1) -- cycle;
+                \draw (0, 0) circle[radius=0.5cm];
+            \end{scope}
+            \node at (0.65, 0.2) {\(\vartheta\)};
+        \end{tikzpicture}
+        \caption{The relationship between wave vectors with elastic scattering, \(k = k'\).}
+        \label{fig:geometry of elastic scattering}
+    \end{figure}
+    \subsection{Screened Coulomb Potential}
+    The classical Coulomb potential is not local and therefore we cannot use the Born approximation.
+    However suppose we consider an incoming electron scattering off of an atom.
+    The atomic electrons provide screening which we model as a \define{screening factor} \(\exp(-\beta r)\) for some constant \(\beta > 0\).
+    Thus the potential has the form
+    \[V(r) = -\frac{Ze^2}{4\pi\varepsilon_0r} e^{-\beta r}.\]
+    This is a central potential and so
+    \begin{align*}
+        \frac{K}{4\pi} \bra{\vv{k'}} \operator{V} \ket{\vv{k}} &= \int_{0}^{\infty} rV(r) \sin(Kr)\dd{r}\\
+        &= -\frac{Ze^2}{4\pi\varepsilon_0} \int_{0}^{\infty} e^{-\beta r}\sin(Kr)\dd{r}\\
+        &= -\frac{Ze^2}{4\pi\varepsilon_0} \int_{0}^{\infty} e^{-\beta r}\frac{1}{2i}[e^{iKr} - e^{-iKr}]\dd{r}\\
+        &= -\frac{Ze^2}{4\pi\varepsilon_0} \frac{1}{2i} \int_{0}^{\infty} [e^{(iK - \beta)r} - e^{-(iK + \beta)r}\dd{r}\\
+        &= -\frac{Ze^2}{4\pi\varepsilon_0} \frac{1}{2i} \left[ \frac{\exp[(iK - \beta)r]}{iK - \beta} + \frac{\exp[-(iK + \beta)]}{iK + \beta} \right]_{0}^{\infty}\\
+        &= -\frac{Ze^2}{4\pi\varepsilon_0} \frac{1}{2i} \left[ \frac{1}{iK - \beta} + \frac{1}{iK + \beta} \right]_{0}^{\infty}\\
+        &= \frac{Ze^2}{4\pi\varepsilon_0} \frac{K}{\beta^2 + K^2}.
+    \end{align*}
+    Substituting this into the Born approximation we have
+    \[\dv{\sigma}{\Omega} = \frac{4m^2}{\hbar^4 K^2}\left( \frac{Ze^2}{4\pi\varepsilon_0} \right)^2 \frac{K^2}{(\beta^2 + K^2)^2} = \frac{4m^2}{\hbar^4} \left( \frac{Ze^2}{4\pi\varepsilon} \right)^2 \frac{1}{(\beta^2 + K^2)^2}.\]
+    This can then be further simplified if needed using
+    \[K = 2k\sin\frac{\vartheta}{2} = \frac{2mv}{\hbar}\sin\frac{\vartheta}{2}.\]
+    
+    \subsubsection{Coulomb Scattering}
+    We can obtain the cross section for scattering by an unscreened Coulomb potential by taking the limit \(\beta \to 0\).
+    We then have
+    \[\dv{\sigma}{\Omega} = \left( \frac{Ze^2}{4\pi\varepsilon_0} \right)^2 \frac{4m^2}{\hbar^4K^4} = \left( \frac{Ze^2}{4\pi\varepsilon_0} \right)^2 \frac{1}{4m^2v^4 \sin^4(\vartheta/2)}.\]
+    This is the \define{Rutherford scattering cross section}.
+    This result is identical to the classical result derived by Rutherford, it is essentially a fluke that the classical approximation by Rutherford and the quantum Born approximation both reduce to the same result.
+    
+    \subsection{Two Body Scattering}
+    So far we have considered a particle (or beam of particles) scattering off a fixed scattering centre.
+    A more realistic set up allows the scattering centre to move.
+    This allows us to model events such as two incident particles colliding and scattering as one might see in an accelerator.
+    Let \(\vv{r_i}\) and \(m_i\) be the position and mass of the \(i\)th particle and let \(\grad_i\) be the gradient operator that acts on the position of the \(i\)th particle.
+    Then the Hamiltonian for a two particle scattering system is
+    \[\operator{H} = - \frac{\hbar^2}{2m_1} \grad_1^2 - \frac{\hbar^2}{2m_2} \grad_2^2 + V(\vv{r_1} - \vv{r_2}).\]
+    As with a classical two body system it is easiest to work in the \gls{cm} frame.
+    We define
+    \[\vv{R} = \frac{m_1\vv{r_1} + m_2\vv{r_2}}{m_1 + m_2}, \qquad\text{and}\qquad \vv{r} = \vv{r_1} - \vv{r_2},\]
+    which are the centre-of-mass and relative position vectors respectively.
+    Rearranging these definitions we can recover our initial coordinate systems:
+    \[\vv{r_1} = \vv{R} + \frac{m_2}{m_1 + m_2}\vv{r}, \qquad \text{and}\qquad \vv{r_2} = \vv{R} - \frac{m_1}{m_1 + m_2} \vv{r}.\]
+    We also need to express the gradient operators in this new system.
+    Let \(x_j^{i}\), \(X_j\), and \(x_j\) be the components of \(\vv{r_i}\), \(\vv{R}\), and \(\vv{r}\) respectively.
+    Then we can rewrite the derivatives as
+    \[\pdv{x^i} = \pdv{X}{x_i}\pdv{X} + \pdv{x}{x^1}\pdv{x} = \frac{m_1}{m_1 + m_2}\pdv{X} + \pdv{x},\]
+    and similarly for the two other directions.
+    The Hamiltonian can then be written as
+    \[\operator{H} = -\frac{\hbar^2}{2M}\grad_{R}^2 - \frac{\hbar^2}{2\mu} + V(\vv{r})\]
+    where \(\grad_R\) and \(\grad\) are the gradient operators with respect to \(\vv{R}\) and \(\vv{r}\) respectively.
+    Here \(M = m_1 + m_2\) is the combined mass and \(\mu = m_1m_2/(m_1 + m_2)\) is the reduced mass.
+    
+    We can separate this Hamiltonian into two parts:
+    \[\operator{H} = \operator{H}_{\mathrm{CM}} + \operator{H}_{\mathrm{rel}}.\]
+    The first of these,
+    \[\operator{H}_{\mathrm{CM}} = -\frac{\hbar^2}{2M}\grad_R^2\]
+    describes the motion of the centre of mass, which is free to move.
+    In the \gls{cm} frame the centre of mass is, by definition, at rest and so the Hamiltonian reduces to
+    \[\operator{H}_{\mathrm{rel}} = -\frac{\hbar^2}{2\mu}\laplacian + V(\vv{r}).\]
+    This is the same as the Hamiltonian for a single particle at position \(\vv{r}\) in potential \(V\).
+    Therefore we can obtain the differential cross section in the centre of mass frame in the same way we do for a single particle scattering off a fixed scattering centre.
+    
+    \section{Bonding in the \texorpdfstring{\ce{H_2^+}}{H2+} Ion}
+    The simplest example of covalent bonding is the \ce{H_2^+} ion which consists of just three particles, two protons which share a single electron.
+    This system has three terms in the potential, the two potentials between the electron and each proton and the potential between the two protons.
+    We work in the \gls{cm} frame of the two protons (assuming the position of the electron has negligible effect on the centre of mass).
+    See figure~\ref{fig:H2+ ion} for more details.
+    \begin{figure}[ht]
+        \centering
+        \tikzsetnextfilename{H2+-ion}
+        \begin{tikzpicture}[scale=1.3]
+            \tikzset{vec/.style={very thick}}
+            \coordinate (p1) at  (-1, 0);
+            \coordinate (p2) at (1, 0);
+            \coordinate (e) at (0.5, 2);
+            \draw[vec] (p1) -- (e);
+            \draw[vec, ->, >=latex] (p1) -- ($(p1)!0.5!(e)$) node[left] {\(\vv{r_1}\)};
+            \draw[vec] (p2) -- (e);
+            \draw[vec, ->, >=latex] (p2) -- ($(p2)!0.5!(e)$) node[right] {\(\vv{r_2}\)};
+            \draw[vec] (0, 0) -- (e);
+            \draw[vec, ->, >=latex] (0, 0) -- ($(0, 0)!0.5!(e)$) node[left] {\(\vv{r}\)};
+            \draw[vec] (p1) -- (p2);
+            \draw[vec, ->, >=latex] (p1) -- ($(p1)!0.75!(p2)$) node[below] {\(\vv{R}\)};
+            \node[below] at (0, 0) {\(O\)};
+            \draw[draw=none, ball color=red] (p1) circle[radius=0.25cm];
+            \draw[draw=none, ball color=red] (p2) circle[radius=0.25cm];
+            \draw[draw=none, ball color=blue] (e) circle[radius=0.1cm];
+        \end{tikzpicture}
+        \caption{The \ce{H_2^+} ion with centre of mass frame origin, \(O\), and proton separation \(\vv{R}\).}
+        \label{fig:H2+ ion}
+    \end{figure}
+    
+    The Schr\"odinger equation for this system is
+    \[\left[ -\frac{\hbar^2}{2\mu_{12}}\grad_R^2 - \frac{\hbar^2}{2\mu_{\Pe}}\grad_r^2 - \frac{e^2}{4\pi\varepsilon_0r_1} - \frac{e^2}{4\pi\varepsilon_0r_2} + \frac{e^2}{4\pi\varepsilon_0R} \right] \psi(\vv{r}, \vv{R}) = E\psi(\vv{r}, \vv{R})\]
+    where \(\mu_{12} = m_{\Pp}/2\) is the reduced proton mass, \(m_{\Pp}\) is the proton mass,
+    \[\mu_{\Pe} = \frac{2m_{\Pp}m_{\Pe}}{2m_{\Pp} + m_{\Pe}} \approx m_{\Pe}\]
+    is the reduced mass of the entire system and \(m_{\Pe}\) is the mass of an electron.
+    
+    \subsection{Born--Oppenheimer Approximation}
+    Since protons are significantly more massive than electrons the motion of the nuclei is much slower than the motion of the electrons.
+    We treat the nuclear and electronic motions as independent and when considering the electronic motion we consider the nuclei to be fixed.
+    That is for each value of \(\vv{R}\) we can find a solution to the Schr\"odinger equation.
+    
+    The electron, in this approximation, is described by the state \(U_j(\vv{r}, \vv{R})\) which satisfies the Schr\"odinger equation
+    \[\left[ -\frac{\hbar^2}{2\mu_{\Pe}}\grad_r^2 - \frac{e^2}{4\pi\varepsilon_0r_1} - \frac{e^2}{4\pi\varepsilon_0r_2} + \frac{e^2}{4\pi\varepsilon_0R} \right]U_j(\vv{r}, \vv{R}) = E_j(\vv{R})U_j(\vv{r}, \vv{R}).\]
+    We can solve this for a given fixed \(\vv{R}\).
+    For each value of \(\vv{R}\) we find a set of energy eigenvalues, \(E_j(\vv{R})\), and eigenfunctions, \(U_j(\vv{r}, \vv{R})\) which are the \define{molecular orbitals}.
+    
+    We then assume that the \(j\)th state is given by
+    \[\psi(\vv{r}, \vv{R}) = F_j(\vv{R})U_j(\vv{r}, \vv{R})\]
+    where \(F_j\) is a wave function describing the nuclear motion which is independent of the location of the electron.
+    We can substitute this into the full Schr\"odinger equation and simplify further using the Schr\"odinger equation for electronic motion to get
+    \[\left[ -\frac{\hbar^2}{2\mu_{12}}\grad_R^2 + E_j(\vv{R}) - E \right]F_j(\vv{R})U_j(\vv{r}, \vv{R}) = 0.\]
+    Using some vector calculus identities we have
+    \begin{align*}
+        \grad_{R}^2[F_j(\vv{R}) U_j(\vv{r}, \vv{R})] &= \grad_R \cdot [\grad_R (F_j(\vv{R})U_j(\vv{r}, \vv{R}))]\\
+        &= \grad_R \cdot [U_j(\vv{r}, \vv{R}) \grad_R F_j(\vv{R}) + F_j(\vv{R})\grad_R U_j(\vv{r}, \vv{R})]\\
+        &= U_j(\vv{r}, \vv{R})\grad_R^2F_j(\vv{R}) + F_j(\vv{R})\grad_R^2U_j(\vv{r}, \vv{R}) + 2 [\grad_RU_j(\vv{r}, \vv{R})]\cdot[\grad_RF_j(\vv{R})].
+    \end{align*}
+    Assuming that the molecular orbitals, \(U_j\), don't change much with inter-nuclear separation, \(\vv{R}\), we neglect the terms including \(\grad_RU_j(\vv{r}, \vv{R})\) and \(\grad_R^2U_j(\vv{r}, \vv{R})\) and we are left with the Schr\"odinger equation
+    \[\left[ -\frac{\hbar^2}{2\mu_{12}}\grad_R^2 + E_j(\vv{R}) - E \right]F_j(\vv{R}) = 0.\]
+    This is the Schr\"odinger equation for a single particle of mass \(\mu_{12}\) in the potential \(E_j(\vv{R})\).
+    
+    \subsection{Electronic Ground State}
+    We can find the lowest electronic energy levels of \ce{H_2^+} using the Rayleigh--Ritz variational method.
+    First we notice that we can write \(\vv{r_1} = \vv{r} + \vv{R}/2\) and \(\vv{r_2} = \vv{r} - \vv{R}/2\).
+    This means that under the parity operator, \(\operator{\parity}\), defined by \(\operator{\parity}f(\vv{r}) = f(-\vv{r})\) we have \(\operator{\parity}\vv{r_1} = -\vv{r_2}\) and \(\operator{\parity}\vv{r_2} = -\vv{r_1}\) so by relabelling \(1 \leftrightarrow 2\) the Hamiltonian is invariant under \(\operator{\parity}\).
+    This means that
+    \[[\operator{\parity}, \operator{H}] = 0.\]
+    The compatibility theorem then tells us that \(\operator{\parity}\) and \(\operator{H}\) have a simultaneous eigenbasis.
+    As eigenfunctions of \(\operator{\parity}\) these must be either even, in which case we call them \textit{gerade} or \(\gerade\), or odd, in which case we call them \textit{ungerade} or \(\ungerade\)\footnote{\textit{gerade} and \textit{ungerade} are German for even and odd respectively}.
+    So we can split the eigenfunctions into two types based on their parity:
+    \[\operator{\parity}U_j^{\gerade}(\vv{r}, \vv{R}) = U_{j}^{\gerade}(\vv{r}, \vv{R}), \qquad \text{and} \qquad \operator{\parity}U_j^{\ungerade}(\vv{r}, \vv{R}) = -U_j^{\ungerade}(\vv{r}, \vv{R}).\]
+    We now need to come up with a trial function, or in this case two trial functions for \textit{gerade} and \textit{ungerade} eigenfunctions.
+    Suppose \(\vv{R}\) is very large.
+    Then the system approximates a free proton and a hydrogen atom.
+    This suggests that the hydrogen atom eigenfunctions may make good trial functions.
+    We are interested in the ground state so we use the \(1\mathrm{s}\) eigenstates, which are even, to construct the trial states
+    \[\psi^{\gerade} = u_{1\mathrm{s}}(r_1) + u_{1\mathrm{s}}(r_2), \qquad\text{and}\qquad \psi^{\ungerade} = u_{1\mathrm{s}}(r_1) - u_{1\mathrm{s}}(r_2).\]
+    This procedure, is known as taking \gls{lcao}.
+    We can calculate the expectation value of the electronic Hamiltonian using these trial wave functions:
+    \[E^{\gerade,\ungerade}(\vv{R}) = \frac{\int \psi^{\gerade,\ungerade}{^*}(\vv{r}, \vv{R})\operator{H}\psi^{\gerade,\ungerade}(\vv{r}, \vv{R})\dd[3]{r}}{\int \abs{\psi^{\gerade,\ungerade}(\vv{r}, \vv{R})}^2\dd[3]{r}}.\]
+    This gives an upper bound on the energies, \(E^{\gerade}(\vv{R})\) and \(E^{\ungerade}(\vv{R})\), for a given value of \(\vv{R}\).
+    We treat \(\vv{R}\) here as a variational parameter.
+    
+    Evaluating these integrals is complicated and not very informative so we simply state the solutions:
+    \begin{align*}
+        E^{\gerade}(\vv{R}) &= E_{1\mathrm{s}} + \frac{e^2}{4\pi\varepsilon_0R} \frac{(1 + R/a_0)e^{-2R/a_0} + [1 - \tfrac{2}{3}(R/a_0)^2]e^{-R/a_0}}{1 + [1 + R/a_0 + \tfrac{1}{3}(R/a_0)^2]e^{-R/a_0}},\\
+        E^{\ungerade}(\vv{R}) &= E_{1\mathrm{s}} + \frac{e^2}{4\pi\varepsilon_0R} \frac{(1 + R/a_0)e^{-2R/a_0} - [1 - \tfrac{2}{3}(R/a_0)^2]e^{-R/a_0}}{1 + [1 + R/a_0 + \tfrac{1}{3}(R/a_0)^2]e^{-R/a_0}}.
+    \end{align*}
+    Here \(a_0 = \SI{5.29e-11}{\metre}\) is the Bohr radius and \(E_{1\mathrm{s}} = \SI{13.6}{\electronvolt}\) is the ground state energy of atomic hydrogen.
+    To fully apply the variational method we need to find \(\vv{R}\) such that these energies are minimised.
+    If we do this then we find that the even orbital has a minimum at \(R = R_0 \approx 2.5a_0\) which corresponds to \(E^{\gerade} - E_{1\mathrm{s}} = -\SI{1.77}{\electronvolt}\).
+    This is an upper bound on the ground state energy and so we conclude that there is a stable bound state, which of course we know to be the case.
+    In contrast there is no minimum for \(E^{\ungerade}\) so any \ce{H_2^+} ion in an antisymmetric-state will dissociate into a proton and a hydrogen atom.
+    
+    This makes sense as we can think of the even states as more tightly bound because the wave function peaks in between the protons and therefore provides shielding and more tightly bonds the ion together.
+    On the other hand the odd wave function vanishes directly between the two protons and therefore the antisymmetric system is less tightly bound.
+    
+    \begin{figure}[ht]
+        \centering
+        \tikzsetnextfilename{energy-levels-H-2-plus-ion}
+        \begin{tikzpicture}
+            \pgfmathsetmacro{\prefactor}{27.2113862}  % prefactor, e^2/(4 pi epsilon0 a0) in electron volts
+            \begin{axis}[
+                domain=0:6,
+                ymax=4,
+                ymin=-2,
+                axis lines=middle,
+                legend style={draw=none},
+                xlabel={\(R/a_0\)},
+                ylabel={Energy (\si{\electronvolt})},
+                x label style={at={(axis description cs:0.5,0.25)},anchor=north},
+                y label style={at={(axis description cs:-0.1,.5)},rotate=90,anchor=south}
+                ]
+                \addplot[
+                samples=100,
+                very thick,
+                red
+                ]
+                {\prefactor * ((1 + x) * e^(-2*x) + (1 - 2*x^2/3) * e^(-x))/(x + x * (1 + x + x^2/3) * e^(-x))};
+                \addlegendentry{\(E^\gerade - E_{1\mathrm{s}}\)}
+                
+                \addplot [
+                samples=100,
+                very thick,
+                blue,
+                dashed
+                ]
+                {\prefactor * ((1 + x) * e^(-2*x) - (1 - 2*x^2/3) * e^(-x))/(x + x * (1 + x + x^2/3) * e^(-x))};
+                \addlegendentry{\(E^\ungerade - E_{1\mathrm{s}}\)}
+            \end{axis}
+        \end{tikzpicture}
+        \caption{Plot of \(E^{\gerade} - E_{1\mathrm{s}}\) as a function of inter--nuclear separation, \(R/a_0\).}
+    \end{figure}
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \tikzexternaldisable
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    \subsection{Rotational and Vibrational Modes}
+    We can now consider the effective one body Schr\"odinger equation for the electronic ground state \(E_j(\vv{R}) = E^{\gerade}(\vv{R})\).
+    Since \(E^{\gerade}(R)\) depends only on the magnitude of \(\vv{R}\) this corresponds to an effective central potential.
+    Therefore the solutions are of the form
+    \[F^{\gerade}(\vv{R}) = \frac{1}{R}\mathcal{R}_{NL}(R)Y_{L}^{M_L}(\vartheta, \varphi)\]
+    where \(\mathcal{R}_{NL}\) satisfies
+    \[\left[ -\frac{\hbar^2}{2\mu_{12}}\left( \dv[2]{R} - \frac{L(L + 1)}{R^2} \right) + E^{\gerade}(\vv{R}) - E \right]\mathcal{R}_{NL}(R) = 0.\]
+    We can Taylor expand \(E^{\gerade}\) about \(R = R_0\).
+    Since this is a minimum the first order term vanishes:
+    \[E^{\gerade}(R) \approx E^{\gerade}(R) + \frac{1}{2}k(R - R_0)^2 + \dotsb\]
+    where \(k = E^{\gerade}{''}(R_0)\).
+    We can also define
+    \[E_r = \frac{\hbar^2}{2\mu_{12}R_0}L(L + 1)\]
+    which gives the value of the centrifugal barrier (the second term in the Hamiltonian) at the point \(R = R_0\).
+    Using this to approximate the centrifugal term and the Taylor series to approximate the potential we have
+    \[\left[ -\frac{\hbar^2}{2\mu_{12}}\dv[2] + \frac{1}{2}k(R - R_0)^2 - E_N \right]\mathcal{R}_{NL}(R) = 0\]
+    where we combine all energy terms into one:
+    \[E_N = E - E^{\gerade}(R_0) - E_r.\]
+    We can now identify this Schr\"odinger equation as corresponding to a harmonic oscillator which has energy levels
+    \[E_N = \hbar\omega_0\left( N + \frac{1}{2} \right)\]
+    for \(N = 0, 1, 2, \dotsc\) and \(\omega_0 = \sqrt{k/\mu_{12}}\).
+    
+    The vibrational modes (which correspond to \(E_N\)) are on the order of \(\SI{0.1}{\electronvolt}\) (which corresponds to \(T = \SI{1160}{\kelvin}\)).
+    It is also possible to compute the rotational modes which are on the order of \(\SI{0.001}{\electronvolt}\) (which corresponds to \(T = \SI{11.6}{\kelvin}\)).
+    Both of these are much smaller than the spacing between electronic energy levels, which are on the order of \(\SI{1}{\electronvolt}\) (which corresponds to \(\SI{11600}{\kelvin}\).
+    Notice that at room temperature it is possible to reach the rotational but not vibrational modes which is a fact we rely on in thermodynamics.
+    The electronic energy level separations lead to molecular absorption/emission spectra and zooming in on a given line we see a vibrational--rotational spectra.
+    
+    \clearpage
+    \appendix
+    \part*{Appendix}
+    \addcontentsline{toc}{part}{Appendix}
+    \begingroup
+    \input{appendices/algebraic-structures.tex}
+    \input{appendices/sum-0-to-n.tex}
+    \input{appendices/clebsch-gordan-coeff.tex}
+    \input{appendices/deutsch-algorithm-tex.tex}
+    \endgroup
+    \section{\texorpdfstring{\(\cos\vartheta\)}{cos theta} Substitution}\label{app:cos theta substitution}
+    Suppose that we have an integral of the form
+    \[I = \int_{0}^{\pi} \sin\vartheta f(\cos\vartheta) \dd{\vartheta}.\]
+    This is common after moving to spherical coordinates.
+    In this case a common substitution is \(u = \cos\vartheta\) and so \(\dd{u} = -\sin\vartheta\dd{\vartheta}\).
+    Also the limits become \(-1 = \cos\pi\) and \(1 = \cos 0\).
+    The integral then becomes
+    \[I = -\int_{1}^{-1} f(u) \dd{u} = \int_{-1}^{1} f(u)\dd{u}.\]
+    This is such a common substitution that it is common practice to not explicitly name the substitution variable and continue working with \(\cos\vartheta\) and so the integral is
+    \[I = \int_{-1}^{1} f(\cos\vartheta) \dd{(\cos\vartheta)}.\]
+\end{document}
