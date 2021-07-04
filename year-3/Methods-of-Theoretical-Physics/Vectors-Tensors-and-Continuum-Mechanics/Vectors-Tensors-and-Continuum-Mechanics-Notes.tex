@@ -1,0 +1,1123 @@
+\documentclass[a4paper]{article}
+
+\usepackage{NotesPackage2}
+\usepackage{csquotes}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+
+\usetikzlibrary{calc}
+\usetikzlibrary{external}
+
+\tcbuselibrary{breakable}
+\tcbuselibrary{theorems}
+\tcbset{highlight math style={}}
+
+\tikzexternalize[prefix=tikz-external/]
+
+\author{Willoughby Seago}
+\date{September 12, 2021}
+\title{
+    Methods of Theoretical Physics\\
+    {\Large Vectors, Tensors and Continuum Mechanics}
+}
+
+\makeglossaries
+% Add glossary entries here
+\newacronym{eg}{EG}{Example}  % this is an example
+
+\newcommand{\notesVersion}{1.2}
+\newcommand{\notesDate}{04/07/2021}
+
+\newcommand{\nxmMatrices}[3]{\mathcal{M}_{{#1}\times{#2}}({#3})}
+\renewcommand{\ident}{I}
+\newcommand{\swap}[2]{{#1} \leftrightarrow {#2}}
+\newcommand{\swapEquals}[2]{\overset{\swap{#1}{#2}}{=}}
+\newcommand{\generalLinearGroup}{\mathrm{GL}}
+\newcommand{\orthogonalGroup}{\mathrm{O}}
+\newcommand{\specialOrthogonalGroup}{\mathrm{SO}}
+\def\centerarc[#1](#2)(#3:#4:#5)% Syntax: [draw options] (center) (initial angle:final angle:radius)
+{ \draw[#1] ($(#2)+({#5*cos(#3)},{#5*sin(#3)})$) arc (#3:#4:#5); }
+\newcommand{\lieAlgebra}[1]{\mathfrak{#1}}
+\newcommand{\basis}{\mathcal{B}}
+\newcommand{\veprime}[1]{\vv{e'_{#1}}}
+\newcommand{\vepprime}[1]{\vv{e''_{#1}}}
+\newcommand{\nindices}[2]{{ {#1}_1 {#1}_2 \dotsm {#1}_{#2} }}
+\DeclareMathOperator{\GRAD}{grad}
+\DeclareMathOperator{\DIV}{div}
+\DeclareMathOperator{\CURL}{curl}
+\newcommand{\vd}[1]{\vv{\mathrm{d}{#1}}}
+\newcommand{\freeEnergy}{\mathcal{F}}
+\DeclareMathOperator{\FT}{FT}
+\newcommand{\mdv}[3][]{\frac{\mathrm{D}^{#1} #2}{\mathrm{D} {#3}^{#1}}}
+\newcommand{\mdvat}[4][]{\frac{\mathrm{D}^{#1} #2}{\mathrm{D} {#3}^{#1}}\bigg|_{#4}}
+\newcommand{\jacobianMatrix}{\mathcal{J}}
+\newcommand{\reynoldsNumber}{\mathrm{Re}}
+
+\includeonly{parts/vectors_and_tensors}
+
+\begin{document}
+    \pagenumbering{roman}  % Number contents pages and glossaries with roman numerals
+    \maketitle
+    These are my notes for the \textit{vectors, tensors, and continuum mechanics} part of the \textit{methods of theoretical physics} course from the University of Edinburgh as part of the third year of the theoretical physics degree.
+    When I took this course in the 2020/21 academic year it was taught by Dr Mehdi Bouzid\footnote{\url{https://www.ph.ed.ac.uk/people/mehdi-bouzid}}.
+    These notes are based on the lectures delivered as part of this course and the notes provided as part of this course which were originally written by Professor Alexander Morozov\footnote{\url{https://ww.ph.ed.ac.uk/people/alexander-morozov}}.
+    The content within is correct to the best of my knowledge but if you find a mistake or just disagree with something or think it could be improved please let me know.
+    
+    These notes were produced using \LaTeX\footnote{\url{https://www.latex-project.org/}}.
+    Graphs where plotted using Matplotlib\footnote{\url{https://matplotlib.org/}}, NumPy\footnote{\url{https://numpy.org/}}, and SciPy\footnote{\url{https://scipy.org/scipylib/}}.
+    Diagrams were drawn with tikz\footnote{\url{https://www.ctan.org/pkg/pgf}}.
+    
+    This is version \notesVersion~of these notes, which is up to date as of \notesDate.
+    \begin{flushright}
+        Willoughby Seago
+        
+        s1824487@ed.ac.uk
+    \end{flushright}
+    \clearpage
+    \tableofcontents
+    \listoffigures
+%    \listoftheorems[ignoreall, show={theorem,corollary,lemma}]
+%    \renewcommand{\listtheoremname}{List of Definitions}
+%    \listoftheorems[ignoreall, show=definition]
+    \printglossary[type=\acronymtype, title=Acronyms]
+    \pagenumbering{arabic}  % Number rest of document with numbers
+    \clearpage
+    \begingroup
+    \let\clearpage\relax  % "\begingroup, \let\clearpage\relax, \endgroup" stops automatic pagebreaks after each include
+    \include{parts/vectors_and_tensors}
+    \endgroup
+    
+    
+    \part{Linear Elasticity}
+    \section{The Deformation Tensor}
+    \subsection{Deformation Types}
+    There are many ways that a body can be deformed.
+    Some of the most common are shears, compressions, and stretches.
+    \begin{figure}[ht]
+        \centering
+        \tikzsetnextfilename{elementary-deformations}
+        \begin{tikzpicture}
+            \tikzset{body/.style={fill=lightgray, fill opacity=0.3, thick}}
+            \pgfmathsetmacro{\boxHeight}{2}
+            \pgfmathsetmacro{\boxLength}{3}
+            % Coordinate naming: (b/t|f/b|l/r) corresponds to corner (base/top|front/back|left/right)
+            \coordinate (bfl) at (0, 0);
+            \coordinate (bbl) at (0.5, 0.5);
+            \coordinate (bfr) at ($(bfl) + (\boxLength, 0)$);
+            \coordinate (bbr) at ($(bbl) + (\boxLength, 0) - (1, 0)$);
+            \coordinate (tfl) at ($(bfl) + (0, \boxHeight)$);
+            \coordinate (tbl) at ($(bbl) + (0, \boxHeight) - (0, 1)$);
+            \coordinate (tbr) at ($(tbl) + (\boxLength, 0) - (1, 0)$);
+            \coordinate (tfr) at ($(tfl) + (\boxLength, 0)$);
+            \draw[body] (bfl) -- (bfr) -- (tfr) -- (tfl) -- cycle; % Front 
+            \draw[body] (bbl) -- (bbr) -- (tbr) -- (tbl) -- cycle; % Back 
+            \draw[body] (bfl) -- (bbl) -- (tbl) -- (tfl) -- cycle; % Left 
+            \draw[body] (bfr) -- (bbr) -- (tbr) -- (tfr) -- cycle; % Right
+            \draw[body] (bfl) -- (bfr) -- (bbr) -- (bbl) -- cycle; % Base
+            \draw[body] (tfl) -- (tfr) -- (tbr) -- (tbl) -- cycle; % Top
+            \node at ($(bfl)!0.5!(bfr) - (0 ,1)$) {Undeformed};
+            
+            \begin{scope}[xshift=5cm]
+                \coordinate (bfl) at (0, 0);
+                \coordinate (bbl) at (0.5, 0.5);
+                \coordinate (bfr) at (3, 0);
+                \coordinate (bbr) at (3, 0.5);
+                \coordinate (tfl) at (1, 2);
+                \coordinate (tbl) at (1, 1.5);
+                \coordinate (tbr) at (3.5, 1.5);
+                \coordinate (tfr) at (4, 2);
+                \draw[body] (bfl) -- (bfr) -- (tfr) -- (tfl) -- cycle; % Front 
+                \draw[body] (bbl) -- (bbr) -- (tbr) -- (tbl) -- cycle; % Back 
+                \draw[body] (bfl) -- (bbl) -- (tbl) -- (tfl) -- cycle; % Left 
+                \draw[body] (bfr) -- (bbr) -- (tbr) -- (tfr) -- cycle; % Right
+                \draw[body] (bfl) -- (bfr) -- (bbr) -- (bbl) -- cycle; % Base
+                \draw[body] (tfl) -- (tfr) -- (tbr) -- (tbl) -- cycle; % Top
+                \node at ($(bfl)!0.5!(bfr) - (0 ,1)$) {Shear};
+            \end{scope}
+            
+            \begin{scope}[yshift=-4cm]
+                \pgfmathsetmacro{\boxLength}{2}
+                \coordinate (bfl) at (0, 0);
+                \coordinate (bbl) at (0.5, 0.5);
+                \coordinate (bfr) at ($(bfl) + (\boxLength, 0)$);
+                \coordinate (bbr) at ($(bbl) + (\boxLength, 0) - (1, 0)$);
+                \coordinate (tfl) at ($(bfl) + (0, \boxHeight)$);
+                \coordinate (tbl) at ($(bbl) + (0, \boxHeight) - (0, 1)$);
+                \coordinate (tbr) at ($(tbl) + (\boxLength, 0) - (1, 0)$);
+                \coordinate (tfr) at ($(tfl) + (\boxLength, 0)$);
+                \draw[body] (bfl) -- (bfr) -- (tfr) -- (tfl) -- cycle; % Front 
+                \draw[body] (bbl) -- (bbr) -- (tbr) -- (tbl) -- cycle; % Back 
+                \draw[body] (bfl) -- (bbl) -- (tbl) -- (tfl) -- cycle; % Left 
+                \draw[body] (bfr) -- (bbr) -- (tbr) -- (tfr) -- cycle; % Right
+                \draw[body] (bfl) -- (bfr) -- (bbr) -- (bbl) -- cycle; % Base
+                \draw[body] (tfl) -- (tfr) -- (tbr) -- (tbl) -- cycle; % Top
+                \node at ($(bfl)!0.5!(bfr) - (0 ,1)$) {Compression};
+            \end{scope}
+        
+            \begin{scope}[yshift=-4cm, xshift=5cm]
+                \pgfmathsetmacro{\boxLength}{4}
+                \coordinate (bfl) at (0, 0);
+                \coordinate (bbl) at (0.5, 0.5);
+                \coordinate (bfr) at ($(bfl) + (\boxLength, 0)$);
+                \coordinate (bbr) at ($(bbl) + (\boxLength, 0) - (1, 0)$);
+                \coordinate (tfl) at ($(bfl) + (0, \boxHeight)$);
+                \coordinate (tbl) at ($(bbl) + (0, \boxHeight) - (0, 1)$);
+                \coordinate (tbr) at ($(tbl) + (\boxLength, 0) - (1, 0)$);
+                \coordinate (tfr) at ($(tfl) + (\boxLength, 0)$);
+                \draw[body] (bfl) -- (bfr) -- (tfr) -- (tfl) -- cycle; % Front 
+                \draw[body] (bbl) -- (bbr) -- (tbr) -- (tbl) -- cycle; % Back 
+                \draw[body] (bfl) -- (bbl) -- (tbl) -- (tfl) -- cycle; % Left 
+                \draw[body] (bfr) -- (bbr) -- (tbr) -- (tfr) -- cycle; % Right
+                \draw[body] (bfl) -- (bfr) -- (bbr) -- (bbl) -- cycle; % Base
+                \draw[body] (tfl) -- (tfr) -- (tbr) -- (tbl) -- cycle; % Top
+                \node at ($(bfl)!0.5!(bfr) - (0 ,1)$) {Stretch};
+            \end{scope}
+        \end{tikzpicture}
+        \caption{Common deformations}
+        \label{fig:common deformations}
+    \end{figure}
+    These are shown in figure~\ref{fig:common deformations}.
+    Very rarely does only one of these deformations occur.
+    For example if you compress an object along one axis the matter has to go somewhere so it tends to increase in size along the other axes.
+    We aim to come up with a way to describe a general deformation.
+    In this course we are interested in linear elasticity which means that we assume all deformations are sufficiently small that things can safely be expanded only up to linear order in the relevant variable.
+    
+    \subsection{Geometry of Deformations}
+    A body in equilibrium has its position, orientation, and shape set by the positions, \(\{\vv{r}\}\), of its material points.
+    What counts as a material point exactly isn't important, its simply a point that we can track as a body moves and deforms, it could be an atom or molecule or it might be a region of material.
+    
+    Suppose the body is then deformed in such a way that a material point that was at \(\vv{r}\) before the deformation is now at \(\vv{r'}\).
+    We define the \define{displacement vector}, \(\vv{u}\), as the displacement of the point under this deformation:
+    \[\vv{u} = \vv{r} - \vv{r'}.\]
+    In a translation or rotation the shape of the body is fixed and therefore \(\vv{u}\) is the same for all points.
+    In a deformation however the shape of the body can change and therefore \(\vv{u}\) is not the same for all points.
+    We can think of \(\vv{u}\) as a vector field mapping points to there deformed points.
+    This introduces a double dependence on \(\vv{r}\): first \(\vv{r}\) is the point that is being moved and second \(\vv{r}\) is the point at which we are evaluating \(\vv{u}(\vv{r})\).
+    By simply rearranging the definition of \(\vv{u}\) we have \(\vv{r'} = \vv{r} + \vv{u}(\vv{r})\) and \(\{\vv{r'}\}\) gives us the shape, orientation, and position of the deformed body.
+    
+    Consider two points, \(\vv{r}\) and \(\vv{r} + \vd{r}\), on the undeformed body.
+    The Cartesian coordinates of these points are then \(x_i\) and \(x_i + \dd{x_i}\) respectively.
+    After the deformation we have
+    \begin{align*}
+        x_i&\mapsto x_i + u_i(\vv{r}),\\
+        x_i + \dd{x_i}&\mapsto x_i + \dd{x_i} + u_i(\vv{r} + \vd{r}).
+    \end{align*}
+    The distance between the two points before the deformation is \(\dd{l}\), which by Pythagoras' theorem is simply
+    \[\dd{l}^2 = \dd{x_1}^2 + \dd{x_2}^2 + \dd{x_3}^2 = \dd{x_i}^2.\]
+    Note that even though the \(i\) only appears once since it appears in a squared term we view it as \(\dd{x_i}\dd{x_i}\) so there is an implied summation.
+    The distance between the two points after the deformation is \(\dd{l'}\).
+    To calculate this we similarly need to sum the square of the differences between the coordinates:
+    \begin{align*}
+        \dd{l'}^2 &= [(x_i + \dd{x_i} + u_i(\vv{r} + \vd{r})) - (x_i + u_i(\vv{r}))]^2\\
+        &= [\dd{x_i} + u_i(\vv{r} + \vd{r}) - u_i(\vv{r})]^2.
+    \end{align*}
+    We can Taylor expand \(u_i\) about \(\vv{r}\) to first order as
+    \[u_i(\vv{r} + \vd{r}) = u_i(\vv{r}) + \pdv{u_i}{x_k}\dd{x_k} + \order{\dd{x_k}^2} \implies u_i(\vv{r} + \vd{r}) - u_i(\vv{r}) \approx \pdv{u_i}{x_k}\dd{x_k}.\]
+    Using this we have
+    \begin{align*}
+        \dd{l'}^2 \approx \left[\dd{x_i} + \pdv{u_i}{x_k}\dd{x_k}\right]^2\\
+        &= \dd{x_i}^2 + 2\pdv{u_i}{x_k}\dd{x_i}\dd{x_k} + \pdv{u_i}{x_k}\pdv{u_i}{x_j}\dd{x_k}\dd{x_j}.
+    \end{align*}
+    The first term is simply \(\dd{l}^2\).
+    The second term can be expanded as
+    \begin{align*}
+        2\pdv{u_i}{x_k}\dd{x_i}\dd{x_k} &= \pdv{u_i}{x_k}\dd{x_i}\dd{x_k} + \pdv{u_i}{x_k}\dd{x_i}\dd{x_k}
+        \shortintertext{renaming \(\swap{i}{k}\) in the second term only we have}
+        &= \pdv{u_i}{x_k}\dd{x_i}\dd{x_k} + \pdv{u_k}{x_k}\dd{x_k}\dd{x_i}\\
+        &= \pdv{u_i}{x_k}\dd{x_i}\dd{x_k} + \pdv{u_k}{x_k}\dd{x_i}\dd{x_k}.
+    \end{align*}
+    For the final term if we rename \(i\rightarrow l\) and \(j\to i\) we have
+    \[\pdv{u_i}{x_k}\pdv{u_i}{x_j}\dd{x_k}\dd{x_j} = \pdv{u_l}{x_k}\pdv{u_l}{x_k}\dd{x_k}\dd{x_k}\]
+    Putting this into \(\dd{l'}^2\) we have
+    \begin{align*}
+        \dd{l'}^2 &= \dd{l}^2 + \left(\pdv{u_i}{x_k} + \pdv{u_k}{x_i}\right) \dd{x_i}\dd{x_k} + \pdv{u_l}{x_i}\pdv{u_l}{x_k}\\
+        &= \dd{l}^2 + \left[\pdv{u_i}{x_k} + \pdv{u_k}{x_i} + \pdv{u_l}{x_i}\pdv{u_l}{x_k}\right]\dd{x_i}\dd{x_k}\\
+        &= \dd{l}^2 + 2u_{ik}\dd{x_i}\dd{x_k}
+    \end{align*}
+    where
+    \[\tcbhighmath{
+        u_{ik} = \frac{1}{2}\left(\pdv{u_i}{x_k} + \pdv{u_k}{x_i} + \pdv{u_l}{x_k}\pdv{u_l}{x_k}\right)
+    }\]
+    are the coordinates of a rank 2 Cartesian tensor, \(u\), called the \define{deformation tensor} or the \define{strain tensor}.
+    Note that the factor of \(1/2\) and therefore factor of 2 in \(\dd{l'}^2\) are simply a matter of convention.
+    Note that sometimes the last term is dropped as it is of higher order so not as important for small deformations.
+    The notation here can be a bit confusing as we use \(u\) for the displacement vector and the deformation tensor.
+    The two uses can be distinguished by the rank of the object in question.
+    
+    The components, \(u_{ik}\), are symmetric in \(i\) and \(k\) (\(u_{ik} = u_{ki}\)).
+    This means that there are only 6 free components and the other three are fixed by symmetry.
+    One corollary of this si that \(u\) can always be diagonalised.
+    Let \(u^{(i)}\) be the eigenvalues, or principle components, of \(u\).
+    Then there in the eigenbasis, \(\{\vv{u^{(i)}}\}\), also known as the principle axes, we have
+    \[
+        u = 
+        \begin{pmatrix}
+            u^{(1)} & 0 & 0\\
+            0 & u^{(2)} & 0\\
+            0 & 0 & u^{(3)}
+        \end{pmatrix}
+        .
+    \]
+    Suppose we work in the eigenbasis.
+    Then
+    \begin{align*}
+        \dd{l'}^2 &= \dd{l}^2 + 2u_{ik}\dd{x_i}\dd{x_k}\\
+        &= \dd{x_i}^2 + 2u_{ik}\dd{x_i}\dd{x_k}\\
+        &= \delta_{ik}\dd{x_i}\dd{x_k} + 2u_{ik}\dd{x_i}\dd{x_k}\\
+        &= (\delta_{ik} + 2u_{ik})\dd{x_i}\dd{x_k}\\
+        &= (1 + 2u_{11})\dd{x_1}^2 + (1 + 2u_{22})\dd{x_2}^2 + (1 + 2u_{33})\dd{x_3}^2\\
+        &= (1 + 2u^{(1)})\dd{x_1}^2 + (1 + 2u^{(2)})\dd{x_2}^2 + (1 + 2u^{(3)})\dd{x_3}^2
+    \end{align*}
+    So the proportional change of separation along each axis is
+    \[\dd{xi'} = \sqrt{1 + 2u^{(i)}}\dd{x_i}\]
+    and hence
+    \[\frac{\dd{x_i'} = \dd{x_i}}{\dd{x_i}} = \sqrt{1 + 2u^{(i)}} - 1.\]
+    Since the deformation is small \(u^{(i)}\) must be small and so we expand this in terms of \(u^{(i)}\):
+    \[\sqrt{1 + 2u^{(i)}} = (1 + 2u^{(i)})^{1/2} \approx 1 + u^{(i)} + \order{u^{(i)}{^2}}\]
+    so we have
+    \[\dd{x_i'} \approx (1 + u^{(i)})\dd{x_i}, \qquad\text{and}\qquad \frac{\dd{x_i'} - \dd{x_i}}{\dd{x_i}} \approx u^{(i)}.\]
+    
+    Suppose we wish to know the volume change.
+    Consider a small volume, \(\dd{V} = \dd{x_1}\dd{x_2}\dd{x_3}\), in the undeformed body.
+    After the deformation this becomes
+    \begin{align*}
+        \dd{V'} &= (1 + u^{(1)})(1 + u^{(2)})(1 + u^{(3)})\dd{x_1}\dd{x_2}\dd{x_3}\\
+        &\approx (1 + u^{(1)} + u^{(2)} + u^{(3)})\dd{V}\\
+        &= [1 + \Tr (u)]\dd{V}
+    \end{align*}
+    where we have dropped any terms of second order or higher.
+    Hence we have
+    \[\frac{\dd{V'} - \dd{V}}{\dd{V}} = \Tr u.\]
+    This is a useful result because the trace is invariant under a coordinate transform, this can be shown by considering a transformation \(L\in\specialOrthogonalGroup(3)\):
+    \[A'_{ii} = l_{i\alpha}l_{i\beta}A_{\alpha\beta} = L\trans_{\alpha i}L_{i\beta}A_{\alpha\beta} = (L\trans L)_{\alpha\beta} A_{\alpha\beta} = \delta_{\alpha\beta}A_{\alpha\beta} = A_{\alpha\alpha} = \Tr(A).\]
+    \begin{example}
+        \textit{Consider a cuboid that is stretched along the \(x_1\) axis so the length increases from \(l\) to \(l + \Delta l\) for some fractional change, \(\alpha\). Suppose that this also causes the cuboid to contract along the other two axes by some amount such that the fractional change, \(\beta\), is the same for both axes. What is the deformation tensor for this deformation?}
+        
+        First consider the \(x_1\) axis:
+        \[\frac{\Delta l}{l} = \frac{x_i' - x_i}{x_i} = \frac{u^{(1)}}{x_i} = \alpha.\]
+        So \(u^{(1)} = \alpha x_1\).
+        Now consider the \(x_2\) axis.
+        If we think of this as the height, \(h\), of the cuboid then we have
+        \[\frac{\Delta h}{h} = \frac{x_2' - x_2}{x_2} = \frac{u^{(2)}}{x_2} = -\beta.\]
+        So \(u^{(2)} = -\beta x_2\), notice that this is negative since the cuboid is compressed along this axis.
+        Similarly if we think about the \(x_3\) axis as width, \(w\), of the cuboid we have
+        \[\frac{\Delta h}{h} = \frac{x_3' - x_3}{x_3} = \frac{u^{(3)}}{x_3} = -\beta.\]
+        So \(u^{(3)} = -\beta x_3\).
+        Hence the deformation tensor in the principle axis basis has components
+        \[
+            u =
+            \begin{pmatrix}
+                \alpha & 0 & 0\\
+                0 & -\beta & 0\\
+                0 & 0 & -\beta
+            \end{pmatrix}
+            .
+        \]
+    \end{example}
+
+    \section{The Stress Tensor}
+    An undeformed body is in equilibrium with its surroundings.
+    This means that all parts of the body are in equilibrium with each other.
+    The total force and total torque the body are zero.
+    When the body is deformed by external forces it is moved away from equilibrium creating internal forces in the body.
+    
+    Consider a small portion of the body.
+    Any forces acting on this portion must have a net effect of acting only at the surface as forces within the body cancel out.
+    Let \(\vv{F}\) be the force per unit volume, or force density, acting on the volume.
+    The total force on the volume is simply
+    \[\int_{V} \vv{F} \dd{V}.\]
+    Since the force acts only at the surface there exists a tensor, \(\sigma_{ij}\), such that we can write the total force as a surface integral,
+    \begin{equation}\label{eqn:int F dV = int sigma dA}
+        \int_V F_i \dd{V} = \int_{\partial V} \sigma_{ij} \dd{A_j},
+    \end{equation}
+    where \(\partial V\) is the boundary of the volume and \(\dd{A_j} = n_j\dd{A}\) is an area element along the surface normal \(\vh{n}\).
+    By the divergence theorem we can then write
+    \[\int_{\partial V}\sigma_{ij}\dd{A_j} = \int_{V}\pdv{\sigma_{ij}}{x_j} \dd{V}.\]
+    Hence
+    \[\tcbhighmath{
+        F_i = \pdv{\sigma_{ij}}{x_j}.
+    }\]
+    In conclusion if the only forces acting on a body act on its surface then the internal forces in the body can be written as the divergence of a second rank tensor, \(\sigma\), which is called the \define{stress tensor}.
+    
+    For a physical understanding of what \(\sigma\) represents consider equation~\ref{eqn:int F dV = int sigma dA}.
+    This gives us
+    \[\dd{F_i} = \sigma_{ij}\dd{A_j} = \sigma_{ij}n_j\dd{A}\]
+    where \(\dd{F_i} = F_i\dd{V}\) is the force on the volume element \(\dd{V}\) in the direction \(x_i\).
+    From this we can see that \(\sigma_{ij}\) is the force per unit area in the direction \(x_i\) acting on the surface element normal to \(x_j\).
+    This can be seen more clearly in figure~\ref{fig:stress tensor} which shows the stress tensor on a cube.
+    Each component of \(\sigma_{i3}\) is proportional to the force acting on the face normal to \(x_3\) and the force acts in the \(x_i\) direction.
+    \begin{figure}[ht]
+        \centering
+        \tikzsetnextfilename{stress-tensor}
+        \begin{tikzpicture}
+            \tikzset{body/.style={gray, very thick, fill=lightgray!50, fill opacity=0.5}}
+            \tikzset{tensor/.style={ultra thick, ->, >=latex}}
+            \draw[body] (1, 1) rectangle (5, 5); % back
+            \draw[body] (0, 0) -- (1, 1) -- (1, 5) -- (0, 4) -- cycle; % left
+            \draw[body] (0, 0) -- (1, 1) -- (5, 1) -- (4, 0) -- cycle; % bottom
+            \draw[body] (4, 0) -- (5, 1) -- (5, 5) -- (4, 4) -- cycle; % right
+            \draw[body] (0, 4) -- (1, 5) -- (5, 5) -- (4, 4) -- cycle; % top
+            \draw[body] (0, 0) rectangle (4, 4); % front
+            \draw[tensor] (2.25, 4.5) -- (2.25, 6) node[above] {\(\sigma_{33}\)};
+            \draw[tensor] (2.25, 4.5) -- (3.75, 4.5) node[right] {\(\sigma_{23}\)};
+            \draw[tensor] (2.25, 4.5) -- ($(2.25, 4.5)!0.8!(1.18933, 3.439)$) node[below] {\(\sigma_{13}\)};
+            \begin{scope}[xshift=1cm, yshift=1cm]
+                \draw[->, >=latex] (6, 2) -- (6, 3.5) node[above] {\(x_3\)};
+                \draw[->, >=latex] (6, 2) -- (7.5, 2) node[right] {\(x_2\)};
+                \draw[->, >=latex] (6, 2) -- ($(6, 1)!0.8!(4.939, 0.939)$) node[below] {\(x_1\)};
+            \end{scope}
+            \node at (-3.5, 0) {}; % make the cube centred
+        \end{tikzpicture}
+        \caption{The stress tensor}
+        \label{fig:stress tensor}
+    \end{figure}
+    
+    Now consider the torque that acts on the volume as a result of the neighbouring volume elements inside the body.
+    This is given by
+    \begin{align*}
+        \left[ \int \vv{r}\times\vv{F} \dd{V} \right]_i &= \int \varepsilon_{ijk} x_jF_k \dd{V}\\
+        &=  \int (x_2F_3 - x_3F_2)\delta_{i1} \dd{V} + \int (x_3F_1 - x_1F_3)\delta_{i2} \dd{V} + \int (x_1F_2 - x_2F_1)\delta_{i3} \dd{V}.
+    \end{align*}
+    Consider just one of these terms:
+    \begin{align*}
+        \int (x_iF_j - x_jF_i) \dd{V} &= \int \left( x_i\pdv{\sigma_{jk}}{x_k} - x_j\pdv{\sigma_{ik}}{x_k} \right)\dd{V}\\
+        &= \int \pdv{x_k} (x_i\sigma_{ik} - x_j\sigma_{ik}) \dd{V} - \int \left( \pdv{x_i}{x_k}\sigma_{jk} - \pdv{x_j}{x_k}\sigma_{ik} \right)\dd{V}\\
+        &= \int (x_i\sigma_{jk} - x_j\sigma_{ik})\dd{A_k} - \int (\delta_{ik}\sigma_{jk} - \delta_{jk}\sigma_{ik})\dd{V}\\
+        &= \int (x_i\sigma_{jk} - x_j\sigma_{ik})\dd{A_k} - \int (\sigma_{ji} - \sigma_{ij})\dd{V}.\\
+    \end{align*}
+    Here we have again used the divergence theorem to replace a volume integral with a surface integral.
+    The same logic that we applied to the forces here leads us to the conclusion that the torque must be able to be written as a surface integral.
+    Therefore we require the second term to be zero.
+    Since this must be the case for an arbitrary volume element we have
+    \[\sigma_{ij} = \sigma_{ji}\]
+    so the stress tensor is symmetric.
+    
+    In the absence of external forces there is no net force applied to any volume element and so
+    \[F_i = \pdv{\sigma_{ij}}{x_j} = 0 \iff \DIV\sigma = 0.\]
+    If there is an external force that acts on all volume elements then
+    \[\pdv{\sigma_{ij}}{x_j} + f_i = 0\]
+    where \(f_i\) is the force per unit volume in the \(x_i\) direction.
+    For example if a body experiences gravity along the \(x_2\) axis then we have
+    \[\pdv{\sigma_{1j}}{x_j} = \pdv{\sigma_{2j}}{x_j} - mg = \pdv{\sigma_{3j}}{x_j} = 0.\]
+    The boundary equations for this differential equation come from specifying the force applied to each surface of the body.
+    For each surface we must specify the force, \(P_i\), applied to area \(A\) along \(x_j\) which is given by \(P_i = \sigma_{ij}n_jA\) where \(\vh{n}\) is the surface normal.
+    
+    \begin{example}
+        \textit{Consider a cylinder stretched by two equal and opposite forces applied to its ends. What is the stress tensor?}
+        \begin{figure}[ht]
+            \centering
+            \tikzsetnextfilename{cylinder-stetch-stress-example}
+            \begin{tikzpicture}
+                \tikzset{body/.style={gray, very thick, fill=lightgray!25}}
+                \tikzset{force/.style={ultra thick, ->, >=latex}}
+                \draw[body] (0, 0) circle [x radius=0.5cm, y radius=1cm];
+                \fill[body] (0, 1) rectangle (5, -1);
+                \draw[body] (0, -1) rectangle (5, -1);
+                \draw[body] (0, 1) rectangle (5, 1);
+                \draw[body] (5, 0) circle [x radius=0.5cm, y radius=1cm];
+                \draw[force] (5, 0) -- (7, 0) node[right] {\(P\)};
+                \draw[force] (-0.5, 0) -- (-2, 0) node[left] {\(-P\)};
+            \end{tikzpicture}
+            \caption{Cylinder being stretched.}
+            \label{fig:example 1 stress tensor}
+        \end{figure}
+        
+        Figure~\ref{fig:example 1 stress tensor} shows the setup.
+        Let \(a\) be the end with force \(-P\) per unit area and \(b\) be the end with force \(P\) per unit area.
+        Let the \(x_1\)-axis run from \(a\) to \(b\), the \(x_2\)-axis be into the page and the \(x_3\) axis be up.
+        Then the boundary conditions are as follows:
+        \begin{itemize}
+            \item At \(b\) the outer normal is \(\ve{1}\) and so \(\sigma_{ij}(b)\delta_{j1}A = P\delta_{i1}\) where \(A\) is the area of the circle.
+            \item At \(a\) the outer normal is \(-\ve{1}\) and so \(-\sigma_{ij}(a)\delta_{j1}A = -P\delta_{i1}\).
+            \item On the curved surface of the cylinder \(\vh{n}\) is perpendicular to \(\ve{1}\) and so \(\vh{n} = \alpha \ve{2} + \beta\ve{3}\).
+            Since no force acts in this direction we have \(\sigma_{ij}n_j\tilde{A} = 0\) where \(\tilde{A}\) is the area of the element of the curved surface that we are currently considering.
+            Expanding these we have
+            \begin{align*}
+                \alpha\sigma_{12} + \beta\sigma_{13} &= 0,\\
+                \alpha\sigma_{22} + \beta\sigma_{23} &= 0,\\
+                \alpha\sigma_{32} + \beta\sigma_{33} &= 0,
+            \end{align*}
+        \end{itemize}
+        Since, in general, there are surface elements where \(\alpha, \beta \ne 0\) we must have \(\sigma_{ij} = 0\) for \(i, j \ne 1\).
+        Hence
+        \[
+            \sigma_{ij} = 
+            \begin{pmatrix}
+                P/A & 0 & 0\\
+                0 & 0 & 0\\
+                0 & 0 & 0
+            \end{pmatrix}
+            .
+        \]
+        
+    \end{example}
+    
+    \begin{example}\label{exa:isotropic compression stress tensor}
+        \textit{What is the stress tensor for an isotropic compression?}
+        
+        An isotropic compression involves the same force on each face.
+        Let \(p\) is the force per unit area.
+        For a compression \(p\) points into the surface, i.e. anti-parallel to the surface normal.
+        Also the only force on a face is perpendicular to that face so the off diagonal elements of the stress tensor are zero.
+        Hence \(\sigma_{ij}n_jA = -p\delta_{ik}n_kA = -p\ident\).
+        \[
+            \sigma_{ij} = 
+            \begin{pmatrix}
+                -p & 0 & 0\\
+                0 & -p & 0\\
+                0 & 0 & -p
+            \end{pmatrix}
+            .
+        \]
+    \end{example}
+    \begin{example}\label{exa:shear stress tensor}
+        \textit{What is the stress tensor for a shear of the surface normal to \(x_2\) along the \(x_1\) direction?}
+        
+        The only force is applied to the surface with surface normal \(\ve{2}\).
+        If the force is \(F\) and it is in the \(x_1\) direction then we must have \(\sigma_{12} = F\).
+        Since the stress tensor is symmetric we must also have \(\sigma_{21} = F\).
+        Hence
+        \[
+            \sigma_{ij} =
+            \begin{pmatrix}
+                0 & F & 0\\
+                F & 0 & 0\\
+                0 & 0 & 0
+            \end{pmatrix}
+            .
+        \]
+    \end{example}
+    
+    \subsection{Relation Between Deformation and Stress Tensors}
+    Suppose we have a medium being deformed under some external force so that the stress tensor is \(\sigma\) and the deformation tensor is \(u\).
+    We want to find a relationship between \(\sigma\) and \(u\).
+    Imagine we perform some extra work on the system changing the displacement vector \(\vv{u}\) to \(\vv{u} + \vv{\delta u}\) (\(u_i\) to \(u_i + \delta u_i\)).
+    We are free to choose how to do this work and so we choose to do it in a way such that \(\delta u_i\) vanishes at the surface.
+    The work done by internal forces is given by
+    \[\int \delta W\dd{V} = \int \vv{F}\cdot\vv{\delta u}\dd{V}\]
+    where \(\delta W\) is the work done on a single volume element and \(\vv{F}\) is the internal force that opposes the deformation.
+    By the definition of the stress tensor we have
+    \[\int \delta W \dd{V} = \int \pdv{\sigma_{ik}}{x_k}\delta u_i \dd{V} = \int \pdv{x_k}(\delta u_i \sigma_{ik}) \dd{V} - \int \sigma_{ik}\pdv{x_k}\delta u_i.\]
+    We can write the first integral as a surface integral using the divergence theorem.
+    We can write the second integral in a symmetric form.
+    \[\int \delta W \dd{V} = \int \sigma_{ik}\delta u_i n_k \dd{A} - \frac{1}{2} \int \left( \sigma_{ik}\pdv{x_k}\delta u_i + \sigma_{ki}\pdv{x_i}\delta u_k \right)\dd{V}.\]
+    Since we chose \(\delta u_i\) to vanish at the surface the first integral vanishes.
+    For the second integral we exploit the symmetry of the stress tensor:
+    \[\int \delta W \dd{V} = -\frac{1}{2}\int \sigma_{ik}\left( \pdv{x_k}\delta u_i + \pdv{x_i}\delta u_k \right) \dd{V} = -\int \sigma_{ik}\delta u_{ik} \dd{V}\]
+    where
+    \[\delta u_{ik} = \frac{1}{2}\left( \pdv{u_i}{x_k} + \pdv{u_k}{x_i} \right).\]
+    Notice that this is simply the deformation tensor after dropping terms of second order.
+    
+    \section{Stress and Strain}
+    Recall that in the last section we derived the result
+    \[\int\delta W\dd{V} = -\int\sigma_{ik}\delta u_{ik}\dd{V}.\]
+    The free energy is defined as
+    \[\freeEnergy = U - TS\]
+    where \(U\) is the internal energy, \(T\) is the temperature, and \(S\) is the entropy.
+    The value derived above is the work done, which is equal to the negative of the internal energy.
+    The infinitesimal free energy change due to the deformation is
+    \[\dd{\freeEnergy} = \dd{(U - TS)} = \dd{U} - S\dd{T}\]
+    using \(\dd{U} = -\delta W\) we have
+    \[\dd{\freeEnergy} = -\delta W - S\dd{T} = \sigma_{ik}\delta u_{ik} - S\dd{T}.\]
+    At constant temperature we have \(\dd{T} = 0\) and so
+    \[\dd{\freeEnergy} = \sigma_{ik}\delta u_{ik}.\]
+    Hence
+    \[\sigma_{ik} = \pdvconst{\freeEnergy}{u_{ik}}{T}.\]
+    Hence \(\freeEnergy\) is a function of the deformation tensor, \(u\).
+    For a homogenous, isotropic medium, which is the only sort we are interested in here, there is no preferred direction and hence \(\freeEnergy\) can only depend on quantities that are invariant under rotations.
+    These quantities are \(\Tr u = u_{ii}\), \(u_{ik}u_{ki}\), and \(u_{ij}u_{jk}u_{ki}\).
+    All higher order tensor invariants can be written in terms of these quantities.
+    Further we consider only small deformations and therefore neglect any terms that appear higher than second order.
+    This leaves us with a generalised version of Hooke's law, which states that the energy stored in a spring with spring constant \(k\) is \(kx^2/2\) where \(x\) is the displacement of the spring from equilibrium.
+    We can think of this simply as Taylor expanding \(\freeEnergy\) in terms of \(u_{ik}\).
+    Finally notice that two deformations with \(u_{ij}\) and \(-u_{ij}\) produce the same free energy change and hence \(u\) can only appear in even powers since the transformation \(u \to -u\) cannot be allowed to introduce a negative.
+    Hence the free energy is given by
+    \[\freeEnergy = \frac{\lambda}{2}u_{ii}^2 + \mu u_{ik}^2\]
+    where we have used the fact that \(u\) is symmetric so \(u_{ik}u_{ki} = u_{ik}u_{ik} = u_{ik}^2\), note that we still sum over \(i\) and \(k\).
+    Here the constants of proportionality are \(\lambda/2\) and \(\mu\).
+    \(\lambda\) and \(\mu\) are called the Lam\`e coefficients.
+    
+    We saw in examples~\ref{exa:isotropic compression stress tensor} and \ref{exa:shear stress tensor} that for an isotropic compression the stress tensor is diagonal.
+    Similarly for a shear the stress tensor will have zeros on the diagonal.
+    Using this we can split any stress tensor into two parts.
+    A diagonal tensor for the compression component and a tensor with only non-zero elements off the diagonal for the shear component.
+    
+    Now consider differentials of the free energy:
+    \begin{align*}
+        \dd{\freeEnergy} &= \frac{\lambda}{2}\dd{(u_{ll}^2)} + 2\mu\dd{u_{ik}^2}\\
+        &= \lambda u_{ll}\dd{u_{ll}} + 2\mu u_{ik}\dd{u_{ik}}
+    \end{align*}
+    Consider the differential of the trace:
+    \[\dd{u_{ll}} = \pdv{u_{ll}}{u_{ik}}\dd{u_{ik}}.\]
+    The derivative can be computed easily by first noting that
+    \[\pdv{u_{ab}}{u_{ik}} = \delta_{ia}\delta_{kb}\]
+    and so
+    \[\pdv{u_{ll}}{u_{ik}} = \delta_{il}\delta_{kl} = \delta_{ik}.\]
+    Hence
+    \[\dd{u_{ll}} = \delta_{ik}\dd{u_{ik}}.\]
+    Substituting this into the differential of the free energy we have
+    \[\dd{\freeEnergy} = \lambda u_{ll}\delta_{ik}\dd{u_{ik}} + 2\mu u_{ik}\dd{u_{ik}}.\]
+    Dividing through by \(\dd{u_{ik}}\) and assuming convergence etc. we have
+    \[\sigma_{ik} = \pdv{\freeEnergy}{u_{ik}} = \lambda u_{ll}\delta_{ik} + 2\mu u_{ik}.\]
+    By defining \(\lambda = K - 2\mu/3\) we can write this as
+    \[\sigma_{ik} = \left( K - \frac{2}{3}\mu \right)\delta_{ik}u_{ll} + 2\mu u_{ik}.\]
+    We will see a physical interpretation for the constant \(K\) later.
+    
+    The equations above allow us to compute the stress tensor for a given deformation tensor assuming we know the values of the relevant constants.
+    We would also like to be able to reverse this and work out what deformation caused a given stress.
+    To this end consider the trace of the stress tensor:
+    \[\sigma_{ll} = \left[ 3\left( K - \frac{2}{3}\mu \right) + 2\mu \right] u_{ll} = 3Ku_{ll}.\]
+    Hence
+    \[u_{ll} = \frac{1}{3K}\sigma_{ll}.\]
+    Substituting this into the equation for \(\sigma_{ik}\) in terms of \(u\) and rearranging gives
+    \[u_{ik} = \frac{1}{2\mu}\left[ \sigma_{ik} - \left( K - \frac{2}{3}\mu \right) \frac{1}{3K} \delta_{ik} \sigma_{ll} \right] = \frac{1}{2\mu}\sigma_{ik} - \frac{1}{6\mu}\delta_{ik}\sigma_{ll} + \frac{1}{9K}\delta_{ik}\sigma_{ll}.\]
+    
+    At this point we note that a given deformation can be split into two parts, one which characterises the shear part of the deformation and the other characterises the compression/extension part.
+    The shear part is given by all of the off diagonal elements whereas the compression is given by the diagonal parts:
+    \[u_{ik} = \underbrace{\left( u_{ik} - \frac{1}{3}\delta_{ik}u_{ll} \right)}_{\text{shear}} + \underbrace{\frac{1}{3}\delta_{ik}u_{ll}.}_{\text{compression}}\]
+    Notice the factor of \(1/3\) which occurs since \(\delta_{ii} = 3\).
+    We can then write the free energy as
+    \[\freeEnergy = \mu\left( u_{ik} - \frac{1}{3}\delta_{ik}u_{ll} \right)^2 + \frac{K}{2}u_{ll}^2.\]
+    This gives us a physical interpretation for \(K\) and \(\mu\).
+    \(K\), called the \define{bulk modulus} or \define{compressability}, characterises how hard it is to compress a material.
+    Similarly \(\mu\), called the \define{shear modulus}, characterises how hard it is to shear the material.
+    
+    We saw in example~\ref{exa:isotropic compression stress tensor} that a compression of force \(p\) per unit area leads to a stress tensor \(\sigma_{ik} = -p\delta_{ik}\).
+    Hence the deformation tensor is
+    \begin{align*}
+        u_{ik} &=  \frac{1}{2\mu}\sigma_{ik} - \frac{1}{6\mu}\delta_{ik}\sigma_{ll} + \frac{1}{9K}\delta_{ik}\sigma_{ll}\\
+        &= \frac{1}{2\mu}(-p\delta_{ik}) - \frac{1}{6\mu}\delta_{ik}(-p\delta_{ll}) + \frac{1}{9K}\delta_{ik}(-p\delta_{ll})\\
+        &= -\frac{1}{2\mu}p\delta_{ik} + \frac{1}{2\mu}\delta_{ik}p - \frac{1}{3K}\delta_{ik}p\\
+        &= - \frac{1}{3K}\delta_{ik}p.\\
+    \end{align*}
+    So
+    \[
+        u = 
+        \begin{pmatrix}
+            -p/3K & 0 & 0\\
+            0 & -p/3K & 0\\
+            0 & 0 & -p/3K
+        \end{pmatrix}
+        .
+    \]
+    Recall that the trace of the deformation tensor gives the relative volume change:
+    \[u_{ll} = -\frac{p}{K} = \frac{\delta V}{V}.\]
+    This shows that increasing \(K\) means that we need to increase the pressure to get the same volume change, which makes sense as \(K\) is the compressibility of the material.
+    If we interpret this as a pressure change rather than an absolute pressure then we can rearrange to get
+    \[\frac{1}{K} = -\frac{1}{V}\pdv{V}{P}\]
+    which should be familiar from thermodynamics.
+    In this case the change in free energy is given by
+    \[\freeEnergy = \frac{p^2}{2K}\]
+    where we have chosen to define zero free energy as the starting free energy of the system.
+    Notice from this that \(K\), and by extension \(\mu\) and \(\lambda\) have units of energy per metre cubed which is the same as pascals.
+    
+    \section{Stress--Strain Examples}
+    \begin{example}
+        \itshape
+        Consider a cylinder with its axis along the \(x_1\) direction.
+        Apply a force per unit area, \(P\), to one end along the \(x_1\) direction.
+        What is the stress and strain?
+        
+        \normalfont
+        The stress is easy to compute, there is force only on one face and in one direction so the stress is zero for all components apart from \(\sigma_{11} = P\).
+        The deformation tensor in general is given by
+        \[u_{ik} = \frac{1}{2\mu} \left[ \sigma_{ik} - \left( K - \frac{2}{3}\mu \right) \frac{1}{3K}\delta_{ik}\sigma_{ll} \right].\]
+        In the case of \(\sigma_{11} = P\) being the only non-zero component then this reduces to
+        \[u_{ik} = \frac{1}{2\mu}\left[ P\delta_{i1}\delta_{k1} -  \left( K - \frac{2}{3}\mu \right) \frac{1}{3K} \delta_{ik}P \right],\]
+        or written in matrix form
+        \[
+            u =
+            \begin{pmatrix}
+                \frac{1}{3}\left( \frac{1}{\mu} + \frac{1}{3K} \right)P &0 & 0\\
+                0 & \left( \frac{1}{9K} - \frac{1}{\mu} \right)P & 0\\
+                0 & 0 & \left( \frac{1}{9K} - \frac{1}{\mu} \right)P
+            \end{pmatrix}
+            .
+        \]
+        At this point it behoves us to introduce two new constants.
+        The first is the \define{Young's modulus},
+        \[E = \frac{9K\mu}{3K + \mu}.\]
+        It is a measure of how much a material will deform in the direction of the force.
+        This can be seen from the fact that
+        \[u_{11} = \frac{P}{E}.\]
+        The other constant is \define{Poisson's ratio},
+        \[\nu = \frac{1}{2} \frac{3K - 2\mu}{3K + \mu}.\]
+        It is a measure of deformation in the directions orthogonal to the forces which can be seen from the fact that
+        \[u_{22} = u_{33} = -\nu u_{11}.\]
+        The value of \(\nu\) is restrained to \([-1, 1/2]\).
+        Notice that the volume change is zero if \(\nu = 1/2\), in this case we say that the material is incompressible.
+        Since \(\nu\) can be both positive and negative for some (most) materials a stretch in one direction will cause a contraction in the other directions but in some materials it will cause an expansion in all directions.
+        \(\nu\) is dimensionless and \(E\) has dimensions of force per unit area, or pascals, but the typical size of \(E\) is such that gigapascals are often the more appropriate unit.
+    \end{example}
+    \begin{example}
+        \itshape
+        Consider a block with its base (normal to the \(x_3\) direction) fixed to the floor.
+        Apply a force such that the deformation that results is \(u_{33} = \gamma\) and all other components zero.
+        What is the stress and free energy?
+        
+        \normalfont
+        The stress in general is given by
+        \[\sigma_{ik} = \frac{E}{1 + \nu}\left[ u_{ik} + \frac{\nu}{1 - 2\nu}u_{ll}\delta_{ik} \right].\]
+        In this case this means we have
+        \[\sigma_{33} = \frac{E(1 - \nu)\gamma}{(1 + \nu)(1 - 2\nu)} = -P\]
+        where we introduce the force per unit area, \(-P\), which we take as negative as it acts out of the surface rather than into it.
+        We also have
+        \[\sigma_{11} = \sigma_{22} = \frac{E\nu \gamma}{(1 + \nu)(1 - 2\nu)} = -P\frac{\nu}{1 - \nu}.\]
+        The free energy is
+        \begin{align*}
+            \freeEnergy &= \frac{E}{2(1 + \nu)}\left[ u_{ik}^2 + \frac{\nu}{1 - 2\nu}u_{ll} \right]\\
+            &= \frac{P^2}{2E}\frac{(1 + \nu)(1 - 2\nu)}{1 - \nu}.
+        \end{align*}
+    \end{example}
+    \section{Point Force on an Infinite Medium}\label{sec:point force elasticity}
+    Consider an infinite elastic medium with a point force applied.
+    Before we start with the maths what do we expect the result to be?
+    We expect maximal deformation at the point where the force is applied and we expect a cylindrically symmetric deformation around this point which decreases as the distance from the point of application decreases.
+    A point force like this is important as we consider linear deformations meaning that any force distribution can be thought of as a linear combination of, possibly an infinite number of, point forces.
+    
+    Recall the force balance equation,
+    \[\pdv{\sigma_{ik}}{x_k} + f_i = 0,\]
+    where \(\sigma\) is the stress tensor and \(\vv{F}\) is the net external force.
+    Writing \(\sigma\) in terms of the deformation tensor we have
+    \begin{align*}
+        -F_i &= \pdv{x_k}\left[ \left( K - \frac{2}{3}\mu \right) \delta_{ik}u_{ll} + 2\mu u_{ik} \right]\\
+        &= \left( K - \frac{2}{3}\mu \right) \partial_{i}u_{ll} + 2\mu\partial_{k}u_{ik}.
+    \end{align*}
+    Now recall that, to second order,
+    \[u_{ik} = \frac{1}{2}(\partial_iu_k + \partial_ku_i)\]
+    where \(\vv{u}\) is the displacement vector.
+    Putting this into the force balance equation we have
+    \begin{align*}
+        -F_i &= \left( K - \frac{2}{3}\mu \right)\partial_i\partial_lu_l + \mu\partial_k(\partial_iu_k + \partial_ku_i)\\
+        &= \left( K - \frac{2}{3}\mu \right) \partial_i\partial_lu_{l} + \mu \partial_i\partial_k u_k + \partial_k\partial_ku_i\\
+        &= \left( K - \frac{2}{3}\mu \right)\partial_i(\div\vv{u}) + \mu\partial_i(\div\vv{u}) + \laplacian u_i\\
+        &= \left( K + \frac{1}{3}\mu \right)\partial_i(\div\vv{u}) + \laplacian u_i
+    \end{align*}
+    or in vector form
+    \[\vv{0} = \mu\laplacian\vv{u} + \left( K + \frac{1}{3}\mu \right)\grad(\div\vv{u}) + \vv{F}.\]
+    
+    Since there is no other sensible choice we choose the origin to be at the point of application.
+    A point force can be modelled with a Dirac delta distribution.
+    So the force balance equation with a point force at the origin is
+    \[\vv{0} = \mu\laplacian\vv{u} + \left( K + \frac{1}{3}mu \right)\grad(\div\vv{u}) + \vv{f}\delta(\vv{r}).\]
+    Where we choose \(f\) such that the force has the correct magnitude and direction.
+    
+    To solve this problem we will move to Fourier space.
+    Recall that the Fourier transform of a vector field, \(\vv{v}\), is
+    \[\FT\{\vv{v}\}(\vv{k}) = \vv{\hat{v}}(\vv{k}) = \int e^{-i\vv{k}\cdot\vv{r}}\vv{v}(\vv{r}) \dd[3]{k},\]
+    and the inverse transform is
+    \[\FT^{-1}\{\vv{\hat{v}}\}(\vv{r}) = \vv{v}(\vv{r}) = \frac{1}{(2\pi)^3}\int e^{i\vv{k}\cdot\vv{r}}\vv{u}(\vv{r})\dd[3]{r}.\]
+    In particular using the sifting property of the Dirac delta distribution we have
+    \[\delta(\vv{r}) = \frac{1}{(2\pi)^3}\int e^{i\vv{k}\cdot\vv{r}}\dd[3]{k}.\]
+    Fourier transforming the entire force balance equation then gives us
+    \[\frac{1}{(2\pi)^3} \int \dd[3]{k} e^{i\vv{k}\cdot\vv{r}} \left[ -\mu k^2\hat{u}_a + \left( K + \frac{1}{3}\mu \right)ik_ak_b\hat{u}_b + f_a \right] = 0.\]
+    This must hold for any \(\vv{r}\) and so we have
+    \begin{equation}\label{eqn:force balance eqn in Fourier space}
+        \mu k^2\hat{u}_a + \left( K + \frac{1}{3}\mu \right)k_ak_b\hat{u}_b = f_a.
+    \end{equation}
+    We want to solve this for \(\hat{u}\) as this will allow us to find the deformation, \(u\), in real space.
+    Multiply by \(k_a\) and we get
+    \[\mu k^2k_a\hat{u}_a + \left( K + \frac{1}{3}\mu \right)k_ak_ak_b\hat{u_b} = f_ak_a.\]
+    Renaming \(a\to b\) in the first term and summing over \(a\) in the second term we have
+    \[\mu k^2k_b\hat{u}_b + \left( K + \frac{1}{3}\mu \right)k^2k_b\hat{u_b} = f_ak_a.\]
+    Rearranging gives
+    \[k_b\hat{u}_b = \frac{f_bk_b}{(K + 4\mu/3)k^2}.\]
+    We substitute this back into equation~\ref{eqn:force balance eqn in Fourier space} and rearranging we have
+    \[\hat{u}_a = \frac{1}{\mu k^2}\left[ \delta_{ab} - \frac{K + \mu/3}{K + 4\mu/3} \frac{k_ak_b}{k^2} \right]f_b.\]
+    We then take the inverse Fourier transform to get back to real space:
+    \[u_a(\vv{r}) = \frac{1}{(2\pi)^3}e^{i\vv{k}\cdot\vv{r}}\frac{1}{\mu k^2}\left[ \delta_{ab} - \frac{K+\mu/3}{K + 4\mu/3} \frac{k_ak_b}{k^2} \right]f_b\dd[3]{k}.\]
+    This can be split into two integrals:
+    \begin{align*}
+        I_1 &= \frac{1}{(2\pi)^3}\int e^{i\vv{k}\cdot\vv{r}} \frac{1}{k^2} \dd[3]{k}\\
+        I_2 &= \frac{1}{(2\pi)^3}\int e^{i\vv{k}\cdot\vv{r}} \frac{k_ak_b}{k^4}
+    \end{align*}
+    For the first integral we move to a spherical coordinate system, \(\{k, \vartheta, \varphi\}\), with the \(z\)-axis (\(\vartheta = 0\)) aligned with \(\vv{r}\) so that \(\vv{k}\cdot\vv{r} = kr\cos\vartheta\).
+    Then
+    \begin{align*}
+        I_1 &= \frac{1}{(2\pi)^3} \int_{0}^{2\pi} \dd{\varphi} \int_0^{\infty}\int_0^{\pi} \sin\vartheta e^{ikr\cos\vartheta} \dd{\vartheta}\dd{k}\\
+        &= \frac{1}{(2\pi)^3} 2\pi \int_0^{\infty}\int_0^{\pi} \sin\vartheta e^{ikr\cos\vartheta} \dd{\vartheta}\dd{k}\\
+        &= \frac{1}{(2\pi)^2} \int_0^{\infty}\int_0^{\pi} \sin(\vartheta) e^{ikr\cos\vartheta} \dd{\vartheta}\dd{k}.
+    \end{align*}
+    First we compute the inner integral over \(\vartheta\).
+    To do this first notice that
+    \begin{align*}
+        \pdv{\vartheta} e^{ikr\cos\vartheta} &= \pdv{\vartheta}[\cos\vartheta]\pdv{\cos\vartheta}e^{ikr\cos\vartheta}\\
+        &= -ikr\sin(\vartheta) e^{ikr\cos\vartheta}
+    \end{align*}
+    so
+    \[\sin(\vartheta) e^{ikr\cos\vartheta} = -\frac{1}{ikr}\pdv{\vartheta}e^{ikr\cos\vartheta}\]
+    and hence
+    \begin{align*}
+        I_1 &= \frac{1}{(2\pi)^2} \int_0^{\infty}\int_0^{\pi} \sin(\vartheta) e^{ikr\cos\vartheta} \dd{\vartheta}\dd{k}\\
+        &= \frac{1}{(2\pi)^2} \int_0^{\infty} \int_{0}^{\pi} -\frac{1}{ikr}\pdv{\vartheta} e^{ikr\cos\vartheta} \dd{\vartheta}\dd{k}\\
+        &= \frac{1}{(2\pi)^2} \int_0^{\infty} -\frac{1}{ikr}\left[ e^{ikr}\cos\vartheta \right]_{0}^{\pi} \dd{k}\\
+        &= \frac{1}{(2\pi)^2} \int_0^{\infty} -\frac{1}{ikr}\left[ e^{-ikr} - e^{ikr} \right] \dd{k}\\
+        &= \frac{1}{(2\pi)^2} \int_0^{\infty} \frac{1}{kr}2\sin(kr)\dd{k}\\
+        &= \frac{1}{2\pi^2} \int_0^{\infty} \frac{\sin(kr)}{kr}\dd{k}.
+    \end{align*}
+    Now let \(\xi = kr\) so \(\dd{k} = \dd{\xi}/r\) and we have
+    \[I_1 = \frac{1}{2\pi r^2}\int_0^{\infty} \frac{\sin\xi}{\xi} \dd{\xi} = \frac{1}{4\pi r}\]
+    where we have used the standard integral
+    \[\int_0^{\infty} \frac{\sin \xi}{\xi} \dd{\xi} = \frac{\pi}{2}.\]
+    For the second integral note that we can write
+    \[I_2 = \frac{1}{(2\pi)^3} \int e^{i\vv{k} \cdot \vv{r}} \frac{k_ak_b}{k^4} \dd[3]{k} = -\frac{1}{(2\pi)^3} \pdvsec{}{x_a}{x_b} \int e^{i\vv{k}\cdot\vv{r}}\frac{1}{k^4} \dd[3]{k}.\]
+    Then in the same spherical system as we used for the first integral we have
+    \[I_2 = -\pdvsec{}{x_a}{x_b} \frac{1}{2\pi^2}\int_0^{\infty}\frac{\sin(kr)}{k^3r}\dd{k}.\]
+    Taking the derivative and defining \(\xi = kr\) we have
+    \[I_2 = \frac{1}{2\pi^2 r} \int_0^{\infty} \left[ \delta_{ab} \left( \frac{\sin\xi}{\xi^3} - \frac{\cos\xi}{\xi^2} \right) + \frac{x_ax_b}{r^2} \left( \frac{\sin \xi}{\xi} + 3\frac{\cos\xi}{\xi} - 3\frac{\sin\xi}{\xi} \right) \right] \dd{\xi}.\]
+    These integrals can be done using the integrals
+    \[\int_0^{\xi} \frac{1 - \cos\xi}{\xi^2} \dd{\xi} = \frac{\pi}{2}, \qquad\text{and}\qquad \int_0^{\infty} \frac{\xi - \sin\xi}{\xi^3} = \frac{\pi}{4}.\]
+    Using this we have
+    \[I_2 = \frac{1}{8\pi r}\left( \delta_{ab} + \frac{x_ax_b}{r^2} \right).\]
+    Combining everything we have
+    \begin{align*}
+        u_a(\vv{r}) &= \frac{1}{8\pi r} \frac{K + \mu/3}{\mu(K + 4\mu/3)} \left[ \left( 1 + \frac{2\mu}{K + \mu/3} \right)\delta_{ab} + \frac{x_ax_b}{r^2} \right]f_b\\
+        &= \frac{1}{8\pi r E}\frac{1 + \nu}{1 - \nu} \left[ (3 - 4\nu)\delta_{ab} + \frac{x_ax_b}{r^2} \right]f_b.
+    \end{align*}
+    The main feature of this result is that the deformation decays as \(1/r\) meaning that it is still felt far from the point of application but it does decrease with distance.
+    
+    \part{Fluid Mechanics}
+    \section{Introduction To Fluid Mechanics}
+    We can model a fluid as a collection of `parcels' of fluid which are somewhere between molecules and macroscopic volumes.
+    We assume that within each parcel the intrinsic properties, such as pressure and temperature, are constant and that parcels are small enough that neighbouring parcels have very similar intrinsic properties and therefore we can approximate these properties as changing continuously throughout the fluid.
+    
+    \subsection{Material and Spatial Variables}
+    There are two ways of describing a fluid that are in common use.
+    The first is called the \define{material} or \define{Lagrangian} description where we track each parcel as the fluid flows.
+    We label each parcel, typically with its initial position, \(\vv{a}\).
+    We can then give, for example, the pressure in that parcel at time \(t\) as \(p(\vv{a}, t)\).
+    
+    The second description is the \define{spatial} or \define{Eulerian} description where we consider a fixed point in space, \(\vv{x}\), and then the pressure at this point at time \(t\) is \(p(\vv{x}, t)\).
+    Notice that \(p\) is a different function here than in the Lagrangian description.
+    
+    The relationship between the Lagrangian and Eulerian descriptions is given by a map, \(\chi\), which takes a parcel that starts at \(\vv{a}\) and gives its position, \(\vv{x}\), at time \(t\) by \(\vv{x} = \vv{\chi}(\vv{a}, t)\).
+    This is shown in figure~\ref{fig:eulerian and lagrangian description} which depicts a control volume in the reference domain \(\Omega(0)\) mapping to a volume in the current configuration, \(\Omega(t)\).
+    \begin{figure}[ht]
+        \centering
+        \tikzsetnextfilename{fluid-flow-map}
+        \begin{tikzpicture}[very thick]
+            \draw (0, 0) grid (5, 5);
+            \draw (0, 0) rectangle (5, 5);
+            \draw[red, fill=red] (3, 3) circle [radius=0.1cm] node[above right, black] {\(\vv{a}\)};
+            \node at (2.5, -0.5) {\(\Omega(0)\)};
+            
+            \draw[->, >=latex] (5.5, 2.5) -- (7.5, 2.5) node[midway, above] {\(\vv{\chi}\)};
+            
+            \begin{scope}[xshift=8cm]
+                % Bounding box
+                \clip[draw] (0, 0) .. controls (2, 0.5) and (3, -0.5) .. (5, 0) -- (5, 0) .. controls (5.5, 2) and (4.5, 3) .. (5, 5) .. controls (3, 6) and (2, 5) .. (0, 5) .. controls (0.5, 3) and (0.5, 2) .. (0, 0);
+                % Horizontal lines
+                \draw (-1, 1) .. controls (2, 0.5) and (3, 0.5) .. (6, 1);
+                \draw (-1, 2) .. controls (2, 1.5) and (3, 2) .. (6, 2);
+                \draw (-1, 3) .. controls (2, 3.5) and (3, 3) .. (6, 3);
+                \draw (-1, 4) .. controls (2, 3) and (3, 5) .. (6, 4);
+
+                % Vertical lines
+                \draw (1, -1) .. controls (1.5, 2) and (0.5, 3) .. (1, 6);
+                \draw (2, -1) .. controls (2.5, 2) and (2, 3) .. (2, 6);
+                \draw (3, -1) .. controls (3.5, 2) and (3.5, 3) .. (3, 6);
+                \draw (4, -1) .. controls (4.5, 2) and (4.5, 3) .. (4, 6);
+                \draw[red, fill=red] (3.36, 3.14) circle [radius=0.1cm];
+                \node[above right] at (3.25, 3.15) {\small\(\vv{x}(\vv{a}, t)\)};
+                \node at (2.5, -0.5) {\(\Omega(t)\)};
+            \end{scope}
+        \end{tikzpicture}
+        \caption{Fluid flow maps a parcel initially at \(\vv{x}(\vv{a}, 0) = \vv{a}\) to \(\vv{\chi}(\vv{a}, t) = \vv{x}(\vv{a}, t)\).}
+        \label{fig:eulerian and lagrangian description}
+    \end{figure}
+    In the language of the earlier part of this course the two descriptions are simply different coordinate systems.
+    The fixed spatial coordinate system is relative to some fixed object.
+    A point described in this spatial coordinate will always be at the same place but the fluid packet that is at this point will change.
+    The material description has a coordinate system that deforms with the fluid.
+    A point in this coordinate system will always describe the same fluid parcel but its location in space will change.
+    
+    \subsection{Fluid Velocity}
+    The velocity of fluid is an important quantity for obvious reasons.
+    The problem is that it isn't straight forward to define.
+    Clearly different parts of the fluid can move at different speeds so what is it we measure speed relative to?
+    The obvious answer is we measure speed relative to a fixed point in the spatial description, however since we are interested in the velocity of a fluid parcel this means that we have to do a transformation of variables.
+    That is if we define the fluid velocity at a point, \(\vv{x}\), in the spatial description as \(\vv{u}(\vv{x}, t) = \partial_t\vv{x}(t)\) then the velocity of a material point labelled \(\vv{a}\) is
+    \[\pdvat{\vv{x}}{t}{\vv{a}} = \pdv{t}\vv{\chi}(\vv{a}, t) = \vv{u}(\vv{x}(\vv{a}, t), t)\]
+    where \(\vv{x}(\vv{a}, 0) = \vv{a}\).
+    Notice the double time dependence as both the position of \(\vv{a}\) and the map from the spatial to the material description depend on time.
+    
+    \subsection{Material Derivative}
+    Suppose we have a function, \(f\), which depends on the Lagrangian variable, \(\vv{a}\), and time, then we can describe the rate of time of \(f\) as \(\partial_tf(\vv{a}, t)\).
+    However if \(f\) is expressed in terms of the Eulerian variable, \(\vv{x} = \vv{\chi}(\vv{a}, t)\) then we have to account for this time dependence as well and we have
+    \[\pdv{t}f(\vv{x}(\vv{a}, t), t)\bigg|_{\vv{a}} = \pdvat{f}{t}{\vv{x}} + \pdvat{f}{x_i}{t}\pdvat{x_i}{t}{\vv{a}} = \left( \pdv{t} + \vv{u}\cdot\grad \right)f = \mdv{f}{t}\]
+    This defines the \define{material derivative}
+    \[\mdv{}{t} = \pdv{t} + \vv{u}\cdot\grad.\]
+    We can think of this as a time derivative which follows the fluid as it flows.
+    For example the acceleration of the fluid written in terms of the spatial representation of the velocity, \(\vv{u}(\vv{x}, t)\), is given by
+    \[\mdv{\vv{u}}{t} = \pdv{\vv{u}}{t} + \vv{u}\cdot\vv{u}.\]
+    One important measure of the fluid deformation is the Jacobian of the map \(\vv{x} = \vv{\chi}(\vv{a}, t)\) since the Jacobian gives us the scale factor for volumes.
+    The Jacobian matrix is\footnote{sometimes the Jacobian is defined without the transpose, this has no effect on the important features of the Jacobian since \(\det \jacobianMatrix = \det \jacobianMatrix\trans\).}
+    \[\jacobianMatrix = \left( \pdv{\vv{x}}{\vv{a}} \right)\trans,\]
+    or in index notation
+    \[\jacobianMatrix_{ij} = \pdv{x_i}{a_j}.\]
+    Taking \(t = 0\) to be before the material is deformed we have \(\jacobianMatrix(\vv{x}, 0) = \ident\) and for a continuous transformation the Jacobian must also be continuously connected to the identity.
+    The Jacobian determinant, \(J = \det \jacobianMatrix\), gives the volume scale factor for a volume element, \(\dd{V}\).
+    One quantity of interest is how fast this changes,
+    \[\dv{J}{t} = (\div \vv{u})J.\]
+    If \(J(\vv{x}, t) = 1\) for all \(\vv{x}\) and \(t\) then we say that the fluid flow is \(\define{volum preserving}\) or that the fluid is \define{incompressible}.
+    It turns out that incompressible fluids are much simpler and still a relatively good description of many every day fluids in normal circumstances so it is common to assume a fluid is incompressible.
+    In this case we have that \(\inlinedv{J}{t} = 0\) and so for an incompressible fluid, since \(J = 1\), we have \(\div\vv{u} = 0\).
+    
+    \section{Conservation Laws}
+    \subsection{Conservation of Mass}
+    The fluid density, \(\rho(\vv{x}, t)\) is defined as the mass per unit volume for a volume element, \(\dd{V}\), centred at \(\vv{x}\), so the mass of this infinitesimal fluid parcel is \(\rho(\vv{x}, t)\dd{V}\).
+    Consider a volume of fluid, \(\Omega(t)\), as the material volume deforms and flows the mass of the fluid is determined by integrating over this volume:
+    \[M(t) = \int_{\Omega(t)} \rho(\vv{x}, t) \dd{V}.\]
+    If there is no mechanism for creation or destruction of mass then the mass must be conserved so that at all times, \(t\), we have \(M(t) = M(0)\), or equivalently
+    \[\dv{M}{t} = 0.\]
+    We can write this in Eulerian form as
+    \[\dv{t}\int_{\Omega(t)} \rho(\vv{x}, t) \dd{V_x} = 0\]
+    where \(\dd{V_x} = \dd{x_1}\dd{x_2}\dd{x_3}\).
+    We can write this integral equation in a differential form by considering it represented in material coordinates:
+    \begin{align*}
+        0 &= \dv{t} \int_{\Omega(t)} \rho(\vv{x}, t) \dd{V_x}\\
+        &= \dv{t} \int_{\Omega(0)} \rho(\vv{x}(\vv{a}, t), t)J\dd{V_a}\\
+        &= \int_{\Omega(0)} \left[ \left( \mdv{t}\rho(\vv{x}(\vv{a}, t), t) \right)J + \rho(\vv{x}(\vv{a}, \vv{t}))\dv{J}{t} \right]\dd{V_a}\\
+        &= \int_{\Omega(0)} \left[ \left( \mdv{t}\rho(\vv{x}(\vv{a}, t), t) \right)J + \rho(\vv{x}(\vv{a}, \vv{t}))(\div\vv{u})J \right]\dd{V_a}\\
+        &= \int_{\Omega(0)} \left[ \mdv{t}\rho(\vv{x}(\vv{a}, t), t) + \rho(\vv{x}(\vv{a}, \vv{t}))(\div\vv{u}) \right]J\dd{V_a}\\
+        &= \int_{\Omega(t)} \left[ \mdv{t}\rho(\vv{x}, t) + \rho(\vv{x}, t)(\div\vv{u}) \right]\dd{V_x}.
+    \end{align*}
+    Since this must hold for all volumes, \(\Omega(t)\), we must have
+    \[\mdv{\rho}{t} + \rho(\div\vv{u}) = 0.\]
+    If the fluid is incompressible then \(\div\vv{u} = 0\) and we have
+    \[\mdv{\rho}{t} = 0.\]
+    In other words for an incompressible fluid the density at any material point is constant.
+    
+    \subsection{Conservation of Momentum}
+    The momentum of the fluid contained in the volume \(\Omega(t)\) in terms of Eulerian variables is
+    \[\vv{p}(t) = \int_{\Omega(t)} \rho(\vv{x}, t) \vv{u}(\vv{x}, t) \dd{V_x}.\]
+    We can express the rate of change of momentum as
+    \begin{align*}
+        \dv{t}\vv{p}(t) &= \dv{t}\int_{\Omega(t)} \rho(\vv{x}, t) \vv{u}(\vv{x}, t) \dd{V_x}\\
+        &= \dv{t} \int_{\Omega(0)} \rho(\vv{x}(\vv{a}, t), t) \vv{u}(\vv{x}(\vv{a}, t), t) J\dd{V_a}\\
+        &= \int_{\Omega(0)} \left[ \mdv{\vv{u}}{t}\vv{u}J + \rho\mdv{\vv{u}}{t}J + \dv{J}{t} \right]\dd{V_a}\\
+        &= \int_{\Omega(0)} \left[ \mdv{\vv{u}}{t}\vv{u} + \rho\mdv{\vv{u}}{t} + (\div\vv{u}) \right]J\dd{V_a}\\
+        &= \int_{\Omega(t)} \rho\mdv{\vv{u}}{t}J\dd{V_a}\\
+        &= \int_{\Omega(t)} \rho\mdv{\vv{u}}{t}\dd{V_x}
+    \end{align*}
+    Here we again assume an incompressible fluid so
+    \[\mdv{\rho}{t} = 0, \qquad\text{and}\qquad \div\vv{u} = 0.\]
+    By Newton's second law the rate of change of momentum in the material volume \(\Omega(t)\) is equal to the net external force acting on the volume.
+    
+    The external forces come in two kinds.
+    External forces such as gravity which we consider as force per unit volume, \(\vv{f}\), and surface forces, such as viscous or elastic stress, which we denote as force per unit area, \(\vv{t}\), for traction.
+    The surface of the fluid volume at a point is described by the outward pointing surface normal, \(\vv{n}\), and the surface traction is given by \(\vv{t} = \vv{n} \cdot\sigma\) where \(\sigma\) is the stress tensor, which we will discuss more in the next section.
+    Balancing forces we must have
+    \[\dv{t}\vv{p}(t) = \int_{\Omega(t)} \rho\mdv{\vv{u}}{t}\dd{V_x} = \int_{\Omega(t)} \vv{f}\dd{V_x} + \int_{\partial\Omega(t)} \vv{t}\dd{S_x}\]
+    where \(\partial\Omega(t)\) is the boundary of the volume \(\Omega(t)\) and \(\dd{S_x}\) is an infinitesimal surface element.
+    Using the divergence theorem the last integral can become a volume integral and we have
+    \[\int_{\Omega(t)} \rho\mdv{\vv{u}}{t}\dd{V_x} = \int_{\Omega(t)} \vv{f}\dd{V_x} + \int_{\Omega(t)} \div\sigma \dd{V_x}.\]
+    Note that the stress tensor is symmetric so it doesn't matter if we take the divergence to be \(\div\sigma = \partial_i\sigma_{ij}\) or \(\div\sigma = \partial_j\sigma_{ij}\).
+    This equation holds for all volumes and so we must have
+    \begin{equation}\label{eqn:cauchy momentum eqn}
+        \rho\dv{\vv{u}}{t} = \vv{f} + \div\sigma.
+    \end{equation}
+    This is the Cauchy momentum equation.
+    We saw this equation in elasticity as well but since we only considered systems in equilibrium the acceleration was zero.
+    
+    \section{Navier--Stokes Equations}
+    The most important object within continuum mechanics is undoubtedly the stress tensor, \(\sigma\).
+    When considering an elastic deformation of a solid we define the stress tensor to depend locally on the material deformation.
+    In fluid mechanics we define the stress slightly differently.
+    The defining difference between a fluid and a solid is that a fluid can deform an arbitrary amount.
+    This means that the size of deformation does not give us important information as a fluid can have an arbitrarily large deformation.
+    Instead we define the stress to be locally dependent on the \emph{rate} of material deformation.
+    In the most general case the stress tensor, \(\sigma\), in fluid mechanics depends on the rate of deformation in a complex, non-linear, and history dependent way defined by a system of partial differential equations.
+    
+    We can consider the stress tensor to give the force per unit area on each face of a cubic control volume in each direction, in a similar way to the elastic case.
+    The traction is then given by \(\vv{t} = \vh{n}\cdot\sigma\) where \(\vh{n}\) is the surface normal.
+    So the component \(\sigma_{ij}\) represents the traction in the \(j\)th surface perpendicular to the \(i\)th direction.
+    For example the traction on the surface with surface normal \(\ve{1}\) is
+    \[\vv{t} = \ve{1}\cdot\sigma = \sigma_{11}\ve{1} + \sigma_{12}\ve{2} + \sigma_{13}\ve{3}.\]
+    
+    The net force, \(\vv{F}\), acting on an immersed body with boundary \(S\) is given by
+    \[\vv{F} = \int_{S} \vh{n}\cdot\sigma \dd{S}.\]
+    Similarly the torque, \(\vv{L}\), about the point \(\vv{x_0}\) on the same object is given by
+    \[\vv{L} = \int_S (\vv{x} - \vv{x}_0)\times (\vh{n}\cdot\sigma)\dd{S}.\]
+    We will only consider cases where there are no external torques which may lead to internal angular momentum.
+    The result of this is that the stress tensor will always be symmetric, \(\sigma = \sigma\trans\) or \(\sigma_{ij} = \sigma_{ji}\).
+    This can be shown by considering the torque on a volume element and imposing the conservation of angular momentum.
+    Since the stress tensor is symmetric we only need to give 6 out of 9 components to completely specify the stress tensor.
+    
+    So far we have made no assumptions about the type of fluid, simply about the existence (or lack of) external forces and torques.
+    This means that our analysis so far holds for all fluids.
+    We can write the stress tensor as
+    \[\sigma = -p\ident + \tau\]
+    where \(\ident\) is the identity matrix, \(p\) is the pressure and \(\tau\) is the \define{deviatoric stress tensor}.
+    We can define \(p\) to include the normal thermodynamic pressure but also the isotropic components of the stress such that \(\tau\) is traceless.
+    The deviatoric stress tensor contains information on the viscous stress and other stresses.
+    For many (Newtonian) fluids of interest to us the deviatoric stress tensor can be written in terms of the local strain rate.
+    
+    Consider a velocity field depending on the spatial coordinate \(\vv{x}\), \(\vv{u}(\vv{x}, t)\).
+    This can be Taylor expanded about the point \(\vv{x}\) as
+    \[\vv{u}(\vv{x} + \vd{x}, t) = \vv{u}(\vv{x}, t) + \vd{x}\cdot\grad\vv{u}(\vv{x}, t) + \order{\abs{\vd{x}}^2}.\]
+    Here we have used
+    \[(\grad\vv{u})_{ij} = \pdv{u_j}{x_i}.\]
+    We can decompose \(\grad\vv{u}\) into symmetric and antisymmetric parts,
+    \[\dot{\gamma} = \grad\vv{u} + (\grad\vv{u})\trans, \qquad\text{and}\qquad \omega = \grad\vv{u} - (\grad\vv{u})\trans\]
+    which gives us
+    \[\grad\vv{u} = \frac{1}{2}(\dot{\gamma} + \omega).\]
+    We define the symmetric part, \(\dot{\gamma}\), to be the \define{rate-of-strain tensor} and the antisymmetric part, \(\omega\), to be the \define{vorticity tensor}.
+    
+    Consider a line element, \(\vd{x}\), which extends from the point \(\vv{x}\) and evolves in a linear flow field.
+    We can then write
+    \[\dv{(\vd{x})}{t} = \vv{u}(\vv{x} + \vd{x}, t) - \vv{u}(\vv{x}, t) = \vd{x}\cdot\grad\vv{u} = \vd{x}\cdot\frac{1}{2}(\dot{\gamma} + \omega).\]
+    We can consider the response of \(\vd{x}\) due to the symmetric and antisymmetric parts individually.
+    The response due to \(\dot{\gamma}\) is best characterised by its eigenvalues and eigenvectors.
+    Since \(\dot{\gamma}\) is symmetric its eigenvectors, \(\mathrm{d_i}\), are orthogonal.
+    The basis formed from these eigenvectors is the principle axes of \(\dot{\gamma}\).
+    The associated eigenvalues, \(\lambda_i\), are called the principle rates-of-strain.
+    We can write the rate-of-strain tensor as
+    \[\dot{\gamma} = \sum_{i} 2\lambda_{i}\vv{d_i}\vv{d_i}.\]
+    Here \(\vv{d_i}\vv{d_i}\) is the dyadic product of the vector \(\vv{d_i}\) with itself.
+    This is defined as
+    \[
+        \vv{a}\vv{b} = 
+        \begin{pmatrix}
+            a_1\\ a_2\\ a_3
+        \end{pmatrix}
+        \begin{pmatrix}
+            b_1 & b_2 & b_3
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            a_1b_1 & a_1b_2 & a_1b_3\\
+            a_2b_1 & a_2b_2 & a_2b_3\\
+            a_3b_1 & a_3b_2 & a_3b_3
+        \end{pmatrix}
+        .
+    \]
+    If \(\grad\vv{u}\) is entirely symmetric we can then write 
+    \[\dv{t}\vd{x} = \frac{1}{2}\vd{x}\cdot\dot{\gamma} = \sum_{i}\lambda_i(\vd{x}\cdot\vv{d_i})\vv{d_i}.\]
+    This shows that a spherical control volume will deform into an ellipsoid with its axes aligned with the principle axes of \(\dot{\gamma}\) and the lengths given by the principle strain rates.
+    
+    It can also be shown that if \(\grad\vv{u}\) is entirely antisymmetric then
+    \[\dv{t}\dv{x} = \frac{1}{2}\vd{x}\cdot\omega = \frac{1}{2}(\curl\vv{u})\times\vd{x}.\]
+    
+    A \define{Newtonian fluid} is defined to be a fluid where the deviatoric stress, \(\tau\), is linear in the rate of strain, \(\dot{\gamma}\), and isotropic.
+    The most general form of the deviatoric stress tensor for a Newtonian fluid is a linear combination of \(\dot{\gamma}\) and \((\div\vv{u})\ident\).
+    We can write this in such a way that we get two terms, one of which is traceless and the other is isotropic:
+    \[\tau = \mu\left( \dot{\gamma} - \frac{2}{3}(\div\vv{u})\ident \right) + \mu'(\div\vv{u})\ident.\]
+    We define \(\mu\) as the \define{fluid viscosity} and \(\mu'\) as the \define{dilational viscosity}.
+    For an incompressible fluid we have \(\div\vv{u} = 0\) and so
+    \[\tau = \mu\dot{\gamma}.\]
+    The stress is then given simply by
+    \[\sigma = -p\ident + \tau = -p\ident + \mu\dot{\gamma}.\]
+    The Cauchy momentum equation (equation~\ref{eqn:cauchy momentum eqn}) then becomes
+    \[\rho\mdv{\vv{u}}{t} = \div\sigma + \vv{f} = -\grad p + \mu\laplacian\vv{u} + \vv{f}.\]
+    This, and the incompressibility condition, \(\div\vv{u} = 0\), are called the \define{incompressible Navier--Stokes equations}.
+    These are incredibly important equations as any incompressible fluid flow can be modelled as a solution to these equations simply by choosing boundary and initial conditions.
+    
+    Each term of these equations tells us some important things about the flow:
+    \[\underbrace{\rho\mdv{\vv{u}}{t}}_{\mathclap{\text{Inertial Term}}} = \rho\pdv{\vv{u}}{t} + \underbrace{\rho\vv{u}\cdot\grad\vv{u}}_{\mathclap{\text{Convection Term}}} = -\grad p + \underbrace{\mu\laplacian\vv{u}}_{\mathclap{\text{Diffusive Term}}} + \vv{f}.\]
+    The inertial term corresponds to flow in the fluid due to inertia of the fluid, the denser the fluid is the more important this term is.
+    The diffusive term relates to energy dissipation in the fluid.
+    The more viscous the fluid is the more important this term is.
+    For a more viscous fluid the diffusion is slower as \(\abs{\laplacian\vv{u}}\) must be smaller to for this term to remain constant.
+    Notice that the diffusive term is proportional to \(\laplacian\vv{u}\), which should be no surprise from the diffusion equation.
+    
+    \section{Reynold's Numbers}
+    Given a particular flow we can choose a characteristic speed, \(U\), and length scale, \(L\).
+    For example for flow in a pipe the characteristic velocity may be the speed in the centre of the pipe and the length scale might be the radius of the pipe.
+    For flow around a sphere the velocity may be the upstream velocity (the velocity of the fluid a long time before it reaches the sphere) and the length scale the radius of the sphere.
+    Once we have chosen these scales we can construct a characteristic time scale, \(L/U\).
+    For pipe flow this corresponds to the time taken for fluid in the centre of the pipe to flow one pipe radius down the pipe.
+    For flow around a sphere this corresponds to the time taken to flow one sphere radius if the sphere is not there.
+    Using the viscosity, \(\mu\), we can also define a typical pressure scale \(\mu U/L\), and a typical force scale \(\mu U/L^2\).
+    
+    Recall that the stress tensor for a Newtonian fluid is given by
+    \[\sigma = -p\ident + \mu\dot{\gamma} = -\pi\ident + \mu[\grad\vv{u} + (\grad\vv{u})\trans].\]
+    We can write this in a dimensionless way by defining the dimensionless quantities
+    \begin{gather*}
+        \vv{x^*}  = \frac{\vv{x}}{L}, \qquad \vv{u^*} = \frac{\vv{u}}{U}, \qquad  t^* = \frac{Ut}{L},\\
+        p^* = \frac{Lp}{\mu U}, \qquad\text{and}\qquad \vv{f^*} = \frac{L^2\vv{f}}{\mu U}.
+    \end{gather*}
+    The incompressible Navier--Stokes equations written in terms of these dimensionless variables are then
+    \[\reynoldsNumber\mdv{\vv{u^*}}{t^*} = \reynoldsNumber\left( \pdv{\vv{u^*}}{t} + \vv{u^*}\cdot\vv{u^*} \right) = -\grad^*p^* + \grad^*{^2}\vv{u^*} + \vv{f^*}\]
+    where \((\grad^*)_i = \partial_{x_i^*}\) and
+    \[\reynoldsNumber = \frac{\rho U L}{\mu}\]
+    is a dimensionless quantity called the \define{Reynolds number}.
+    This quantity characterises the flow in the system.
+    We can think of it as a ratio,
+    \[\reynoldsNumber = \frac{\text{inertial effects}}{\text{viscous effects}}.\]
+    If \(\reynoldsNumber\) is large then the inertial effects are important and we have nice laminar flow.
+    If \(\reynoldsNumber\) is small then viscous effects dominate and we have turbulent flow.
+    What counts as a small or large value for \(\reynoldsNumber\) depends on the situation and exactly which length scale and velocity scale we pick but in general \(\reynoldsNumber > 2000\) is considered large\footnote{this is the typically accepted engineering convention} and \(\reynoldsNumber < 2000\) is considered small.
+    For \(\reynoldsNumber \sim 2000\) we are in a transition state between laminar and turbulent flow.
+    
+    Laminar flow is considerably simper than turbulent flow since for small \(\reynoldsNumber\) we can neglect the left hand side and we get the following set of equations, called the \define{Stokes equations}
+    \begin{gather*}
+        -\grad p + \mu\laplacian\vv{u} + \vv{f} = \vv{0},\\
+        \div \vv{u} = 0.
+    \end{gather*}
+    We will focus on the low Reynold's number regime as this is where analytic solutions can be found.
+    
+    \section{Flow Due to a Point Force}
+    Consider an infinite volume of fluid which experiences a point force given by \(\vv{f}\delta(\vv{r})\) where \(\delta\) is the Dirac delta distribution.
+    Suppose also that this force is small enough that we are in the low Reynold's number regime and therefore can use the Stokes equations which in component form are
+    \[\partial_i p + \mu\laplacian u_i + f_i\delta(\vv{r}) = 0, \qquad\text{and}\qquad \partial_iu_i = 0.\]
+    We can expand the velocity field, \(\vv{u}\), in a Fourier series:
+    \[\vv{u}(\vv{r}) = \frac{1}{(2\pi)^3} \int \vh{u}(\vv{k}) e^{i\vv{k}\cdot\vv{r}}\dd[3]{k}, \qquad\text{and}\qquad \vh{u}(\vv{k}) = \int \vv{u}(\vv{r})e^{-i\vv{k}\cdot\vv{r}} \dd[3]{r}.\]
+    We can also do the same for the pressure:
+    \[p(\vv{r}) = \frac{1}{(2\pi)^3} \int \hat{p}(\vv{r}) e^{i\vv{k}\cdot\vv{r}}\dd[3]{k}, \qquad\text{and}\qquad \hat{p}(\vv{k}) = \int p(\vv{r}) e^{-i\vv{k}\cdot\vv{r}} \dd[3]{r}.\]
+    And again for the force term using the Fourier transform of the Dirac delta:
+    \[\vv{f}\delta(\vv{r}) = \vv{f}\frac{1}{(2\pi)^3} \int e^{i\vv{k}\cdot\vv{r}} \dd[3]{k}.\]
+    Substituting these into the Stokes equation and using
+    \[\FT[\partial_a g] = ik_a\hat{g} \implies \FT[\partial_a^2g] = -k_a^2\hat{g}\]
+    we get
+    \[0 = \frac{1}{(2\pi)^3} \int [-ik_a\hat{p} - \mu\hat{u}_a + f_a]e^{i\vv{k}\cdot\vv{r}}\dd[3]{k}\]
+    and
+    \[0 = \frac{1}{(2\pi)^3} \int k_a\hat{u}_a e^{i\vv{k}\cdot\vv{r}}\dd[3]{k}.\]
+    These must hold for any particular position, \(\vv{r}\), and so the integrands must be identically zero:
+    \begin{align*}
+        0 &= -ik_a\hat{p} - \mu\hat{u}_a + f_a\\
+        0 &= k_a\hat{u}_a.
+    \end{align*}
+    We can eliminate the pressure by multiplying the first equation by \(k_a\) and summing over \(a\) to get
+    \[0 = -ik^2\hat{p} -\mu k^2\underbrace{\hat{u}_ak_a}_{=0} + f_ak_a \implies \hat{p} = \frac{f_ak_a}{ik^2}.\]
+    Substituting this in for \(\hat{p}\) we have
+    \[0 = -ik_a\frac{k_bf_b}{ik^2} - \mu k^2\hat{u}_a + f_a.\]
+    Rearranging this gives us
+    \[\hat{u}_a = \frac{1}{\mu k^2}[f_a - \frac{k_ak_b}{k^2}f_b]\frac{1}{\mu k^2}\left[ \delta_{ab} - \frac{k_ak_b}{k^2} \right]f_b.\]
+    We now have the solution in \(k\)-space which is simply the Fourier transform of the solution in \(r\)-space:
+    \[u_a(\vv{r}) = \frac{1}{(2\pi)^3} \int \frac{1}{\mu k^2}\left[ \delta_{ab} - \frac{k_ak_b}{k^2} \right]f_b e^{i\vv{k}\cdot\vv{r}}\dd[3]{k}.\]
+    To compute this we need the following integrals:
+    \[I_1 = \frac{1}{(2\pi)^3} \int \frac{1}{k^2} e^{i\vv{k}\cdot\vv{r}}\dd[3]{k}, \qquad\text{and}\qquad I_2 = \frac{1}{(2\pi)^3} \int \frac{k_ak_b}{k^4} e^{i\vv{k}\cdot\vv{r}}\dd[3]{k}.\]
+    We have already computed these in section~\ref{sec:point force elasticity} so we simply state the results here:
+    \[I_1 = \frac{1}{4\pi r}, \qquad\text{and}\qquad I_2 = \frac{1}{8\pi r}\left[ \delta_{ab} + \frac{x_ax_b}{r^2} \right].\]
+    Hence the solution in real space is
+    \[u_a(\vv{r}) = \frac{1}{8\pi \mu r}\left[ \delta_{ab} + \frac{x_ax_b}{r^2} \right]f_b.\]
+    Compare this to the solution for the similar elasticity problem in section~\ref{sec:point force elasticity}:
+    \[u_a(\vv{r}) = \frac{1}{8 \pi r E}\frac{1 + \nu}{1 - \nu} \left[ (3 - 4\nu)\delta_{ab} + \frac{x_ax_b}{r^2} \right]f_b.\]
+    Notice that the form of these two solutions is very similar even though the first gives the velocity of fluid flow and the second gives the displacement of an elastic medium.
+    These solutions go as \(\sim 1/r\) far from the point of application.
+    This decays fairly slowly so even at large distances there is often a non-negligible effect from disturbances.
+    This is one of the things that makes fluid dynamics so complicated.
+    
+    \subsection{Stokes Force}
+    Consider a sphere moving through an otherwise stationary fluid (sometimes referred to as a \define{quiescent} fluid).
+    This sphere experiences a drag force which it can be shown is given by
+    \[\vv{F} = -6\pi\mu a\vv{U}\]
+    where \(\vv{U}\) is the velocity of the sphere, \(a\) is the radius of the sphere, and \(\mu\) is the viscosity of the fluid.
+    This force is called the Stokes force.
+    If instead the fluid is flowing at constant velocity \(\vv{W}\) in some frame and in the same frame the sphere moves at velocity \(\vv{U}\) then the formula still holds if we adjust for the relative velocity of the sphere and fluid:
+    \[\vv{F} = -6\pi\mu a(\vv{U} - \vv{W}).\]
+    By Newton's third law in these scenarios there must be a force, \(-\vv{F}\), exerted on the fluid by the sphere.
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \tikzexternaldisable
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    \clearpage
+    \appendix
+    \part*{Appendix}
+    \addcontentsline{toc}{part}{Appendix}
+    \begingroup
+    \let\clearpage\relax
+    \input{appendices/appendices}
+    \endgroup 
+\end{document}
