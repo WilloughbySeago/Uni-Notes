@@ -1,0 +1,2446 @@
+\documentclass[a4paper]{article}
+
+\usepackage{NotesPackage2}
+\usepackage{tocbibind}
+%\usepackage[utf8]{inputenc}  % for Greek writing  % Not needed since 2018
+\usepackage[greek,english]{babel}  % for Greek writing
+\usepackage{lmodern}  % for Greek writing
+\usepackage[T1]{fontenc}  % for alternate ddbar
+\usepackage{tablefootnote}
+\usepackage[version=4]{mhchem}
+\usepackage{tcolorbox}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+
+\usetikzlibrary{patterns}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{calc}
+\usetikzlibrary{external}
+
+\tikzexternalize[prefix=tikz-external/]
+
+\tcbuselibrary{breakable}
+
+\author{Willoughby Seago}
+\date{September 23, 2020}
+\title{Thermal Physics}
+
+% constants
+\newcommand{\boltzmann}{k_\mathrm{B}}
+\newcommand{\avagadro}{N_\mathrm{A}}
+\newcommand{\gaylussac}{k_\mathrm{GL}}
+
+% specify part of systems/surroundings/universe
+\newcommand{\sys}{{\mathrm{sys}}}
+\newcommand{\surr}{{\mathrm{surr}}}
+\newcommand{\tot}{{\mathrm{tot}}}
+\newcommand{\vap}{{\mathrm{vap}}}
+
+% other
+\newcommand{\notesVersion}{1.1}
+\newcommand{\notesDate}{04/07/2021}
+\newcommand{\ddbar}[1]{\text{\dj}{#1}}
+\newcommand{\emf}{\mathcal{E}}
+\DeclareSIUnit{\atm}{atm}
+\newcommand{\mean}[1]{\overline{#1}}
+\DeclareMathOperator{\Var}{Var}
+\newcommand{\partition}{\mathcal{Z}}
+\newcommand{\fermiEnergy}{\varepsilon_{\mathrm{f}}}
+\newcommand{\fermiTemp}{T_{\mathrm{f}}}
+\newcommand{\boseTemp}{T_{\mathrm{B}}}
+
+% key point environment
+\newcounter{keypointcounter}
+\newenvironment{keypoint}{%
+    \stepcounter{keypointcounter}
+    \begin{tcolorbox}[breakable, title=Key Point \thekeypointcounter]
+}{%
+    \end{tcolorbox}
+}
+
+
+
+\makeglossaries
+\newacronym{cpt}{CPT}{charge parity time}
+\newacronym{npl}{NPL}{national physical laboratory}
+\newacronym{cfc}{CFC}{chloroflurocarbon}
+\newacronym{pdf}{PDF}{probability density function}
+
+\includeonly{parts/thermodynamics}
+
+\begin{document}
+    \pagenumbering{roman}  % Number contents pages and glossaries with roman numerals
+    \maketitle
+    These are my notes for the \textit{thermal physics} course from the University of Edinburgh as part of the third year of the theoretical physics degree.
+    When I took this course in the 2020/21 academic year it was taught by Professor Graeme Ackland\footnote{\url{https://www.ph.ed.ac.uk/people/graeme-ackland}} and Professor Alexander Morozov\footnote{\url{https://www.ph.ed.ac.uk/people/alexander-morozov}}.
+    These notes are based on the lectures delivered as part of this course, the notes provided as part of this course, and the book `Finn's thermal physics'\footnote{Rex, A. \textit{Finn's Thermal Physics}, third edition (CRC Press, Boca Raton, 2017)}.
+    The content within is correct to the best of my knowledge but if you find a mistake or just disagree with something or think it could be improved please let me know.
+    
+    These notes were produced using \LaTeX\footnote{\url{https://www.latex-project.org/}}.
+    Graphs where plotted using Matplotlib\footnote{\url{https://matplotlib.org/}}, NumPy\footnote{\url{https://numpy.org/}}, and SciPy\footnote{\url{https://scipy.org/scipylib/}}.
+    Diagrams were drawn with tikz\footnote{\url{https://www.ctan.org/pkg/pgf}}.
+    
+    This is version \notesVersion~of these notes, which is up to date as of \notesDate.
+    \begin{flushright}
+        Willoughby Seago
+        
+        s1824487@ed.ac.uk
+    \end{flushright}
+    \clearpage
+    \tableofcontents
+    \listoffigures
+    \listoftables
+    \printglossary[type=\acronymtype, title=Acronyms, style=long]
+    \clearpage
+    \pagenumbering{arabic}  % Number rest of document with numbers
+    \begingroup
+    \let\clearpage\relax  % "\begingroup, \let\clearpage\relax, \endgroup" stops automatic pagebreaks after each include
+    \include{parts/thermodynamics}
+    \endgroup
+    
+    
+    \part{Statistical Mechanics}
+    \section{Why Statistical Mechanics?}
+    Thermodynamics was developed phenomenologically.
+    This means that observations where made and maths was found to fit them and then tested against new scenarios.
+    This is useful if the only thing we care about is getting the answer at the end but it is limited to scenarios that are similar to ones we have already seen and doesn't actually tell us anything about \emph{why} something happens.
+    Thermodynamics is a macroscopic approach, we have macroscopic quantities, like pressure, volume, and temperature, and we study how these change.
+    
+    In theory we can take a microscopic approach where we start with information such as the position and momentum of all particles and then perform some sort of calculation which will tell us the same information at a later time.
+    That calculation may be classical or quantum but in general is not that difficult for an individual molecule.
+    The problem is we don't have individual molecules, we have a very large number of molecules which are all interacting.
+    This causes two problems with the deterministic approach.
+    
+    First even for a small amount of material we have a huge amount of data.
+    For a single mole of gas ignoring interactions between molecules we have 6 degrees of freedom.
+    One for each possible direction to get the position and one for each possible direction to get the momentum.
+    If we include interactions this will just increase the number of degrees of freedom.
+    So for a mole of gas we have at least \(6N_A \approx \num{1.2e24}\) degrees of freedom.
+    Suppose this was stored as \SI{8}{bit} numbers.
+    We would need \(6N_A/8 \approx \SI{4.5e23}{B} = \SI{4.5e6}{\peta B} = \SI{450}{\zetta B}\).
+    For Google stores about \SIrange{1e18}{1.5e18}{B} or \SIrange{10}{15}{\exa B} of data.
+    So we would need approximately \(30000\) Googles worth of data.
+    This sort of data storage capacity simply does not exist.
+    All of this is just to \emph{store} the bare minimum amount of data.
+    If we want to start performing calculations then the amount of computing power and time that we need would also be completely infeasible.
+    
+    The second problem is that in general most systems of interest are modelled by systems of differential equations.
+    For each degree of freedom of this system we need an initial value.
+    This value will have to be the result of a measurement and as such will have some amount of error.
+    A non-linear system of differential equations with more than two degrees of freedom is chaotic in that a small change to the initial conditions will create a large change in the output.
+    For example if one degree of freedom of the system is \(a\) which has initial value \(a(t = 0) = a_0 \pm \delta a\) then if we consider the solution with initial conditions \(a_0\) and \(a_0 + \delta a\) then at time \(t\) the average separation between these results will be \(e^{\lambda t}\delta a\).
+    Here \(\lambda\), knows as the Lyapunov exponent, is a characteristic of the system and measures how fast solutions diverge.
+    After \(t \approx \lambda\) the model will have almost no predictive power as the possible solutions cover such a wide range.
+    For example in the UK the weather is a chaotic system and \(\lambda \approx \SI{3}{days}\).
+    This means that after \(\SI{3}{days}\) weather prediction is almost pointless.
+    
+    The result of this is that even if we did have the computing power and the ability to measure with the bare minimum quantum uncertainty we still wouldn't be able to make long term predictions.
+    For this reason the deterministic approach is simply not possible.
+    Instead we use statistical mechanics where we consider microscopic properties and then use statistical techniques to make predictions about macroscopic properties based on these properties.
+    For example we measure the velocity of particles, fit them to a Maxwell--Boltzmann distribution, and then use this to predict the temperature.
+    
+    \section{Probability Part One}
+    \subsection{What is Probability}
+    There are two main views on what exactly we mean by the probability of an event.
+    The first is the frequentist view where if we perform \(N\) trials and observe an event \(n\) times out of those \(N\) trials then we say the probability of that event is
+    \[P = \lim_{N\to\infty}\frac{n}{N}.\]
+    The second view is the degree of belief we have that a certain event will occur.
+    For example if there are \(q\) possible events and we believe they are all equally likely then the probability of any one particular event is \(1/q\).
+    Fortunately both views can be made to give the same numbers and follow the same rules.
+    
+    \subsection{Probability Rules}
+    A random variable is one which can take on a different value every time we measure it.
+    A random variable can be continuous or discontinuous.
+    Typically the only difference is that a sum becomes an integral or vice versa.
+    In this section we will take \(X\) as a discrete random variable which can take values \(\{X_i\}\) and has probability distribution \(P\) meaning that the probability that measuring \(X\) gives the result \(X_i\) is \(P(X_i)\).
+    We will take \(x\) as a continuous random variable with \gls{pdf} \(p\) meaning that the probability of measuring \(x\) to be in \([x, x + \dd{x}]\) is \(p(x)\dd{x}\).
+    
+    One of the most important things about a probability distribution or \gls{pdf} is that it is normalised.
+    This means that
+    \[\sum_i P(X_i) = 1, \qquad\text{or}\qquad \int p(x)\dd{x} = 1\]
+    where the sum is over all possible values of \(i\) and the integral is over all possible values of \(x\).
+    
+    If \(X_1\) and \(X_2\) are mutually exclusive events, that is both cannot occur at once, then the probability of \(X_1\) or \(X_2\) is
+    \[P(X_1~\text{or}~X_2) = P(X_1\vee X_2) = P(X_1 \cup X_2) = P(X_1) + P(X_2).\]
+    If \(X_1\) and \(X_2\) are independent events, that is the value of \(X_1\) has no effect on the value of \(X_2\) then the probability of \(X_1\) and \(X_2\) is
+    \[P(X_1~\text{and}~X_2) = P(X_1\wedge X_2) = P(X_1 \cap X_2) = P(X_1)P(X_2).\]
+    
+    The average value of \(X\)/\(x\) is defined by
+    \[\mean{X} = \sum_i X_iP(X_i), \qquad\text{or}\qquad \mean{x} = \int xp(x)\dd{x}.\]
+    The variance of \(X\)/\(x\) is defined by
+    \[\Var(X) = \mean{\Delta X^2} = \mean{(X - \mean{X})^2} = \mean{X^2} - \mean{X}^2, \qquad\text{or}\qquad \Var(x) = \mean{\Delta x^2} = \mean{(x - \mean{x})^2} = \mean{x^2} - \mean{x}^2.\]
+    The mean of a function, \(f\), is
+    \[\mean{f(X)} = \sum_i P(X_i)f(X_i), \qquad\text{or}\qquad \mean{f(x)} = \int p(x)f(x)\dd{x}.\]
+    
+    \subsection{Binomial Distribution}
+    \subsubsection{Counting}
+    The way of selecting \(n\) distinguishable items from \(N\) items is
+    \[N(N - 1)(N - 2) \dotsm (N - n + 2)(N - n + 1) = \frac{N!}{(N - n)!}.\]
+    This is because there are \(N\) options for the first item, \(N - 1\) for the second and so on down to \(N - n + 1\) options for the final times.
+    This takes into account the ordering of the items, this is most obvious when we consider the number of ways of selecting \(N\) items from \(N\) items which gives
+    \[\frac{N!}{(N - N)!} = N!.\]
+    We know that \(N!\) is the number of ways of arranging \(N\) items.
+    If we don't care about order, possibly because the items are indistinguishable, then we correct for over-counting by dividing by the number of arrangements of the \(n\) items we selected, that is dividing by \(n!\).
+    Thus the way of selecting \(n\) items from \(N\) indistinguishable items is
+    \[{N\choose n} = \frac{N!}{n!(N - n)!}.\]
+    Coincidentally this is the same binomial coefficient that appears in
+    \[(a + b)^N = \sum_{n = 0}^{N} {N\choose n}a^Nb^{N - n}.\]
+    
+    \subsubsection{Binomial Distribution}
+    The binomial distribution is the probability distribution for the number of successes out of \(N\) trials if the probability of success on any one trial is \(p\).
+    The distribution is
+    \[P(n) = {N\choose n}p^n(1 - p)^{N-n}.\]
+    The first term accounts for the number of ways that we can get \(n\) successes out of \(N\) trials.
+    The second term, \(p^n\) accounts for the probability of getting \(n\) successes and the final term, \((1 - p)^{N - n}\), accounts for the probability that the rest of the trials are failures.
+    
+    As a probability distribution it is important that this is normalised.
+    This is fairly easy to see if we use the binomial coefficient's original definition.
+    \[\sum_{n=0}^{N}P(n) = \sum_{n=0}^{N}{N\choose n}p^n(1 - p)^{N - n} = (p + (1 - p))^{N} = 1^N = 1.\]
+    
+    First consider
+    \begin{align*}
+        \pdv{\alpha}\sum_{n=0}^{N} {N\choose n}(\alpha p)^n(1 - p)^{N-n}\Bigg\vert_{\alpha = 1} &= \sum_{n=0}^{N} {N\choose n}n\alpha^{n-1} p^n(1 - p)^{N-n}\Bigg\vert_{\alpha = 1}\\
+        &= \sum_{n=0}^{N} {N\choose n}n p^n(1 - p)^{N-n}\\
+        &= \sum_{n=0}^{N} nP(n)\\
+        &= \mean{n}.
+    \end{align*}
+    If we then start from the same place and proceed slightly differently we get
+    \begin{align*}
+        \pdv{\alpha}\sum_{n=0}^{N} {N\choose n}(\alpha p)^n(1 - p)^{N-n}\Bigg\vert_{\alpha = 1} &= \pdv{\alpha}(\alpha p + (1 - p))^N\Bigg\vert_{\alpha = 1}\\
+        &= pN(\alpha p + (1 - p))^{N-1}\bigg\vert_{\alpha = 1}\\
+        &= pN(p + (1 - p))^{N - 1}\\
+        &= pN
+    \end{align*}
+    Hence
+    \[\mean{n} = pN.\]
+    
+    We can calculate the variance in a similar way.
+    We start with 
+    \begin{align*}
+        \pdv{\alpha}\pdv{\beta}\sum_{n=0}^{N} {N\choose n}(\alpha\beta p)^n(1 - p)^{N-n}\Bigg\vert_{\alpha = \beta = 1} &= \pdv{\alpha}\sum_{n=0}^{N} {N\choose n}n\beta^{n-1}(\alpha p)^n(1 - p)^{N-n}\Bigg\vert_{\alpha = \beta = 1}\\
+        &= \sum_{n=0}^{N} {N\choose n}n^2\alpha^{n-1}\beta^{n-1}p^n(1 - p)^{N-n}\Bigg\vert_{\alpha = \beta = 1}\\
+        &= \sum_{n=0}^{N} {N\choose n}n^2 p^n(1 - p)^{N-n}\\
+        &= \sum_{n=0}^{N} n^2P(n)\\
+        &= \mean{n^2}.
+    \end{align*}
+    Then from the same starting point preceding slightly differently we have
+    \begin{align*}
+        \pdv{\alpha}\pdv{\beta}\sum_{n=0}^{N} {N\choose n}(\alpha\beta p)^n(1 - p)^{N-n}\Bigg\vert_{\alpha = \beta = 1} &= \pdv{\alpha}\pdv{\beta} (\alpha\beta p + (1 - p))^{N}\Bigg\vert_{\alpha = \beta = 1}\\
+        &= \pdv{\alpha} \alpha pN(\alpha\beta p + (1 - p))^{N-1}\Bigg\vert_{\alpha = \beta = 1}\\
+        &=  pN(\alpha\beta p + (1 - p))^{N-1}\Bigg\vert_{\alpha = \beta = 1} \\
+        &\qquad+ \alpha\beta p^2N(N - 1)(\alpha\beta p + (1 - p))^{N - 2}\Bigg\vert_{\alpha = \beta = 1}\\
+        &= pN(p + (1 - p))^{N - 1} + p^2N(N - 1)(p + (1 - p))^{N - 2}\\
+        &= pN + p^2N(N - 1)\\
+        &= pN + p^2N^2 - p^2N
+    \end{align*}
+    So
+    \[\mean{n^2} = pN + p^2N^2 - p^2N.\]
+    Thus
+    \[\Var(n) = \mean{\Delta n} = \mean{n^2} - \mean{n}^2 = pN + p^2N^2 -p^2N - p^2N^2 = pN - p^2N = Np(1 - p).\]
+    To compare the mean an variance we use the standard deviation, which is the square root of the variance, and we see that
+    \[\frac{\sqrt{\mean{\Delta n^2}}}{\mean{n}} = \frac{\sqrt{Np(1 = p)}}{Np} = \frac{\sqrt{1 - p}}{\sqrt{Np}} \sim \frac{1}{\sqrt{N}}\]
+    so we see as \(N\) increases we expect the width of the distribution to decrease as \(N^{-1/2}\).
+    
+    \subsection{Stirling Approximation}
+    We will often need the factorial of very large numbers, on the order of \(N_A = \num{6.02e23}\).
+    These values simply cannot be computed due to the size of the numbers and the number of operations required.
+    We can however approximate them very well.
+    One of the most common approximations for factorials is \define{Stirling's approximation}.
+    For large \(N\)
+    \[\ln(N!) \approx N\ln N - N \iff N! + \order{\ln N} \approx e^{N\ln N - N} = e^{\ln N^N}e^{-N} = N^Ne^{-N}.\]
+    Notice that \(N^N\) is huge and \(e^{-N}\) decays (relatively) slowly so for large \(N\) this will be a very large number.
+    We can actually be even more accurate if we say that
+    \[\ln(N!) \approx N\ln N - N + \frac{1}{2}\ln(2\pi N) + \order{1/N} \iff N! \approx \sqrt{2\pi N}\left(\frac{N}{e}\right)^N.\]
+    We often don't need this level of accuracy or the added complexity.
+    
+    We will now justify this approximation more than `well \(N!\) is really big and so is \(N^N\)'.
+    We start by considering
+    \begin{align*}
+        \ln(N!) - \frac{1}{2}\ln 1 + \frac{1}{2}\ln N &= \ln(1\cdot 2\dotsm(N - 1)N) - \frac{1}{2}\ln 1 - \frac{1}{2}\ln N\\
+        &= \ln 1 + \ln 2 + \dotsb + \ln(N - 1) + \ln N - \frac{1}{2}\ln 1 - \frac{1}{2}\ln N\\
+        &= \frac{1}{2}\ln 1 + \ln 2 + \dotsb + \ln(N - 1) + \frac{1}{2}\ln N.
+    \end{align*}
+    We now compare this with the trapezium rule for approximating an integral as a series of rectangles and we see that
+    \begin{align*}
+        \ln(N!) - \frac{1}{2}\ln 1 - \frac{1}{2}\ln N &\approx \int_{1}^{N}\ln x \dd{x}\\
+        &= [x\ln x - x]_1^N\\
+        &= N\ln N - N - \ln 1 + 1\\
+        &\approx N\ln N - N.
+    \end{align*}
+    See appendix~\ref{app:integral of ln x} for the integral and appendix~\ref{app:trapezium rule} for the trapezium rule.
+    Notice that even for large \(N\) \(\ln N\) is not that large, for example \(\ln \num{e23} = 23\ln 10 = 52.0 \ll \num{e23}\) so we can't ignore the \(N\) term just because the \(N\ln N\) term grows slightly faster.
+    Strictly this is an asymptotic approximation meaning that
+    \[\lim_{N\to\infty} \frac{N\ln N - N}{N!} = 1.\]
+    \(N!\) and \(N\ln N - N\) have been plotted in figure~\ref{fig:stirling's approximation} for comparison.
+    \begin{figure}[ht]
+        \centering
+        \includegraphics[scale=0.45]{stirling.png}
+        \caption{Plot of \(N!\) and \(N\ln N - N\) as well as the continuous extension of the factorial, the \(\Gamma\) function, which is defined such that \(\Gamma(N + 1) N!\) for \(N\in\naturals\). Also shown is the ratio \((x\ln x - x) / \Gamma(x + 1)\) which tends to 1 as \(x \to \infty\).}
+        \label{fig:stirling's approximation}
+    \end{figure}
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{rrrrr}\hline
+            \(N\) & \(\ln(N!)\) & \(N\ln N - N\) & Absolute Error & Percentage Error\\\hline
+            2 & 0.693 & -0.614 & 1.31 & 189\%\\
+            3 & 1.79 & 0.296 & 1.50 & 83.5\%\\
+            4 & 3.18 & 1.55 & 1.63 & 51.4\%\\
+            5 & 4.79 & 3.05 & 1.74 & 36.4\%\\
+            6 & 6.58 & 4.75 & 1.83 & 27.8\%\\
+            7 & 8.53 & 6.62 & 1.90 & 22.3\%\\
+            8 & 10.6 & 8.64 & 1.97 & 18.6\%\\
+            9 & 12.8 & 10.8 & 2.03 & 15.8\%\\
+            10 & 15.1 & 13.0 & 2.08 & 13.8\%\\
+            11 & 17.5 & 15.4 & 2.13 & 12.1\%\\
+            12 & 20.0 & 17.8 & 2.17 & 10.8\%\\
+            13 & 22.6 & 20.3 & 2.21 & 9.79\%\\
+            14 & 25.2 & 22.9 & 2.24 & 8.91\%\\
+            15 & 27.9 & 25.6 & 2.28 & 8.17\%\\
+            16 & 30.7 & 28.4 & 2.31 & 7.53\%\\
+            17 & 33.5 & 31.2 & 2.34 & 6.99\%\\
+            18 & 36.4 & 34.0 & 2.37 & 6.51\%\\
+            19 & 39.3 & 36.9 & 2.40 & 6.09\%\\
+            20 & 42.3 & 39.9 & 2.42 & 5.72\%\\
+            50 & 148.5 & 145.6 & 2.88 & 1.94\%\\
+            100 & 364.7 & 360.5 & 3.22 & 0.886\%\\
+            1000 & 5912.1 & 5907.8 & 4.37 & 0.0740\%\\\hline
+        \end{tabular}
+        \caption{Some values of \(\ln(N!)\) and \(N\ln N - N\). The percentage error first falls below \(1\%\) at \(N = 90\).}
+    \end{table}
+    
+    \section{Probability Part Two}
+    \subsection{Poisson Distribution}
+    Using Sterling's approximation we can approximate the binomial coefficient.
+    If \(N \gg n\) then
+    \begin{align*}
+        \ln {N \choose n} &= \ln\left[ \frac{N!}{n!(N - n)!} \right]\\
+        &= \ln(N!) - \ln[(N - n)!] - \ln(n!)\\
+        &\approx N\ln N - N - (N - n)\ln(N - n) - (N - n) - \ln(n!)\\
+        &= N\ln N - (N - n)\ln(N - n) + n - \ln(n!)\\
+        &\approx N\ln N - (N - n)\left[\ln N - \frac{n}{N}\right] - \ln(n!)\\
+        &= n\ln N + n - \frac{n^2}{N} - \ln(n!)\\
+        &\approx n\ln N - \ln(n!)
+    \end{align*}
+    where we have used Stirling's approximation for \(\ln(N!)\) and \(\ln[(N - n)!]\) and used a Taylor series for \(\ln(N - n) \approx \ln N - n/N\).
+    We have also only kept the highest order terms.
+    Thus
+    \[{N \choose n} \approx \exp[n\ln N - \ln(n!)] = \frac{N^n}{n!}.\]
+    Now consider
+    \[(1 - p)^{N-n} = \exp[(N - n)\ln(1 - p)] \approx \exp[-(N - n)p] \approx e^{-Np}.\]
+    Here we have used \(\ln(1 - p) \approx -p\) for \(p \ll 1\) and \(N - n \approx N\).
+    More strictly we require that \(N\to\infty\) and \(p\to 0\) such that \(Np = \mean{n}\) is finite\footnote{For a more rigorous derivation see the statistics part of Fourier analysis and statistics course.}.
+    Combining these two results we see that
+    \[P(n) = {N \choose n}p^n(1 - p)^{N - n} \approx \frac{N^n}{n!}p^ne^{-Np} = (Np)^n\frac{e^{-Np}}{n!} = \mean{n}^n\frac{e^{-\mean{n}}}{n!}.\]
+    This is the Poisson distribution.
+    It applies when \(N\) is large and \(p\) is small.
+    
+    This distribution is already properly normalised:
+    \begin{align*}
+        \sum_{n=0}^{\infty} P(n) &= \sum_{n=0}^{\infty} \frac{1}{n!}\mean{n}^n e^{-\mean{n}}\\
+        &= e^{-\mean{n}}\sum_{n=0}^{\infty} \frac{\mean{n}^n}{n!}\\
+        &= e^{-\mean{n}}e^{\mean{n}}\\
+        &= 1.
+    \end{align*}
+    The mean is \(\mean{n}\):
+    \begin{align*}
+        \sum_{n=0}^{\infty} nP(n) &= \sum_{n=0}^{\infty} n\frac{1}{n!}\mean{n}^n e^{-\mean{n}}\\
+        &= \sum_{n=1}^{\infty} n\frac{1}{n!}\mean{n}^n e^{-\mean{n}}\\
+        &= \sum_{n=1}^{\infty} \frac{1}{(n-1)!}\mean{n}^n e^{-\mean{n}}\\
+        &= \sum_{m=0}^{\infty} \frac{1}{m!}\mean{n}^{m+1}e^{-\mean{n}}\\
+        &= \mean{n}e^{-\mean{n}}\sum_{m=0}^{\infty} \frac{\mean{n}^m}{m!}\\
+        &= \mean{n}e^{-\mean{n}}e^{\mean{n}}\\
+        &= \mean{n}.
+    \end{align*}
+    The variance is \(\mean{n}\).
+    To show this we use \(\mean{\Delta n^2} = \mean{n^2} - \mean{n}^2\).
+    We already know \(\mean{n}\) so we just need \(\mean{n^2}\).
+    To find this we use the fact that \(\mean{n^2} = \mean{n(n - 1)} + \mean{n}\).
+    We can find \(\mean{n(n - 1)}\) as follows:
+    \begin{align*}
+        \mean{n(n - 1)} &= \sum_{n=0}^{\infty} n(n - 1)P(n)\\
+        &= \sum_{n=0}^{\infty} n(n - 1)\frac{\mean{n}^n}{n!} e^{-\mean{n}}\\
+        &= \sum_{n=2}^{\infty} n(n - 1)\frac{\mean{n}^n}{n!} e^{-\mean{n}}\\
+        &= \sum_{n=2}^{\infty} \frac{\mean{n}^n}{(n - 2)!}e^{-\mean{n}}\\
+        &= \sum_{m=0}^{\infty} \frac{\mean{n}^{m+2}}{m!}e^{-\mean{n}}\\
+        &= \mean{n}^2e^{-\mean{n}} \sum_{m=0}^{\infty} \frac{\mean{n}^m}{m!}\\
+        &= \mean{n}^2e^{-\mean{n}}e^{\mean{n}}\\
+        &= \mean{n}^2.
+    \end{align*}
+    Hence
+    \[\mean{\Delta n^2} = \mean{n^2} - \mean{n}^2 = \mean{n(n - 1)} + \mean{n} - \mean{n}^2 = \mean{n}^2 + \mean{n} - \mean{n}^2 = \mean{n}.\]
+    
+    \subsection{Gaussian Distribution}
+    We now consider the case when \(N\) is very large and so is \(Np\).
+    For \(P(n)\) to not be vanishingly small we need for \(n\) to be of the same order as \(Np\).
+    First we define \(s(n) = \ln[P(n)]\) and using Stirling's approximation for all factorials we have
+    \begin{align*}
+        s(n) &= \ln[P(n)]\\
+        &= \ln\left[\frac{N!}{n!(N - n)!}p^n(1 - p)^{N-n}\right]\\
+        &= \ln(N!) - \ln(n!) - \ln[(N - n)!] + n\ln p + (N - n)\ln(1 - p)\\
+        &\approx N\ln N - N - n\ln n + n - (N - n)\ln(N - n) + N - n + n\ln p + (N - n)\ln(1 - p).
+    \end{align*}
+    Computing derivatives for later we have
+    \begin{align*}
+        s'(n) &= -\ln n - 1 + 1 + \frac{N}{N - n} + \ln(N - n) \underbrace{- \frac{n}{N - n} - 1}_{= - N/(N-n)} + \ln(p) - \ln(1 - p)\\
+        &= \ln p - \ln(1 - p) + \ln(N - n) - \ln n\\
+        s''(n) &= -\frac{1}{N - n} - \frac{1}{n}.
+    \end{align*}
+    Notice that \(s(n)\) is maximised at \(n = Np\), i.e. the mean.
+    We now define \(x = n - Np\), the deviation from the mean, and expand around this point:
+    \[s(x) = s(Np) + xs'(Np) + \frac{x^2}{2}s''(Np) + \dotsb.\]
+    Since \(s\) is maximised at \(n = Np\) the first derivative will evaluate to zero.
+    Thus
+    \[s(x) \approx s(Np) - \frac{x^2}{2Np(1 - p)}.\]
+    So
+    \[P(n) \approx \exp\left[s(Np) - \frac{x^2}{2Np(1 - p)}\right] = A\exp\left[-\frac{x^2}{2Np(1 - p)}\right]\]
+    where we absorb the constant \(\exp[s(Np)]\) into the normalisation factor, \(A\).
+    Now assuming that this is valid for a continuous variable \(x\) we have the \gls{pdf}
+    \[P(x) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left[-\frac{(n - \mean{n})}{2\sigma^2}\right]\]
+    where \(\sigma^2 = Np(1 - p)\).
+    This is the Gaussian distribution.
+    See appendix~\ref{app:Gaussian integral} for details on the normalisation.
+    
+    \subsection{Large Numbers}
+    In statistical mechanics we often have incredibly large numbers, typically \(N\approx\num{e23}\).
+    This is useful for it makes the following approximations \emph{very} accurate.
+    
+    Let \(\{x_i\}\) be \(N\) random variables.
+    The \define{law of large numbers} states that
+    \[\lim_{N\to\infty} \frac{1}{N}\sum_{i=1}^{N} x_i = \mean{x}.\]
+    Here \(\mean{x}\) is the true mean of the distribution that \(x_i\) follow.
+    In words this says as sample size increases the sample mean tends towards the population mean.
+    We use this to our advantage as we expect for large \(N\) the approximation of the sample mean and population mean being the same will be a very good approximation.
+    
+    Let \(\{x_i\}\) be \(N\) random variables drawn from a distribution with mean \(\mean{x}\) and variance \(\mean{\Delta x^2}\).
+    Then the \define{central limit theorem} states that the sum
+    \[S = \sum_{i=1}^{N} x_i\]
+    in the limit \(N \to \infty\) will be a random variable drawn from a Gaussian distribution with mean \(\mean{S} = N\mean{x}\) and standard deviation \(\mean{\Delta S^2} = N\mean{\Delta x^2}\).
+    Notice that this doesn't require individual \(x_i\) to follow a Gaussian distribution.
+    Technically not all distributions will tend towards Gaussians but all of the ones we will consider in this course will.
+    One useful consequence of this is that the fractional deviation, \(\sigma/\mu\), always goes as \(\sim 1/\sqrt{N}\) so increasing \(N\) will have the effect of sharpening the distribution simplifying things further for large \(N\).
+    
+    \subsection{Introductory Statistical Mechanics}
+    \subsection{Ensembles}
+    An \define{ensemble} the system we consider.
+    Typically we distinguish between three different types of ensembles.
+    A \define{micro-canonical ensemble} is a truly closed system.
+    The number of particles, \(N\), is fixed as is the internal energy, \(E\)\footnote{In statistical mechanics we use \(E\) for internal energy instead of the \(U\) used in thermodynamics.}.
+    The universe is the only true micro-canonical ensemble that exist but many systems can be approximated as micro-canonical ensembles.
+    For example a gas in a box with adiabatic walls is a micro-canonical ensemble however in real life truly adiabatic walls don't exist.
+    A \define{canonical ensemble} is a system where the number of particles, \(N\), is fixed but the internal energy, \(E\), is not.
+    For example a gas in a box has a fixed number of particles (assuming an air tight box and no quantum tunnelling out of the box) but by colliding with the wall gas molecules can give some of their energy to the box and then to the outside.
+    A \define{grand-canonical ensemble} has neither \(n\) nor \(E\) fixed.
+    Essentially these are three different systems with different conservation laws.
+    
+    \begin{keypoint}
+        A \define{microstate} is a complete specification of the state of the system on a microscopic scale.
+    \end{keypoint}
+    For example knowing the microstate of a box of gas would involve knowing the position and momentum of each particle which is \(6N\) degrees of freedom.
+    
+    \begin{keypoint}
+        A \define{macrostate} is a limited description of the state of the system given by macroscopic (measurable) observables.
+    \end{keypoint}
+    For example the macrostate of a box of gas is the pressure, temperature and volume of the gas.
+    Typically each macrostate corresponds to a large number of different microstates which all result in the same macroscopic properties.
+    
+    We will assume in this course that all systems contain only \define{weakly interacting} constituents, this is nothing to do with the weak force, it simply means that no energy is stored in internal degrees of freedom, for example a weakly interacting system will have no vibrational energy but will have kinetic energy.
+    Strongly interacting systems, again, nothing to do with the strong force, just the opposite of weakly interacting systems, will be covered in later courses.
+    
+    \section{Entropy}
+    \begin{keypoint}
+        To any macrostate there corresponds, in general, very many microstates.
+    \end{keypoint}
+    The multiplicity, or weight, of a given macrostate is the number of microstates that correspond to that macrostate.
+    We denote the multiplicity of the macrostate with \(N\) particles, energy \(E\), and free microscopic parameters, \(\{\alpha\}\), by \(\Omega(N, E, \{\alpha\})\), or to simplify notation \(\Omega(E, \{\alpha\})\) when it is clear that \(N\) is constant.
+    The multiplicity of a macrostate can tell us a lot about a system.
+    To see this we will consider an example.
+    
+    \subsection{Model Magnet}
+    We consider a system of independent spins in a uniform magnetic field, \(\vv{H}\).
+    The spins can be in one of two states.
+    The ground state, \(\uparrow\), where the spin is aligned with the magnetic field or an excited state, \(\downarrow\), where the spin is anti-aligned with the magnetic field.
+    The corresponding energies are \(\varepsilon = -mH\) and \(\varepsilon = mH\).
+    We consider the case of \(N\) spins with fixed energy \(E\).
+    Let \(n_1\) be the number of spins in the ground state and \(n_2\) be the number of spins in the excited state.
+    Clearly \(N = n_1 + n_2\).
+    As well as this the total energy is simply the sum of the energies of each state which is the sum of the energy of the ground and excited states weighted by the number of spins in that state:
+    \[E = -mHn_1 + mHn_2.\]
+    We can solve these two equations and find that
+    \[n_1 = \frac{1}{2}\left(N - \frac{E}{mH}\right), \qquad\text{and}\qquad n_2 = \frac{1}{2}\left(N + \frac{E}{mH}\right).\]
+    The exact relationship between \(n_1\) and \(n_2\) and the values \(N\) and \(E\) isn't important, what is important is that \(n_1\) and \(n_2\) are fixed by fixing \(N\) and \(E\).
+    The only thing that can change is which spins are in which state.
+    
+    The weight of a given macrostate with \(N\) particles and energy \(E\) is
+    \[\Omega(N, E) = {N \choose n_2} = \frac{N!}{n_1!n_2!}\]
+    here we have used \(N - n_2 = n_1\).
+    To lighten notation we define \(n = n_2\) and use \(n_1 = N - n\)
+    For an explicit example counting the microstates see tables~\ref{tab:multiplicity N = 3} and \ref{tab:multiplicity N = 4}.
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{ccc}\hline
+            Macrostate & Microstates & Weight\\\hline
+            \(E = -3mH\) & \(\uparrow\uparrow\uparrow\) & 1\\\hline
+            & \(\uparrow\uparrow\downarrow\) & \\
+            \(E = -mH\) & \(\uparrow\downarrow\uparrow\) & 3\\
+            & \(\downarrow\uparrow\uparrow\) & \\\hline
+            & \(\uparrow\downarrow\downarrow\) & \\
+            \(E = mH\) & \(\downarrow\uparrow\downarrow\) & 3\\
+            & \(\downarrow\downarrow\uparrow\) & \\\hline
+            \(E = 3mH\) & \(\downarrow\downarrow\downarrow\) & 1\\\hline
+        \end{tabular}
+        \caption{The multiplicity of macrostates with \(N = 3\) and a given value of \(E\).}
+        \label{tab:multiplicity N = 3}
+    \end{table}
+    \begin{table}[ht]
+        \centering
+        \begin{tabular}{ccc}\hline
+            Macrostate & Microstates & Weight\\\hline
+            \(E = -4mH\) & \(\uparrow\uparrow\uparrow\uparrow\) & 1\\\hline
+            \(E = -2mH\) & \(\uparrow\uparrow\uparrow\downarrow\) \(\uparrow\uparrow\downarrow\uparrow\) & 4\\
+            & \(\uparrow\downarrow\uparrow\uparrow\) \(\downarrow\uparrow\uparrow\uparrow\) & \\\hline
+            & \(\uparrow\uparrow\downarrow\downarrow\) \(\uparrow\downarrow\uparrow\downarrow\) & \\
+            \(E = 0\) & \(\downarrow\uparrow\uparrow\downarrow\) \(\uparrow\downarrow\downarrow\uparrow\) & 6\\
+            & \(\downarrow\uparrow\downarrow\uparrow\) \(\downarrow\downarrow\uparrow\uparrow\) & \\\hline
+            \(E = 2mH\) & \(\uparrow\downarrow\downarrow\downarrow\) \(\downarrow\uparrow\downarrow\downarrow\) & 4\\
+            & \(\downarrow\downarrow\uparrow\downarrow\)  \(\downarrow\downarrow\downarrow\uparrow\) & \\\hline
+            \(E = 4mH\) & \(\downarrow\downarrow\downarrow\downarrow\) & 0\\\hline
+        \end{tabular}
+        \caption{The multiplicity of macrostates with \(N = 4\) and a given value of \(E\).}
+        \label{tab:multiplicity N = 4}
+    \end{table}
+    There are a few things to notice here.
+    First the special cases of \(n_1 = N\) or \(n_2 = N\) always have multiplicity 1 as there is only one way for all spins to be the same.
+    Outside of these cases the numbers increase rapidly.
+    For example for \(N = 10\) the multiplicity of the \(E = 0\) state, corresponding to \(n_1 = n_2 = 5\) is 252 and the multiplicity of the \(E = 2mH\) state, corresponding to \(n_1 = 4\)and \(n_2 = 6\), is 210.
+    
+    We can approximate the multiplicity for large \(N\) using Sterling's approximation assuming that \(N\), \(n\) and \(N - n\) are large we have
+    \begin{align*}
+        \ln\Omega(N, E) &= \ln{N \choose n}\\
+        &= \ln\frac{N!}{n!(N - n)!}\\
+        &\approx N\ln N - N - n\ln n + n - (N - n)\ln(N - n) + (N - n)\\
+        &= N\left[\ln N - \frac{n}{N}\ln n - \left(1 - \frac{n}{N}\right)\ln(N - n)\right]\\
+        &= N\left[-\frac{n}{N}\ln\left(\frac{n}{N}\right) - \left(1 - \frac{n}{N}\right)\ln\left(1 - \frac{n}{N}\right)\right].
+    \end{align*}
+    Here we used
+    \[-\frac{n}{N}\ln\left(\frac{1}{N}\right) - \left(1 - \frac{n}{N}\right)\ln\left(\frac{1}{N}\right) = \frac{n}{N}\ln N + \left(1 - \frac{n}{N}\right)\ln N = \ln N\]
+    Hence we find that
+    \[\frac{1}{N}\ln\Omega(N, E) = s\left(\frac{n}{N}\right)\]
+    where
+    \[s(x) = -(1 - x)\ln(1 - x) - x\ln x.\]
+    This function, \(s\), has several key features:
+    \begin{itemize}
+        \item It has a maximum at \(x = 1/2\)
+        \item It is symmetric about \(x = 1/2\) since \(s(x) = s(1 - x)\)
+        \item \(s(0) = s(1) = 0\), this can be seen by taking limits formally or just noting that as \(x\to 0, 1\) we have a polynomial going to \(0\) times a log going to \(-\infty\).
+        Since polynomials grow faster they will dominate and we will have \(s(x) = 0\).
+        \item Since \(\Omega = e^{Ns(n/N)}\) the weight function is exponential in \(N\) but \(\ln \Omega\) is proportional to \(N\).
+    \end{itemize}
+    \begin{figure}[ht]
+        \centering
+        \includegraphics[scale=0.6]{log_multiplicity.png}
+        \caption{A plot of \(s(x) = -(1 - x)\ln(1 - x) - x\ln x\).}
+    \end{figure}
+    At the start of this system we mentioned a free microscopic variable \(\alpha\).
+    This is a microscopic property that is not fixed by choosing a particular macroscopic state.
+    For example if we line up the spins in our system then we could define the free microscopic variable \(n_L\) being the number of excited dipoles on the left hand side and \(n_R\) being the number of excited dipoles on the right hand side.
+    These values are constrained by \(n_L + n_R = n\) but we still have one degree of freedom left so we are free to pick \(n_L\) to be any integer from zero to \(N/2\).
+    
+    To calculate the multiplicity of a given macrostate with some value of \(n_L\) we simply consider two separate subsystems made of the left and right halves and count the number of ways we can have \(n_L\) excited states in the left hand side and \(n_R = n - n_L\) excited states in the right hand side.
+    Since the two halves are independent the total number of ways we can have \(n_L\) excited states in the left hand side is
+    \[\Omega(N, E, n_L) = {N/2 \choose n_L} {N/2 \choose n - n_L}.\]
+    In the case that \(E = 0\) and so \(n = N/2\) and \(n_L = N/2 - n_R\) it can be shown that
+    \[\frac{1}{N}\ln\Omega(N, 0, n_L) \approx s\left(\frac{n_L}{N/2}\right).\]
+    
+    \begin{keypoint}
+        We define the entropy of a system as
+        \[S(N, E, \{\alpha\}) = \boltzmann\ln \Omega(N, E, \{\alpha\}).\]
+        Here \(\boltzmann = \SI{1.381e-23}{\joule.\kelvin^{-1}}\) is Boltzmann's constant.
+    \end{keypoint}
+    The entropy of a macrostate of our model magnet is then \(\boltzmann N s(n/N)\).
+    
+    We now know a lot about the weight function so why is it important?
+    The reason lies in the following assumption: 
+    \begin{keypoint}
+        An isolated system is equally likely to be found in any of its allowed microstates.
+    \end{keypoint}
+    This is a reasonable assumption and is almost always at least a good approximation.
+    This is referred to as the principle of equal a priori probabilities.
+    This assumption is essentially due to assuming equal probabilities before a Bayesian calculation of the most likely state.
+    Having no further information this really is the best guess.
+    
+    \begin{keypoint}
+        Assuming all microstates are equally likely the probability that an isolated system will be found in the macrostate \(N, E, \{\alpha\}\) is proportional to \(\Omega(N, E, \{\alpha\})\).
+    \end{keypoint}
+    This is simply due to all microstates being equally likely so the only thing biasing a system towards a particular macrostate is what proportion of all microstates correspond to that macrostate.
+    
+    The weight function for the model magnet very quickly becomes a sharp spike at \(n = N/2\).
+    This means that the most likely state for the model magnet is half of the spins excited and half in the ground state.
+    This assumes that all microstates are allowed which is the case as long as there is at least \(NmH\) energy available to the system.
+    Free macroscopic variables settle into an equilibrium value that maximises \(\Omega\) simply through the shear overwhelming probability of the microstates with these values.
+    
+    This is a pretty amazing result.
+    The system of spins is completely isolated and each spin is independent of all other spins yet for sufficiently large \(N\) we can say that approximately \(N/2\) spins will be in each state.
+    
+    One way to view a system is as randomly walking through parameter space moving from microstate to microstate.
+    On average each move it makes will take it to a more likely macrostate until eventually it is in the most likely macrostate.
+    It is then unlikely to change much, it is in equilibrium.
+    While the system moves between microstates with each macrostate becoming more likely it must also be moving from lower multiplicity states to higher multiplicity states.
+    Thus the entropy is increasing.
+    We see that this definition of entropy satisfies the second law of thermodynamics in that it increases with every process.
+    The fact that this is a law comes down to the huge size of \(N\) most of the time which means that moving to a less likely macrostate (and hence decreasing entropy) is so unlikely it simply doesn't happen.
+    Recall that deviations from the mean are of the order \(N^{-1/2}\) and therefore miniscule.
+    
+    \section{The Boltzmann Distribution}
+    \subsection{Addition of Entropy}
+    Consider a system split into two subsystems, 1 and 2.
+    If each subsystem has \(N_i\) particles and energy \(E_i\) then the total number of microstates with \(N = N_1 + N_2\) for some specific \(N_i\) and energy \(E = E_1 + E_2\) for some specific \(E_i\) and some other parameters, \(\{\alpha\}\), is
+    \[\Omega(N, E, \{\alpha\}) = \Omega_1(N_1, E_1, \{\alpha\})\Omega_2(N_2, E_2, \{\alpha\}).\]
+    Here \(\Omega_i\) is the weight function for each subsystem.
+    The entropy of the whole system is then
+    \begin{align*}
+        S(N, E, \{\alpha\}) &= \boltzmann\ln\Omega(N, E, \{\alpha\})\\
+        &= \boltzmann\ln[\Omega_1(N_1, E_1, \{\alpha\})\Omega_2(N_2, E_2, \{\alpha\})]\\
+        &= \boltzmann\ln \Omega_1(N_1, E_1, \{\alpha\}) + \boltzmann\ln\Omega_2(N_2, E_2, \{\alpha\})\\
+        &= S_1(N_1, E_1, \{\alpha\}) + S_2(N_2, E_2, \{\alpha\})
+    \end{align*}
+    where \(S_i\) are the entropies of the individual subsystems.
+    
+    \subsection{Entropy and Temperature}
+    Consider a system with fixed \(N\) split into two subsystems.
+    If the energy of these subsystems is \(E_i\) and the energy of the whole system is \(E = E_1 + E_2\) then the total entropy is
+    \[S(E) = S_1(E_1) + S_2(E_2)\]
+    where we drop \(N\) from the notation as it is constant.
+    Suppose we want to now what the effect of changing \(E_1\) to \(E_1 + \dd{E_1}\).
+    Since \(E\) is fixed this change necessitates changing \(E_2\) to \(E_2 - \dd{E_1}\).
+    The change in entropy is then
+    \begin{align*}
+        \dd{S} &= \dd{S_1} + \dd{S_2}\\
+        &= \pdv{S_1}{E_1}\dd{E_1} + \pdv{S_2}{E_2}\dd{E_2}\\
+        &= \left(\pdv{S_1}{E_1} - \pdv{S_2}{E_2}\right)\dd{E_1}.
+    \end{align*}
+    Since entropy is maximised at equilibrium we must have \(\dd{S} = 0\) and therefore
+    \[\pdv{S_1}{E_1} = \pdv{S_2}{E_2}.\]
+    Recall from the zeroth law of thermodynamics we know that two systems in thermal equilibrium have the same temperature.
+    Therefore it is reasonable to conclude that \(\inlinepdv{S}{E}\) is some function of \(T\).
+    In fact the correct function is
+    \begin{keypoint}
+        \[\pdv{S}{E} = \frac{1}{T}.\]
+    \end{keypoint}
+    We will justify this later.
+
+    Now consider what happens if we change the temperatures of the two systems and then put them in thermal contact.
+    We know from the second law that we must have \(\dd{S} > 0\) so
+    \[\dd{S} = \left(\pdv{S_1}{E_1} - \pdv{S_2}{E_2}\right)\dd{E_1} = \left(\frac{1}{T_1} - \frac{1}{T_2}\right)\dd{E_1} > 0.\]
+    If \(T_1 > T_2\) then this will be true only if \(\dd{E_1}\) is negative and therefore energy flows from the hotter system to the cooler system.
+    If \(T_1 < T_2\) then \(\dd{E_1}\) is positive and therefore energy still flows from hot to cold.
+    
+    \subsection{The Boltzmann Distribution}\label{sec:the boltzmann distribution}
+    The setup that we consider is a heat bath at temperature \(T_{\mathrm{b}}\) and a system in the heat bath.
+    The system we consider has \(N_s\) particles which is fixed.
+    Its energy is not fixed.
+    The composite system (system and heat bath), or the universe, has both \(N\) and \(E_{\tot}\) fixed.
+    The composite is thus isolated and has fixed total energy so all microstates are equally likely.
+    However we are interested in the microstates of the system which we will see are not all equally likely.
+    
+    Suppose the system is in a microstate with energy \(E_i\).
+    We want to know the probability, \(P(E_i)\), of the system being in this microstate.
+    Notice that if the system has energy \(E_i\) then the bath must have energy \(E_{\mathrm{b}} = E_{\tot} - E_i\).
+    Thus
+    \[P(E_i) = \frac{\Omega(E_i)\Omega_{\mathrm{b}}(E_{\tot} - E_i)}{\Omega_{\mathrm{universe}}(E_{\tot})}.\]
+    Here \(\Omega(E_i)\) gives the number of ways to get the \emph{micro}state with \(E_i\).
+    Therefore \(\Omega(E_i) = 1\).
+    Also \(\Omega_{\mathrm{b}}\) is the weight system for the bath and \(\Omega_{\mathrm{universe}}\) is the weight function for the composite.
+    The important part of this equation is \(\Omega_{\mathrm{b}}(E_{\tot} - E_i)\) since \(\Omega_{\mathrm{universe}}\) is a constant and we can therefore discard it and recover the information by requiring \(P\) be normalised.
+    Thus
+    \[P(E_i) \propto \Omega_{\mathrm{b}}(E_{\tot} - E_i).\]
+    We can express \(\Omega_{\mathrm{b}}\) in terms of the entropy, \(S_{\mathrm{b}}\), of the bath:
+    \[\Omega_{\mathrm{b}}(E_{\tot} - E_i) = \exp\left[\frac{S_{\mathrm{b}}(E_{\tot} - E_i)}{\boltzmann}\right].\]
+    We assume that \(E_i \ll E_{\tot}\) and therefore we can Taylor expand the entropy as
+    \[S_{\mathrm{b}}(E_{\tot} - E_i) = S_{\mathrm{b}}(E_{\tot}) - E_i\pdvat{S_{\mathrm{b}}}{E_{\mathrm{b}}}{E_{\tot}} + \frac{E_i^2}{2}\pdvat[2]{S_{\mathrm{b}}}{E_{\mathrm{b}}}{E_{\tot}} + \dotsb.\]
+    As usual we only keep the first two terms, we will show later that the second term is small.
+    Thus
+    \begin{align*}
+        P(E_i) &\propto \exp\left[\frac{S_{\mathrm{b}}}{\boltzmann} - \pdvat{S_{\mathrm{b}}}{E_{\mathrm{b}}}{E_{\tot}} \frac{E_i}{\boltzmann}\right]\\
+        &= \exp\left[\frac{S_{\mathrm{b}}}{\boltzmann}\right] \exp\left[-\pdvat{S_{\mathrm{b}}}{E_{\mathrm{b}}}{E_{\tot}} \frac{E_i}{\boltzmann}\right]\\
+        &\propto \exp\left[-\pdvat{S_{\mathrm{b}}}{E_{\mathrm{b}}}{E_{\tot}} \frac{E_i}{\boltzmann}\right]\\
+        &= \exp\left[-\frac{-E_i}{\boltzmann T}\right]
+    \end{align*}
+    This is the Boltzmann factor.
+    We now require \(P\) to be normalised so
+    \[\sum_{\mathclap{\text{all microstates}}} P(E_i) = \sum_{\mathclap{\text{all microstates}}} \mathrm{const.}\,e^{-E_i/\boltzmann T} = 1.\]
+    \begin{keypoint}
+        The probability that a system is in a microstate with energy \(E_i\) is
+        \[P(E_i) = \frac{e^{-E_i/\boltzmann T}}{Z}\]
+        where
+        \[Z = \sum_{\mathclap{\text{all microstates}}} e^{-E_j/\boltzmann T}.\]
+    \end{keypoint}
+    \(Z\) is known as the statistical sum or partition function.
+    
+    This is quite a remarkable result.
+    The only information about a microstate that we need is the energy and the temperature.
+    For example if we consider particles in an isothermal atmosphere with mass \(m\) then the height is distributed as
+    \[P(h) = \frac{1}{Z}\exp\left[-\frac{mgh}{\boltzmann T}\right].\]
+    If instead we are considering particles in a gas then the velocity in the \(x\) direction is distributed as
+    \[P(v_x) = \frac{1}{Z}\exp\left[-\frac{mv_x^2}{2\boltzmann T}\right].\]
+    
+    \begin{example}
+        Consider a single particle with magnetic moment \(m\) in a magnetic field, \(H\), 
+        Suppose the particle can be either spin up, with energy \(E_{\uparrow} = -mH\), or spin down, with energy \(E_{\downarrow} = mH\).
+        Then
+        \begin{align*}
+            Z &= \exp\left[-\frac{E_{\uparrow}}{\boltzmann T}\right] + \exp\left[-\frac{E_{\downarrow}}{\boltzmann T}\right]\\
+            &= \exp\left[\frac{mH}{\boltzmann T}\right] + \exp\left[-\frac{mH}{\boltzmann T}\right]\\
+            &= 2\cosh\left(\frac{mH}{\boltzmann T}\right).
+        \end{align*}
+        So the probability of being in the spin up state is
+        \begin{align*}
+            P(\uparrow) &= \frac{\exp\left[\frac{mH}{\boltzmann T}\right]}{2\cosh\left(\frac{mH}{\boltzmann T}\right)}\\
+            &= \frac{1}{1 + \exp\left[-\frac{2mH}{\boltzmann T}\right]}.
+        \end{align*}
+        Now consider what happens at \(T = 0\).
+        We see that \(P(\uparrow) = 1\).
+        This is because if there is no thermal energy then we expect to find the system in the ground state.
+        Then as \(T \to \infty\) we find that \(P(\uparrow)\to1/2\).
+        This is because as the total energy available increases the small energy difference between the two states becomes negligible and both states become equally likely.
+        
+        We can also calculate the average energy:
+        \begin{align*}
+            \mean{E} &= E_{\uparrow}P(\uparrow) + E_{\downarrow}P(\downarrow)\\
+            &= \frac{1}{Z}\left(-mH\exp\left[\frac{mH}{\boltzmann T}\right] + mH\exp\left[-\frac{mH}{\boltzmann T}\right]\right)\\
+            &= -mH\frac{\sinh\left(\frac{mH}{\boltzmann T}\right)}{2\cosh\left(\frac{mH}{\boltzmann T}\right)}\\
+            &= -mH\tanh\left(\frac{mH}{\boltzmann T}\right).
+        \end{align*}
+        Recall that for small \(x\) we have \(\tanh x \approx x\) and for large \(x\) \(\tanh x\approx 1\).
+        Therefore we expect \(\mean{E}\) to increase exponentially from \(-mH\) with \(T\) for low temperatures before tapering off at \(0\) for high temperatures.
+        
+        Now consider the entropy of the model magnet:
+        \[S(E) = -N\boltzmann[x\ln x + (1 - x)\ln(1 - x)]\]
+        where
+        \[x = \frac{n}{N} = \frac{1}{2}\left(1 + \frac{E}{NmH}\right).\]
+        Where \(N\) is the total number of dipoles and \(n\) is the number of excited dipoles.
+        We find that
+        \begin{align*}
+            \frac{1}{T} &= \pdv{S}{E}\\
+            &= \pdv{x}{E}\pdv{S}{x}\\
+            &= -\frac{Nk}{2NmH}[\ln x + 1 - \ln(1 - x) - 1]\\
+            &= -\frac{\boltzmann}{2mH}\ln\left(\frac{x}{1 - x}\right).
+        \end{align*}
+        So we find that
+        \[\exp\left(-\frac{2mH}{\boltzmann T}\right) = \frac{x}{1 - x}\]
+        which means
+        \[x = \frac{n}{N} = \frac{\exp\left(-\frac{2mH}{\boltzmann T}\right)}{1 + \exp\left(-\frac{2mH}{\boltzmann T}\right)} = \frac{\exp(-\beta mH)}{\exp(\beta mH) + \exp(-\beta mH)}\]
+        where \(\beta = 1/\boltzmann T\).
+        Taking a frequentist view \(n/N\) is the probability that a single dipole is in an excited state so we see that we recover the Boltzmann distribution for a single dipole.
+        This initially seems wrong as we would expect an isolated system to have all microstates be equally likely.
+        However this isn't an isolated system.
+        The single dipole in the model magnet can exchange energy with the other \(N - 1\) dipoles so we can treat a single dipole as a canonical system in a heat bath made of the other \(N - 1\) dipoles.
+    \end{example}
+    
+    During this derivation we neglected the second order term.
+    We will now see that this is an extremely valid thing to do:
+    \begin{align*}
+        \frac{E_i^2}{2}\pdv[2]{S_{\mathrm{b}}}{E_{\mathrm{b}}} &= \frac{E_i^2}{2}\pdv{E_{\mathrm{b}}} \frac{1}{T_{\mathrm{b}}}\\
+        &= -\frac{E_i^2}{2T_{\mathrm{b}}}\pdv{T_\mathrm{b}}{E_{\mathrm{b}}}\\
+        &\propto \frac{1}{C_{\mathrm{b}}}
+    \end{align*}
+    where \(C_{\mathrm{b}} = \inlinepdv{E_{\mathrm{b}}}{T_{\mathrm{b}}}\) is the heat capacity of the bath.
+    By definition the heat capacity of a heat bath is very large as the temperature must remain constant.
+    Ideally it is infinite.
+    This means that the second order term is, even in the real world, very small and can safely be neglected.
+    
+    \section{Free Energy Minimisation}
+    \subsection{Energy Fluctuations}
+    The mean energy of a canonical system is
+    \begin{align*}
+        \mean{E} &= \sum_i E_iP(E_i)
+        \shortintertext{where the sum is over all microstates}
+        &= \frac{1}{Z} \sum_i E_i \exp\left(-\frac{E_i}{\boltzmann T}\right)
+        \shortintertext{introducing \(\beta = 1 / \boltzmann T\) this becomes}
+        &= \frac{1}{Z} \sum_i E_i e^{-\beta E_i}\\
+        &= \frac{1}{Z} \sum_i \pdv{\beta} e^{-\beta E_i}\\
+        &= -\frac{1}{Z}\pdv{\beta} \sum_i e^{-\beta E_i}\\
+        &= -\frac{1}{Z}\pdv{Z}{\beta}\\
+        &= -\pdv{\beta}\ln Z.
+    \end{align*}
+    So
+    \begin{equation}\label{eqn:mean E in terms of Z}
+        \mean{E} = -\pdv{\ln Z}{\beta} = -\pdv{T}{\beta}\pdv{\ln Z}{T} = \boltzmann T^2\pdv{\ln Z}{T}
+    \end{equation}
+    Considering now the heat capacity, \(C\), we have
+    \[C = \pdv{\mean{E}}{T}.\]
+    To calculate this we use
+    \[\pdv{T} = \pdv{\beta}{T}\pdv{\beta} = \left(\pdv{T}\frac{1}{\boltzmann T}\right)\pdv{\beta} = -\frac{1}{\boltzmann T^2}\pdv{\beta}\]
+    so
+    \begin{align*}
+        C &= -\frac{1}{\boltzmann T^2}\pdv{\beta} \frac{\sum_i E_ie^{-\beta E_i}}{Z}
+        \shortintertext{taking care as \(Z\) has \(\beta\) dependence and applying the product rule this gives}
+        &= -\frac{1}{\boltzmann T^2} \left[ -\frac{\sum_i E_i^2 e^{-\beta E_i}}{Z} - \frac{\sum_i E_i e^{-\beta E_i}}{Z^2}\pdv{Z}{\beta} \right]\\
+        &= -\frac{1}{\boltzmann T^2} \left[-\sum E_i^2P(E_i) - \sum_i E_iP(E_i) \pdv{Z}{\beta}\frac{1}{Z}\right]\\
+        &= \frac{1}{\boltzmann T^2}(\mean{E^2} - \mean{E}^2)\\
+        &= \frac{\mean{\Delta E^2}}{\boltzmann T^2}.
+    \end{align*}
+    Here we have used
+    \[\sum_i E_iP(E_i) = \mean{E} = -\frac{1}{Z}\pdv{Z}{\beta}, \qquad\text{and}\qquad \sum_i E_i^2P(E_i) = \mean{E^2}.\]
+    The heat capacity characterises the response of the system to a change of temperature.
+    We see here that this responds is proportional to the size of energy fluctuations that the system can undergo.
+    Notice that \(\mean{E} \propto N\) and therefore \(C\propto N\) which means that \(\mean{\Delta E^2}\propto N\).
+    Thus the size of fluctuations on the scale of the mean energy is
+    \[\frac{\sqrt{\mean{\Delta E^2}}}{\mean{E}} \propto \frac{\sqrt{N}}{N} = \frac{1}{\sqrt{N}}.\]
+    This is exactly what we would expect.
+    We see that even though \(E\) is free to change in a canonical system for large \(N\) the energy distribution is still sharply peaked at \(\mean{E}\).
+    
+    \subsection{Free Energy}
+    Previously we have considered \(P(E_i)\), the probability that the system is in a \emph{micro}state with energy \(E_i\).
+    Now we will consider \(P(E)\), the probability that the system is in a \emph{macro}state with energy \(E\).
+    Before our partition function was
+    \[Z = \sum_{\mathclap{\text{all microstates}}} e^{-E_i/\boltzmann T}.\]
+    Now this doesn't change but we instead can express it as
+    \[Z = \sum_{\mathclap{\text{all macrostates}}} \Omega(E)e^{-E/\boltzmann T}.\]
+    These are essentially equivalent but we collapse all microstates with the same energy into one term and weight it with \(\Omega(E)\).
+    Thus
+    \[P(E) = \frac{1}{Z}\Omega(E)e^{-E/\boltzmann T}\]
+    which again follows from considering each possible microstate with energy \(E_i = E\) and combining them into one by weighting the term by \(\Omega(E)\).
+    
+    Inverting the definition of entropy we know that
+    \[\Omega(E) = e^{S(E)/\boltzmann}.\]
+    Hence
+    \begin{align*}
+        P(E) &= \frac{1}{Z}\Omega(E)\exp\left[-\frac{E}{\boltzmann T}\right]\\
+        &= \frac{1}{Z} \exp\left[\frac{S(E)}{\boltzmann}\right] \exp\left[-\frac{E}{\boltzmann T}\right]\\
+        &= \frac{1}{Z} \exp\left[\frac{S(E)}{\boltzmann} - \frac{E}{\boltzmann T}\right]\\
+        &= \frac{1}{Z} \exp\left[-\frac{E - TS(E)}{\boltzmann T}\right]\\
+        &= \frac{1}{Z} \exp\left[-\frac{F(E)}{\boltzmann T}\right].
+    \end{align*}
+    So we see that the probability of finding the system in a macrostate with energy \(E\) is directly linked to the Helmholtz free energy, \(F(E) = E - TS(E)\).
+    More than this we see that \(P(E)\) peaks when the argument of the exponent is maximised meaning that \(F(E)\) is minimised.
+    
+    This gives us a strong general concept: 
+    \begin{keypoint}
+        The equilibrium values of the macroscopic properties, \(E\) and \(\{\alpha\}\) of a system in equilibrium are such as to minimise the free energy, \(F(E, \{\alpha\}) = E - TS(E, \{\alpha\})\).
+    \end{keypoint}
+    
+    This allows us to view the process of coming to equilibrium as a fight between minimising \(E\) and maximising \(S\).
+    For example at low temperatures ice forms because the energetically favourable crystal structure outweighs the decrease in entropy (of the system, total entropy still increases).
+    At higher temperatures entropy considerations win out and the less organised water phase dominates.
+    
+    \section{The Partition Function}
+    \subsection{Energy, Free Energy, and Entropy from the Partition Function}
+    Recall that we can write
+    \[Z = \sum_{E} \Omega(E)e^{-E\beta}\]
+    where the sum is over the energies of macrostates.
+    The majority of energies fall into a range \(\Delta E = \sqrt{\mean{\Delta E^2}}\) either side of \(\mean{E}\).
+    Since \(\mean{E}\) is \(\order{N}\) and \(\Delta E\) is \(\order{\sqrt{N}}\) this means that the partition function becomes sharply peaked at \(\mean{E}\) for large \(N\).
+    This allows us to write
+    \begin{align*}
+        Z &\approx \Omega(\mean{E})e^{-\mean{E}\beta} \order{\sqrt{N}}\\
+        &= e^{-F(T)\beta}\order{\sqrt{N}}.
+    \end{align*}
+    We can treat the free energy, \(F = E - TS\), as purely a function of temperature since it depends on \(T\), \(E\), and \(S\), but \(\mean{E}\) and \(S\) depends only on \(T\) at equilibrium.
+    Taking logs we have
+    \[\ln Z = -\beta F(T) + \order{\sqrt{N}}.\]
+    Neglecting the last term as it is relatively small for large \(N\) we have
+    \[F(T) = \mean{E} - TS(T) = -\boltzmann T\ln Z.\]
+    This is a very useful formula for calculating the free energy.
+    We can rewrite it in terms of the entropy to get
+    \[S(T) = \boltzmann \ln Z + \frac{\mean{E}}{T}.\]
+    Combining this with equation~\ref{eqn:mean E in terms of Z},
+    \[E(T) = \boltzmann T^2\pdv{\ln Z}{T},\]
+    we see that the partition function and temperature alone give us probably the three most important quantities in statistical mechanics.
+    \begin{keypoint}
+        \begin{align*}
+            F(T) &= -\boltzmann T\ln Z,\\
+            E(T) &= \boltzmann T^2\pdv{T}\ln Z,\\
+            S(T) &= \boltzmann\ln Z + \frac{E(T)}{T}.
+        \end{align*}
+    \end{keypoint}
+    
+    \subsection{Factorisation of the Partition Function}
+    Consider a weakly interacting system.
+    That is a system of particles where the energy of a particle depends only on its position and momentum, there is no energy stored in internal degrees of freedom.
+    Suppose there are \(N\) particles with energies \(\varepsilon_i\).
+    Then for a we can write the energy of a given microstate as
+    \[E_r = \varepsilon_{i_1} + \varepsilon_{i_2} + \dotsb + \varepsilon_{i_N}.\]
+    The partition function is then
+    \begin{align*}
+        Z &= \sum_r e^{-\beta E_r}\\
+        &= \sum_{i_1, i_2, \dotsc, i_N} \exp[-\beta(\varepsilon_{i_1} + \varepsilon_{i_2} + \dotsb + \varepsilon_{i_N})]\\
+        &= \left[\sum_{i_1}e^{-\beta\varepsilon_{i_1}}\right] \left[\sum_{i_2}e^{-\beta\varepsilon_{i_2}}\right] \dotsm \left[\sum_{i_N}e^{-\beta\varepsilon_{i_N}}\right]\\
+        &= [Z(1)]^N
+    \end{align*}
+    where \(Z(1)\) is the partition function for a single particle.
+    Using this we have
+    \[\ln Z = N\ln[Z(1)]\]
+    which allows us to easily compute \(F\), \(E\), and \(S\).
+    For example
+    \[\mean{E} = -\pdv{\beta}\ln Z = -N\pdv{\beta}\ln[Z(1)] = N\mean{\varepsilon}.\]
+    Another useful thing that we get from this factorisation is that if we are only interested in particle one then we can sum out all the other states:
+    \begin{align*}
+        P_{i_1} &= Z^{-1}\sum_{i_2,\dotsc,i_N} \exp(-\beta [\varepsilon_{i_1} + \varepsilon_{i_2} + \dotsb + \varepsilon_{i_N}])\\
+        &= \frac{\exp(-\beta\varepsilon_{i_1})[Z(1)]^{N-1}}{[Z(1)]^N}\\
+        &= \frac{\exp(-\beta\varepsilon_{i_1})}{Z(1)}.
+    \end{align*}
+     \begin{keypoint}
+        For a system of \(N\) weakly interacting, distinguishable particles the partition function is
+        \[Z = [Z(1)]^N\]
+        and the probability a given particle is in a state with energy \(\varepsilon_i\) is
+        \[P(\varepsilon_i) = \frac{\exp(-\beta\varepsilon_i)}{Z(1)}.\]
+    \end{keypoint}
+    
+    \subsection{The Model Magnet}
+    Earlier we calculated the partition function for a single dipole.
+    It was
+    \[Z(1) = 2\cosh x, \qquad\text{where}\qquad x = \frac{mH}{\boltzmann T}.\]
+    Using the results we have found in this section we have
+    \begin{align*}
+        \mean{E} &= N\mean{\varepsilon}\\
+        &= -N\pdv{\beta} Z(1)\\
+        &= - NmH\pdv{x}\ln Z(1)\\
+        &= -NmH\tanh x,\\
+        S(T) &= \boltzmann\ln Z + \frac{\mean{E}}{T}\\
+        &= N\boltzmann \ln Z(1) + \frac{N\mean{\varepsilon}}{T}\\
+        &= N\boltzmann [\ln(e^x + e^{-x}) - x\tanh x].
+    \end{align*}
+    It can be shown that the mean magnetisation is
+    \[\mean{M} = Nm\tanh x.\]
+    Considering the function \(\tanh\) at extremes as \(x\to 0\) we have
+    \[\tanh x = \frac{e^{x} - e^{-x}}{e^{x} + e^{-x}} \approx \frac{(1 + x) - (1 - x)}{(1 + x) + (1 - x)} = x.\]
+    As \(x\to\infty\) instead we have
+    \[\tanh x = \frac{e^{x} - e^{-x}}{e^{x} + e^{-x}} \approx \frac{e^x}{e^x} = 1.\]
+    Hence or low fields, i.e. \(mH \ll \boltzmann T\) and \(x \ll 1\), we have
+    \[\mean{M} \approx \frac{Nm^2H}{\boltzmann T}.\]
+    Or for high fields, i.e. \(mH \gg \boltzmann T\) and \(x \gg 1\), we have
+    \[\mean{M} \approx Nm.\]
+    The susceptibility is defined as
+    \[\chi_M = \pdv{\mean{M}}{H}.\]
+    Suppose we are interested in the zero-field susceptibility so
+    \[\chi_M = \pdvat{\mean{M}}{H}{H=0} = \frac{Nm^2}{\boltzmann T}.\]
+    The \(1/T\) dependence of \(\chi_M\)  is called the Curie law.
+    Consider the heat capacity with a constant field:
+    \begin{align*}
+        C_H &= \pdvconst{\mean{E}}{T}{H}\\
+        &= \pdvconst{x}{T}{H}\pdvconst{\mean{E}}{x}{H}\\
+        &= N\boltzmann x^2\sech^2x.
+    \end{align*}
+    The behaviour of this at low temperatures, i.e. large \(x\), is
+    \[\sech x = \frac{2}{e^x + e^{-x}} \approx \frac{2}{e^x} = 2e^{-x}.\]
+    So we see that at low temperatures the heat capacity will vanish.
+    This is actually a feature of all heat capacities.
+    At \(T = 0\) all particles will be in the ground state and they can't leave until \(\boltzmann T\) is comparable with the energy of the lowest energy excited state.
+    This means that the temperature can increase up to this point without the energy changing.
+    
+    \section{Strongly Interacting Systems}
+    \textit{This section is non-examinable.}
+    
+    Previously we saw that a system which moves to equilibrium minimises the free energy, \(F = E - TS\), in the process.
+    This leads to two different behaviours depending on temperature:
+    \begin{itemize}
+        \item At high temperatures \(F \approx -TS\) and minimising \(F\) is equivalent to maximising \(S\).
+        This favours high disorder states such as gases.
+        \item At low temperatures \(F\approx E\) and minimising \(F\) is equivalent to minimising \(E\).
+        This favours low disorder states such as crystals.
+    \end{itemize}
+    At some point we must therefore have a phase transition between the two points.
+    \begin{figure}[ht]
+        \centering
+        \tikzsetnextfilename{two-phase-free-energy}
+        \begin{tikzpicture}
+            \tikzstyle{axis} = [very thick, ->]
+            \tikzstyle{line} = [ultra thick, color=#1]
+            % \draw[lightgray!50, step=0.25] (0, 0) grid (4, 4);
+            % \draw[lightgray] (0, 0) grid (4, 4);
+            \draw[axis] (0, 0) -- (4, 0) node[right] {\(T\)};
+            \draw[axis] (0, 0) -- (0, 4) node[above] {\(F\)};
+            \draw[line=blue] (0.5, 0.5) .. controls (2, 2.5) and (3, 3) .. (4, 3.5);
+            \draw[line=green] (3.5, 0.5) .. controls (2, 2.5) and (1.5, 3) .. (0.5, 3.5);
+            \draw[dashed] (2.08, 2.25) -- (2.08, 0);
+            
+            \begin{scope}[xshift=5cm]
+                % \draw[lightgray!50, step=0.25] (0, 0) grid (4, 4);
+                % \draw[lightgray] (0, 0) grid (4, 4);
+                \draw[axis] (0, 0) -- (4, 0) node[right] {\(T\)};
+                \draw[axis] (0, 0) -- (0, 4) node[above] {\(F\)};
+                \begin{scope}
+                    \clip (0, 0) rectangle (2.08, 4);
+                    \draw[line=red] (0.5, 0.5) .. controls (2, 2.5) and (3, 3) .. (4, 3.5);
+                \end{scope}
+                \begin{scope}
+                    \clip (2.08, 0) rectangle (4, 4);
+                    \draw[line=red] (3.5, 0.5) .. controls (2, 2.5) and (1.5, 3) .. (0.5, 3.5);
+                \end{scope}
+                \draw[dashed] (2.08, 2.25) -- (2.08, 0);
+            \end{scope}
+            \coordinate (key) at (10, 3.2);
+            \node[right] at ($(key) + (-0.2, 0)$) {Key:};
+            \draw[line=green] ($(key) + (0, -0.75)$) -- ($(key) + (0.5, -0.75)$) node[right, black] {Low \(T\) phase};
+            \draw[line=blue] ($(key) + (0, -1.5)$) -- ($(key) + (0.5, -1.5)$) node[right, black] {High \(T\) phase};
+            \draw[line=red] ($(key) + (0, -2.25)$) -- ($(key) + (0.5, -2.25)$) node[right, black] {True phase};
+        \end{tikzpicture}
+        \caption{The free energy of a low temperature phase and high temperature phase and the free energy of the stable phase.}
+        \label{fig:free energy of two phases}
+    \end{figure}
+    Figure~\ref{fig:free energy of two phases} shows an example of the free energy of two phases preferred at different temperatures and the free energy of the actual phase at any particular temperature.
+    The problem that we see at the transition temperature the free energy is not differentiable.
+    However we previously showed that the free energy is given by
+    \[F = -\boltzmann T\ln Z\]
+    so for a non-differentiable point in \(F\) we must have something non-analytic in \(Z\).
+    But
+    \[Z = \sum_{i} e^{-E_i/\boltzmann T}\]
+    is surely analytic.
+    This caused a problem for a long time in statistical mechanics until a model was found that could reproduce the expected non-analyticity.
+    
+    \subsection{The Ising Model}
+    The Ising model is similar to the model magnet that we have been using.
+    The difference is the Ising model is strongly interacting.
+    In the Ising model we imagine a lattice of spins which can be either up, \(+1\), or down, \(-1\).
+    The spins are not in and external field so for a single particle both spin up and spin down have the same energy.
+    The new feature here is we allow the spins to interact.
+    This lowers the energy if spins align and decreases the energy if they are anti-aligned.
+    Since spin is quantum mechanical it is reasonable to assume that its effects are short ranged and we only consider the direct neighbours of a particle when considering its energy.
+    
+    \subsection{One-Dimensional Ising Model}
+    \begin{figure}
+        \centering
+        \tikzsetnextfilename{ising-model-1d}
+        \begin{tikzpicture}
+            \foreach \x/\spin in {0/0.5, 1/0.5, 2/-0.5, 3/-0.5, 4/0.5, 5/0.5, 6/0.5, 7/-0.5, 8/0.5, 9/-0.5} {
+                \draw[very thick, ->] ($(\x, 0) + (0, \spin)$) -- ($(\x, 0) - (0, \spin)$);
+                \shade[ball color=red] (\x, 0) circle[radius=0.25cm];
+            }
+        \end{tikzpicture}
+        \caption{The Ising model in one dimension.}
+    \end{figure}
+    The simplest case of the Ising model is in one dimension.
+    In this case we have a line of particles with spin up or down and we assume that only the particle on the left and right of a particle effect its energy.
+    Let the spin of the \(i\)th particle be \(S_i\).
+    Then a particle with spin \(J\) has energy
+    \[\hamiltonian = -J\sum_{i,j}S_iS_j\]
+    where the sum is over the nearest neighbours.
+    The partition function can then be written as
+    \begin{align*}
+        Z &= \sum_{\mathclap{\text{all microstates}}} e^{-E_i/\boltzmann T}\\
+        &= \sum_{S_1=\pm 1}\sum_{S_2=\pm 1}\dotsb\sum_{S_N=\pm 1} \exp\left[-\frac{J}{\boltzmann T}(S_1S_2 + S_2S_3 + \dotsb + S_{N-1}S_N)\right]\\
+        &= \sum_{S_i, S_j=\pm 1} \exp\left[-\frac{J}{\boltzmann T}(S_1S_2 + S_2S_3 + \dotsb + S_{N-1}S_N)\right].
+    \end{align*}
+    Now define \(\sigma_{i} = S_{i-1}S_{i}\).
+    The possible values of \(\sigma_i\), using \(\pm\) to denote spin up/down, are
+    \[
+    \begin{array}{ccc}\hline
+        S_{i-1} & S_i & \sigma_i\\\hline
+        + & + & +\\
+        + & - & -\\
+        - & + & -\\
+        - & - & +\\\hline
+    \end{array}
+    \]
+    Using this we can rewrite the sum that appears in the exponent of the partition function:
+    \[S_1S_2 + S_2S_3 + S_3S_4 + \dotsb + S_{N-1}S_N = \sigma_{2} + \sigma_3 + \sigma_4 + \dotsb \sigma_{N}.\]
+    Notice that there are \(N - 1\) terms in this sum.
+    This is the number of degrees of freedom of the system.
+    The partition function can then be written as
+    \[Z = \sum_{\sigma_i = \pm 1} \exp\left[-\frac{J}{\boltzmann T}(\sigma_2 + \sigma3 + \dotsb)\right].\]
+    We can write the partition function for a single particle as
+    \[Z(1) = \sum_{\sigma} \exp\left[-\frac{J}{\boltzmann T}\sigma\right]\]
+    and so the partition function for all particles is this to the power of the number of degrees of freedom:
+    \begin{align*}
+        Z &= [Z(1)]^{N - 1}\\
+        &= \left[\sum_{\sigma} \exp\left(-\frac{J}{\boltzmann T}\sigma\right)\right]^{N-1}\\
+        &= \left[2\exp\left(\frac{J}{\boltzmann T}\right) + 2\exp\left(-\frac{J}{\boltzmann T}\right)\right]^{N-1}\\
+        &= 4^{N - 1} \left[\cosh\left(\frac{J}{\boltzmann T}\right)\right]^{N - 1}
+    \end{align*}
+    where we expand the sum over \(\sigma\) to account for all four possible cases of values of \(\sigma\), two of which are \(+\) and two of which are \(-\).
+    
+    This partition function is analytic.
+    It does not permit phase transitions.
+    This means that the one-dimensional Ising model doesn't have phase transitions.
+    The reason for this comes from considering what possible phases could be.
+    The most obvious is a total ordered state where all spins are up or all spins are down.
+    See figure~\ref{fig:ising model ordered and one defect}.
+    In this case the energy is minimal as all spins are aligned but the entropy is also very low.
+    We introduce a single defect by choosing a particle and flipping the spins of all particles to the right of it.
+    There is only one point where nearest neighbours are unaligned and so the energy is still low.
+    However there are \(N\) different particles we could choose to be the first to flip (strictly we are picking a gap between particles and there are \(N - 1\) of these but \(N - 1 \approx N\) for sufficiently large \(N\)).
+    The entropy change then is proportional to \(N\) and so the change in free energy is
+    \[\Delta F = 2J - \boltzmann TN.\]
+    The second term dominates and this is a large decrease in free energy.
+    The same logic applied again and again can convince us that the state that minimises the free energy is the most disordered state where all spins are aligned randomly.
+    \begin{figure}
+        \centering
+        \tikzsetnextfilename{ising-model-1d-ordered-and-1-defect}
+        \begin{tikzpicture}
+            \foreach \x/\spin in {0/0.5, 1/0.5, 2/0.5, 3/0.5, 4/0.5, 5/0.5, 6/0.5, 7/0.5, 8/0.5, 9/0.5} {
+                \draw[very thick, ->] ($(\x, 0) + (0, \spin)$) -- ($(\x, 0) - (0, \spin)$);
+                \shade[ball color=red] (\x, 0) circle[radius=0.25cm];
+            }
+            \begin{scope}[yshift=-2cm]
+                \foreach \x/\spin in {0/0.5, 1/0.5, 2/0.5, 3/0.5, 4/0.5, 5/-0.5, 6/-0.5, 7/-0.5, 8/-0.5, 9/-0.5} {
+                    \draw[very thick, ->] ($(\x, 0) + (0, \spin)$) -- ($(\x, 0) - (0, \spin)$);
+                    \shade[ball color=red] (\x, 0) circle[radius=0.25cm];
+                }
+            \end{scope}
+        \end{tikzpicture}
+        \caption{The Ising model in one dimension. A completely ordered state (above) and a state with a single default (below).}
+        \label{fig:ising model ordered and one defect}
+    \end{figure}
+    The fact that the most disordered state is also the most favourable means that there are no phase transitions as any single change simply results in a different but still highly disordered state.
+    
+    \subsection{Two-Dimensional Ising Model}
+    \begin{figure}[ht]
+        \centering
+        \tikzsetnextfilename{ising-model-2d}
+        \begin{tikzpicture}
+            \foreach \x/\spin in {0/0.45, 1/0.45, 2/-0.45, 3/-0.45, 4/0.45, 5/0.45, 6/0.45, 7/-0.45, 8/0.45, 9/-0.45} {
+                \draw[very thick, ->] ($(\x, 0) + (0, \spin)$) -- ($(\x, 0) - (0, \spin)$);
+                \shade[ball color=red] (\x, 0) circle[radius=0.25cm];
+            }
+            \begin{scope}[yshift=-1cm]
+            \foreach \x/\spin in {0/-0.45, 1/0.45, 2/-0.45, 3/-0.45, 4/-0.45, 5/-0.45, 6/0.45, 7/-0.45, 8/0.45, 9/-0.45} {
+                \draw[very thick, ->] ($(\x, 0) + (0, \spin)$) -- ($(\x, 0) - (0, \spin)$);
+                \shade[ball color=red] (\x, 0) circle[radius=0.25cm];
+            }
+            \end{scope}
+            \begin{scope}[yshift=-2cm]
+            \foreach \x/\spin in {0/-0.45, 1/-0.45, 2/0.45, 3/0.45, 4/-0.45, 5/0.45, 6/-0.45, 7/0.45, 8/0.45, 9/-0.45} {
+                \draw[very thick, ->] ($(\x, 0) + (0, \spin)$) -- ($(\x, 0) - (0, \spin)$);
+                \shade[ball color=red] (\x, 0) circle[radius=0.25cm];
+            }
+            \end{scope}
+            \begin{scope}[yshift=-3cm]
+                \foreach \x/\spin in {0/-0.45, 1/0.45, 2/0.45, 3/0.45, 4/-0.45, 5/-0.45, 6/-0.45, 7/-0.45, 8/0.45, 9/0.45} {
+                    \draw[very thick, ->] ($(\x, 0) + (0, \spin)$) -- ($(\x, 0) - (0, \spin)$);
+                    \shade[ball color=red] (\x, 0) circle[radius=0.25cm];
+                }
+            \end{scope}
+            \begin{scope}[yshift=-4cm]
+                \foreach \x/\spin in {0/0.45, 1/-0.45, 2/-0.45, 3/-0.45, 4/0.45, 5/0.45, 6/0.45, 7/-0.45, 8/0.45, 9/-0.45} {
+                    \draw[very thick, ->] ($(\x, 0) + (0, \spin)$) -- ($(\x, 0) - (0, \spin)$);
+                    \shade[ball color=red] (\x, 0) circle[radius=0.25cm];
+                }
+            \end{scope}
+            \begin{scope}[yshift=-5cm]
+                \foreach \x/\spin in {0/-0.45, 1/0.45, 2/0.45, 3/0.45, 4/-0.45, 5/0.45, 6/-0.45, 7/-0.45, 8/0.45, 9/0.45} {
+                    \draw[very thick, ->] ($(\x, 0) + (0, \spin)$) -- ($(\x, 0) - (0, \spin)$);
+                    \shade[ball color=red] (\x, 0) circle[radius=0.25cm];
+                }
+            \end{scope}
+            \begin{scope}[yshift=-6cm]
+                \foreach \x/\spin in {0/-0.45, 1/0.45, 2/0.45, 3/-0.45, 4/-0.45, 5/-0.45, 6/-0.45, 7/0.45, 8/0.45, 9/-0.45} {
+                    \draw[very thick, ->] ($(\x, 0) + (0, \spin)$) -- ($(\x, 0) - (0, \spin)$);
+                    \shade[ball color=red] (\x, 0) circle[radius=0.25cm];
+                }
+            \end{scope}
+            \begin{scope}[yshift=-7cm]
+                \foreach \x/\spin in {0/-0.45, 1/0.45, 2/-0.45, 3/0.45, 4/-0.45, 5/-0.45, 6/0.45, 7/0.45, 8/-0.45, 9/0.45} {
+                    \draw[very thick, ->] ($(\x, 0) + (0, \spin)$) -- ($(\x, 0) - (0, \spin)$);
+                    \shade[ball color=red] (\x, 0) circle[radius=0.25cm];
+                }
+            \end{scope}
+            \begin{scope}[yshift=-8cm]
+                \foreach \x/\spin in {0/-0.45, 1/0.45, 2/-0.45, 3/0.45, 4/-0.45, 5/-0.45, 6/0.45, 7/-0.45, 8/-0.45, 9/-0.45} {
+                    \draw[very thick, ->] ($(\x, 0) + (0, \spin)$) -- ($(\x, 0) - (0, \spin)$);
+                    \shade[ball color=red] (\x, 0) circle[radius=0.25cm];
+                }
+            \end{scope}
+            \begin{scope}[yshift=-9cm]
+                \foreach \x/\spin in {0/0.45, 1/0.45, 2/0.45, 3/-0.45, 4/-0.45, 5/0.45, 6/-0.45, 7/0.45, 8/-0.45, 9/-0.45} {
+                    \draw[very thick, ->] ($(\x, 0) + (0, \spin)$) -- ($(\x, 0) - (0, \spin)$);
+                    \shade[ball color=red] (\x, 0) circle[radius=0.25cm];
+                }
+            \end{scope}
+        \end{tikzpicture}
+        \caption{The Ising model in two dimensions.}
+    \end{figure}
+    The Ising model in two dimensions is mathematically harder to deal with and therefore we will just discuss important results.
+    If there are \(N\) total particles and \(N_{\uparrow}\) are in the spin up state then there must be \(N - N_{\uparrow} = N_{\downarrow}\) particles in the spin down state.
+    Further the net magnetisation of the system is \(m = N_{\uparrow} - N_{\downarrow}\).
+    Since the entropy depends only on how many different ways we can split the system into \(N_{\uparrow}\) spin up particles and \(N_{\downarrow}\) spin down particles we can use the same entropy function as we did with the model magnet.
+    That is
+    \[S = \boltzmann \ln \binom{N}{N_{\uparrow}} = -\boltzmann N \ln\left[\frac{m + 1}{2}\ln\frac{m + 1}{2} + \frac{1 - m}{2}\ln \frac{1 - m}{2}\right].\]
+    This is written here in terms of \(m = N_{\uparrow} - N_{\downarrow}\).
+    
+    Again the energy of a particle depends only on its nearest neighbours but this now includes the particles directly above and below.
+    The energy of a given particle is
+    \[\hamiltonian = -J\sum_{i,j} S_iS_j\]
+    where all symbols have the same meaning as in the one dimensional case and the sum is over the nearest neighbours.
+    
+    We now apply a mean field theory.
+    This is a fancy way of saying we assume that all of the particles, apart from the particle we are focused on, have the mean value of any property.
+    This means that the energy of a given particle is simply
+    \[\hamiltonian = -4Jm^2.\]
+    The total energy of the system is then the sum of the energy of each particle but we have to introduce a factor of \(1/2\) as we are double the contribution of a pair of particles to the energy.
+    Thus
+    \[E = -2NJm^2\]
+    The free energy is then
+    \[F = -2NJm^2 + \boltzmann TN \ln\left[\frac{m + 1}{2}\ln\frac{m + 1}{2} + \frac{1 - m}{2}\ln \frac{1 - m}{2}\right].\]
+    It can be shown that the free energy is minimised if
+    \[m = \tanh \frac{4Jm}{\boltzmann T}.\]
+    Notice that \(m\) appears on the left hand side and also in the argument of \(\tanh\).
+    This introduces non-analyticity which allows for phase transitions in the two dimensional Ising model.
+    The two phases can be shown to be a low temperature phase which favours spins aligned and the plane separates into regions of mostly spin up or mostly spin down, and a high temperature phase which favours disorder and the spin of any one particle is uncorrelated with the spin of its neighbours.
+    
+    \section{Einstein Model of a Crystal}
+    \subsection{Classical Model of a Crystal}
+    Crystals are often modelled as a lattice of atoms connected by springs, as shown in figure~\ref{fig:crystal model - spring lattice}.
+    \begin{figure}[ht]
+        \centering
+        \tikzsetnextfilename{spring-model-of-crystal}
+        \begin{tikzpicture}
+            \tikzstyle{atom} = [ball color=red]
+            \tikzstyle{spring} = [thick, decoration={zigzag}, decorate]
+            
+            
+            % Horizontal springs
+            \foreach \x in {0.25, 2.25} {
+                \foreach \y in {0, 2, 4} {
+                    \draw[spring] (\x, \y) -- ($(\x, \y) + (1.5, 0)$);
+                }
+            }
+            % Vertical springs
+            \foreach \x in {0, 2, 4} {
+                \foreach \y in {0.25, 2.25} {
+                    \draw[spring] (\x, \y) -- ($(\x, \y) + (0, 1.5)$);
+                }
+            }
+            % Atoms
+            \foreach \x in {0, 2, 4} {
+                \foreach \y in {0, 2, 4} {
+                    \fill[atom] (\x, \y) circle[radius=0.25cm];
+                }
+            }
+        \end{tikzpicture}
+        \caption{A crystal modelled as a lattice of atoms connected by springs.}
+        \label{fig:crystal model - spring lattice}
+    \end{figure}
+    The problem with this model is that it is strongly interacting.
+    What we can do is consider the potential that every particle is in due to its interactions with its neighbours and then model a crystal as a lattice of particles in potentials with no interactions between particles.
+    This removes the strongly interacting component of the model while keeping much of the same physics.
+    Each atom can be approximated as a harmonic oscillator such as in figure~\ref{fig:crystal model - HO potentials}.
+    \begin{figure}[ht]
+        \centering
+        \tikzsetnextfilename{oscillator-model-of-crystal}
+        \begin{tikzpicture}
+            \tikzstyle{atom} = [ball color=red]
+            \foreach \xshift in {0, 2, 4} {
+                \foreach \yshift in {0, 2, 4} {
+                    \begin{scope}[yshift=\yshift cm]
+                        \begin{scope}[xshift=\xshift cm]
+                            \draw[domain=-0.5:0.5] plot (\x, 3*\x*\x);
+                            \fill[atom] (0, 0.25) circle[radius=0.25cm];
+                        \end{scope}
+                    \end{scope}
+                }
+            }
+        \end{tikzpicture}
+        \caption{A crystal modelled as a lattice of atoms in harmonic potentials.}
+        \label{fig:crystal model - HO potentials}
+    \end{figure}
+    To start with we will consider this system classically.
+    The energy of each individual oscillator is
+    \[\varepsilon = \frac{1}{2}\kappa x^2 + \frac{1}{2}mv^2.\]
+    Therefore in three dimensions the system has \(3\cdot 2\cdot N\)  quadratic degrees of freedom (3 dimensions, potential and kinetic contributions, \(N\) particles).
+    The equipartition theorem states that each quadratic degree of freedom contributes \(\boltzmann T/2\) to the mean energy so the mean energy of the system is
+    \[\mean{E} = 6N\frac{1}{2}\boltzmann T = 3N\boltzmann T.\]
+    The heat capacity is then
+    \[C_V = \pdv{\mean{E}}{T} = 3N\boltzmann.\]
+    This is known as the Dulong--Petit law which states that \(C_V\) is constant.
+    However some substances, for example diamond, have much lower heat capacities than the Dulong--Petit law predicts.
+    Experimental evidence also shows that \(C_V\) goes to zero as \(T\) goes to zero.
+    The reason for these violations of the Dulong--Petit law is because energy is quantised so at low energies it is possible to increase temperature without moving up an energy level and therefore \(\inlinedv{E}{T} = 0\).
+    The reason that this violation was noticed in diamond is because diamond is very hard which translates to diamond having a high spring constant, \(\kappa\).
+    Since quantum effects are most prevalent when \(\varepsilon \sim \boltzmann T\) a higher value of \(\kappa\) makes these effects more noticeable.
+    
+    \subsection{The Einstein Model of a Crystal}\label{sec:einstein model of a crystal}
+    The Einstein model of a crystal is a lot like the classical model but the oscillators are replaced with quantum harmonic oscillators.
+    Recall that a quantum harmonic oscillator in one dimension has energy
+    \[\varepsilon_n = \left(n + \frac{1}{2}\right)\hbar\omega.\]
+    Notice that this is now quantised giving discrete energy levels, \(\varepsilon_n\) for \(n\in\naturals = \{0, 1, 2, \dotsc\}\).
+    Another important thing is that \(\varepsilon_0 = \hbar\omega/2 \ne 0\).
+    The three dimensional harmonic oscillator is simply three linearly independent one dimensional oscillators.
+    Its energy levels are given by
+    \[\varepsilon^{3D}_n = \left(n_x + n_y + n_z + \frac{3}{2}\right)\hbar\omega = \left(n + \frac{3}{2}\right)\hbar\omega.\]
+    This assumes an isotropic harmonic oscillator (\(\omega\) the same in all directions) which fits experimental evidence.
+    
+    We are considering a weakly interacting system so the partition function is
+    \[Z = [Z(1)]^N\]
+    where \(Z(1)\) is the partition function for a single particle.
+    Since the energy of the three dimensional oscillator is simply the sum of the three one dimensional oscillators there is a similar factorisation leading to
+    \[Z(1) = [Z^{1D}(1)]^3\]
+    where \(Z^{1D}(1)\) is the partition function for a single particle in one dimension.
+    Hence the partition function for the entire system is
+    \[Z = [Z^{1D}(1)]^{3N}.\]
+    The partition function for a single particle in one dimensions is
+    \[Z^{1D}(1) = \sum_{n=0}^{\infty} \exp\left[-\left(n + \frac{1}{2}\right)\beta\hbar\omega\right].\]
+    To evaluate this simply recall the formula for the sum of an infinite geometric series (see appendix~\ref{app:geometric series}):
+    \[\sum_{n=0}^{\infty} a^n = \frac{1}{1 - a}.\]
+    Identifying \(a = e^{-x/2}\) where \(x = \beta\hbar\omega\) we see that
+    \begin{align*}
+        Z^{1D}(1) &= \sum_{n=0}^{\infty} \exp\left[-\frac{x}{2} + nx \right]\\
+        &= e^{-x/2}\sum_{n=0}^{\infty} e^{-nx}\\
+        &= \frac{e^{-x/2}}{1 - e^{-x}}.
+    \end{align*}
+    The mean energy is then
+    \[\mean{E} = 3N\mean{\varepsilon} = 3N\hbar\omega\left(\mean{n} + \frac{1}{2}\right).\]
+    It is actually easier to calculate \(\mean{\varepsilon}\) than \(\mean{n}\) since we already have a relation for the mean energy:
+    \begin{align*}
+        \mean{\varepsilon} &= -\pdv{\beta}\ln[Z^{1D}(1)]\\
+        &= -\pdv{x}{\beta}\pdv{x}\ln[Z^{1D}(1)]\\
+        &= -\hbar\omega\pdv{x}\left[-\ln(1 - e^{-x}) - \frac{1}{2}\right]\\
+        &= \hbar\omega\left[\frac{e^{-x}}{1 - e^{-x}} + \frac{1}{2}\right].
+    \end{align*}
+    From this we see that
+    \[\mean{n} = \frac{e^{-x}}{1 - e^{-x}} = \frac{1}{e^{x} - 1}.\]
+    We can also calculate \(\mean{n}\) from the Boltzmann distribution:
+    \begin{align*}
+        \mean{n} &= \sum_{n=0}^{\infty} nP_n\\
+        &= \frac{1}{Z^{1D}(1)} \sum_{n=0}^{\infty} n\exp\left[-x\left(n + \frac{1}{2}\right)\right]
+    \end{align*}
+    using our favourite trick of differentiating under the sum we have
+    \begin{align*}
+        \sum_{n=0}^{\infty} na^n &= a\dv{a}\sum_{n=0}^{\infty}a^n\\
+        &= a\dv{a}\frac{1}{1 - a}\\
+        &= \frac{a}{(1 - a)^2}.
+    \end{align*}
+    So \(\mean{n}\) is given by
+    \begin{align*}
+        \mean{n} &= \frac{1}{Z^{1D}(1)} \sum_{n=0}^{\infty} n\exp\left[-x\left(n + \frac{1}{2}\right)\right]\\
+        &= \frac{1}{Z^{1D}(1)} e^{-x/2} \sum_{n=0}^{\infty} ne^{-nx}\\
+        &= \frac{1}{Z^{1D}(1)} e^{-x/2} \frac{e^{-x}}{(1 - e^{-x})^2}\\
+        &= \frac{1 - e^{-x}}{e^{-x/2}} e^{-x/2} \frac{e^{-x}}{(1 - e^{-x})^2}\\
+        &= \frac{e^{-x}}{1 - e^{-x}}\\
+        &= \frac{1}{e^x - 1}.
+    \end{align*}
+    The mean total energy is then given by
+    \[\mean{E} = 3N\hbar\omega\left[\frac{e^{-x}}{1 - e^{-x}} + \frac{1}{2}\right]\]
+    and the heat capacity by
+    \begin{align*}
+        C_V &= \pdvconst{\mean{E}}{T}{V}\\
+        &= \pdvconst{x}{T}{\omega}\pdvconst{\mean{E}}{x}{\omega}\\
+        &= -\frac{\hbar\omega}{\boltzmann T^2} \pdvconst{\mean{E}}{T}{\omega}\\
+        &= 3N\boltzmann \frac{x^2e^x}{(e^x - 1)^2}.
+    \end{align*}
+    Notice that constant volume, \(V\), translates to constant \(\omega\) as this is the only way that volume, or variable other than temperature, can enter the model.
+    
+    \subsubsection{High and Low Temperature Behaviour}
+    As with any new model one of the first things we will consider is the limiting behaviour of the system.
+    First consider \(T \to \infty\).
+    As this happens \(\boltzmann T \gg \hbar\omega\) and so quantisation effects are negligible and we expect that the Einstein model reduces to the Dulong--Petit model (constant heat capacity).
+    We have \(x \to 0\) as \(T\to\infty\) so
+    \[C_V \approx 3N\boltzmann \frac{x^2\cdot 1}{(1 + x + \dotsb - 1)^2} \approx 3N\boltzmann\frac{x^2}{x^2} = 3N\boltzmann.\]
+    So we do indeed recover the Dulong--Petit law.
+    
+    As \(T\to 0\) we expect \(C_V \to 0\).
+    In this case \(x \to \infty\) meaning that \(e^x - 1 \approx e^x\) and so
+    \[C_V \approx 3N\boltzmann \frac{x^2 e^x}{e^{2x}} = x^2e^{-x} \to 0.\]
+    So this has the expected low temperature behaviour.
+    \emph{However} experimental evidence shows that \(C_V\sim T^{3}\) for low temperatures which doesn't match the Einstein model.
+    A better model, called the Debye model, can explain this but we won't look at this model until next years condensed matter course.
+    
+    \section{Ideal Quantum Gas}
+    A classical ideal gas has distinguishable particles.
+    This is because we could pick a particle and track its path through space.
+    A quantum ideal gas has indistinguishable particles as the uncertainty principle means we cannot track a given particle in this way.
+    \begin{keypoint}
+        Identical, non-localised particles must be treated as indistinguishable.
+    \end{keypoint}
+    For full generality we need to consider a many-particle wave function since there aren't really any weakly interacting quantum systems.
+    However often we can simply modify the Boltzmann distribution slightly to account for indistinguishability.
+    
+    Suppose we have a system of two particles each of which can be in two different states.
+    If this is a classical system then there are two microstates, \((a, b) = (\uparrow, \downarrow)\) and \((a, b) = (\downarrow, \uparrow)\) corresponding to both particles being in different states.
+    In a quantum system however we can't distinguish between \((a, b)\) and \((b, a)\) so there is only one microstate corresponding to both particles being in different states.
+    In general if we count microstates assuming distinguishability we will over count the number of microstates.
+    
+    The classical partition function is
+    \[Z = [Z(1)]^N = \sum_{i_1, i_2, \dotsc, i_N} \exp[-\beta(\varepsilon_{i_1} + \varepsilon_{i_2} + \dotsb + \varepsilon_{i_N})].\]
+    We can divide this into various classes of microstate however there isn't a mathematical notation that lends itself to this so we will use diagrams.
+    The first class of microstates is states where all particles are in the same energy level:
+    \begin{center}
+        \tikzsetnextfilename{microstates-class-I}
+        \begin{tikzpicture}
+            \tikzstyle{energy level} = [ultra thick]
+            \tikzstyle{particle} = [draw=none, ball color=red]
+            \node[draw, left] at (-1, 0.75) {Class I:};
+            \foreach \y in {0, 0.5, 1, 1.5} {
+                \draw[energy level] (0, \y) -- (2, \y);
+            }
+            \foreach \x in {0.5, 1, 1.5} {
+                \draw[particle] (\x, 0) circle[radius=0.1cm];
+            }
+            \node at (2.5, 0.75) {\(+\)};
+            \begin{scope}[xshift=3cm]
+                \foreach \y in {0, 0.5, 1, 1.5} {
+                    \draw[energy level] (0, \y) -- (2, \y);
+                }
+                \foreach \x in {0.5, 1, 1.5} {
+                    \draw[particle] (\x, 0.5) circle[radius=0.1cm];
+                }
+                \node at (2.5, 0.75) {\(+\)};
+            \end{scope}
+        \begin{scope}[xshift=6cm]
+            \foreach \y in {0, 0.5, 1, 1.5} {
+                \draw[energy level] (0, \y) -- (2, \y);
+            }
+            \foreach \x in {0.5, 1, 1.5} {
+                \draw[particle] (\x, 1) circle[radius=0.1cm];
+            }
+            \node at (2.5, 0.75) {\(+\)};
+        \end{scope}
+        \begin{scope}[xshift=9cm]
+            \foreach \y in {0, 0.5, 1, 1.5} {
+                \draw[energy level] (0, \y) -- (2, \y);
+            }
+            \foreach \x in {0.5, 1, 1.5} {
+                \draw[particle] (\x, 1.5) circle[radius=0.1cm];
+            }
+        \end{scope}
+        \end{tikzpicture}
+    \end{center}
+    The next class is all but one particle in the same energy level:
+    \begin{center}
+        \tikzsetnextfilename{microstates-class-II}
+        \begin{tikzpicture}
+            \tikzstyle{energy level} = [ultra thick]
+            \tikzstyle{particle} = [draw=none, ball color=red]
+            \node[draw, left] at (-1, 0.75) {Class II:};
+            \foreach \y in {0, 0.5, 1, 1.5} {
+                \draw[energy level] (0, \y) -- (2, \y);
+            }
+            \foreach \x/\y in {0.5/0, 1/0, 1.5/0.5} {
+                \draw[particle] (\x, 0) circle[radius=0.1cm];
+            }
+            \node at (2.5, 0.75) {\(+\)};
+            \begin{scope}[xshift=3cm]
+                \foreach \y in {0, 0.5, 1, 1.5} {
+                    \draw[energy level] (0, \y) -- (2, \y);
+                }
+                \foreach \x/\y in {0.5/0, 1/0, 1.5/1} {
+                    \draw[particle] (\x, \y) circle[radius=0.1cm];
+                }
+                \node at (2.5, 0.75) {\(+\)};
+            \end{scope}
+            \begin{scope}[xshift=6cm]
+                \foreach \y in {0, 0.5, 1, 1.5} {
+                    \draw[energy level] (0, \y) -- (2, \y);
+                }
+                \foreach \x/\y in {0.5/0, 1/0, 1.5/1.5} {
+                    \draw[particle] (\x, \y) circle[radius=0.1cm];
+                }
+                \node at (2.5, 0.75) {\(+\)};
+            \end{scope}
+            \begin{scope}[xshift=9cm]
+                \foreach \y in {0, 0.5, 1, 1.5} {
+                    \draw[energy level] (0, \y) -- (2, \y);
+                }
+                \foreach \x/\y in {0.5/1, 1/1, 1.5/0} {
+                    \draw[particle] (\x, \y) circle[radius=0.1cm];
+                }
+                \node at (2.5, 0.75) {\(+\dotsb\)};
+            \end{scope}
+        \end{tikzpicture}
+    \end{center}
+    And so on up to the final class which is all particles in a different energy level.
+    
+    Consider a case of \(M\) energy levels.
+    The number of microstates in class I is simply \(M\), one for each possible energy level.
+    The number of microstates in class II is \(M(M - 1)\), pick one energy level to place the lone particle and a different energy level to place the rest of the particles in.
+    The number of microstates in the final class is \(M!\).
+    As \(M\to\infty\) the final final class dominates.
+    
+    If we now introduce indistinguishability we see we have over counted.
+    Class I has no over counting.
+    Class II will have been over counted by a factor of \(N\) as classically all particles in the lowest energy state apart from one in the second has \(N\) distinct microstates one for each particle that can be on its own.
+    The final class will have been over counted by a factor of \(N!\).
+    
+    We cannot account for the different over counting of each class but since the final class dominates any sum we correct for any over counting in this term.
+    This gives what is called the \define{semi-classical approximation}:
+    \[Z_{\mathrm{SC}} = \frac{1}{N!}Z_{\mathrm{classical}} = \frac{1}{N!}[Z(1)]^N.\]
+    
+    \subsection{Calculation of \texorpdfstring{\(Z(1)\)}{Z(1)}}
+    Consider a cubic box of side length \(L\).
+    For a free particle (\(V = 0\)) in this box Schr\"odinger's equation for is
+    \[\left[-\frac{\hbar^2}{2M}\laplacian - \varepsilon\right]\psi = 0.\]
+    In the one-dimensional case we have
+    \[\psi''(x) = -k^2\psi, \qquad\text{where}\qquad k^2 = \frac{2M\varepsilon}{\hbar^2}.\]
+    The boundary conditions are that \(\psi\) vanishes at \(x = 0, L\) and so
+    \[\psi(x) = A\sin(kx), \qquad\text{where}\qquad k = \frac{n\pi}{L}, \qquad\text{for}\qquad n = 1, 2, 3, \dotsc.\]
+    This is a separable equation and the solution in three dimensions is simply the product of three one dimensional solutions:
+    \[\psi^{3D}(\vv{r}) = A\sin(k_x x)\sin(k_y y)\sin(k_z z), \qquad\text{where}\qquad k_i = \frac{n_i\pi}{L}, \qquad\text{for}\qquad n_i = 1, 2, 3, \dotsc.\]
+    The energy is then
+    \[\varepsilon_{n} = \frac{\hbar^2}{2M}(k_x^2 + k_y^2 + k_z^2) = \frac{\hbar^2\pi^2}{2ML^2}(n_x^2 + n_y^2 + n_z^2).\]
+    To calculate the partition function we need to sum over all values \(n_x\), \(n_y\), and \(n_z\):
+    \[Z(1) = \sum_{n}e^{-\varepsilon_n\beta} = \sum_{n_x, n_y, n_z} \exp\left[-\frac{\hbar^2\pi^2}{2ML^2\boltzmann T}(n_x^2 + n_y^2 + n_z^2)\right].\]
+    This sum is not easy to compute however we can approximate it as an integral using the density of states method.
+    \begin{figure}[ht]
+        \centering
+        \tikzsetnextfilename{density-of-states-2d-n-space}
+        \begin{tikzpicture}
+            \draw[lightgray, step=0.5] (0, 0) grid (3, 3);
+            \draw[ultra thick, <->] (3, 0) -- (0, 0) -- (0, 3);
+            \node[right] at (3, 0) {\(n_x\)};
+            \node[above] at (0, 3) {\(n_y\)};
+            \foreach \x in {0.5, 1, 1.5, 2, 2.5, 3} {
+                \foreach \y in {0.5, 1, 1.5, 2, 2.5, 3} {
+                    \draw[fill] (\x, \y) circle[radius=0.05cm];
+                }
+            }
+            \begin{scope}
+                \clip (0, 0) rectangle (3, 3);
+                \draw (0, 0) circle[radius=2.6cm];
+                \draw (0, 0) circle[radius=2.5cm];
+            \end{scope}
+        \end{tikzpicture}
+        \caption{Two-dimensional \(\vv{n}\) space with point density 1. Shown is part of a annulus with radius \(n\) and thickness \(\dd{n}\).}
+    \end{figure}
+    This method works since the partition function depends only on the magnitude of the vector \(\vv{n} = (n_x, n_y, n_z)\) in \(n\)-space.
+    We want to evaluate the sum on the points with integer coordinates in \(n\)-space.
+    What we do is we take the fact that the density of these points is 1 per unit volume and we consider a thin spherical shell of radius \(n\) and thickness \(\dd{n}\).
+    The volume of this shell is \(4\pi n^2\dd{n}\) and so it contains approximately \(4\pi n^2\dd{n}\) points.
+    However we are only interested in cases when all coordinates of \(\vv{n}\) are positive so this over counts by a factor of 8 meaning there are \(4\pi n^2\dd{n}/8\) points in the part of the shell in the region of interest.
+    Using this we convert our sum into an integral.
+    In general for some function, \(f\), of the magnitude, \(n\), we have
+    \[\sum_{n_x, n_y, n_z} f(n) \approx \frac{1}{8}\int 4\pi n^2f(n)\dd{n} = \frac{\pi}{2}\int n^2f(n)\dd{n}\]
+    where the integral is over \(n\in[0, \infty)\).
+    So the partition function is
+    \begin{align*}
+        Z(1) &= \sum_{n_x, n_y, n_z} \exp\left[-\frac{\hbar^2\pi^2}{2ML^2\boltzmann T}(n_x^2 + n_y^2 + n_z^2)\right]\\
+        &\approx \frac{\pi}{2}\int n^2 \exp\left[-\frac{\hbar^2\pi^2}{2ML^2\boltzmann T}n^2\right] \dd{n}
+    \end{align*}
+    This approximation is good if
+    \[\frac{\hbar^2\pi^2}{2ML^2} \ll \boltzmann T.\]
+    We can now calculate \(Z(1)\):
+    \begin{align*}
+        Z(1) &= \frac{\pi}{2} \int_{0}^{\infty} n^2 e^{-an^2} \dd{n}, \qquad\text{where}\qquad a = \frac{\hbar^2 \pi^2}{2\boltzmann TML^2}\\
+        &= \frac{1}{2}\int_{-\infty}^{\infty} e^{-an^2} \dd{n}\\
+        &= \frac{\sqrt{\pi}}{4a^{3/2}}.
+    \end{align*}
+    where we have used the standard result
+    \[\int_{-\infty}^{\infty} x^2e^{-ax^2} \dd{x} = \frac{\sqrt{\pi}}{2a^{3/2}}.\]
+    Putting in the constants we have
+    \[Z(1) = \frac{\pi^{3/2}}{8}\left( \frac{2ML^2}{\beta\hbar^2\pi^2} \right)^{3/2} = V \left( \frac{2\pi M\boltzmann T}{h^2} \right)^{3.2}\]
+    where \(V = L^3\) and \(h = 2\pi\hbar\).
+    
+    \section{Ideal Quantum Gas: Low Density Limit}
+    \subsection{Density of States}\label{sec:density of states}
+    The density of states method used in the last section is very useful.
+    It allows us to approximate a sum by an integral:
+    \[\sum_{n_x, n_y, n_z} A(n) \approx \frac{1}{8} \int_{0}^{\infty} A(n) 4\pi n^2 \dd{n}\]
+    where \(A\) is some function of \(n\).
+    We call \(\pi^2n^2/2\) the density of states in \(n\)-space.
+    Recall that \(k = n\pi/L\).
+    Suppose we have some function, \(B\), of \(k\) such that \(B(k = n\pi/L) = A(n)\).
+    We can still use the density of states method to sum \(B\) over all values of \(k\); we just have to do a change of variables.
+    \[n = \frac{L}{\pi}k \implies \dd{n} = \dv{n}{k}\dd{k} = \frac{L}{\pi}\dd{k}.\]
+    Hence
+    \begin{align*}
+        \sum_{n_x, n_y, n_z} &\approx \int A(n) 4\pi n^2 \dd{n}\\
+        &= \int B(k)4\pi \frac{L^2k^2}{\pi^2}\frac{L}{\pi}\dd{k}\\
+        &= \int B(k)\Gamma(k)\dd{k}
+    \end{align*}
+    where
+    \[\Gamma(k) = \frac{k^2V}{2\pi^2}\]
+    is the density of states in \(k\)-space.
+    What this means is \(\Gamma(k)\dd{k}\) is the number of states with \(k\) in \([k, k+\dd{k}]\).
+    
+    Suppose now that we wish to perform a sum in energy-space.
+    Recall that
+    \[\varepsilon = \frac{\hbar^2k^2}{2M} \implies k = \sqrt{\frac{2M\varepsilon}{\hbar^2}}\]
+    and so
+    \[\dd{k} = \dv{k}{\varepsilon}\dd{\varepsilon} = \sqrt{\frac{2M}{\hbar^2}} \frac{1}{2\sqrt{\varepsilon}}\dd{\varepsilon}.\]
+    Let \(g\) denote the density of states in \(\varepsilon\)-space.
+    Then we have
+    \[\Gamma(k)\dd{k} = g(\varepsilon)\dd{\varepsilon}.\]
+    A change of variables gives us
+    \[g(\varepsilon)\dd{\varepsilon} = \left( \frac{2M}{h^2} \right) \frac{V}{4\pi^2}\sqrt{\varepsilon}\dd{\varepsilon}.\]
+    Hence the density of states in \(\varepsilon\)-space is
+    \[g(\varepsilon) = \left( \frac{2M}{h^2} \right) \frac{V}{4\pi^2}\sqrt{\varepsilon}.\]
+    What this means is \(g(\varepsilon)\dd{\varepsilon}\) gives the number of states with energy in \([\varepsilon, \varepsilon + \dd{\varepsilon}]\).
+    
+    We can use the density of states in \(\varepsilon\)-space to calculate the partition function:
+    \[Z(1) = \int_{0}^{\infty} \exp(-\beta \varepsilon) g(\varepsilon) \dd{\varepsilon}.\]
+    Notice that \(g(\varepsilon)\) increases with \(\varepsilon\).
+    This is because as \(\varepsilon\) increases there are more ways to distribute the energy amongst the three directions and hence more ways to have \(n_x + n_y + n_z = n\) for a given value of \(n\).
+    
+    We have worked out the density of states here for a cube of volume \(V\) but it turns out that the density of states is the same for any macroscopic volume \(V\).
+    
+    \subsection{Thermodynamic Variables}
+    We now have an expression for the partition function that we can use to calculate various thermodynamic variables.
+    The partition function is
+    \[Z = \frac{1}{N!}[Z(1)]^N = \frac{V^N}{N!}\left( \frac{2\pi M\boltzmann T}{h^2} \right)^{3N/2}.\]
+    This allows us to calculate the free energy:
+    \begin{align*}
+        F &= -\boltzmann T\ln Z\\
+        &= N\boltzmann T\left[ \ln\left( \frac{1}{V} \right) - \frac{3}{2} \ln\left( \frac{2\pi M\boltzmann T}{h^2} \right) + \ln N - 1\right]\\
+        &= N\boltzmann T \left[ \ln\left( \frac{N}{V} \right) - 1 - \frac{3}{2}\ln\left( \frac{2\pi M\boltzmann T}{h^2} \right) \right]
+    \end{align*}
+    where we have used Sterling's approximation in the second line.
+    We can also compute the average energy:
+    \begin{align*}
+        \mean{E} &= \boltzmann  T^2\pdv{\ln Z}{T}\\
+        &= \boltzmann T^2\pdv{T} N \left[ \ln\left( \frac{1}{V} \right) - \frac{3}{2} \ln\left( \frac{2\pi M\boltzmann T}{h^2} \right) + \ln N - 1\right]\\
+        &= \frac{3}{2}N\boltzmann T,
+    \end{align*}
+    the entropy:
+    \begin{align*}
+        S &= \frac{\mean{E} - F}{T}\\
+        &= N\boltzmann \ln\left[\left( \frac{V}{N} \right)\left( \frac{2\pi M \boltzmann T}{h^2} \right)^{3/2} \right] + \frac{5}{2}N\boltzmann,
+    \end{align*}
+    the pressure:
+    \[P = -\pdvconst{F}{V}{T} = \frac{N\boltzmann T}{V} = \frac{nRT}{V},\]
+    which is just the ideal gas law, and the heat capacity:
+    \[C_V = \pdvconst{\mean{E}}{T}{V} = \frac{3N\boltzmann }{T}.\]
+    We see that the ideal gas law and equipartition of energy are recovered.
+    The recovery of the ideal gas law identifies our statistical mechanics definition of temperature (\(1/T = \partial_E S\)) with the thermodynamic temperature.
+    
+    \subsection{Entropy}
+    Notice that the entropy in the last section takes the form \(S(N, V) = Ns(N/V)\) for some function \(s\).
+    This means that after we take out a factor of \(N\) the only \(N\) dependence is through the density, \(N/V\).
+    This means that entropy is additive and an extensive quantity, i.e. it scales with \(N\).
+    
+    The entropy is given by a logarithm (plus a constant that we'll ignore here) and the argument of said logarithm can be less than 1.
+    This means that the entropy can become arbitrarily negative.
+    This is a problem as our statistical mechanics definition of entropy doesn't allow for negative entropy as \(\Omega \ge 1\) so \(S = \boltzmann \ln\Omega \ge 0\).
+    The entropy becomes negative when, ignoring the constant term, we have
+    \[\frac{V}{N}\left( \frac{2\pi M\boltzmann T}{h^2} \right)^{3/2} \lesssim 1\]
+    or
+    \begin{equation}\label{eqn:break down of ideal quantum gas}
+        \left( \frac{V}{N} \right)^{1/3} \lesssim \frac{h}{\sqrt{2\pi M\boltzmann T}}
+    \end{equation}
+    
+    So why does the theory break down at this point?
+    Recall that the average kinetic energy of a particle is \(E_{\mathrm{KE}}\sim 3\boltzmann T/2\) and the typical momentum is then \(p = \sqrt{2ME_{\mathrm{KE}}} = \sqrt{3M\boltzmann T}\).
+    Recall also that the de Broglie wavelength is
+    \[\lambda_{\mathrm{dB}} = \frac{h}{p} = \frac{h}{\sqrt{3m\boltzmann T}}.\]
+    So we can identify the right hand side of~\ref{eqn:break down of ideal quantum gas} as being the typical de Broglie wavelength of a molecule of our gas.
+    The left hand side of this equation can be interpreted as the average spacing between molecules, \(d\), since \(V/N\) is the volume per molecule.
+    Hence the semi-classical ideal gas model breaks down when the distance between molecules is on the same scale as the de Broglie wavelength.
+    This is common in quantum mechanics.
+    If we have a length scale, such as \(\lambda_{\mathrm{dB}}\), then often a classical or semi-classical approximation will break down at or below this length scale.
+    
+    We call the region where the semi-classical approximation is valid the \define{low density limit} where the particles are spaced out enough that \(d > \lambda_{\mathrm{dB}}\).
+    The region where the model breaks down is called the \define{high density limit} and is when \(d < \lambda_{\mathrm{dB}}\).
+    This region requires a full quantum treatment considering the wave function of a many particle system.
+
+    There is an alternative way that we can come to the same conclusion about where the semi-classical approximation is valid.
+    Remember that for the semi-classical approximation we assumed that most microstates had at most one particle in a given energy level.
+    We can find the average number of particles, \(\mean{n_i}\), in a given quantum state, \(i\), which, assuming distinguishable particles, is given by
+    \[\mean{n_i} = \frac{N\exp(-\varepsilon_i\beta)}{Z(1)}.\]
+    For there to be at most one particle per energy level we expect \(\mean{n_i}\ll 1\) as most energy levels will be empty.
+    This means we need
+    \begin{equation}\label{eqn:low desnity limit}
+        \frac{N}{Z(1)} = \frac{N}{V} \left( \frac{2\pi  M\boltzmann T}{h^2} \right)^{-3/2} \ll 1.
+    \end{equation}
+    Rearranging this we recover the same low density limit:
+    \[\left( \frac{V}{N} \right)^{1/3} > \frac{h}{\sqrt{2\pi m\boltzmann T}}.\]
+    
+    \section{Classical Ideal Gas}
+    Before we can proceed further with quantum ideal gases we need to review some key classical ideal gas ideas, such as equipartition, and the Maxwell--Boltzmann distribution.
+    
+    \subsection{Classical Statistical Mechanics}
+    When we use the density of states methods we take a discrete system and we approximate it as continuous.
+    This is classical statistical mechanics as we neglect the idea of discrete states.
+    Classical statistical mechanics is an entire field that we haven't got time to go into so we will just cover the key idea for us which is the idea of phase space.
+    Classically a particle of an ideal gas is a member of a weakly interacting system and therefore its properties are entirely specified by its position, \(\vv{x}\), and its momentum, \(\vv{p}\)\footnote{these are conjugate variables in the sense of Hamiltonian dynamics.}.
+    This means in three dimensions that each particle has 6 degrees of freedom, \(\{x, y, z, p_x, p_y, p_z\}\).
+    We can think of each particle as corresponding to a point in six-dimensional space known as \define{phase space} by identifying \(\reals^6\) with vectors of the form \((x, y, z, p_x, p_y, p_z)\trans\).
+    Calculations, such as calculating the partition function, then become integrals over phase space.
+    
+    In classical statistical mechanics we assume particles are distinguishable and therefore we can use \(Z = [Z(1)]^n\).
+    The simplest example of a phase space calculation may be simply calculating the probability that a particle's position and momentum are in a given range.
+    By definition
+    \[P(\vv{x}, \vv{p})\dd[3]{x}\dd[3]{p}\]
+    gives the probability that a particle has position \(x_i \in[x, x + \dd{x}]\) and momentum \(p_i \in[p, p + \dd{p}]\).
+    Using the Boltzmann distribution this becomes
+    \[\frac{1}{Z(1)}\exp[-\beta\varepsilon(\vv{x}, \vv{p})]\dd[3]{x}\dd[3]{p}.\]
+    For example if we want to know what the probability is that the particle is in space somewhere between \(x = 1\) and \(x = 2\) then this is given by
+    \[\int_1^2\dd{x}\int_{-\infty}^{\infty} \dd{y} \int_{-\infty}^{\infty} \dd{z} \int_{-\infty}^{\infty} \dd{p_x} \int_{-\infty}^{\infty} \dd{p_y} \int_{-\infty}^{\infty} \dd{p_z} \frac{1}{Z(1)}\exp[-\beta\varepsilon(\vv{x}, \vv{p})].\]
+    
+    \subsection{Equipartition}
+    We have already used the equipartition theorem which states
+    \begin{theorem*}{Equipartition Theorem}{}
+        If a system that can be adequately described by classical statistical mechanics has a degree of freedom which contributes to the classical energy, \(\varepsilon\), in a quadratic way then the mean contribution to the energy due to this degree of freedom is
+        \[\frac{1}{2}\boltzmann T.\]
+    \end{theorem*}
+    For example the classical harmonic oscillator in one dimension has energy
+    \[\varepsilon = \frac{p^2}{2m} + \frac{1}{2}kx^2.\]
+    Hence the mean energy is
+    \[\mean{\varepsilon} = \frac{1}{2}\boltzmann T + \frac{1}{2}\boltzmann T = \boltzmann T.\]
+    A free particle in three dimensions has energy
+    \[\varepsilon = \frac{p_x^2}{2m} + \frac{p_y^2}{2m} + \frac{p_z^2}{2m}\]
+    and hence the mean energy of this particle is
+    \[\mean{\varepsilon} = \frac{3}{2}\boltzmann T.\]
+    
+    The `proof' of the equipartition theorem is fairly simple.
+    Suppose that \(z\) is a degree of freedom of a system and contributes to the energy in a way that allows us to write
+    \[\varepsilon(z, \{\alpha\}) = az^2 + \varepsilon(\{\alpha\})\]
+    where \(\{\alpha\}\) are all other degrees of freedom and \(a\) is a constant.
+    Then
+    \begin{align*}
+        \mean{az^2} &= \frac{\int az^2e^{-\beta\varepsilon}\dd{z}\dd[n]{\alpha}}{\int e^{-\beta\varepsilon}\dd{z}\dd^n{\alpha}}\\
+        &= \frac{\int az^2e^{-\beta az^2}\dd{z}}{\int e^{-\beta az^2}\dd{z}} \frac{\int e^{-\beta\varepsilon(\{\alpha\})}\dd[n]{\alpha}}{\int e^{0\beta \varepsilon(\alpha)\dd[n]{\alpha}}}\\
+        &= \frac{\int az^2e^{-\beta az^2}\dd{z}}{\int e^{-\beta az^2}\dd{z}}\\
+        &= \boltzmann T \frac{\int q^2e^{-\beta q^2}\dd{q}}{\int e^{-\beta q^2}\dd{q}}
+    \end{align*}
+    where we have made the substitution \(q = \beta az^2\).
+    Now consider two cases, first suppose that \(z\) can take any real value.
+    Then we have
+    \[\mean{az^2} = \boltzmann T\frac{\int_{-\infty}^{\infty} q^2e^{-\beta q^2}\dd{q}}{\int_{-\infty}^{\infty} e^{-\beta q^2}\dd{q}} = \frac{\sqrt{\pi}/2}{\sqrt{\pi}} = \frac{1}{2}\boltzmann T.\]
+    If instead \(z\) is non-negative then we have
+    \[\mean{az^2} = \boltzmann T\frac{\int_{0}^{\infty} q^2e^{-\beta q^2}\dd{q}}{\int_{0}^{\infty} e^{-\beta q^2}\dd{q}} = \frac{\sqrt{\pi}/4}{\sqrt{\pi}/2} = \frac{1}{2}\boltzmann T.\]
+    Note that if \(z\) is bound to some other range of values then equipartition may not be valid.
+    Also equipartition is only valid at equilibrium as we used Boltzmann statistics to derive it which only apply at equilibrium.
+    
+    \subsection{Maxwell--Boltzmann Distribution}
+    The Maxwell--Boltzmann distribution was originally derived by Maxwell before Boltzmann came up with his statistics.
+    It can now be seen as a special case of the Boltzmann distribution.
+    The Maxwell--Boltzmann distribution is the probability distribution describing the velocity distribution of a gas.
+    
+    We start with the probability distribution, \(P(\varepsilon)\), in energy space.
+    We want to turn this into a probability distribution in velocity space, \(P(v)\).
+    The starting distribution is
+    \[P(\varepsilon) = \frac{\exp\left( -\frac{p^2}{2m}\beta \right)}{Z(1)}.\]
+    We are looking to find \(P(v)\) such that \(P(v)\dd{v}\) gives the probability that the speed of the particle is in \([v, v + \dd{v}]\).
+    Currently we know that \(P(\vv{p})\dd[3]{p}\) gives the probability of the momentum of the particle being in \([p_i, p_i + \dd{p_i}]\).
+    Since a particle must have some momentum the following integral over all of momentum space must give 1:
+    \[1 = \int P(\vv{p})\dd[3]{p}.\]
+    This means that
+    \[1 = \frac{1}{Z(1)} \int \exp\left( -\frac{p^2}{2m}\beta \right) \dd[3]{p}.\]
+    We now change to spherical coordinates in momentum space.
+    Since an ideal gas is isotropic we can perform the angular integral and we have \(\dd[3]{p} = 4\pi p^2\dd{p}\) so
+    \[1 = \frac{1}{Z(1)} \int_{0}^{\infty} 4\pi p^2 \exp\left( -\frac{p^2}{2m}\beta \right)\dd{p}.\]
+    Now making a change of variables we have \(p = mv\) and hence \(\dd{p} = m\dd{v}\) giving us
+    \[1 = \frac{1}{Z(1)} \int_{0}^{\infty} 4\pi m^2v^2 \exp\left( -\frac{mv^2}{2}\beta \right)\dd{v}.\]
+    Looking at this we identify
+    \[P(v) = \sqrt{\frac{2}{\pi}} \left( \frac{m}{\boltzmann T} \right)^{3/2}v^2\exp\left( -\frac{mv^2}{2\boltzmann T} \right).\]
+    This is the Maxwell--Boltzmann distribution.
+    It increases as \(\sim v^2\) for small velocities and decays away as \(\sim e^{-v^2}\) for larger velocities.
+    It allows for infinite velocities but with an incredibly small chance of that ever happening.
+    
+    There are a variety of ways to interpret the `average' velocity from this distribution.
+    The fist is the most probable velocity which is given by the velocity at the peak of the distribution.
+    To find this we find \(v_{\mathrm{mp}}\) such that \(P'(v_{\mathrm{mp}}) = 0\).
+    If we do this we find
+    \[v_{\mathrm{mp}} = \sqrt{\frac{
+        2\boltzmann T}{m}}.\]
+    The next is the mean velocity given by
+    \[\mean{v} = \int_0^{\infty} vP(v)\dd{v} = \sqrt{\frac{8\boltzmann T}{\pi m}}.\]
+    Finally the root-mean-squared velocity is given by
+    \[\sqrt{\mean{v^2}} = \sqrt{\int_0^{\infty} v^2P(v)\dd{v}} = \sqrt{\frac{3\boltzmann T}{m}}.\]
+    Alternatively
+    \[\frac{1}{2}m\mean{v^2} = \frac{3}{2}\boltzmann T\]
+    by the equipartition theorem and rearranging this gives the same result.
+    Notice that all three measures of average velocity are proportional to \(\sqrt{\boltzmann T/m}\).
+    It doesn't really matter which one we pick and we choose whichever better suits are needs.
+    
+    \section{Grand Canonical Ensembles}
+    So far we have considered micro-canonical systems, where both energy and the number of particles are fixed, and canonical systems, where the energy is fixed.
+    We saw that for a micro-canonical system the physics is determined by maximising the entropy whereas for a canonical system it is determined by minimising the free energy.
+    We can view a canonical ensemble as a partition of a micro-canonical ensemble into the system and the bath.
+    We will proceed similarly in this section to derive results for a grand canonical system but first we consider a simpler system.
+    
+    \subsection{Chemical Potential}
+    Consider a canonical ensemble divided into two parts such that one part has \(N_1\) particles and the other has \(N_2\).
+    The total number of particles is simply \(N = N_1 + N_2\).
+    The free energy of the system is \(F(N) = F_1(N_1) + F_2(N_2)\) where \(F_i(N_i)\) are the free energies of each part.
+    Since \(N\) is fixed if \(N_1 \to N_1 + \dd{N_1}\) we must have \(N_2 \to N_2 + \dd{N_2} = N_2 - \dd{N_1}\).
+    Hence
+    \[\dd{F} = \pdv{F_1}{N_1}\dd{N_1} + \pdv{F_2}{N_2}\dd{N_2} = \left[\pdv{F_1}{N_1} - \pdv{F_2}{N_2}\right] \dd{N_1}.\]
+    At equilibrium the free energy is minimised and so \(\dd{F} = 0\) meaning
+    \[\pdv{F_1}{N_1} = \pdv{F_2}{N_2}.\]
+    We define the \define{chemical potential}
+    \begin{equation}\label{eqn:definition of chemical potential}
+        \mu = \pdvconst{F}{N}{T,V}.
+    \end{equation}
+    At equilibrium all subsystems must have the same chemical potential.
+    
+    Out of equilibrium if the chemical potential of part \(i\) is \(\mu_i\) then we have
+    \[\dd{F} = (\mu_1 - \mu_2)\dd{N_1}.\]
+    Out of equilibrium the system acts to minimise \(F\) and therefore \(\dd{F} < 0\).
+    Suppose \(\mu_1 > \mu_2\); then we must have \(\dd{N_1} < 0\) so that \(\dd{F}\) is negative.
+    Similarly if \(\mu_1 < \mu_2\) then \(\dd{N_1} > 0\).
+    We see that in a way \(\mu\) controls the flow of particles between subsystems.
+    
+    We can make an analogy between the chemical potential and the temperature.
+    We know that if there is a temperature gradient then energy will flow along this gradient until equilibrium is achieved.
+    Similarly if there is a chemical potential gradient then particles will flow along this gradient until equilibrium is achieved.
+    The temperature plays a key role in the Boltzmann factor as a constant value.
+    We will see that for a grand canonical system \(\mu\) plays a similar role.
+    
+    We can come up with a similar definition of the chemical potential based upon a micro-canonical.
+    Split the micro-canonical ensemble into two parts in a similar way to the canonical ensemble at the start of this section.
+    We now also have that the energy of each part is \(E_i\) and the total energy, \(E = E_1 + E_2\), is fixed.
+    The entropy of the system is
+    \[S(E, N) = S_1(E_1, N_1) + S_2(E_2, N_2)\]
+    and so similar logic to above means that we have
+    \[\dd{S} = \left[\pdv{S_1}{E_1} - \pdv{S_2}{E_2}\right]\dd{E_1} + \left[\pdv{S_1}{N_1} - \pdv{S_2}{N_2}\right]\dd{N_1}.\]
+    At equilibrium \(S\) is maximised for a micro-canonical ensemble and so \(\dd{S} = 0\).
+    Since \(\dd{E_1}\) and \(\dd{N_1}\) are independent this means that both terms in \(\dd{S}\) above must be zero.
+    We have already seen that
+    \[\pdvconst{S}{E}{V,N} = \frac{1}{T}.\]
+    Inverting the definition of the free energy we have
+    \[S = \frac{E - F}{T}.\]
+    Hence
+    \[\pdvconst{S}{N}{V, E} = -\frac{1}{T}\pdvconst{F}{N}{V, E} = -\frac{\mu}{T}.\]
+    Rearranging this we have
+    \[\mu = -T\pdvconst{S}{N}{V, E}.\]
+    
+    \begin{example}\label{exa:ideal gas semi classical approx chemical potential}
+        Consider a system of an ideal gas contained in two connected volumes one of which is a height \(H\) above the other.
+        Suppose also that the height of each volume is negligible compared to \(H\).
+        Let \(N_u\) be the number of particles in the upper volume and \(N_l\) be the number of particles in the lower volume.
+        Similarly let \(Z_u\) and \(Z_l\) be the partition functions of the upper and lower volumes respectively.
+        In the semi-classical approximation we have
+        \begin{align*}
+            Z(N_l, N_u) &= Z_l(N_l)Z_u(N_u)\\
+            &= \left[ \frac{(V/\lambda^3)^{N_l}}{N_l!} \right] \left[ \frac{(V/\lambda^3)^{N_u}\exp(-\beta mg HN_u)}{N_u!} \right]
+        \end{align*}
+        where
+        \[\lambda = \frac{h}{\sqrt{2\pi m\boltzmann T}}.\]
+        Hence the free energy of each volume is
+        \begin{align*}
+            F_l &= -\boltzmann T\ln Z_l\\
+            &= N_u\boltzmann T\left[ \ln\left( \frac{N_l\lambda^3}{V} - 1 \right) \right],\\
+            F_u &= N_u\boltzmann T\left[ \ln\left( \frac{N_l\lambda^3}{V} - 1 \right) \right] + N_umgH.
+        \end{align*}
+        The chemical potentials are then
+        \begin{align*}
+            \mu_l &= \pdv{F_l}{N_l} = \boltzmann T\ln\left( \frac{N_l}{V}\lambda^3 \right),\\
+            \mu_u &= \pdv{F_u}{N_u} = \boltzmann T\ln\left( \frac{N_u}{V}\lambda^3 \right) + mgH.\\
+        \end{align*}
+        So at equilibrium when we have \(\mu_u = \mu_l\) we have
+        \[\boltzmann T\ln\left( \frac{N_l}{N_u} \right) = mgH \implies N_u = N_l\exp\left( -\frac{mgH}{\boltzmann T} \right).\]
+        So we expect more particles in the lower volume than the upper volume.
+        Notice that both chemical potentials increases with density so the denser the gas the more pronounced the effect is.
+        Similarly the larger \(H\) is the more difference there is between \(N_l\) and \(N_u\).
+    \end{example}
+    \subsection{Grand Canonical Distribution}
+    The goal of this section is to find a statistical distribution like the Boltzmann distribution for the canonical system derived in section~\ref{sec:the boltzmann distribution}.
+    The derivation is very similar so it is worth recapping that section before reading this.
+    
+    Consider a micro-canonical system split into two parts which we call the system and the bath.
+    The system has \(N\) particles and energy \(E\), both of which can vary.
+    The bath has energy \(E_{\mathrm{b}}\) and \(N_{\mathrm{b}}\) particles.
+    The energy of the entire system is then \(E_\tot = E + E_{\mathrm{b}}\) and the total number of particles is \(N_\tot = N + N_{\mathrm{b}}\).
+    The bath is considerably larger than the system and so acts as a reservoir of both energy and particles at constant temperature, \(T\), and chemical potential, \(\mu\).
+    
+    A microstate, \(i\), of the system with energy \(E_i\) and \(N_i\) particles has probability
+    \[P(E_i, N_i) = \frac{\Omega(E_i, N_i) \Omega_{\mathrm{b}}(E_{\mathrm{b}}, N_{\mathrm{b}})}{\Omega_{\mathrm{universe}}(E_\tot, N_\tot)}.\]
+    The denominator is a constant as both \(E_\tot\) and \(N_\tot\) are constant so we can discard it and simply normalise at the end.
+    The term \(\Omega(E, N)\) is one since we are counting the number of microstates and there is only one microstate with energy \(E\) and \(N\) particles.
+    Hence
+    \[P(E_i, N_i) \propto \Omega_{\mathrm{b}}(E_\tot - E, N_\tot - N).\]
+    From the definition of entropy we can write this as
+    \[P(E_i, N_i) \propto \exp\left[ \frac{1}{\boltzmann} S_{\mathrm{b}}(E_\tot - E, N_\tot - N) \right].\]
+    Since we assume that the entire set up is much larger than the system we have \(E_\tot \gg E\) and \(N_\tot \gg N\).
+    This allows us to Taylor expand giving
+    \[S_{\mathrm{b}}(E_\tot - E, N_\tot - N) = S_{\mathrm{b}}(E_\tot, N_\tot) + \pdvat{S_{\mathrm{b}}}{E}{E=E_\tot}(-E) + \pdvat{S_{\mathrm{b}}}{N}{N=N_\tot} = \text{const} - \frac{E}{T} + \frac{N\mu}{T}.\]
+    Hence
+    \[P(E_i, N_i) \propto \exp\left[ \frac{N\mu - E}{\boltzmann T} \right].\]
+    This, when normalised, gives us the \define{grand canonical distribution}, also called the Gibbs--Boltzmann distribution.
+    \begin{keypoint}
+        The probability that a system in equilibrium with a reservoir of energy and particles at temperature \(T\) and chemical potential \(\mu\) is in the microstate \(i\) with energy \(E_i\) and particle number \(N_i\) is
+        \[P(E_i, N_i) = \frac{1}{\partition}\exp\left[ -\beta(E_i - \mu N_i) \right]\]
+        where \(\partition\) is the grand canonical partition function given by
+        \[\partition = \sum_j\exp\left[ -\beta(E_j - \mu N_j) \right]\]
+        and
+        \[\beta = \frac{1}{\boltzmann T}.\]
+    \end{keypoint}
+
+    There are two main uses of the grand canonical ensemble.
+    The first is rather obvious, there are systems where the number of particles isn't fixed.
+    The second is more interesting.
+    In a similar way to how the energy of a large canonical system isn't constant but fluctuates a small amount about \(\mean{E}\) the number of particles of a large grand canonical system isn't constant but fluctuates about \(\mean{N}\).
+    This allows us to study canonical ensembles with \(N_c\) particles ensembles by studying grand canonical ensembles with \(\mean{N} = N_c\) particles.
+    This is useful as the restriction to have \(N\) be constant actually makes some of the mathematics harder.
+    
+    For example we had to partition the energy of the system into different energy levels while keeping \(N\) fixed.
+    This is equivalent to an open problem in number theory about partitioning integers as the sum of strictly positive integers.
+    It is not known in general how many ways this can be done for a given integer which makes our sums very hard to do.
+    If instead we allow a slight change in \(N\) the system is almost identical and the mathematics becomes a lot easier.
+    
+    \section{Quantum Gas}
+    Recall that the grand canonical distribution for a microstate, \(r\), with energy \(E_r\) and \(N_r\) particles is
+    \[P(E_r, N_r) = \frac{1}{\partition}\exp[-\beta(E_r - \mu N_r)], \qquad\text{where}\qquad \partition = \sum_r \exp[-\beta(E_r - \mu N_r)].\]
+    The mean number of particles is fairly easy to compute:
+    \begin{align*}
+        \mean{N} &= \sum_r N_rP(E_r, N_r)\\
+        &= \frac{1}{\partition}\sum_r N_r\exp[-\beta(E_r - \mu N_r)]\\
+        &= \frac{1}{\partition} \sum_r \frac{1}{\beta}\pdv{\mu}\exp[-\beta(E_r - \mu N_r)]\\
+        &= \frac{1}{\partition} \frac{1}{\beta}\pdv{\mu} \sum_r\exp[-\beta(E_r - \mu N_r)]\\
+        &= \frac{1}{\partition}\frac{1}{\beta}\pdv{\mu}\partition\\
+        &= \frac{1}{\beta}\pdv{\mu}\ln \partition\\
+        &= \boltzmann T\pdv{\mu}\ln\partition.
+    \end{align*}
+    Here we have used
+    \[\frac{1}{y}\pdv{y}{x} = \pdv{x}\ln y.\]
+    Compare this to
+    \[\mean{E} = \boltzmann T^2\pdv{\beta}\ln Z\]
+    for a canonical system and we see that the analogy of \(\mu\) being like temperature continues.
+    Further we can show that
+    \[\frac{\sqrt{\mean{\Delta N^2}}}{\mean{N}} \sim \frac{1}{\sqrt{\mean{N}}}.\]
+    This means that for large \(N\) the number of particles is sharply spiked at \(\mean{N}\).
+    This allows us to approximate a canonical system dependent on \(T\) as a grand canonical system dependent on \(T\) and \(\mu\) by choosing \(\mu\) to give \(\mean{N}\) the value of \(N\) in the canonical system.
+    
+    \subsection{Indistinguishable Particles}\label{sec:indistinguishable particles}
+    For distinguishable particles to have complete information about a system we need to know exactly which state each particle is in.
+    For indistinguishable particles we need to know only how many particles are in each state as it doesn't matter which particle we consider as they are all the same.
+    \begin{keypoint}
+        A microstate for distinguishable particles is specified by the state, \(i_j\), of each particle where \(i_j\) represents the \(j\)th particle being in state \(i\).
+        
+        A microstate for indistinguishable particles is specified by occupation number, \(n_i\), of the \(i\)th state.
+    \end{keypoint}
+    For a given microstate of a system of indistinguishable particles it is then quite simple to compute \(N_r\), the total number of particles in the microstate, it is simply the number of particles in each state summed over each state:
+    \[N_r = \sum_{i}n_i.\]
+    Similarly the energy of the microstate, \(E_r\), is just the sum of the energies of each state:
+    \[E_r = \sum_{i}n_i\varepsilon_i\]
+    where \(\varepsilon_i\) is the energy of the \(i\)th state.
+    
+    This allows us to rewrite the exponent of the Boltzmann--Gibbs factor as
+    \[-\beta(E_r - \mu N_r) = -\beta\sum_{i}n_i(\varepsilon_i - \mu).\]
+    Similarly a sum over all microstates becomes a series of sums over each quantum state (i.e. the state of a single particle):
+    \[\sum_r \to \sum_{n_1}\sum_{n_2}\dotsb.\]
+    We saw this previously with a canonical ensemble and this sum was very hard to do as we had to keep \(N\) fixed.
+    This meant that, for example, the value of \(n_1\) effected the allowed values of \(n_2\).
+    In a grand canonical ensemble we don't have this restriction and the sums decouple.
+    
+    The partition function can be written as
+    \begin{align*}
+        \partition &= \sum_{r} \exp[-\beta(E_r - \mu N_r)]\\
+        &= \sum_{n_1}\sum_{n_2}\dotsb \sum_{n_j}\exp\left[ -\beta\sum_{i} n_i(\varepsilon_i - \mu) \right]\\
+        &= \left[ \sum_{n_1} \exp[-\beta n_1(\varepsilon_1 - \mu)] \right] \left[ \sum_{n_2} \exp[-\beta n_2(\varepsilon_2 - \mu)] \right] \dotsm \left[ \sum_{n_j} \exp[-\beta n_j(\varepsilon_j - \mu)] \right]\\
+        &= \partition_1 \partition_2 \dotsm \partition_j\\
+        &= \prod_{i}\partition_{i}
+    \end{align*}
+    where \(\partition_{i}\) is the partition function for the quantum state \(i\).
+    We see that the partition function factors into single state partition functions.
+    Compare this to the partition function for a canonical distribution which factors into single particle partition functions.
+    
+    We can then perform the usual sorts of calculations using this factorisation.
+    For example the probability of being in a microstate \(r\) with corresponding occupancies \(\{n_1, n_2, \dotsc\}\) is given by
+    \begin{align*}
+        P(N_r, E_r) &= P(n_1, n_2, \dotsc)\\
+        &= \frac{\exp[-\beta n_1(\varepsilon_1 - \mu)]}{\partition_1} \frac{\exp[-\beta n_2(\varepsilon_2 - \mu)]}{\partition_2} \dotsm\\
+        &= P(n_1)P(n_2)\dotsm
+    \end{align*}
+    where \(P(n_i)\) is the probability that state \(i\) has \(n_i\) particles:
+    \[P(n_i) = \frac{\exp[-\beta n_i(\varepsilon_i - \mu)]}{\partition_i}.\]
+    
+    \subsection{Fermions and Bosons}
+    For the first time in statistical mechanics we now need to actually consider what the particles are.
+    There are two possible cases:
+    \begin{itemize}
+        \item \define{Fermions} have half integer spin (i.e. \(s = \hbar(2n + 1)/2\)).
+        Common examples include electrons, protons, neutrons, and \ce{^3He}.
+        \item \define{Bosons} have integer spin (i.e. \(s = \hbar n/2\)).
+        Common examples include photons, the Higg's boson, and \ce{^4He}.
+    \end{itemize}
+    The key difference for our purposes is the Pauli exclusion principle which states that there can only be at most one fermion in a given quantum state.
+    This means that if our particles are fermions then \(n_i\) can only take the values 0 or 1.
+    The quantum state partition function for a fermionic system is
+    \[\partition_i = \sum_{n_i = 0, 1} \exp[-\beta n_i(\varepsilon_i - \mu)] = 1 + \exp[-\beta(\varepsilon_i - \mu)].\]
+    Conversely there is no restriction on the number of bosons in a given state so the most general case is
+    \begin{align*}
+        \partition_i &= \sum_{n_i = 0}^{\infty} \exp[-\beta n_i(\varepsilon_i - \mu)]\\
+        &= \sum_{n_i=0}^{\infty} \exp[-\beta(\varepsilon_i - \mu)]^{n_i}\\
+        &= \frac{1}{1 - \exp[-\beta(\varepsilon_i - \mu)]}
+    \end{align*}
+    which holds only if \(\abs{\exp[-\beta(\varepsilon_i-\mu)]}<1\) as we have used the result for a geometric series that
+    \[\sum_{n=0}^{\infty} a^n = \frac{1}{1 - a}\]
+    for \(\abs{a} < 1\) (see appendix~\ref{app:geometric series}).
+    
+    We can now calculate \(\mean{n_i}\), the average number of particles in quantum state \(i\).
+    We can do the derivation for both fermions and bosons at the same time by noting that
+    \[\partition_i = [1 \pm \exp(-\beta[\varepsilon_i - \mu])]^{\pm 1}\]
+    where we take \(+\) for fermions and \(-\) for bosons.
+    The average occupancy is
+    \[\mean{n_i} = \sum_{n_i} n_iP(n_i) = \frac{1}{\beta}\pdv{\mu}\ln\partition_i.\]
+    We showed this earlier for \(\mean{N}\) but it is the same if we consider only a single state.
+    Hence
+    \begin{align*}
+        \mean{n_i} &= \frac{1}{\beta}\pdv{\mu} \ln[(1 \pm \exp[-\beta(\varepsilon_i - \mu)])^{\pm 1}]\\
+        &= \pm\frac{1}{\beta}\pdv{\mu} \ln[1 \pm \exp(-\beta[\varepsilon_i - \mu])]\\
+        &= \pm\frac{1}{\beta}\frac{(\pm\beta)\exp[-\beta(\varepsilon_i - \mu)]}{1 \pm \exp[-\beta(\varepsilon_i - \mu)]}\\
+        &= \frac{\exp[-\beta(\varepsilon_i - \mu)]}{1 \pm \exp[-\beta(\varepsilon_i - \mu)]}\\
+        &= \frac{1}{\exp[\beta(\varepsilon_i - \mu)] \pm 1}
+    \end{align*}
+    \begin{keypoint}
+        The mean number of particles in quantum state \(i\) (which has energy \(\varepsilon_i\)) is given by:
+        \begin{itemize}
+            \item the Fermi--Dirac distribution for fermions:
+            \[\mean{n_i} = f_{+}(\varepsilon_i) = \frac{1}{\exp[\beta(\varepsilon_i - \mu)] + 1}\]
+            \item the Bose--Einstein distribution for bosons:
+            \[\mean{n_i} = f_{-}(\varepsilon_i) = \frac{1}{\exp[\beta(\varepsilon_i - \mu)] - 1}\]
+        \end{itemize}
+    \end{keypoint}
+    The number of particles is then determined by
+    \[N = \sum_i \mean{n_i} = \sum_i f_{\pm}(\varepsilon_i).\]
+    
+    \section{Ideal Fermi Gas}
+    \subsection{Low Density Limit}
+    Consider the case of \(\mu \ll -1\).
+    This means that \(e^{-\beta\mu} \gg 1\) and so
+    \[\mean{n_{i}} = f_{\pm}(\varepsilon_{i}) = \frac{1}{\exp[\beta(\varepsilon_i - \mu)] \pm 1} \approx e^{-\beta(\varepsilon_i - \mu)}\]
+    for both fermions and bosons.
+    Suppose we are interested in a canonical system with \(N\) fixed.
+    We can model this by fixing \(\mu\) such that
+    \[N = \sum_i \mean{n_i} \approx e^{\beta \mu}\sum_i e^{-\beta \varepsilon_i} = e^{\beta \mu}Z(1)\]
+    where \(Z(1)\) is the usual canonical single-particle partition function.
+    Then in the limit of large, negative \(\mu\) we have
+    \[\mu \approx \boltzmann T\ln\left( \frac{N}{Z(1)} \right).\]
+    This recovers the semi-classical approximation of \(\mu\) from example~\ref{exa:ideal gas semi classical approx chemical potential}.
+    This is called the low density limit (or high temperature limit) because in this limit we have
+    \[\mu \ll -1 \implies \ln\left( \frac{N}{Z(1)} \right) \ll -1 \implies \frac{N}{Z(1)} \ll 1\]
+    which is the low density limit from equation~\ref{eqn:low desnity limit} where the semi-classical partition function worked well.
+    
+    \subsection{Ideal Fermi Gas}
+    Consider the Fermi--Dirac distribution in the limit \(T\to 0\).
+    We then have \(\beta\to\infty\) and we find that
+    \[
+        f_{+}(\varepsilon) = \frac{1}{\exp[\beta(\varepsilon - \mu)] + 1} \to
+        \begin{cases}
+            1, & \text{if}~\varepsilon < \fermiEnergy,\\
+            0, & \text{if}~\varepsilon > \fermiEnergy,
+        \end{cases}
+    \]
+    where \(\fermiEnergy\) is the \define{Fermi energy} defined to be
+    \[\fermiEnergy = \lim_{T\to 0} \mu(T).\]
+    The Fermi--Dirac distribution gives the average number of particles in a given state.
+    However since these are fermions there can only be zero or one particle and so the Fermi--Dirac distribution is also the probability that a state is occupied.
+    Therefore at \(T = 0\) what we see is that all states with \(\varepsilon < \fermiEnergy\) are occupied and all states with \(\varepsilon > \fermiEnergy\) are unoccupied.
+    This is shown in figure~\ref{fig:Fermi function at T = 0}.
+    \begin{figure}[ht]
+        \centering
+        \pgfmathdeclarefunction{fermiDiracDist}{1}{%
+            \pgfmathparse{(and(1, #1<1)*(1))}%
+        }
+        \tikzsetnextfilename{fermi-dirac-dist-at-0-temp}
+        \begin{tikzpicture}
+            \begin{axis}[
+                domain=0:2,
+                xlabel = \(\varepsilon\),
+                ylabel = \(f_+(\varepsilon)\),
+                no markers,
+                samples=200,
+                thick,
+                xticklabels={\(\fermiEnergy\)},
+                yticklabels={0,1},
+                xtick={1},
+                ytick={0,1},
+                tick style={color=white}
+                ]
+                \addplot[ultra thick, domain=0:2]{fermiDiracDist(x)};
+            \end{axis}
+        \end{tikzpicture}
+        \caption{The Fermi--Dirac distribution at \(T = 0\).}
+        \label{fig:Fermi function at T = 0}
+    \end{figure}
+    Contrast this with a classical gas where at \(T = 0\) all particles would be in the ground state of \(\varepsilon = 0\).
+    The Fermi energy arises naturally from the Pauli exclusion principle and the fact that energy levels 'fill up'.
+    
+    Clearly at low temperatures the Fermi energy is going to be important but what \emph{is} the Fermi energy.
+    To calculate this we use the density of states method in \(\varepsilon\)-space.
+    Let \(g\) be the density of states in \(\varepsilon\)-space.
+    Then
+    \[N = \sum_i f_{+}(\varepsilon_i) \approx \int_{0}^{\infty} g(\varepsilon) f_{+}(\varepsilon) \dd{\varepsilon}.\]
+    Recall that \(g\) is such that \(g(\varepsilon)\dd{e}\) gives the number of states with energy in \((\varepsilon, \varepsilon + \dd{\varepsilon})\).
+    In section~\ref{sec:density of states} we showed that for spinless particles in a box
+    \[g(\varepsilon) = DV\sqrt{\varepsilon}, \qquad\text{where}\qquad D = \left( \frac{2m}{\hbar^2} \right)^{3/2}\frac{1}{4\pi^2}.\]
+    If we now allow particles to have spin, \(s\), then each translational state now corresponds to \(2s + 1\) states and so
+    \[g(\varepsilon) = \tilde{D}V\sqrt{\varepsilon}, \qquad\text{where}\qquad \tilde{D} = (2s + 1)D.\]
+    At \(T = 0\) we have \(f_{+}(\varepsilon) = 0\) for \(\varepsilon > \fermiEnergy\) and \(f_{+}(\varepsilon) = 1\) for \(\varepsilon < \fermiEnergy\).
+    Hence
+    \begin{align*}
+        N &= \sum_{i} f_{+}(\varepsilon_{i})\\
+        &\approx \int_{0}^{\infty} g(\varepsilon)f_{+}(\varepsilon) \dd{\varepsilon}\\
+        &= \int_{0}^{\fermiEnergy} g(\varepsilon)\dd{\varepsilon}\\
+        &= \tilde{D}V \int_{0}^{\fermiEnergy} \sqrt{\varepsilon}\dd{\varepsilon}\\
+        &= \tilde{D}V \frac{2}{3}\left[ \varepsilon^{3/2} \right]_{0}^{\fermiEnergy}\\
+        &= \frac{2}{3}\tilde{D}V\fermiEnergy^{3/2}.
+    \end{align*}
+    Rearranging this we have
+    \[\fermiEnergy = \left( \frac{3N}{2\tilde{D}V} \right)^{2/3} = \frac{\hbar^2}{2m}\left( \frac{6\pi^2N}{(2s + 1)V} \right)^{2/3}.\]
+    It can be shown that
+    \[E(T = 0) = \int_{0}^{\fermiEnergy}g(\varepsilon)\varepsilon\dd{\varepsilon} = \frac{3}{5}\fermiEnergy.\]
+    From this we see that the average energy per particle at \(T = 0\) is
+    \[\frac{E}{N} = \frac{3}{5}\fermiEnergy.\]
+    Some points to note:
+    \begin{itemize}
+        \item \(\fermiEnergy\) decreases with the mass of the fermion, \(m\).
+        \item \(\fermiEnergy\) increases with the density, \(N/V\).
+        \item \(\fermiEnergy\) defines a characteristic temperature called the \define{Fermi temperature}, \(\fermiTemp\) which is such that \(\fermiEnergy = \boltzmann \fermiTemp\).
+        \item At \(T = 0\) each particle has non-zero energy, \(\varepsilon = 3\fermiEnergy/5\).
+    \end{itemize}
+    
+    \subsection{Low Temperature Behaviour}
+    Consider what happens now if instead of at \(T = 0\) we are at some small, but non-zero, temperature?
+    In this case we have
+    \[
+        f_{+}(\varepsilon) = \frac{1}{\exp[\beta(\varepsilon - \mu)] + 1} \to 
+        \begin{cases}
+            1, & \text{if}~\beta(\varepsilon - \mu) \ll -1,\\
+            0, & \text{if}~\beta(\varepsilon - \mu) \gg 1,\\
+            \frac{1}{2}, & \text{if}~ \varepsilon = \mu.
+        \end{cases}
+    \]
+    This is very similar to the result at \(T = 0\) but slightly smoothed out.
+    It differs only when \(\abs{\varepsilon - \mu} \sim \order{\boltzmann T}\).
+    \begin{figure}[ht]
+        \centering
+        \tikzsetnextfilename{fermi-dirac-dist-at-low-temp}
+        \begin{tikzpicture}
+            \begin{axis}[
+                domain=0:2,
+                xlabel = \(\varepsilon\),
+                ylabel = \(f_+(\varepsilon)\),
+                no markers,
+                samples=200,
+                thick,
+                xticklabels={\(\mu(T)\)},
+                yticklabels={0,1},
+                xtick={1},
+                ytick={0,1},
+                tick style={color=white}
+                ]
+                \addplot[ultra thick, domain=0:2]{exp(-50*(x-1))/(1+exp(-50*(x-1)))};    
+            \end{axis}
+            \draw[|-|] (3, 5.5) -- (4, 5.5) node[midway, below] {\scriptsize\(\boltzmann T\)};
+        \end{tikzpicture}
+        \caption{The Fermi--Dirac distribution for small \(T\).}
+        \label{fig:Fermi function at small T}
+    \end{figure}
+    For the Fermi distribution still approximate its value at \(T = 0\) we must have
+    \[\boltzmann T \ll \mu(T) \approx \fermiEnergy\]
+    or equivalently
+    \[T \ll \fermiTemp.\]
+    We've assumed that for low temperatures \(\mu(T) \approx \fermiEnergy = \mu(0)\), which is the case, in fact we can show that
+    \[\mu(T) = \fermiEnergy\left[ 1 - \order{\frac{T^2}{\fermiTemp^2}} \right].\]
+    So to first order \(\mu(T) = \fermiEnergy\).
+    
+    We can think of the low temperature case as the zero temperature case with a small number of fermions in an excited state which leaves a small number of lower energy states unoccupied.
+    As a rough estimate we expect that the total energy increase as the temperature increases from \(0\) to \(T\) will be proportional to the number of excited particles times the typical energy of an excited fermion.
+    The fraction of excited particles is \(N\boltzmann T/\fermiEnergy\) and the average excited energy is \(\boltzmann T\) so we expect
+    \[\Delta E = E(T) - E(0) \sim \frac{N\boltzmann T}{T}\boltzmann T.\]
+    Similarly the heat capacity is
+    \[C_{V} = \pdv{E}{T} \approx \frac{\Delta E}{\Delta T} = \frac{E(T) - E(0)}{T - 0} \sim \frac{N \boltzmann^2 T}{\fermiEnergy}.\]
+    Notice that this scales as \(T\) whereas for a classical ideal gas \(C_V\) is constant and equal to \(3N\boltzmann T/2\).
+
+    \subsection{Electron Gas}
+    The most basic example of a Fermi gas is an electron gas.
+    This arises mostly when we consider conduction in a metal.
+    In a metal each atom denotes some electrons to the sea of delocalised electrons.
+    While the atoms are held in a crystal lattice the electrons are free to move and modelling them as a gas can lead to reasonable results.
+    Since electrons have spin 1/2 they are fermions and so the most basic model is as an ideal Fermi gas, called a free electron gas.
+    
+    For most metals \(\fermiEnergy \gg \boltzmann T\) at all reasonable operating temperatures and therefore the ideal Fermi gas approximation is valid so long as there are no other effects getting in the way.
+    
+    \section{Ideal Bose Gas}
+    Recall that for bosons the average occupancy of a state with energy \(\varepsilon\) is given by the Bose--Einstein distribution:
+    \[\mean{n}(\varepsilon) = f_{-(\varepsilon)} = \frac{1}{\exp[\beta(\varepsilon - \mu)] - 1}.\]
+    The exclusion principle doesn't apply to bosons and so the most important quantum effect is simply the indistinguishability of bosons.
+    
+    \subsection{Quanta as Bosons}
+    Recall that a quantum harmonic oscillator at frequency \(\omega\) has energy levels
+    \[\varepsilon_n = \hbar\omega\left( n + \frac{1}{2} \right).\]
+    In section~\ref{sec:einstein model of a crystal} we showed that
+    \[\mean{n} = \frac{1}{e^{\beta\hbar\omega} - 1}.\]
+    Comparing this to the Bose--Einstein distribution we see that the Bose--Einstein distribution can be thought of as the average number of bosons in a quantum state with energy \(\hbar\omega\) and chemical potential \(\mu = 0\).
+    
+    This suggests that we can treat quanta of energy as bosons.
+    This idea becomes more reasonable when we consider that there is no restriction on the number of quanta and that quanta's of energy are indistinguishable.
+    This idea becomes obvious when we identify quanta of energy as photons which are spin 0 and therefore bosons.
+    
+    The fact that \(\mu = 0\) means that we can add or remove quanta without violating any laws.
+    The number of quanta is not conserved, just the total energy.
+    Recall that in equation~\ref{eqn:definition of chemical potential} we defined the chemical potential to be
+    \[\mu = \pdvconst{F}{N}{T,V}\]
+    so we see that \(\mu = 0\) simply corresponds to minimising free energy with respect to the number of quanta, \(N\).
+    
+    \subsection{Wave--Particle Duality}
+    This view of quanta as bosons gives us a new way of thinking about wave--particle duality:
+    \begin{itemize}
+        \item Standing waves, or normal modes, of the system have discrete frequencies, \(\nu\), or angular frequencies, \(\omega\).
+        \item From quantum mechanics we know that energy is quantised and therefore the energy in a mode is \(\varepsilon = nh\nu + C\) for some constant \(C\).
+        \item Quanta can be treated as bosons and where the average number of bosons in  a given quantum state with energy \(\varepsilon = h\nu\) is given by the Bose--Einstein distribution:
+        \[\mean{n}(\nu) = \frac{1}{e^{\beta h\nu} - 1}.\]
+        This tells us how energy is distributed among the different frequencies.
+    \end{itemize}
+    
+    We can view this as a sort of double quantisation.
+    First start with classical one-dimensional waves satisfying
+    \[\frac{1}{c^2}\pdv[2]{\psi}{t} = \pdv[2]{\psi}{\psi}.\]
+    With boundary conditions such that \(\psi(0) = \psi(L) = 0\) this is solved easily by separation of variables.
+    Simply make the ansatz that \(\psi(x, t) = X(x)T(t)\) and so
+    \[\frac{1}{c^2}\frac{1}{T}\dv[2]{T}{t} = \frac{1}{X}\dv[2]{X}{x} = -k^2\]
+    where \(k\) is a constant and we choose to use \(-k^2\) to make the solution nicer.
+    From this we have
+    \[X(x) = \sin\left( \frac{m\pi x}{L} \right)\]
+    where the boundary conditions impose \(k = m\pi/L\).
+    We also have
+    \[\frac{1}{c^2}\dv[2]{T}{t} = -k^2T\]
+    which is the normal simple harmonic oscillator with angular frequency \(\omega = kc\).
+    
+    Suppose we now replace the ordinary harmonic oscillator with a quantum harmonic oscillator.
+    We know that this then has energy
+    \[\varepsilon_{m,n} = \hbar\omega\left( n + \frac{1}{2} \right) = \frac{\hbar m\pi c}{L}\left( n + \frac{1}{2} \right).\]
+    So we see that energy is twice quantised by \(m\) and \(n\).
+    We can view the standing waves as the states which are quantised and then the energy quanta can be viewed as bosons in these states.
+    
+    \subsection{Black Body Radiation}
+    A black body is one that absorbs all radiation.
+    This means that when it is cold it appears black.
+    However when it is heated up a black body must emit radiation as it cannot heat up indefinitely.
+    It is this radiation that makes black bodies interesting in physics.
+    It seems that this radiation depends only on the temperature of the body, not what it is made of.
+    The classical description of a black body also failed to properly account for radiation in the ultraviolet range.
+    
+    An idealised black body is really quite simple.
+    We simply take an adiabatic box at some fixed temperature, \(T\), and cut a small hole in it.
+    The hole must be small so that energy can be exchanged but not particles.
+    The radiation will have the same spectrum as the radiation which is inside the cavity.
+    
+    The radiation inside the cavity is simply formed of electromagnetic standing waves of frequency \(\nu\).
+    We can treat the photons as bosons and then we find that the average energy in a mode of given frequency, \(\nu\), is
+    \[\mean{\varepsilon}(\nu) = \hbar \nu \mean{n}(\nu) = \frac{h\nu}{e^{\beta h\nu} - 1}.\]
+    
+    Consider a cubic cavity with side length \(L\).
+    The waves must vanish at the walls so we have \(2L/\lambda_x = m_{x}\) and similar for the other directions.
+    Each component of the momentum is
+    \[p_x = \frac{h}{\lambda_x} = \frac{hm_x}{2L}.\]
+    So the magnitude of the momentum is
+    \[p = \frac{h}{2L}\sqrt{m_x^2 + m_y^2 + m_z^2}.\]
+    So we see that by restricting \(m_i\in\integers\) we restrict the values that \(\nu\) can take since \(\nu = cp/h\).
+    As usual sums are hard and integrals are (relatively) easy so we want to find a density of modes approximation.
+    The density of modes in \(m\)-space is similar to the density of states in \(n\)-space except that there are two possible orthogonal polarisations which gives an extra factor of 2 so we have
+    \[\sum_{\text{modes}} A(\nu) \approx \pi\int_{0}^{\infty} A[\nu(m)] m^2 \dd{m} = \pi\int_{0}^{\infty} A(\nu)\left( \frac{2L}{c} \right)^3\nu^2\dd{\nu}.\]
+    So we can define the density of modes, \(g\), as
+    \[g(\nu) = \frac{8\pi}{c^3}V\nu^2\]
+    which is such that \(g(\nu)\dd{\nu}\) gives the number of modes with frequency in \([\nu, \nu + \dd{\nu}]\).
+    
+    The energy contained in modes with frequency in \([\nu, \nu + \dd{\nu}]\) is then
+    \[h\nu\mean{n}(\nu)g(\nu)\dd{\nu} = \frac{8\pi Vh}{c^3} \frac{\nu^3\dd{\nu}}{e^{\beta h\nu} - 1}.\]
+    The spatial energy density is given by
+    \[u(\nu) = \frac{8\pi h}{c^3} \frac{\nu^3}{e^{\beta h\nu} - 1}.\]
+    This is called the \define{Planck distribtuion}.
+    It is common to write this as a function of the wavelength \(\lambda = c/\nu\) which requires that we use
+    \[\dd{\nu} = \abs{\dv{\nu}{\lambda}} \dd{\lambda}\]
+    which will give us
+    \[u(\lambda)\dd{\lambda} = \frac{8\pi hc}{\lambda^5}\frac{\dd{\lambda}}{e^{\beta hc/\lambda} - 1}.\]
+    Notice that the only dependence on the cavity appears as temperature (since \(\beta = 1/\boltzmann T\)).
+    There is no dependence on the shape or material of the cavity.
+    
+    Consider the high temperature limit where \(h\nu/\boltzmann T \ll 1\) so \(\beta h\nu \ll 1\).
+    In this limit if we define \(x = \beta h \nu\) we have
+    \begin{align*}
+        u(\nu) &\propto \frac{x^3}{e^{x} - 1}\\
+        &= \frac{x^3}{1 + x + \dotsb - 1}\\
+        &= \frac{x^3}{x + \dotsb}\\
+        &\approx x^2.
+    \end{align*}
+    If we kept track of the constants then we would find
+    \[u(\nu) \approx \frac{8\pi\boltzmann T}{c^3}\nu^2.\]
+    Notice that this goes as \(\nu^2\).
+    This is a classical result as \(h\) does not appear and indeed it can be derived classically.
+    This result leads to the ultraviolet catastrophe, since it breaks down for high \(\nu\), which was one of the clues that lead to quantum mechanics in the first place.
+    
+    The correct high frequency limit when \(h\nu/\boltzmann T\gg 1\), again setting \(x = \beta h\nu \gg 1\), is
+    \begin{align*}
+        u(\nu) &\propto \frac{x^3}{e^x -1}\\
+        &\approx \frac{x^3}{e^x}\\
+        &= x^3e^x.
+    \end{align*}
+    Again if we had kept all of the constants we would have found
+    \[u(\nu) \approx \frac{8\pi h}{c^3}\nu^3e^{-\beta h\nu}.\]
+    This decays much more rapidly and we don't have to worry about the ultraviolet catastrophe any more.
+    
+    \section{Radiation Gas}
+    \subsection{Stefan--Boltzmann Law}
+    The average energy per unit volume, that is the energy density, of a cavity times the speed of light gives the energy flux through the hole in the cavity.
+    The energy density can be calculated as
+    \[\frac{\mean{E}}{V} = \int_{0}^{\infty} u(\nu)\dd{\nu} = \frac{8\pi h}{c^3} \int_{0}^{\infty} \frac{\nu^3}{e^{\beta h\nu} - 1}\dd{\nu}.\]
+    To evaluate this integral first let \(x = \beta h\nu\) then \(\dd{x} = \beta h\dd{n}\) and we have
+    \begin{equation}\label{eqn:radiation energy density}
+        \frac{\mean{E}}{V} = \frac{8\pi h}{c^3}\frac{1}{(\beta h)^4} \int_{0}^{\infty} \frac{x^3}{e^{x} - 1}\dd{x}.
+    \end{equation}
+    This integral is now dimensionless and can be computed by numerical methods or it can be done analytically (see appendix~\ref{app:integral x^(p-1)/(e^x - 1)})\footnote{definitely worth checking out, the zeta and gamma functions both make appearances!}.
+    Either way the result is \(\pi^4/15\).
+    What is actually important for us though is that the integral is just a constant and we see that \(\mean{E}/V \propto T^{4}\).
+    This is called the Stefan--Boltzmann law.
+    
+    \subsection{Thermodynamics of Radiation Gas}
+    Recall that in section~\ref{sec:indistinguishable particles} we say that we can factorise the partition function as
+    \[\partition = \prod_{i} \partition_{i} = \prod_{i} \frac{1}{1 - \exp[-\beta(\varepsilon_i - \mu)]}.\]
+    We also have \(\mu = 0\) for photons.
+    In an analogous way to ideal gases we can define the free energy as
+    \begin{align*}
+        F &= -\boltzmann T\ln\partition\\
+        &= -\boltzmann T\ln\left[ \prod_{i}\partition_{i} \right]\\
+        &= -\boltzmann T\sum_{i} \ln\partition_{i}\\
+        &= -\boltzmann T\sum_{i} \ln\left[ \frac{1}{1 - \exp(-\beta\varepsilon_{i})} \right]\\
+        &= \boltzmann T\sum_{i} \ln[1 - \exp(-\beta\varepsilon_{i})].
+    \end{align*}
+    If we then apply the density of modes approximation we have
+    \begin{align*}
+        F &\approx \boltzmann T \int_{0}^{\infty} \ln[1 - e^{-\beta h\nu}]g(\nu)\dd{\nu}\\
+        &= \frac{8\pi\boltzmann T}{c^3} \int_{0}^{\infty} \nu^2\ln[1 - e^{-\beta h\nu}]\dd{\nu}.
+    \end{align*}
+    Similarly we can calculate the mean energy using
+    \[\mean{E} = -\pdv{\beta}\ln\partition\]
+    and we find that
+    \[\mean{E} = \frac{8\pi h}{c^3}V\int_{0}^{\infty} \frac{\nu^3}{e^{\beta h\nu} -1}\dd{\nu}\]
+    which is the result that we found in the previous section (equation~\ref{eqn:radiation energy density}).
+    Using the thermodynamic relation
+    \[P = -\pdvconst{F}{V}{T}\]
+    we can also define a sensible notion of pressure as
+    \[P = -\frac{8\pi\boltzmann T}{c^3}\int_{0}^{\infty}\nu^2 \ln[1 - e^{-\beta h\nu}]\dd{\nu}.\]
+    If we integrate this by parts we find that
+    \[P = \frac{1}{3}\frac{\mean{E}}{V}.\tag{radiation}\]
+    Notice that this is distinct from an ideal gas where we have
+    \[P = \frac{N\boltzmann T}{V} = \frac{2}{3}\frac{\mean{E}}{V}. \tag{ideal gas}\]
+    We can also define the compressibility,
+    \[K = -V\pdvconst{P}{V}{T}\]
+    and for radiation we have
+    \[K = 0. \tag{radiation}\]
+    again contrast this with an ideal gas where
+    \[K = P. \tag{ideal gas}\]
+    What this means is that an ideal gas when compressed will have a pressure increase but a photon gas can be compressed without pressure change as the number of photons is not fixed (since \(\mu = 0\)) and therefore compression simply decreases the number of photons so the pressure doesn't change.
+    
+    We can calculate the average number of photons in a cavity:
+    \begin{align*}
+        \mean{N} &= \int_{0}^{\infty} \mean{n}(\nu)g(\nu) \dd{\nu}\\
+        &= \frac{8\pi V}{c^3} \int_{0}^{\infty}\frac{\nu^2}{1 - e^{\beta h\nu} - 1}
+        \shortintertext{now letting \(x = \beta h\nu\) we have}
+        &= \frac{8\pi V}{c^3} \left( \frac{\boltzmann T}{h} \right)^3 \int_{0}^{\infty} \frac{x^2}{e^{x} - 1}\dd{x}\\
+        &\approx 8\pi V\left( \frac{\boltzmann T}{ch} \right)^3\cdot 2.404
+    \end{align*}
+    again see~\ref{app:integral x^(p-1)/(e^x - 1)}.
+    We find that the average energy per particle is
+    \[\frac{\mean{E}}{\mean{N}} \approx 2.7\boltzmann T \tag{radiation}\]
+    which can be compared with the equipartition for an ideal gas with \(f\) degrees of freedom:
+    \[\frac{\mean{E}}{N} = \frac{f}{2}\boltzmann T. \tag{ideal gas}\]
+    We can also compute the heat capacity:
+    \[C_V = \pdvconst{\mean{E}}{T}{V} = \frac{32\pi^2\boltzmann^4}{15c^3h^3}T^3V. \tag{radiation}\]
+    Notice that this goes as \(T^3\) this agrees with the Debye model.
+    Compare this to an ideal gas where
+    \[C_V = \frac{f}{2}R \tag{ideal gas}\]
+    which is constant.
+    
+    Finally consider the entropy:
+    \[S = \int_{0}^{T} \frac{C_V(T')}{T'}\dd{T'} = \frac{1}{3}\frac{32\pi^5\boltzmann^4}{15c^3h^3}T^3V\]
+    interestingly we see that an adiabatic process for a photon gas means that \(T^3V\) must be constant.
+    The entropy per particle is then
+    \[\frac{S}{\mean{N}} = 3.6 \boltzmann T\]
+    
+    \subsection{Cosmic Background Radiation}
+    Shortly after the big bang the universe was incredibly hot.
+    At this point the universe was a hot plasma in thermal equilibrium with radiation.
+    The universe cooled and expanded and the plasma formed atoms but the radiation remained.
+    This radiation now forms the cosmic background radiation.
+    Measuring this radiation and fitting the distribution to the Planck distribution we find a very good fit with temperature \(T = \SI{2.74}{\kelvin}\).
+    So the radiation of the early universe has cooled down to about \(\SI{3}{\kelvin}\).
+    
+    \section{Bose--Einstein Condensate}
+    Consider a Bose gas with \(\mu \ne 0\).
+    The average number of bosons is fixed and we choose \(\mu\) to get the correct value of \(\mean{N}\).
+    The average number of particles in state with energy \(\varepsilon_i\) is
+    \[\mean{n}(\varepsilon_i) = f_{-}(\varepsilon_i) = \frac{1}{\exp[\beta(\varepsilon_i - \mu)] - 1}.\]
+    Using the density of states approximation we need to choose \(\mu\) such that \(N\) as given by
+    \[N = \sum_{i} f_{-}(\varepsilon_i) \approx \int_{0}^{\infty} g(\varepsilon) \frac{1}{\exp[\beta(\varepsilon - \mu)] - 1}\dd{\varepsilon}\]
+    has the correct value.
+    For spinless bosons in a box the density of states is given by \(DV\sqrt{\varepsilon}\) where \(D\) is a constant and \(V\) is the volume of the box (see section~\ref{sec:density of states}).
+    So we need to solve
+    \[N = DV \int_{0}^{\infty} \frac{\sqrt{\varepsilon}}{\exp[\beta(\varepsilon - \mu)] - 1}\dd{\varepsilon}\]
+    for \(\mu\).
+    Recall that the average occupation number for any state must be non-negative and therefore we need to have \(e^{-\beta\mu} > 1\) which means that \(\mu < 0\).
+    Let \(x = \beta\varepsilon\) and therefore \(\dd{x} = \beta\dd{\varepsilon}\).
+    This substitution gives us
+    \[N = DV(\boltzmann T)^{3/2} \int_{0}^{\infty} \frac{\sqrt{x}}{e^xe^{-\beta\mu} - 1}.\]
+    Assume now that we solve this for a particular temperature, \(T_1\), call this solution \(\mu_1 = \mu(T_1)\).
+    Now consider a second temperature, \(T_2 < T_1\), and find the solution \(\mu_2 = \mu(T_2)\).
+    At this lower temperature the prefactor for the integral, \(T_2^{3/2} < T_{1}^{3/2}\), and also \(\beta_2 > \beta_1\) so for constant \(\mu\) we have \(e^{-\beta_2 \mu} > e^{-\beta_1 \mu}\).
+    So if we want to keep \(N\) constant then we must have that \(\mu\) increases (recall \(\mu\) is negative so its absolute value decreases).
+    In fact \(\mu\) will increase until \(T\) reaches the \define{Bose temperature}, \(\boseTemp\), and below this temperature \(\mu = 0\).
+    At the Bose temperature we have
+    \[N = DV(\boltzmann \boseTemp)^{3/2} \int_{0}^{\infty} \frac{\sqrt{x}}{e^x - 1}\dd{x}.\]
+    This integral is computed in appendix~\ref{app:integral x^(p-1)/(e^x - 1)} and we find it to be approximately \(1.306\sqrt{\pi}\).
+    Below \(\boseTemp\) we cannot satisfy the equation for \(N\) to be constant.
+    So what happens to all the bosons?
+    The answer is they are in the ground state.
+    This occurs due to the fact that the density of states approximation is only an approximation.
+    This approximation works best away from the origin as over large distances in \(\varepsilon\)-space it is reasonable to treat the states as continuous.
+    Near the origin however the density of states method doesn't account from the contribution of the state at \(\varepsilon = 0\).
+    We can fix the problem by including an extra term, \(\mean{n_0}\), which accounts for the mean number of particles in the ground state and so for \(T < \boseTemp\) we have
+    \[N = \mean{n_0} + \int_{0}^{\infty} \frac{g(\varepsilon)}{e^{\beta \varepsilon} - 1}\dd{\varepsilon}.\]
+    It can be shown that
+    \[\mean{n_0} = N\left[ 1 - \left( \frac{T}{\boseTemp} \right)^{3/2} \right]\]
+    so for \(T \approx \boseTemp\) \(\mean{n_0}\) is negligible but for \(T \ll \boseTemp\) \(\mean{n_0}\) becomes important.
+    
+    Below the Bose temperature a finite (non-zero) fraction of particles are in the ground state.
+    We have what is called a \define{Bose--Einstein Condensate}.
+    Since so many particles are in low energy states quantum mechanical effects, such as superfluidity and superconductivity, become noticeable.
+    These effects can also occur in other materials but they are usually swamped by thermal effects however since a Bose--Einstein condensate allows for so many particles to be in a low energy state quantum effects can be seen on a macroscopic scale.
+    
+    The existence of Bose--Einstein condensates follows immediately from the indistinguishability of particles.
+    Suppose a system of indistinguishable particles are all in the ground state and that the next energy level is at \(\Delta\varepsilon\).
+    For distinguishable particles there are \(N\) ways to choose a particle to excite and the entropy gain of this excitation is thus \(\boltzmann \ln N\) which, for sufficiently large N, will win out against minimising energy when it comes to minimising the free energy.
+    So any system of enough particles to be macroscopic will also have some excited particles.
+    
+    Consider now the same system but with indistinguishable particles.
+    Then which particle becomes excited is unimportant and the entropy change due to a single excitation will simply be \(\boltzmann \ln 1 = 0\).
+    So energy minimising will win and the system will remain in the unexcited state.
+    While this example of all particles in the ground state is not realistic the same logic applies if a significant number of particles are in the ground state.
+    
+    \subsection{Quantum Gasses Summary}
+    The main difference between fermions and bosons lies in their behaviour at low temperatures and densities.
+    Fermions follow the Pauli exclusion principle and therefore at low temperatures there is still energy separation between particles.
+    We can think of this as an effective repulsion between fermions.
+    Bosons on the other hand have no such restriction and in fact tend towards all being in the ground state as the temperature decreases which we can think of as an effective attraction between bosons.
+    
+    At high temperatures but low density still the differences between fermions and bosons are less important and a more classical treatment works where we treat particles as point particles with definite position and momentum except when colliding.
+    We can tell that the quantum nature of these particles is less important as \(h\) or \(\hbar\) appears in some formulae, such as the partition function and entropy, but vanishes in physically measurable quantities such as entropy differences.
+    
+    At low temperature and high densities the quantum nature of gasses is very important, which can be seen from the emergence of \(\hbar\) in physically measurable quantities.
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Move lower when figures below have \tikzsetnextfilename{...}
+    \tikzexternaldisable
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    \clearpage
+    \appendix
+    \part*{Appendix}
+    \addcontentsline{toc}{part}{Appendix}
+    \begingroup
+    \let\clearpage\relax
+    \input{appendices/appendices-a-and-b}
+    \input{appendices/appendices-c-and-d}
+    \endgroup
+    \section{Integral of \texorpdfstring{\(x^{(p-1)}/(e^x - 1)\)}{x cubed divided by exp x minus 1}}\label{app:integral x^(p-1)/(e^x - 1)}
+    We wish to calculate the integral
+    \[\int_{0}^{\infty} \frac{x^3}{e^x - 1}\dd{x}.\]
+    We will actually do this for the more general
+    \[\int_{0}^{\infty} \frac{x^{p - 1}}{e^x - 1}\dd{x}\]
+    where \(p > 1\).
+    Then we have
+    \begin{align*}
+        \int_{0}^{\infty} \frac{x^{p-1}}{e^x - 1}\dd{x} &= \int_{0}^{\infty} \frac{1}{1 - e^{-x}}e^{-x}x^{p - 1}\dd{x}
+        \shortintertext{recognising this first term as the limit of a geometric series and since \(e^{-x} < 1\) for all positive \(x\) this becomes}
+        &= \int_{0}^{\infty} e^{-x}\left[ \sum_{m=0}^{\infty} (e^{-x})^m \right] x^{p - 1} \dd{x}\\
+        &= \int_{0}^{\infty} \sum_{m=0}^{\infty} e^{-(m+1)x}x^{p-1}\dd{x}
+        \shortintertext{since the geometric series is uniformly convergent (where it converges) we can safely swap the sum and the integral:}
+        &= \sum_{m=0}^{\infty} \int_{0}^{\infty} e^{-(m+1)x}x^{p-1}\dd{x}
+        \shortintertext{let \(n = m + 1\) then}
+        &= \sum_{n=1}^{\infty} \int_{0}^{\infty} e^{-nx}x^{p - 1}\dd{x}
+        \shortintertext{now making the substitution \(y = nx\) so \(\dd{y} = n\dd{x}\) we have}
+        &= \sum_{n=1}^{\infty} \int_{0}^{\infty} e^{-y} \frac{y^{p-1}}{n^{p-1}} \frac{\dd{y}}{n}\\
+        &= \sum_{n=1}^{\infty}\frac{1}{n^p} \int_{0}^{\infty} e^{-y}y^{p-1}\dd{y}\\
+        &= \zeta(p) \Gamma(p)
+    \end{align*}
+    where \(\zeta\) is the Riemann zeta function and \(\Gamma\) is the gamma function.
+    It is not possible to evaluate both of these functions exactly at all values of \(p\), fortunately for the value \(p = 4\) that we care about we know that \(\zeta(4) = \pi^{4}/90\) and \(\Gamma(4) = 6\) and so
+    \[\int_{0}^{\infty} \frac{x^3}{e^x - 1}\dd{x} = \zeta(4)\Gamma(4) = \frac{\pi^{4}}{15}.\]
+    Similarly we will need later in the text the integral
+    \[\int_{0}^{\infty} \frac{x^2}{e^x - 1} \dd{x}\]
+    which can be evaluated the same way using \(p = 3\) however this is one of those cases where an exact value is not known.
+    We have \(\zeta(3) \approx 1.20205\) and \(\Gamma(3) = 2\)\footnote{recall that \(\Gamma(n) = (n - 1)!\) for \(n\in\integers\).} so
+    \[\int_{0}^{\infty} \frac{x^2}{e^{x} -1}\dd{x} \approx 2.4041\]
+    We will also need the integral
+    \[\int_{0}^{\infty} \frac{x^{1/2}}{e^x - 1} \dd{x}.\]
+    This corresponds to \(p = 3/2\) and we have \(\Gamma(3/2) = \sqrt{\pi}/2\) and \(\zeta(3/2) \approx 2.612\) so
+    \[\int_{0}^{\infty} \frac{x^{1/2}}{e^x - 1} \dd{x} \approx 1.306\sqrt{\pi}.\]
+\end{document}
