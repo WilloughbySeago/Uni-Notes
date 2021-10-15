@@ -1,0 +1,698 @@
+\documentclass[a4paper]{article}
+
+\usepackage{NotesPackage2}
+\usepackage{subcaption}
+\usepackage[version=4]{mhchem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{pgfplots}
+
+\usetikzlibrary{calc}
+\usetikzlibrary{decorations.markings, decorations.pathreplacing}
+\usetikzlibrary{external}
+\usetikzlibrary{cd}
+
+\tikzexternalize[prefix=tikz-external/]
+
+\pgfplotsset{compat=1.17}
+\usepgfplotslibrary{groupplots}
+
+\author{Willoughby Seago}
+\date{September 22, 2020}
+\title{Electromagnetism}
+
+% particles
+\newcommand{\downQuark}{\mathrm{d}}
+\newcommand{\electron}{{\mathrm{e}^-}}
+\newcommand{\proton}{\mathrm{p}}
+\newcommand{\anti}[1]{\bar{#1}}
+\newcommand{\massElectron}{m_{\mathrm{e}}}
+\newcommand{\chargeElectron}{q_{\mathrm{e}}}
+
+% Letters for specific things where a weird font is needed
+\newcommand{\region}{\mathcal{R}}
+\newcommand{\boundary}{\mathcal{B}}
+\newcommand{\quadrupole}{\mathcal{Q}}
+\newcommand{\current}{\mathcal{I}}
+\newcommand{\emf}{\mathcal{E}}
+\newcommand{\fresnelCoeff}[2]{{#1}_{\mathrm{{#2}}}}
+\newcommand{\FT}{\mathop{\mathcal{F}}}
+
+% units
+\DeclareSIUnit{\gauss}{G}
+\DeclareSIUnit{\gaussAlternate}{Gs}
+
+% other
+\newcommand{\notesVersion}{1.2}
+\newcommand{\notesDate}{15/10/2021}
+\newcommand{\vhsub}[2]{\vh{#1}\bm{#2}}
+\DeclareMathOperator{\sgn}{sgn}
+\newcommand{\enc}{{\mathrm{enc}}}
+\newcommand{\brewstersAngle}{\vartheta_{\mathrm{B}}}
+\newcommand{\criticalAngle}{\vartheta_{\mathrm{c}}}
+\DeclareMathOperator{\sinc}{sinc}
+\newcommand{\convolution}{\mathbin{*}}
+\def\axisht{\dimexpr.5\fontcharht\font`)-.5\fontchardp\font`)\relax}  % used to algin tikzpictures w/ maths centre line
+
+\makeglossaries
+% Add glossary entries here
+\newacronym{em}{EM}{electromagnetism}
+\newacronym{pde}{PDE}{partial differential equation}
+\newacronym{bc}{BC}{boundary conditions}
+\newacronym{pe}{PE}{Poisson's equation}
+\newacronym{le}{LE}{Laplace's equation}
+\newacronym{emf}{emf}{electromotive force}
+\newacronym{lih}{LIH}{linear isotropic homogeneous}
+\newacronym{hwp}{HWP}{half-wave plate}
+\newacronym{qwp}{QWP}{quarter-wave plate}
+
+\includeonly{parts/electrostatics, parts/magnetostatics, parts/electromagnetism, parts/optics-part-1, parts/polarisation, parts/interference}
+
+\begin{document}
+    \pagenumbering{roman}  % Number contents pages and glossaries with roman numerals
+    \maketitle
+    These are my notes for the \textit{electromagnetism} course from the University of Edinburgh as part of the third year of the theoretical physics degree.
+    When I took this course in the 2020/21 academic year it was taught by Dr Andreas Hermann\footnote{\url{https://www.ph.ed.ac.uk/people/andreas-hermann}} and Dr Jamie Cole\footnote{\url{https://www.ph.ed.ac.uk/people/jamie-cole}}.
+    These notes are based on the lectures delivered as part of this course, the notes provided as part of this course, and the book `introduction to electrodynamics'\footnote{Griffiths, D.~J. \textit{Introduction to Electrodynamics}, fourth edition (Cambridge University Press, Cambridge, 2017)}.
+    The content within is correct to the best of my knowledge but if you find a mistake or just disagree with something or think it could be improved please let me know.
+    
+    These notes were produced using \LaTeX\footnote{\url{https://www.latex-project.org/}}.
+    Graphs where plotted using Matplotlib\footnote{\url{https://matplotlib.org/}}, NumPy\footnote{\url{https://numpy.org/}}, and SciPy\footnote{\url{https://scipy.org/scipylib/}}.
+    Diagrams were drawn with tikz\footnote{\url{https://www.ctan.org/pkg/pgf}}.
+    
+    This is version \notesVersion{} of these notes, which is up to date as of \notesDate.
+    \begin{flushright}
+        Willoughby Seago
+        
+        s1824487@ed.ac.uk
+    \end{flushright}
+    \clearpage
+    \tableofcontents
+    \listoffigures
+    % \listoftables
+    \printglossary[type=\acronymtype, title=Acronyms, style=long]
+    \clearpage
+    \pagenumbering{arabic}  % Number rest of document with numbers
+    \begingroup
+    \let\clearpage\relax  % "\begingroup, \let\clearpage\relax, \endgroup" stops automatic pagebreaks after each include
+    \include{parts/electrostatics}
+    \include{parts/magnetostatics}
+    \include{parts/electromagnetism}
+    \include{parts/optics-part-1}
+    \include{parts/polarisation}
+    \include{parts/interference}
+    \endgroup
+    
+    \part{Diffraction}
+    \section{Basic Diffraction}
+    So far we have considered only homogenous media and abrupt boundaries.
+    If we need to study inhomogeneous media then we need the idea of diffraction.
+    This is the process by which light is partially blocked and how the light propagates past the blockage.
+    We will consider a scalar wave model in this section, which means we will ignore polarisation effects and consider only the amplitude of the wave.
+    We are mostly interested in the intensity, \(I = cn\varepsilon_0E_0^2/2\).
+    However we only really care about relative intensity, which points will be dark and which will be light, so we will often drop the prefactor and take \(I = E_0^2\).
+    
+    \subsection{The Huygens--Fresnel Principle}
+    Huygens' principle was discussed in section~\ref{sec:huygens principle}.
+    This same principle can be adapted to explain diffraction.
+    One of the problems with Huygens' principle is that it treats all waves the same, regardless of wavelength, which doesn't match reality.
+    For example it is possible to hear something that is happening around the corner but not see it.
+    For some reason the sound waves are able to bend around the corner in a way that light cannot.
+    We also ignored the backwards propagating wavelets when we first considered Huygens' principle and we only drew the wavelets necessary to create the next wavefront.
+    
+    Fresnel proposed a correction to Huygens' principle that interference of secondary wavelets was what lead to only the forward propagation being important.
+    The amended \define{Huygen--Fresnel principle} can be stated as:
+    \begin{displayquote}
+        Every unobstructed point of a wavefront serves as a source of spherical secondary wavelets having the same frequency and speed as the primary wave. The resulting optical disturbance is given by the superposition of all the secondary waves.
+    \end{displayquote}
+    This seems like a fairly superficial change initially, we've simply included the fact that the secondary wavelets are waves and therefore interfere with each other.
+    However, this manages to fix a lot of the problems with Huygens' principle.
+    
+    \subsubsection{Single Slit Diffraction}
+    \begin{figure}[htb]
+        \centering
+        \tikzsetnextfilename{single-slit-diffraction}
+        \begin{tikzpicture}
+            \tikzset{boundary/.style={gray, line width=0.2cm}}
+            \tikzset{wavefront/.style={red, very thick}}
+            \foreach \x in {-0.25, -1.25, -2.25} {
+                \draw[wavefront] (\x, -3) -- (\x, 3);
+            }
+            \begin{scope}
+                \clip (0, -3) rectangle (6, 3);
+                \foreach \r in {0.75, 1.75, 2.75, 3.75, 4.75} {
+                    \draw[wavefront] (0, 0) circle[radius=\r];
+                }
+            \end{scope}
+            \begin{scope}
+                \clip (-0.1, -0.3) -- (0.1, -0.4) -- (0.1, -3) -- (-0.1, -3) -- cycle;
+                \draw[boundary] (0, -3) -- (0, -0.3);
+            \end{scope}
+            \begin{scope}
+                \clip (-0.1, 0.3) -- (0.1, 0.4) -- (0.1, 3) -- (-0.1, 3) -- cycle;
+                \draw[boundary] (0, 3) -- (0, 0.3);
+            \end{scope}
+            \coordinate (P) at (3, 2);
+            \draw[fill=black] (P) circle[radius=0.05cm] node[above right] {\(P\)};
+            \draw[dashed] (-0.1, 0.3) -- (P);
+            \draw[dashed] (-0.1, -0.3) -- (P);
+            \node[left] at (-0.1, 0.3) {\(A\)};
+            \node[left] at (-0.1, -0.3) {\(B\)};
+        \end{tikzpicture}
+        \caption{Single slit diffraction.}
+        \label{fig:single slit diffraction}
+    \end{figure}
+    Consider a single slit of width \(a = AB\), as shown in figure~\ref{fig:single slit diffraction}.
+    At a given point, \(P\), the maximum possible optical path difference (assuming the wave propagates through air so \(n = 1\) for simplicity) is \(\ell = \abs{BP - AP}\).
+    This is at most equal to the slit width, \(a = AB\).
+    If the wavelength of the light, \(\lambda \gg a\) then we also have \(\lambda \gg \ell\).
+    Since all secondary wavelets at the slit are in phase we will then have constructive interference at \(P\).
+    This makes no assumption about where \(P\) is so for a narrow slit (narrow being defined as \(\lambda \gg a\)) we have constructive interference everywhere.
+    
+    If instead \(\lambda \ll a\) then we only have \(\lambda \gg \ell\) if \(\ell\) happens to be particularly small.
+    This only occurs just in front of the slit, and slightly off to the side.
+    Above a certain angle we will have \(\ell \approx \lambda\) and we will have destructive interference.
+    What we have discovered here is we can only have geometrically perfect shadows, with sharp edges, in the limit \(\lambda/a\to 0\).
+    
+    \subsection{Near and Far Field Diffraction}
+    Consider a point source of wavelength \(\lambda\) placed at the origin.
+    If we ignore the time varying part of the waves then the scalar amplitude at a point \(\vv{r}\) 
+    \[E(\vv{r}) = \frac{\mathcal{A}}{r}\cos(kr)\]
+    where \(k = 2\pi/\lambda\).
+    Close to the point source we have to use this full equation and treat the waves as spherical.
+    
+    Notice that we can write \(r\) as
+    \[r = \sqrt{x^2 + y^2 + z^2} = z\sqrt{\frac{x^2 + y^2}{z^2} + 1} = z\left( 1 + \frac{x^2 + y^2}{z^2} \right).\]
+    If we consider the waves at some point with \(z \gg x, y\) then using the binomial expansion we have
+    \[r \approx z + \frac{x^2 + y^2}{2z}.\]
+    This corresponds to assuming that the wave fronts are locally parabolic.
+    We call this the Fresnel or near field diffraction regime.
+    
+    Even further from the origin we can approximate the waves as locally plane waves.
+    At a distance \(D\) from the point source at an angle \(\vartheta_0\) to the \(z\)-axis considering the point with \(y = y_0\) we have
+    \[r\approx \frac{D}{\cos\vartheta_0} + (y - y_0)\sin\vartheta_0\]
+    where \(y_0 = D\tan\vartheta_0\).
+    See figure~\ref{fig:spherical waves approx plane waves}.
+    We call this the Fraunhofer or far field regime.
+    This is the regime in which we will work.
+    \begin{figure}[htb]
+        \centering
+        \tikzsetnextfilename{plane-wave-approx}
+        \begin{tikzpicture}[scale=0.9]
+            \tikzset{wavefront/.style={red, very thick}}
+            \begin{scope}
+                \clip (-1.4, -2) rectangle (3, 2);
+                \foreach \r in {0, 0.5,..., 2.5} {
+                    \draw[wavefront] (0, 0) circle[radius=\r];
+                }
+            \end{scope}
+            \begin{scope}
+                \clip (10, -1) rectangle (14, 1);
+                \foreach \r in {10.5, ..., 13.5} {
+                    \draw[wavefront] (0, 0) circle[radius=\r];
+                }
+            \end{scope}
+            \begin{scope}[rotate=15]
+                \clip (10, -1) rectangle (14, 1);
+                \foreach \r in {10.5, ..., 13.5} {
+                    \draw[wavefront] (0, 0) circle[radius=\r];
+                }
+            \end{scope}
+            \draw[->, >=latex, thick] (0, 0) -- (15, 0) node[right] {\(z\)};
+            \draw[->, >=latex, thick] (0, 0) -- (15:15) node[midway, above] {\(r\)};
+            \begin{scope}
+                \clip (0, 0) -- (15, 0) -- (15:15) -- cycle;
+                \draw (0, 0) circle[radius=3];
+                \node at (7.5:3.3) {\(\vartheta_0\)};
+            \end{scope}
+            \draw[->, >=latex, thick] (13, 0) -- (13, 5) node[above] {\(y\)};
+            \node[right] at ($(13, 0)!0.5!(15:13) + (0.3, 0)$) {\(y_0\)};
+            \node[below] at (6.5, 0) {\(D\)};
+        \end{tikzpicture}
+        \caption{Far from the origin we can approximate spherical waves as plane waves.}
+        \label{fig:spherical waves approx plane waves}
+    \end{figure}
+    
+    \section{Single Slit Diffraction}
+    \subsection{Far Field Single Slit Diffraction}
+    Consider a single slit, \(a\), in the plane \(P_0\) being illuminated by a wave of wavelength \(\lambda\).
+    We assume the slit is infinite in the other direction and take this direction to be the \(x\)-axis.
+    We take the \(z\) axis to be normal to the plane.
+    Consider a point \(s\) on the plane \(P_1\) which is at a distance \(D\) from the split and parallel to \(P_0\).
+    The line from the middle of the slit to \(s\) makes an angle \(\vartheta\) to the \(z\) axis.
+    We place the origin in the middle of the slit.
+    As before we consider the two rays coming from \(A\) and \(B\), the edges of the slit, and in the far field approximation we consider these two rays to be parallel.
+    
+    Before we attempt a full solution we will consider what we expect.
+    Suppose we split the slit into \(2n\) sections (here \(n\in\naturals\) is \emph{not} the refractive index), each of width \(a/2n\).
+    Consider the path difference, \(\ell\), for a secondary wavelet reaching \(s\) from the upper edge of the slit and from a secondary wavelet reaching \(s\) from a point \(a/2n\) below that.
+    Simple geometry gives us \(\ell = (a/2n)\sin\vartheta\).
+    If \(s\) is such that \(\ell = \lambda/2\) then we will have destructive interference.
+    In fact any point in the first segment will undergo destructive interference, not just the end point.
+    The same logic applies for the next segment over and so we have the condition for minima:
+    \[a\sin\vartheta = n\lambda, \qquad\text{for}\qquad n = 0, 1, 2, \dotsc.\]
+    By symmetry the same applies for negative \(\vartheta\).
+    
+    If instead \(s\) lies on the \(z\)-axis then \(\vartheta = 0\) and all secondary wavelets arrive in phase causing a central maximum.
+    This maximum is between two minima at \(\sin\vartheta = \pm \lambda/a\) and so the width is \(2\lambda/a\).
+    We will also find maxima between the other neighbouring minima but the exact angle at which we find them is not simple to derive, however we do know that their widths are \(\lambda/a\).
+    Notice the reciprocal relationship between slit width and peak width.
+    We will see this again later.
+    
+    \subsubsection{Analytical Solution}
+    We considered special cases of rays in the previous argument.
+    Here we aim to develop a theory that works for all rays coming from the slit.
+    To do this we have to account for the phase shifts of all secondary wavelets that arrive at the point \(s\).
+    The optical path length of a ray leaving the slit at \(y\) is \(\ell = \ell_0 + y\sin\vartheta\) where \(\ell_0\) is the optical path length of travelled by light leaving the centre of the slit, however, for our purposes we can simply treat \(\ell_0\) as a constant as it just depends upon how far away we place the screen.
+    The phase shift due to the point at which the light leaves the slit is then
+    \[\delta(y) = 2\pi\frac{\ell(y)}{\lambda} = 2\pi\frac{y}{\lambda}\sin\vartheta.\]
+    We can approximate the distance of \(s\) from the slit to be \(R = D/\cos\vartheta\) if \(D\) is large.
+    We find that the total amplitude, ignoring oscillations, is then given by the superposition of the amplitudes of all rays arriving from anywhere on the slit:
+    \begin{equation}\label{eqn:single slit amplitude}
+        E(\vartheta) = \frac{\mathcal{A}}{R} = \int_{-a/2}^{a/2}\cos\delta \dd{y} = \frac{\mathcal{A}}{R}\int_{-a/2}^{a/2} \cos\left( 2\pi\frac{y}{\lambda}\sin\vartheta \right)\dd{y} = \frac{a\mathcal{A}}{R}\frac{\sin\beta}{\beta} = \frac{a\mathcal{A}}{R}\sinc\beta
+    \end{equation}
+    where \(\beta = (\pi a/\lambda)\sin\vartheta\).
+    The intensity is then
+    \[I(\vartheta) = \varepsilon v\expected{E^2} = \frac{\varepsilon v}{2}\left( \frac{a\mathcal{A}}{R} \right)^2\sinc^2\beta = I(0)\sinc^2\beta.\]
+    This vanishes for \(\beta = n\pi\) where \(n\in\integers\setminus\{0\}\).
+    This condition can also be written as \(a\sin\vartheta = n\lambda\), which agrees with our first attempt.
+    See figure~\ref{fig:sinc squared} for a plot of the intensity.
+    
+    \begin{figure}[htb]
+        \centering
+        \tikzsetnextfilename{sinc-squared}
+        \begin{tikzpicture}
+            \begin{axis}[xlabel=\(\beta\), ylabel={\(I(\vartheta)/I(0)\)}]
+                \addplot[domain=-10:10, very thick, red, samples=200] {(sin(deg(x))/x)^2};
+            \end{axis}
+        \end{tikzpicture}
+        \caption{The ratio of intensities, \(I(\vartheta)/I(0)\), as a function of \(\beta = (\pi a/\lambda)\sin\vartheta\)}
+        \label{fig:sinc squared}
+    \end{figure}
+
+    \subsubsection{Slit and a Lens}
+    We are considering only the far field limit as this allows us to approximate rays leaving the slit and arriving at the screen at the same point as parallel.
+    Another way to make the same assumption is to place a lens of focal length \(f\) just after the slit.
+    This causes parallel rays to converge at a point on the back focal plane, \(P_{f_b}\), which is a distance \(f\) from the lens.
+    So a plane wave diffracted in the direction \(\vartheta\) will be focused at the point \(s = f\tan\vartheta \approx f\vartheta\).
+    The intensity on the back focal plane will be
+    \[I(s) = I_0\sinc^2\left( \frac{\pi as}{\lambda f} \right).\]
+    This has zeros at
+    \[s = n\frac{\lambda f}{a}, \qquad\text{for}\qquad n = \pm 1,\pm 2, \pm 3, \dotsc.\]
+    The central maxima has width \(w = 2\lambda f/a\).
+    Here we see again the reciprocal relationship between peak width and slit width.
+    
+    \subsection{Fourier Approach}
+    Let \(f\colon\reals\to\complex\) have a Fourier transform.
+    Then the Fourier transform is given by
+    \[F(q) = \FT\{f(x)\} = \int_{-\infty}^{\infty} f(x) e^{iqx} \dd{x}.\]
+    If \(f\colon\reals\to\reals\) then
+    \[F(q) = \int_{-\infty}^{\infty} f(x)\cos(qx) \dd{x} + i\int_{-\infty}^{\infty} f(x)\sin(qx) \dd{x}.\]
+    We can define a function, \(p\), which represents the slit:
+    \[
+        p(y) = 
+        \begin{cases}
+            1, & \abs{y} < a/2,\\
+            0, & \abs{y} \ge a/2.
+        \end{cases}
+    \]
+    We can rewrite equation~\ref{eqn:single slit amplitude} as
+    \[\Re[E(\vartheta)] = \frac{\mathcal{A}}{R} \int_{-\infty}^{\infty} p(y)\cos\left( \frac{2\pi}{\lambda}y\sin\vartheta \right) \dd{y} = \frac{\mathcal{A}}{R}\Re[P(q)]\]
+    where we take \(E\) to be the complex amplitude of the field and \(P(q) = \FT\{p(t)\}\) and \(q = (2\pi/\lambda)\sin\vartheta\).
+    
+    Similarly for the case of the slit and lens set up we have
+    \[\Re[E(s)] = \frac{\mathcal{A}}{f} \int_{-\infty}^{\infty} p(y)\cos\left( \frac{2\pi}{\lambda}y\frac{s}{f} \right) \dd{y} = \frac{\mathcal{A}}{f}\Re[P(q)],\]
+    where this time \(q = 2\pi s/(\lambda f)\).
+    The intensity is then \(I(s) = I_0\abs{P(q)}^2\).
+    So we see that the intensity in the back focal plane is proportional to the modulus squared of the Fourier transform of the function representing the slit.
+    It can be shown that
+    \[\FT\{p(x)\} = P(q) = a\sinc\left( \frac{aq}{2} \right).\]
+    
+    We can extend this to a two-dimensional slit which is rectangular with side lengths \(a\) and \(b\).
+    This can be defined by the function
+    \[
+        p(x, y) =
+        \begin{cases}
+            1, & \abs{x} < a/2, \text{ and } \abs{y} < b/2,\\
+            0, & \text{else.}
+        \end{cases}
+    \]
+    The two-dimensional Fourier transform is then
+    \[\FT\{p(x, y)\} = P(x, y) = ab\sinc\left( \frac{aq}{2} \right)\sinc\left( \frac{bp}{2} \right).\]
+    Notice that we can write \(P\) and \(p\) as products of one-dimensional functions.
+    This means that the intensity can be derived in the same way as above and we find that
+    \[I(s, t) = I_0\sinc^2\left( \frac{\pi a s}{\lambda f} \right)\sinc^2\left( \frac{\pi b t}{\lambda f} \right).\]
+    See figure~\ref{fig:rectangular slit}.
+    \begin{figure}[ht]
+        \centering
+        \begin{subfigure}{0.9\textwidth}
+            \centering
+            \tikzsetnextfilename{rectangular-slit-intensity}
+            \begin{tikzpicture}
+                \begin{axis}[
+                    xlabel=\(s\),
+                    ylabel=\(t\),
+                    zlabel={\(I(s, t)/I(0, 0)\)},
+                    xmin=-5,
+                    xmax=5,
+                    ymin=-5,
+                    ymax=5,
+                    samples=30
+                    ]
+                    \addplot3[
+                    mesh,
+                    colormap/hot
+                    ] {(sin(deg(x))/x)^2 * (sin(deg(y))/y)^2};
+                \end{axis}
+            \end{tikzpicture}
+            \caption{Intensity}
+        \end{subfigure}
+        \begin{subfigure}{0.9\textwidth}
+            \centering
+            \tikzsetnextfilename{rectangular-slit-log-intensity}
+            \begin{tikzpicture}
+                \begin{axis}[
+                    xlabel=\(s\),
+                    ylabel=\(t\),
+                    zlabel={\(\ln[I(s, t)/I(0, 0)]\)},
+                    xmin=-5,
+                    xmax=5,
+                    ymin=-5,
+                    ymax=5,
+                    samples=30
+                    ]
+                    \addplot3[
+                    mesh,
+                    colormap/hot
+                    ] {ln((sin(2*deg(x))/x)^2 * (sin(deg(y))/y)^2)};
+                \end{axis}
+            \end{tikzpicture}
+            \caption{Log intensity.}
+        \end{subfigure}
+        \caption{The intensity, \(I(s, t)\), and log intensity, \(\ln[I(s, t)]\) of a slit of width \(2\) and height \(1\).}
+        \label{fig:rectangular slit}
+    \end{figure}
+
+    \section{Two Slit Diffraction}
+    We have now seen that the Fourier approach is a powerful one.
+    We will apply it in this section to the famous two slit experiment.
+    Let \(p\) be a single slit transition function for a slit of width \(a\) centred at \(x = 0\):
+    \[
+        p(x) = 
+        \begin{cases}
+            1, & \abs{x} < a/2,\\
+            0, & \text{else.}
+        \end{cases}
+    \]
+    We can then model two slits using delta distributions and a convolution:
+    \[f(x) = p(x) \convolution \left[ \delta\left( x - \frac{d}{2} \right) + \delta\left( x + \frac{d}{2} \right) \right].\]
+    Graphically this corresponds to
+    \[
+        \tikzsetnextfilename{double-slit-transmission-function}
+        \begin{tikzpicture}[baseline=0, yshift=\axisht - 1cm]
+            \draw[->, >=latex] (-2, 0) -- (2, 0);
+            \draw[->, >=latex] (0, 0) -- (0, 2);
+            \draw[very thick] (-2, 0) -- (-1.25, 0) -- (-1.25, 1.5) -- (-0.75, 1.5) -- (-0.75, 0) -- (0.75, 0) -- (0.75, 1.5) -- (1.25, 1.5) -- (1.25, 0) -- (2, 0);
+        \end{tikzpicture}
+        =
+        \tikzsetnextfilename{single-slit-transmission-function}
+        \begin{tikzpicture}[baseline=0, yshift=\axisht - 1cm]
+            \draw[->, >=latex] (-2, 0) -- (2, 0);
+            \draw[->, >=latex] (0, 0) -- (0, 2);
+            \draw[very thick] (-2, 0) -- (-0.25, 0) -- (-0.25, 1.5) -- (0.25, 1.5) -- (0.25, 0) -- (2, 0);
+        \end{tikzpicture}
+        \convolution
+        \tikzsetnextfilename{double-dirac-delta-distribution}
+        \begin{tikzpicture}[baseline=0, yshift=\axisht - 1cm]
+            \draw[->, >=latex] (-2, 0) -- (2, 0);
+            \draw[->, >=latex] (0, 0) -- (0, 2);
+            \draw[very thick] (-2, 0) -- (-1, 0) -- (-1, 2) -- (-1, 0) -- (1, 0) -- (1, 2) -- (1, 0) -- (2, 0);
+        \end{tikzpicture}
+    \]
+    Using the convolution theorem we can write the Fourier transform of \(f\) as the product of the Fourier transforms of \(p\) and the delta distributions:
+    \[F(q) = \sinc\left( \frac{aq}{2} \right)\cos\left( \frac{dq}{2} \right).\]
+    The intensity is then
+    \[I(\vartheta) = I_0\abs{F(q)}^2 = I_0\sinc^2\left( \frac{\pi a}{\lambda}\sin\vartheta \right)\cos^2\left( \frac{\pi d}{\lambda}\sin\vartheta \right).\]
+    If we add in a lens of focal length \(f\) then
+    \[I(s) = I_0\sinc^2\left( \frac{\pi a}{\lambda f}s \right)\cos^2\left( \frac{\pi d}{\lambda f}s \right).\]
+    What we end up with is \(\cos^2\) fringes modulated by \(\sinc^2\), as can be seen in figure~\ref{fig:double slit intensity}.
+    
+    \begin{figure}[ht]
+        \centering
+        \tikzsetnextfilename{double-slit-intensity}
+        \begin{tikzpicture}
+            \begin{axis}[
+                    xlabel=\(s\),
+                    ylabel={\(I(s)/I(0)\)},
+                    samples=300
+                ]
+                \addplot[
+                    domain=-10:10,
+                    very thick,
+                    red
+                ] {(sin(deg(x)) / x)^2 * cos(5*deg(x))^2};
+                \addplot[gray, dashed, domain=-10:10]{((sin(deg(x))/x)^2};
+                \addlegendentry{\(I(s)/I(0)\)}
+                \addlegendentry{\(\sinc^2\)}
+            \end{axis}
+        \end{tikzpicture}
+        \caption{The intensity from a double slit is \(\cos^2\) fringes modulated by \(\sinc^2\).}
+        \label{fig:double slit intensity}
+    \end{figure}
+    
+    This derivation was much quicker than the geometric argument that one has to make if they lack Fourier analysis.
+    We can see that the extrema occur whenever the argument of \(\cos\) is \(n\pi\) or \((n + 1/2)\pi\) for \(n\in\integers\), which corresponds to 
+    \[d\sin\vartheta = n\lambda, \qquad\text{or}\qquad d\sin\vartheta = (n + 1/2)\lambda\]
+    which are the conditions for constructive and destructive interference respectively.
+    
+    \subsection{Diffraction Gratings}\label{sec:diffraction gratings}
+    A diffraction grating is a large number of equally spaced thin slits.
+    The phase difference between light from adjacent slits is
+    \[\delta = \frac{2\pi}{\lambda}d\sin\vartheta\]
+    where \(d\) is the space between adjacent slits.
+    We know that wavelets will add constructively when \(\delta = 2\pi n\) for \(n\in\integers\).
+    Therefore we expect peaks when
+    \[d\sin\vartheta = n\lambda.\]
+    If we include a lens of focal length \(f\) then we get peaks at
+    \[s = n\frac{\lambda f}{d}.\]
+    This doesn't tell us anything about the shapes of the peaks, just their locations, to get more information we again turn to Fourier analysis.
+    
+    If we approximate the number of slits as infinite and take the slits to have no width then we can then model the transmission function as a Dirac comb:
+    \[c(x) = \sum_{m\in\integers} \delta(x - md).\]
+    The Fourier transform of this is simple to compute and is
+    \[C(q) = \frac{1}{d}\sum_{m\in\integers} \delta(q - 2\pi m/d).\]
+    Notice that the spacing of the original comb, \(d\), is reciprocal to the spacing of the Fourier transformed comb, \(2\pi/d\).
+    The intensity is then \(I(\vartheta) \propto \abs{C(q)}^2\).
+    This is zero except when \(q = 2\pi m/d\) for \(m\in\integers\).
+    Since \(q = (2\pi/\lambda)\sin\vartheta\) this corresponds to \(m\lambda = d\sin\vartheta\).
+    This is the same condition we found before.
+    
+    This result is unrealistic as in reality there aren't an infinite number of slits and the slits have finite width.
+    We can modify for the finite width by convolving the Dirac comb with a single slit transmission function, \(p\), and we can modify for the finite number of slits by multiplying by a top hat function, \(w\), of width \(D = Nd\) where \(N\) is the total number of slits.
+    Thus the transmission function is
+    \[f(x)= [c(x)\convolution p(x)]w(x).\]
+    Graphically this is
+    \[
+        \tikzsetnextfilename{diffraction-grating-transmission-function}
+        \begin{tikzpicture}[baseline=0, yshift=\axisht - 1cm]
+            \draw[->, >=latex] (-1.5, 0) -- (1.5, 0);
+            \draw[->, >=latex] (0, 0) -- (0, 2);
+            \foreach \x in {-1, -0.75, ..., 1} {
+                \draw (\x-0.1, 0) -- (\x-0.1, 0) -- (\x-0.1, 1.5) -- (\x+0.1, 1.5) -- (\x+0.1, 0);
+            }
+        \end{tikzpicture}
+        =
+        \tikzsetnextfilename{dirac-comb}
+        \begin{tikzpicture}[baseline=0, yshift=\axisht - 1cm]
+            \draw[decorate, decoration={brace, amplitude=5pt}] (-1.75, 0) -- (-1.75, 2);
+            \draw[->, >=latex] (-1.5, 0) -- (1.5, 0);
+            \draw[->, >=latex] (0, 0) -- (0, 2);
+            \draw[very thick] (-1.5, 0) -- (1.5, 0);
+            \foreach \x in {-1.25, -1, ..., 1.25} {
+                \draw[very thick] (\x, 0) -- (\x, 2);
+            }
+        \end{tikzpicture}
+        \convolution
+        \tikzsetnextfilename{single-slit-transmission-function-again}
+        \begin{tikzpicture}[baseline=0, yshift=\axisht - 1cm]
+            \draw[->, >=latex] (-1.5, 0) -- (1.5, 0);
+            \draw[->, >=latex] (0, 0) -- (0, 2);
+            \draw[very thick] (-1.5, 0) -- (-0.1, 0) -- (-0.1, 1.5) -- (0.1, 1.5) -- (0.1, 0) -- (1.5, 0);
+            \draw[decorate, decoration={brace, amplitude=5pt}] (1.75, 2) -- (1.75, 0);
+        \end{tikzpicture}
+        \tikzsetnextfilename{top-hat}
+        \begin{tikzpicture}[baseline=0, yshift=\axisht - 1cm]
+            \draw[->, >=latex] (-1.5, 0) -- (1.5, 0);
+            \draw[->, >=latex] (0, 0) -- (0, 2);
+            \draw[very thick] (-1.5, 0) -- (-1.2, 0) -- (-1.2, 1.5) -- (1.2, 1.5) -- (1.2, 0) -- (1.5, 0);
+        \end{tikzpicture}
+    \]
+    By the convolution theorem the Fourier transform of the transmission function is
+    \[F(x) = [W(q)\convolution C(q)]P(q).\]
+    These functions are given by
+    \begin{align*}
+        C(q) &= \sum_{m\in\integers} \delta(q - 2\pi m/d),\\
+        P(q) &= \sinc(aq/2),\\
+        W(q) &= \sinc(Ndq/2).
+    \end{align*}
+    The intensity is
+    \[I(\vartheta) = I(0)\abs{F(q)}^2 = I(0)\abs{F\left( \frac{2\pi}{\lambda}\sin\vartheta \right)}^2.\]
+    
+    \subsubsection{Spectroscopy}
+    The intensity of light from a diffraction grating depends on the wave length, and therefore colour, of the light.
+    So if a white light source is used we will see the colours separate out and each colour will have a maxima at a slightly different point.
+    This makes diffraction gratings useful in spectroscopy.
+    At this point we note that most diffraction gratings used for spectroscopy aren't actually made of lots of slits in an opaque material but rather a transparent medium with lots of thin parallel scratches.
+    It is also common to instead use a reflection grating, which is basically the same but with reflective coating, such as aluminium.
+    This is useful because glass absorbs strongly in the UV part of the spectrum and so glass transmission gratings don't work for UV light.
+    
+    A large amount of light from a diffraction grating ends up in the zeroth order, \(\vartheta = 0\), maxima.
+    This is a problem because the intensity of this maxima \emph{doesn't} depend on \(\lambda\) making this fringe useless for spectroscopy.
+    This is a problem if the light source we are using isn't very intense as the first order fringes, which can be used for spectroscopy, may be hard to see.
+    One solution to this is to use a reflection grating with a surface that looks like this:
+    \[\tikzsetnextfilename{blazed-grating}
+        \tikz{
+            \foreach \x in {1, 2, ..., 5} {
+                \draw (\x, 0) -- (\x+1, 0.2) -- (\x+1, 0);
+            }
+        }
+    \]
+    This is called a blazed grating.
+    Light that enters normal to the macroscopic surface is reflected mostly at an angle \(2\gamma\) where \(\gamma\), called the blazing angle, is the angle of the microscopic surface to the macroscopic surface.
+    The zeroth order maxima from the diffraction however remains in the same place but is now much weaker.
+    Instead by carefully selecting the blazing angle we can focus the majority of light onto where we expect the first order maxima to be and this light will be separated by wavelength.
+    
+    \section{More Diffraction}
+    \subsection{Circular Aperture}
+    It is very common for an optical system to have cylindrical symmetry about the beam axis, for example telescopes and microscopes.
+    Therefore it is worth considering a circular aperture such as one might use for an eyepiece.
+    The transmission function for a circular aperture of diameter \(a\) is
+    \[
+        p(x, y) =
+        \begin{cases}
+            1, & x^2 + y^2 \le a^2/4,\\
+            0, & \text{else.}
+        \end{cases}
+    \]
+    The Fourier transform of this is
+    \[P(\rho) \propto \frac{J_1(\rho)}{\rho}\]
+    where \(\rho = (\pi a/\lambda)\sin\vartheta\) and \(J_1\) is the first order Bessel function of the first kind, the exact details of which aren't important.
+    The intensity at angle \(\vartheta\) is then
+    \[I(\vartheta) = 4I(0) \abs{\frac{J_1([\pi a/\lambda]\sin\vartheta)}{(\pi a/\lambda)\sin\vartheta}}^2.\]
+    If we include a lens of focal length \(f\) then the intensity at position \((s, t)\) on the back focal plane is
+    \[I(s, t) = 4I(0, 0) = \abs{\frac{J_1(\pi ar/(\lambda f))}{\pi ar/(\lambda f)}}^2, \qquad\text{where}\qquad r^2 = s^2 + f^2.\]
+    This result is very similar to the result of a single slit and has a similar profile at \(y = 0\) as shown in figure~\ref{fig:bessel funcs}.
+    The first minimum occurs at \(\rho = 1.22\pi\), which corresponds to \(\sin\vartheta = 1.22\lambda/a\) (as opposed to \(\sin\vartheta = \lambda/a\) which we saw for a single slit).
+    
+    \begin{figure}[ht]
+        \centering
+        \begin{subfigure}{0.9\textwidth}
+            \centering
+            \tikzsetnextfilename{bessel-func}
+            \input{parts/bessel_plot}
+            \caption{\(P(\rho) \propto J_1(\rho)/\rho\).}
+        \end{subfigure}
+        \begin{subfigure}{0.9\textwidth}
+            \centering
+            \tikzsetnextfilename{bessel-func-squared}
+            \input{parts/bessel_squared_plot}
+            \caption{\(I(\rho) \propto \abs{P(\rho)}^2 \propto \abs{J_1(\rho)/\rho}^2\).}
+        \end{subfigure}
+        \caption{The Fourier transform, \(P\), of the transmission function \(p(x, y) = 1\) if \(x^2 + y^2 \le a^2/4\) and \(p(x, y) = \) otherwise, and the intensity of the light that results from this circular aperture.}
+        \label{fig:bessel funcs}
+    \end{figure}
+    The function \(J_1(\rho)/\rho\) is actually two-dimensional with \(\rho\) just being the distance from the origin.
+    The is plotted in figure~\ref{fig:bessel funcs 3d}.
+    \begin{figure}[htbp!]
+        \centering
+        \begin{subfigure}{0.45\textwidth}
+            \centering
+            \includegraphics[scale=0.5]{bessel_func.png}
+            \caption{\(J_1(\sqrt{x^2 + y^2})/\sqrt{x^2 + y^2}.\)}
+        \end{subfigure}
+        \begin{subfigure}{0.45\textwidth}
+            \centering
+            \includegraphics[scale=0.5]{bessel_func_squared.png}
+            \caption{\(\abs{J_1(\sqrt{x^2 + y^2})/\sqrt{x^2 + y^2}}^2.\)}
+        \end{subfigure}
+        \caption{The functions \(J_1(\sqrt{x^2 + y^2})/\sqrt{x^2 + y^2}\) and \(\abs{J_1(\sqrt{x^2 + y^2})/\sqrt{x^2 + y^2}}^2\).}
+        \label{fig:bessel funcs 3d}
+    \end{figure}
+    
+    Suppose we view a distant point object through a lens of focal length \(f\) and diameter \(a\).
+    The lens is circular so in the back focal plane of the lens we will get a diffraction pattern corresponding to a circular aperture.
+    This has the first zero at radius
+    \[r_0 = \frac{1.22 \lambda f}{a} = 1.22\lambda F_{\mathrm{No}}.\]
+    Here we have introduced the \define{\(f\)-number}, \(F_\mathrm{no} = f/a\) which is the ratio of the focal length and aperture.
+    This number is important in photography, where it is usually written as \(f/F_{\mathrm{No}}\), with \(f\) left as \(f\) but \(F_{\mathrm{No}}\) replaced with a number, for example \(f/2.8\), if we substitute for the focal length as well then we would get the aperture of the lens.
+    If \(F_{\mathrm{No}}\) is large then a photograph will have a blurred background as the intensity of light from each point is very spread out.
+    If \(F_{\mathrm{No}}\) is small then the photograph will have a sharp background as the intensity drops to zero very quickly.
+    round the image of the point object there will be rings, known as \define{Airy rings}, and the whole pattern that appears from a single point object is called the \define{point spread function}.
+    
+    The point spread function limits the spatial resolution of the system.
+    If two point objects have angular separation \(\Delta\vartheta\) then in the back focal plane of the lens we will have two point spread functions with their peaks separated by \(s = f\Delta \vartheta\) (assuming \(\Delta\vartheta\ll 1\)).
+    There are three possibilities:
+    \begin{itemize}
+        \item[\(s \gg r_0\)] Two well separated point spread functions, it is easy to tell the two points apart.
+        \item[\(s \ll r_0\)] The two point spread functions merge and it is not possible to tell the two points apart.
+        \item[\(s\approx r_0\)] There will be some limit at which we say the points are resolved.
+    \end{itemize}
+    The \define{Rayleigh criterion} states that two points are first resolved when \(s = r_0\).
+    Under this condition the peak of one point spread function appears at the zero of the other resulting in a twin peak with a \SI{20}{\percent} dip in the middle.
+    This corresponds to the angular condition that
+    \[\Delta\vartheta = 122\frac{\lambda}{a}.\]
+    See figure~\ref{fig:two points}.
+    \begin{figure}[htb]
+        \centering
+        \includegraphics[scale=0.8]{two_points.png}
+        \caption{The intensity on the back focal plane for two points at separation \(s = 5\).}
+        \label{fig:two points}
+    \end{figure}
+    
+    \section{Even More Diffraction}
+    \subsection{Diffraction in 1D}
+    When we first considered diffraction gratings in section~\ref{sec:diffraction gratings} we considered the slits to be narrow in one dimension and infinitely long in the orthogonal direction.
+    The incident light was normal to both of these axes.
+    If we truly restrict ourselves to one dimensional slits then we can consider non-normal incidence.
+    If light is incident on the diffraction grating (either a transmission or reflection grating) at an angle \(\vartheta_i\) to the surface normal and leaves the grating at an angle \(\vartheta_m\) to the surface normal then the condition for constructive interference is
+    \[m\lambda = d(\sin\vartheta_m - \sin\vartheta_i)\]
+    for \(m\in\integers\).
+    As \(\vartheta_i\) is increased from 0 to \(\pi/2\) then we lose diffraction peaks with \(m > 0\) and gain higher order peaks for negative \(m\).
+    For grazing incidence at \(\vartheta_i = \pi/2\) the condition for constructive interference reduces to
+    \[\sin\vartheta_m = \frac{m\lambda}{d} + 1.\]
+    As well as this since the light simply passes straight past the diffraction grating we require that \(\vartheta_m = \pm \pi/2\).
+    The case of \(\vartheta_m = \pi/2\) corresponds to \(m = 0\) so the zeroth order peak is directly ahead.
+    The case of \(\vartheta_m = -\pi/2\) corresponds to \(-m\lambda = 2d\) which corresponds to the beam heading back the way it came.
+    This returning beam can only exist if \(d\) is equal to an integer number of half-wavelengths, or if \(k = m\pi/d\).
+    
+    \subsection{X-ray Diffraction}
+    Moving back to three dimensions consider an array of identical holes.
+    We expect the diffraction pattern to be the superposition of the diffraction patterns from each hole.
+    As with the initial diffraction grating we can describe the transmission function with a convolution of single hole transmission function and a two dimensional Dirac comb.
+    We can then deal with the finite extent of the grating by multiplying by a two dimensional top hat function.
+    Once we've done this we simply take the square of the Fourier transform for the intensity.
+    The Fourier transform is easy to find if the scattering centres are evenly distributed, in particular they are located at \(\vv{R} = l\vv{a} + m\vv{b}\) for \(l, m\in\integers\), and basis vectors \(\vv{a}\) and \(\vv{b}\).
+    
+    We can also consider a three dimensional diffraction grating.
+    The most common example being a crystalline solid.
+    The repeat distance in this case is the interatomic spacing, which is on the order of \(\SI{e-10}{\metre}\), which is about four orders of magnitude smaller than the wavelength of visible light.
+    This means that visible light will display only the first order diffraction, which isn't very useful.
+    Instead we use X-rays.
+    Again we can decompose the system into scattering units with some given transmission function that we then replicate through space by convolution with a three-dimensional Dirac comb and multiplication by some three-dimensional top hat function.
+    Taking \(\{\vv{a}, \vv{b}, \vv{c}\}\) as basis vectors then we have a scattering unit at each \(\vv{R} = l\vv{a} + m\vv{b} + n\vv{c}\) for \(l, m, n\in\integers\).
+    The set of all such \(\vv{R}\) gives all of the locations and we can distinguish any one such point with three numbers, \((l, m, n)\).
+    Consider one particular, but arbitrary, scattering centre positioned at \(\vv{R}\).
+    It can be shown that there will be constructive interference if and only if
+    \[\vv{R}\cdot(\vv{k} - \vv{k'}) = 2\pi q\]
+    for some \(q\in\integers\).
+    Here \(\vv{k}\) and \(\vv{k'}\) are the wave vectors of the incident and scattered rays.
+    All scattering sites which are an integer multiple of \(\vv{R}\) away from this original scattering centre will also contribute constructively to the interference.
+    There are a few observations to be made:
+    \begin{itemize}
+        \item The wave vectors, \(\vv{K}\), satisfying \(\vv{R}\cdot\vv{K} = 2\pi q\) for some \(q\in\integers\) are special.
+        The correspond to harmonic waves with the same periodicity as the lattice.
+        These are the waves that appear in the Fourier series of the lattice.
+        \item This allows us to state the constructive interference condition generally as \(\vv{k} - \vv{k'} = \vv{K}\).
+        \item We can also use Fourier methods to find the intensity as well as just the extrema, this requires us to take a Fourier transform of the electron density surrounding each scattering centre as it is the electrons that are responsible for scattering the X-rays.
+    \end{itemize}
+\end{document}
