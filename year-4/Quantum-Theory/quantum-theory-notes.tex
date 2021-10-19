@@ -1,0 +1,2195 @@
+\documentclass[fleqn]{NotesClass}
+
+% Hyphenation
+\hyphenation{Schr\"o-ding-er}
+
+%% Packages
+\usepackage{csquotes}
+\usepackage{cancel}
+\usepackage{siunitx}
+
+% Tikz stuff
+\usepackage{tikz}
+\tikzset{>=latex}
+% external
+\usetikzlibrary{external}
+\tikzexternalize[prefix=tikz-external/]
+%\tikzexternaldisable
+% other libraries
+\usetikzlibrary{decorations.markings, decorations.pathreplacing}
+
+% References, should be last things loaded
+\usepackage{hyperref}  % Should be loaded second last (cleveref last)
+\colorlet{hyperrefcolor}{blue!60!black}
+\hypersetup{colorlinks=true, linkcolor=hyperrefcolor, urlcolor=hyperrefcolor}
+\usepackage[
+capitalize,
+nameinlink,
+noabbrev
+]{cleveref} % Should be loaded last
+
+% My packages
+\usepackage{mathtools}
+\usepackage{NotesBoxes}
+\usepackage{NotesMaths}
+
+
+% Title page info
+\title{Quantum Theory}
+\author{Willoughby Seago}
+\date{September 20, 2021}
+% \subtitle{}
+% \subsubtitle{}
+
+% Highlight colour
+\definecolor{highlight}{HTML}{990000}
+\definecolor{darker}{HTML}{370000}
+\definecolor{highlightpurple}{HTML}{990085}
+\definecolor{complementary}{HTML}{009999}
+
+% Commands
+% Maths
+\newcommand*{\hilbert}{\mathcal{H}}
+\undef{\Re}
+\undef{\Im}
+\DeclareMathOperator{\Re}{Re}
+\DeclareMathOperator{\Im}{Im}
+\newcommand*{\e}{\mathrm{e}}
+\newcommand*{\idop}{\hat{1}}
+\def\OLDvector\vector
+\undef{\vector}
+\renewenvironment*{vector}{\begin{pmatrix}}{\end{pmatrix}}
+\newenvironment*{mat}{\begin{pmatrix}}{\end{pmatrix}}
+\newcommand*{\hermit}{\dagger}
+\newcommand*{\trans}{\top}
+\DeclarePairedDelimiterX{\commutator}[2]{[}{]}{#1, #2}
+\newcommand{\ident}{I}
+\let\OLDdd\dd
+\RenewDocumentCommand{\dd}{ o m }{
+    \IfValueTF{#1}{
+        \OLDdd{^{#1} #2}
+    }{
+        \OLDdd{#2}
+    }
+}
+\NewDocumentCommand{\DL}{ o m }{
+    \IfValueTF{#1}{
+        \mathcal{D}^{#1}{#2}
+    }{
+        \mathcal{D}{#2}
+    }
+}
+\NewDocumentCommand{\DD}{ o m }{
+    \IfValueTF{#1}{
+        \mukern2mu\mathcal{D}^{#1}{#2}
+    }{
+        \mkern2mu\mathcal{D}{#2}
+    }
+}
+\newcommand*{\order}{\mathop{\mathcal{O}}}
+\newcommand*{\lagrangian}{L}
+\newcommand*{\hamiltonian}{H}
+\newcommand*{\cl}{\mathrm{cl}}
+\DeclareMathOperator{\sinc}{sinc}
+\newcommand*{\timeorder}{T}
+\newcommand*{\schrodingerPicture}{\mathrm{S}}
+\newcommand*{\heisenbergPicture}{\mathrm{H}}
+\DeclareMathOperator{\SE}{SE}
+\DeclareMathOperator{\Res}{Res}
+\newcommand*{\boltzmann}{k_{\mathrm{B}}}
+\DeclareMathOperator{\tr}{tr}
+
+% Include
+\includeonly{parts/appendix-identities, parts/appendix-formal-definitions, parts/appendix-integrals}
+
+\begin{document}
+    \frontmatter
+    \titlepage
+    \innertitlepage{tikz-external/double-slit-result.pdf} 
+    \tableofcontents
+    \mainmatter
+    
+    \chapter{Introduction}
+    This course builds on quantum mechanics knowledge from previous courses.
+    In particular we assume knowledge of the contents of \enquote{principles of quantum mechanics}, notes for this course can be found here: \url{https://github.com/WilloughbySeago/Uni-Notes}.
+    As well as this knowledge of the basics of Lagrangian dynamics and complex analysis is assumed.
+    
+    The goal of this course is to develop the quantum mechanics formalism with the goal of later studying quantum field theory (QFT)\glossary[acronym]{QFT}{quantum field theory}.
+    We won't spend much time thinking about \enquote{real world problems}, whatever that means in quantum mechanics.
+    
+    We will take the approach of theoretical physicists being only as rigorous as necessary for the problem at hand but we also won't worry ourselves too much about real world details.
+    In doing so we will probably annoy both experimental physicists and mathematicians in equal parts, which hopefully cancels out to keep everyone happy.
+    
+    \section{A Brief History of Quantum Mechanics}
+    In 1925 Werner Heisenberg, Max Born, and Pascual Jordan developed the key ideas of matrix mechanics, the first logically consistent formalism of quantum mechanics.
+    Shortly after this, still in 1925 Erwin Schr\"odinger developed wave mechanics.
+    Then in 1926 Schr\"odinger and Paul Dirac went on to prove that matrix mechanics and wave mechanics are equivalent.
+    Both of these formalisms are based on Hamiltonian mechanics.
+    
+    Later on, in 1942, Richard Feynman, developing earlier work of Dirac's, came up with a third formalism called the path integral formalism.
+    In this formalism problems are treated by summing (or integrating) over all possible outcomes, called a sum over histories.
+    Unlike matrix and wave mechanics the path integral formalism is based on Lagrangian mechanics.
+    
+    The path integral formalism lends itself to relativistic problems, such as scattering, and eventually to QFT.
+    However, the mathematics is significantly more complicated than wave mechanics when it comes to bound states, for example, the quantum harmonic oscillator.
+    
+    In this course we will focus on developing the path integral formalism for the most part before switching to wave mechanics to develop some basic ideas of relativistic quantum mechanics, such as the Klein-Gordon equation, Dirac equation, antimatter, and more.
+    We will end with a brief introduction to QFT.
+    
+    \part{The Basics}
+    \chapter{Quantum Kinematics}
+    \section{The Two-Slit Experiment}
+    We start with the classic starting point for any quantum mechanics course, the two slit experiment.
+    In this experiment a particle source is set up such that it puts out particles incident on a grating with two slits.
+    On the other side of the grating is a screen or some sort of detector allowing us to measure the distribution of particles that make it through the slits.
+    
+    \begin{figure}
+        \tikzsetnextfilename{double-slit-result}
+        \begin{tikzpicture}
+            \pgfmathdeclarefunction{sinc}{1}{%
+                \pgfmathparse{abs(#1)<0.01 ? int(1) : int(0)}%
+                \ifnum\pgfmathresult>0 \pgfmathparse{1}\else\pgfmathparse{sin(#1 r)/#1}\fi%
+            }
+            \draw[very thick] (0, 0) -- (0, 5);
+            \draw[highlight, thick, domain=0.01:5,
+            samples=100] plot ({sinc(5*(\x-2.3))^2}, \x);
+            \draw[complementary, thick, domain=0.01:5, samples=100] plot ({sinc(5*(\x-2.7))^2}, \x);
+            \begin{scope}[xshift=3cm]
+                \draw[very thick] (0, 0) -- (0, 5);
+                \draw[highlightpurple, thick, domain=0.01:5,
+                samples=100] plot ({sinc(5*(\x-2.3))^2+sinc(5*(\x-2.7))^2}, \x);
+            \end{scope}
+            \begin{scope}[xshift=6cm]
+                \draw[very thick] (0, 0) -- (0, 5);
+                \draw[highlightpurple, thick, domain=0.01:5,
+                samples=600] plot ({1.5*cos(20*deg(\x))^2 * sinc(5*(\x - 2.5))^2}, \x);
+            \end{scope}
+        \end{tikzpicture}
+        \caption{The two peaks that form with just one slit open (left), the sum of the two peaks (middle), which is the pattern we would expect classically, and the actual pattern we find (right)}
+        \label{fig:two slit results}
+    \end{figure}
+    
+    We typically measure the intensity of the particles on the screen, however we can treat this as proportional to the probability that a particle reaches that part of the screen.
+    \Cref{fig:two slit results} shows three different plots.
+    The first is the two curves that form if only one slit is open (ignoring single slit diffraction).
+    These curves have peaks that align with the open slit.
+    The second is the sum of these two curves, which is classically what we would expect if both slits were open.
+    The third is what we actually measure.
+    As you can see it is very different from what we expect.
+    
+    The intensity is given by the square of the amplitude.
+    Hence if the amplitude for going through slit 1 is \(\varphi_1\), and the amplitude for going through slit 2 is \(\varphi_2\) then the two single slit curves are \(P_1 = \abs{\varphi_1}^2\) and \(P_2 = \abs{\varphi_2}^2\).
+    The curve for both slits being open is classically given by the sum of the other two curves, that is \(P_{1,2}^\mathrm{C} = \abs{\varphi_1}^2 + \abs{\varphi_2}^2\), notice that this is non-negative.
+    However, the quantum mechanics prediction, which agrees with experiment, has us sum the amplitudes, and \emph{then} square them, giving instead \(P_{1,2}^\mathrm{Q} = \abs{\varphi_1 + \varphi_2}^2\).
+    The difference between the classical and quantum predictions is the interference term, which we will show later is \(2\Re(\varphi_1\varphi_2^*)\), which is real but can take any sign, hence why there are points with zero intensity.
+
+    \section{Mathematical Framework}
+    We pivot now to introducing the mathematical framework, consisting of definitions and notation, which the rest of the course will use.
+    These concepts should be familiar and we won't give full definitions, just point out the useful features.
+    
+    \subsection{States and Linearity}
+    The state of the system is a vector in a Hilbert space.
+    We will use the \enquote{bra-ket} notation\footnote{joke due to Dirac} where vectors are represented by \define{kets}\index{ket}.
+    These are denoted \(\ket{\cdot}\) where we can use anything to label the ket, for example the position, \(\ket{x}\), some variable, \(\ket{\psi}\), or even a list of properties, \(\ket{\ell, m_\ell, s, m_s}\).
+    
+    A \defineindex{Hilbert space} is, for our purposes, a complex vector space with a conjugate symmetric inner product, more on this later.
+    We will typically denote the state space for a given system \(\hilbert\).
+    
+    The normalisation of a given state isn't physically important since the states \(\ket{\psi}\) and \(c\ket{\psi}\) have the same eigenvalues and eigenvectors for all \(c\in\complex\), and these are the only measurable aspects of the state.
+    For this reason we often assume that all states are normalised.
+    
+    Since \(\hilbert\) is a complex vector space this means that for all \(\ket{\psi_1},\ket{\psi_2}\in\hilbert\) and \(c_1, c_2\in\complex\) we have
+    \begin{equation}
+        \ket{\psi_3} = c_1\ket{\psi_1} + c_2\ket{\psi_2}
+    \end{equation}
+    is another state in \(\hilbert\).
+    We say that \(\ket{\psi_3}\) is a \defineindex{linear superposition}\index{superposition} of \(\ket{\psi_1}\) and \(\ket{\psi_2}\).
+    
+    \subsection{Dual Space}
+    We define the inner product between two states to be the function
+    \begin{equation}
+        \braket{\cdot}{\cdot} \colon \hilbert^*\times\hilbert \to \complex
+    \end{equation}
+    where \(\hilbert^*\) is the \defineindex{dual space} of \(\hilbert\).
+    For every \(\ket{\psi}\in\hilbert\) there exists a dual state, \(\bra{\psi}\in\hilbert^*\).
+    In Dirac notation we refer to this as a \defineindex{bra}.
+    Bras are the \defineindex{dual}, \defineindex{adjoint}, or \defineindex{Hermitian conjugate} of kets and vice versa.
+    In practice we often don't distinguish between a space and its dual.
+    
+    The inner product satisfies \(\braket{\varphi}{\psi} = \braket{\psi}{\varphi}^* \in \complex\) for all \(\ket{\psi}, \ket{\varphi} \in\hilbert\).
+    This is called being conjugate symmetric.
+    The inner product is also positive definite meaning that \(\braket{\psi}{\psi} \ge 0\) for all \(\ket{\psi}\in\hilbert\) with equality only if \(\ket{\psi}\) is the zero vector.
+    
+    The inner product is also linear, meaning that
+    \begin{equation}
+        \bra{\varphi}(c_1\ket{\psi_1} + c_2\ket{\psi_2}) = c_1\braket{\varphi}{\psi_1} + c_2\braket{\varphi}{\psi_2}.
+    \end{equation}
+    Taking the complex conjugate of this we get
+    \begin{align}
+        c_1^*\braket{\varphi}{\psi_1}^* + c_2^*\braket{\varphi}{\psi_2} &= c_1^*\braket{\psi_1}{\varphi} + c_2^*\braket{\psi_2}{\varphi}\\
+        &= [c_1^*\bra{\psi_1} + c_2^*\bra{\psi_2}]\ket{\varphi}.
+    \end{align}
+    This implies that \(\ket{\psi} = \bra{\psi}^*\).
+    
+    From the inner product we can define a norm on the space:
+    \begin{equation}
+        \norm{\ket{\psi}}^2 \coloneqq \braket{\psi}{\psi}.
+    \end{equation}
+    We work mostly with normalised states where \(\norm{\ket{\psi}} = 1\).
+    
+    \subsection{Probability}
+    If a system starts in the state \(\ket{\psi}\) then the probability that it ends up in the state \(\ket{\varphi}\) is
+    \begin{equation}
+        P(\psi \to \varphi) \coloneqq \abs{\braket{\varphi}{\psi}}^2.
+    \end{equation}
+    We call \(\braket{\varphi}{\psi}\) the \defineindex{probability amplitude} since it squares to the probability (in the same way that the normal amplitude squares to the intensity).
+    
+    If we consider a system changing states, from \(\ket{\psi}\) to \(\ket{\chi}\), via some intermediate state, \(\ket{\varphi}\), then the amplitude for this is very simply the product of the amplitude for the two changes that need to happen, \(\psi \to \chi\) then \(\chi\to\varphi\).
+    The probability is then
+    \begin{equation}
+        P(\psi \to \varphi \to \chi) = \abs{\braket{\psi}{\varphi}\braket{\varphi}{\psi}}^2 = P(\psi\to\varphi)P(\varphi\to\chi).
+    \end{equation}
+    This is also what we would expect classically.
+    
+    If instead we have a system that starts in the state \(\ket{\psi}\) and we want to know what is the probability that it ends up in either the state \(\ket{\varphi}\) or \(\ket{\chi}\) then this is given by
+    \begin{align}
+        P(\psi \to \varphi \text{ or }\psi \to \chi) &= \abs{\braket{\chi}{\psi} + \braket{\varphi}{\psi}}\\
+        &= \abs{\braket{\chi}{\psi}}^2 + \abs{\braket{\varphi}{\psi}}^2 + 2\Re(\braket{\chi}{\psi}\braket{\varphi}{\psi}^*)\\
+        &\ne P(\psi \to \varphi) + P(\psi \to \chi).
+    \end{align}
+    Here we have used an identity expanded upon in \cref{app:useful identities}.
+    
+    
+    We can now put this formalism together to derive the interference term for the two slit experiment.
+    \begin{exm}{Two Slit Experiment}{}
+        In the quantum mechanical treatment of the two slit experiment we consider a two-dimensional state space, \(\hilbert\).
+        In particular we work with a basis \(\{\ket{1}, \ket{2}\}\), where \(\ket{i}\) represents the state \enquote{the particle travelled through slit \(i\)}.
+        The final state of a general particle is some linear combination of these two states:
+        \begin{equation}
+            \ket{f} = c_1\ket{1} + c_2\ket{2}.
+        \end{equation}
+        
+        Suppose that the system starts in the state \(\ket{i}\).
+        The amplitude that it passes through the state \(\ket{1}\), i.e. that the particle goes through slit 1, and then ends up in state \(\ket{f}\) is \(\braket{f}{1}\braket{1}{i}\), and similarly for slit 2.
+        Since the particle must go through one of the slits (we only consider particles which make it to the screen) the amplitude is the sum of the amplitudes for going through the two slits.
+        Then the probability that it ends up in the state \(\ket{f}\) going via either slit is
+        \begin{align}
+            \abs{\braket{f}{i}}^2 &= \abs{\braket{f}{1}\braket{1}{i} + \braket{f}{2}\braket{2}{i}}^2\\
+            &= \abs{\braket{f}{1}\braket{1}{i}}^2 + \abs{\braket{f}{2}\braket{2}{i}}^2 + 2\Re[\braket{f}{1}\braket{1}{i}(\braket{f}{2}\braket{2}{f})^*].
+        \end{align}
+        Hence we have derived the form of the interference term.
+    \end{exm}
+
+    \chapter{Bases and Observables}
+    \section{Basis States and Completeness}
+    Hilbert spaces are by definition \defineindex{complete}.
+    While this has a technical mathematical meaning we won't worry ourselves with this.
+    We take complete to mean \enquote{contains all states}, that is there aren't any \enquote{holes} in the space, a hole being a state we can approach, but which is not actually in the Hilbert space.
+    
+    The most important application of this for our purposes comes when we introduce a basis, \(\{\ket{n}\}\).
+    This allows us to write some arbitrary \(\ket{\psi}\in\hilbert\) as
+    \begin{equation}
+        \ket{\psi} = \sum_n \psi_n\ket{n}.
+    \end{equation}
+    Without loss of generality we will assume that bases are always orthonormal, meaning \(\braket{m}{n} = \delta_{mn}\).
+    Using this we have
+    \begin{equation}
+        \braket{m}{\psi} = \sum_n \psi_n\braket{m}{n} = \sum_n \psi_n\delta_{mn} = \psi_m.
+    \end{equation}
+    This gives us a way to compute the coefficients, \(\psi_n\).
+    
+    We can recognise now \(\braket{m}{\psi}\) as the amplitude for the state \(\ket{\psi}\) to go to the basis state \(\ket{m}\).
+    
+    We can use this definition of \(\psi_n\) to write
+    \begin{equation}
+        \ket{\psi} = \sum_n \psi_n\ket{n} = \sum_n \ket{n}\braket{n}{\psi}
+    \end{equation}
+    where we have used the fact that \(\braket{n}{\psi}\) is simply a complex number so we can move it past \(\ket{n}\).
+    Since this relationship must hold for \(\ket{\psi}\in\hilbert\) we have that
+    \begin{equation}
+        \sum_n \ket{n}\bra{n} = \idop
+    \end{equation}
+    where \(\idop\) is the identity operator defined by
+    \begin{equation}
+        \idop\ket{\psi} \coloneqq \ket{\psi}
+    \end{equation}
+    for all \(\ket{\psi}\in\hilbert\).
+    The relation
+    \begin{equation}
+        \sum_n\ket{n}\bra{n} = \idop
+    \end{equation}
+    is called the \defineindex{completeness relation}.
+    It is a result of the fact that the total probability must be 1:
+    \begin{align}
+        \sum_n P(\psi \to n) &= \sum_n \abs{\braket{n}{\psi}}^2\\
+        &= \sum \braket{n}{\psi}\braket{n}{\psi}^*\\
+        &= \sum \braket{\psi}{n}\braket{n}{\psi}\\
+        &= \braket{\psi}{\psi}\\
+        &= 1.
+    \end{align}
+    
+    \begin{exm}{Two State System}{}
+        Consider some two state system, \(\hilbert\), with basis \(\{\ket{1}, \ket{2}\}\).
+        We may represent these basis vectors as column vectors:
+        \begin{equation}
+            \ket{1} =
+            \begin{vector}
+                1\\ 0
+            \end{vector}
+            , \qqand
+            \ket{2} = 
+            \begin{vector}
+                0\\ 1
+            \end{vector}
+            .
+        \end{equation}
+        Note that the dual vectors are then the transpose, that is
+        \begin{equation}
+            \bra{1} =
+            \begin{vector}
+                1 & 0
+            \end{vector}
+            , \qqand
+            \bra{2} = 
+            \begin{vector}
+                0 & 1
+            \end{vector}
+            .
+        \end{equation}
+        We can check that this is indeed an orthonormal basis:
+        \begin{align}
+            \braket{1}{1} &= 
+            \begin{vector}
+                1 & 0
+            \end{vector}
+            \begin{vector}
+                1\\ 0
+            \end{vector}
+            =
+            1,\\
+            \braket{2}{2} &= 
+            \begin{vector}
+                0 & 1
+            \end{vector}
+            \begin{vector}
+                0\\ 1
+            \end{vector}
+            =
+            1,\\
+            \braket{1}{2} &= 
+            \begin{vector}
+                1 & 0
+            \end{vector}
+            \begin{vector}
+                0\\ 1
+            \end{vector}
+            =
+            0,\\
+        \end{align}
+        and hence \(\braket{n}{m} = \delta_{nm}\) as required.
+        
+        This basis also satisfies the completeness relation:
+        \begin{align}
+            \sum_n \bra{n}\ket{n} &= \bra{1}\ket{1} + \bra{2}\ket{2}\\
+            &= 
+            \begin{vector}
+                1\\ 0
+            \end{vector}
+            \begin{vector}
+                1 & 0
+            \end{vector}
+            +
+            \begin{vector}
+                0\\ 1
+            \end{vector}
+            \begin{vector}
+                0 & 1
+            \end{vector}
+            \\
+            &= 
+            \begin{mat}
+                1 & 0\\
+                0 & 1
+            \end{mat}
+            +
+            \begin{mat}
+                0 & 0\\
+                0 & 1
+            \end{mat}
+            \\
+            &=
+            \begin{mat}
+                1 & 0\\
+                0 & 1
+            \end{mat}
+            \\
+            &= \idop.
+        \end{align}
+    \end{exm}
+
+    \section{Observables and Operators}
+    An \defineindex{observable} corresponds to a property of a system that we can measure and determine the state of at a given time.
+    We will not worry ourselves with how these measurements can be performed in reality, we are interested only in the results of making a measurement.
+    Examples of observables are energy, position, and momentum.
+    
+    Observables must take real values as these are the only values we can measure.
+    Suppose the set of possible observables is \(\{\xi_n\}\) and we work in some basis \(\{\ket{n}\}\).
+    We can define an operator, for our purposes, to be
+    \begin{equation}
+        \operator{\xi} \coloneqq \sum_n \xi_n \ket{n}\bra{n}.
+    \end{equation}
+    This generalises the completeness relation which is the special case of \(\xi_n = 1\) for all \(n\).
+    We call this the \defineindex{spectral representation} of the operator.
+    
+    Operators are \defineindex{linear}, meaning
+    \begin{equation}
+        \operator{\xi} (c_1\ket{\psi_1} + c_2\ket{\psi_2}) = c_1\operator{\xi}\ket{\psi_1} + c_2\operator{\xi}\ket{\psi_2}
+    \end{equation}
+    for all \(c_1, c_2\in\complex\) and \(\ket{\psi_1}, \ket{\psi_2}\in\hilbert\).
+    This is clearly true when we define an operator by its spectral representation.
+    
+    Operators corresponding to observables must be Hermitian, that is equal to their own Hermitian conjugate where the Hermitian conjugate is defined as follows.
+    \begin{dfn}{Hermitian Conjugate}{}
+        Given an operator, \(\operator{\xi}\), we define the \defineindex{Hermitian conjugate}, \(\operator{\xi}^\hermit\), to be such that
+        \begin{equation}
+            \bra{\psi} \operator{\xi}^\hermit \ket{\varphi} \coloneqq \bra{\varphi} \operator{\xi} \ket{\psi}^*
+        \end{equation}
+        for all states \(\ket{\psi}, \ket{\varphi} \in \hilbert\).
+        
+        If \(\operator{\xi} = \operator{\xi}^\hermit\) we say that \(\operator{\xi}\) is \defineindex{Hermitian}.
+    \end{dfn}
+    
+    We can easily show that an operator with a spectra decomposition is Hermitian:
+    \begin{align}
+        \bra{\psi} \operator{\xi} \ket{\varphi} &= \bra{\varphi} \operator{\xi} \ket{\psi}^*\\
+        &= \bra{\varphi} \left( \sum_n \xi_n\ket{n}\bra{n} \right) \ket{\psi}^*\\
+        &= \sum_n \xi_n^*\braket{\varphi}{n}^*\braket{n}{\psi}^*\\
+        &= \sum_n \xi_n \braket{n}{\varphi}\braket{\psi}{n}\\
+        &= \sum_n \xi_n \braket{\psi}{n}\braket{n}{\varphi}\\
+        &= \bra{\psi}\left( \sum_n \xi_n \ket{n}\bra{n} \right)\ket{\varphi}\\
+        &= \bra{\psi} \operator{\xi} \ket{\varphi}.
+    \end{align}
+    Since this relationship holds for all \(\ket{\psi}, \ket{\varphi} \in \hilbert\) we have \(\operator{\xi} = \operator{\xi}^{\hermit}\) and so \(\operator{\xi}\) is Hermitian.
+    
+    The states \(\ket{n}\) are the eigenstates of \(\operator{\xi}\) with eigenvalues \(\xi_n\):
+    \begin{equation}
+        \operator{\xi} \ket{n} = \sum_m \xi_m \ket{m}\braket{m}{n} = \sum_m \xi_m \ket{m}\delta_{mn} = \xi_n\ket{n}.
+    \end{equation}
+    Similarly this implies that \(\bra{n}\operator{\xi} = \xi_n\bra{n}\) using the Hermitian nature of \(\operator{\xi}\).
+    
+    If we have some second observable, \(\operator{\eta}\), with eigenvalues \(\eta_n\) such that \(\operator{\eta}\) and \(\operator{\xi}\) both share \(\{\ket{n}\}\) as a basis then \(\operator{\eta}\) and \(\operator{\xi}\) commute:
+    \begin{equation}
+        \operator{\xi}\operator{\eta} \ket{n} = \eta_n\operator{\xi}\ket{n} = \eta_n\xi_n\ket{n} = \xi_n\eta_n\ket{n} = \xi_n\operator{\eta}\ket{n} = \operator{\eta}\operator{\xi}\ket{n}
+    \end{equation}
+    which holds for all \(\ket{n}\), and by linearity holds for all \(\ket{\psi}\in\hilbert\), and hence \(\operator{\xi}\operator{\eta} = \operator{\eta}\operator{\xi}\).
+    \begin{dfn}{Commutator}{}
+        Given two operators, \(\operator{\xi}\) and \(\operator{\eta}\) we define the \defineindex{commutator}:
+        \begin{equation}
+            \commutator{\operator{\xi}}{\operator{\eta}} \coloneqq \operator{\xi}\operator{\eta} - \operator{\eta}\operator{\xi}.
+        \end{equation}
+        If \(\commutator{\operator{\xi}}{\operator{\eta}} = 0\) then we say that \(\operator{\xi}\) and \(\operator{\eta}\) \defineindex{commute}.
+    \end{dfn}
+    
+    \subsection{Measurement}
+    When we make a measurement according to the operator \(\operator{\xi}\) we will achieve as a result one of the eigenvalues of \(\operator{\xi}\),
+    After the measurement the state, initially \(\ket{\psi}\), collapses into the corresponding eigenstate, \(\ket{n}\).
+    The probability of measuring \(\xi_n\) is therefore
+    \begin{equation}
+        P(\xi = \xi_n) = \abs{\braket{n}{\psi}}^2.
+    \end{equation}
+    
+    Using the definition of the mean of the probability distribution, \(P\), as
+    \begin{equation}
+        \mean{x} = \sum_n xP(x)
+    \end{equation}
+    we can work out the mean, or \defineindex{expected value}, of \(\operator{\xi}\), which is formally the average result of an infinite number of measurements of \(\operator{\xi}\) all on the same identical initial state \(\ket{\psi}\).
+    \begin{align}
+        \expected{\operator{\xi}} &= \sum_n \xi_n \abs{\braket{n}{\psi}}^2\\
+        &= \sum_n \xi_n \braket{\psi}{n}\braket{n}{\psi}\\
+        &= \bra{\psi}\operator{\xi}\ket{\psi}.
+    \end{align}
+    
+    We define the \defineindex{projection operator} onto the basis state \(\ket{n}\) to be
+    \begin{equation}
+        \operator{P}_n \coloneqq \ket{n}\bra{n}.
+    \end{equation}
+    We can easily check that this has the mathematical properties required to be a projection operator, namely that \(\operator{P}_n\operator{P}_m = \delta_{mn}\operator{P}_n\) and \(\sum_n \operator{P}_n = \idop\):
+    \begin{align}
+        \operator{P}_n\operator{P}_m &= \ket{n}\braket{n}{m}\bra{m}\\
+        &= \ket{n}\bra{m}\delta_{mn}
+        &= \operator{P}_n\delta_{mn}.
+    \end{align}
+    Here we have used the fact that if \(m\ne n\) then the third expression is zero and so it doesn't matter whether we include a factor of \(\ket{n}\bra{m}\) or \(\operator{P}_n\), and if \(m = n\) then \(\ket{n}\bra{m} = \ket{n}\bra{n} = \operator{P}_n\).
+    \begin{align}
+        \sum_n \operator{P}_n = \sum_n \bra{n}\ket{n} = \idop.
+    \end{align}
+    
+    After a measurement yielding the value \(\xi_n\) the state of the system will be \(\operator{P}_n\ket{\psi}\).
+    We can compute the probability that the system ends up in this state for some given \(n\):
+    \begin{align}
+        \norm{\operator{P}_n\ket{\psi}}^2 &= \bra{\psi}\operator{P}_n^\hermit \operator{P}_n\ket{\psi}\\
+        &= \braket{\psi}{n}\braket{n}{n}\braket{n}{\psi}\\
+        &= \abs{\braket{n}{\psi}}^2,
+    \end{align}
+    which is, as we already saw, the probability of measuring \(\xi_n\).
+    
+    \subsection{Degeneracy}
+    It is possible that more than one state will have the same eigenvalue for the same observable.
+    This is called \defineindex{degeneracy}.
+    We get around it by assigning multiple labels to states to distinguish them.
+    Conceptually degeneracy doesn't add very much, it usually just requires us to sum over degenerate states where we would have a single state otherwise.
+    For this reason we often assume that states are non-degenerate, just to avoid having to write out lots of sums.
+    
+    \chapter{Basis Changes and Continuous Variables}
+    \section{Change of Basis}
+    Suppose \(\{\ket{n}\}\) and \(\{\ket{\bar{n}}\}\) are two orthonormal bases for \(\hilbert\).
+    Since basis vectors are just states themselves we can define the basis vectors \(\ket{\bar{n}}\) in terms of \(\{\ket{\bar{n}}\}\):
+    \begin{equation}
+        \ket{\bar{n}} = \sum_m \ket{m}\braket{m}{\bar{n}} = \sum_m\ket{m}U_{mn}
+    \end{equation}
+    where we define \(U_{mn} \coloneqq \braket{m}{\bar{n}}\).
+    We follow Dirac's lead and call \(U_{mn}\) transformation coefficients.
+    It is no coincidence that we use matrix notation here as this is simply a linear (unitary) transformation.
+    
+    Orthonormality of the bases gives us
+    \begin{equation}
+        \delta_{mn} = \braket{\bar{m}}{\bar{n}} = \sum_l \braket{\bar{m}}{l}\braket{l}{\bra{n}} = \sum_l U_{ml}^\hermit U_{ln}
+    \end{equation}
+    where we define \(U_{ml}^\hermit = U_{lm}^*\), i.e. the conjugate transpose.
+    Recognising this sum as the definition of matrix multiplication we identify \((U^\hermit U)_{mn} = \delta_{mn}\) and hence \(U^\hermit U = \ident\).
+    
+    We can define a corresponding operator, \(\operator{U}\), such that
+    \begin{equation}
+        \ket{\bar{n}} = \operator{U}\ket{n}.
+    \end{equation}
+    This means that
+    \begin{equation}
+        U_{mn} \bra{m}\operator{U}\ket{n}.
+    \end{equation}
+    Hence \(U_{mn}\) are the matrix elements of some unitary operator, \(\operator{U}\).
+    We can show easily that \(\operator{U}\) is unitary:
+    \begin{align}
+        \delta_{mn} &= \sum_{l}U_{lm}^*U_{ln}\\
+        &= \sum_l \bra{l}\operator{U}\ket{m}^*\bra{l}\operator{U}\ket{n}\\
+        &= \sum_l \bra{m}\operator{U}^\hermit\ket{l}\bra{l}\operator{U}\ket{n}\\
+        &= \bra{m}\operator{U}^\hermit \operator{U} \ket{n}.
+    \end{align}
+    Hence the matrix elements of \(\operator{U}^\hermit \operator{U}\) are \(\delta_{mn}\) and so \(\operator{U}^\hermit \operator{U} = \idop\) meaning \(\operator{U}\) is a unitary operator.
+    
+    At this point it should be noted that most unitary operators are \emph{not} observables since there is no requirement that unitary operators have real eigenvalues.
+    The only restriction on their eigenvalues is that they have unit modulus.
+    
+    \section{Continuous Variables}
+    So far we have assumed discrete variables.
+    This means that the dimension of the Hilbert space is finite, or countable.
+    We can also have Hilbert spaces of uncountable dimension, and these have a real use in physics.
+    We can define them formally in a limiting process from countable dimension Hilbert spaces but we won't bother here.
+    Instead we will assume that, after sufficient substitutions, the rules are exactly the same.
+    
+    Consider some uncountable basis, \(\{\ket{x}\}\), where the index \(x\) is now a real number, as opposed to \(\{\ket{n}\}\), which is indexed by integers.
+    Everything we have said so far holds if we make the following substitutions:
+    \begin{equation}
+        \ket{n} \to \ket{x}, \qquad \sum_n \to\int\dl{x}, \qqand \delta_{mn} \to \delta(x - x').
+    \end{equation}
+    Here \(\delta\) is the \defineindex{delta distribution}.
+    
+    \subsection{Position Basis}
+    The most common continuous variable is the position of some particle.
+    In this section we will recap many of our results for the discrete case but for the position basis, \(\{\ket{x}\}\).
+    
+    A generic state, \(\ket{\psi} \in \hilbert\) can be written as
+    \begin{equation}
+        \ket{\psi} = \int \psi(x) \ket{x} \dd{x},
+    \end{equation}
+    where \(\psi(x)\) is the continuous analogue of \(\psi_n\).
+    Note that when we write an integral with no limits in quantum mechanics what we usually mean is a definite integral over the entire domain.
+    The orthonormality condition becomes
+    \begin{equation}
+        \braket{x'}{x} = \delta(x - x').
+    \end{equation}
+    From this we have
+    \begin{align}
+        \braket{x}{\psi} &= \int \psi(x')\braket{x'}{x}\dd{x'}\\
+        &= \int\psi(x')\delta(x - x')\dd{x'}\\
+        &= \psi(x).
+    \end{align}
+    Note the importance of having a dummy variable, \(x'\), for the expansion of \(\ket{\psi}\).
+    We have used here the defining property of the delta distribution:
+    \begin{equation}
+        \int f(x')\delta(x - x') \dd{x'} = f(x)
+    \end{equation}
+    so long as \(x\) is in the range of integration, otherwise the integral is zero.
+    Also the integral of just the delta distribution over all space is 1.
+    From this we see that
+    \begin{equation}
+        \psi(x) = \braket{x}{psi}, \qqand \psi^*(x) = \braket{\psi}{x}.
+    \end{equation}
+    
+    Substituting this into our expansion for \(\ket{\psi}\) we have
+    \begin{equation}
+        \ket{\psi} = \int \ket{x}\braket{x}{\psi}\dd{x}
+    \end{equation}
+    which gives us the continuous completeness relation:
+    \begin{equation}
+        \int \ket{x}\bra{x} = \idop.
+    \end{equation}
+    Again, this is a result of the total probability being 1.
+    We use this to show
+    \begin{equation}
+        1 = \braket{\psi}{\psi} = \int \braket{\psi}{x}\braket{x}{\psi} = \int \psi^*(x)\psi(x)\dd{x} = \int\abs{\psi(x)}^2 \dd{x}.
+    \end{equation}
+    This means we can interpret \(\abs{\psi(x)}^2\) as a probability density.
+    That is, \(\abs{\psi(x)}^2 \dl{x}\) is the probability of finding the particle in the range \([x, x + \dl{x}]\).
+    This means that \(\psi(x)\) is the \defineindex{wave function} that we are familiar with from previous courses.
+    
+    We can define an operator in an analogous way to the discrete case.
+    In particular the \defineindex{position operator} is defined to be
+    \begin{equation}
+        \operator{x} \coloneqq \int x\ket{x}\bra{x}\dd{x}.
+    \end{equation}
+    This is a spectral representation and so \(\operator{x}\) is trivially Hermitian.
+    We can check that \(\ket{x}\) are indeed eigenvalues of this operator>
+    \begin{equation}\label{eqn:eigenvalues of position basis are x}
+        \operator{x}\ket{x} = \int x'\ket{x'}\braket{x'}{x} \dd{x'} = \int x'\ket{x'}\delta(x' - x) \dd{x'} = x\ket{x}.
+    \end{equation}
+    Similarly we have
+    \begin{equation}
+        \bra{x}\operator{x} = \int x'\braket{x}{x'}\bra{x} \dd{x'} = \int x'\bra{x'}\delta(x' - x) \dd{x'} = \bra{x}x.
+    \end{equation}
+    
+    The expectation value of \(\operator{x}\) in the state \(\ket{\psi}\) is
+    \begin{align}
+        \expected{x} &= \bra{\psi}\operator{x}\ket{\psi}\\
+        &= \int \bra{\psi}\operator{x}\ket{x}\braket{x}{\psi} \dd{x}\\
+        &= \int \braket{\psi}{x}x\braket{x}{\psi} \dd{x}\\
+        &= \int x\psi^*(x)\psi(x) \dd{x}\\
+        &= \int x\abs{\psi(x)}^{2}\dd{x}.
+    \end{align}
+    Note that this fits the normal definition of the mean of a continuous probability density function, \(\abs{\psi(x)}^2\).
+    
+    \subsection{Fourier Transform Basis}
+    An alternative basis to the position basis of the previous section is the Fourier transform basis, \(\{k\}\), defined by
+    \begin{equation}
+        \ket{k} \coloneqq \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} \e^{ikx}\ket{x}\dd{x}.
+    \end{equation}
+    We call \(k\) the wave number.
+    We will soon see that this basis is related to the momentum basis by a factor of \(\hbar\), and it is the momentum basis with which we tend to work over the \(\{\ket{k}\}\) basis.
+    
+    The completeness relation for \(\{\ket{x}\}\) gives us
+    \begin{equation}
+        \ket{k} = \int_{-\infty}^{\infty} \ket{x}\braket{x}{k}\dd{x}.
+    \end{equation}
+    Combining this with the definition of \(\ket{k}\) we have
+    \begin{equation}
+        \braket{x}{k} = \frac{1}{\sqrt{2\pi}} \e^{ikx}, \qqand \braket{k}{x} = \frac{1}{\sqrt{2\pi}} \e^{-ixk}.
+    \end{equation}
+    
+    From this we get
+    \begin{equation}
+        \braket{k'}{k} = \int_{-\infty}^{\infty} \braket{k'}{x}\braket{x}{k}\dd{x} = \frac{1}{2\pi}\int_{-\infty}^{\infty} \e^{i(k - k')x} = \delta(k - k')
+    \end{equation}
+    where we have used the well known Fourier transform of the delta distribution.
+    This shows that \(\{\ket{k}\}\) is orthonormal, and hence the transformation is unitary since it transforms orthonormal bases into orthonormal bases.
+    
+    We can now compute the action of the position operator on this basis:
+    \begin{align}
+        \operator{x}\ket{k} &= \int x\ket{x}\braket{x}{k}\dd{x}\\
+        &= \frac{1}{\sqrt{2\pi}} x\e^{ikx}\ket{x}\dd{x}\\
+        &= \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} -i\diffp*{}{k} \e^{ikx}\ket{x}\dd{x}\\
+        &= -i\diffp*{}{k} \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} \e^{ikx}\ket{x}\dd{x}\\
+        &= -i\diffp*{}{k} \int_{-\infty}^\infty \ket{x}\braket{x}{k}\dd{x}\\
+        &= -i\diffp*{}{k}\ket{k}.
+    \end{align}
+    Similarly
+    \begin{equation}
+        \bra{k}\hat{x} = i\diffp*{}{k}\bra{k}.
+    \end{equation}
+    
+    We can now construct a Hermitian operator, \(\operator{k}\):
+    \begin{equation}
+        \operator{k} \coloneqq \int k\ket{k}\bra{k}\dd{k}.
+    \end{equation}
+    We have \(\operator{k}\ket{k} = k\ket{k}\) and \(\bra{k}\operator{k} = \bra{k}k\) by the same logic as \cref{eqn:eigenvalues of position basis are x}.
+    
+    We can now compute the action of \(\operator{k}\) on \(\ket{x}\):
+    \begin{align}
+        \operator{k}\ket{x} &= \int_{-\infty}^{\infty} k\ket{k}\braket{k}{x}\dd{k}\\
+        &= \frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} k\ket{k}\e^{-ikx}\dd{k}\\
+        &= \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} i\diffp*{}{x} \e^{-ikx} \ket{k}\dd{k}\\
+        &= i\diffp*{}{x} \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} \e^{-ikx}\ket{k}\dd{k}\\
+        &= i\diffp*{}{x} \int_{-\infty}^{\infty} \ket{k}\braket{k}{x}\\
+        &= i\diffp*{}{x} \ket{x}.
+    \end{align}
+    Similarly
+    \begin{equation}
+        \bra{x}\operator{k} = -i\diffp*{}{x}\bra{x}.
+    \end{equation}
+    
+    Using this we have
+    \begin{equation}
+        \bra{x}\operator{k}\ket{\psi} = -i\diffp*{}{x}\braket{x}{\psi} = -i\diffp*{\psi(x)}{x}.
+    \end{equation}
+    Hence,
+    \begin{equation}
+        \bra{\varphi}\operator{k}\ket{\psi} = \int_{-\infty}^{\infty} \braket{\varphi}{x}\bra{x}\operator{k}\ket{\psi}\dd{x} = \int_{-\infty}^{\infty} \varphi^*(x)\left( -i\diffp*{}{x} \right) \psi(x) \dd{x}.
+    \end{equation}
+    
+    We can define
+    \begin{align}
+        \tilde{\psi}(k) &\coloneqq \braket{k}{\psi}\\
+        &= \int_{-\infty}^{\infty} \braket{k}{x}\braket{x}{\psi}\dd{x}\\
+        &= \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} \e^{-ikx}\psi(x)\dd{x}\\
+        &= \fourierTransform\{\psi(x)\}.
+    \end{align}
+    This justifies us calling \(\{\ket{k}\}\) the Fourier transform basis.
+    
+    Similarly we can show that the following hold:
+    \begin{align}
+        \bra{k}\operator{k}\ket{\psi} &= k\tilde{\psi}(k),\\
+        \bra{\varphi}\operator{k}\ket{\psi} &= \int\dd{k}\tilde{\varphi}^*(k)\tilde{\psi}(k)\dd{k},\\
+        \bra{k}\operator{x}\ket{\psi} &= i\diffp*{}{k} \tilde{\psi}(k),\\
+        \bra{\varphi}\operator{x}\ket{\psi} &= \int \tilde{\varphi}^*(k)\left( i\diffp*{}{k} \right)\tilde{\psi}(k) \dd{k}.
+    \end{align}
+    
+    We can also derive arguably the most important relation in quantum mechanics,
+    \begin{equation}
+        \commutator{\operator{x}}{\operator{k}} = i
+    \end{equation}
+    or, as we will more often use it after identifying \(\operator{p} = \hbar\operator{k}\)
+    \begin{equation}
+        \commutator{\operator{x}}{\operator{p}} = i\hbar.
+    \end{equation}
+    This follows by introducing some test state, \(\ket{\psi}\):
+    \begin{align}
+        \bra{x}\commutator{\operator{x}}{\operator{p}}\ket{\psi} &= \bra{x}(\operator{x}\operator{k} - \operator{k}\operator{x})\ket{\psi}\\
+        &= \bra{x}\operator{x}\operator{k}\ket{\psi} - \bra{x}\operator{k}\operator{x}\ket{\psi}\\
+        &= x\left( -i\diffp{}{x} \right)\braket{x}{\psi} - \left( -i\diffp{}{x} \right)x\braket{x}{\psi}\\
+        &= -ix\diffp{\psi}{x} + i\diffp{\psi}{x}x + i\psi(x).
+    \end{align}
+    Since this holds for all \(\ket{\psi} \in \hilbert\) the commutation relation follows.
+    
+    From this follows the Heisenberg uncertainty principle
+    \begin{equation}
+        \Delta x \Delta k \ge \frac{1}{2}, \qqor \Delta x \Delta p \ge \frac{\hbar}{2}
+    \end{equation}
+    where \(\Delta\xi = \expected{(\operator{\xi} - \expected{\operator{\xi}})^2} = \expected{\operator{\xi}^2} - \expected{\operator{\xi}}^2\) for some operator \(\operator{\xi}\).
+    
+    \subsection{Three Dimensions}
+    So far we have worked in one dimension.
+    The change to three dimensions is fairly trivial and consists mostly of replacing \(x\) and \(k\) with \(\vv{r}\) and \(\vv{k}\) and single integrals with triple integrals.
+    In particular we have the position basis \(\{\ket{\vv{r}}\}\), and Fourier transform basis, \(\{\ket{\vv{k}}\}\), which we assume are orthonormal, meaning
+    \begin{equation}
+        \braket{\vv{r'}}{\vv{r}} = \delta^{(3)}(\vv{r} - \vv{r'}), \qqand \braket{\vv{k'}}{\vv{k}} = \delta^{(3)}(\vv{k} - \vv{k'})
+    \end{equation}
+    where \(\delta^{(3)}\) is a three-dimensional delta distribution, which can be given by
+    \begin{equation}
+        \delta^{(3)}(\vv{r'} - \vv{r}) = \delta(x' - x)\delta(y' - y)\delta(z' - z)
+    \end{equation}
+    where \(\vv{r} = (x, y, z)\) and \(\vv{r'} = (x', y', z')\).
+    We will often be lazy with the notation and drop the superscript \((3)\).
+    
+    The completeness relation in three dimensions is
+    \begin{equation}
+        \int \ket{\vv{r}}\bra{\vv{r}} \dd[3]{r} = \int \ket{\vv{k}}\bra{\vv{k}} \dd[3]{k} = \idop.
+    \end{equation}
+    
+    The wave function in Fourier space is given again by the Fourier transform, now of a three-dimensional function:
+    \begin{equation}
+        \tilde{\psi}(\vv{k}) = \frac{1}{(2\pi)^{3/2}}\int \e^{-i\vv{k} \cdot \vv{r}} \psi(\vv{r}) \dd[3]{k}.
+    \end{equation}
+    Note that there is a factor of \(1/\sqrt{2\pi}\) for each dimension.
+    
+    \chapter{Time as a Continuum}
+    \section{Infinite Gratings}
+    We started with two slits.
+    We then imagined the number of slits tending to infinity to give us a continuous position.
+    We still only have a single point in time.
+    To get around this we imagine many gratings placed one after the other.
+    We can consider passing through each grating to be a moment of time passing.
+    
+    Suppose we have \(N\) gratings, labelled \(1\) through \(N\). We take to have an infinite number of slits, and so position is continuous.
+    Place these gratings one after the other.
+    We are interested in the amplitude, \(\braket{f}{i}\), that a system initially in state \(\ket{i}\) ends up in state \(\ket{f}\).
+    
+    We use the notation \(\ket{x_n, t_n}\) to mean that the \(n\)th grating was passed through at time \(t_n\) and position \(x_n\).
+    At any fixed time, \(t_i\), this set up is identical to a single grating and so we have a completeness relation in \(x_i\).
+    In particular at time \(t_1\) we have
+    \begin{equation}
+        \braket{f}{i} = \int \dl{x_1} \braket{f}{x_1, t_1}\braket{x_1, t_1}{i}.
+    \end{equation}
+    
+    The same logic then applies at \(t_2\) giving us
+    \begin{equation}
+        \braket{f}{i} = \int \dl{x_2} \int \dl{x_2} \braket{f}{x_2, t_2} \braket{x_2, t_2}{x_1, t_1}\braket{x_1, t_1}{i}.
+    \end{equation}
+    And continuing on we have
+    \begin{equation}\label{eqn:N gratings}
+        \braket{f}{i} = \int\dl{x_N} \dotsi \int\dl{x_2}\int\dl{x_1} \braket{f}{x_N, t_N} \dotsm \braket{x_2, t_2}{x_1, t_1}\braket{x_1, t_1}{i}.
+    \end{equation}
+    
+    For consistency of notation we change our notation to \(\ket{i} = \ket{x_a, t_a}\), and \(\ket{f} = \ket{x_b, t_b}\).
+    We take the gratings to be equally spaced such that the times satisfy
+    \begin{equation}
+        t_n = t_a + n\varepsilon \qqwhere \varepsilon = \frac{t_b - t_a}{N + 1}.
+    \end{equation}
+    In particular notice that this means \(t_0 = t_a\) and \(t_{N+1} = t_b\).
+    
+    Using this we can write \cref{eqn:N gratings} as
+    \begin{equation}\label{eqn:product of integrals}
+        \braket{x_b, t_b}{x_a, t_a} = \left( \prod_{n=1}^{N} \int \dl{x_n} \right) \left( \prod_{n=0}^{N} \braket{x_{n+1}, t_{n+1}}{x_n, t_n} \right).
+    \end{equation}
+    
+    In the limit\footnote{This limit is at best mathematically dubious and at worst nonsense, however, path integrals give us accurate predictions so we move on with them anyway.} of \(\varepsilon \to 0\), which is to say \(N \to \infty\), we have
+    \begin{equation}
+        \braket{x_b, t_b}{x_a, t_a} = \int_{x_a}^{x_b} \DL{x} \braket{x_b, t_b}{x_a, t_a}\big\vert_{x(t)}.
+    \end{equation}
+    Here we have introduced new notation where this integral represents an integral over all paths, \(x(t)\), which begin at \(x(t_a) = x_a\), and end at \(x(t_b) = x_b\), and the amplitude \(\braket{x_b, t_b}{x_a, t_a}\big\vert_{x(t)}\) is the amplitude for the particle travelling along the continuous path \(x(t)\).
+    That is, the integral and measure denotes the first bracket of the continuous limit of \cref{eqn:product of integrals}, and inner product for \(x(t)\) denotes the second bracket.
+    
+    \subsection{Intuitive Rewriting}\label{sec:intuitive rewriting}
+    We expect that
+    \begin{equation}
+        \braket{x_{n+1}, t_{n+1}}{x_n, t_n} \approx \e^{i\varepsilon\varphi}
+    \end{equation}
+    where \(\varepsilon = t_{n+1} - t_n\) and \(\varphi\) is a real function of \(x_n\), \(x_{n+1}\), \(t_n\), and \(t_{n+1}\).
+    We call this the transition amplitude along the path \(x(t)\).
+    As \(\varepsilon \to 0\) we see that the amplitude becomes constant.
+    Since \(\varphi\) only depends on the \(n\)th and \((n + 1)\)th positions and times this is a local quantity.
+    
+    We can regard the transition \(\ket{x_n, t_n} \to \ket{x_{n+1}, t_{n+1}}\) as a change of basis, which is given by some operator \(\operator{U}\):
+    \begin{equation}
+        \ket{x_{n+1}, t_{n+1}} = \operator{U}^\hermit \ket{x_n, t_n}.
+    \end{equation}
+    The Hermitian conjugate here is just a matter of convention.
+    Probably because someone originally defined \(\operator{U}\) using
+    \begin{equation}
+        \ket{x_n, t_n} = \operator{U}\ket{x_{n+1}, t_{n+1}}.
+    \end{equation}
+    
+    We can write \(\operator{U}\) as
+    \begin{equation}
+        \operator{U} = \idop + i\varepsilon\operator{\varphi} + \order(\varepsilon^2) \approx \e^{i\varepsilon\operator{\varphi}}.
+    \end{equation}
+    We can expand any unitary operator in this way.
+    The fact that \(\operator{U}\) is unitary means that \(\operator{\varphi}\) must be Hermitian.
+    Hence \(\operator{\varphi}\) has real eigenvalues, \(\varphi\), satisfying
+    \begin{equation}
+        \operator{\varphi} \ket{x_n, t_n} \approx \varphi \ket{x_n, t_n}.
+    \end{equation}
+    We therefore have
+    \begin{equation}
+        \ket{x_n, t_n} = \operator{U}\ket{x_{n+1}, t_{n+1}} \approx \e^{i\varepsilon\operator{\varphi}}\ket{x_{n+1}, t_{n+1}} \approx \e^{i\varepsilon\varphi}\ket{x_{n+1}, t_{n+1}}.
+    \end{equation}
+    
+    Hence
+    \begin{align}
+        \braket{x_b, t_b}{x_a, t_a} &\approx \left( \prod_{n=1}^{N} \int \dl{x_n} \right) \left( \prod_{n=0}^{N} \e^{i\varepsilon\varphi(x_n, x_{n+1}, t_n, t_{n+1})} \right)\\
+        &= \left( \prod_{n=1}^{N} \int\dl{x_n} \right)\exp\left[ i\sum_{n=0}^{N} \varepsilon\varphi(x_n, x_{n+1}, t_n, t_{n+1}) \right]\\
+        &= \left( \prod_{n=1}^{N} \int\dl{x_n} \right)\exp\left[ i\sum_{n=0}^{N} (t_{n+1} - t_n) \varphi(x_n, x_{n+1}, t_n, t_{n+1}) \right].
+    \end{align}
+    In the limit of \(N \to \infty\) we have \(\Delta t = t_{n+1} - t_n \to 0\) and our sum becomes an integral giving us
+    \begin{equation}\label{eqn:integral over paths}
+        \braket{x_b, t_b}{x_a, t_a} \approx \int_{x_a}^{x_b} \DL{x} \exp\left[ i\int_{t_a}^{t_b} \dl{t} \varphi(x(t), \dot{x}(t), t) \right]
+    \end{equation}
+    where we introduce \(\dot{x}(t)\) as the continuous analogue of being able to find absolute differences \(x_{n+1} - x_n\).
+    This is called a \defineindex{path integral} as we integrate over all possible paths.
+    Path integrals will be the object of our study for much of the course.
+    
+    \part{Quantum Dynamics}
+    \chapter{Classical Mechanics}
+    \epigraph{This is not a course where we solve interesting problems. It's a course where we solve the harmonic oscillator in increasingly complicated ways.}{Roger Horsley}
+    \section{Euler--Lagrange Equation}
+    \begin{dfn}{Action}{}
+        Given a path, \(x(t)\), we define the \defineindex{action} from time \(t_a\) to \(t_b\) to be the functional
+        \begin{equation}
+            S[x(t)] \coloneqq \int_{t_a}^{t_b} \lagrangian(x, \dot{x}, t) \dd{t}.
+        \end{equation}
+        Here \(\lagrangian\) is the \defineindex{Lagrangian} of the system which, for a non-relativistic point particle in a potential, \(V\), in the absence of changing electromagnetic fields is
+        \begin{equation}
+            \lagrangian(x, \dot{x}, t) \coloneqq T - V = \frac{1}{2}m\dot{x}^2 - V(x, t).
+        \end{equation}
+    \end{dfn}
+    
+    This definition turns out to be very powerful when combined with the \defineindex{principle of least action}, which states that the classical path, \(\bar{x}(t)\), is such that the action is an extrema.
+    We usually assume that the action is minimised.
+    As a result of this
+    \begin{equation}
+        \diffd{S}{x}[x=\bar{x}] = 0
+    \end{equation}
+    where \(\diffd{S}/{x}\) is the functional derivative of \(S\) with respect to \(x\).
+    For our purposes this is not that different from a normal derivative.
+    We can compute it by considering the result of a small change in the path \(x(t)\).
+    Specifically consider a path given by \(x(t) + \delta x(t)\) where \(\delta x(t)\) is taken to be small so that terms of order \(\delta x(t)^2\) are negligible.
+    We also assume that \(\delta x(t_a) = \delta x(t_b) = 0\) so that the endpoints of the path are fixed.
+    
+    The change in \(S\) that follows from this change in the path is
+    \begin{equation}
+        \delta S = S[x + \delta x] - S[x] = \int_{t_a}^{t_b} \left[ \lagrangian(x + \delta x, \dot{x} + \dot{\delta x}, t) - \lagrangian(x, \dot{x}, t) \right] \dd{t}.
+    \end{equation}
+    Taylor expanding the first Lagrangian about \(x\) we have
+    \begin{equation}
+        \delta S = \int_{t_a}^{t_b} \left[ \diffp{\lagrangian}{x}\delta x + \diffp{\lagrangian}{\dot{x}}\dot{\delta x} + \order(\delta x^2) \right] \dd{t}.
+    \end{equation}
+    We now consider just the second term of this integral:
+    \begin{equation}
+        \int_{t_a}^{t_b} \diffp{\lagrangian}{\dot{x}}\dot{\delta x} \dd{t}.
+    \end{equation}
+    We can integrate this by parts, using
+    \begin{align}
+        u &= \diffp{\lagrangian}{\dot{x}}, & v &= \delta x,\\
+        u' &= \diff*{\left( \diffp{\lagrangian}{\dot{x}} \right)}{t}, & v' = \dot{\delta x},
+    \end{align}
+    which gives us
+    \begin{equation}\label{eqn:integtral of dL/dxdot delta x}
+        \left[ \diffp{\lagrangian}{\dot{x}}\delta x \right]_{t_a}^{t_b} - \int_{t_a}^{t_b} \diff*{\left( \diffp{\lagrangian}{\dot{x}} \right)}{t} \delta x \dd{t}.
+    \end{equation}
+    Taking the end points to be fixed means that the first term vanishes.
+    Bringing back the other term we have
+    \begin{equation}
+        \delta S = \int_{t_a}^{t_b} \left[ \diffp{\lagrangian}{x} - \diff*{\left( \diffp{\lagrangian}{\dot{x}} \right)}{t} \right]\delta x \dd{t}
+    \end{equation}
+    where we have dropped terms of order \(\delta x^2\) or higher.
+    
+    In order for the derivative to disappear, as we are looking for extrema, we must have that \(\delta S = 0\).
+    Since this also has to apply to all time intervals it follows that the integrand must be zero, that is
+    \begin{equation}
+        \diff*{\left( \diffp{\lagrangian}{\dot{x}} \right)}{t} - \diffp{\lagrangian}{x} = 0.
+    \end{equation}
+    This is the famous \defineindex{Euler--Lagrange equation}.
+    
+    We define the action on the classical path to be \(S_{\cl} \coloneqq S[\bar{x}(t)]\).
+    This is a function of the end points, \(x_a\) and \(x_b\), as well as the times \(t_a\) and \(t_b\), which appear through the limits on the integral and implicitly in \(\bar{x}\).
+    
+    \section{Hamilton's Principle Function}
+    We now investigate what happens if we vary slightly the final spatial point from \((x_b, t_b)\) to \((x_b + \delta x_b, t_b + \delta t_b)\).
+    First suppose we keep \(t_b\) fixed.
+    Then, with \(x_b = x(t_b)\), we have \(\delta x_b = \delta x_b(t_b)\).
+    Considering the first term in \cref{eqn:integtral of dL/dxdot delta x} we now have that the variation in the path is
+    \begin{equation}\label{eqn:delta Scl}
+        \delta S_{\cl} = \diffp{\lagrangian}{\dot{x}} \delta x\bigg\vert^{t_b}.
+    \end{equation}
+    Recall that the \defineindex{canonical momentum} is defined as
+    \begin{equation}
+        p \coloneqq \diffp{\lagrangian}{\dot{x}}.
+    \end{equation}
+    Dividing \cref{eqn:delta Scl} through by \(\delta x\) we get a functional derivative.
+    We are evaluating this for a particular path so it becomes a standard derivative and we have
+    \begin{equation}\label{eqn:dS = p dx}
+        p_b = \diffp{\lagrangian}{\dot{x}}\bigg|^{t_b} = \diffp{S_{\cl}}{x_b} \implies \delta S_{\cl} = p_b\delta x_b
+    \end{equation}
+    where \(p_b\) is the classical momentum at the endpoint.
+    
+    Suppose instead that we vary \(t_b\) and keep \(x_b\) fixed.
+    Now \(x_b = x(t_b + \delta t_b)\), Taylor expanding this gives us
+    \begin{equation}
+        \delta x(t_b + \delta t_b) = \delta x_b(t_b) + \dot{x}(t_b)\delta t_b + \order(\delta t_b^2).
+    \end{equation}
+    Recognising that keeping \(x_b\) fixed means the left hand side of this is zero we must have
+    \begin{equation}
+        \delta x(t_b) = -\dot{x}_b(t_b) \delta t_b.
+    \end{equation}
+    
+    We have seen now how varying \(x_b\) effects the classical action and how varying \(t_b\) effects \(x_b\), and hence the classical action, it follows that the change in the action is
+    \begin{equation}\label{eqn:dS = -E dt}
+        \delta S_{\cl} = \lagrangian_b\delta t_b + p_b\delta x(t_b) = (\lagrangian_b - p_b\dot{x}_b)\delta t_b = -E_b \delta t_b
+    \end{equation}
+    where \(E_b = \hamiltonian(x_b, \dot{x}_b, t_b)\) is the value of the Hamiltonian evaluated at the endpoint.
+    This follows from the definition of the \defineindex{Hamiltonian} as the Legendre transform of the Lagrangian, in one dimension that is
+    \begin{equation}
+        \hamiltonian \coloneqq \lagrangian - p\dot{x}.
+    \end{equation}
+    Dividing through by \(\delta t_b\) we have
+    \begin{equation}
+        E_b = -\diffp{S_{\cl}}{t_b}
+    \end{equation}
+    which can be rewritten taking \(E_b \) to be the value of some function \(E\) evaluated at the endpoint:
+    \begin{equation}
+        E(x_b, \diffp{S_{\cl}}/{x_b}, t_b) + \diffp{S_{\cl}}{x_b} = 0.
+    \end{equation}
+    This is the \defineindex{Hamilton--Jacobi equation} (HJ)\glossary[acronym]{HJ}{Hamilton--Jacobi}.
+    Since \(t_b\) is arbitrary we usually drop the index and write this as
+    \begin{equation}
+        H(x, \diffp{S_{\cl}}/{t}, t) + \diffp{S_{\cl}}{t} = 0.
+    \end{equation}
+    \defineindex{Hamilton's principle function}, here denoted \(S_{\cl}\), is a solution of the Hamilton--Jacobi equation and is equal to the action up to a constant.
+    
+    This equation is useful for finding the action as it is a first order differential equation which is relatively easy to solve.
+    The alternative being solving the second order Euler--Lagrange equation and then integrating.
+    We don't usually need to find the action in classical mechanics so we aren't that interested in this function.
+    
+    \begin{exm}{Free Particle}{}
+        Consider a free particle.
+        The corresponding Lagrangian is
+        \begin{equation}
+            \lagrangian = \frac{1}{2}m\dot{x}^2.
+        \end{equation}
+        From this it follows that \(\ddot{\bar{x}} = 0\), which is obvious as there are no forces.
+        We must then have
+        \begin{equation}
+            \bar{x}(t) = x_a + v(t - t_a)
+        \end{equation}
+        where
+        \begin{equation}
+            v = \frac{x_b - x_a}{t_b - t_a} = \dot{\bar{x}}
+        \end{equation}
+        so \(v\) is the constant velocity of the particle.
+        Then,
+        \begin{equation}\label{eqn:classical action free particle}
+            S_{\cl} = S[\bar{x}] = \int_{t_a}^{t_b} \frac{1}{2}m\dot{x}^2 \dd{t} = \frac{1}{2}m \frac{(x_b - x_a)^2}{t_b - t_a}.
+        \end{equation}
+        This then gives us
+        \begin{equation}
+            p_b = \diffp{S_{\cl}}{x_b} = mv, \qqand E_b = - \diffp{S_{\cl}}{t_b} = \frac{1}{2}mv^2.
+        \end{equation}
+        That is the classical momentum of a free particle is \(mv\) and the energy is \(mv^2/2\).
+        These are just the standard results that we are familiar with which are taken as definitions in Newtonian mechanics.
+    \end{exm}
+    
+    \begin{exm}{Simple Harmonic Oscillator}{}
+        The Lagrangian for a simple harmonic oscillator is
+        \begin{equation}
+            \lagrangian = \frac{1}{2}m(\dot{x}^2 - \omega^2x^2).
+        \end{equation}
+        From this it is trivial to derive the equation of motion
+        \begin{equation}
+            \ddot{\bar{x}} + \omega^2\bar{x} = 0.
+        \end{equation}
+        Taking \(T = t_b - t_a\), \(\bar{x}(t_a) = x_a\), and \(\bar{x}(t_b) = x_b\) we have
+        \begin{equation}
+            \bar{x}(t) = x_b\frac{\sin[\omega(t - t_a)]}{\sin(\omega T)} + x_a\frac{\sin[\omega(t_b - t_a)]}{\sin(\omega T)}.
+        \end{equation}
+        It should be noted that this solution is slightly more complicated than the standard solution since it considers boundary conditions at two points, \(x_a\) and \(x_b\), whereas the standard solution considers boundary and initial conditions at \(x_a\) and \(t = 0\).
+        The action is then
+        \begin{equation}
+            S_{\cl} = S[\bar{x}] = \frac{m\omega}{2\sin(\omega T)} [(x_a^2 + x_b^2)\cos(\omega T) - 2x_ax_b].
+        \end{equation}
+        Notice that when \(\omega \to 0\) we recover the free particle limit since \(\cos(0) = 0\) and
+        \begin{equation}
+            \lim_{\omega \to 0} \frac{\omega}{\sin(\omega T)} = \lim_{\omega\to 0} \frac{\omega T}{T\sin(\omega T)} = \frac{1}{T}\lim_{\omega\to 0} \frac{1}{\sinc(\omega T)} = \frac{1}{T}.
+        \end{equation}
+        The Hamilton--Jacobi equations then give
+        \begin{equation}
+            p_b = m\dot{\bar{x}}\big\vert_{t=t_b}, \qqand E_b = \frac{m}{2}(\dot{\bar{x}}^2 + \omega^2\bar{x}^2)\bigg\vert_{t=t_b}.
+        \end{equation}
+    \end{exm}
+
+    \chapter{Path Integrals}
+    \section{Amplitude for a Path}
+    Recall from \cref{eqn:integral over paths} we can write the amplitude for some path \(x(t)\) as
+    \begin{equation}
+        \braket{x_b, t_b}{x_a, t_a}\big\vert_{x(t)} \sim \exp\left[ i \int_{t_a}^{t_b} \varphi(x(t), \dot{x}(t), t) \right].
+    \end{equation}
+    To determine \(\varphi\) we go to the classical case since we should always be able to recover known classical results in the classical limit of the quantum result.
+    
+    The classical action is the Lagrangian integrated over a path.
+    This suggests that the phase, \(\varphi\), should be proportional to the Lagrangian, \(\lagrangian\).
+    We will find that this recovers the expected results.
+    However, for dimensionality reasons we need to include an extra factor since
+    \begin{equation}
+        [S] = [\text{time}][\text{energy}] = [\text{length}][\text{momentum}] = [\text{angular momentum}]
+    \end{equation}
+    and the argument of the exponential must be dimensionless.
+    We call this constant extra factor \(\hbar\) with \([\hbar] = [S]\) and write
+    \begin{equation}
+        \braket{x_b, t_b}{x_a, t_a}\big\vert_{x(t)} = \e^{iS[x(t)]/\hbar}.
+    \end{equation}
+    
+    At this point there are a few things to note.
+    First we have an overall normalisation constant which we simply absorb into our definition of \(\DL{x}\).
+    Second, if the action is modified by a constant, \(S \to S + c\), then the amplitudes are unchanged since this just gives us a global phase, \(\e^{ic/\hbar}\), which has no physical consequence.
+    Finally, the size at which quantum effects become important is set by the size at which variations in the exponent are \(\order(1)\), that is when \(\delta S = \order(\hbar)\).
+    
+    So far we have been attempting to motivate this definition.
+    From now on we take it as a postulate and see what we can derive from it.
+    
+    \section{The Feynman Path Integral}
+    Integrating the result of the previous section over all paths gives us the transition amplitude
+    \begin{equation}
+        \braket{x_b, t_b}{x_a, t_a} = \int_{x_a}^{x_b} \DL{x} \e^{iS[x(t)]/\hbar}.
+    \end{equation}
+    In order to evaluate this we use the limiting process from \cref{sec:intuitive rewriting}, now including a normalisation factor, \(A_N\):
+    \begin{equation}
+        \int_{x_a}^{x_b}\DL{x} = \lim_{N\to\infty} A_N \prod_{n=1}^{N}\int_{-\infty}^{\infty} \dl{x_n}.
+    \end{equation}
+    We take the normalisation factor to be
+    \begin{equation}
+        A_n = \nu(\varepsilon)^{N+1}
+    \end{equation}
+    where \(\nu(\varepsilon)\) is the normalisation factor for each discrete interval.
+    
+    It should be noted that this notation of \(\int \DL{x}\) is hard, if not impossible, to make mathematically precise.
+    This is one of those times where we use the maths just because it works, not because there is a rigorous reason behind it.
+    The limits on this integral shouldn't be thought of like the limits of a normal integral.
+    They are just a way of keeping track of which section of the path we are considering.
+    
+    We can insert a complete set of states in the transition amplitude giving
+    \begin{align}
+        \braket{x_b, t_b}{x_a, t_a} &= \int \dl{x_c} \braket{x_b, t_b}{x_c, t_c}\braket{x_c, t_c}{x_a, t_a}\\
+        &= \int\dl{x_c} \int_{x_c}^{x_b} \DL{x} \int_{x_a}^{x_c} \DL{x'} \exp\left[ \frac{i}{\hbar}\left( \int_{t_c}^{t_b} \lagrangian \dd{t} + \int_{t_a}^{t+c} \lagrangian \dd{t}\right) \right].
+    \end{align}
+    We can see this as splitting the path into two sections and then integrating over all paths that go through the chosen mid point.
+    We then integrate over all possible mid points and hence over all possible paths.
+    This will be useful when it comes to evaluating the normalisation factors, \(\nu\).
+    
+    \begin{figure}
+        \tikzsetnextfilename{split-path}
+        \begin{tikzpicture}
+            \tikzset{mid arrow/.style={postaction={decorate,decoration={
+                            markings,
+                            mark=at position .5 with {\arrow{>}}
+            }}}}
+            \foreach \a in {-60, -40, ..., 60} {
+                \draw [thick, mid arrow] (0, 0) to[out=\a, in=180-\a, looseness=1.2] (2, 1.5);
+                \draw [thick, mid arrow, looseness=0.8] (2, 1.5) to[out=\a, in=180-\a] (5, 2);
+            }
+            \fill[highlight] (0, 0) circle [radius = 0.1cm];
+            \fill[highlightpurple] (5, 2) circle [radius = 0.1cm];
+            \fill[complementary] (2, 1.5) circle [radius = 0.1cm];
+            \node at (2.5, -1) {\(\displaystyle\braket{\textcolor{highlight}{x_b}, \textcolor{highlight}{t_b}}{\textcolor{highlightpurple}{x_a}, \textcolor{highlightpurple}{t_a}} = \int \dl{\textcolor{complementary}{x_c}} \int_{\textcolor{complementary}{x_c}}^{\textcolor{highlight}{x_b}} \DL{x} \int_{\textcolor{highlightpurple}{x_a}}^{\textcolor{complementary}{x_c}} \DL{x'} \exp\left[ \frac{i}{\hbar} \left( \int_{\textcolor{complementary}{t_c}}^{\textcolor{highlight}{t_b}} \lagrangian \dd{t} + \int_{\textcolor{highlightpurple}{t_a}}^{\textcolor{complementary}{t_c}} \lagrangian \dd{t} \right) \right]\)};
+        \end{tikzpicture}
+        \caption{Splitting a path from \(\textcolor{highlightpurple}{x_a}\) to \(\textcolor{highlight}{x_b}\) into two paths from \(\textcolor{highlightpurple}{x_a}\) to \(\textcolor{complementary}{x_c}\) and then \(\textcolor{complementary}{x_c}\) to \(\textcolor{highlight}{x_b}\).}
+    \end{figure}
+
+    \section{Connection to Classical Limit}
+    In a quantum situation we typically consider \(t_a\) and \(t_b\) to be close, and also \(x_a\) and \(x_b\) to be close.
+    We take the action, \(S[x(t)]\), to be on the order of \(\hbar\).
+    Hence the magnitude of the exponent is on the order of 1 and therefore paths far from the classical path may well have non-negligible contributions.
+    
+    On the other hand, in the classical process the time and space intervals are typically much greater and hence the action is larger.
+    This means that the exponent is typically much larger than \(\hbar\).
+    Formally the classical limit is found by taking the limit of \(\hbar \to 0\).
+    
+    Consider paths which are a small perturbation, \(\delta x\), from a given path, \(x(t)\).
+    Given that \(S\) is large we expect \(\delta S\) to be large, even if \(\delta x\) is small.
+    The result is that the exponential oscillates rapidly and hence most of the paths cancel out, apart from those near to the classical path where \(S[x(t)]\) is minimised\footnote{see the section on asymptotic integral expansions in the methods of mathematical physics course where this is discussed in more detail}, and hence the terms in \(\delta S\) of order \(\delta x\) are zero and \(\delta S\) is \(\order(\delta x^2)\), which will be considerably smaller for small \(\delta x\).
+    Paths near to the classical path therefore add constructively.
+    In the limit of \(\hbar \to 0\) the classical path gives the dominant contribution and we arrive at the principle of least action.
+    We then have\footnote{this is a proper asymptotic relation, again, see methods of mathematical physics.}
+    \begin{equation}
+        \braket{x_b, t_b}{x_a, t_a} \sim \e^{i S_{\cl}/\hbar}
+    \end{equation}
+    
+    \section{Momentum and Energy}
+    \subsection{Momentum}
+    Consider a small change in the endpoint of the path, \(x_b \to x_b + \delta x_b\), keeping \(t_b\) fixed.
+    The change in the integrand, \(\delta S_{\cl}/\hbar\), is defined to be \(k_b\delta x_b\), where \(k_b\) is the wavenumber.
+    We also know from \cref{eqn:dS = p dx} that \(\delta S_{\cl} = p_b\delta x_b\), and so we finally identify \(p_b = \hbar k_b\), or, since the endpoint is arbitrary,
+    \begin{equation}
+        p = \hbar k.
+    \end{equation}
+    This then naturally converts to operators as \(\operator{p} = \hbar \operator{k}\).
+    
+    We can then define the \defineindex{momentum basis} as the states \(\ket{p} = \hbar\ket{p}\) and from this follows the expected relations, such as
+    \begin{equation}
+        \commutator{\operator{x}}{\operator{p}} = i\hbar
+    \end{equation}
+    and
+    \begin{equation}
+        \braket{x}{p} = \frac{1}{\sqrt{2\pi\hbar}} \e^{ipx/\hbar}, \qqand \braket{p}{x} = \frac{1}{\sqrt{2\pi\hbar}} \e^{-ipx/\hbar}.
+    \end{equation}
+    Notice the change in the normalisation factor to include \(1/\sqrt{\hbar}\) to account for the extra factor of \(1/\hbar\) in the exponent.
+    
+    \subsection{Energy}
+    Now suppose we vary \(t_b\) and keep \(x_b\) fixed.
+    The change in the exponent \(\delta S_{\cl}/\hbar\), is defined to be \(-\omega_b\delta t_b\), where \(\omega_b\) is the (angular) frequency.
+    \Cref{eqn:dS = -E dt} tells us that \(\delta S_{\cl} = -E_b\delta t_b\), and hence \(E_b = \hbar\omega_b\), or, since the endpoint is arbitrary,
+    \begin{equation}
+        E = \hbar\omega.
+    \end{equation}
+    
+    \chapter{Path Integrals In Use}
+    \epigraph{Very rough mathematically, but never mind.}{Roger Horsley}
+    In this chapter we will give examples of how path integrals can be used to find the amplitude for some simple systems, including a free particle and a harmonic oscillator.
+    
+    \section{Free Particle}
+    The Lagrangian for a free particle is
+    \begin{equation}
+        \lagrangian = T = \frac{1}{2}m\dot{x}^2.
+    \end{equation}
+    The simplest method for computing the amplitude is to consider the discrete case and then take the limit.
+    In this case we have a discrete Lagrangian where the rate of change is turned into a ratio of finite differences:
+    \begin{equation}
+        \lagrangian \approx \frac{1}{2}m\left( \frac{x_{n+1} - x_n}{\varepsilon} \right)^2.
+    \end{equation}
+    Recall that \(\varepsilon = t_{n+1} - t_n\).
+    We then have
+    \begin{align}
+        \braket{x_b, t_b}{x_a, t_a} &= \int_{x_a}^{x_b} \DL{x} \exp\left[ \frac{i}{\hbar} \int_{t_a}^{t_b} \lagrangian \dd{t} \right]\\
+        &= \lim_{N\to\infty} A_N \left( \prod_{n=1}^{N} \int\dl{x_n} \right) \exp\left[ \frac{i\varepsilon m}{2\hbar} \sum_{n=0}^{N} \left( \frac{x_{n+1} - x_n}{\varepsilon} \right)^2 \right].\label{eqn:free particle path integral discrete}
+    \end{align}
+    In this the integral
+    \begin{equation}
+        \int \lagrangian \dd{t}
+    \end{equation}
+    becomes the discrete sum
+    \begin{equation}
+        \sum_{n=0}^{N} \lagrangian \varepsilon.
+    \end{equation}
+
+    We will determine the normalisation factor, \(A_N\), later.
+    For now we state that we expect it to be of the form \(\nu(\varepsilon)^{N+1}\) for some function \(\nu\).
+    
+    \subsection{Double Gaussian}
+    The integrals above are a series of nested Gaussian integrals.
+    In order to compute this we consider a single double Gaussian integral:
+    \begin{equation}
+        I = \int_{-\infty}^{\infty} \exp\left[ \frac{i}{a}(x - u)^2 + \frac{i}{b}(u - y)^2 \right] \dd{u}.
+    \end{equation}
+    This integral is translation invariant, which is a fancy way of saying that if we replace \(u\) with \(u + y\) then nothing changes.
+    We can also view this as a change of variables to \(u' = u - y\).
+    \begin{equation}
+        I = \int_{-\infty}^{\infty} \exp\left[ \frac{i}{a}(x - y - u)^2 + \frac{i}{b}u^2 \right] \dd{u}.
+    \end{equation}
+    Another way of viewing this is that this integral depends only on \(x - y\), not the actual values of \(x\) and \(y\).
+    
+    Completing the square in the exponent we have
+    \begin{equation}
+        \frac{1}{a}(x - y - u)^2 + \frac{1}{b}u^2 = \left( \frac{1}{a} + \frac{1}{b} \right)\left( u - \frac{x - y}{a\left( \frac{1}{a} + \frac{1}{b} \right)} \right)^2 + \frac{(x - y)^2}{a _ b}.
+    \end{equation}
+    Again shifting \(u\), this time to
+    \begin{equation}
+        u - \frac{x - y}{a\left( \frac{1}{a} + \frac{1}{b} \right)}
+    \end{equation}
+    we end up with
+    \begin{equation}
+        I = \int_{-\infty}^{\infty} \exp\left[ i(\frac{1}{a} + \frac{1}{b})u^2 + i\frac{(x - y)^2}{a + b} \right] \dd{u}.
+    \end{equation}
+    This is simply a Gaussian integral in \(u\) and so, using the results in \cref{app:gaussian integral}, we get
+    \begin{equation}
+        I = \sqrt{\frac{i\pi ab}{a + b}} \exp\left[ i\frac{(x - y)^2}{a + b} \right].
+    \end{equation}
+    
+    \subsection{Nested Gaussian Integrals}
+    Now consider the nested integrals in \cref{eqn:free particle path integral discrete}.
+    Writing \(c = 2\hbar \varepsilon/m\) and \(x_n' = x_n/\sqrt{c}\) for brevity we need to evaluate
+    \begin{equation}
+        I_N = c^{N/2} \int \dl{x_1'} \dotsm \dl{x_N'} \exp[i(x_1' - x_0')^2 + i(x_2' - x_1')^2 + \dotsb ]
+    \end{equation}
+    Computing the \(x_1'\) integral we get
+    \begin{equation}
+        I_N = \sqrt{\frac{i \pi 1\cdot 1}{1 + 1}} \int \dl{x_2'} \dotsm \dl{x_N'} \exp[i(x_2' - x_0')/2 + (x_3' - x_2')^2 + \dotsm].
+    \end{equation}
+    Continuing on and computing all integrals we have
+    \begin{align}
+        I_N &= c^{N/2} \sqrt{\frac{i\pi 1\cdot1}{\cancel{1 + 1}}} \sqrt{\frac{i\pi \cancel{2\cdot 1}}{\cancel{2 + 1}}} \dotsm \sqrt{\frac{i\pi \cancel{N}}{N + 1}} \exp[i(x'_{N+1} - x_0')^2/(N+1)]\\
+        &= \left( \frac{2\pi i\varepsilon \hbar}{m} \right)^{N/2} \frac{1}{\sqrt{N + 1}} \exp\left[ \frac{i}{\hbar}\frac{m}{2\varepsilon m\hbar(N+1)} (x_b - x_a)^2 \right].
+    \end{align}
+    
+    \subsection{Evaluating the Free Particle Amplitude}
+    Putting in the result from the previous section we have
+    \begin{equation}
+        \braket{x_b, t_b}{x_a, t_a} = \lim_{N\to\infty} A_N \left( \frac{2\pi i \varepsilon \hbar}{m} \right)^{(N+1)/2} \sqrt{\frac{m}{2\pi i \hbar(N + 1)\varepsilon}} \exp\left[ \frac{i}{\hbar} \frac{m(x_b - x_a)^2}{2\varepsilon(N + 1)} \right].
+    \end{equation}
+    Notice that \((N + 1)\varepsilon = t_b - t_a\) since \(t_b = t_{N+1}\) and \(t_a = t_0\) and \(t_n = t_0 + n\varepsilon\).
+    We will often call the time interval \(t_b - t_a\) \(T\) and unless stated otherwise assume that this is what \(T\) means.
+    
+    We need to normalise this quantity.
+    As it stands we simply need the quantity to be finite and we look for a normalisation factor that makes this so.
+    If we have \(A_N = \nu(\varepsilon)^{N + 1}\) then clearly by setting
+    \begin{equation}
+        \nu(\varepsilon) = \sqrt{\frac{m}{2\pi i\hbar T}}
+    \end{equation}
+    not only do we remove the factor of \(1/\sqrt{\varepsilon}\), which diverges in the limit, but we also remove the constant to the power of \((N + 1)/2\), which either explodes to infinity or becomes zero depending on the constant.
+    Neither of these behaviours is desirable so this seems to be a good choice of normalisation.
+    
+    The result of this normalisation is
+    \begin{equation}
+        \braket{x_b, t_b}{x_a, t_a} = \sqrt{\frac{m}{2\pi i\hbar T}} \exp\left[ \frac{i}{\hbar} \frac{m}{2}\frac{(x_b - x_a)^2}{T} \right].
+    \end{equation}
+
+    \subsection{Rewriting in Terms of the Classical Action}
+    We can recognise from \cref{eqn:classical action free particle} that the exponent is proportional to the classical action for a free particle:
+    \begin{equation}
+        S_{\cl} = \frac{m}{2}\frac{(x_b - x_a)^2}{T}.
+    \end{equation}
+    This means that we have
+    \begin{equation}
+        \braket{x_b, t_b}{x_a, t_a} = F_0(T) \e^{i S_{\cl}/\hbar}
+    \end{equation}
+    where
+    \begin{equation}
+        F_0(T) = \sqrt{\frac{m}{2\pi i\hbar T}}.
+    \end{equation}
+    Notice that the prefactor is independent of both \(x_a\) and \(x_b\).
+    
+    \subsection{Notes}
+    \subsubsection{Plane Waves}
+    If we consider a variation in \(x_b\) and \(t_b\) then for fixed \(t_b\) we have \(\delta S_{\cl} = p_b\delta x_b\) and for fixed \(x_b\) we have \(\delta S_{\cl} = -E_b\delta t_b\).
+    We then have
+    \begin{align}
+        \braket{x_b + \delta x_b, t_b + \delta t_b}{x_a, t_a} &= F_0(T + \delta t_b) \exp\left[ \frac{i}{\hbar}(S_{\cl} + \delta S_{\cl}) \right]\\
+        &= F_0(T + \delta t_b) \e^{iS_{\cl}/\hbar} \exp\left[ \frac{i}{\hbar} (p_b\delta x_b - E_b\delta t_b) \right]\\
+        &\approx \braket{x_b, t_b}{x_a, t_a} \exp\left[ \frac{i}{\hbar} (p_b\delta x_b - E_b\delta t_b) \right].
+    \end{align}
+    This represents a plane wave with amplitude \(\braket{x_b, t_b}{x_a, t_a}\), momentum \(p_b\), and energy \(E_b = p_b^2/2m\).
+    This justifies us calling the wave function a plane wave when discussing the double slit experiment.
+    
+    \subsubsection{Green's Function}\label{sec:green's function}
+    This note is mostly on terminology.
+    We call the free particle amplitude the \defineindex{free particle Green's function}, which we write as
+    \begin{equation}
+        G_0(x_b - x_a, t_b - t_a) \coloneqq \braket{x_b, t_b}{x_a, t_a}
+    \end{equation}
+    for \(t_b > t_a\).
+    This makes clear the translation invariance since the Green's function depends only on the difference between the endpoints.
+    
+    We can take the Fourier transform of the Green's function:
+    \begin{align}
+        \tilde{G}_0(p, t) &= \int_{-\infty}^{\infty} G_0(x, t) \e^{ipx/\hbar} \dd{x}\\
+        &= \exp\left[ -\frac{i}{\hbar} \frac{p^2}{2m}t \right]\\
+        &= \exp\left[ -\frac{i}{\hbar} Et \right]
+    \end{align}
+    where \(E = p^2/2m\).
+    We see that we get a plane wave of classical energy \(E\), which is what we would expect.
+    \begin{wrn}
+        Notice that we are using a different Fourier transform convention here, this is simply for convenience.
+    \end{wrn}
+    
+    \subsubsection{Normalisation}
+    \epigraph{Just don't worry about it.}{Roger Horsley}
+    The normalisation constant, \(\nu(\varepsilon)\), diverges as \(\varepsilon \to 0\).
+    This means that the amplitude diverges for infinitesimal time intervals.
+    This is all fine since for finite time intervals all of the diverging cancels out and we are left with a finite quantity proportional to
+    \begin{equation}
+        \lim_{N\to \infty} \nu(\varepsilon)\sqrt{\frac{2\pi i\hbar \varepsilon}{m}}.
+    \end{equation}
+    For this to be finite we have some freedom in \(\nu(\varepsilon)\), we simply need
+    \begin{equation}\label{eqn:single amplitude freedom in normalisation}
+        \nu(\varepsilon) \propto \frac{1}{\sqrt{\varepsilon}}(1 + \order(\varepsilon))
+    \end{equation}
+    since this will always be finite in the limit of \(\varepsilon \to 0\).
+    We use this freedom to cancel out a bunch of constants and to keep things simple we just don't include any \(\order(\varepsilon)\) terms.
+    
+    \subsubsection{Orthogonality}
+    Since \(\braket{x_b, t_b}{x_a, t_a}\) are Gaussians in \(x_b - x_a\) with width \(\sigma = \sqrt{\hbar T/m}\) and unit area (another advantage of the choice of normalisation) we can recover the orthonormality condition that as \(t_b \to t_a\)
+    \begin{equation}
+        \braket{x_b, t_b}{x_a, t_a} \to \delta(x_b - x_a).
+    \end{equation}
+    Now we can make sense of this as if \(x_b\) and \(x_a\) are distinct points then in zero time there is no way to get from \(x_b\) to \(x_a\).
+    This follows from identifying one common definition of the delta distribution as the limit of the function sequence \((\delta_\varepsilon(x))\) where
+    \begin{equation}
+        \delta_{\varepsilon} = \sqrt{\frac{a}{\pi \varepsilon}} \e^{-ax^2/\varepsilon}.
+    \end{equation}
+    
+    \subsubsection{Completeness}
+    A final reason to suggest that we have made a good choice of normalisation, which is really a result of the orthogonality suggested in the previous note, is that the completeness relation
+    \begin{equation}
+        \braket{x_b, t_b}{x_a, t_a} = \int_{-\infty}^{\infty} \braket{x_b, t_b}{x, t} \braket{x, t}{x_a, t_a} \dd{x}
+    \end{equation}
+    for all \(t \in [t_a, t_b]\).
+    This follows by splitting the path in two.
+    
+    \subsection{Free Particle: The Action Strikes Back}
+    Now that we have done this full derivation we discuss a shorter method.
+    This shorter method applies to many simple cases, but cannot be applied to more complicated systems for which we need to use the discrete method from above.
+        
+    This alternative derivation follows from the observation that we ended up with the classical action at the end of the longer derivation.
+    Consider quantum fluctuations about the classical path.
+    In particular consider the path
+    \begin{equation}
+        x(t) = \bar{x}(t) + \eta(t)
+    \end{equation}
+    where \(\eta\colon[t_a, t_b] \to \reals\) is some arbitrary function with the boundary conditions \(\eta(t_a) = \eta(t_b) = 0\), which keeps the endpoints of \(x\) fixed as \(x_a\) and \(x_b\).
+    The action associated with this path is
+    \begin{align}
+        S[x] &= \int_{t_a}^{t_b} \frac{1}{2}m\left( \diff*{\bar{x} + \eta}{t} \right)^2 \dd{t}\\
+        &= \frac{m}{2} \int_{t_a}^{t_b} (\dot{\bar{x}}^ + \dot{\eta}^) \dd{t} + m \int_{t_a}^{t_b} \dot{\bar{x}}\dot{\eta}\\
+        &= \frac{m}{2} \int_{t_a}^{t_b} (\dot{\bar{x}}^ + \dot{\eta}^) \dd{t} + m\underbrace{[\dot{\bar{x}}\eta]_{t_a}^{t_b}}_{=0} - m\underbrace{\int_{t_a}^{t_b} \eta\ddot{\bar{x}} \dd{t}}_{=0}
+    \end{align}
+    The middle term vanishes as \(\eta(t_b) = \eta(t_a) = 0\).
+    The third term vanishes as the equations of motion for a free particle give us \(\ddot{\bar{x}} = 0\) (i.e. a free particle doesn't accelerate).
+    
+    Since \(\bar{x}\) is a fixed path we have \(\dl{x_n} = \dl{\eta_n}\) for all \(n\).
+    This gives us
+    \begin{equation}
+        \int_{x_a}^{x_b} \DL{x} = \int_0^0 \DL{\eta}.
+    \end{equation}
+    \begin{rmk}
+        The limits look a bit weird here because they are just a reminder of the boundary conditions, in this case the zeros emphasise that the result is independent of \(x_a\) and \(x_b\).
+    \end{rmk}
+    It follows that
+    \begin{equation}
+        \braket{x_b, t_b}{x_a, t_a} = \int_{x_a}^{x_b} \DL{x} \e^{iS[x(t)]/\hbar} - \e^{iS_{\cl}/\hbar}\int_0^0 \DL{\eta} \e^{iS[\eta]/\hbar}.
+    \end{equation}
+    This integral is independent of \(x_a\) and \(x_b\) so is a function only of \(t_a\) and \(t_b\).
+    Further, the situation is translation invariant and so is a function only of \(T = t_b - t_a\).
+    That is
+    \begin{equation}
+        \int_0^0 \DL{\eta} \e^{iS[\eta]/\hbar} \eqqcolon F_0(T) = \braket{0, t_b}{0, t_a} = \braket{0, T}{0, 0}.
+    \end{equation}
+    Here we have used the translational invariance to choose \(t_b = T\) and hence \(t_a = 0\).
+    
+    We can explicitly compute this integral, but we don't have to.
+    Instead notice that inserting completeness we have
+    \begin{align}
+        F_0(T) &= \braket{0, T}{0, 0}\\
+        &= \int_{-\infty}^{\infty} \braket{0, T}{x, t}\braket{x, t}{0, 0} \dd{x}\\
+        &= \int_{-\infty}^{\infty} F_0(T - t)\exp\left[ \frac{imx^2}{2\hbar(T - t)} \right] F_0(t)\exp\left[ \frac{imx^2}{2\hbar t} \right]  \dd{x}\\
+        &= \sqrt{\frac{2\pi i \hbar (T - t) t}{mT}} F_0(T - t)F_0(T).
+    \end{align}
+    We can now see by inspection that we must have \(F_0(t) \propto 1/\sqrt{t}\).
+    Alternatively we can take the limit that \(T \gg t\), and hence \(T - t \approx T\).
+    Either way a little bit of algebra gives us
+    \begin{equation}
+        F_0(t) = \sqrt{\frac{m}{2\pi i\hbar t}}.
+    \end{equation}
+
+    We have now arrived at the same point as the previous method but we didn't have to do any of the nasty maths like treating the discrete path integral. 
+    
+    \section{Harmonic Oscillator}
+    The Lagrangian for the harmonic oscillator is
+    \begin{equation}
+        \lagrangian = \frac{1}{2}m\dot{x}^2 - \frac{1}{2}m\omega^2x^2.
+    \end{equation}
+    Bolstered by our success with the free particle we write \(x = \bar{x} + \eta\) where \(\bar{x}\) is the classical path satisfying \(\bar{x}(t_a) = x_a\) and \(\bar{x}(t_b) = x_b\), and \(\eta\) is the deviation from this path satisfying \(\eta(t_a) = \eta(t_b) = 0\).
+    Using this we find
+    \begin{align}
+        S[x] &= \frac{m}{2}\int_{t_a}^{t_b} (\dot{\bar{x}} + \dot{\eta})^2 - \omega^2(\bar{x} + \eta)^2\dd{t}\\
+        &= \frac{m}{2}\int_{t_a}^{t_b} \dot{\bar{x}}^2 - \omega^2 \bar{x}^2 \dd{t} + \frac{m}{2}\int_{t_a}^{t_b} \dot{\eta}^2- \omega^2\eta^2 \dd{t}\\
+        &\qquad+ m\int_{t_a}^{t_b} (\dot{\bar{x}}\dot{\eta} - \omega^2\bar{x}\eta) \dd{t}\\
+        &= S[\bar{x}] + S[\eta] + m[\eta\dot{\bar{x}}]_{t_a}^{t_b} - m\int_{t_a}^{t_b} \varepsilon(\ddot{\bar{x}} + \omega^2 x) \dd{t}\\
+        &= S_{\cl} + S[\eta].
+    \end{align}
+    Note that \([\eta\dot{\bar{x}}]_{t_a}^{t_b}\) term is zero as \(\eta\) vanishes on the boundary and the final integral vanishes as we can use the equation of motion for a simple harmonic oscillator and replace \(\ddot{\bar{x}}\) in the integrand with \(-\omega^2\bar{x}\), and hence the integrand vanishes.
+    
+    It can be shown more generally that this result holds for any Lagrangian quadratic in \(x\), not just a simple harmonic oscillator.
+    
+    As for the free particle we have \(\DL{x} = \DL{\eta}\) and hence
+    \begin{equation}
+        \braket{x_b, t_b}{x_a, t_a} = \e^{iS_{\cl}/\hbar} \int_0^0 \DL{\eta} \e^{iS[\eta]/\hbar} \eqqcolon F_{\omega}(T)\e^{iS_{\cl}/\hbar}.
+    \end{equation}
+    Again, since the \(\eta\) path integral has no \(x_a\) or \(x_b\) dependence the integral depends only on \(T\).
+    
+    We can evaluate \(F_{\omega}(T)\) directly by discretising the path integral or by expanding \(\eta(t)\) in a Fourier series.
+    However, there is an easier way to do this using the completeness relation.
+    We have
+    \begin{equation}
+        F_{\omega}(T) = \braket{0, T}{0, 0} = \int_{-\infty}^{\infty} \braket{0, T}{0, 0} \braket{x, t}{0, 0} \dd{x}.
+    \end{equation}
+    It can be shown\footnote{see problem sheet 2} that the classical action for a harmonic oscillator is
+    \begin{equation}
+        S_{\cl} = \frac{m\omega}{2\sin(\omega T)} [(x_a^2 + x_b^2)\cos(\omega T) - 2x_ax_b].
+    \end{equation}
+    From this it follows that
+    \begin{align}
+        F_{\omega}(T) &= \int_{-\infty}^{\infty} \bigg\{ F_{\omega}(T - t) \exp\left[ \frac{im\omega x^2}{2\hbar}\frac{\cos[\omega(T - t)]}{\sin[\omega(T - t)]} \right]\\
+        &\hspace{5em}F_{\omega}(t) \exp\left[ \frac{im\omega x^2}{2\hbar} \frac{\cos(\omega t)}{\sin(\omega t)} \right]\bigg\} \dd{x}\\
+        &= F_\omega(T - t)F_\omega(t) \sqrt{\frac{2\pi i\hbar \sin[\omega(T - t)\sin(\omega t)]}{m \omega \sin(\omega T)}}.
+    \end{align}
+    Noticing that this implies \(F_\omega(t) \propto 1/\sqrt{\sin(\omega t)}\), or taking the limit \(T \gg t\), we can show that
+    \begin{equation}
+        F_{\omega}(t) = \sqrt{\frac{m \omega}{2\pi i\hbar \sin (\omega t)}}.
+    \end{equation}
+    Notice that in the limit \(\omega \to 0\) approximating \(\sin(\omega t) \approx \omega t\) we recover \(F_0(t)\).
+    That is to say that the free particle is a special case of the harmonic oscillator with zero spring constant.
+    This is exactly what we would expect classically.
+    
+    \section{Forced Harmonic Oscillator}
+    The forced harmonic oscillator includes an additional term linear in \(x\):
+    \begin{equation}
+        \lagrangian = \frac{1}{2}m(\dot{x}^2 - \omega^2x^2) + J(t)x
+    \end{equation}
+    where \(J\colon[t_a, t_b]\to\reals\) is some arbitrary function of time.
+    The equation of motion for the classical path is still quite simple:
+    \begin{equation}
+        \ddot{\bar{x}} = \omega^2\bar{x} = \frac{J}{m}.
+    \end{equation}
+    We can split the action into two parts as usual by considering the path \(x = \bar{x} + \eta\) where \(\eta\) satisfies \(\eta(t_a) = \eta(t_b) = 0\).
+    We then have
+    \begin{align}
+        S[\bar{x} + \eta, J] &= \frac{m}{2}\int\left[ (\dot{\bar{x}} + \dot{\eta})^2 - \omega^2(\bar{x} + \eta)^2 + \frac{2J}{m}(\bar{x} + \eta) \right] \dd{t}\\
+        &= \frac{m}{2} \int_{t_a}^{t_b} (\dot{\bar{x}} + \dot{\eta})^2 - \omega^2(\bar{x} + \eta)^2 + \frac{2J}{m}(\bar{x} + \eta) \dd{t}\\
+        &= \textcolor{highlight}{\frac{m}{2} \int_{t_a}^{t_b}  \dot{\bar{x}}^2 - \omega^2\bar{x}^2 + \frac{2J}{m}\bar{x} \dd{t}} + \textcolor{complementary}{\frac{m}{2} \int_{t_a}^{t_b} \dot{\eta}^2 - \omega^2\eta^2 + \textcolor{highlightpurple}{\frac{2J}{m}\eta} \dd{t}}\\
+        &\qquad+ m \int_{t_a}^{t_b}  \dot{\bar{x}}\dot{\eta} - \omega^2\bar{x}\eta \dd{t}\\
+        &= \textcolor{highlight}{S[\bar{x}, J]} + \textcolor{complementary}{S[\eta, 0]} + m \int_{t_a}^{t_b} \dot{\bar{x}}\dot{\eta} - \omega^2\bar{x}\eta + \textcolor{highlightpurple}{\frac{J}{m}\eta} \dd{t}\\
+        &= S[\bar{x}, J] + S[\eta, 0] + m\underbrace{[\dot{\bar{x}}\eta]_{t_a}^{t_b}}_{=0} + m \int_{t_a}^{t_b} -\ddot{\bar{x}} \underbrace{- \omega^2\bar{x} + \frac{J}{m}}_{=\ddot{\bar{x}}} \dd{t}\\
+        &= S[\bar{x}, J] + S[\eta, 0].
+    \end{align}
+    Here we integrated the \(\dot{\bar{x}}\dot{\eta}\) term by parts to get the final result.
+    The boundary terms vanish since \(\eta(t_a) = \eta(t_b) = 0\) and substituting the classical equation of motion in for \(\ddot{x}\) shows that the remaining integral also vanishes.
+    
+    The main result then follows the same way as for the harmonic oscillator:
+    \begin{equation}
+        \braket{x_b, t_b}{x_a, t_a} = F_{\omega}(T) \e^{iS[\bar{x}, J]/\hbar}.
+    \end{equation}
+    This is the same prefactor, \(F_{\omega}(T)\), as for the un-driven case, the only difference is in the action.
+    The classical action for a driven harmonic oscillator is horrible:
+    \begin{align}
+        S_{\cl} &= \frac{m\omega}{2\sin(\omega T)} \bigg[ (x_a^2 + x_b^2)\cos(\omega T) - 2x_ax_b\\
+        &\qquad+ \frac{2x_b}{m\omega} \int_{t_a}^{t_b} \sin[\omega(t - t_a)]J(t) \dd{t}\\
+        &\qquad+ \frac{2x_a}{m\omega} \int_{t_a}^{t_b} \sin[\omega(t_b - t)]J(t) \dd{t}\\
+        &\qquad- \frac{2}{(m\omega)^2}\mkern-2mu \int_{t_a}^{t_b}\mkern-10mu\int_{t_a}^{t} \mkern-8mu\sin[\omega(t_b - t)]\sin[\omega(t' - t_a)] J(t)J(t') \dd{t'}\dd{t} \bigg]
+    \end{align}
+    
+    \section{Arbitrary Potentials}
+    We now consider the case of an arbitrary potential, \(V(x, t)\).
+    We restrict ourselves to velocity independent potentials, so, for example, this doesn't work for electromagnetism, we will see the velocity dependent case in a tutorial.
+    The Lagrangian with an arbitrary potential is
+    \begin{equation}
+        \lagrangian = \frac{1}{2}m\dot{x}^2 - V(x, t).
+    \end{equation}
+    For an arbitrary potential we turn to the definition of the path integral:
+    \begin{align}
+        \braket{x_b, t_b}{x_a, t_a} &=\\
+        &\mkern-90mu\lim_{N\to\infty} \int\!\dl{x_1}\dotsm\dl{x_N} \braket{x_b, t_b}{x_N, t_N} \braket{x_N, t_N}{x_{N-1}, t_{N-1}} \dotsm \braket{x_1, t_1}{x_a, t_a}\\
+        &= \lim_{N\to\infty} \left( \prod_{n=1}^{N} \int\dl{x_n} \right) \left( \prod_{n=0}^{N} \braket{x_{n+1}, t_{n+1}}{x_n, t_n} \right).
+    \end{align}
+    
+    Consider the infinitesimal amplitude between two time steps:
+    \begin{equation}
+        \braket{x_{n+1}, t_{n+1}}{x_n, t_n} = \sqrt{\frac{m}{2\pi i\hbar\varepsilon}} \exp\left[ \frac{i}{\hbar}\varepsilon\left[ \frac{m}{2}\left( \frac{x_{n+1} - x_n}{\varepsilon} \right)^2 - V(x_n, t_n) \right] \right].
+    \end{equation}
+    Recall we define \(\varepsilon = t_{n+1} - t_n\).
+    
+    We have taken here the free particle normalisation.
+    This is justified by the potential being of higher order in \(\varepsilon\) and we were free to choose \(\nu(\varepsilon) = \sqrt{m/(2mi\hbar\varepsilon)}(1 + \order(\varepsilon))\) (see \cref{eqn:single amplitude freedom in normalisation}) for our normalisation.
+    We can further justify this by showing it works for the simple harmonic case (and therefore for all potentials up to second order in \(\varepsilon\)):
+    \begin{align}
+        F_{\omega}(\varepsilon) &= \sqrt{\frac{m\omega}{2\pi i\hbar\sin(\omega \varepsilon)}}\\
+        &= \sqrt{\frac{m}{2\pi i\hbar\varepsilon}}\left( 1 + \frac{1}{12}\omega^2\varepsilon^2 + \dotsb \right)\\
+        &= F_0(\varepsilon) + \order(\varepsilon^{3/2}).
+    \end{align}
+    Here we have used a series expansion for \([\sin x]^{-1/2}\).
+    Another justification which we will show in a tutorial is that when we consider the limiting behaviour of
+    \begin{equation}
+        \psi(x, t + \varepsilon) = \int \braket{x, t + \varepsilon}{y, t} \braket{y, t}{\psi} \dd{y}
+    \end{equation}
+    we get the Schr\"odinger equation, which we assume is true and hence justifies our choice.
+    
+    \subsection{Phase Space Path Integral}
+    It can be shown that the following identity holds:
+    \begin{multline}
+        \exp\left[ \frac{im\varepsilon}{2\hbar} \left( \frac{x_{n+1} - x_n}{\varepsilon} \right)^2 \right]\\
+        = \sqrt{\frac{2\pi\hbar i\varepsilon}{m}} \int_{-\infty}^{\infty} \frac{1}{\pi\hbar}\exp[-\frac{i\varepsilon}{2m\hbar}p_n^2 + \frac{i}{\hbar}p_n(x_{n+1} - x_n)] \dd{p_n}.
+    \end{multline}
+    From this we find that the infinitesimal amplitude is
+    \begin{multline}\label{eqn:infinitesimal amplitude}
+        \braket{x_{n+1}, t_{n+1}}{x_n, t_n}\\
+        = \int_{-\infty}^{\infty} \frac{1}{2\pi\hbar} \exp\left[ \frac{ip_n}{\hbar}(x_{n+1} - x_n) - \frac{i\varepsilon}{2m\hbar}p_n^2 - \frac{i\varepsilon}{2m\hbar}V(x_n, t_n) \right] \dd{p_n}.
+    \end{multline}
+    Inserting this into the definition of the path integral we have
+    \begin{align}
+        \braket{x_b, t_b}{x_a, t_a} &= \lim_{N\to\infty} \left( \prod_{n=1}^{N} \int\dl{x_n} \right) \left( \prod_{n=0}^{N} \braket{x_{n+1}, t_{n+1}}{x_n, t_n} \right)\\
+        &= \lim_{N\to\infty} \left( \prod_{n=1}^{N} \int\dl{x_n} \right) \left( \prod_{n=0}^{N} \int \frac{\dl{p_n}}{2\pi\hbar} \right)\notag\\
+        &\qquad \times \exp\left[ \frac{i\varepsilon}{\hbar} \sum_{n=0}^{N} \left[ p_n \left( \frac{x_{n+1} - x_n}{\varepsilon} \right) - \frac{p_n^2}{2m} - V(x_n, t_n) \right] \right]\\
+        &\eqqcolon \int\DL{x} \int\DL{p} \exp\left[ \frac{i}{\hbar} \int_{t_a}^{t_b} p\dot{x} - \hamiltonian(x, p, t) \right]
+    \end{align}
+    where we define
+    \begin{equation}
+        \int\DL{p} \coloneqq \prod_{n=0}^{\infty} \int \frac{\dl{p_n}}{2\pi\hbar},
+    \end{equation}
+    and 
+    \begin{equation}
+        \hamiltonian(x, p, t) \coloneqq \frac{p^2}{2m} + V(x, t)
+    \end{equation}
+    as the \defineindex{Hamiltonian}, which requires us to identify \(p\) with the momentum.
+    Note that we have used \((x_{n+1} - x_n)/\varepsilon \to \dot{x}\).
+    We can then identify
+    \begin{equation}
+        p\dot{x} - \hamiltonian = \lagrangian
+    \end{equation}
+    as the inverse of the Legendre transformation that defines the Hamiltonian.
+    
+    \section{Free Particle: Return of the Phase Space}
+    Using the phase space path integral we can derive the amplitude for a free particle for a third time.
+    We start with
+    \begin{multline}
+        \braket{x_b, t_b}{x_a, t_a} = \lim_{N\to\infty} \left( \prod_{n=1}^{N} \dl{x_n} \right) \left( \prod_{n=0}^{N} \int\frac{\dl{p_n}}{2\pi\hbar} \right)\\
+        \times \exp\left[ \frac{i}{\hbar} \sum_{n=0}^{N} \left[ p_n(x_{n+1} - x_n) - \frac{p_n^2}{2m}\varepsilon \right] \right].
+    \end{multline}
+    We can split the exponential into two:
+    \begin{equation}
+        \exp\left[ \frac{i}{\hbar} \sum_{n=0}^{N} p_n(x_{n+1} - x_n) \right]\exp \left[ - \frac{i}{\hbar} \sum_{n=0}^{N} \frac{p_n^2}{2m}\varepsilon \right].
+    \end{equation}
+    Consider the sum in the first of these:
+    \begin{align}
+        \sum_{n=0}^{N} p_n(x_{n+1} - x_n) &\\
+        &\mkern-50mu=p_0x_1 - p_0x_0 + p_1x_2 - p_1x_1 + p_2x_3 - p_2x_2 + p_3x_4 - p_3x_3\\
+        +&\dotsb + p_{N-1}x_N - p_{N-1}x_{N-1} + p_Nx_{N+1} - p_Nx_N\\
+        &\mkern-50mu= x_0p_0 + x_1(p_0 - p_1) + x_2(p_1 - p_2) + x_3(p_2 - p_3)\\
+        &+ \dotsb + x_{N-1}(p_{N-1} - p_N) + x_{N+1}p_N\\
+        &\mkern-50mu= x_{N+1}p_N - x_0p_0 + \sum_{n=1} x_n(p_{n-1} - p_n)\\
+        &\mkern-50mu= x_bp_N - x_ap_0 + \sum_{n=1} x_n(p_{n-1} - p_n)\\
+    \end{align}
+    We then have
+    \begin{align}
+        \braket{x_b, t_b}{x_a, t_a} &= \lim_{N\to\infty} \left( \prod_{n=1}^{N} \int\dl{x_n} \right) \left( \prod_{n=0}^{N} \int\frac{\dl{p_n}}{2\pi\hbar} \right) \exp \left[ - \frac{i}{\hbar} \sum_{n=0}^{N} \frac{p_n^2}{2m}\varepsilon \right]\notag\\
+        & \qquad \times \exp\left[ \frac{i}{\hbar} \left( x_bp_N - x_ap_0 + \sum_{n=1} x_n(p_{n-1} - p_n) \right) \right]\\
+        &= \lim_{N\to\infty} \left( \prod_{n=0}^{N} \int \frac{\dl{p_n}}{2\pi\hbar} \right) \left( \prod_{n=1}^{N} \delta(p_n - p_{n-1}) \right)\notag\\
+        &\qquad \times \exp\left[ \frac{i}{\hbar} \left( p_Nx_b - p_0x_a - \frac{\varepsilon}{2m} \sum_{n=0}^{N} p_n^2 \right) \right].
+    \end{align}
+    Here\footnote{is it valid to swap the integrals here? Who knows, this whole thing is mathematically dubious and we get the same free particle result at the end, so its probably fine.} we have identified the integral representation of the Dirac delta:
+    \begin{equation}
+        \int \e^{ix(p - p')} \dd{x} = \delta(p - p').
+    \end{equation}
+    We can then use the delta distribution to greatly reduce the number of integrals to one since for this answer to be nonzero we must have \(p_n = p_{n-1}\) for all \(n\).
+    We then have
+    \begin{align}
+        \braket{x_b, t_b}{x_a, t_a} &= \lim_{N\to \infty} \int_{-\infty}^{\infty} \frac{\dl{p_0}}{2\pi\hbar} \exp\left[ \frac{i}{\hbar}p_0(x_b - x_a) - \frac{i}{2m\hbar}(N + 2)\varepsilon p_0^2 \right]\\
+        &= \sqrt{\frac{m}{2\pi \iota\hbar T}} \exp\left[ \frac{i}{\hbar}\frac{m}{2}\frac{(x_b - x_a)^2}{T} \right]
+    \end{align}
+    where we have identified \((N + 1)\varepsilon = T = t_b - t_a\).
+    
+    \chapter{Connection to Standard Quantum Mechanics}
+    Consider again \cref{eqn:infinitesimal amplitude}, which we can write as
+    \begin{multline}
+        \braket{x_{n+1}, t_{n+1}}{x_n, t_n} = \int_{-\infty}^{\infty} \frac{\dl{p_n}}{2\pi\hbar} \exp\left[ \frac{i}{\hbar}p_n(x_{n+1} - x_n) \right]\\
+        \times \exp\left[ -\frac{i}{\hbar}\frac{p_n^2}{2m}\varepsilon \right] \exp\left[ -\frac{i}{\hbar}\varepsilon V(x_n, t_n) \right].
+    \end{multline}
+    We introduce a basis of time independent momentum and position eigenstates satisfying
+    \begin{equation}
+        \operator{p}\ket{p_n} = p_n\ket{p_n}, \qqand \operator{x}\ket{x_n} = x_n\ket{x_n}.
+    \end{equation}
+    We can then write the infinitesimal amplitude above as
+    \begin{equation}
+        \int_{-\infty}^{\infty} \dl{p_n} \braket{x_{n+1}}{p_n}\braket{p_n}{x_n} \exp\left[ -\frac{i}{\hbar}\frac{p_n^2}{2m}\varepsilon \right] \exp[-\frac{i}{\hbar}\varepsilon V(x_n, t_n)].
+    \end{equation}
+    Here we have used
+    \begin{equation}
+        \braket{x}{p} = \frac{1}{\sqrt{2\pi\hbar}}\e^{ipx/\hbar}.
+    \end{equation}
+    We can write this as
+    \begin{equation}
+        \int_{-\infty}^{\infty}  \dl{p_n} \bra{x_{n+1}} \exp\left[ -\frac{i}{\hbar}\frac{p_n^2}{2m}\varepsilon \right] \ket{p_n}\bra{p_n} \exp\left[ -\frac{i}{\hbar} \varepsilon V(x_n, t_n) \right] \ket{x_n}.
+    \end{equation}
+    Noticing that we have something of the form \(\e^{ap_n}\ket{p_n} = \e^{a\operator{p}}\ket{p_n}\) we can write this as
+    \begin{equation}
+        \int_{-\infty}^{\infty}  \dl{p_n} \bra{x_{n+1}} \exp\left[ -\frac{i}{\hbar}\frac{\operator{p}^2}{2m}\varepsilon \right] \ket{p_n}\bra{p_n} \exp\left[ -\frac{i}{\hbar} \varepsilon V(\operator{x}, t_n) \right] \ket{x_n}.
+    \end{equation}
+    We have also identified here \(V(x_n, t_n)\) with \(V(\operator{x}, t_n)\).
+    Strictly this requires that \(V\) is analytic allowing us to Taylor expand and then replace \(x_n\) with \(\operator{x}\).
+    This is generally not an issue with physically reasonable potentials.
+    We can identify here the factor of \(\int \dl{p_n} \ket{p_n}\bra{p_n} = \idop\) and hence we have
+    \begin{equation}
+        \bra{x_{n+1}} \exp\left[ -\frac{i}{\hbar}\frac{\operator{p}^2}{2m}\varepsilon \right] \exp\left[ -\frac{i}{\hbar} \varepsilon V(\operator{x}, t_n) \right] \ket{x_n}.
+    \end{equation}
+    
+    The two exponentials do not commute, however, we do have
+    \begin{align}
+        \e^{\operator{A}}\e^{\operator{B}} &= (\idop + \operator{A} + \dotsb)(\idop + \operator{B} + \dotsb)\\
+        &= \idop + \operator{A} + \operator{B} + \dotsb\\
+        &= \e^{\operator{A} + \operator{B} + \dotsb}
+    \end{align}
+    This is a truncated form of the more general \defineindex{Baker--Campbell--Hausdorff formula}:
+    \begin{equation}
+        \e^{\operator{A}}\e^{\operator{B}} = \exp\left[ \operator{A} + \operator{B} + \frac{1}{2}\commutator{\operator{A}}{\operator{B}} + \frac{1}{12}\commutator{\operator{A}}{ \commutator{\operator{A}}{\operator{B}}} - \frac{1}{12}\commutator{\operator{B}}{\commutator{\operator{A}}{\operator{B}}} + \dotsb \right].
+    \end{equation}
+    Which reduces to 
+    \begin{equation}
+        e^{\operator{A}}\e^{\operator{B}} = \exp\left[ \operator{A} + \operator{B} + \frac{1}{2}\commutator{\operator{A}}{\operator{B}} \right]
+    \end{equation}
+    in the case where \(\operator{A}\) and \(\operator{B}\) commute with their commutator, \(\commutator{\operator{A}}{\operator{B}}\), and further reduces to
+    \begin{equation}
+        \e^{\operator{A}}\e^{\operator{B}} = \e^{\operator{A} + \operator{B}}
+    \end{equation}
+    in the case where \(\operator{A}\) and \(\operator{B}\) commute.
+    
+    Ignoring terms of second order in \(\varepsilon\) we then have
+    \begin{align}
+        \braket{x_{n+1}, t_{n+1}}{x_n, t_n} &= \bra{x_{n+1}} \exp[-\frac{i}{\hbar}\varepsilon \left( \frac{\operator{p}^2}{2m} + V(\operator{x}, t_n) \right)]\ket{x_n}\\
+        &= \bra{x_{n+1}} \exp\left[ -\frac{i}{\hbar}\varepsilon H(\operator{x}, \operator{p}, t_n) \right]\ket{x_n}.
+    \end{align}
+    Here we have identified the \define{Hamiltonian operator}\index{Hamiltonian!operator}
+    \begin{equation}\label{eqn:hamiltonian operator}
+        \operator{H}(t) = H(\operator{x}, \operator{p}, t) \coloneqq \frac{\operator{p}^2}{2m} + V(\operator{x}, t).
+    \end{equation}
+    
+    Now consider some time, \(t_0\), which is infinitesimally close to both \(t_n\) and \(t_{n+1}\).
+    We have \(\varepsilon = t_{n+1} - t_n = (t_{n+1} - t_0) - (t_n - t_0)\).
+    Hence
+    \begin{align}
+        \braket{x_{n+1}, t_{n+1}}{x_n, t_n} &\approx \bra{x_{n+1}} \exp\left[ -\frac{i}{\hbar}[(t_{n+1} - t_0) - (t_n - t_0)]\operator{H}(t_0) \right]\\
+        &\approx \bra{x_{n+1}} \exp\left[ -\frac{i}{\hbar}(t_{n+1} - t_0)\operator{H}(t_0) \right]\notag\\
+        &\qquad\qquad\times\exp\left[ -\frac{i}{\hbar}(t_n - t_0)\operator{H}(t_0) \right] \ket{x_n}.
+    \end{align}
+    The first of these holds up to second order in \(\varepsilon\) and the latter to second order in \((t_{n+1} - t_0)\) and \((t_n - t_0)\).
+    We also approximate \(\operator{H}(t_n) = \operator{H}(t_0)\), which is valid for sufficiently smooth \(H\).
+    
+    Now define a time dependent state \(\ket{x, t}\) for \(t - t_0 = \order(\varepsilon)\) by
+    \begin{equation}
+        \ket{x, t} = \exp\left[ \frac{i}{\hbar}(t - t_0) \right]\ket{x} = \operator{U}^\hermit(t, t_0)\ket{x}
+    \end{equation}
+    where we define the \defineindex{time evolution operator}, \(\operator{U}\), such that
+    \begin{equation}
+        \operator{U}^\hermit(t, t_0) = \exp\left[ \frac{i}{\hbar}(t - t_0) \right]\operator{H}(t_0)
+    \end{equation}
+    for infinitesimal \(t - t_0\).
+    
+    The first thing to notice is that at \(t = t_0\) we have \(\ket{x, t_0} = \ket{x}\), this means that the basis, \(\{\ket{x, t_0}\}\) is independent of when it is inserted.
+    However, it is often useful to consider \(\ket{x, t_0}\) with the \(t_0\) written out.
+    
+    \section{Properties of the Time Evolution Operator}
+    The infinitesimal time evolution operator as defined above has several properties.
+    Firstly it is unitary, since we can view the action of changing \(\ket{x}\) to \(\ket{x, t}\) as a basis change.
+    This means
+    \begin{equation}
+        \operator{U}^\hermit(t, t_0) = \operator{U}^{-1}(t, t_0).
+    \end{equation}
+    We have the boundary condition on \(\operator{U}\) that
+    \begin{equation}
+        \operator{U}(t_0, t_0) = \idop.
+    \end{equation}
+    The product rule for time evolution operators is
+    \begin{equation}
+        \operator{U}(t, t')\operator{U}(t', t_0) = \operator{U}(t, t_0).
+    \end{equation}
+    This is simple to show with the exponential form and holds up to second order in \(t - t'\) and \(t' - t_0\).
+    We can use this process to build up a time evolution operator for a finite time interval as a product of many time evolution operators for infinitesimal time intervals.
+    Considering the special case for the product rule of \(t = t_0\) we have
+    \begin{equation}
+        \operator{U}(t_0, t')\operator{U}(t', t_0) = \operator{U}(t_0, t_0) = \idop.
+    \end{equation}
+    Hence,
+    \begin{equation}
+        \operator{U}^{-1}(t, t_0) = \operator{U}(t_0, t).
+    \end{equation}
+    This allows us to compute the state in the past.
+    
+    \subsection{A Differential Equation for the Time Evolution Operator}
+    Consider the following Taylor expansion:
+    \begin{align}
+        \operator{U}(t + \delta t, t_0) &= \operator{U}(t + \delta t, t)\operator{U}(t, t_0)\\
+        &= \left( \operator{U}(t, t) + \diff*{\operator{U}(t, t)}{t} + \dotsb \right)\operator{U}(t, t_0)\\
+        &= \operator{U}(t, t_0) + \delta t \diffp*{\operator{U}(t, t_0)}{t} + \dotsb.
+    \end{align}
+    We can also Taylor expand the definition of the infinitesimal time evolution operator:
+    \begin{align}
+        \operator{U}(t + \delta t, t_0) &= \operator{U}(t + \delta t, t)\operator{U}(t, t_0)\\
+        &= \exp\left[ -\frac{i}{\hbar}\delta t\operator{H}(t) \right] \operator{U}(t, t_0)\\
+        &= \left( 1 - \frac{i}{\hbar}\delta t \operator{H}(t) + \dotsb \right) \operator{U}(t, t_0).
+    \end{align}
+    Comparing these two expansions we identify
+    \begin{equation}\label{eqn:ih dU/dt = HU}
+        \diffp*{\operator{U}(t, t_0)}{t} = -\frac{i}{\hbar} \operator{H}(t) \operator{U}(t, t_0) \implies i\hbar\diffp{\operator{U}(t, t_0)}{t} = \operator{H}(t)\operator{U}(t, t_0)
+    \end{equation}
+    
+    Now suppose that we have a conservative system, that is \(\operator{H}\) is independent of time, this is usually the case.
+    We then have time translation invariance\footnote{energy conservation implies time translation invariance due to Noether's theorem}, which means
+    \begin{equation}
+        \operator{U}(t, t_0) = \operator{U}(t - t_0),
+    \end{equation}
+    that is the time evolution operator depends only on the length of the time interval, not the end points.
+    When this is the case we then have
+    \begin{equation}
+        \operator{U}(t, t_0) = \exp\left[ -\frac{i}{\hbar}(t - t_0)\operator{H} \right],
+    \end{equation}
+    which we can show by either considering an infinite number of infinitesimal time steps or by solving \cref{eqn:ih dU/dt = HU}.
+    
+    If instead our Hamiltonian has explicit time dependence then it can be shown that the solution to \cref{eqn:ih dU/dt = HU} is
+    \begin{equation}
+        \operator{U}(t, t_0) = \timeorder \exp\left[ -\frac{i}{\hbar} \int_{t_0}^t \operator{H}(t') \dd{t'} \right].
+    \end{equation}
+    Here \(\timeorder\) represents time ordering, a concept we will see later.
+    We will return to this case once we have a better understanding of time ordering.
+    
+    We'll derive one final useful result relating to the time evolution operator.
+    We have now shown that for finite \(t - t_0\) we have
+    \begin{equation}
+        \ket{x, t} = \operator{U}^\hermit(t, t_0)\ket{x}, \qqand \bra{x, t} = \bra{x}\operator{U}(t, t_0).
+    \end{equation}
+    We also have \(\ket{x, t_0} = \ket{x}\), by setting \(t = t_0\).
+    It follows that
+    \begin{align}
+        \braket{x_b, t_b}{x_a, t_a} &= \bra{x_b} \operator{U}(t_b, t_0) \operator{U}^\hermit(t_a, t_0)\ket{x_a}\\
+        &= \bra{x_b} \operator{U}(t_b, t_0) \operator{U}(t_0, t_a)\ket{x_a}\\
+        &= \bra{x_b} \operator{U}(t_b, t_a) \ket{x_a}.
+    \end{align}
+    
+    \section{The \texorpdfstring{Schr\"odinger}{Schrodinger} Equation}
+    Consider the wave function, \(\psi\), associated with the state \(\ket{\psi}\) at time \(t\), this is given by
+    \begin{equation}
+        \psi(x, t) = \braket{x, t}{\psi} = \bra{x} \operator{U}(t, t_0) \ket{\psi}.
+    \end{equation}
+    Differentiating with respect to \(t\) and multiplying through by \(i\hbar\) we get
+    \begin{equation}
+        i\hbar\diffp{\psi(x, t)}{t} = \bra{x} i\hbar\diffp{\operator{U}(t, t_0)}{t}\ket{\psi} = \bra{x} H(\operator{x}, \operator{p}, t) \operator{U}(t, t_0) \ket{\psi}.
+    \end{equation}
+    Here we have used the fact that the states \(\ket{x}\) and \(\ket{\psi}\) are time independent and the result of \cref{eqn:ih dU/dt = HU} for the time derivative of \(\operator{U}(t, t_0)\).
+    
+    Recall that \(\bra{x}\operator{x} = x\operator{x}\) and \(\bra{x}\operator{p} = -i\hbar\diffp{\bra{x}}/{x}\) and so
+    \begin{align}
+        i\hbar\diffp{\psi(x, t)}{t} &= H\left( x, -i\hbar\diff{}{x}, t \right) \bra{x}\operator{U}(t, t_0) \ket{\psi}\\
+        &=  H\left( x, -i\hbar\diff{}{x}, t \right)\psi(x, t).
+    \end{align}
+    Substituting in the functional form of the Hamiltonian from \cref{eqn:hamiltonian operator} we have
+    \begin{equation}
+        i\hbar\diffp{\psi}{t} = \left[ -\frac{\hbar^2}{2m}\diff[2]{}{x} + V(x, t) \right] \psi(x, t).
+    \end{equation}
+    
+    This is the famous \defineindex{Schr\"odinger equation}.
+    We have derived it as a consequence of the path integral formalism.
+    The reverse can also be done, path integrals can be derived from the Schr\"odinger equation.
+    This shows that the two are equivalent and also justifies are claim that the path integral formulation should apply to the dynamics of a quantum system, assuming of course that we are willing to accept the efficacy of the Schr\"odinger equation.
+    
+    \section{\texorpdfstring{Schr\"odinger}{Schrodinger} and Heisenberg Pictures}
+    There are two common pictures of basic quantum mechanics (as well as the path integral formulation and Dirac's picture which we will see later).
+    These are the Schr\"odinger picture and Heisenberg picture.
+    The Schr\"odinger picture is the most familiar for basic quantum mechanics.
+    
+    \subsection{\texorpdfstring{Schr\"odinger}{Schrodinger} Picture}
+    In the Schr\"odinger picture we can define a time dependent state vector
+    \begin{equation}
+        \ket{\psi, t} = \operator{U}(t, t_0)\ket{\psi}.
+    \end{equation}
+    When \(t = t_0\) the states \(\ket{\psi, t_0}\) and \(\ket{\psi}\) coincide.
+    This state automatically satisfies the Schr\"odinger equation since substituting \(\ket{\psi, t}\) into the Schr\"odinger equation reduces it to \cref{eqn:ih dU/dt = HU}.
+    
+    In the \defineindex{Schr\"odinger picture} the state of the system, \(\ket{\psi, t}\) is a time dependent state, and the position eigenstate, \(\ket{x}\), is time independent.
+    Operators, which are defined through their spectra decompositions,
+    \begin{equation}
+        \operator{\xi} \coloneqq \int x\ket{\xi}\bra{\xi} \dd{x},
+    \end{equation}
+    are time independent.
+    To make it clear that we are treating an object in the Schr\"odinger picture we will sometimes attach a subscript \(\schrodingerPicture\).
+    So we could call the operator above \(\operator{\xi}_{\schrodingerPicture}\).
+    
+    \subsection{Heisenberg Picture}
+    In the \defineindex{Heisenberg picture} the state vector, \(\ket{\psi}\), is time independent.
+    Instead the position eigenstate, \(\ket{x, t}\), is time dependent.
+    This then means that operators, defined through their spectral decomposition,
+    \begin{equation}
+        \operator{\xi}(t) \coloneqq \int \xi \ket{\xi, t}\bra{\xi, t} \dd{\xi},
+    \end{equation}
+    are time dependent.
+    It follows then that
+    \begin{align}
+        \operator{\xi}(t) &= \int \xi \ket{\xi, t}\bra{\xi, t} \dd{\xi}\\
+        &= \int \xi \operator{U}^\hermit(t, t_0) \ket{\xi}\bra{\xi} \operator{U}(t, t_0)\\
+        &= \operator{U}^\hermit(t, t_0) \left( \int \xi \ket{\xi}\bra{\xi} \right) \operator{U}(t, t_0)\\
+        &= \operator{U}^\hermit(t, t_0) \operator{\xi_{\schrodingerPicture}} \operator{U}(t, t_0).
+    \end{align}
+    This gives us the time evolution of an operator in the Heisenberg picture.
+    
+    To make it clear that we are treating something in the Heisenberg picture we will sometimes attach a subscript \(\heisenbergPicture\).
+    So we could call the operator above \(\operator{\xi}_{\heisenbergPicture}(t)\).
+    Often we will just explicitly write the time dependence and assume the Heisenberg picture.
+    
+    \subsection{Working Between Pictures}
+    At time \(t = t_0\) all states and operators in both pictures coincide.
+    The wave function is the same in either picture since
+    \begin{equation}
+        \psi(x, t) = \braket{x, t}{\psi} = \bra{x}\operator{U}(t, t_0)\ket{\psi} = \braket{x}{\psi, t}.
+    \end{equation}
+    Similarly expectation values are unchanged, to show this recall that the time evolution operator is unitary:
+    \begin{align}
+        \expected{\operator{O}}_{\heisenbergPicture} &= \bra{\psi} \operator{O}(t) \ket{\psi}\\
+        &= \bra{\psi, t} \operator{U}(t, t_0)\operator{O}(t) \operator{U}^\hermit(t, t_0) \ket{\psi, t}\\
+        &= \bra{\psi, t} \operator{U}(t, t_0)\operator{U}^\hermit(t, t_0) \operator{O}_{\schrodingerPicture} \operator{U}(t, t_0)\operator{U}^\hermit(t, t_0) \ket{\psi, t}\\
+        &= \bra{\psi, t} \operator{O}_{\schrodingerPicture} \ket{\psi, t}\\
+        &= \expected{\operator{O}}_{\schrodingerPicture}.
+    \end{align}
+    Here we have used
+    \begin{gather}
+        \ket{\psi} = \idop\ket{\psi} =  \operator{U}^\hermit\operator{U}\ket{\psi} = \operator{U}\ket{\psi, t}.\\
+        \bra{\psi} = \bra{\psi}\idop = \bra{\psi}\operator{U}^\hermit\operator{U} = \bra{\psi, t}\operator{U},\\
+        \operator{O}(t) = \operator{U}^\hermit \operator{O}_{\schrodingerPicture}\operator{U}.
+    \end{gather}
+    
+    We have defined the time evolution of operators in the Heisenberg picture.
+    We can now derive an equation of motion for operators
+    \begin{align}
+        i\hbar \diffp*{\operator{O}(t)}{t} &= i\hbar \diffp*{(\operator{U}^\hermit \operator{O} \operator{U})}{t}\\
+        &= \left( i\hbar \diffp{\operator{U}^\hermit}{t} \right) \operator{O} \operator{U} + \operator{U}^\hermit \operator{O} \left( i\hbar \diffp{\operator{U}}{t} \right)\\
+        &= -\operator{U}^\hermit \operator{H} \operator{O} \operator{U} + \operator{U}^\hermit \operator{O} \operator{H} \operator{U}.
+    \end{align}
+    Here we have used both \cref{eqn:ih dU/dt = HU} and its Hermitian conjugate,
+    \begin{equation}
+        -i\hbar\diff{\operator{U}}{t} = \operator{U}^\hermit \operator{H},
+    \end{equation}
+    note that \(\operator{H}\) is Hermitian.
+    Continuing on we can insert the identity, in the form \(\idop = \operator{U}\operator{U}^\hermit\) to get
+    \begin{align}
+        i\hbar \diffp*{\operator{O}(t)}{t} &= -\operator{U}^\hermit \operator{H} \operator{U}\operator{U}^\hermit \operator{O} \operator{U} + \operator{U}^\hermit \operator{O} \operator{U}\operator{U}^\hermit \operator{H} \operator{U}\\
+        &= -\operator{H}(t) \operator{O}(t) + \operator{O}(t) \operator{H}(t)\\
+        &= \commutator{\operator{O}(t), \operator{H}_{\heisenbergPicture}(t)}.
+    \end{align}
+    Here
+    \begin{equation}
+        \operator{H}_{\heisenbergPicture}(t) = \operator{U}^\hermit(t, t_0)H(\operator{x}, \operator{p}, t)\operator{U}(t, t_0) = H(\operator{x}(t), \operator{p}(t), t).
+    \end{equation}
+    Care must be taken to distinguish between the Hamiltonian of a conservative system in the Heisenberg picture and the Hamiltonian of a system with an explicit time dependence in the Schr\"odinger picture.
+    
+    For the case of a time independent Hamiltonian we have \(\operator{H}_{\heisenbergPicture}(t) = H(\operator{x}, \operator{p}) = \operator{H}\) and then
+    \begin{equation}
+        i\hbar\diffp*{\operator{O}(t)}{t} = \commutator{\operator{O}(t)}{\operator{H}}.
+    \end{equation}
+    This is the \defineindex{Heisenberg equation of motion} for the time evolution of the position operator in the Heisenberg picture.
+    
+    If \(\diffp{\operator{O}(t)}/{t} = 0\), that is \(\commutator{\operator{O}(t)}{\operator{H}} = 0\), then we say that \(\operator{O}\) is \defineindex{conserved}.
+    For example, momentum is conserved if \(\commutator{\operator{p}, \operator{H}} = 0\), this is the case, for example, for the free particle, but not for the Harmonic oscillator where
+    \begin{align}
+        \commutator{\operator{p}}{\operator{H}} &= \omega^2\commutator{\operator{p}}{\operator{x}^2}\\
+        &= \omega^2(\commutator{\operator{p}}{\operator{x}}\operator{x} + \operator{x}\commutator{\operator{p}}{\operator{x}})\\
+        &= -2i\hbar\omega^2\operator{x}.
+    \end{align}
+    
+    In the rest of this course we will largely adopt the Heisenberg picture.
+    
+    \chapter{Transition Amplitude as a Green's Function}
+    In \cref{sec:green's function} we commented that the transition amplitude, \(\braket{x_b, t_b}{x_a, t_a}\), is a Green's function.
+    Now we show that it is a Green's function for the Schr\"odinger equation.
+    Consider the wave function
+    \begin{equation}
+        \psi(x, t) = \braket{x, t}{\psi} = \int \braket{x, t}{x', t'} \braket{x', t'}{\psi} \dd{x'}.
+    \end{equation}
+    Define the function
+    \begin{equation}
+        G(x, x'; t, t') \coloneqq 
+        \begin{cases}
+            \braket{x, t}{x', t'}, & t > t',\\
+            0 & t < t'
+        \end{cases}
+    \end{equation}
+    We then have
+    \begin{equation}\label{eqn:wave func times heaviside}
+        \psi(x, t)\theta(t - t') = \int G(x, x'; t, t') \psi(x, t) \dd{x'}
+    \end{equation}
+    where \(\theta\) is the Heaviside step function defined by
+    \begin{equation}
+        \theta(t - t') \coloneqq
+        \begin{cases}
+            1, & t - t_0 > 0,\\
+            1/2, & t - t_0 = 0,\\
+            0, & t - t_0 < 0.
+        \end{cases}
+    \end{equation}
+    
+    Since \(\psi\) is a solution to the Schr\"odinger equation it follows that
+    \begin{align}
+        \left( -\frac{\hbar^2}{2m} \diffp[2]{}{x} + V(x, t) - i\hbar\diffp{}{t} \right) \psi(x, t)\theta(t - t') &\\
+        &\hspace{-6cm}= -\frac{\hbar^2}{2m}\diff[2]{\psi}{x}\theta(t - t') + V(x, t)\psi(x, t)\theta(t - t')\\
+        &\hspace{-5cm}- i\hbar\diffp{\psi}{t}\theta(t - t') - i\hbar\diffp{\theta}{t}\psi(x, t)\\
+        &\hspace{-6cm}= \underbrace{\left( -\frac{\hbar^2}{2m}\diffp[2]{\psi}{x} + V(x, t)\psi(x, t) - i\hbar\diffp{\psi}{t} \right)}_{=\SE\psi = (\operator{H} - i\hbar\partial_t)\psi = 0}\theta(t - t') - i\hbar\diffp{\theta}{t}\psi(x, t)\\
+        &\hspace{-6cm}= -i\hbar\diffp{\theta}{t}\psi(x, t)\\
+        &\hspace{-6cm}= -i\hbar\delta(t - t')\psi(x, t)
+    \end{align}
+    where \(\delta\) is the Dirac delta, which is related to the Heaviside step function by\footnote{see the chapter on the Dirac delta in the methods of mathematical physics course.}
+    \begin{equation}
+        \diff*{\theta(t - t')}{t} = \delta(t - t').
+    \end{equation}
+    
+    It follows from \cref{eqn:wave func times heaviside} that
+    \begin{multline}
+        \int \left( -\frac{\hbar^2}{2m} \diffp[2]{}{x} + V(x, t) - i\hbar\diffp{}{t} \right) G(x, x'; t, t')\psi(x', t') \dl{x'}\\
+        = -i\hbar\delta(t - t')\psi(x, t).
+    \end{multline}
+    This must hold for all \(\psi\) and hence
+    \begin{equation}
+        \left( -\frac{\hbar^2}{2m}\diffp[2]{}{x} + V(x, t) - i\hbar\diffp{}{t} \right)G(x, x'; t, t') = -i\hbar\delta(t - t')\delta(x - x').
+    \end{equation}
+    This shows that \(G\) is Green's function for the Schr\"odinger equation.
+    
+    \section{Energy Eigenstate Representation}
+    Consider a time independent Hamiltonian, \(\operator{H}\).
+    For simplicity we assume a discrete spectrum, so this applies, for example, to the harmonic oscillator, but not the free particle.
+    Let \(\{\ket{n}\}\) be the energy eigenbasis, that is
+    \begin{equation}
+        \operator{H}\ket{n} = E_n\ket{n}
+    \end{equation}
+    where we take \(n = 0, 1, \dotsc\).
+    We also define the energy eigenfunctions
+    \begin{equation}
+        u_n(x) \coloneqq \braket{x}{n}.
+    \end{equation}
+    
+    For \(t > 0\) we have
+    \begin{align}
+        G(x, y; t) &\coloneqq \braket{x, t}{y, 0}\\
+        &\hphantom{:}= \bra{x} \e^{-it\operator{H}/\hbar}\ket{y}\\
+        &\hphantom{:}= \sum_n \bra{x} \e^{-it\operator{H}/\hbar}\ket{n}\braket{n}{y}\\
+        &\hphantom{:}= \sum_n \e^{-itE_n/\hbar}\braket{x}{n}\braket{n}{y}\\
+        &\hphantom{:}= \sum_n \e^{-itE_n/\hbar} u_n(x)u_n^*(y).
+    \end{align}
+    Here we have used the relation
+    \begin{equation}
+        \e^{-it\operator{H}/\hbar}\ket{n} = \e^{-itE_n/\hbar}\ket{n}
+    \end{equation}
+    with the second exponential being simply a complex number and so commuting with the ket.
+    
+    From this we see that \(G\) contains all of the information about the wave functions and energy eigenstates.
+    This explains why the path integral formulation is typically more complicated than solving the Schr\"odinger equation for a single wave function at a time.
+    
+    \section{Fourier Transform of the Amplitude}
+    It is useful to define the Fourier transform of \(G\).
+    In particular the Fourier transform from time to energy space, which is analogous to moving from position to momentum space.
+    However, we need a slightly modified form of the Fourier transform, which includes an exponential damping factor \(\e^{it(i\varepsilon)/\hbar} = \e^{-t\varepsilon/\hbar}\) where \(\varepsilon > 0\) is arbitrarily small.
+    This is to ensure convergence of the transform.
+    We then define the Fourier transform as
+    \begin{equation}
+        \tilde{G}(x, y; E) \coloneqq \int_{-\infty}^{\infty} G(x, y; t)\e^{itE/\hbar}\e^{it(i\varepsilon)/\hbar} \dd{t}.
+    \end{equation}
+    
+    Substituting in the energy eigenstate representation, and remembering that for \(t < 0\) we have \(G(x, y; t) = 0\), we get
+    \begin{align}
+        \tilde{G}(x, y; E) &= \sum_n \int_{0}^{\infty} \e^{-itE_n/\hbar}u_n(x)u_n^*(x) \e^{itE/\hbar} \e^{it(i\varepsilon)/\hbar} \dd{t}\\
+        &= \sum_n u_n(x)u_n^*(y) \int_{0}^{\infty} \e^{it(E - E_n + i\varepsilon)}\dd{t}\\
+        &= \sum_n u_n(x)u_n^*(y) \left[ i\hbar \frac{\e^{it(E - E_n + i\varepsilon)}}{E - E_n + i\varepsilon} \right]_{0}^{\infty}\\
+        &= i\hbar \sum_n \frac{u_n(x)u_n^*(y)}{E - E_n + \varepsilon}
+    \end{align}
+    
+    The bound states correspond to the poles of \(\tilde{G}\), which lie just below the real axis.
+    The choice of \(\varepsilon > 0\) ensures that when we perform the inverse Fourier transform we recover \(G\):
+    \begin{equation}
+        G(x, y; t) = \frac{1}{2\pi\hbar} \int_{-\infty}^{\infty} \tilde{G}(x, y; E) \e^{-iEt/\hbar} \dd{E}.
+    \end{equation}
+    If \(t < 0\) then we can close a contour\footnote{See methods of theoretical/mathematical physics notes for more details} in the upper half plane with a semicircle.
+    The contour integral gives zero as it contains no poles and the integral over the semicircle vanishes by Jordan's lemma, so we have \(G(x, y; t) = 0\).
+    For \(t > 0\) we can close the contour in the lower half plane with another semicircle.
+    The integral over the semicircle vanishes again due to Jordan's lemma.
+    The contour now poles corresponding to each energy eigenstate and so by the residue theorem
+    \begin{align}
+        G(x, y; t) &= \frac{1}{2\pi\hbar} \int_{-\infty}^{\infty} \tilde{G}(x, y; E) \e^{-iEt/\hbar} \dd{E}\\
+        &= \sum_n u_n(x) u_n^*(y) \frac{1}{2\pi \hbar} i\hbar \oint \frac{1}{E - E_n + i\varepsilon} \dd{E}\\
+        &= \sum_n u_n(x) u_n^*(y) \frac{1}{2\pi \hbar} (i\hbar) (2\pi i) \Res\left( \frac{1}{E - E_n + i\varepsilon}, E = E_n - i\varepsilon \right)\\
+        &= \sum_n u_n(x) u_n^*(y)\e^{-it(E_n - i\varepsilon)/\hbar}.
+    \end{align}
+    So taking \(\varepsilon \to 0\) we recover the causal Green's function.
+    
+    This \enquote{\(i\varepsilon\) prescription} is fairly useful to make things converge.
+    For example if we consider the simple harmonic oscillator then we change \(E_n \to E_n - i\varepsilon\) so \(\omega \to \omega - i\varepsilon/\hbar = \omega - i\varepsilon'\), and then \(\omega^2 \to \omega^2 - i\varepsilon' \omega = \omega^2 - i\varepsilon''\), where we take \(\varepsilon\), \(\varepsilon'\), and \(\varepsilon''\) to be infinitesimal, we will often drop the primes and write these all as \(\varepsilon\) and think of it as absorbing unimportant prefactors.
+    We then have that the action changes from
+    \begin{equation}
+        S[x] \to S[x] + i\varepsilon \int x^2 \dd{t}
+    \end{equation}
+    so the integrand of the path integral is damped by a factor of
+    \begin{equation}
+        \exp\left[ -\varepsilon\int x^2 \dd{t} \right].
+    \end{equation}
+    
+    \section{Trace}
+    Consider what happens if we take \(x = y\) and integrate over \(x\), that is we take the trace of \(\idop\):
+    \begin{align}
+        \int_{-\infty}^{\infty} \braket{x, t}{x, 0} \dd{x} &= \int G(x, x; t) \dd{x}\\
+        &= \sum_{n} \e^{-itE_n/\hbar} \int\abs{u_n(x)}^2 \dd{x}\\
+        &= \sum_{n} \e^{-itE_n/\hbar}\label{eqn:trace}
+    \end{align}
+    where we use the orthonormality of the states in the last step.
+    
+    If we know \(G(x, y; t)\) we can use this to deduce the energy eigenvalues.
+    For example, consider the harmonic oscillator.
+    We have
+    \begin{equation}
+        \int_{-\infty}^{\infty} \braket{x, t}{x, 0} \dd{x} = \sqrt{\frac{m\omega}{2\pi i\hbar \sin(\omega t)}} \int_{-\infty}^{\infty} \exp\left[ \frac{i}{\hbar} \frac{m}{2} \frac{\omega}{\sin(\omega t)} 2x^2(\cos\omega t - 1) \right] \dd{x}.
+    \end{equation}
+    While this looks hideous its actually just a Gaussian integral, the result of which, after applying some trig identities to simplify, is
+    \begin{align}
+        \int_{-\infty}^{\infty} \braket{x, t}{x, 0} \dd{x} &= \frac{1}{2i} \frac{1}{\sin(\omega t/2)}\\
+        &= \frac{1}{\e^{i\omega t/2} - \e^{-i\omega t/2}}\\
+        &= \frac{\e^{-i\omega t/2}}{1 - \e^{-i\omega t}}\\
+        &= \e^{-i\omega t/2}\sum_{n=0}^{\infty} \e^{in\omega t}
+    \end{align}
+    where we recognise a geometric series in \(\e^{-i\omega t}\).
+    Comparing the result here to \cref{eqn:trace} we can identify
+    \begin{equation}
+        \e^{-itE_n/\hbar} = \e^{-i\omega t/2} \e^{-in\omega t} \implies E_n = \left( n + \frac{1}{2} \right)\hbar \omega
+    \end{equation}
+    so we get the expected energy eigenvalues for the simple harmonic oscillator.
+    It is also possible to deduce the eigenfunctions in a similar way.
+    
+    \section{Statistical Mechanics}
+    The form of 
+    \begin{equation}
+        \sum_n \e^{-itE_n/\hbar}
+    \end{equation}
+    may be familiar from the partition function in statistical mechanics\footnote{see the second half of the thermodynamics course}.
+    
+    Recall that the \defineindex{Helmholtz free energy} is defined as
+    \begin{equation}
+        F \coloneqq U - TS
+    \end{equation}
+    where \(U\) is the internal energy, \(T\) is the temperature, and \(S\) is the entropy.
+    Combining this with the central equation of statistical mechanics,
+    \begin{equation}
+        \dl{U} = T\dd{S} - p\dd{V},
+    \end{equation}
+    where \(p\) is the pressure and \(V\) is the volume, we get
+    \begin{equation}
+        S = -\diffp{F}{T}[V], \qqand p = -\diffp{F}{V}[T].
+    \end{equation}
+    So clearly the free energy is a useful quantity.
+    Unfortunately it's not easy to work with in this form.
+    Fortunately we can also use the form
+    \begin{equation}
+        F = -\boltzmann T\ln Z
+    \end{equation}
+    where \(Z\) is the \defineindex{partition function}, defined by
+    \begin{equation}
+        Z \coloneqq \sum_n \e^{-\beta E_n}
+    \end{equation}
+    where \(\beta \coloneqq 1/(\boltzmann T)\).
+    With an orthonormal basis \(\{\ket{n}\}\) we have
+    \begin{equation}
+        Z = \sum_n \e^{-\beta E_n}\braket{n}{n} = \sum_n \bra{n}\e^{-\beta E_n}\ket{n} = \sum_n \bra{n}\e^{-\beta\operator{H}}\ket{n} = \tr(\e^{-\beta\operator{H}}).
+    \end{equation}
+    
+    To complete the example we consider a system of one degree of freedom and we take the classical limit, \(\hbar \to 0\).
+    To do so we use the fact that the trace is independent of the basis we choose to calculate it in and so can calculate it in the position basis \(\{\ket{x}\}\):
+    \begin{align}
+        Z &= \tr(\e^{-\beta\operator{H}})\\
+        &= \int \bra{x} \e^{-\beta\operator{H}}\ket{x} \dd{x}\\
+        &= \int \bra{x} \e^{-\beta \operator{p}^2/2m - \beta V(\operator{x})}\ket{x} \dd{x}\\
+        &= \int \bra{x} \e^{-\beta \operator{p}^2/(2m)}\e^{-\beta V(\operator{x})}\ket{x} \dd{x} + \order(\hbar)\\
+        &= \int\mkern-7mu\dl{x} \int\mkern-7mu\dl{p} \bra{x} \e^{-\beta\operator{p}^2/(2m)}\ket{p}\bra{p} \e^{-\beta V(\operator{x})}\ket{x} + \order(\hbar)\\
+        &= \int\mkern-7mu\dl{x} \int\mkern-7mu\dl{p} \braket{x}{p}\braket{p}{x} \e^{-\beta H(x, p)}  + \order(\hbar)\\
+        &= \frac{1}{2\pi \hbar} \int\mkern-7mu\dd{x} \int\mkern-7mu\dd{p}\, \e^{-\beta H(x, p)} + \order(\hbar).
+    \end{align}
+    Here we split the exponential which gives us a term proportional to \(\commutator{\operator{p}}{V(\operator{x})}\), the exact form of which depends on the potential, but will in general be at least \(\order(\hbar)\).
+    
+    Comparing this result to \cref{eqn:trace} we see that
+    \begin{equation}
+        Z = \int_{-\infty}^{\infty} \braket{x, -i\beta \hbar}{x, 0} \dd{x}.
+    \end{equation}
+    This rather remarkable result says that a path integral (usually called a \define{propagator}\index{propagator|see{path integral}}) at negative imaginary time is related to partition functions.
+    
+    We considered a system of one degree of freedom, in statistical mechanics typical systems have Avagadro's number of degrees of freedom, that is \(\num{e23}\).
+    In this case we replace \(x\) with \(\vv{x} \in \reals^{\num{e23}}\).
+    Clearly it is not possible to treat these all individually and we usually need to apply statistical methods.
+    One case we can manage fairly easily is when there is no interaction between the particles since this means that \(Z = [Z(1)]^N\) where \(Z(1)\) is the partition function for a single particle.
+    
+    To evaluate the path integral we can set \(t = -i\tau\) for \(\tau > 0\).
+    This can be viewed as an analytic continuation of the path integral.
+    This process of moving to imaginary time is often called a \defineindex{Wick rotation}, since multiplication by \(i\) corresponds to a rotation by \(\pi/2\).
+    We then have a slightly modified Lagrangian
+    \begin{equation}
+        \lagrangian = \frac{1}{2}m\left( \diff{x}{t} \right)^2 - V(x) = -\left[ \frac{1}{2}\left( \diff{x}{\tau} \right)^2 + V(x) \right] = - \lagrangian_{\mathrm{E}}
+    \end{equation}
+    where \(\lagrangian_{\mathrm{E}}\) is the Euclidean Lagrangian, that is the normal Lagrangian with real time, but an inverted potential.
+    We also take the upper integration limit as \(\tau = \hbar\beta\).
+    This means the exponent in the path integral changes from
+    \begin{equation}
+        \frac{i}{\hbar} \int_{0}^{t} \lagrangian \dd{t} \to \frac{i}{\hbar} \int_{0}^{\hbar \beta} (-\lagrangian_{\mathrm{E}}) (-i\dd{\tau}) = \frac{i}{\hbar} \int_{0}^{\hbar \beta} \lagrangian_{\mathrm{E}} \dd{\tau}.
+    \end{equation}
+    Hence the partition function is
+    \begin{align}
+        Z &= \int_{-\infty}^{\infty} \braket{x, -i\beta\hbar}{x, 0} \dd{x}\\
+        &= \int\mkern-7mu \dl{x} \int_x^x \DL{x(\tau)} \, \exp\left[ -\frac{1}{\hbar} \int_{0}^{\hbar\beta} \lagrangian_{\mathrm{E}} \dd{\tau} \right].
+    \end{align}
+    The value of \(\hbar \beta\) controls how temperature and quantum effects interact.
+    
+    If we don't take the trace then we have the \defineindex{density matrix}, given by
+    \begin{equation}
+        \rho(x, y) = G(x, y; -i\beta\hbar) = \sum_n \e^{-\beta E_n}u_n(x)u_n^*(y).
+    \end{equation}
+    Since \(G\) contains all knowledge of the system the density matrix does too.
+    
+    Returning to the example of a simple harmonic oscillator we have
+    \begin{align}
+        Z &= \int_{-\infty}^{\infty} \braket{x, -i\hbar\beta}{x, 0} \dd{x}\\
+        &= \frac{1}{2i} \frac{1}{\sin(-\omega i\hbar\beta/2)}\\
+        &= \frac{1}{2\sinh(\hbar\omega\beta/2)}.
+    \end{align}
+    Expanding this as before we can recover \(E_n = (n + 1/2)\hbar \omega\).
+    
+%   Appdendix
+    \appendixpage
+    \begin{appendices}
+        \include{parts/appendix-identities}
+        \include{parts/appendix-formal-definitions}
+        \include{parts/appendix-integrals}
+    \end{appendices}
+    
+    \backmatter
+    \renewcommand{\glossaryname}{Acronyms}
+    \printglossary[acronym]
+    \printindex
+\end{document}
