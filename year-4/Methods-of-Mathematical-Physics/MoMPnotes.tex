@@ -1,0 +1,2161 @@
+\documentclass[fleqn]{NotesClass}
+
+%% Packages
+\usepackage{csquotes}
+\usepackage{etoolbox}
+\usepackage{siunitx}
+
+% Tikz stuff
+\usepackage{tikz}
+\tikzset{>=latex}
+% External
+\usetikzlibrary{external}
+\tikzexternalize[prefix=tikz-external/]
+%\tikzexternaldisable
+\usetikzlibrary{hobby}
+
+% References, should be last things loaded
+\usepackage{hyperref}  % Should be loaded second last (cleveref last)
+\colorlet{hyperrefcolor}{blue!60!black}
+\hypersetup{colorlinks=true, linkcolor=hyperrefcolor, urlcolor=hyperrefcolor, breaklinks=true}
+\gappto\UrlSpecials{\do\|{\newline}}
+%\gappto\UrlBreaks{\UrlOrds}
+
+\usepackage[
+capitalize,
+nameinlink,
+noabbrev
+]{cleveref} % Should be loaded last
+
+% My packages
+\usepackage{NotesBoxes}
+\usepackage{NotesMaths}
+
+
+% Title page info
+\title{Methods of Mathematical Physics}
+\author{Willoughby Seago}
+\date{September 20, 2021}
+% \subtitle{}
+% \subsubtitle{}
+
+% Highlight colour
+\definecolor{highlight}{HTML}{10cfd9}
+\definecolor{darker}{HTML}{00acb6}
+\definecolor{dark}{HTML}{03386c}
+\definecolor{highlightalt}{HTML}{cde37a}
+
+% Commands
+% Maths
+\newcommand*{\e}{\mathrm{e}}
+\DeclareMathOperator{\Res}{Res}
+\let\Re\relax
+\let\Im\relax
+\DeclareMathOperator{\Re}{Re}
+\DeclareMathOperator{\Im}{Im}
+\newcommand*{\order}{\mathcal{O}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\erf}{erf}
+\DeclareMathOperator{\erfc}{erfc}
+\DeclareMathOperator{\erfi}{erfi}
+\DeclareMathOperator{\Ai}{Ai}
+\DeclareMathOperator{\sinc}{sinc}
+\DeclareMathOperator{\linop}{\mathcal{L}}
+
+% Include
+\includeonly{}
+
+\begin{document}
+    \frontmatter
+    \titlepage
+    \innertitlepage{tikz-external/dirac-delta-lorentzian-limit.pdf}
+    \tableofcontents
+    \mainmatter
+    
+    \chapter{Introduction}
+    \epigraph{The first lecture is like the first pancake}{Kristel Torokoff, shortly before an online lecture full of technical difficulties.}
+    This is a course on mathematical methods.
+    Specifically on analytic methods.
+    Analytic here referring to analysis, with our focus on complex analysis.
+    This course goes hand in hand with the symmetries of quantum mechanics course which teaches algebraic mathematical methods.
+    Algebra here referring to abstract algebra, as in groups.
+    
+    \chapter{Infinite Series}
+    \epigraph{\enquote{Infinite}, that means an awful lot}{Kristel Torokoff}
+    Infinite series are common in physics, for example approximating functions with Taylor series, doing perturbation theory, expanding integrals, the list goes on.
+    
+    A general \defineindex{infinite series} is a formal sum of the form
+    \begin{equation}
+        \sum_{n=0}^{\infty} a_n
+    \end{equation}
+    where \(a_n\) are the terms of the series, usually their values are specified by some rule.
+    We can think of \(a_n\) as a function from \(\naturals\) to whatever set of values \(a_n\) may take, that is \((a_n)\) is a sequence.
+    Note that starting at \(n = 0\) is just since we need a start point, we could equally well start at \(n = 1\), \(n = 57\), or \(n = -\infty\).
+    We are mostly interested in series which converge, which is something we should define properly.
+    
+    \section{Convergence}
+    \begin{dfn}{Sequence Convergence}{dfn:sequence convergence}\index{sequence convergence}
+        The sequence \((a_n)\) converges to the value \(l\) if for all \(\varepsilon>0\) there exists \(n_0\in\naturals\) such that \(\abs{a_n - l} < \varepsilon\) for all \(n > n_0\).
+        In this case we write
+        \begin{equation}
+            \lim_{n\to\infty} a_n = l, \qqor a_n \to l\text{ as } n\to\infty.
+        \end{equation}
+    \end{dfn}
+    What this means intuitively is that by taking terms sufficiently far along we can make the gap between \(a_n\) and \(l\) arbitrarily small.
+    
+    \begin{dfn}{Partial Sum}{dfn:partial sum}
+        Given an infinite series
+        \begin{equation}
+            \sum_{n=0}^{\infty} a_n
+        \end{equation}
+        we define the \(N\)th \defineindex{partial sum} to be
+        \begin{equation}
+            \sum_{n=0}^{N}a_n.
+        \end{equation}
+    \end{dfn}
+    
+    \begin{dfn}{Series Convergence}{}\index{series convergence}
+        The series
+        \begin{equation}
+            \sum_{n=0}^{\infty} a_n
+        \end{equation}
+        converges if the sequence of its partial sums converges.
+        If this is the case the series and sequence of partial sums converge to the same value, \(S\).
+        
+        Combining \cref{dfn:sequence convergence,dfn:partial sum} we have that the series converges to \(S\) if for all \(\varepsilon>0\) there exists \(N_0\in\naturals\) such that
+        \begin{equation}
+            \abs{S - \sum_{n=0}^{N}a_n} < \varepsilon
+        \end{equation}
+        for all \(N > N_0\).
+    \end{dfn}
+    Intuitively this definition means that \(\sum a_n \to S\) if we can make the partial sums arbitrarily close to \(S\) by considering sufficiently many terms.
+    
+    \begin{dfn}{Absolute Convergence}{}
+        A series,
+        \begin{equation}
+            \sum_{n=0}^{\infty} a_n
+        \end{equation}
+        is \define{absolutely convergent}\index{absolute convergence} if
+        \begin{equation}
+            \sum_{n=0}^{\infty} \abs{a_n}
+        \end{equation}
+        is convergent.
+    \end{dfn}
+    It turns out that absolute convergence is a significantly stronger condition than convergence.
+    That is, all absolutely convergent series are also convergent, but not the other way round.
+    
+    If a series or sequence doesn't converge to a finite value we say it diverges.
+    We may also abuse this term to say that, for example, an oscillating sequence, such as \((-1)^{n}\), diverges, when what we mean is it doesn't converge, which isn't quite the same but is often close enough.
+    
+    \begin{exm}{Geometric Series}{}
+        The series
+        \begin{equation}
+            \sum_{n=0}^{\infty} x^n = 1 + x + x^2 + \dotsb
+        \end{equation}
+        is called the \defineindex{geometric series}.
+        It is absolutely convergent whenever \(\abs{x}<1\) and divergent otherwise.
+        
+        The geometric sequence converges absolutely to \(1/(1-\abs{x})\).
+        To show this we consider the partial sums:
+        \begin{equation}
+            G_N = \sum_{n=0}^{n}x^n
+        \end{equation}
+        which we can prove by induction are
+        \begin{equation}
+            G_N = \frac{1 - x^{N+1}}{1 - x}.
+        \end{equation}
+        In the case of \(N = 0\), our basis case, we have \(G_n = 0\), as the empty sum is by definition 0.
+        Now suppose that
+        \begin{equation}
+            G_k = \frac{1 - x^{k+1}}{1 - x}
+        \end{equation}
+        for some \(k \in \integers\).
+        It then follows that
+        \begin{align}
+            G_{k+1} &= x^{k+1} + G_{k}\\
+            &= x^{k+1} \frac{1 - x^{k+1}}{x}\\
+            &= \frac{x^{k+1}(1 - x) + 1 - x^{k+1}}{1 - x}\\
+            &= \frac{x^{k+1} - x^{k+2} + 1 - x^{k+1}}{1 - x}\\
+            &= \frac{1 - x^{k+2}}{1 - x}
+        \end{align}
+        as required.
+        So, by the principle of induction, we have
+        \begin{equation}
+            G_N = \frac{1 - x^{N+1}}{1 - x}
+        \end{equation}
+        for all \(N \in \naturals\).
+        
+        It remains to prove that \(G_N \to 1/(1 - x)\) as \(N \to \infty\).
+        Given some \(\varepsilon > 0\) we have to show that
+        \begin{equation}
+            \abs{\frac{1}{1 - x} - \frac{1 - x^{N+1}}{1 - x}} < \varepsilon
+        \end{equation}
+        for some sufficiently large \(N\).
+        We start by combining the fractions to get
+        \begin{equation}
+            \abs{\frac{1}{1 - x} - \frac{1 - x^{N+1}}{1 - x}} = \abs{\frac{x^{N+1}}{1 - x}}
+        \end{equation}
+        For the specific value of \(\varepsilon\) under consideration take
+        \begin{equation}
+            N_0 = \left\lceil \frac{\log[\varepsilon(1 - x)]}{\log x} - 1 \right\rceil.
+        \end{equation}
+        It then follows that for \(N > N_0\) we have
+        \begin{align}
+            &N + 1 < \frac{\log[\varepsilon(1 - x)]}{\log x}\\
+            \implies &(N + 1)\log x <  \log[\varepsilon(1-x)]\\
+            \implies &x^{N+1} < \varepsilon(1 - x)\\
+            \implies &\frac{x^{N+1}}{1 - x} < \varepsilon
+        \end{align}
+        which proves our claim.
+        
+        The proof for absolute convergence is identical but replace \(x\) with \(\abs{x}\).
+    \end{exm}
+    
+    \section{Convergence Tests}
+    It is a pain to prove convergence directly from the definition.
+    For this reason many convergence tests have been invented.
+    Most of these can tell us only whether or not a series converges but this is often enough.
+    
+    We start with a simple necessary, but not sufficient, condition for convergence which is immediately obvious.
+    For \(\sum a_n\) to converge we must have \(a_n \to 0\) as \(n \to \infty\).
+    
+    Some tests apply only to certain series, for example, alternating series:
+    \begin{dfn}{Alternating Series}{}
+        An \defineindex{alternating series} is a series where the terms alternate between positive and negative.
+        Such a series can be written as
+        \begin{equation}
+            \sum_{n=1}^{\infty} (-1)^{n-1}a_n
+        \end{equation}
+        where \(a_n\) are either all positive or all negative, depending on the sign of the first term.
+    \end{dfn}
+    
+    \begin{lma}{Leibniz Criterion}{}
+        The \defineindex{Leibniz criterion}, also known as the \defineindex{alternating series test} states that the series
+        \begin{equation}
+            \sum_{n=1}^{\infty} (-1)^{n-1} a_n
+        \end{equation}
+        converges if
+        \begin{enumerate}
+            \item \(a_n\) decrease monotonically\footnote{A sequence is monotonically decreasing (increasing) if \(a_{n+1} \le a_{n}\) (\(a_{n+1} \ge a_n\)) for all \(n\), if we can make the inequality \(<\) (\(>\)) instead we say the sequence is strictly monotonically decreasing (increasing).} for all but a finite number\footnote{A property holds for all but a finite number of terms of a sequence if there exists \(n_0\) such that the property holds for all \(a_n\) with \(n > n_0\).} of \(a_n\).
+            \item \(a_n \to 0\) as \(n \to \infty\).
+        \end{enumerate}
+        \begin{proof}
+            The proof consists of considering the odd and even partial sums,
+            \begin{equation}
+                S_{2m+1} = \sum_{n=1}^{2m+1} (-1)^{n-1}a_n, \qqand S_{2m} = \sum_{n=1}^{2m} (-1)^{n-1}a_n.
+            \end{equation}
+            If both converge to the same limit, \(L\), then the series converges to \(L\).
+            
+            The odd partial sums decrease monotonically:
+            \begin{equation}
+                S_{2(m+1)+1} = S_{2m + 1} - a_{2m+2} + a_{2m+3} \le S_{2m+1}
+            \end{equation}
+            where we use the fact that \(a_n\) is monotonically decreasing for sufficiently large \(n\) and so we may assume \(a_{2m+3} \le a_{2m + 1}\) and hence \(a_{2m+3}-a_{a_{2m+2}} < 0\).
+            Similarly the even partial sums increase monotonically:
+            \begin{equation}
+                S_{2(m+1)} = S_{2m} + a_{2m+1} - a_{2m+2}\ge S_{2m}.
+            \end{equation}
+            Since \(a_n\) decrease monotonically and \(a_n \to 0\) we have that \(a_n \ge 0\) for all \(n\).
+            Therefore \(S_{2m+1} - S_{2m} = a_{2m+1} \ge 0\).
+            
+            From this we have
+            \begin{equation}
+                a_1 - a_2 = S_2 \le S_{2m} \le S_{2m+1} \le S_1 = a_1.
+            \end{equation}
+            This shows that both odd and even partial sums are bounded.
+            Since the odd partial sums decrease monotonically the bound below implies convergence.
+            Since the even partial sums increase monotonically the bound above implies convergence.
+            
+            It remains to show that both sequences of partial sums converge to the same value.
+            This is simple since
+            \begin{equation}
+                \lim_{m\to\infty} (S_{2m+1} - S_{2m}) = \lim_{m\to\infty} a_{2m+1} = 0
+            \end{equation}
+            by our original requirements, and also
+            \begin{equation}
+                \lim_{m\to\infty} (S_{2m+1} - S_{2m}) = \lim_{m\to\infty} S_{2m+1} - \lim_{m\to\infty} S_{2m} \implies \lim_{m\to\infty} S_{2m+1} = \lim_{m\to\infty} S_{2m}.
+            \end{equation}
+            Hence \(S_{2m+1}\) and \(S_{2m}\) must tend to the same value, \(L\), and therefore the original sequence converges.
+        \end{proof}
+    \end{lma}
+    
+    A more general convergence test, upon which many other convergence tests are built, is the ratio test.
+    
+    \begin{lma}{Ratio Test}{}\index{ratio test}
+        Let
+        \begin{equation}
+            L = \lim_{n\to\infty} \abs{\frac{a_{n+1}}{a_n}}.
+        \end{equation}
+        If \(L < 1\) then \(\sum a_n\) converges absolutely, if \(L > 1\) then it diverges, and if \(L = 1\) the test is inconclusive.
+        
+        \begin{proof}
+            For any given \(\varepsilon < 1 - L\) we can find \(n_9\) such that
+            \begin{equation}
+                \abs{\frac{a_{n+1}}{a_n}} \le L + \varepsilon < 1
+            \end{equation}
+            for all \(n > n_0\).
+            It then follows that if we fix \(N > n_0\) we have
+            \begin{align}
+                \abs{\sum_{n=N}^{\infty} a_n} &\le \sum_{n=N}^{\infty} \abs{a_n}\\
+                &= \abs{a_N} + \abs{a_{N+1}} + \abs{a_{N+2}} + \dotsb\\
+                &= \abs{a_N}\left[ 1 + \abs{\frac{a_{N+1}}{a_N}} + \abs{\frac{a_{N+2}}{a_{N}}} + \dotsb \right]\\
+                &= \abs{a_N} \left[ 1 + \abs{\frac{a_{N+1}}{a_N}} + \abs{\frac{a_{N+2}}{a_{N+1}}}\abs{\frac{a_{N+1}}{a_N}} + \dotsb \right]\\
+                &\le \abs{a_N} \sum_{n=0}^{\infty} (K + \varepsilon)^{n}
+            \end{align}
+            and this converges for \(L + \varepsilon < 1\) (which is indeed the case) as it is a geometric series.
+            Note that the first inequality comes from noticing that if the absolute values are around the entire sum there is a chance that some terms cancel but if we take the absolute value of each term then they must add together.
+            
+            It then follows that the sum
+            \begin{equation}
+                \sum_{n=1}^{\infty} \abs{a_n} = \sum_{n=1}^{N-1} + \sum_{n=N}^{\infty} \abs{a_n}
+            \end{equation}
+            converges since the first sum contains only a finite number of terms and the second converges by our earlier work.
+            This proves the case of \(L < 1\).
+            
+            Clearly if \(L > 1\) then the sequence fails to converge as the terms increase in size.
+            If \(L = 1\) then we can't make a claim either way.
+        \end{proof}
+    \end{lma}
+    
+    \begin{dfn}{Harmonic Series}{}
+        An example of an inconclusive test is the \defineindex{harmonic series}:
+        \begin{equation}
+            \sum_{n=1}^{\infty} \frac{1}{n} = 1 + \frac{1}{2} + \frac{1}{3} + \dotsb
+        \end{equation}
+        and it famously diverges.
+        However, the ratio test is inconclusive since
+        \begin{equation}
+            \lim_{n\to\infty} \abs{\frac{a_{n+1}}{a_n}} = \lim_{n\to\infty} \frac{1/(n+1)}{1/n} = \lim_{n\to\infty} \frac{n}{n+1} = 1.
+        \end{equation}
+    \end{dfn}
+    
+    \begin{lma}{Cauchy or Maclaurin Integral Test}{}
+        The \define{Cauchy}, or \define{Maclaurin integral test}\index{Cauchy!integral test}\index{Maclaurin integral test} states that if \(f\) is a continuous monotonic decreasing function\footnote{A function is monotonically decreasing (increasing) if \(f(x) \le f(y)\) (\(f(x) \ge f(y)\)) for all \(x > y\), if we can make the inequality \(<\) (\(>\)) instead we say the sequence is strictly monotonically decreasing (increasing). That is a monotonically increasing function preserves the order and a monotonically decreasing function reverses it.} in agreement with \(a_n\), that is \(f(n) = a_n\) for all \(n\in I\) where \(I\) is the indexing set for the sequence \((a_n)\), then 
+        \begin{equation}
+            \sum_{n=b}^{\infty} a_n
+        \end{equation}
+        converges if
+        \begin{equation}
+            \int_{b-1}^{\infty} f(x)\dd{x}
+        \end{equation}
+        converges and diverges if
+        \begin{equation}
+            \int_b^{\infty} f(x)\dd{x}
+        \end{equation}
+        diverges.
+        \begin{proof}
+            For simplicity in the proof we will take \(b = 1\), but we can change this with a simple translation of the axes.
+            The proof relies on the definition of the integral as the area under \(f(x)\).
+            
+            Suppose that \(f\) is the function plotted in \cref{fig:integral test}.
+            This may not be its exact form but this works for any monotonically decreasing function.
+            On the left hand side of this diagram starting at \(x = 1\) we have drawn blocks of width 1 which have the height \(f(x)\) on their left edge.
+            Since these blocks are drawn at integer positions, \(n\), this height is \(a_n\).
+            Since the width of the blocks is 1 the area of the blocks is \(a_n\) also.
+            Clearly these blocks cover a larger area than the area under the curve and hence
+            \begin{equation}
+                \int_{1}^{\infty} f(x) \dd{x} \le \sum_{n=1}^{\infty} a_n.
+            \end{equation}
+            Now consider the right hand side of the diagram.
+            Notice that these are the same blocks, but shifted left by 1.
+            Clearly the area under the curve is greater than the area covered by the blocks so
+            \begin{equation}
+                \int_{0}^{\infty} f(x) \dd{x} \ge \sum_{n=1}^{\infty} a_n.
+            \end{equation}
+            Combining these we have
+            \begin{equation}
+                \int_{1}^{\infty} f(x) \dd{x} \le \sum_{n=1}^{\infty} a_n \le \int_{0}^{\infty} f(x) \dd{x}.
+            \end{equation}
+            Clearly from this we can conclude that if 
+            \begin{equation}
+                \int_{0}^{\infty} f(x) \dd{x}
+            \end{equation}
+            converges to some finite value then \(\sum a_n\) must as well since it is bounded above.
+            Similarly if
+            \begin{equation}
+                \int_1^\infty f(x)\dd{x}
+            \end{equation}
+            diverges then there is no way that \(\sum a_n\) can converge.
+        \end{proof}
+    \end{lma}
+    
+    \begin{figure}
+        \tikzsetnextfilename{integral-test}
+        \begin{tikzpicture}
+            \tikzset{axis/.style={very thick, <->}}
+            \tikzset{box/.style={highlight, very thick, fill opacity=0.5, fill=highlight}}
+            \foreach \i in {0,...,5} \node[below] at (\i, 0) {\i};
+            \node[right] at (5, 0) {\(x\)};
+            \draw[very thick, domain=0:5, samples=100, dark] plot (\x, {4/(\x+1)});
+            \draw[box] (1, 0) rectangle (2, 2);
+            \draw[box] (2, 0) rectangle (3, 4/3);
+            \draw[box] (3, 0) rectangle (4, 1);
+            \draw[box] (4, 0) rectangle (5, 4/5);
+            \draw[axis] (0, 5) -- (0, 0) -- (5, 0);
+            \begin{scope}[xshift=6cm]
+                \foreach \i in {0,...,5} \node[below] at (\i, 0) {\i};
+                \node[right] at (5, 0) {\(x\)};
+                \draw[very thick, domain=0:5, samples=100, dark] plot (\x, {4/(\x+1)});
+                \draw[box] (0, 0) rectangle (1, 2);
+                \draw[box] (1, 0) rectangle (2, 4/3);
+                \draw[box] (2, 0) rectangle (3, 1);
+                \draw[box] (3, 0) rectangle (4, 4/5);
+                \draw[axis] (0, 5) -- (0, 0) -- (5, 0);
+            \end{scope}
+        \end{tikzpicture}
+        \caption{Comparison of leading and lagging blocks with the area under an integral, used for proving Cauchy's integral test.}
+        \label{fig:integral test}
+    \end{figure}
+
+    \begin{exm}{Riemann Zeta Function}{}
+        The \defineindex{Riemann zeta function}, or simply the \defineindex{zeta function}, \(\zeta\)\index{\(\zeta\)|see{zeta function}}, is defined by
+        \begin{equation}
+            \zeta(s) = \sum_{n=1}^{\infty} \frac{1}{n^s}.
+        \end{equation}
+        For now we consider only \(s\in\reals\).
+        
+        For a given value of \(s\) the ratio test gives us
+        \begin{equation}
+            \lim_{n\to\infty} \abs{\frac{1/(n+1)^s}{1/n^s}} = \lim_{n\to\infty} \abs{\frac{n}{n+1}}^s = 1,
+        \end{equation}
+        so it is inconclusive.
+        Instead we try to apply the Cauchy integral test.
+        Define
+        \begin{equation}
+            I_n = \int_1^{n} \frac{\dl{x}}{x^s} = \left[ \frac{x^{-s+1}}{1-s} \right]^n_1 = \frac{n^{1-s}}{1-s} = \frac{1}{1-s}\frac{1}{n^{s-1}}.
+        \end{equation}
+        Clearly if \(s > 1\) then \(I_n \to 0\) as \(n \to \infty\).
+        The Cauchy integral test then allows us to conclude that the Riemann zeta function converges for all integer values greater than 1.
+    \end{exm}
+
+    \chapter{Asymptotic Series}
+    \epigraph{If your choice is to commit an unlawful act, or be stuck, just commit the unlawful act.}{Kristel Torokoff}
+    In this chapter we introduce asymptotic series.
+    We will do so with a motivating example saving a formal definition until the end.
+    
+    \section{Motivating Example}\label{sec:asymptotic series:motivating example}
+    Consider the integral
+    \begin{equation}
+        G(x) = \int_0^{\infty} \frac{\e^{-xt}}{1 + t} \dd{t}.
+    \end{equation}
+    It can be shown that for \(x > 0\) this is convergent.
+    
+    For large \(x\) this integral is dominated by small \(t\) since the \(\e^{-xt}\) term dominates the \(1/(1 + t)\) term.
+    For this reason we may choose to expand the integrand about \(t = 0\).
+    We can do so easily by noticing that if we rewrite the integrand as \(\e^{-xt}/[1-(-t)]\) then we can recognise a geometric series and so we have for \(\abs{t} \le 1\)
+    \begin{equation}
+        \frac{\e^{-xt}}{1 + t} = \e^{-xt} \sum_{m=0}^{\infty} (-t)^{m}.
+    \end{equation}
+    This is the alternating geometric series.
+    
+    Hence our integral is 
+    \begin{equation}
+        G(x) = \int_{0}^{\infty} \e^{-xt} \sum_{m=0} (-t)^{m}\dd{t}.
+    \end{equation}
+    Making a change of variables we define \(t' = xt\) and so \(x\dl{t} = \dl{t'}\) and the limits are unchanged, giving us
+    \begin{equation}
+        G(x) = \int_0^\infty \e^{-t'} \frac{1}{x^{m+1}}\sum_{m=0} (-t')^{m}\dd{t'} \mathrel{\text{\enquote{=}}} \sum_{m=0}^{\infty} \frac{(-1)^m}{x^{m+1}} \int_0^{\infty} \e^{-t'} (t')^m \dd{t'}.
+    \end{equation}
+    We put the equals in quotation marks as what we have done here is not legal.
+    The sum doesn't converge uniformly and we cannot swap the order of the sum and integral.
+    But what if we do anyway?
+    After all, as physicists we are only interested in maths in so far as it gives us useful answers.
+    Can we extract a useful answer anyway?
+    Lets give it a go.
+    
+    If we define
+    \begin{equation}
+        I_m \coloneqq \int_0^\infty (t')^m \e^{-t'}\dd{t'}
+    \end{equation}
+    then integrating by parts we use
+    \begin{align}
+        u &= (t')^m & v &= -\e^{-t'}\\
+        u' &= m(t')^{m-1} & v' &= \e^{-t'}
+    \end{align}
+    which gives us
+    \begin{equation}
+        I_m = [-(t')^m\e^{-t'}]_0^\infty + \int_0^\infty m(t')^{m-1}\e^{-t'}\dd{t'} = mI_{m-1}.
+    \end{equation}
+    From this it follows that
+    \begin{equation}
+        I_m = m!I_0
+    \end{equation}
+    We then have
+    \begin{equation}
+        I_0 = \int_0^{\infty} \e^{-t'} \dd{t'} = [-\e^{-t'}]_{0}^{\infty} = 1.
+    \end{equation}
+    Hence,
+    \begin{equation}
+        I_m = m!.
+    \end{equation}
+
+    Hence our integral is
+    \begin{equation}
+        G(x) \mathrel{\text{\enquote{=}}} \sum_{m=0}^{\infty} \frac{(-1)^mm!}{x^{m+1}}.
+    \end{equation}
+    We have an infinite series.
+    We should check convergence, let's try the ratio test:
+    \begin{equation}
+        \lim_{m\to\infty} \abs*{\frac{a_{m+1}}{a_m}} = \lim_{m\to\infty} \frac{(m+1)!}{x^{m+2}}\frac{x^{m+1}}{m!} = \lim_{m\to\infty} \frac{m+1}{x} = \infty.
+    \end{equation}
+    So the sum diverges!
+    
+    However, if we evaluate the first few terms then we find that actually the series aligns very closely with numerical calculations of \(G\).
+    Define
+    \begin{equation}
+        g_n(x) \coloneqq \sum_{m=0}^{n-1} \frac{(-1)^nn!}{x^{n+1}}.
+    \end{equation}
+    \Cref{fig:asymptotic expansion} shows \(g_n(10)\) plotted for \(n = 1, \dotsc, 26\) and the numerical value of \(G(10)\).
+    We can see that around \(n=23\) \(g_n\) starts to diverge away from \(G(10)\), but before this \(g_n\) is a fairly good approximation of \(G\).
+    This is very different to our usual expectation of series which is that more terms means a more accurate approximation.
+    
+    \begin{figure}
+        \tikzsetnextfilename{asymptotic-expansion}
+        \begin{tikzpicture}
+            \tikzset{axis/.style={thick, ->}}
+            \draw[axis] (0, 0) -- (9.5, 0) node[right] {\(n\)};
+            \draw[axis] (0, -0.3) -- (0, 4) node[above] {\(g_n(10)\)};
+            \draw[highlight, very thick] (0, 0.915633) -- (9.5, 0.915633);
+            \node[left] at (0, 0.915) {\(G(10)\)};
+            \foreach \pos in {(0.667,1.00), (1.00,0.900), (1.33,0.920), (1.67,0.914), (2.00,0.916), (2.33,0.915), (2.67,0.916), (3.00,0.915), (3.33,0.916), (3.67,0.915), (4.00,0.916), (4.33,0.915), (4.67,0.916), (5.00,0.915), (5.33,0.916), (5.67,0.915), (6.00,0.917), (6.33,0.913), (6.67,0.920), (7.00,0.908), (7.33,0.932), (7.67,0.881), (8.00,0.993), (8.33,0.735), (8.67,1.36), (9.00,-0.196), (9.33,3.84)} {
+                \fill[dark] \pos circle [radius = 0.075];
+            }
+        \end{tikzpicture}
+        \caption{The function \(g_n\) is defined by taking the first \(n-1\) terms of the series for \(G\). Here we have arbitrarily chosen to evaluate both at \(x = 10\).}
+        \label{fig:asymptotic expansion}
+    \end{figure}
+    
+    To aid in our analysis of this behaviour we define
+    \begin{equation}
+        R_n(x) = G(x) - g_n(x),
+    \end{equation}
+    which we can think of as the remainder of the series, that is all terms not included in \(g_n\).
+    We can now work backwards to find an integral form for \(g_n\):
+    \begin{equation}
+        g_n(x) = \int_0^{\infty} \e^{-xt}\sum_{m=0}^{n-1} (-t)^{m}\dd{t}.
+    \end{equation}
+    We can recognise this sum as a finite geometric series and hence
+    \begin{equation}
+        g_n(x) = \int_0^{\infty} \e^{-xt} \frac{1 - (-1)^n}{1 + t}\dd{t}.
+    \end{equation}
+    Combing the integrals forms of \(G\) and \(g_n\) we get
+    \begin{equation}
+        R_n(x) = \int_0^{\infty} \e^{-xt} \frac{(-t)^n}{1 + t}\dd{t}.
+    \end{equation}
+    We can bound this:
+    \begin{align}
+        \abs{R_n(x)} = \abs*{\int_0^{\infty} \e^{-xt} \frac{(-t)^n}{1 + t}\dd{t}}\\
+        &\le \int_0^{\infty} \abs{\e^{-xt}t^n}\\
+        &= I_n\\
+        &= \frac{n!}{x^{n+1}}
+    \end{align}
+    Here we have used the fact that \(1/(1 + t)\) is largest when \(t = 0\), and the integral of an absolute value is always at least as big as the absolute value of the integral.
+    Also, \(I_n\) is the same integral as before, but now with \(\e^{-xt}\) instead of \(\e^{-t'}\).
+    
+    Consider how the last term of \(g_n\) grows in comparison to \(R_n\) as functions of \(x\).
+    We can do this by considering their ratio as \(x \to \infty\):
+    \begin{equation}
+        \lim_{x\to\infty} \abs{\frac{R_n}{a_{m-1}}} = \lim_{x\to\infty} \frac{n!}{x^{n+1}}\frac{x^n}{(n-1)!} = \lim_{x\to\infty} \frac{n}{x} = 0.
+    \end{equation}
+    We see also that
+    \begin{equation}
+        \lim_{x\to\infty} x^nR_n(x) = \lim_{x\to\infty} \frac{n!}{x} = 0.
+    \end{equation}
+    What both of these show is that \(R_n(x)\) goes to zero faster than the last included term of the truncated series, \(g_n\).
+    Therefore \(g_n(x)\) approaches \(G(x)\) but only for fixed \(n\) and large \(x\).
+    This leads us to the definition of an asymptotic series.
+    
+    \begin{dfn}{Asymptotic Series}{}
+        Consider the function defined by
+        \begin{equation}
+            f(z) = a_0 + \frac{a_1}{z} + \frac{a_2}{z^2} + \dotsb + \frac{a_n}{z^n} + R_n(z)
+        \end{equation}
+        for some function \(R_n\).
+        Then
+        \begin{equation}
+            S_n(z) = \sum_{s=0}^{n}a_sz^{-s}
+        \end{equation}
+        is an \defineindex{asymptotic} series for \(f\) as \(z \to \infty\) if the \defineindex{remainder}, \(R_n\), satisfies
+        \begin{equation}
+            \lim_{z\to\infty} z^nR_n(z) = \lim_{z\to\infty} z^n
+            [f(z) -  S_n(z)] = \lim_{z\to\infty} z^n\left[ f(z) - \sum_{s=0} \frac{a_s}{z^s} \right] = 0.
+        \end{equation}
+    \end{dfn}
+    
+    \begin{ntn}{Asymptotic Notation}{}
+        If \(S_n(z)\) is an asymptotic expansion of \(f(z)\) then we denote this by \(S_n(z) \sim f(z)\).\index{\(\sim\)|see{asymptotic}}
+        Note that this notation is often abused to say \enquote{\(f\) and \(S_n\) have similar behaviour as \(z \to \infty\)} but the precise mathematical meaning is in the sense described above.
+        
+        Another way of writing the condition on \(R_n\) is using \defineindex{little \(o\) notation}, in which the function \(g(x) = o(h(x))\) if \(g(x)/h(x) \to 0\) as \(x \to \infty\).
+        In the case of asymptotic expansions we require that \(R_n(z) = o(z^{-n})\).
+    \end{ntn}
+
+    Intuitively a series is an asymptotic expansion for a function if the remainder goes to zero faster than the last included term as \(z \to \infty\).
+    
+    It should be noted that asymptotic expansions don't need to be convergent.
+    In fact most of the interesting asymptotic expansions don't converge.
+    
+    The best place to truncate the series is where the remainder's absolute value is minimised.
+    Usually this depends on the value at which we are evaluating the sum.
+    
+    Asymptotic series are usually alternating series in which the partial sums first approach the function but then start to increase in size and oscillate wildly.
+    
+    We can actually define an asymptotic series where instead of \(a_nz^{-n}\) the terms are of the form \(\varphi_n(z)\) where \(\varphi_n\) are functions such that \(\varphi_{n+1}(z) = o(\varphi_n(z))\), that is \(\varphi_{n+1}(z)/\varphi_n(z) \to 0\) as \(z \to \infty\).
+    
+    It is important to make sure you understand the difference between asymptotic and convergent series.
+    \begin{important}
+        A convergent series for \(f\) will approach \(f(z)\) as \(n \to \infty\) for a given value of \(z\).
+        
+        An asymptotic series for \(f\) will approach \(f(z)\) as \(z \to \infty\) for a given value of \(n\).
+    \end{important}
+    
+    \chapter{Complex Analysis}
+    \epigraph{Complex analysis, just a small subject for a Monday afternoon.}{Kristel Torokoff}
+    This chapter is a recap of complex analysis.
+    It will consist mostly of definitions, theorems, and examples.
+    For proofs refer to the complex analysis part of the methods of theoretical physics notes: \url{https://github.com/WilloughbySeago/Uni-Notes/blob/main/year-3/Methods-of-Theoretical-Physics/Complex-Analysis/|Complex-Analysis-Notes.pdf}.
+    
+    \section{Basics}
+    \begin{dfn}{Differentiable}{}
+        The function \(f \colon S \subseteq \complex \to \complex\) is \defineindex{differentiable} at the point \(z \in S\) if
+        \begin{equation}
+            \lim_{\Delta z \to 0} \frac{f(z + \Delta z) - f(z)}{\Delta z}
+        \end{equation}
+        exists and is independent of the direction we approach 0.
+        We define this limit, when it exists, to be the derivative of \(f\).
+    \end{dfn}
+    
+    \begin{thm}{Cauchy--Riemann Relations}{}
+        Let \(f\) be a complex function, which we can always write as
+        \begin{equation}
+            f(z) = f(x + iy) = u(x, y) + iv(x, y)
+        \end{equation}
+        for some \(u, v\colon \reals^2 \to \reals\).
+        Then \(f\) is differentiable if and only if \(u\) and \(v\) satisfy the \defineindex{Cauchy--Riemann relations}:
+        \begin{equation}
+            \diffp{u}{x} = \diffp{v}{y}, \qqand \diffp{u}{y} = -\diffp{v}{x}.
+        \end{equation}
+        Or in an alternative notation
+        \begin{equation}
+            u_x = v_y, \qqand u_y = - v_x.
+        \end{equation}
+    \end{thm}
+    
+    \begin{dfn}{Analytic}{}
+        The function \(f\) is \defineindex{analytic} on the domain \(D\) if \(f\) is differentiable at all points in \(D\).
+    \end{dfn}
+    
+    For example, the function defined by \(f(z) = 1/z\) is analytic on \(\complex\setminus\{0\} \eqqcolon \complex^{\times}\), however at 0 it is not only not analytic but not defined.
+    
+    \begin{thm}{Cauchy's Theorem}{}
+        \index{Cauchy!theorem}
+        If \(f\) is an analytic on and within a closed contour, \(C\), then
+        \begin{equation}
+            \oint_C f(z) \dd{z} = 0.
+        \end{equation}
+    \end{thm}
+    
+    A consequence of Cauchy's theorem is that integrals of analytic functions are independent of the path between the start and end points as long as the paths can be continuously deformed into each other without crossing a singularity (i.e. the paths are homotopic).
+    This follows from integrating one way along one path and back along another, forming an integral around a loop which is necessarily zero.
+    
+    \begin{thm}{Cauchy's Integral Formula}{thm:cauchy integral formula}
+        \index{Cauchy!integral formula}
+        If \(f\) is analytic in a neighbourhood of \(z_0\) and \(C\) is a closed contour contained in this neighbourhood with \(z_0\) in the interior of \(C\) then
+        \begin{equation}
+            f(z_0) = \frac{1}{2\pi i} \oint_C \frac{f(z)}{z - z_0}\dd{z}.
+        \end{equation}
+        It follows that
+        \begin{equation}
+            f^{(n)}(z_0) = \frac{n!}{2\pi i} \oint_C \frac{f(z)}{(z - z_0)^{n+1}}\dd{z}.
+        \end{equation}
+        It follows that if a function is analytic in a neighbourhood it is infinitely differentiable and all its derivatives are analytic on this neighbourhood.
+    \end{thm}
+    
+    \begin{dfn}{Entire Functions}{}
+        A function that is analytic for all finite values is called \defineindex{entire}.
+    \end{dfn}
+    
+    For example, \(\e^z\), \(\sin z\), and \(\cos z\) are all entire functions.
+    
+    \begin{thm}{Liouville's Theorem}{}
+        \index{Liouville's theorem}
+        If \(f\) is analytic for all \(z\) and bounded then \(f\) is a constant function.
+    \end{thm}
+
+    This means that all functions of interest must have some point at which they are not analytic, or at which they are not bounded.
+    For example, \(\e^z\), \(\sin z\), and \(\cos z\) all blow up at infinity.
+    
+    \section{Series Expansions}
+    \begin{thm}{Taylor's Theorem}{}
+        \index{Taylor's theorem}
+        An analytic function has a convergent expansion about any point, \(z\), within its domain of analyticity.\footnote{Often analyticity is \emph{defined} as having a convergent expansion at a point. In this case we call functions satisfying the differentiable definition of an analytic function a holomorphic function. For complex functions the two are equivalent so we don't bother.}
+        \begin{proof}
+            We consider a series expansion at the point \(z\).
+            From Cauchy's integral theorem (\cref{thm:cauchy integral formula}) we have
+            \begin{equation}
+                f(z) = \frac{1}{2\pi i} \oint_C \frac{f(z')}{z' - z}\dd{z'}
+            \end{equation}
+            for a circular contour, \(C\), centred at some point \(z_0\) and for \(z\) within \(c\).
+            This then implies that
+            \begin{equation}
+                \abs*{\frac{z - z_0}{z' - z_0}} < 1,
+            \end{equation}
+            since \(z'\) are on the circle and so are further from the centre than \(z\) which is inside the circle.
+            We then have
+            \begin{align}
+                \frac{1}{z' - z} &= \frac{1}{z' - z_0}\frac{1}{1 - \frac{z - z_0}{z' - z_0}}\\
+                &= \frac{1}{z' - z_0} \sum_{n=0}^{\infty} \left( \frac{z - z_0}{z' - z_0} \right)^n
+            \end{align}
+            where we have used the geometric series, which is convergent since the absolute ratio of terms is less than one.
+            We then find that
+            \begin{align}
+                f(z) = \frac{1}{2\pi i} \oint_C \sum_{n=0}^{\infty} \frac{f(z')(z - z_0)^n}{(z' - z_0)^{n+1}} \dd{z'}\\
+                &= \sum_{n=0}^{\infty} \frac{(z-z_0)^n}{n!}f^{(n)}(z_0).
+            \end{align}
+            For an absolute ratio of terms less than one the geometric series converges uniformly and so exchanging the integral and sum is valid.
+            This last equality then gives us the \defineindex{Taylor series} of \(f\) at \(z\).
+        \end{proof}
+    \end{thm}
+    
+    \begin{dfn}{Isolated Singularity}{}
+        An \defineindex{isolated singularity} is a singularity, that is a point where a function is undefined, which has a neighbourhood which contains no other singularities.
+    \end{dfn}
+    
+    \begin{thm}{Laurent Series}{}
+        If \(f\) has an isolated singularity at \(z_0\) then we can expand \(f\) in a \defineindex{Laurent series}:
+        \begin{equation}
+            f(z) = \sum_{n=0}^{\infty} a_n(z - z_0)^n + \sum_{n=1}^{\infty} \frac{b_n}{(z - z_0)^n}.
+        \end{equation}
+        We call the first sum the \defineindex{analytic part} and the second the \defineindex{principle part}.
+    \end{thm}
+    
+    \begin{dfn}{Pole Types}{}
+        Let \(b_n\) be the coefficients of the principle part of a Laurent series expansion of \(f\) at some singularity \(z_0\).
+        Then
+        \begin{enumerate}
+            \item If \(b_n = 0\) for \(n > 1\) and \(b_1 \ne 0\) we call \(z_0\) a \defineindex{simple pole}.
+            \item If \(b_n = 0\) for \(n > N\) and \(b_N \ne 0\) we call \(z_0\) a \define{pole of order \(\bm{N}\)}\index{pole of order \(N\)}.
+            \item If \(b_n \ne 0\) for infinitely many values of \(n\) then we call \(z_0\) an essential singularity.
+        \end{enumerate}
+    \end{dfn}
+    
+    \begin{dfn}{Residue}{}
+        We call the coefficient \(b_1\) of a Laurent series for \(f\) the residue at \(z_0\), denoted \(\Res(f, z_0)\).
+    \end{dfn}
+    
+    \section{Residue Theorem}
+    \begin{thm}{Residue Theorem}{thm:residue}
+        Let \(C\) be some closed contour, which we traverse in an anticlockwise direction.
+        Let \(z_\alpha\) be poles inside \(C\).
+        Then
+        \begin{equation}
+            \oint_C f(z) \dd{z} = 2\pi i\sum_\alpha \Res(f, z_\alpha).
+        \end{equation}
+    \end{thm}
+    
+    \begin{exm}{}{exm:integral 0 to inf 1/1+x^2}
+        Consider the integral
+        \begin{equation}
+            I = \int_0^{\infty} \frac{1}{1 + x^2}\dd{x}.
+        \end{equation}
+        We can compute this with an integral in the complex plane running along the real axis from \(-R\) to \(R\) and then around a semicircle in the upper half plane.
+        Along the large semicircle, \(C\), let \(z = R\e^{i\vartheta}\) for \(0 < \vartheta < \pi\).
+        Then,
+        \begin{equation}
+            \int_C \frac{1}{1 + z^2} \dd{z} = iR\int_0^\pi \frac{\e^{i\vartheta}}{1 + R^2\e^{2i\vartheta}}.
+        \end{equation}
+        The magnitude of this is bounded by \(\pi R/(R^2 - 1)\) and hence goes to zero as \(R \to \infty\).
+        Therefore the integral along this whole contour is equal to the integral along the real line as \(R \to \infty\), since we are interested in the integral from 0 to \(\infty\) this means the contour integral is equal to \(2I\).
+        By noticing that
+        \begin{equation}
+            \frac{1}{1 + z^2} = \frac{1}{(z + i)(z - i)}
+        \end{equation}
+        we see that the integrand has simple poles at \(z = \pm i\), of these only \(z = i\) is inside the contour.
+        The residue at this point is \(1/2i\) and hence
+        \begin{equation}
+            2I = 2\pi i\frac{1}{2i} = \pi \implies I = \frac{\pi}{2}.
+        \end{equation}
+    \end{exm}
+    
+    \begin{exm}{Generating Function}{}
+        For some set of polynomials, \(f_n\), such as the Legendre polynomials\index{Legendre polynomials}, \(P_n\), we define a \defineindex{generating function} to be
+        \begin{equation}
+            \mathcal{F}(x, z) = \sum_{n=-\infty}^{\infty} f_n(x)z^n.
+        \end{equation}
+        Sometimes we can find a closed, analytical expression for \(\mathcal{F}\).
+        In this case we can use the residue function to recover the polynomials:
+        \begin{equation}
+            \frac{1}{2\pi i} \oint_C \frac{\mathcal{F}(x, z)}{z^{n+1}}\dd{z} = f_n(x).
+        \end{equation}
+        Here \(C\) is some anticlockwise contour containing the origin.
+        This gives us an integral representation for the polynomials.
+        We will use this later.
+    \end{exm}
+    
+    \begin{lma}{Jordan's Lemma}{lma:jordan's}
+        \index{Jordan's lemma}
+        Given an integral of the form 
+        \begin{equation}
+            I_R = \int_C \e^{ikz}f(z) \dd{z}
+        \end{equation}
+        for some real \(k > 0\) and function \(f\), which is analytic in the upper plane, except for at a finite number of poles, with \(C\) being the curved part of a semicircular contour between \(-R\) and \(R\) on the real axis with the curved part in the upper half plane.
+        If
+        \begin{equation}
+            \lim_{\abs{z} \to\infty} f(z) = 0, \qquad\text{when}\qquad 0 \le \arg z \le \pi
+        \end{equation}
+        then
+        \begin{equation}
+            \lim_{R\to\infty} I_R = 0.
+        \end{equation}
+        
+        An equivalent result holds for real \(k < 0\) with the condition now that \(\pi \le \arg z \le 2\pi\) and the contour is in the lower half plane.
+    \end{lma}
+
+    \begin{exm}{}{}
+        Consider a resistance, \(R\), and inductance, \(L\), in series with a voltage\footnote{when we do Fourier transforms we will see that this is really a voltage impulse, \(A\delta(t)\) at time \(t = 0\)},
+        \begin{equation}
+            V(t) = \frac{A}{2\pi} \int_{-\infty}^{\infty} \e^{i\omega t}\dd{\omega}.
+        \end{equation}
+        The current due to an alternating voltage \(\e^{i\omega t}\) is \(\e^{i\omega t}/(R + i\omega L)\), which follows from Ohm's law with complex impedance \(R + i\omega L\).
+        The current is then
+        \begin{equation}
+            I(t) = \frac{A}{2\pi} \int_{-\infty}^{\infty} \frac{\e^{i\omega t}}{R + i\omega L}\dd{\omega}.
+        \end{equation}
+        
+        We can split this integral into two halves, one covering \(t < 0\) and the other \(t > 0\), since \(t\) plays the role of \(k\) in Jordan's lemma (\cref{lma:jordan's}).
+        
+        There is one pole at \(\omega = iR/L\) so we find that for \(t < 0\) we have a complete contour in the lower half plane containing no poles and so \(I(t) = 0\).
+        
+        For \(t > 0\) we have a complete contour in the upper half plane encircling a single pole.
+        By the residue theorem (\cref{thm:residue}) the integral around the entire contour is \(A\e^{-Rt/L}\), and by Jordan's lemma (\cref{lma:jordan's}) the integral over the curved part of the contour is zero, leaving us with only the contribution from the real line, which means \(I(t) = A\e^{-Rt/L}\) for \(t > 0\).
+        
+        This is consistent with the physical picture where for \(t < 0\) there has never been a voltage and so there is no current.
+        Then, at \(t = 0\), there is a voltage impulse, and after this there is an exponentially decaying current with time constant \(R/L\).
+    \end{exm}
+    
+    \section{Multi-Valued Functions}
+    When we extend functions to the complex plane they often become multi-valued.
+    The canonical examples being \(\ln z\) and \(z^r\) for non-integer \(r\).
+    We can see this most easily if we consider the polar form of \(z = Re^{i\vartheta}\):
+    \begin{equation}
+        \begin{array}{l}
+            \ln z = \ln(R\e^{i\vartheta}) = \ln(R\e^{i\vartheta + 2\pi in}) = \ln R + i\vartheta + 2i\pi n,\\
+            z^{1/p} = (R\e^{i\vartheta})^{1/p} = (R\e^{i\vartheta + 2\pi i n})^{1/p} = R^{1/p}\e^{i\vartheta/p + 2\pi in/p}
+        \end{array}
+        \qquad n \in \integers
+    \end{equation}
+    
+    \begin{dfn}{Branch Point}{}
+        A multi-valued function, \(f\), has a \defineindex{branch point} at \(z\) if \(f(z + \varepsilon) \ne f(z + \varepsilon\e^{2\pi i})\) in the limit \(\varepsilon \to 0\).
+    \end{dfn}
+    
+    \begin{dfn}{Branch Cut}{}
+        We can render a multi-valued function single valued by connecting branch points with \define{branch cuts}\index{branch cut}.
+        For now we think of these as barriers which cannot be passed.
+    \end{dfn}
+    
+    The choice of branch cut is arbitrary, as long as all branch points are connected to a branch cut the function will be single valued.
+    Once we have chosen a branch cut however we must stick with it.
+    Therefore we should take care to choose branch cuts to make the problem as simple as possible.
+    For example, \(\ln\) has branch points at \(z = 0, \infty\), suppose we wish to integrate from \(0\) to \(\infty\) along the real axis.
+    Then we may choose \([-\infty, 0]\) as a branch cut, handily keeping out of the way of our integral.
+    
+    Notice that we must consider branch points at infinity.
+    Given a function, \(f\), if we know the position of all of its finite branch cuts then we can consider \(f(1/\lambda)\) and take \(\lambda \to 0\), if we end up evaluating at one of the finite branch points then infinity is also a branch point.
+    
+    A function is, by definition, not analytic at a branch point as if the function is not uniquely defined then the derivative isn't either.
+    We can often integrate along a branch cut by integrating around it and taking the limit of getting closer to the branch cut.
+    
+    \begin{exm}{}{exm:keyhole contour}
+        Consider the integral
+        \begin{equation}
+            I = \int_0^{\infty} \frac{1}{1 + x^3}\dd{x}.
+        \end{equation}
+        We cannot close the contour in the same way as in \cref{exm:integral 0 to inf 1/1+x^2}, and consider an integral along the real axis, since the integrand is not even.
+        Instead we make a change of variables: \(u = x^3\) and hence \(\diff{x}/{u} = u^{-2/3}/3\) giving us
+        \begin{equation}
+            I = \int_0^{\infty} \frac{1}{3}\frac{u^{-2/3}}{1 + u}\dd{u}.
+        \end{equation}
+        This introduces a branch point at \(u = 0\).
+        We take a branch cut from 0 to \(\infty\) along the positive real axis.
+        
+        See \cref{fig:keyhole contour} for the contour we will use.
+        We can integrate just above the branch cut with \(u = r\e^{i\varepsilon}\) taking \(\varepsilon \to 0\).
+        The result of this is \(I\).
+        
+        Similarly we can integrate just below the branch cut with \(u = r\e^{-i\varepsilon}\) taking \(\varepsilon \to 0\).
+        The result of this is
+        \begin{equation}
+            \int_{\infty}^{0} \frac{r^{-2/3}}{3}\frac{\e^{-4\pi i/3}}{1 + r} \dd{r} - \e^{-4\pi i/3}I.
+        \end{equation}
+        
+        We can close the contour with two arcs.
+        We take the large arc to infinity so it includes the pole \(u = -1 = \e^{i\pi}\) and by the residue theorem (\cref{thm:residue}) the integral around the large arc is \(2\pi i \e^{2\pi i/3}/3\).
+        We take the small arc around the origin to zero.
+        The integral over this arc yields zero.
+       
+       Combining all of these results we have
+       \begin{equation}
+           (1 - \e^{4\pi i/3})I = \frac{2}{3}\pi i\e^{-2\pi i/3} \implies I = \frac{2\pi}{3\sqrt{3}}.
+       \end{equation}
+    \end{exm}
+    
+    \begin{figure}
+        \tikzsetnextfilename{keyhole-contour-avoid-positive-real-axis}
+        \begin{tikzpicture}
+            \tikzset{axis/.style={very thick, ->}}
+            \tikzset{contour/.style={ultra thick, highlight}}
+            \draw[axis] (-4, 0) -- (4, 0);
+            \draw[axis] (0, -4) -- (0, 4);
+            \draw[contour] (0, 0.1) -- (4, 0.1) arc(1.43:358.57:4) -- (0, -0.1) arc(270:90:0.1);
+        \end{tikzpicture}
+        \caption{A contour avoiding the positive real axis, as used in \cref{exm:keyhole contour}.}
+        \label{fig:keyhole contour}
+    \end{figure}
+    
+    \section{Analytic Continuation}
+    \begin{thm}{Identity Theorem}{thm:identity}
+        If two functions are analytic in the region \(R\) and have the same values for all points in some subregion, or along some curve within \(R\), then the two functions are identical everywhere within \(R\).
+    \end{thm}
+    
+    This result allows us to extend functions defined along the real axis to the complex plane.
+    For example, if we define \(\e^x\) by its Taylor series for \(x \in \reals\) then we can uniquely extend this to define \(\e^z\) by the same Taylor series with \(z \in \complex\).
+    
+    Consider a power series about some point \(z_1\) with a finite radius of convergence, which extends to the nearest singularity.
+    This power series represents a function, \(f_1\), which is analytic in the original domain of convergence.
+    
+    We can then expand this function about some new point, \(z_2\), within this domain of convergence.
+    The resulting series may have a domain of convergence that extends beyond that of the original domain of convergence.
+    We can use this to define a second function, \(f_2\), which is analytic on this new domain of convergence.
+    
+    Since \(z_2\) was chosen to be in the domain of convergence for \(f_1\) we know that there is a region where the domains of convergence overlap.
+    The identity theorem (\cref{thm:identity}) then tells us that \(f_1\) and \(f_2\) must agree on this overlapping area.
+    We call \(f_2\) the \defineindex{analytic continuation} of \(f_1\) into this new region.
+    
+    We can repeat this process as much as we like and eventually, assuming only isolated singularities, we can define the analytic continuation of \(f_1\) to the whole complex plane, minus the singularities.
+    This procedure does potentially require an infinite number of steps so instead we usually resort to tricks and short cuts.
+    
+    \begin{exm}{}{}
+        Consider the function \(f_1(z) = \sum_{n=0}^{\infty} z^n\).
+        This is the geometric series and converges for \(\abs{z} < 1\) to \(f(z) = 1/(1 - z)\).
+        \(f\) is then analytic everywhere, except at \(z = 1\).
+        Hence \(f\) is the analytic continuation of \(f_1\) into \(\complex\setminus\{1\}\).
+    \end{exm}
+    
+    \subsection{Caveats}
+    Not all functions can be continued indefinitely.
+    There may be a natural barrier of non-isolated singularities which cannot be passed.
+    
+    It is also possible that we will create a multi-valued function.
+    For example \(f_2\) and the similarly defined \(f_3\) may overlap outside of the original domain of convergence and there is no requirement that they agree here.
+    Similarly if we cross a branch cut we may get a result in the original domain of convergence that doesn't agree with \(f_1\).
+    
+    \chapter{Gamma Function}
+    \epigraph{With just a little bit of hand waving, common sense, and bravery we have derived Stirling's formula.}{Kristel Torokoff}
+    \begin{dfn}{Factorial}{}
+        For a natural number, \(n\), the \defineindex{factorial}\index{"!|see{factorial}} is defined as
+        \begin{equation}
+            n! \coloneqq n(n - 1)(n - 2) \dotsm 1,
+        \end{equation}
+        with \(0! \coloneqq 1\).
+        This can also be written recursively as
+        \begin{equation}
+            n! = n(n-1)!.
+        \end{equation}
+        
+        For an even natural number the \defineindex{double factorial}\index{"!"!|see{double factorial}} is defined as
+        \begin{equation}
+            (2m)!! \coloneqq (2m)(2m-2)(2m-4) \dotsm 4\cdot 2
+        \end{equation}
+        with \(0!! \coloneqq 1\), and for an odd natural number
+        \begin{equation}
+            (2m + 1)!! \coloneqq (2m + 1)(2m - 1)(2m - 3) \dotsm 3\cdot 1.
+        \end{equation}
+        with \((-1)!! \coloneqq 1\).
+    \end{dfn}
+    In this section we are interested in the factorial and continuing it to non-integer values, and even to complex values.
+    We mention the double factorial only because it appears in some expansions.
+    It should be noticed that the double factor is usually smaller than the single factorial, despite the name.
+    
+    \section{Gamma Function}
+    In \cref{sec:asymptotic series:motivating example} we met the integral
+    \begin{equation}
+        I_n = \int_0^{\infty} \e^{-t}t^{n} \dd{t}.
+    \end{equation}
+    We also showed that \(I_n = n!\).
+    Changing up the notation we can view this as a function \(I\colon\naturals\to\naturals\) defined by \(I(n) = I_n = n!\).
+    For this reason we call \(I\) an \defineindex{integral representation} of the factorial function.
+    Integral representations are a handy tool and often allow us to generalise functions easily.
+    
+    Considering again the form of the integral we see that if we consider a similar function, \(I' \colon \{z\in\complex\mid\Re(z) > -1\} \to \complex\), then this integral still converges on the domain.
+    We can think of this as generalising the factorial to complex values.
+    This function, or rather its analytic continuation to the whole complex plane, which we will derive later, is so common that it gets its own name.
+    \begin{dfn}{Gamma Function}{}
+        The \defineindex{gamma function}\index{\(\Gamma\)|see{gamma function}}, \(\Gamma\colon\complex\to\complex\), is defined by
+        \begin{equation}
+            \Gamma(z) \coloneqq \int_{0}^{\infty} \e^{-t}t^{z-1}\dd{t}
+        \end{equation}
+        for \(\Re(z) > 0\).
+    \end{dfn}
+    
+    The extra \({}-1\) term here is simply a historic accident in the definitions that has now stuck.
+    For \(n \in \naturals\) we have
+    \begin{equation}
+        \Gamma(n + 1) = n!.
+    \end{equation}
+    
+    In order to have the gamma function be defined on the entire complex plane we need to analytically continue it.
+    There are two ways to do this.
+    The first is simple, but requires an infinite amount of steps.
+    The second is slightly more complex but requires only one step.
+    
+    We can apply integration by parts to the integral representation of the gamma function.
+    Contrary to what we would normally do we take \(\e^{-t}\) as the term to differentiate, giving \(-\e^{-t}\), and \(t^{z - 1}\) as the term to integrate, giving \(t^{z}/z\)
+    \begin{equation}
+        \Gamma(z) = \left[ -\frac{t^{z}}{z} \e^{-t} \right]_{0}^{\infty} + \frac{1}{z}\int_{0}^{\infty} t^z\e^{-t} = \frac{1}{z}\Gamma(z + 1).
+    \end{equation}
+    This gives us \(\Gamma(z)\) in terms of \(\Gamma(z + 1)\).
+    There is a simple pole at \(z = 0\), due to the factor of \(1/z\).
+    Since the integral for \(\Gamma(z + 1)\) converges for \(\Re(z) > -1\) we have continued the gamma function slightly along the negative real axis into a strip of the complex plane.
+    We can repeat this process and we get \(\Gamma(z)\) in terms of \(\Gamma(z + 2)\).
+    This converges for \(\Re(z) > -2\), and has two simple poles, at \(z = 0, -1\).
+    
+    This process is of stripwise continuation will, if we carry it on to infinity, give us the gamma function defined on all of \(\complex\), with a set of simple poles at non-positive integers.
+    This shows that the gamma function is meromorphic\footnote{a \defineindex{meromorphic} function is a function which is analytic except for at countably many isolated points.}.
+    
+    Unfortunately continuing on forever is not practical.
+    Fortunately we don't actually need to as there is another way to analytically continue the gamma function.
+    Notice that for non-integer \(z\) the \(t^{z-1}\) factor in the definition of the gamma function will give a branch point at \(t = 0\).
+    We take a branch cut from zero to infinity along the positive real axis.
+    We can then evaluate the gamma function by considering \defineindex{Hankel's contour}, \(C\), which is shown in \cref{fig:hankel contour}.
+    Notice that this is \emph{not} a closed contour.
+    We wish to compute
+    \begin{equation}
+        \int_C \e^{-t}t^{z-1} \dd{t}.
+    \end{equation}
+    
+    \begin{figure}
+        \tikzsetnextfilename{hankel-contour}
+        \begin{tikzpicture}
+            \tikzset{axis/.style={very thick, ->}}
+            \draw[axis] (-2, 0) -- (5, 0) node[right] {\(\Re(t)\)};
+            \draw[axis] (0, -2) -- (0, 2) node[above] {\(\Im(t)\)};
+            \draw[red, very thick] (0, 0) -- (5, 0);
+            \draw[highlight, ultra thick] (5, 0.2) -- (0.4, 0.2) arc(30:330:0.4) -- (5, -0.2);
+            \draw[ultra thick, highlight, ->] (2.51, 0.2) -- (2.45, 0.2);
+            \draw[ultra thick, highlight, ->] (2.49, -0.2) -- (2.55, -0.2);
+            \node[above] at (2.5, 0.2) {I};
+            \node[above left] at (135:0.25) {II};
+            \node[below] at (2.5, -0.2) {III};
+        \end{tikzpicture}
+        \caption{The Hankel contour.}
+        \label{fig:hankel contour}
+    \end{figure}
+    
+    Along part I of the Hankel contour, being careful that this part of the contour goes from infinity to zero.
+    We can parametrise this with \(t = r\e^{i\varepsilon}\), and we will take \(\varepsilon \to 0\), we then get
+    \begin{equation}
+        \int_{\mathrm{I}} \e^{-t}t^{z-1}\dd{t} = \int_{\infty}^{0} \e^{-r\e^{-i\varepsilon}}r^{z-1}\e^{i\varepsilon(z-1)} \e^{i\varepsilon} \dd{r} \to \int_{\infty}^{0} \e^{-r}r^{z-1} \dd{r} = -\Gamma(z).
+    \end{equation}
+    
+    Similarly we can parametrise part III of the Hankel contour with \(t = r\e^{2\pi i - i\varepsilon}\), where, again, we take \(\varepsilon \to 0\).
+    The contribution is therefore
+    \begin{align}
+        \int_{\mathrm{III}} \e^{-t}t^{z-1}\dd{t} &= \int_{0}^{\infty} \e^{-r\e^{2\pi i - i\varepsilon}}r^{z-1}\e^{(2\pi i - i\varepsilon)(z - 1)}\e^{2\pi i - i\varepsilon}\dd{r}\\
+        &\to \e^{2\pi i(z - 1)}\int_{0}^{\infty} \e^{-r}r^{z-1} \dd{r}\\
+        &= \e^{2\pi i(z - 1)}\Gamma(z).
+    \end{align}
+    
+    Finally we need the contribution from the small arc that is part II of the Hankel contour.
+    Notice that in the limit of the two straight lines getting closer and closer to the axis this arc becomes a full circle.
+    We can parametrise this part using \(t = \rho\e^{i\vartheta}\), and we will take \(\rho \to 0\).
+    \begin{align}
+        \int_{\mathrm{II}} \e^{-t}t^{z - 1} &= \int_{0}^{2\pi} \e^{-\rho\e^{i\vartheta}}\rho^{z-1}\e^{i\vartheta(z - 1)}i\rho\e^{i\vartheta}\dd{\vartheta}\\
+        &= i\rho^{z}\int_{0}^{2\pi}\e^{-\rho\e^{i\vartheta}}\e^{i\vartheta z}\dd{\vartheta}\\
+        &\to 0.
+    \end{align}
+    
+    Combing these we have
+    \begin{equation}
+        \int_C \e^{-t}t^{z-1} = (\e^{2\pi i(z - 1)} - 1)\Gamma(z) \implies \Gamma(z) = \frac{1}{\e^{2\pi i (z - 1)} - 1} \int_C \e^{-t}t^{z-1}\dd{t}.
+    \end{equation}
+    This is valid for all \(z \notin \integers\).
+    Multiplying through by \(\e^{i\pi(z-1)}\), and recognising the exponential definition of the sine function we have
+    \begin{equation}
+        \Gamma(z) = \frac{1}{\e^{\pi i(z - 1)} - \e^{-\pi i(z-1)}}\int_C\e^{-t}t^{z-1}\dd{t} = \frac{1}{2i\sin[\pi(z - 1)]}\int_C\e^{-t}t^{z-1}\dd{t}.
+    \end{equation}
+    Which gives us a contour integral representation of the gamma function:
+    \begin{equation}
+        2 i\sin[\pi(z - 1)] \Gamma(z) = \int_C \e^{-t}t^{-z}.
+    \end{equation} 
+    
+    As mentioned before this is valid for all \(z \notin \integers\).
+    Now we consider \(z \in \integers\).
+    There will be no branch point now, and hence no branch cut.
+    We can therefore close up Hankel's contour at infinity.
+    For \(z \ge 1\) there will be no poles, and hence the integral gives zero.
+    The integrals along the two straight parts of the contour will cancel also and we arrive at \(0 = 0\).
+    Instead we can just compute \(z!\) as a normal factorial.
+    For \(z \le 1\) we have \(\sin[\pi(z - 1)] = 0\) and the right hand side gives an integral around a pole at \(t = 0\).
+    This integral is non-zero and we conclude that we must have a pole at non-positive integers as this is the only way to justify having one side of the equation be zero.
+    
+    \section{Beta Function}
+    Consider the product of two gamma functions, evaluated at some \(r, s > 0\):
+    \begin{align}
+        \Gamma(r)\Gamma(s) &= \int_{0}^{\infty} x^{r-1}e^{-x}\dd{x} \int_{0}^{\infty} y^{s-1}\e^{-y}\dd{x}\\
+        &= \int_{0}^{\infty} \dd{x} \int_{0}^{\infty} \dd{y} x^{r - 1}(x + y - x)^{s - 1}\e^{-(x + y)}.
+    \end{align}
+    Now let \(u = x + y\) and we then have
+    \begin{equation}
+        \Gamma(r) \Gamma(s) = \int_{0}^{\infty} \dd{u} \e^{-u} \int_{0}^{u} \dd{x} (u - x)^{s - 1}.
+    \end{equation}
+    Let \(x = ut\), so \(\dl{x} = u\dd{t}\) and
+    \begin{equation}
+        \Gamma(r) \Gamma(s) = \int_{0}^{\infty} \e^{-u} u^{r+s-1} \dd{u} \int_0^1 t^{r -1}(1 - t)^{s-1} = \Gamma(r + s) B(r, s).
+    \end{equation}
+    
+    \begin{dfn}{Beta Function}{}
+        The \defineindex{beta function}\index{\(B\)|see{beta function}}, \(B\), is defined, for \(\Re(r), \Re(s) > 0\), as
+        \begin{equation}
+            B(r, s) \coloneqq \int_0^1 t^{r - 1}(1 - t)^{s - 1} = \frac{\Gamma(r)\Gamma(s)}{\Gamma(r + s)}.
+        \end{equation}
+    \end{dfn}
+    
+    Consider the case of \(r = z\) and \(s = 1 - z\), we have
+    \begin{align}
+        \Gamma(z)\Gamma(1 - z) &= \Gamma(z + 1 - z) B(z, 1 - z)\\
+        &= \Gamma(1)B(z, 1 - z)\\
+        &= B(z, 1 - z)\\
+        &= \int_0^{1} t^{z-1}(1 - t)^{-z}\\
+        &= \int_0^{\infty} \frac{x^{z-1}}{1 + x}\dd{x}
+    \end{align}
+    where we have made the change of variables to \(x = t/(1 - t)\).
+    This final integral can be done by contour integration and we obtain the result
+    \begin{equation}
+        \Gamma(z)\Gamma(z-1) = \frac{\pi}{\sin(\pi z)}.
+    \end{equation}
+    This is called \defineindex{Euler's reflection formula}.
+    We derived this for \(0 < \Re(z) < 1\) but since both sides of the equation can be continued to the rest of the plane, except at integers, this relation extends to the entire plane, again, except at integers.
+    
+    Setting \(z = 1/2\) in Euler's reflection formula gives we get the result
+    \begin{equation}
+        \Gamma(1/2) = \sqrt{\pi}.
+    \end{equation}
+    This can be a useful value to know.
+    
+    \section{Stirling's Formula}
+    In this section we aim to find an approximation of the factorial for positive integers.
+    This is desirable since computing factorials exactly for large numbers is very computationally expensive.
+    Since we are interested in an approximation for large values it makes sense that we should look for an asymptotic expansion, and that is indeed what we shall do.
+    
+    \begin{figure}
+        \tikzsetnextfilename{exp-vs-cubic}
+        \begin{tikzpicture}
+            \tikzset{axis/.style={very thick, ->}}
+            \node (A) at (0, -0.1) {};  % For some reason externalise cuts off arrow edge so put point just to the left to expand picture size
+            \draw[axis] (0, 0) -- (8, 0) node[right] {\(t\)};
+            \draw[axis] (0, 0) -- (0, 5);
+            \draw[highlight, very thick, domain=0:8, samples=300] plot (\x, {exp(-\x)});
+            \draw[dark, very thick, domain=0:1.71, samples=300] plot (\x, \x^3);
+            \draw[highlightalt, very thick, domain=0:8, samples=700] plot (\x, {\x^3 * exp(-\x)});
+            \draw[very thick, highlight, text=black] (0, -0.5) -- ++ (1, 0) node[right] {\(\e^{-t}\)};
+            \draw[very thick, dark, text=black] (3, -0.5) -- ++ (1, 0) node[right] {\(t^n\)};
+            \draw[very thick, highlightalt, text=black] (6, -0.5) -- ++ (1, 0) node[right] {\(\e^{-t}t^n\)};
+        \end{tikzpicture}
+        \caption{Plot of \(\e^{-t}\), \(t^{n}\), and \(\e^{-t}t^{n}\).}
+        \label{fig:plot for stirling}
+    \end{figure}
+    
+    We know from our earlier work that
+    \begin{equation}
+        n! = \Gamma(n + 1) = \int_{0}^{\infty} \e^{-t}t^n \dd{t}.
+    \end{equation}
+    Consider the plot shown in \cref{fig:plot for stirling}.
+    This shows the plot of the two factors in the integrand of the gamma function, as well as a plot of the entire integrand.
+    We see that initially the increasing \(t^{n}\) wins and the product gets larger but eventually the exponential decay wins and the product goes to zero.
+    This plot, for illustration purposes, corresponds to the case of \(n = 3\) but the shape is generally the same for all values of \(n\).
+    With the integral being the area under the plot it is clear that the dominant contribution to the integral comes from an area around the maximum of the integrand.
+    This becomes more and more true as \(n\) increases.
+    We can rearrange the integrand to get
+    \begin{equation}
+        \e^{-t} t^{n} = \e^{-t}\e^{n\ln t} = \e^{-t + n\ln t}.
+    \end{equation}
+    Let \(f(t) = -t + n\ln t\).
+    Clearly the integrand is maximised when \(f\) is maximised.
+    Differentiating we have
+    \begin{equation}
+        0 = f'(t) = -1 + \frac{n}{t} \implies t = n
+    \end{equation}
+    so there is an extrema at \(t = n\).
+    Taking the second derivative we have
+    \begin{equation}
+        f''(n) = -\frac{n}{t^2}\bigg\vert_{t=n} = -\frac{1}{n} < 0.
+    \end{equation}
+    
+    We can expand \(f\) around this maximum:
+    \begin{align}
+        f(t) &= f(n) + f'(n)(t - n) + \frac{1}{2}f''(n)(t - n)^2 + \dotsb\\
+        &= -n + n\ln n - \frac{1}{2}\frac{1}{n}(t - n)^2 + \dotsb.
+    \end{align}
+    Substituting this into the expression for our integral we have
+    \begin{align}
+        n! &= \int_{0}^{\infty} \e^{f(t)} \dd{t}\\
+        &= \int_0^{\infty} \exp\left[ -n + n\ln n - \frac{(t - n)^2}{2n} + \dotsb \right]\\
+        &= \e^{-n}\e^{n\ln n} \int_{0}^{\infty} \exp[-\frac{(t - n)^2}{2n}](1 + \dotsb)\dd{t}\\
+        &= \e^{-n}n^n \int_{0}^{\infty} \exp[-\frac{(t - n)^2}{2n}](1 + \dotsb)\dd{t}.
+    \end{align}
+    At this point we notice that the integrand is small for \(t < 0\) and so if we extend the bounds of integration to include the entire real axis the error will be small as it is exponentially suppressed.
+    We therefore have
+    \begin{equation}
+        n! \approx \e^{-n}n^{n} \int_{-\infty}^{\infty} \exp[\frac{(t - n)^2}{2n}](1 + \dotsb)\dd{t} = \e^{-n}n^n \sqrt{2\pi n}(1 + \dotsb)
+    \end{equation}
+    where we have recognised the Gaussian integral
+    \begin{equation}
+        \int_{-\infty}^{\infty} \e^{-a(x + b)^2} \dd{x} = \sqrt{\frac{\pi}{a}}.
+    \end{equation}
+    Hence we have found an approximation for the factorial.
+    It can be shown that it is an asymptotic expansion.
+    This particular approximation is called \defineindex{Stirling's approximation} and is particularly common in statistical mechanics where we often need to consider combinations of \(N \approx \num{e23}\) particles, which gives rise to \(N!\), which is simply impossible to compute exactly.
+    Instead we use the approximation
+    \begin{equation}
+        n! \approx \e^{-n}n^n \sqrt{2\pi n},
+    \end{equation}
+    or, in its more common form taking logs of both sides and neglecting \(\ln(2\pi n)/2\) as the smallest term
+    \begin{equation}
+        \ln n! \approx n \ln n - n + \frac{1}{2}\ln(2\pi n) + \dotsb = n\ln n - n + \order(\ln n).
+    \end{equation}
+    
+    \chapter{Asymptotic Expansion of Integrals}
+    \epigraph{Doing integrals and having a wonderful time.}{Kristel Torokoff}
+    \section{Laplace's Method for Real Integrals}
+    \epigraph{We get away with murder because its exponentially suppressed.}{Kristel Torokoff}
+    Inspired by our success with Stirling's approximation we discuss a more general method for finding asymptotic expansions of integrals.
+    In particular consider the integral
+    \begin{equation}
+        I(x) = \int_a^b f(t) \e^{x\varphi(t)}\dd{t}.
+    \end{equation}
+    We wish to find an asymptotic expansion for large \(x\).
+    We take \(f, \varphi \colon \reals\to\reals\) to be functions such that \(f(t)\) varies relatively slowly compared to \(\e^{x\varphi(t)}\).
+    Note that if \(f(t)\) doesn't vary slowly we can always move it into the exponential in the way we moved \(t^n\) into the exponential with Stirling's approximation.
+    
+    The general argument is the same as for finding Stirling's approximation.
+    We find the maximum of \(\varphi\), say at \(t = c\).
+    We then expand about this point and substitute into the integral.
+    We take the limits of the integral to infinity under the assumption that the error will be relatively small, and finally we integrate.
+    
+    In more detail \defineindex{Laplace's method for real integrals} is
+    \begin{enumerate}
+        \item Identify \(c = \argmax_{[a, b]}\varphi\), that is find \(c\) such that \(\varphi(c)\) is the maximum value value of \(\varphi\) on the interval \([a, b]\).
+        If there is no maximum on this interval then one of the endpoints will be the largest point and we instead take \(c\) as that endpoint.
+        If there are multiple maxima consider the one for which \(\varphi(c)\) is largest.
+        
+        \item Expand \(f(t)\) and \(\varphi(t)\) about \(t = c\).
+        Since \(f\) is relatively slowly varying we can take it to be approximately constant, \(f(t) \approx f(c)\).
+        For \(\varphi\) it varies faster and since \(c\) is a maximum \(\varphi'(c) = 0\).
+        Therefore we need to go to (at least) second order:
+        \begin{equation}
+            \varphi(t) \approx \varphi(c) + \frac{1}{2}(t - c)^2\varphi''(c) + \dotsb.
+        \end{equation}
+        If \(c\) is instead a point of inflection then \(\varphi''(c)\) will be zero also and we will have to go to third order.
+        Note that \(\varphi''(c) < 0\) assuming a maximum at \(c\).
+        If \(c\) is an endpoint and not a maximum then the \(\varphi'(c)\) term won't vanish.
+        
+        
+        \item Expand the integration range to \(\reals\) and compute the integral to the desired number of terms.
+        Up to second order, assuming \(c\) is a maximum, we would have
+        \begin{align}
+            I(x) &\approx \int_{-\infty}^{\infty} f(c) \exp[x\varphi(c) - \frac{x}{2}\abs{x''(c)}(t- c)^2] \dd{t}\\
+            &= f(c)\exp[x\varphi(c)] \int_{-\infty}^{\infty} \e^{-\abs{\varphi''(x)}u^2/2}\dd{u}\\
+            &= f(c)\exp[x\varphi(c)] \sqrt{\frac{2\pi}{x\abs{\varphi''(c)}}}\label{eqn:laplace method result}
+        \end{align}
+        where we have made a change of variables to \(u = t - c\).
+        
+        It can be shown that the error in increasing the integration range is proportional to the complementary error function, which we showed in a tutorial has asymptotic expansion
+        \begin{equation}
+            \erfc(x) \sim \frac{1}{\sqrt{\pi}} \frac{\e^{-x^2}}{x} \sum_{n=0}^{\infty} \frac{(-1)^n(2n - 1)!!}{x^{2n}2^n}.
+        \end{equation}
+        Hence, the error is exponentially suppressed.
+    \end{enumerate}
+    
+    \begin{dfn}{Error Function}{}
+        The \defineindex{error function} is defined as
+        \begin{equation}
+            \erf x = \frac{2}{\sqrt{\pi}} \int_0^x \e^{-t^2} \dd{t}.
+        \end{equation}
+        The \defineindex{complementary error function} is defined as
+        \begin{equation}
+            \erfc x = 1 - \erf x = \frac{2}{\sqrt{\pi}} \int_x^{\infty} \e^{-t^2}\dd{t}.
+        \end{equation}
+        The \defineindex{imaginary error function} is defined as
+        \begin{equation}
+            \erfi x = -i\erf(ix).
+        \end{equation}
+        The name error function comes from the relation to Gaussians and the distribution of statistical errors.
+    \end{dfn}
+    
+    It may be necessary to manipulate an integral, say through a change of variables, to get it into a form where we can apply Laplace's method.
+    If we wan more terms in the series we have to expand \(f\) and \(\varphi\) to higher orders.
+    For example taking \(f\) to second order and \(\varphi\) to fourth we have
+    \begin{multline}
+        I(x) \approx \int_{-\infty}^{\infty} \left[ f(c) + uf'(c) + \frac{u^2}{2}f''(c)\right] \\
+        \exp\left[ x\varphi(c) - \frac{x}{2}\abs{\varphi''(c)}u^2 + \frac{x}{3!}\varphi^{(3)}(c)u^3 + \frac{x}{4!}\varphi^{(4)}(c)u^{4} \right] \dd{u}
+    \end{multline}
+    where \(u = t - c\) again.
+    We can then expand the exponential as
+    \begin{multline}
+        \exp\left[ x\varphi(c) - \frac{x}{2}\abs{\varphi''(c)}u^2 + \frac{x}{3!}\varphi^{(3)}(c)u^3 + \frac{x}{4!}\varphi^{(4)}(c)u^{4} \right] \\
+        \approx 1 + \left( x\varphi(c) - \frac{x}{2}\abs{\varphi''(c)}u^2 + \frac{x}{3!}\varphi^{(3)}(c)u^3 + \frac{x}{4!}\varphi^{(4)}(c)u^{4} \right) +\\
+        \frac{1}{2}\left( x\varphi(c) - \frac{x}{2}\abs{\varphi''(c)}u^2 + \frac{x}{3!}\varphi^{(3)}(c)u^3 + \frac{x}{4!}\varphi^{(4)}(c)u^{4} \right)^2.
+    \end{multline}
+    We end up with a collection of Gaussian integrals to compute.
+    We can do so using the general formula
+    \begin{equation}
+        \int_{-\infty}^{\infty} u^n\e^{-au^2/2} = 
+        \begin{cases}
+            0, & \text{if \(n\) is odd},\\
+            \frac{\sqrt{2\pi}}{a^{(n+1)/2}} n!!, &\text{if \(n\) is even}.
+        \end{cases}
+    \end{equation}
+    
+    We then simply collect terms of the same order in \(x\).
+    For example the first correction to \cref{eqn:laplace method result} is
+    \begin{equation}
+        \exp[x\varphi] \sqrt{\frac{2\pi}{\abs{\varphi''}}}\frac{1}{x^{3/2}} \left[ -\frac{f^(2)}{2\varphi^{(2)}} + \frac{f\varphi^{(4)}}{8(\varphi^{(2)})^2} + \frac{f^{(1)\varphi^{(3)}}}{2(\varphi^{(2)})^2} - \frac{5f(\varphi^{(3)})^2}{24(\varphi^{(2)})^3} \right]
+    \end{equation}
+    where \(f\), \(\varphi\), and all of their derivatives are evaluated at \(c\).
+    
+    Clearly this procedure quickly becomes just a lot of unwieldy algebraic manipulation, but that's what computers are for.
+    The important thing is that we develop an asymptotic expansion
+    \begin{equation}
+        I(x) \sim \exp[x\varphi(c)] \sqrt{\frac{2\pi}{x\abs{\varphi''(c)}}} \left[ f(c) + \frac{A}{x} + \frac{B}{x^2} + \dotsb \right]
+    \end{equation}
+    where \(A\), \(B\), and all other coefficients can, in principle, be calculated with basic algebra and known expansions.
+    
+    \subsection{Stirling's Formula Revisited}
+    This more general formula allows us to quickly re-derive Stirling's formula.
+    We start with
+    \begin{equation}
+        n! = \Gamma(n + 1) = \int_{0}^{\infty} \e^{-t}t^{n} \dd{t}.
+    \end{equation}
+    We make a change of variables to \(t = sn\) giving \(\dl{t} = n\dd{s}\) and hence
+    \begin{align}
+        \Gamma(n + 1) &= \int_{0}^{\infty} \e^{-sn}n^{n}s^{n} n\dd{s}\\
+        &= n^{n+1}\int_0^\infty \e^{-sn} s^n\dd{s}\\
+        &= n^{n+1} \int_0^{\infty} \exp[n(-s + \ln s)] \dd{s}.
+    \end{align}
+    Identifying this integrand as being of the required form \(f(s)\exp[n\varphi(s)]\) with \(\varphi(s) = -s + \ln s\) and \(f(s) = 1\) and noticing that \(c = 1\) is the maximum of \(\varphi\) we have
+    \begin{equation}
+        \Gamma(1 + n) \approx \exp[n\varphi(1)]\sqrt{\frac{2\pi}{n\abs{\varphi''(1)}}} = \e^{-n}n^{n}\sqrt{2\pi n}
+    \end{equation}
+    since \(\varphi(1) = -1 + \ln 1 = -1\), \(\varphi'(s) = -1 + 1/s\), and \(\varphi''(1) = -1/1^2 = -1\).
+    Notice that we use \(n^{n+1}\sqrt{1/n} = n^{n}\sqrt{n^2/n} = n^n\sqrt{n}\).
+    
+    We can also analyse the error, and it turns out to be proportional to \(\erfc(\sqrt{n/2})\).
+    For large \(n\) this is asymptotic to \(\e^{-x/2}\sqrt{2/(\pi n)}\).
+    
+    \section{Watson's Lemma}
+    In this section we prove a lemma useful for Laplace-type integrals with \(\varphi(t) = -t\).
+    
+    \begin{lma}{Watson's Lemma}{}
+        Consider the integral
+        \begin{equation}
+            I(x) = \int_0^b f(t)\e^{-xt} \dd{t}
+        \end{equation}
+        for \(b > 0\).
+        Suppose \(f\) is continuous on \([0, b]\) and as \(t \to 0_+\) \(f\) has the asymptotic expansion
+        \begin{equation}
+            f(t) \sim t^{\alpha} \sum_{n=0}^{\infty} a_nt^{\beta n}
+        \end{equation}
+        where \(\alpha > -1\) and \(\beta < 0\), such that the integral is bounded near \(t \to 0_+\).
+        Further as \(b \to \infty\) assume that \(f(t) = o(\e^{ct})\) as \(t \to \infty\) for some \(c > 0\) such that the integral is bounded for large \(t\).
+        
+        For large \(x > 0\) we then have
+        \begin{equation}
+            I(x) \sim \sum_{n=0}^{\infty} \frac{a_n}{x^{\alpha+\beta n + 1}}\Gamma(\alpha + \beta n + 1).
+        \end{equation}
+        
+        \begin{proof}
+            We prove this using Laplace's method with \(\varphi(t) = -t\).
+            This has a global maximum at \(t = 0\), which is one of the limits of integration.
+            Consider the integral
+            \begin{equation}
+                I(x; \varepsilon) = \int_0^\varepsilon f(t) \e^{-xt}\dd{t}
+            \end{equation}
+            for some small \(\varepsilon > 0\).
+            
+            Let \(N \in \naturals\) be such that for a given value of \(\varepsilon\) the first \(N\) terms of the asymptotic expansion of \(f\) are a good approximation, that is
+            \begin{equation}
+                \abs*{f(g) - t^\alpha \sum_{n=0}^{N} a_n t^{\beta n}} \le K t^{\alpha + \beta(N + 1)}
+            \end{equation}
+            where \(0 \le t \le b\) and \(K > 0\) is some constant.
+            
+            Substitute the first \(N\) terms of the asymptotic expansion for \(f\) into \(I(x; \varepsilon)\).
+            This approximation has error
+            \begin{align}
+                \delta I &= \abs*{I(x; \varepsilon) - \sum_{n=0}^{N} a_n \int_0^{\varepsilon} t^{\alpha+\beta n}\e^{-xt} \dd{t}}\\
+                &= \abs*{\int_0^{\varepsilon} \left[ f(t) - t^\alpha\sum_{n=0}^{N} a_nt^{\beta n} \right]\e^{-xt} \dd{t}}\\
+                &\le \int_0^\varepsilon \abs*{f(t) - t^{\alpha} \sum_{n=0}^{N} a_nt^{\beta n}}\e^{-xt}\dd{t}\\
+                &\le K \int_0^{\varepsilon} t^{\alpha + \beta(N + 1)}\e^{-xt} \dd{t}.
+            \end{align}
+        
+            Now consider the integral
+            \begin{equation}
+                \int_0^{\infty} t^m\e^{-xt}.
+            \end{equation}
+            Making the substitution \(u = xt\) this becomes
+            \begin{equation}
+                \int_0^{\infty} \frac{u^m}{x^m} \e^{-u} \frac{\dd{u}}{x} = \frac{1}{x^{m+1}} \int_0^{\infty} u^m\e^{-u} \dd{u} = \frac{\Gamma(m + 1)}{x^{m+1}}.
+            \end{equation}
+        
+            We therefore have
+            \begin{equation}
+                \delta I \le K \frac{\Gamma(\alpha + \beta + \beta N + 1)}{x^{\alpha + \beta + \beta N + 1}}.
+            \end{equation}
+            We now extend the range of integration to \([0, \infty)\) and we get
+            \begin{align}
+                I(x) &= \sum_{n=0}^{N} a_n \int_0^\infty t^{\alpha + \beta n} \e^{-xt} + o\left( \frac{1}{x^{\alpha + \beta N + 1}} \right)\\
+                &= \sum_{n=0}^{N} a_n \frac{\Gamma(\alpha + \beta N + 1)}{x^{\alpha + \beta N + 1}} + o\left( \frac{1}{x^{\alpha + \beta N + 1}} \right).
+            \end{align}
+            This is true for all \(N\) as \(x \to \infty\).
+        \end{proof}
+    \end{lma}
+    
+    \section{Method of Stationary Phase}
+    Consider an integral of the form
+    \begin{equation}
+        I(x) = \int_a^b f(t) \e^{ix\psi(t)} \dd{t},
+    \end{equation}
+    for large positive \(x\).
+    This is similar to the form require for Laplace's method except that the exponent is purely imaginary.
+    Here \(a\), \(b\), \(x\), \(f(t)\), and \(\psi(t)\) are all real for all \(t\).
+    These integrals are often called \define{Fourier integrals}\index{Fourier integral} due to their similarity with the Fourier transform.
+    
+    The factor of \(i\) in the exponent means that when \(x\) is large the integrand will oscillate rapidly.
+    We do not have the same exponential decay that we used to great effect with Laplace's method.
+    Fortunately the rapid oscillations tend to cancel out in the integral.
+    We make this idea rigorous with a lemma.
+    
+    \begin{lma}{Riemann--Lebesgue Lemma}{}
+        If \(\abs{f(t)}\) is integrable and \(\psi(t)\) is continuously differentiable on \([a, b]\) and \(\psi(t)\) is \emph{not} constant over any subinterval of \([a, b]\) then as \(x \to \infty\)
+        \begin{equation}
+            I(x) = \int_a^b f(t)\e^{ix\psi(t)} \dd{t} \to 0.
+        \end{equation}
+    \end{lma}
+    
+    Notice that we explicitly state \(\psi(t)\) is not constant.
+    So what happens if it is constant over some \((c, d) \subseteq [a, b]\)?
+    In this case there will be no oscillations and therefore the contribution to the integral in \((c, d)\) will not cancel out.
+    We can use this to our benefit.
+    
+    Consider a stationary point of \(\psi\), where \(\psi'(t) = 0\).
+    The phase of the exponential is stationary here.
+    Therefore the dominant contribution to the integral will come from this region near to where \(\psi'(t) = 0\).
+    
+    The \defineindex{method of stationary phase} is then as follows.
+    For an integral of the form
+    \begin{equation}
+        I(x) = \int_a^b f(t)\e^{ix\psi(t)} \dd{t}.
+    \end{equation}
+    \begin{enumerate}
+        \item Find \(c\) such that \(\psi'(c) = 0\).
+        \item Expand \(f\) and \(\psi\) about \(t = c\):
+        \begin{equation}
+            f(t) \approx f(c), \qqand \psi(t) \approx \psi(c) + \frac{1}{2!}\psi''(c)(t - c)^2.
+        \end{equation}
+        \item Consider the integral over a small region about this point, that is take some \(\varepsilon > 0\) and we have
+        \begin{equation}
+            I(x) \sim \int_{-\infty}^{\infty} f(c)\exp\left[ ix\left[ \psi(c) + \frac{1}{2}\psi''(c)(t - c)^2 \right] \right]
+        \end{equation}
+        \item Extend the integral to \((-\infty, \infty)\).
+        This introduces an error proportional to \(1/x\).
+        Setting \(u = t - c\) we then have
+        \begin{align}
+            I(x) &\sim f(c) \e^{ix\psi(c)} \int_{-\infty}^{\infty} \e^{i\psi''(c)u^2/2}(1 + \dotsb) \dd{u}\\
+            &= f(c)\e^{ix\psi(c)} \frac{\sqrt{2\pi}}{\sqrt{i\psi''(c)}}(1 + \dotsb)\\
+            &= f(c) \e^{ix\psi(c) \pm i\pi/4} \sqrt{\frac{2\pi}{x\abs{\psi''(c)}}}\\
+            &= f(c) \e^{ix\psi(c) + \sgn(\psi''(c))i\pi/4}\sqrt{\frac{2\pi}{x\abs{\psi''(c)}}}.
+        \end{align}
+        Note that for \(\pm\) we take \(+\) if \(\psi''(c) > 0\) and \(-\) if \(\psi''(c) < 0\).
+        If \(\psi''(c) = 0\) then we need to consider a higher order expansion.
+    \end{enumerate}
+    
+    If there are multiple stationary points then we must consider all of them and add the contributions together.
+    We cannot take only the biggest as we did with Laplace's method since the \(1/x\) error is too large.
+    
+    If a stationary point is at the boundary of \([a, b]\) then only expand the integration limits on the opposite side of the integral.
+    If considering a second order expansion for \(\psi\) then the result is an even function in \(u = t - c\) and so by halving the range of integration the value of the integral is halved.
+    
+    If the stationary point also is such that all derivatives of \(\psi\) up to the \((m - 1)\)th derivative are zero then use \(\psi(t) \approx \psi(c) + \psi^{(m)}(c)(t - c)^2/m!\) and the integral will behave like \(x^{-1/m}\) instead of \(x^{-1/2}\) as \(x \to \infty\).
+    
+    \begin{exm}{Airy Function}{}
+        The \defineindex{Airy function}\index{\(\Ai\)|see{Airy function}} for large, negative arguments.
+        This has the integral representation
+        \begin{equation}
+            \Ai(-x) = \frac{1}{\pi} \int_0^\infty \cos\left( \frac{\omega^3}{3} - x\omega \right) \dd{\omega}
+        \end{equation}
+        for large, positive \(x\).
+        Notice that we can extend the integration range to \((-\infty, \infty)\) since the integrand is an even function:
+        \begin{equation}
+            \Ai(-x) = \frac{1}{2\pi} \int_{-\infty}^{\infty} \cos\left( \frac{\omega^3}{3} - x\omega \right) \dd{\omega}.
+        \end{equation}
+        Further, notice that
+        \begin{equation}
+            \exp\left[ i\left( \frac{\omega^3}{3} - x\omega \right) \right] = \cos\left( \frac{\omega^3}{3} - x\omega \right) + i\sin\left( \frac{\omega^3}{x} \right)
+        \end{equation}
+        is made of two parts, an even function, the same as our integrand, and an odd function, which vanishes when integrated over \((-\infty, \infty)\).
+        Hence
+        \begin{equation}
+            \Ai(-x) = \int_{-\infty}^{\infty} \exp\left[ i\left( \frac{\omega^3}{3} - x\omega \right) \right] \dd{\omega}.
+        \end{equation}
+        Even if the imaginary part didn't vanish we could still consider the exponential and just discard the imaginary part at the end.
+        
+        In order to apply the method of stationary phase we want to be able to write the exponent in the form \(ix\psi\), where \(\psi\) is a real function of the integration variable.
+        To do so we need to factor the \(x\) out, we can do this with a change of variables.
+        After the change of variables we want both \(\omega^3\) and \(x\omega\) to have the same factor of \(x\).
+        Suppose that we make a change of variables \(\omega = zx^p\).
+        We therefore have \(\omega^3 = z^3x^{3p}\) and \(x\omega = zx^{p+1}\).
+        So we need \(3p = p + 1\), that is \(p = 1/2\).
+        So we choose \(\omega = z\sqrt{x}\).
+        This gives us \(\dd{\omega} = \sqrt{x}\dd{z}\) and leaves our integration limits unchanged.
+        We then have
+        \begin{equation}
+            \Ai(-x) = \frac{\sqrt{x}}{2\pi} \int_{-\infty}^{\infty} \exp\left[ ix^{3/2}\left( \frac{z^3}{3} - z \right) \right] \dd{z}.
+        \end{equation}
+        
+        This is of the required form.
+        Notice that what we called \(x\) above is \(x^{3/2}\) here.
+        This doesn't matter since \(x^{3/2}\) is large and positive exactly when \(x\) is large and positive.
+        We trivially have \(f(z) = 1\).
+        Now take \(\psi(z) = z^3/3 - z\).
+        We then have \(\psi'(z) = z^2 - 1\), which means we have stationary points at \(z = \pm 1\), and so \(\psi(\pm 1) = \mp 2/3\).
+        We have \(\psi''(z) = 2z\) and so \(\psi''(\pm 1) = \pm 2\).
+        
+        Expanding about \(z = 1\) we have
+        \begin{equation}
+            \psi(z) \approx -\frac{2}{3} + (z - 1)^2
+        \end{equation}
+        and about \(z = -1\) we have
+        \begin{equation}
+            \psi(z) \approx \frac{2}{3} + (z + 1)^2.
+        \end{equation}
+        
+        We then have
+        \begin{align}
+            \Ai(-x) &\approx \frac{\sqrt{x}}{2\pi} \bigg[ \int_{-\infty}^{\infty} \exp\left[ ix^{3/2}\left( -\frac{2}{3} + (z - 1)^2 \right) \right] \dd{z}\\
+            &\qquad\qquad+ \int_{-\infty}^{\infty} \exp\left[ ix^{3/2}\left( \frac{2}{3} - (z + 1)^2 \right) \right] \dd{z} \bigg]\\
+            &= \frac{\sqrt{x}}{2\pi} \bigg[ \exp\left[ \frac{2}{3}x^{3/2} - i\frac{\pi}{4} \right] \sqrt{\frac{2\pi}{2x^{3/2}}}\\
+            &\qquad\qquad+ \exp\left[ -i\frac{2}{3}x^{3/2} + i\frac{\pi}{4} \right] \sqrt{\frac{2\pi}{2x^{3/2}}} \bigg]\\
+            &= \frac{1}{x^{1/4}\sqrt{\pi}} \cos\left( \frac{2}{3}x^{3/2} - \frac{\pi}{4} \right).
+        \end{align}
+    \end{exm}
+    
+    \section{Saddle Point Method}
+    \epigraph{The complex world is wacky. Abandon everything we have taught you so far, well, not everything.}{Kristel Torokoff}
+    The \defineindex{saddle point method} generalises Laplace's method (for real exponents) and the method of stationary phase (for purely imaginary exponents) to contour integrals of the form
+    \begin{equation}
+        I(N) = \int_C g(z)\e^{Nf(z)}\dd{z}
+    \end{equation}
+    where \(N\) is large and positive, \(f, g \colon \complex \to \complex\) are analytic in a simply connected region on and around some given contour, \(C\), and \(g(z)\) varies slowly compared to \(\e^{f(z)}\).
+    
+    The value of \(I(N)\) is independent the contour by Cauchy's theorem.
+    We can always write \(f(z) = u(z) + iv(z)\) for \(u, v \colon \complex \to \reals\), it's a basic fact of complex analysis, following immediately from the Cauchy--Riemann equations, that \(u\) and \(v\) are harmonic.
+    We also know that \(f\) has no minima or maxima, only saddle points.
+    The integral will be most sensitive to \(u(z)\).
+    
+    As with Laplace's method we expect that the integral will be dominated by a small region about the highest stationary point of \(f\).
+    This follows since for a non-negligible contribution \(u\) must be maximised while \(v\) must be stationary, or the oscillations will cancel out.
+    
+    There is a theorem, known as Jensen's theorem, which states that \(\abs{F(z)}\) takes extremal points only at saddle points or at troughs where \(F(z) = 0\).
+    We will consider \(F(z) = \exp(Nf(z))\).
+    Considering \(\abs{\exp(Nf(z))}\) is then equivalent to considering \(\Re(f(z))\) since only the real part of the exponent contributes to the magnitude of the exponential.
+    Since \(f(z) = u(z) + iv(z)\) and \(u\) is harmonic we have \(u_{xx} + u_{yy} = 0\), which implies that if \(u_{xx} > 0\) we must have \(u_{yy} < 0\), and vice versa.
+    This in turn means that we don't have maxima or minima.
+    In the rare case that \(u_{xx} = u_{yy} = 0\) the result still holds but showing it is more involved.
+    
+    To evaluate \(I(N)\) we deform the contour so that it passes through the saddle point.
+    This doesn't change the value of the integral by Cauchy's theorem.
+    We deform the contour in such a way that it remains in regions where \(\abs{\exp(Nf(z))}\) is small, and hence the contribution to the integrand is small, apart from at the saddle point.
+    
+    We then expand about the saddle point, \(z = z_0\), giving
+    \begin{equation}
+        g(z) \approx g(z_0), \qqand f(z) \approx f(z_0) + \frac{1}{2}f''(z_0)(z - z_0)^2.
+    \end{equation}
+    We then have
+    \begin{equation}
+        I(N) \approx g(z_0) \e^{Nf(z_0)} \int_{C'} \exp\left[ \frac{1}{2}Nf''(z_0)(z - z_0)^2 \right]\dd{z}
+    \end{equation}
+    where \(C'\) is our modified contour.
+    
+    Now set \(z - z_0 = r\e^{i\varphi}\) and write \(f''(z_0) = \abs{f''(z_0)}\e^{i\vartheta}\).
+    To pick up the dominant contribution along the path of steepest descent we need to choose \(\varphi\), the angle at which the path passes through the saddle point, in such a way that the imaginary part of the exponential is zero and the real part is negative.
+    Making these substitutions we have
+    \begin{equation}
+        I(N) \approx g(z_0) \e^{Nf(z_0)} \int_{C'} \exp\left[ \frac{1}{2}N\abs{f''(z_0)}\e^{i\vartheta}r^2\e^{2i\varphi} \right] \e^{i\varphi}\dd{r}.
+    \end{equation}
+    The phase of the exponent is \(\e^{i(\vartheta + 2\varphi)}\).
+    We want this to be a multiple of \(\pi\), so that the exponential is real.
+    We therefore choose \(\varphi = (m\pi - \vartheta)/2\) for \(m\in\integers\).
+    We end up with four angles (restricting arguments to some interval of length \(2\pi\)).
+    These map out four paths across the saddle point.
+    These paths pair up with a path and its reverse.
+    One pair will be along the path of steepest ascent and one along the path of steepest descent.
+    It is this latter path that we are interested in since along this path the value of the integrand falls away quickly, which allows us to neglect contributions not close to the saddle point.
+    What remains is to choose the value of \(\varphi\) from the pair which gives us the \enquote{correct sense}, that is the deformed contour should keep the same orientation of the original contour, or as close as possible.
+    This will become clearer in the examples later.
+    
+    We can extend the limits of the integral to infinity and we get a Gaussian integral.
+    Evaluating this with our chosen value of \(\varphi\) gives
+    \begin{equation}
+        I(N) \approx g(z_0) \e^{Nf(z_0)} \e^{i\varphi} \sqrt{\frac{2\pi}{N\abs{f''(z_0)}}}.
+    \end{equation}
+    This is the so called \defineindex{saddle-point approximation} to the integral \(I\).
+    
+    \subsection{Notes}
+    If there are several saddle points along the contour then in the most general case you need to sum the contribution from each.
+    Often however, one of the saddle points dominates and it is possible to argue your way out of considering the others.
+    
+    If there is no saddle point the the dominant contribution will come from somewhere on the boundary where it is possible that \(f'(z) \ne 0\).
+    We still consider the path of steepest descent but this case must be handled slightly differently.
+    It is still possible to find an asymptotic expansion.
+    
+    
+    \subsection{Relation to Previous Methods}
+    Laplace's method corresponds to a saddle point on the real axis with \(u_{xx} < 0\), that is a maximum as you travel along the real axis, and \(u_{yy} > 0\), that is a minimum along the imaginary axis.
+    We go through the saddle point on the real axis so \(f''(z_0)\) is real and negative.
+    We then have \(\vartheta = \pi\) and \(\varphi = 0\).
+    
+    The method of stationary phase corresponds to a saddle point with \(\vartheta + 2\varphi = \pi/2\) and so
+    \begin{equation}
+        \int \exp\left[ \frac{N}{2}f''(z_0)(z - z_0)^2 \right] \dd{z} = \e^{-i\vartheta/2 + i\pi/4} \int \exp\left[ \frac{iN}{2}\abs{f''(z_0)}r^2 \right]\dd{r}.
+    \end{equation}
+    
+    \subsection{Examples}
+    \epigraph{They're all related, its like the royal family}{Kristel Torokoff on Hankel and Bessel functions.}
+    \begin{exm}{Binomial Coefficient}{}
+        It can be shown that the following is an integral representation of the binomial coefficient:
+        \begin{equation}
+            \binom{N}{M} = \frac{1}{2\pi i} \oint_C \frac{(1 + z)^N}{z^{M + 1}} \dd{z}.
+        \end{equation}
+        Here \(C\) is a contour encircling the origin.
+        We can understand this by expanding \((1 + z)^N\) with the binomial expansion, this gives us a series in \(z^n\).
+        For \(n > M\) we end up with no pole and therefore that term doesn't contribute.
+        For \(n < M\) the integrand is bounded by \(\abs{1/z^{n - m + 1}}\), and taking the contour to infinity this term vanishes.
+        Finally for \(n = M\) we have \(\abs{1/z}\) which has a residue of \(1\) and so by the Residue theorem we get \(2\pi i\) times the coefficient of \(z^{M}\) in the expansion of \((1 + z)^{N}\), which is exactly what we define as \(\binom{N}{M}\).
+        
+        Now consider the case where \(M\) and \(N\) are large.
+        We can always write \(M = Ny\) for some \(y\).
+        Consider the integrand.
+        It is possible to generate an exponential by using \(a = \e^{\ln a}\):
+        \begin{align}
+            \frac{(1 + z)^{N}}{z^{Ny + 1}} &= \frac{1}{z} \frac{(1 + z)^N}{z^{Ny}}\\
+            &= \frac{1}{z}\exp\left[ \ln\left( \frac{(1 + z)^{N}}{z^{Ny}} \right) \right]\\
+            &= \frac{1}{z}\exp[N\ln(1 + z) - Ny\ln z].
+        \end{align}
+        Hence
+        \begin{equation}
+            \binom{N}{M} = \frac{1}{2\pi i} \oint_C \frac{1}{z} \exp[N\ln(1 + z) - Ny\ln z] \dd{z}.
+        \end{equation}
+        Let \(f(z) = \ln(1 + z) - y\ln z\).
+        Differentiating this we have
+        \begin{equation}
+            f'(z) = \frac{1}{1 + z} - \frac{y}{z} = 0 \implies z_0 = \frac{y}{1 - y}.
+        \end{equation}
+        The second derivative is then
+        \begin{equation}
+            f''(z) = -\frac{1}{(1 + z)^2} + \frac{y}{z^2} \implies f''(z_0) = \frac{(1 - y)^3}{y}.
+        \end{equation}
+        
+        So the saddle point is on the real axis and at a minimum along the real axis but a maximum along the imaginary direction.
+        The only singularity in the integrand is at \(z = 0\) and so we can deform the contour freely as long as we avoid the origin.
+        We do so to pass through the saddle point in the imaginary direction.
+        This is most easily done by just taking a large circle centred at the origin with radius \(z_0\), but can be done any way we like.
+        We are choosing here to have \(\varphi = \pi/2\).
+        
+        Using the saddle-point approximation we then have
+        \begin{align}
+            \binom{N}{M} &\approx \frac{1}{2\pi i} \frac{\e^{i\varphi}}{z_0} \e^{Nf(z_0)} \sqrt{\frac{2\pi}{Nf''(z_0)}}\\
+            &= \sqrt{\frac{1}{2\pi Ny(1 - y)}} \exp[-N(y\ln y + (1 - y)\ln(1 - y)].
+        \end{align}
+        The exponent here should be familiar from dealing with entropy and similar concepts in statistical mechanics, this arises due to the combinatorial uses of the binomial coefficients.
+    \end{exm}
+    
+    \begin{dfn}{Bessel and Hankel Functions}{}
+        A common differential equation is Bessel's differential equation,
+        \begin{equation}
+            x^2\diff[2]{y}{x} + x\diff{y}{x} + (x^2 - \nu^2)y = 0.
+        \end{equation}
+        This has two linearly independent solutions which are defined to be the \define{Bessel functions}\index{Bessel function}, in particular the Bessel function of the first kind, \(J_\nu\)\index{\(J_\nu\)|see{Bessel function}}, and second kind, \(Y_\nu\)\index{\(Y_\nu\)|see{Bessel function}}.
+        
+        An alternative pair of linearly independent functions that solve Bessel's differential equation are the \define{Hankel functions}\index{Hankel function} of the first and second kind:
+        \begin{equation}
+            H_\nu^{(1)} = J_\nu + iY_\nu, \qqand H_{\nu}^{(2)} = J_\nu - iY_\nu.
+        \end{equation}
+        \index{\(H_\nu^{(1)}\)|see{Hankel function}}\index{\(H_\nu^{(2)}\)|see{Hankel function}}.
+        
+        There are also the modified Bessel functions, which are rescaled Bessel functions, and spherical Bessel functions, which are solutions to Helmholtz's equation, \(\laplacian f = -k^2f\), in spherical coordinates, the radial component of which is of the form of Bessel's differential equation.
+        Ultimately the spherical Bessel functions are also rescaled Bessel functions.
+    \end{dfn}
+    
+    \begin{exm}{Hankel Function of the First Kind}{}
+        It can be shown that the Hankel functions of the first kind have the integral representation
+        \begin{equation}
+            H_\nu^{(1)}(x) = \frac{1}{i\pi} \int_{0 + i\varepsilon}^{-\infty + i\varepsilon} \exp\left[ \frac{x}{2}\left( z - \frac{1}{z} \right) \right] \frac{1}{z^{\nu + 1}}\dd{z}
+        \end{equation}
+        with \(\varepsilon > 0\) and \(x\) large and positive.
+        There is a branch cut along the negative real axis.
+        The Hankel functions of the second kind have the same integral but with a contour that is just below the branch cut instead of above.
+        
+        Let \(f(z) = (z - 1/z)/2\).
+        Then
+        \begin{equation}
+            f'(z) = 1 + \frac{1}{z^2} = 0 \implies z = \pm i.
+        \end{equation}
+        We then have \(f(\pm i) = \pm i\), as well as
+        \begin{equation}
+            f''(z) = -\frac{1}{z^3} \implies f''(\pm i) = \mp i.
+        \end{equation}
+        
+        Expanding \(f\) near \(z = i\) we get
+        \begin{align}
+            f(z) &\approx f(i) + \frac{1}{2}f''(i)(z - i)^2\\
+            &= i + \frac{r^2}{2}\exp\left[ -i\frac{\pi}{2} + i2\varphi \right].
+        \end{align}
+        We want the exponential to be purely real and negative.
+        We therefore want \(\cos(2\varphi - \pi/2)  < 0\) and \(\sin(2\varphi - \pi/2) = 0\).
+        This happens when \(2\varphi - \pi/2 = m\pi\) with \(m\in\integers\).
+        In particular the unique values this gives are \(\varphi = \pi/4, 3\pi/4, 5\pi/4, 7\pi/4\).
+        Of these \(3\pi/4\) and \(7\pi/4\) give the negative cosine.
+        Of these it is \(3\pi/4\) that gives the \enquote{correct sense}.
+        See \cref{fig:Hankel saddle point method}.
+        
+        We can do the same expansion about \(z = -i\) and we get the same set of four angles but this time it is \(\pi/4\) and \(-3\pi/4\) that give the steepest descent.
+        
+        It turns out that the contribution from the \(z = -i\) saddle point is much smaller than from the \(z = i\) saddle point.
+        This is mostly because the initial contour is above the negative real axis, along which there is a branch cut.
+        This means we cannot deform a contour to cross the \(z = -i\) saddle point without going back on ourselves to get out from under the real axis.
+        But going back on ourselves simply cancels the contribution.
+        As a result the net contribution from the \(z = -i\) saddle point is negligible.
+        
+        It then follows that by taking only the contribution from the \(z = i\) saddle point we have
+        \begin{equation}
+            H^{(1)}_\nu (x) \approx \exp\left[ i\left( x - \frac{\pi}{4} - \nu\frac{\pi}{2} \right) \right] \sqrt{\frac{2}{x\pi}}.
+        \end{equation}
+    \end{exm}
+    
+    \begin{figure}
+        \tikzsetnextfilename{hankel-saddle-point-contour}
+        \begin{tikzpicture}
+            \draw[very thick, ->] (-4, 0)  -- (4, 0) node[right] {\(\Re(z)\)};
+            \draw[very thick, ->] (0, -4)  -- (0, 4) node[above] {\(\Im(z)\)};
+            \draw[ultra thick, red] (0, 0) -- (-4, 0);
+            \fill[highlightalt] (0, -2) circle [radius = 0.075cm] node[left, black] {\(-i\)};
+            \draw[very thick, highlight] (0, 0.2) -- (-4, 0.2);
+            \draw[very thick, highlight, ->] (0, 0.2) --++ (-2.1, 0) node[above right, black] {\(C\)};
+            \draw[darker] (0, 2) -- ++ (0.5, 0);
+            \draw[darker] (0.3, 2) arc(0:130:0.3);
+            \node at (0.4, 2.3) {\(\frac{3\pi}{4}\)};
+            \draw[dark, use Hobby shortcut, very thick] (0, 0.2) .. (0.5, 0.2) .. (1, 0.5) .. (0.5, 1.5) .. (0, 2) .. (-0.5, 2.5) .. (-2, 1) .. (-2.3, 0.5) .. (-2.8, 0.2);
+            \node at (1.3, 0.6) {\(C'\)};
+            \draw[dark, very thick, ->] (0.6, 1.4) -- (0.5, 1.5);
+            \draw[dark, very thick, ->] (-1.95, 1.1) -- (-2, 1);
+            \fill[highlightalt] (0, 2) circle [radius = 0.075cm] node[below left, black] {\(i\)};
+        \end{tikzpicture}
+        \caption{The contour, \(C\), used in the integral representation of the Hankel function of the first kind, \(H_\nu^{(1)}\), and the modified contour, \(C'\), used to calculate it in the saddle point method. Notice that the contours are in the same \enquote{sense}.}
+        \label{fig:Hankel saddle point method}
+    \end{figure}
+    
+    \chapter{Dirac Delta}
+    \epigraph{What on Earth are we talking about?}{Kristel Torokoff}
+    \section{Motivation}
+    \epigraph{Words are obsolete.}{Kristel Torokoff}
+    Consider an impulse, that is an instantaneous increase in momentum from 0 to \(mv\), applied at time \(t_0\).
+    We can model this as the application of a force \(F(t)\) giving
+    \begin{equation}
+        mv = \int_{t_0-\tau}^{t_0 + \tau} F(t) \dd{t}.
+    \end{equation}
+    The force, \(F\), must be strongly peaked around \(t = t_0\) since at this point an instantaneous jump in the momentum means an infinite rate of change, and hence force.
+    Obviously this is non-physical but still can be a useful concept.
+    The exact details of \(F\) are not important, we can think of it as having any shape but as we make the duration of the impulse, \(2\tau\), smaller \(mv\) must be unchanged and so the peak must get higher so the area underneath is the same.
+    In the limit \(\tau \to 0\) we write \(F(t) = mv\delta(t - t_0)\).
+    
+    Another example of a similar function is the mass density of a point mass, \(M\), which is concentrated at a point \(\vv{r_0}\) such that any integral over space containing that point gives \(M\) and any integral over space not containing the point gives zero.
+    This again requires a strongly peaked function and in the limit of the volume of the integration region going to zero we write \(\rho(\vv{r}) = M\delta(\vv{r} - \vv{r_0})\).
+    
+    Both of these examples have functions which are peaked such that the peak gets smaller as the integration region gets larger in such a way that the integral stays constant, as long as it contains the distinguished point.
+    We can therefore think of them as \enquote{functions} with a spike at that point and zero everywhere else.
+    We make this idea rigorous in the following definition
+    
+    \begin{dfn}{Dirac Delta}{}
+        The \defineindex{Dirac delta}, \(\delta\)\index{\(\delta\)|see{Dirac delta}}, is defined such that
+        \begin{equation}
+            \int_{-\infty}^{\infty} \delta(x) f(x) = \int_{-\varepsilon}^{\varepsilon} \delta(x)f(x) \dd{x} = f(0)
+        \end{equation}
+        for arbitrarily small \(\varepsilon > 0\) and sufficiently nice\footnote{Sufficiently nice in this case meaning differentiable, continuous and vanishing at infinity} test functions \(f\).
+        This defines \(\delta\) only up to a constant.
+        We further require that
+        \begin{equation}
+            \int_{-\infty}^{\infty} \delta(x) \dd{x} = 1.
+        \end{equation}
+    \end{dfn}
+    
+    The Dirac delta defined as above doesn't quite fit the requirements to be a function.
+    Instead it is a \defineindex{distribution}, or \define{generalised function}\index{generalised function|see{distribution}}.
+    A distribution is simply a mathematical object that we when integrated with a well behaved test function gives a second well behaved function.
+    In the case of the Dirac delta this second function is the first function evaluated at 0.
+    We won't worry about the details of what this means.
+    For us the important thing is that the Dirac delta is fairly meaningless outside of an integral, although we can still formally manipulate it according to the rules we will derive shortly.
+    
+    \section{Dirac Delta as a Limit of a Function Sequence}
+    One of the most useful ways to think about the Dirac delta is as the limit of a series of functions which have the key property of getting narrower and taller in such a way that the area remains constant, and is 1 as per our second normalisation requirement for \(\delta\), and also have the property that when integrated with a test function we get the test function evaluated at zero.
+    This makes mathematicians a bit nervous as the limit of such sequences doesn't exist, since the Dirac delta is not a function.
+    Fortunately we're doing physics and as such don't need to worry about trivial things like limits existing.
+    
+    \subsection{Top Hat}
+    Define the \defineindex{top hat}\index{\(\Pi_n\)|see{top hat}} function
+    \begin{equation}
+        \Pi_n(x) \coloneqq
+        \begin{cases}
+            0, & \abs{x} > 1/n,\\
+            n/2, & \abs{x} \le x.
+        \end{cases}
+    \end{equation}
+    This gives a series of rectangular areas of width \(2/n\) and height \(n/2\), so area \(1\).
+    In the limit \(n \to \infty\) they get narrower and taller, just as required for the Dirac delta.
+    
+    \begin{figure}
+        \tikzsetnextfilename{dirac-delta-top-hat-limit}
+        \begin{tikzpicture}
+            \draw[very thick, ->] (-4, 0)  -- (4, 0) node[right] {\(x\)};
+            \draw[very thick, ->] (0, 0)  -- (0, 8) node[above] {\(y\)};
+            \foreach \i/\col in {0.3/20, 0.5/25, 1/30, 2/40, 3/50, 4/60, 5/70, 6/90, 7/100} {
+                \draw[very thick, highlight!\col] (-4, 0) -- (-1/\i, 0) -- (-1/\i, \i) -- (1/\i, \i) -- (1/\i, 0) -- (4, 0);
+                \node[right] at (1/\i, \i) {\i};
+            }
+        \end{tikzpicture}
+        \caption{Top hat functions in a limit become Dirac deltas.}
+    \end{figure}
+    
+    Consider now a test function, \(f\), which is continuous at \(0\).
+    Then for all \(\varepsilon > 0\) there exists \(\eta\) such that for all \(\abs{x} < \eta\) \(\abs{f(0) - f(x)} < \varepsilon\), this is just the usual \(\varepsilon\)-\(\delta\) definition of continuity but avoiding reusing the symbol \(\delta\).
+    It then follows that for all \(n > 1/\eta\)
+    \begin{align}
+        \abs*{f(0) - \int_{-\infty}^{\infty} \Pi_n(x)f(x) \dd{x}} &= \abs*{ \frac{n}{2} \int_{-1/n}^{1/n} (f(0) - f(x))\dd{x} }\\
+        &\le \frac{n}{2} \int_{-1/n}^{1/n} \abs{f(0) - f(x)} \dd{x}\\
+        &\le \varepsilon.
+    \end{align}
+    Therefore we have
+    \begin{equation}
+        \lim_{n\to\infty} \int_{-\infty}^{\infty} \Pi_n(x)f(x) \dd{x} = f(0)
+    \end{equation}
+    for any continuous function \(f\).
+    This is the defining property of the Dirac delta.
+    
+    \subsection{Gaussian}
+    Consider the Gaussian function
+    \begin{equation}
+        \mathcal{N}_n(x) = \frac{n}{\sqrt{\pi}} \e^{-n^2x^2}.
+    \end{equation}
+    This is peaked at \(x = 0\) with the area under the curve being 0.
+    Further as \(n\) increases the peak becomes taller and the curve narrower, the obvious measure of curve width here being the standard distribution, \(1/n^2\), taking this to be a probability density function.
+    
+    \begin{figure}
+        \tikzsetnextfilename{dirac-delta-gaussian-limit}
+        \begin{tikzpicture}
+            \draw[very thick, ->] (-4, 0)  -- (4, 0) node[right] {\(x\)};
+            \draw[very thick, ->] (0, 0)  -- (0, 8) node[above] {\(y\)};
+            \foreach \i/\col in {1/20, 2/25, 3/30, 4/40, 5/50, 6/60, 7/70, 8/80, 9/90, 10/100} {
+                \draw[very thick, highlight!\col, domain=-4:4, samples=1000] plot (\x, {1.35 * \i * exp(-(\x)^2 * (\i)^2) * 0.564 });
+            }
+        \end{tikzpicture}
+        \caption{Gaussian functions in a limit become Dirac deltas. Shown here are the Gaussians with standard deviations \(1/n^2\) with \(n = 1, \dotsc, 10\).}
+    \end{figure}
+    
+    It can also be shown that in the limit of \(n \to \infty\) this has the defining property of the Dirac delta.
+    
+    \subsection{Lorentzian}
+    Consider the Lorentzian defined by
+    \begin{equation}
+        L_n(x) = \frac{n}{\pi} \frac{1}{1 + n^2x^2}.
+    \end{equation}
+    This has unit area under the curve and is peaked at zero and becomes more peaked as \(n\) increases.
+    The natural measure of width here being the full width at half maximum, \(2/n^2\).
+    We can also show that it has the defining property of the Dirac delta.
+    
+    \begin{figure}
+        \tikzsetnextfilename{dirac-delta-lorentzian-limit}
+        \begin{tikzpicture}
+            \draw[very thick, ->] (-4, 0)  -- (4, 0) node[right] {\(x\)};
+            \draw[very thick, ->] (0, 0)  -- (0, 8) node[above] {\(y\)};
+            \foreach \i/\col in {1/20, 2/25, 3/30, 4/40, 5/50, 6/60, 7/70, 8/80, 9/90, 10/100} {
+                \draw[very thick, highlight!\col, domain=-4:4, samples=1000] plot (\x, {0.7 * \i * 1/(1 + (\i)^2*(\x)^2)});
+            }
+        \end{tikzpicture}
+    \caption{Lorentzian functions in a limit become Dirac deltas. Shown here are the the Lorentzians with full width at half maximum \(2/n^2\) with \(n = 1, \dotsc, 10\).}
+    \end{figure}
+    
+    \subsection{\texorpdfstring{\(\sinc\)}{sinc} Function}
+    Consider the scaled \(\sinc\) function
+    \begin{equation}
+        f_n(x) = \frac{n}{\pi}\sinc^2(nx) = \frac{1}{n\pi} \frac{\sin^2(n x)}{x^2}.
+    \end{equation}
+    This is peaked at the origin, and the peak gets narrower as \(n\) increases.
+    The natural width measurement here being the distance between the first minima, which occur at \(\pm \pi/n\), and so the width is \(2\pi/n\), which goes to zero as \(n\) increases.
+    
+    \begin{figure}
+        \tikzsetnextfilename{dirac-delta-sinc-limit}
+        \begin{tikzpicture}
+            % https://tex.stackexchange.com/a/235009/180184
+            \pgfmathdeclarefunction{sinc}{1}{%
+                \pgfmathparse{abs(#1)<0.01 ? int(1) : int(0)}%
+                \ifnum\pgfmathresult>0 \pgfmathparse{1}\else\pgfmathparse{sin(#1 r)/#1}\fi%
+            }
+            \draw[very thick, ->] (-4, 0)  -- (4, 0) node[right] {\(x\)};
+            \draw[very thick, ->] (0, 0)  -- (0, 8) node[above] {\(y\)};
+            \foreach \i/\col in {1/20, 2/25, 3/30, 4/40, 5/50, 6/60, 7/70, 8/80, 9/90, 10/100} {
+                \draw[very thick, highlight!\col, domain=-4:4, samples=1000] plot (\x, {0.75 * \i * sinc(\i * \x)^2});
+            }
+        \end{tikzpicture}
+        \caption{Scaled \(\sinc\) functions in a limit become Dirac deltas. Shown here are the the scaled \(\sinc\) functions with \(2\pi/n\) between first minima with \(n = 1, \dotsc, 10\).}
+    \end{figure}
+    
+    \section{Integral Representation}
+    Before we can get onto the integral representation of the Dirac delta we need a related function.
+    
+    \begin{dfn}{Heaviside Step Function}{}
+        The \defineindex{Heaviside step function}\index{\(\theta\)|see{Heaviside step function}} is defined as
+        \begin{equation}
+            \theta(t) \coloneqq 
+            \begin{cases}
+                1, & t > 0,\\
+                0, & t < 0.
+            \end{cases}
+        \end{equation}
+        The notation \(H(t)\) is also used for this function.
+        The value at zero is not important for our purposes, and there is no agreement on what it should be, common choices being 0, \(1/2\), and 1.
+        We will only consider \(\theta\) as a distribution, inside an integral, where the value at a single point makes no difference.
+    \end{dfn}
+    
+    For \(t \ne 0\) we have
+    \begin{equation}
+        \int_{-\infty}^t \delta(u) \dd{u} = \theta(t),
+    \end{equation}
+    since if \(t < 0\) the origin is not in the integration range and so the integral is zero, and if \(t > 0\) then the origin is in the integration range and the integral is 1.
+    
+    Now consider the following integral
+    \begin{equation}
+        I = \int_{-\infty}^{\infty} f(t) \theta'(t) \dd{t}
+    \end{equation}
+    where \(f\) is a well behaved test function, in particular it vanishes at infinity.
+    Integrating by parts we have
+    \begin{align}
+        I &= [f(t)\theta(t)]_{-\infty}^{\infty} - \int_{-\infty}^{\infty} f'(t)\theta(t) \dd{t}\\
+        &= f(\infty)\underbrace{\theta(\infty)}_{=1} - f(-\infty)\underbrace{\theta(-\infty)}_{=0} - \int_{0}^{\infty} f'(t) \dd{t}
+    \end{align}
+    at this point we use the requirement that \(f\) vanishes at infinity so this is
+    \begin{equation}
+        I = -\int_0^\infty f'(t) \dd{t} = -[f(t)]_{0}^{\infty} = -f(\infty) + f(0) = f(0),
+    \end{equation}
+    where again we have used the fact that \(f\) vanishes at infinity.
+    Note that we can't just say \enquote{\(f(\infty) - f(\infty) = 0\)} here since infinity is, to use a technical term, weird, and formally these infinities arise in separate limiting procedures and we can't guarantee that they are actually the same point.
+    From this we conclude that \(\theta'(t) = \delta(t)\).
+    
+    Consider the integral representation of the step function,
+    \begin{equation}
+        \theta(x) = \frac{1}{2\pi i} \int_{-\infty - i\gamma}^{\infty - i\gamma} \frac{\e^{ikx}}{k} \dd{k}
+    \end{equation}
+    where \(\gamma > 0\) is arbitrary.
+    We will show this is in a tutorial but the general argument is that for \(x > 0\) the integral converges in the upper half plane.
+    Closing the contour to form a semicircle we circle the origin, since the contour is just below the real axis.
+    The integral over the curved part of the semicircle vanishes by Jordan's lemma (\cref{lma:jordan's}).
+    Evaluating the residue at the origin gives us the value of the integral.
+    For \(x < 0\) the integral converges in the lower half plane.
+    Hence we can close the contour with a semicircle but now the contour contains no poles and so the integral is zero.
+    
+    From this we can easily derive an integral representation of the Dirac delta by noticing that
+    \begin{equation}
+        \diffp*{\e^{ikx}}{k} = \frac{\e^{ikx}}{k}.
+    \end{equation}
+    We then have
+    \begin{equation}
+        \delta(x) = \diff{\theta(x)}{x} = \frac{1}{2\pi} \int_{-\infty-i\gamma}^{\infty-i\gamma} \e^{ikx} \dd{k}.
+    \end{equation}
+    There is now no pole at the origin and so we are also free to take \(\gamma = 0\) giving us the integral representation of the Dirac delta:
+    \begin{equation}
+        \delta(x) = \frac{1}{2\pi}\int_{-\infty}^{\infty} \e^{ikx} \dd{k}.
+    \end{equation}
+    This integral is divergent, like the Dirac delta it represents, and is only meaningful under another integral.
+    
+    Compare this result to the integral representation of the Kronecker delta that we derived in a tutorial:
+    \begin{equation}
+        \delta_{nm} = \frac{1}{2\pi i} \oint_{C} \frac{z^m}{z^{n+1}}
+    \end{equation}
+    where \(n, m \in \integers\) and \(C\) is an anticlockwise closed contour containing the origin.
+    As a reminder if \(m > n\) then there are no poles and so this is zero.
+    If \(m < n\) then the integral is bound by \(1/R^{m+n}\), where \(R\) is the radius of the contour, which we are free to take as a circle.
+    Hence the integral vanishes as the contour goes to infinity.
+    Only when \(m = n\) do we get the integral of \(1/z\) which gives \(2\pi i\) by the residue theorem.
+    
+    Now make a change of variables to \(z = \e^{ik}\) with \(k \in (-\pi, \pi)\) and we have
+    \begin{equation}
+        \delta_{nm} = \frac{1}{2\pi} \int_{-\pi}^{\pi} \e^{ik(m - n)} \dd{k}.
+    \end{equation}
+    Note the similarity to the integral representation of \(\delta\), in particular to the integral representation of \(\delta(x - x_0)\), which we will see in the next section.
+    
+    \section{Other Properties}
+    \subsection{Shift}
+    Consider what happens when we shift the Dirac delta by some amount \(x_0\).
+    We then consider
+    \begin{equation}
+        \int_{-\infty}^{\infty} f(x)\delta(x - x_9) \dd{x}.
+    \end{equation}
+    A simple change of variables to \(u = x - x_0\) gives
+    \begin{equation}
+        \int_{-\infty}^{\infty} f(u + x_0)\delta(u) \dd{u} = f(0 + x_0) = f(x_0).
+    \end{equation}
+    
+    From this we see that by shifting the Dirac delta we can pick out the value of a function at any point.
+    This is often referred to as the \defineindex{sifting property} of the Dirac delta.
+    Our previous ideas generalise to this shifted Dirac delta.
+    In particular
+    \begin{equation}
+        \delta(x - x_0) = \frac{1}{2\pi} \int_{-\infty}^{\infty} \e^{ik(x - x_0)} \dd{k}.
+    \end{equation}
+    
+    \subsection{Derivative of the Dirac Delta}
+    It is reasonable to think that the derivative of the Dirac delta is another distribution.
+    As such we should consider it in an integral with a well behaved test function:
+    \begin{equation}
+        \int_{-\infty}^{\infty} f(x)\delta'(x) \dd{x}.
+    \end{equation}
+    Integrating by parts we get
+    \begin{equation}
+        \underbrace{[f(x)\delta(x)]_{-\infty}^{\infty}}_{=0\text{ as } f(\pm \infty) = 0} - \int_{-\infty}^{\infty} f'(x)\delta(x) \dd{x} = -f'(0).
+    \end{equation}
+    Repeated application of this process gives us
+    \begin{equation}
+        \int_{-\infty}^{\infty} f(x) \diff[n]{\delta(x)}{x} \dd{x} = (-1)^n \diff[n]{f}{x}[x=0].
+    \end{equation}
+    Note that in order for this to be well defined we require that \(f\) is \(n\) times differentiable.
+    
+    \subsection{Dirac Delta of Functions}
+    Now consider \(\delta(ax)\) for some constant \(a\), and consider
+    \begin{equation}
+        \int_{-\infty}^{\infty} \delta(ax)f(x) \dd{x}.
+    \end{equation}
+    Suppose \(a > 0\).
+    A change of variables to \(y = ax\) gives
+    \begin{equation}
+        \frac{1}{a}\int_{-\infty}^{\infty} \delta(y)f(y) \dd{y} = \frac{f(0)}{a}.
+    \end{equation}
+    If instead \(a < 0\) then the same change of variables gives
+    \begin{equation}
+        \frac{1}{a}\int_{\infty}^{-\infty} \delta(y)f(y) \dd{y} = -\frac{1}{\abs{a}}\int_{\infty}^{-\infty} \delta(y)f(y) \dd{y} = \frac{1}{\abs{a}}\int_{-\infty}^{\infty} \delta(y)f(y) \dd{y} = \frac{f(0)}{\abs{a}}.
+    \end{equation}
+    If \(a = 0\) the integral diverges.
+    Hence
+    \begin{equation}
+        \delta(ax) = \frac{\delta(x)}{\abs{a}}.
+    \end{equation}
+    
+    We can be a bit more general and consider the Dirac delta with some well behaved test function, \(g\), as its argument.
+    In particular consider
+    \begin{equation}
+        \int_{-\infty}^{\infty} f(x)\delta(g(x)) \dd{x}.
+    \end{equation}
+    Let \(x_i\) be the zeros of \(g(x)\), since the argument of \(\delta\) being zero are the points where we pick out the value of the function.
+    In particular between these points the integrand is zero and so this integral is equal to
+    \begin{equation}
+        \sum_{i}  \int_{x_i - \varepsilon}^{x_i + \varepsilon} f(x)\delta(g(x)) \dd{x}.
+    \end{equation}
+    Here \(\varepsilon > 0\) is arbitrarily small.
+    In particular we take \(\varepsilon\) to be small enough that none of the integrals overlap.
+    Note that this requires these be simple zeros, if they aren't then the result is undefined.
+    
+    A change of variables to \(y = g(x)\) gives \(g^{-1}(y) = 0\)\footnote{if \(g\) is not invertible we can restrict it to an arbitrarily small interval, \((x_i - \varepsilon, x_i + \varepsilon)\) over which it is invertible}, \(\dd{y} = g'(x)\dd{x}\), and \(x_i \pm \varepsilon = g(x_i \pm \varepsilon)\).
+    We then have
+    \begin{equation}
+        \sum_{i} \int_{g(x_i - \varepsilon)}^{g(x_i + \varepsilon)} f(g^{-1}(y))\delta(y)\frac{1}{g'(g^{-1}(y))} \dd{y} = \sum_{i} \frac{f(x_i)}{\abs{g'(x_i)}}
+    \end{equation}
+    where the absolute value arises by the same argument as for the simple \(\delta(ax)\) case, if \(g'(x_i) > 0\) then nothing happens, if \(g'(x_i) < 0\) then the limits swap but we change them back by introducing a negative, which we then cancel with the negative of \(g'(x_i)\) to give \(\abs{g'(x_i)}\).
+    
+    From this we can identify
+    \begin{equation}
+        \delta(g(x)) = \sum_{i} \frac{\delta(x - x_i)}{\abs{g'(x_i)}}.
+    \end{equation}
+    Notice that this is consistent with the two cases \(g(x) = ax\) and \(g(x) = x - x_0\) that we considered earlier.
+    
+    \subsection{Higher Dimensions}
+    While we mostly restrict ourselves to single variables in this course, be they real or complex, we can easily generalise the Dirac delta to arbitrary dimension, and this is common enough in physics that it warrants comment.
+    The simplest way to do so is to define \(N\)-dimensional Dirac delta, \(\delta^{N}\), as a product of one-dimensional Dirac deltas.
+    That is
+    \begin{equation}
+        \delta^N((x_1, x_2, \dotsc, x_N)) = \delta(x_1)\delta(x_2)\dotsm \delta(x_N).
+    \end{equation}
+    In particular in physics we usually care about the three-dimensional case.
+    In particular when considering an effect concentrated at some point \(\vv{r_0}\) we often use
+    \begin{equation}
+        \delta^3(\vv{r} - \vv{r_0}) = \delta(x - x_0)\delta(y - y_0)\delta(z - z_0)
+    \end{equation}
+    where \(\vv{r} = (x, y, z)\) and \(\vv{r_0} = (x_0, y_0, z_0)\).
+    
+    Since the Dirac delta behaves almost identically in multiple dimensions we usually drop the superscript telling us the dimension and just write this as \(\delta(\vv{r} - \vv{r_0})\), letting the dimension of the argument inform us of the dimension we are considering.
+    
+    \chapter{Ordinary Differential Equations}
+    \epigraph{Heeellllooo Count Wronski!}{Kristel Torokoff}
+    \section{Types of ODEs}
+    An \(n\)th order \defineindex{ordinary differential equation} (ODE)\glossary[acronym]{ODE}{ordinary differential equation} is a relation of the form
+    \begin{equation}
+        y^{(n)} = F(x, y(x), y'(x), \dotsc, y^{(n-1)}(x)).
+    \end{equation}
+    Here \(f\) is a function of \(x\), \(y\), and the \(n - 1\) first derivatives of \(y\).
+    
+    We say that the ODE is \defineindex{linear} if \(F\) is linear in \(y\) and its derivatives.
+    Note that this does \emph{not} require \(F\) be linear in \(x\), that would lead only to particularly boring equations.
+    
+    An \(n\)th order ODE depends on \(n\) parameters, often called \define{constants of integration}\index{constant of integration}.
+    These are usually set by either boundary conditions or initial values.
+    We typically won't worry about this step since it isn't too difficult and is heavily dependent on the system we are studying.
+    
+    We can always write an \(n\)th order ODE as a system of \(n\) first order ODEs by defining the functions \(y_k\) as
+    \begin{equation}
+        y_k(x) \coloneqq \diff[k]{y}{x} = y^{(k)}(x).
+    \end{equation}
+    We then have
+    \begin{equation}
+        \diff{y_k}{x} = y_{k+1}(x), \text{for \(k = 0, \dotsc, n - 2\) and } \diff{y_{n-1}}{x} = F(x, y(x), y_1(x), \dotsc, y_{n-1}(x)).
+    \end{equation}
+    Notice that here we are treating \(y_k\) as functions, not derivatives of functions, and so \(\diff{y_k}/{x}\) is just a first order derivative.
+    
+    Sometimes first order ODEs are written in terms of differentials,
+    \begin{equation}
+        A(x, y) \dd{y} + B(x, y) \dd{x} = 0,
+    \end{equation}
+    which is to be understood as the result of multiplying through by \(\dl{x}\).
+    Reversing this we get the same ODE in more standard notation:
+    \begin{equation}
+        A(x, y) \diff{y}{x} + B(x, y) = 0.
+    \end{equation}
+    
+    We can always write a linear ODE in the form
+    \begin{equation}
+        \linop y(x) = f(x)
+    \end{equation}
+    where
+    \begin{equation}
+        \linop \coloneqq p_0(x) + p_1(x)\diff{}{x} + \dotsb + p_{n-1}(x) \diff[n - 1]{}{x} + \diff[n]{}{x}
+    \end{equation}
+    is a \defineindex{linear differential operator}.
+    Here \(p_i\) are functions of \(x\) and we are free to choose them in conjunction with \(f\) such that the coefficient of \(\diff[n]{}/{x}\) is 1.
+    
+    If \(f(x) = 0\) for all \(x\) then we say that the ODE is \defineindex{homogenous} and if \(f(x) \ne 0\) for some \(x\) then we say it is \defineindex{inhomogeneous}.
+    %Appendicies
+    %\appendixpage
+    %\begin{appendices}
+    %    \include{}
+    %\end{appendices}
+    
+    \backmatter
+    \renewcommand{\glossaryname}{Acronyms}
+    \printglossary[acronym]
+    \printindex
+\end{document}
