@@ -21,6 +21,17 @@ If you have spotted a mistake, have a suggestion or improvement in mind or think
 ## Courses
 Here are all the courses I took.
 (y) denotes a year long course, (s1) a course that was only in semester 1 and (s2) a course that was only in semester 2.
+
+### Year 4
+* [Introduction to Condensed Matter Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Introduction-to-Condensed-Matter-Physics) (s1)
+* [Relativity, Nuclear, and Particle Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Relativity-Nuclear-and-Particle-Physics) (s1) - composed of three parts:
+    * [Relativity](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Relativity-Nuclear-and-Particle-Physics/Relativity)
+    * [Nuclear Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Relativity-Nuclear-and-Particle-Physics/Nuclear-Physics)
+    * Particle Physics (hasn't started yet)
+* [Methods of Mathematical Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Methods-of-Mathematical-Physics)
+* [Lagrangian Dynamics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Lagrangian-Dynamics) (s1)
+* [Quantum Theory](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Quantum-Theory)  (s1) (see also another student's notes [here](https://github.com/penguinoneshaw/PHYS11019-quantum-theory))
+
 ### Year 3
 * [Electromagnetism](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Electromagnetism) (y)
 * [Principles of Quantum Mechanics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Principles-of-Quantum-Mechanics) (y)
@@ -77,6 +88,7 @@ As the main source of this material I would like to thank the following people w
 * [Prof Alex Murphy](https://www.ph.ed.uk/people/alex-murphy)
 * [Prof Philip Clark](https://www.ph.ed.uk/people/philip-clark)
 * [Prof Judy Hardy](https://www.ph.ed.uk/people/judy-hardy)
+* [Prof Tom Bruce](https://www.eng.ed.ac.uk/about/people/prof-tom-bruce)
 * [Dr David Laurenson](https://www.eng.ed.ac.uk/about/people/dr-david-laurenson)
 * [Prof Rebecca Cheung](https://www.eng.ed.ac.uk/about/people/prof-rebecca-cheung)
 * [Prof Romeel Dave](https://www.ph.ed.uk/people/romeel-dave)
@@ -95,11 +107,17 @@ As the main source of this material I would like to thank the following people w
 * [Prof Alexander Morozov](https://www.ph.ed.uk/people/ross-galloway)
 * [Dr Miguel Martinez-Canales](https://www.ph.ed.ac.uk/people/miguel-martinez-canales)
 * [Dr Mehdi Bouzid](https://mehdibouzid.com/)
+* [Prof Phil Woods](https://www.ph.ed.ac.uk/people/phil-woods)
+* [Dr Ingo Loa](https://www.ph.ed.ac.uk/people/ingo-loa)
+* [Dr Jenni Smillie](https://www.ph.ed.ac.uk/people/jenni-smillie)
+* [Dr Roger Horsley](https://www.ph.ed.ac.uk/people/roger-horsley)
 
 ### Bibliography
+Some of the books I have used to help write these notes:
 * Liebeck, M. _A Concise Introduction To Pure Mathematics_, fourth edition (CRC Press, Boca Raton, 2016)
 * Griffiths, D. J. _Introduction to Electrodynamics_, fourth edition (Cambridge University Press, Cambridge, 2017)
 * Press, W. H. et al. _Numerical Recipes_, third edition (Cambridge University Press, Cambridge, 2007)
 * Riley, K. F. et al. _Mathematical Methods for Physics and Engineering_, third edition (Cambridge University Press, Cambridge, 2006)
 * Halliday, D. _Principles of Physics_, tenth edition (Wiley, Hoboken, 2014)
 * Rex, A. _Finn's Thermal Physics_, third edition (CRC Press, Boca Raton, 2017)
+* Feynman, R. P. et al. _Quantum Mechanics and Path Integrals_ emended edition(Dover Publications, Mineloa, 2010)
