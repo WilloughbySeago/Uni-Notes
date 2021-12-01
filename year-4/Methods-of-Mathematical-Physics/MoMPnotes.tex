@@ -4,6 +4,7 @@
 \usepackage{csquotes}
 \usepackage{etoolbox}
 \usepackage{siunitx}
+\usepackage{cancel}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -61,6 +62,10 @@ noabbrev
 \DeclareMathOperator{\Ai}{Ai}
 \DeclareMathOperator{\sinc}{sinc}
 \DeclareMathOperator{\linop}{\mathcal{L}}
+\DeclarePairedDelimiterX{\innerprod}[2]{\langle}{\rangle}{#1 , #2}
+\newcommand*{\laplaceTransform}{\mathcal{L}}
+\newcommand*{\inverseLaplaceTransform}{\laplaceTransform^{-1}}
+\newcommand*{\hermit}{\dagger}
 
 % Include
 \includeonly{}
@@ -80,6 +85,8 @@ noabbrev
     This course goes hand in hand with the symmetries of quantum mechanics course which teaches algebraic mathematical methods.
     Algebra here referring to abstract algebra, as in groups.
     
+    \part{Complex Analysis}
+    
     \chapter{Infinite Series}
     \epigraph{\enquote{Infinite}, that means an awful lot}{Kristel Torokoff}
     Infinite series are common in physics, for example approximating functions with Taylor series, doing perturbation theory, expanding integrals, the list goes on.
@@ -89,7 +96,7 @@ noabbrev
         \sum_{n=0}^{\infty} a_n
     \end{equation}
     where \(a_n\) are the terms of the series, usually their values are specified by some rule.
-    We can think of \(a_n\) as a function from \(\naturals\) to whatever set of values \(a_n\) may take, that is \((a_n)\) is a sequence.
+    We can think of \(a_n\) as a function from \(\naturals\)\footnote{\(\naturals \coloneqq \{0, 1, 2, \dotsc\}\)} to whatever set of values \(a_n\) may take, that is \((a_n)\) is a sequence.
     Note that starting at \(n = 0\) is just since we need a start point, we could equally well start at \(n = 1\), \(n = 57\), or \(n = -\infty\).
     We are mostly interested in series which converge, which is something we should define properly.
     
@@ -975,7 +982,7 @@ noabbrev
     \end{dfn}
     In this section we are interested in the factorial and continuing it to non-integer values, and even to complex values.
     We mention the double factorial only because it appears in some expansions.
-    It should be noticed that the double factor is usually smaller than the single factorial, despite the name.
+    Note that the double factor is usually smaller than the single factorial, despite the name.
     
     \section{Gamma Function}
     In \cref{sec:asymptotic series:motivating example} we met the integral
@@ -1684,13 +1691,13 @@ noabbrev
         \begin{equation}
             x^2\diff[2]{y}{x} + x\diff{y}{x} + (x^2 - \nu^2)y = 0.
         \end{equation}
-        This has two linearly independent solutions which are defined to be the \define{Bessel functions}\index{Bessel function}, in particular the Bessel function of the first kind, \(J_\nu\)\index{\(J_\nu\)|see{Bessel function}}, and second kind, \(Y_\nu\)\index{\(Y_\nu\)|see{Bessel function}}.
+        This has two linearly independent solutions which are defined to be the \define{Bessel functions}\index{Bessel function}, in particular the Bessel function of the first kind, \(J_\nu\)\index{\(J_\nu\)|see{Bessel function (1st kind)}}, and second kind, \(Y_\nu\)\index{\(Y_\nu\)|see{Bessel function (2nd kind)}}.
         
         An alternative pair of linearly independent functions that solve Bessel's differential equation are the \define{Hankel functions}\index{Hankel function} of the first and second kind:
         \begin{equation}
-            H_\nu^{(1)} = J_\nu + iY_\nu, \qqand H_{\nu}^{(2)} = J_\nu - iY_\nu.
+            H_\nu^{(1)} \coloneqq J_\nu + iY_\nu, \qqand H_{\nu}^{(2)} \coloneqq J_\nu - iY_\nu.
         \end{equation}
-        \index{\(H_\nu^{(1)}\)|see{Hankel function}}\index{\(H_\nu^{(2)}\)|see{Hankel function}}.
+        \index{\(H_\nu^{(1)}\)|see{Hankel function}}\index{\(H_\nu^{(2)}\)|see{Hankel function}}
         
         There are also the modified Bessel functions, which are rescaled Bessel functions, and spherical Bessel functions, which are solutions to Helmholtz's equation, \(\laplacian f = -k^2f\), in spherical coordinates, the radial component of which is of the form of Bessel's differential equation.
         Ultimately the spherical Bessel functions are also rescaled Bessel functions.
@@ -1698,7 +1705,7 @@ noabbrev
     
     \begin{exm}{Hankel Function of the First Kind}{}
         It can be shown that the Hankel functions of the first kind have the integral representation
-        \begin{equation}
+        \begin{equation}\label{eqn:hankel function first time integral}
             H_\nu^{(1)}(x) = \frac{1}{i\pi} \int_{0 + i\varepsilon}^{-\infty + i\varepsilon} \exp\left[ \frac{x}{2}\left( z - \frac{1}{z} \right) \right] \frac{1}{z^{\nu + 1}}\dd{z}
         \end{equation}
         with \(\varepsilon > 0\) and \(x\) large and positive.
@@ -1764,6 +1771,8 @@ noabbrev
         \label{fig:Hankel saddle point method}
     \end{figure}
     
+    \part{Ordinary Differential Equations}
+        
     \chapter{Dirac Delta}
     \epigraph{What on Earth are we talking about?}{Kristel Torokoff}
     \section{Motivation}
@@ -1996,7 +2005,7 @@ noabbrev
     Only when \(m = n\) do we get the integral of \(1/z\) which gives \(2\pi i\) by the residue theorem.
     
     Now make a change of variables to \(z = \e^{ik}\) with \(k \in (-\pi, \pi)\) and we have
-    \begin{equation}
+    \begin{equation}\label{eqn:integral representation kronecker delta}
         \delta_{nm} = \frac{1}{2\pi} \int_{-\pi}^{\pi} \e^{ik(m - n)} \dd{k}.
     \end{equation}
     Note the similarity to the integral representation of \(\delta\), in particular to the integral representation of \(\delta(x - x_0)\), which we will see in the next section.
@@ -2017,7 +2026,7 @@ noabbrev
     This is often referred to as the \defineindex{sifting property} of the Dirac delta.
     Our previous ideas generalise to this shifted Dirac delta.
     In particular
-    \begin{equation}
+    \begin{equation}\label{eqn:integral representation of dirac delta}
         \delta(x - x_0) = \frac{1}{2\pi} \int_{-\infty}^{\infty} \e^{ik(x - x_0)} \dd{k}.
     \end{equation}
     
@@ -2048,9 +2057,10 @@ noabbrev
         \frac{1}{a}\int_{-\infty}^{\infty} \delta(y)f(y) \dd{y} = \frac{f(0)}{a}.
     \end{equation}
     If instead \(a < 0\) then the same change of variables gives
-    \begin{equation}
-        \frac{1}{a}\int_{\infty}^{-\infty} \delta(y)f(y) \dd{y} = -\frac{1}{\abs{a}}\int_{\infty}^{-\infty} \delta(y)f(y) \dd{y} = \frac{1}{\abs{a}}\int_{-\infty}^{\infty} \delta(y)f(y) \dd{y} = \frac{f(0)}{\abs{a}}.
-    \end{equation}
+    \begin{align}
+        \frac{1}{a}\int_{\infty}^{-\infty} \delta(y)f(y) \dd{y} &= -\frac{1}{\abs{a}}\int_{\infty}^{-\infty} \delta(y)f(y) \dd{y}\\
+        &= \frac{1}{\abs{a}}\int_{-\infty}^{\infty} \delta(y)f(y) \dd{y}\\ &= \frac{f(0)}{\abs{a}}.
+    \end{align}
     If \(a = 0\) the integral diverges.
     Hence
     \begin{equation}
@@ -2147,7 +2157,2780 @@ noabbrev
     is a \defineindex{linear differential operator}.
     Here \(p_i\) are functions of \(x\) and we are free to choose them in conjunction with \(f\) such that the coefficient of \(\diff[n]{}/{x}\) is 1.
     
-    If \(f(x) = 0\) for all \(x\) then we say that the ODE is \defineindex{homogenous} and if \(f(x) \ne 0\) for some \(x\) then we say it is \defineindex{inhomogeneous}.
+    If \(f(x) = 0\) for all \(x\) then we say that the ODE is \defineindex{homogeneous} and if \(f(x) \ne 0\) for some \(x\) then we say it is \defineindex{inhomogeneous}.
+    
+    \section{Linear Homogeneous ODEs}
+    Consider the linear homogeneous ODE
+    \begin{equation}
+        y^{(n)} + p_{n-1}y^{(n-1)} + \dotsb + p_1(x)y' + p_0(x)y = 0.
+    \end{equation}
+    The general solution to this is of the form
+    \begin{equation}
+        y(x) = \sum_{i=1}^{n} C_iy_i(x)
+    \end{equation}
+    where \(C_i\) are constants of integration and \(\{y_i\}\) is a set of \(n\) linearly independent functions satisfying the ODE.
+    Note that by linearly independent we mean the only solution to
+    \begin{equation}
+        \sum_{i} \alpha_i y_i(x) = 0
+    \end{equation}
+    is the trivial \(\alpha_i = 0 \forall i\) solution.
+    
+    Differentiating this linear dependence equation \(n - 1\) times we get \(n\) conditions that must be satisfied:
+    \begin{equation}
+        \sum_{i=1}^{n} \alpha_i y_i(x) = 0, \qquad \sum_{i=1}^n \alpha_i y_i'(x) = 0, \quad\dotsc\quad, \sum_{i=1}^{n} \alpha_iy_i^{(n-1)}(x) = 0.
+    \end{equation}
+    From these \(n\) equations we get a non-trivial solution if and only if the \defineindex{Wronskian}, defined as
+    \begin{equation}
+        W(x) = W[y_1(x), y_2(x), \dotsc, y_n(x)] \coloneqq
+        \begin{vmatrix}
+            y_1 & y_2 & \dots & y_n\\
+            y_1' & y_2' & \dots & y_n'\\
+            \vdots & \vdots & \ddots & \vdots\\
+            y_1^{(n-1)} & y_2^{(n - 1)} & \dots & y_n^{(n-1)}
+        \end{vmatrix}
+        ,
+    \end{equation}
+    is non-vanishing for some \(x\).
+    If this is the case then we can invert the system to get \(\alpha_i = 0\).
+    If this is not the case then the vanishing of \(W(x)\) implies the linear dependence of some of the \(y_i\).
+    Note that when we say vanish we mean vanishing for all \(x\), it is fine if the Wronskian vanishes for some specific values of \(x\).
+    
+    Consider a second order linear homogeneous ODE,
+    \begin{equation}
+        u''(x) + p_1(x)u'(x) + p_0(x)u(x) = 0.
+    \end{equation}
+    Let \(u_1\) and \(u_2\) be linearly independent solutions to this.
+    We then have
+    \begin{equation}
+        W(x) = 
+        \begin{vmatrix}
+            u_1 & u_2\\
+            u_1' & u_2'
+        \end{vmatrix}
+        = u_1u_2' - u_2u_1' \ne 0.
+    \end{equation}
+    Now consider the derivative of the Wronskian:
+    \begin{align}
+        W'(x) &= u_1'u_2' + u_1u_2'' - u_2'u_1' - u_2u_1''\\
+        &= u_1u_2'' - u_2u_1''\\
+        &= u_1[-p_1u_2' - p_0u_2] - u_2[-p_1u_1' - p_0u_1]\\
+        &= p_1[-u_1u_2' + u_2u_1'] + p_0[-u_1u_2 + u_1u_2]\\
+        &= p_1W(x).
+    \end{align}
+    So we have derived a first order differential equation for the Wronskian.
+    This is separable and we can solve it by integration:
+    \begin{equation}
+        W' = -p_1W \implies \frac{W'}{W} = -p_1 \implies \ln W(x) = -\int_{x_0}^{x} p_1(z) \dd{z}.
+    \end{equation}
+    It then follows that
+    \begin{equation}
+        W(x) = W(x_0)\exp\left[ -\int_{x_0}^{x} p_1(z) \dd{z} \right].
+    \end{equation}
+    This is called \defineindex{Abel's formula}.
+    It holds more generally for an \(n\)th order linear ODE we have
+    \begin{equation}
+        W'(x) = -p_{n-1}(x)W(x) \implies W(x) = W(x_0)\exp\left[ -\int_{x_0}^{x} p_1(z) \dd{z} \right].
+    \end{equation}
+    
+    We can use Abel's formula to generate a second solution from a first solution for the second order case.
+    Suppose we know \(u_1\) but not \(u_2\).
+    Consider
+    \begin{equation}
+        \diff*{\left( \frac{u_2}{u_1} \right)}{x} = \frac{u_2'}{u_1} - \frac{u_2u_1'}{u_1^2} = \frac{u_1u_2' - u_2u_1'}{u_1^2} = \frac{W(x)}{u_1^2}.
+    \end{equation}
+    We then have
+    \begin{equation}
+        \frac{u_2}{u_1} = \int_{x_0}^{x} \frac{W(z)}{u_1(z)^2} \dd{z}.
+    \end{equation}
+    
+    \begin{exm}{Laguerre's Equation}{}
+        Consider the second order linear differential equation
+        \begin{equation}
+            xy'' + (1 - x)y' + ny = 0
+        \end{equation}
+        for some parameter \(n\).
+        This is known as \defineindex{Laguerre's equation}.
+        The polynomial solutions are the \define{Laguerre polynomials}\index{Laguerre polynomical}, \(L_n\)\index{\(L_n\)|see{Laguerre polynomial}}.
+        Consider the case of \(n = 0\).
+        We then have the simple case of \(L_0(n) = 1\).
+        We can identify \(p_1(x) = (1 - x)/x\) and so the Wronskian is:
+        \begin{equation}
+            W(x) = \exp\left[ -\int_{x_0}^{x} \frac{1 - t}{t} \dd{t} \right] = A\exp[-\ln x + x]
+        \end{equation}
+        from which we see that a second linearly independent solution is
+        \begin{equation}
+            A\int_{x_0}^{x} \frac{\e^{-\ln u + u}}{(1 - u)/u}\dd{u} = \int_{x_0}^{x} \frac{\e^{u}}{1 - u} \dd{u}.
+        \end{equation}
+    \end{exm}
+    
+    \section{Sturm--Liouville Form}
+    The \defineindex{Sturm--Liouville form}, or \defineindex{self-adjoint form}, of a second order linear inhomogeneous  ODE is
+    \begin{equation}
+        \linop(x)y(x) = f(x)
+    \end{equation}
+    where
+    \begin{equation}
+        \linop(x) = \diff{}{x}\left[ p(x) \diff{}{x} \right] + q(x).
+    \end{equation}
+    All second order ODEs can be written in this form.
+    Say we start with
+    \begin{equation}
+        y''(x) + p_1(x)y'(x) + p_0(x)y(x) = g(x).
+    \end{equation}
+    We can then use \(W'(x) = -p_1(x)W(x)\) to write
+    \begin{equation}
+        \diff{}{x}\left[ \frac{1}{W}\diff{}{x} \right] = -\frac{W'}{W^2}\diff{}{x} + \frac{1}{W}\diff[2]{}{x} = \frac{1}{W}\diff[2]{}{x} + \frac{p_1}{W}\diff{}{x}.
+    \end{equation}
+    We then have
+    \begin{equation}
+        W(x)\left[ \diff{}{x}\left( \frac{1}{W(x)}\diff{}{x} \right) + \frac{p_0(x)}{W(x)} \right]y(x) = g(x).
+    \end{equation}
+    From this we can identify
+    \begin{equation}
+        p(x) = \frac{1}{W(x)}, \qquad q(x) = \frac{p_0(x)}{W(x)}, \qqand f(x) = \frac{g(x)}{W(x)}.
+    \end{equation}
+    Note that the Wronskian is only ever defined up to a multiplicative constant and hence these may all differ by a common constant factor and the solutions will be the same.
+    
+    \section{Green's Functions}
+    Consider an inhomogeneous second order linear ODE,
+    \begin{equation}
+        \linop(x) u(x) = f(x)
+    \end{equation}
+    for \(x \in [a, b]\).
+    This has as a solution
+    \begin{equation}
+        u(x) = u_{\mathrm{H}}(x) + u_{\mathrm{P}}(x).
+    \end{equation}
+    Here \(u_{\mathrm{H}}\) is the solution to the homogeneous equation, which we assume are known, and of the form
+    \begin{equation}
+        \sum_{i} \alpha_i \tilde{u}_i(x)
+    \end{equation}
+    where \(\tilde{u}_i\) each individually solve the homogeneous equation and are linearly independent.
+    
+    We wish to find the particular solution, \(u_{\mathrm{P}}\).
+    We do so by constructing a \defineindex{Green's function}, \(G(x, x')\), such that it solves
+    \begin{equation}
+        \linop(x) G(x, x') = \delta(x - x').
+    \end{equation}
+    Notice that the right hand side is not a function and therefore the Green's \enquote{function} is also not really a function.
+    We can think of \(G\) as an \enquote{inverse differential operator} which undoes \(\linop\) at a particular value of \(x = x'\).
+    This allows us to solve the differential equation one point at a time to get the solution by integrating over all points, in particular
+    \begin{equation}
+        \int_{a}^{b} \linop(x) G(x,x') f(x') \dd{x'} = \int_{a}^{b} \delta(x - x') f(x') \dd{x'} = f(x).
+    \end{equation}
+    We can view the second integral as a superposition of perturbations, \(f(x')\), which come together to form the final perturbation \(f(x)\).
+    Since \(\linop(x)\) acts only on \(x\) and we are integrating with respect to \(x'\) we are free to reverse the order of integration and \(\linop(x)\) so we have
+    \begin{equation}
+        \linop(x) \int_{a}^{b} G(x, x') f(x') \dd{x'} = f(x).
+    \end{equation}
+    Thinking about this what we have is some function of \(x\) (after we integrate over \(x'\)) to which we apply \(\linop(x)\) to get \(f(x)\).
+    This is exactly what we require for \(u_{\mathrm{P}}(x)\) and so we identify
+    \begin{equation}
+        u_{\mathrm{P}}(x) = \int_{a}^{b} G(x, x') \dd{x'}.
+    \end{equation}
+    So, combining this with \(u_{\mathrm{H}}\) we have the solution, assuming of course that we can find \(G\).
+    
+    \subsection{Constructing the Green's Function}
+    \subsubsection{Boundary Value Problem}
+    For a boundary value problem we are given the values of \(u(a)\) and \(u(b)\).
+    First start by considering \(x \ne x'\).
+    We have
+    \begin{equation}
+        \linop(x) G(x, x') = \delta(x - x') = 0,
+    \end{equation}
+    this is the homogeneous solution to which we assume the solutions, \(\tilde{u}_i\), are known.
+    We can then construct \(G(x, x')\) for \(x \ne x'\) from these solutions.
+    In particular we define
+    \begin{align}
+        G(x, x') = 
+        \begin{cases}
+            C_1(x')u_1(x), & x < x',\\
+            C_2(x')u_2(x), & x > x'.
+        \end{cases}
+    \end{align}
+    Here \(C_i\) are functions to be determined and \(u_i\) are suitable linear combinations of \(\tilde{u}_i\) chosen to satisfy the boundary conditions.
+    In particular \(u_1(x)\) satisfies the boundary conditions at \(a\) since \(a \le x'\) and \(u_2(x)\) satisfies the boundary conditions at \(b\) since \(b \ge x'\).
+    Notice that the boundary conditions effect our choice of \(G\) so the same equation with different boundary conditions will have different Green's functions.
+    
+    We want \(G\) to be continuous so we choose \(G(x, x')\) to make this true, that is we demand
+    \begin{equation}
+        C_1(x)u_1(x) - C_2(x)u_2(x) = 0.
+    \end{equation}
+    
+    Now consider now the integral
+    \begin{equation}
+        \int_{x' - \varepsilon}^{x' + \varepsilon} \linop(x) G(x, x') \dd{x'} = \int_{x' - \varepsilon}^{x' + \varepsilon} \delta(x - x') \dd{x} = 1
+    \end{equation}
+    for arbitrary \(\varepsilon > 0\).
+    Using the Sturm--Liouville form we then have
+    \begin{equation}
+        \int_{x' - \varepsilon}^{x' + \varepsilon} \left[ \diff{}{x}\left[ p(x) \diff{G}{x} \right] + q(x)G(x, x') \right] \dd{x} = 1.
+    \end{equation}
+    Since \(qG\) is continuous at \(x = x'\) in the limit \(\varepsilon \to -0\) the contribution from this second term vanishes.
+    We then have
+    \begin{equation}
+        \left[ p(x)\diff{G}{x} \right]_{x' - \varepsilon}^{x' + \varepsilon} = 1.
+    \end{equation}
+    Taking \(\varepsilon \to 0\) again we have a discontinuity of \(G'\) at \(x = x'\).
+    Differentiating our earlier definition of \(G\) we have
+    \begin{align}
+        G'(x, x') = 
+        \begin{cases}
+            C_1(x')u_1'(x), & x < x',\\
+            C_2(x')u_2'(x), & x > x'.
+        \end{cases}
+    \end{align}
+    and so at \(x = x'\) we have
+    \begin{equation}
+        C_1(x)u_1'(x) - C_2(x)u_2'(x) = -\frac{1}{p(x)}.
+    \end{equation}
+    
+    This gives us two equations in \(C_i\) which we can solve to get
+    \begin{equation}
+        C_1(x) = \frac{u_2}{p(x)W(x)} = Ku_2(x), \qqand C_2(x) = \frac{u_1(x)}{p(x)W(x)} = Ku_1(x)
+    \end{equation}
+    where the factors of \(K\) occur due to the arbitrary constant in the definition of the Wronskian and we have used \(p(x) = 1/W(x)\).
+    
+    We can write the definition of the Green's function now in one piece with Heaviside step functions:
+    \begin{equation}
+        G(x, x') = K[u_1(x)u_2(x')\theta(x' - x) + u_1(x')u_2(x)\theta(x - x')]
+    \end{equation}
+    where the first term corresponds to \(x < x'\) and the second to \(x > x'\).
+    The particular solution is then the integral of this:
+    \begin{equation}
+        u_{\mathrm{P}}(x) = Ku_2(x) \int_a^x u_1(x') f(x') \dd{x'} + Ku_1(x)\int_x^b u_2(x') f(x') \dd{x'}.
+    \end{equation}
+    Notice that this automatically satisfies the boundary conditions at \(x = a, b\) by construction.
+    We then have the full solution
+    \begin{equation}
+        u(x) = u_{\mathrm{P}}(x) + \sum_{i} \alpha_i \tilde{u}_i(x)
+    \end{equation}
+    where \(\alpha_i\) can be determined from the boundary conditions.
+    
+    \subsubsection{Initial Value Problem}
+    The other type of differential equation problem we encounter is an initial value problem of the form
+    \begin{equation}
+        \ddot{u} + p_1(t)\dot{u} + p_0(t)u = f(t).
+    \end{equation}
+    We assume that \(f\) is some perturbation which only takes effect after \(t = 0\) and therefore for \(t < 0\) \(f(t) = 0\).
+    We will consider the particular case of 
+    \begin{equation}
+        \ddot{u} + u = f(t)
+    \end{equation}
+    with the initial conditions \(u(0) = \dot{u}(0) = 0\).
+    We can interpret this as a driven harmonic oscillator initially at rest at the origin to with the driving force \(f(t)\) applied starting at time \(t = 0\).
+    The solution to the homogeneous equation is
+    \begin{equation}
+        u_{\mathrm{H}}(t) = A\sin t + B \cos t.
+    \end{equation}
+
+    Our Green's function, \(G(t, t')\) therefore represents the effects of the driving force at \(t = t'\).
+    For \(t < t'\) we have \(G(t, t') = 0\), and also \(G'(t, t') = 0\), since the perturbation doesn't take effect until \(t = t'\).
+    For \(t > t'\) we have
+    \begin{equation}
+        G(t, t') = C_1(t')u_1(t) + C_2(t')u_2(t)
+    \end{equation}
+    since we have no further conditions to satisfy so we choose the most general solution.
+    We also have
+    \begin{equation}
+        \diff{G}{t}[t=t'] = \frac{1}{p(t)} \implies C_1u_1' + C_2u_2' = \frac{1}{p}.
+    \end{equation}
+    It follows that
+    \begin{equation}
+        C_1(t) = -\frac{u_2(t)}{p(t) W(t)}, \qqand C_2(t) = \frac{u_1(t)}{p(t)W(t)}.
+    \end{equation}
+    For our example we have \(u_1(t) = \sin t\) and \(u_2(t) = \cos t\), which gives \(W(t) = -1\) and so
+    \begin{equation}
+        C_1(t')= \cos t', \qqand C_2(t') = -\sin t'.
+    \end{equation}
+    Hence for \(t > t'\) our Green's function is
+    \begin{equation}
+        G(t, t') = \cos(t')\sin(t) - \sin(t')\cos(t) = \sin(t - t').
+    \end{equation}
+    Thus, the particular solution is
+    \begin{align}
+        u_{\mathrm{P}}(t) &= \int_{-\infty}^{\infty} G(t, t') f(t') \dd{t'}\\
+        &= \int_{0}^{\infty} G(t, t')f(t') \dd{t'}\\
+        &= \int_{0}^{t} \sin(t - t') f(t') \dd{t'}\label{eqn:driven shm solution}
+    \end{align}
+    which is as far as we can go without knowing \(f\).
+    Note that the limits change from \((-\infty, \infty)\) to \((0, \infty)\) due to the fact that \(f(t') = 0\) for \(t' < 0\) and the second set of limits change from \(t' \in (0, \infty)\) to \(t' \in (0, t)\) since \(G(t - t') = 0\) for \(t < t'\).
+    
+    \subsection{Inhomogeneous Boundary Conditions}
+    Consider the case of a second order linear differential equation, \(\linop y = f\), with boundary conditions given by
+    \begin{equation}
+        \alpha y(a) + \beta y'(a) = A, \qqand \gamma y(b) + \delta y'(b) = B.
+    \end{equation}
+    We can write the solution as
+    \begin{equation}
+        y(x) = y_{p}(x) + \tilde{y}(x)
+    \end{equation}
+    where \(y_p\) is the particular solution given by
+    \begin{equation}
+        y_p = \int_a^b G(x, x')f(x') \dd{x'},
+    \end{equation}
+    which satisfies \(\linop y_p = f\) with the homogeneous boundary conditions
+    \begin{equation}
+        \alpha y_p(x) + \beta y_p'(x) = 0, \qqand \gamma y_p(x) + \delta y_p'(x) = 0.
+    \end{equation}
+    We then have
+    \begin{equation}
+        f = \linop y = \linop (y_p + \tilde{y}) = f + \linop \tilde{y} \implies \linop \tilde{y} = 0.
+    \end{equation}
+    Similarly the boundary conditions are
+    \begin{equation}
+        \alpha \tilde{y}(a) + \beta \tilde{y}'(a) = A, \qqand \gamma \tilde{y}(b) + \delta \tilde{y}'(b) = B.
+    \end{equation}
+    So, \(\tilde{y}\) is the solution to the homogeneous equation with inhomogeneous boundary conditions.
+    
+    \begin{exm}{}{}
+        Consider the forced harmonic oscillator described by
+        \begin{equation}
+            \diff[2]{y}{t} + y(t) = f(t)
+        \end{equation}
+        with boundary conditions
+        \begin{equation}
+            y(0) = A, \qqand y'(0) = B.
+        \end{equation}
+        The solution then follows from the work in this section and the result in \cref{eqn:driven shm solution}
+        \begin{equation}
+            y(t) = \int_{0}^{t} \sin(t - t') f(t') \dd{t'} + \tilde{y}(t)
+        \end{equation}
+        where
+        \begin{equation}
+            \tilde{y}(t) = A\cos t + B\sin t.
+        \end{equation}
+    \end{exm}
+    
+    \chapter{Series Solutions}
+    We have seen how we can obtain a second solution to a homogeneous differential equation given the first solution.
+    We then saw how Green's functions can be used to combine find solutions from this that work with inhomogeneous equations.
+    In this chapter we look at how to find the first solution to the homogenous equation.
+    
+    \section{Classifying Points}
+    \begin{dfn}{Classifying Points}{}
+        Consider the second-order, linear, homogenous ordinary differential equation
+        \begin{equation}
+            u''(x) + p(x)u'(x) + q(x)u(x) = 0.
+        \end{equation}
+        Consider the point \(x = x_0\).
+        Then
+        \begin{itemize}
+            \item if \(p\) and \(q\) are analytic at \(x = x_0\) we say \(x_0\) is an \defineindex{ordinary point}.
+            \item else we say \(x = x_0\) is a \defineindex{singular point}.
+        \end{itemize}
+        Given a singular point, \(x_0\), we classify it further as
+        \begin{itemize}
+            \item \defineindex{regular}, if \((x - x_0)p(x)\) and \((x - x_0)^2q(x)\) are analytic.
+            \item \defineindex{essential} or \define{irregular}\index{irregular|see{essential}} otherwise.
+        \end{itemize}
+    \end{dfn}
+    
+    For finite \(x_0\) we can determine the nature of the point by inspection of \(p\) and \(q\).
+    For \(x_0 = \infty\) we can determine the nature of the point by considering \(z = 1/x\) studying the behaviour as \(z \to 0\).
+    To do so we need to change variables in the whole equation, meaning that we need to change our derivatives according to
+    \begin{equation}
+        \diff{}{x} = \diff{z}{x}\diff{}{z} = -z^2\diff{}{z}
+    \end{equation}
+    and
+    \begin{equation}
+        \diff[2]{}{x} = \diff{z}{x}\diff{}{z}\left[ -z^2\diff{}{z} \right] = 2z^3\diff{}{z} + z^4\diff[2]{}{z}.
+    \end{equation}
+    Defining \(Y(z) = y(1/z)\) our differential equation becomes
+    \begin{equation}
+        Y''(z) + \left[ \frac{2}{z} - \frac{p(1/z)}{z^2} \right]Y'(z) + \frac{q(1/z)}{z^4}Y(z) = 0.
+    \end{equation}
+    
+    Note that singularities in a differential equation don't necessarily imply singularities in the solution, for example
+    \begin{equation}
+        y''(x) - \frac{3}{x}y'(x) + \frac{3}{x^2}y(x) = 0
+    \end{equation}
+    has a singularity at \(x = 0\), but the solution, \(y(x) = Ax + Bx^3\) does not.
+    
+    \begin{exm}{}{}
+        Consider the simple harmonic oscillator described by
+        \begin{equation}
+            y''(x) + \omega^2 y(x) = 0.
+        \end{equation}
+        We identify \(p(x) = 0\) and \(q(x) = \omega^2\)
+        There are no singularities at finite \(x\).
+        For the point at infinity our equation becomes
+        \begin{equation}
+            Y''(z) + \frac{2}{z}Y'(z) + \frac{\omega^2}{z^4}Y(z) = 0.
+        \end{equation}
+        This has an essential singularity at \(z = 0\) since \(z^2(\omega^2/z^4) = \omega^2/z^2\) is not analytic at zero.
+    \end{exm}
+    
+    \begin{exm}{}{}
+        Consider \defineindex{Legendre's equation}
+        \begin{equation}
+            (1 - x^2)y''(x) - 2xy'(x) + n(n + 1)y(x) = 0.
+        \end{equation}
+        This often occurs with \(x = \cos\vartheta\) in \defineindex{Laplace's equation}, \(\laplacian f = 0\), in spherical polar coordinates.
+        We rewrite this in the conventional form dividing through by \(1 - x^2\) to give
+        \begin{equation}
+            y''(x) - \frac{2x}{1 - x^2}y'(x) + \frac{n(n + 1)}{1 - x^2}y(x) = 0.
+        \end{equation}
+        From this we identify \(p(x) = -2x/(1 - x^2)\) and \(q(x) = n(n+1)/(1 - x^2)\).
+        Clearly this has singularities at \(x = \pm 1\) and since \((x \mp 1)p(x) = 2x/(x \pm 1)\) is analytic at \(x = \pm 1\), and similarly, \((x \mp 1)q(x)\) is analytic, this is a regular singular point.
+        
+        For the point at infinity our differential equation becomes
+        \begin{equation}
+            Y''(z) + \frac{2z}{z^2 - 1} Y'(z) + \frac{n(n + 1)}{z^2(z^2 - 1)} = 0
+        \end{equation}
+        which has a regular singular point at \(z = 0\), so \(x = \infty\) is a regular singular point.
+    \end{exm}
+    
+    It can be shown that every ODE has at least one singular point.
+    Further if an ODE has exactly one singular point at \(x = a\) then the ODE must be
+    \begin{equation}
+        y''(x) + \frac{2}{x - a} y'(x) = 0
+    \end{equation}
+    which has the solution
+    \begin{equation}
+        y(x) = A + \frac{B}{x - a}.
+    \end{equation}
+    
+    \section{Ansatz (Taylor's Version)}\label{sec:Anzatz (Taylor's Version)}
+    Consider the differential equation
+    \begin{equation}
+        u''(x) + p(x)u'(x) + q(x)u(x) = 0.
+    \end{equation}
+    Suppose \(x = x_0\) is a singular point.
+    Then the ansatz
+    \begin{equation}
+        u(x) = \sum_{m=0}^{\infty} c_m(x - x_0)^{m}
+    \end{equation}
+    will converge in a region up to the nearest singular point.
+    
+    The general method is then to substitute this ansatz in and equate coefficients to get a recursion relation for \(c_m\).
+    We then use the boundary conditions to get the first values of \(c_m\) and the others follow from the recurrence relation.
+    This method is best demonstrated by an example.
+    
+    Consider Legendre's differential equation
+    \begin{equation}
+        (1 - x^2)u''(x) - 2xu'(x) + n(n + 1)u(x) = 0.
+    \end{equation}
+    We wish to solve this at \(x = 0\), which is an ordinary point.
+    Suppose that
+    \begin{equation}
+        u(x) = \sum_{m=0}^{\infty} c_m(x) x^m.
+    \end{equation}
+    Then
+    \begin{equation}
+        u'(x) = \sum_{m=0}^{\infty} mc_mx^{m-1}, \qqand u''(x) = \sum_{m=0}^{\infty} m(m - 1)c_mx^{m - 2}.
+    \end{equation}
+    Substituting this into our differential equation we have
+    \begin{align}
+        0 &= (1 - x^2) \sum_{m=0}^{\infty} m(m - 1)c_mx^{m-2} - 2x\sum_{m=0}^{\infty} mc_mx^{m-1}\notag\\
+        &\qquad+ n(n + 1) \sum_{m=0}^{\infty} c_mx^m\\
+        &= \sum_{m=0}^{\infty} m(m - 1)c_mx^{m-2} - \sum_{m=0}^{\infty} m(m - 1)c_mx^{m} + \sum_{m=0}^{\infty}2mc_mx^{m}\notag\\
+        &\qquad+ \sum_{m=0}^{\infty}n(n+1) c_mx^m.
+    \end{align}
+    Now consider the first sum, first notice that for \(m = 0, 1\) this term is zero, so we can change the limits on the sum to
+    \begin{equation}
+        \sum_{m=0}^{\infty} m(m - 1) c_mx^{m-2} = \sum_{m=2}^{\infty} m(m - 1) c_mx^{m-2}.
+    \end{equation}
+    We can then re-index to \(m' = m - 2\) giving
+    \begin{equation}
+        \sum_{m=2}^{\infty} m(m-1)c_mx^{m-2} = \sum_{m'=0}^{\infty} (m' + 2)(m' + 1)c_{m' + 2}x^{m'}.
+    \end{equation}
+    Now \(m'\) is just a dummy variable so we are free to rename it to \(m\) giving
+    \begin{equation}
+        \sum_{m=0}^{\infty} m(m - 1) c_{m}x^{m-2} = \sum_{m=0}^{\infty} (m + 1)(m - 1)c_{m+2}x^{m}.
+    \end{equation}
+    Putting this back in to the differential equation and combining the sums we get
+    \begin{align}
+        0 &= \sum_{m=0}^{\infty} [c_m(n(n + 1) - m - m^2) + c_{m+2}(m + 1)(m + 2)]x^m.
+    \end{align}
+    This must be true for all \(x\) (in the region of convergence), and therefore, since \(x^m\) and \(x^{m'}\) are linearly independent for \(m \ne m'\), we must have that the square bracket is zero.
+    Hence
+    \begin{equation}
+        c_{m+2} = \frac{m(m + 1) - n(n + 1)}{(m + 1)(m + 2)} c_m = \frac{(m - n)(m + n + 1)}{(m + 2)(m + 1)}.
+    \end{equation}
+    This gives a recurrence relation for \(c_m\).
+    Since it relates \(c_m\) and \(c_{m+2}\) we need two starting values, \(c_0\) and \(c_1\), to specify all \(c_m\).
+    We get these values from the boundary conditions.
+    Once we have found them we can use the recurrence relation to write the solution as
+    \begin{align}
+        u(x) &= \sum_{m=0}^{\infty} c_mx^m\\
+        &= c_0\left[ 1 + \frac{c_2}{c_0}x^2 + \frac{c_4}{c_6}x^{4} + \dotsb \right] c_1\left[ x + \frac{c_3}{c_1}x^3 + \frac{c_5}{c_1}x^5 + \dotsb \right]\\
+        &= c_0 \left[ 1 - n(n + 1)\frac{x^2}{2!} + n(n + 1)(n - 2)(n + 3)\frac{x^4}{4!} + \dotsb \right]\\
+        &\times c_1\left[ x - (n - 1)(n + 2)\frac{x^3}{3!} + (n - 1)(n + 2)(n - 3)(n + 4)\frac{x^5}{5!} + \dotsb \right].
+    \end{align}
+    We separate into even and odd order terms giving two independent solutions.
+    It can be shown that this converges for \(\abs{x} < 1\) using the ratio test.
+    
+    If \(n\) is an even (odd) positive integer then the series of even (odd) order terms terminates at \(x^{n}\).
+    The solutions are then polynomials, and we call them the \define{Legendre polynomials}\index{Legendre polynomial}, denoting them \(P_n\).
+    The first few Legendre polynomials are
+    \begin{alignat}{3}
+        P_0(x) &= 1, \qquad & P_2(x) &= \frac{1}{2}(3x^2 - 1),\\
+        P_1(x) &= x, \qquad & P_3(x) &= \frac{1}{2}(5x^3 - 3x).
+    \end{alignat}
+    
+    \section{Frobenius Expansion About a Regular Singular Point}
+    \epigraph{What is the world coming to? Thank goodness we have maths to keep us sane}{Kristel Torokoff on the impending COP26 climate conference}
+    For a regular singular point Taylor's ansatz fails.
+    Instead we use the modified Frobenius series
+    \begin{equation}
+        y(x) = (x - x_0)^{\alpha} \sum_{m=0}^{\infty} c_m(x - x_0)^m
+    \end{equation}
+    with \(c_0 \ne 0\).
+    
+    Consider the ordinary differential equation
+    \begin{equation}
+        u''(x) + P(x)u'(x) + Q(x)u(x) = 0
+    \end{equation}
+    with an regular point at \(x_ = 0\), for simplicity, we can always do the same at any regular point.
+    Since this is a regular point we know that \(xP(x)\) and \(x^2Q(x)\) are regular, meaning that we can expand \(P\) and \(Q\) in Laurent series starting from \(x^{-1}\) and \(x^{-2}\) respectively:
+    \begin{equation}
+        P(x) = \sum_{m=-1}^{\infty} P_mx^m, \qqand Q(x) = \sum_{m=-2}^{\infty} Q_mx^{m}.
+    \end{equation}
+    The Frobenius ansatz is then
+    \begin{equation}
+        u(x) = x^\alpha \sum_{n=0}^{\infty} a_nx^n
+    \end{equation}
+    with \(a_0 \ne 0\) and \(\alpha \in \reals\).
+    We need to determine the values of \(\alpha\) and \(a_i\).
+    We start by computing the derivatives
+    \begin{align}
+        u'(x) &= \alpha x^{\alpha-1}\sum_{n=0}^{\infty}  + x^\alpha \sum_{n=1}^{\infty} a_nnx^{n-1}\\
+        u''(x) &= \alpha(\alpha - 1)x^{\alpha - 2} \sum_{n=0}^{\infty} a_nx^n + 2\alpha x^{\alpha - 1} \sum_{n=1}^{\infty} a_n nx^{n-1}\notag\\
+        &\qquad+ x^\alpha \sum_{n=2}^{\infty} a_nn(n - 1) x^{n-2}.
+    \end{align}
+    Here we have written the sums such that the first term is nonzero.
+    
+    Substituting this into our differential equation, as well as the Laurent series for \(P\) and \(Q\) we get
+    \begin{align}\label{eqn:sub in frobenius}
+        0 &= \sum_{n=0}^{\infty} \bigg[ a_n(a + n)(\alpha + n - 1)x^{n + \alpha - 2} + \sum_{m=-1}^{\infty} P_m(\alpha + n)a_nx^{m + n + \alpha - 1} \notag\\
+        &\qquad+ \sum_{m=-2}^{\infty} Q_ma_n x^{m + n + \alpha} \bigg].
+    \end{align}
+    From this we identify the coefficient of the \(x^{\alpha - 2}\) term, which must be zero as the coefficients of \(x^i\) must be zero in order for the whole sum to be zero.
+    This gives us
+    \begin{align}
+        0 = a_0\alpha(\alpha - 1) + P_{-1}\alpha a_0 + Q_{-2}a_0.
+    \end{align}
+    Since \(a_0 \ne 0\) by our original assumption we therefore have
+    \begin{equation}
+        \alpha(\alpha - 1) + P_{-1}\alpha + Q_{-2} = 0.
+    \end{equation}
+    This is a quadratic equation for \(\alpha\), we call this the \defineindex{indicial equation}.
+    Solving it we find two roots
+    \begin{equation}
+        r_{1,2} = -\frac{P_{-1} - 1}{2} \pm \sqrt{\frac{(P_{-1} - 1)^2}{4} - Q_{-2}}.
+    \end{equation}
+    From this we can write the indicial equation as
+    \begin{equation}
+        \alpha^2 + \alpha(P_{-1} - 1) + Q_{-2} = (\alpha - r_1)(\alpha - r_2) = \alpha^2 - \alpha(r_1+r_2) + r_1r_2.
+    \end{equation}
+    Which gives us
+    \begin{equation}
+        r_1 + r_2 = 1 - P_{-1}, \qqand r_1 r_2 = Q_{-2}.
+    \end{equation}
+    Without loss of generality we assume that \(\Re(r_1) \ge \Re(r_2)\).
+    
+    \subsection{Fuch's Theorem}
+    \epigraph{I'll show you the proof, otherwise it looks like thermodynamics, just a postulate}{Kristel Torokoff}
+    \epigraph{I don't think [Fuch] would survive a modern physics class, fortunately when he was around people where much more innocent}{Kristel Torokoff}
+    
+    \begin{thm}{Fuch's Theorem}{}
+        In the notation of the last section if \(r_1 - r_2 \notin \integers\) then there will be two linearly independent solutions of the the form of Frobenius' ansatz.
+        If \(r_1 - r_2 \in \integers\) then most of the time there will be one solution of the form of Frobenius' ansatz and the other solution will be of the form
+        \begin{equation}
+            u_2(x) = \ln(x - x_0)u_1(x) + C(x)(x - x_0)^\beta,
+        \end{equation}
+        although exceptionally there will still be two solutions of the form of Frobenius' ansatz.
+        \begin{proof}
+            Our starting point is \cref{eqn:sub in frobenius}:
+            \begin{align}
+                0 &= \sum_{n=0}^{\infty} \bigg[ a_nx^{n+\alpha-2}(\alpha + n)(\alpha + n - 1) + \sum_{m=-1}^{\infty} P_m(\alpha + n)a_nx^{m + n + \alpha - 1}\notag\\
+                &\qquad+ \sum_{m=-2}^{\infty} Q_ma_nx^{m+n-\alpha} \bigg].
+            \end{align}
+            Now consider the coefficient of \(x^{N + \alpha - 2}\), where \(m\) and \(n\) can take any value so long as the resulting power of \(x\) is \(N + \alpha - 2\).
+            As usual this coefficient must be zero.
+            We then have
+            \begin{align}
+                0 &= a_N(\alpha + N)(\alpha + N - 1) + \sum_{n=0}^{N - 1}\sum_{m=-1}^{\infty} P_{N - n - 1}(\alpha + n)a_n\notag\\
+                &\qquad+ P_{-1}(\alpha + N)a_N + \sum_{n=0}^{N - 1}\sum_{m=-2}^{\infty} Q_{m - 2 - n} a_n + Q_{-2}a_N.
+            \end{align}
+            Rearranging this to collect \(a_N\) and \(a_n\) we have
+            \begin{multline}
+                a_N\underbrace{[(N + \alpha)(N + \alpha - 1) + P_{-1}(N + \alpha) + Q_{-2}]}_{\xi}\\
+                = -\sum_{n=0}^{N-1}[a_n(n + \alpha)P_{N - n - 1} + \alpha_nQ_{N - n - 2}].
+            \end{multline}
+            Now, supposing that the first term in square brackets, \(\xi\), is nonzero we get a recurrence relation for \(a_N\) in terms of \(a_0, \dotsc, a_{N - 1}\).
+            To find the recurrence relation expand \(\xi\):
+            \begin{align}
+                \xi &= N^2 + 2N\alpha - N + \alpha^2 - \alpha + P_{-1}N + P_{-1}\alpha + Q_{-2}\\
+                &= N^2 + 2N\alpha - N + NP_{-1}\\
+                &= N(N + 2\alpha - (1 - P_{-1}1))\\
+                &= N(N + 2\alpha - (r_1 + r_2))
+            \end{align}
+            where we have used \(\alpha^2 - \alpha + \alpha P_{-1} + Q_{-2} = 0\), which is the indicial equation, and the result \(r_1 + r_2 = 1 - P_{-1}\).
+            
+            If \(\alpha = r_1\), where we assume without loss of generality that \(\Re(r_1) \ge \Re(r_2)\), then we have
+            \begin{equation}
+                \xi = N(N + 2r_1 - r_1 - r_2) = N(N + r_1 - r_2)
+            \end{equation}
+            We then have \(\Re(\xi) > 0\), since \(N > 0\) and \(\Re(r_1 - r_2) \ge 0\).
+            We therefore have \(\xi \ne 0\).
+            If instead \(\alpha = r_2\) then
+            \begin{equation}
+                \xi = N(N + 2r_2 - r_1 - r_2) = N(N - (r_1 - r_2)),
+            \end{equation}
+            which will be zero when \(r_1 - r_2 = N \in \integers\).
+            Therefore if \(r_1 - r_2 \ne N\) we can find a recurrence relation for \(a_n\).
+            This must occur for all \(N\) in order to find a solution and therefore we require that \(r_1 - r_2 \notin \naturals\) to guarantee two solutions of the Frobenius form.
+            
+            Suppose then that \(r_1 - r_2 = N\), so the second solution is not of the form of Frobenius' ansatz.
+            From Abel's formula we therefore have\footnote{we use the notation \(\int^x\) here to denote an integral with upper bound \(x\) and some arbitrary lower bound \(x_0 < x\) since all of this is defined only up to a constant.}
+            \begin{equation}
+                u_2 = u_1 \int^x \frac{W(t)}{u_1^2(t)} \dd{t}
+            \end{equation}
+            where \(W\) is the Wronskian given by
+            \begin{equation}
+                W(t) = \exp[-\int^{t} P(z) \dd{z}] = \exp[-\int^t \sum_{m=-1} P_mz^m \dd{z}].
+            \end{equation}
+            We can write \(u_1\) as
+            \begin{equation}
+                u_1(x) = x^{r_1} \sum_{n=0}^{\infty} a_nx^n.
+            \end{equation}
+            Using this we have
+            \begin{align}
+                \frac{u_2(x)}{u_1(x)} &= \int^x \frac{\exp[-\int^t [P_{-1}z^{-1} + P_0 + P_1z + \dotsb]]}{t^{2r_1}[a_0 + a_1 t + a_2 t^2 + \dotsb]^2} \dd{t}\\
+                &= \int^x \frac{\exp[-(P_1\ln t + P_0t + P_1t^2/2 + \dotsb)]}{t^{2r_1}\left( \sum_{n=0}^{\infty} a_nt^n \right)^2} \dd{t}\\
+                &= \int^x t^{-2r_1-P_{-1}} \sum_{n=0}^{\infty} b_nt^n \dd{t}
+            \end{align}
+            where we take everything apart from \(\exp[-P_{-1}\ln t]/t^{2r_1}\) and define a new series.
+            Using \(r_1 + r_2 = 1 - P_{-1}\) and \(r_1 - r_2 = N\) (which is our current assumption) we can write \(2r_1 + P_{-1} = N + 1\), which gives us
+            \begin{align}
+                \frac{u_2(x)}{u_1(x)} &= \int^x t^{-1-N} \sum_{n=0}^{\infty} b_nt^n \dd{t}\\
+                &= \int^x \sum_{n=0}^{\infty} b_n t^{n-N-1} \dd{t}\\
+                &= \int^x b_Nt^{-1} + t^{-1-N} \sum_{\stackrel{n-0}{n\ne N}}^{\infty} b_nt^n \dd{t}\\
+                &= b_N\ln x - x^{-N}\sum_{n-0}^{\infty} c_n x^n
+            \end{align}
+            where we have taken the last term of the integral and defined a new series.
+            Defining \(C(x) = -\sum_{n=0}^{\infty} c_nx^n\) and \(\beta = -N\) this is of the desired form.
+        \end{proof}
+    \end{thm}
+    
+    \begin{exm}{}{}
+        Consider Bessel's equation,
+        \begin{equation}
+            x^2y'' + xy' + (x^2 - n^2)y = 0.
+        \end{equation}
+        There is a regular singular point at \(x = 0\).
+        Substituting in
+        \begin{equation}
+            y(x) = x^\alpha\sum_{m=0}^{\infty} c_mx^m
+        \end{equation}
+        we get
+        \begin{multline}
+            0 = \sum_{m=0}^{\infty} [(\alpha + m)(\alpha + m - 1)c_mx^{\alpha + m} + (\alpha + m)c_mx^{\alpha + m}\\
+            - n^2 c_mx^{\alpha + m} + c_mx^{\alpha + m + 2}].
+        \end{multline}
+        The final sum is zero for \(m = 0, 1\).
+        Setting the coefficients of \(x^\alpha\) and \(x^{\alpha + 1}\) to zero gives us the indicial equations
+        \begin{align}
+            c_0[\alpha^2 - n^2] &= 0 \implies c_0 = 0 \text{ or } \alpha = \pm n,\\
+            c_1[(\alpha + 1)^2 - n^2] &= 0 \implies c_1 = 0 \text{ or } \alpha = -1 \pm n.
+        \end{align}
+        We defined the Frobenius ansatz such that \(c_0 \ne \) and therefore \(\alpha = \pm n \ne -1 \pm n\) which means \(c_1 = 0\).
+        Alternatively we could demand that \(c_1 \ne 0\), and we would get the same series solution just shifted by 1.
+        
+        For \(m \ge 2\) we find the recurrence relation
+        \begin{equation}
+            c_m[(\alpha + m)^2 - n^2] + c_{m-2} = 0.
+        \end{equation}
+        Since \(c_1 = 0\)  this gives \(c_m = \) for all odd \(m\), for even \(m\) we have
+        \begin{equation}
+            c_{m+2} = -\frac{c_m}{(m + 2)(m + 2 + 2\alpha)}
+        \end{equation}
+        where \(\alpha = \pm n\).
+        
+        If \(n\) is not an integer then we get two independent series solutions corresponding to \(\alpha = \pm n\).
+        If \(n\) is an integer then we take \(\alpha = \abs{n}\), otherwise the recurrence relation will diverge for \(m = -2 + 2\abs{n}\).
+        We therefore only get one independent solution.
+        
+        Consider the case of \(n\) being a positive integer.
+        We therefore take \(\alpha = n\) and we find that the first few terms in the series are
+        \begin{align}
+            c_2 &= - \frac{1}{2\cdot 2 (1 + n)}c_0,\\
+            c_4 &= -\frac{1}{4\cdot 2(2 + n)}c_2 = \frac{1}{2^4\cdot 2(2 + n)(1 + n)}c_0\\
+            c_6 &= -\frac{1}{6\cdot 2(3 + n)}c_4 = -\frac{1}{2^6\cdot 6 (3 + n)(2 + n)(1 + n)}c_0.
+        \end{align}
+        It doesn't take much to convince us from here that
+        \begin{equation}
+            c_{2p} = (-1)^p \frac{n!}{2^{2p}p!(n + p)!}c_0.
+        \end{equation}
+        We therefore have the solution
+        \begin{equation}
+            y_1(x) = J_n(x) = \sum_{p=0}^{\infty} \frac{(-1)^p}{p!(p + n)!} \left( \frac{x}{n} \right)^{n+2p}
+        \end{equation}
+        where we chose \(c_0 = 1/(2^nn!)\).
+        This equation defines the \define{Bessel functions of the first kind}\index{Bessel function!first kind}.
+        
+        We can find a second solution, for simplicity we do so only for \(n = 0\).
+        We then have
+        \begin{equation}
+            J_0(x) = 1 - \frac{x^2}{4} + \frac{x^4}{64} - \order(x^6).
+        \end{equation}
+        We have \(p(x) = 1/x\) and so the Wronskian is
+        \begin{equation}
+            W(x) = \exp\left[ -\int^x t^{-1} \dd{t} \right] = -\e^{-\ln x} = \frac{1}{x}.
+        \end{equation}
+        We therefore have
+        \begin{align}
+            y_2(x) &= y_1(x) \int^x \frac{1}{t}\frac{1}{y_1^2(t)} \dd{t}\\
+            &= J_0(x) \int^x \frac{1}{t}\left[ 1 - \frac{t^2}{4} + \frac{t^4}{64} + \dotsb \right]^{-2}\dd{t}\\
+            &= J_0(x) \int^x \frac{1}{t} \left[ 1 = \frac{t^2}{2} + \frac{5t^4}{32} + \dotsb \right] \dd{t}\\
+            &= J_0(x) \left[ \ln x + \frac{x^2}{4} + \frac{5x^{4}}{128} + \dotsb \right].
+        \end{align}
+    \end{exm}
+    
+    \section{Expansion About an Irregular Singular Point}
+    In general there is no exact solution about an irregular, or essential, singular point.
+    There is, however, a common method for finding an approximate solution.
+    
+    \subsection{Normal Form}
+    Consider a second order ODE of the form
+    \begin{equation}
+        u'' + p_1u' + p_0u = 0.
+    \end{equation}
+    Consider the change of variables \(u = vw\).
+    We have \(u' = v'w + vw'\) and \(u'' = v''w + 2v'w' + vw''\).
+    Now assuming that \(v \ne 0\), which is an acceptable assumption as \(v = 0\) implies \(u = 0\), which is not an interesting solution, we can write the differential equation as
+    \begin{equation}
+        w'' + \left( 2\frac{v'}{v} + p_1 \right)w' + \left( \frac{v''}{v} + p_1\frac{v'}{v} + p_0 \right)w = 0.
+    \end{equation}
+    
+    Choosing
+    \begin{equation}
+        v(x) = \sqrt{W(x)} = \exp\left[ -\frac{1}{2}\int^x p_1(x')\dd{x'} \right]
+    \end{equation}
+    we see that \(2v'/v + p_1 = 0\) and so our differential equation becomes
+    \begin{equation}
+        w''(x) + Q(x)w(x) = 0
+    \end{equation}
+    with
+    \begin{equation}
+        Q(x) = p_0(x) - \frac{1}{2}p_1'(x) - \frac{1}{4}p_1^2(x).
+    \end{equation}
+    This is called the \defineindex{normal form} of the differential equation, also sometimes called the \define{Schr\"odinger form}\index{Schrodinger form@Schr\"odinger form} for the similarity with the time independent Schr\"odinger equation,
+    \begin{equation}
+        \psi'' + \frac{2m}{\hbar^2}(E - V(x))\psi = 0.
+    \end{equation}
+    
+    \section{WKB Method}
+    The Wentzel--Kramers--Brillouin method, commonly known as the WKB\glossary[acronym]{WKB}{Wentzel--Kramers--Brillouin} method, or alternatively as the JWKB or WKBJ method, with J standing for Jeffreys, or as the Liouville-Green method, is a way of approximating a solution for a differential equation about an irregular point.
+    
+    We start by writing the differential equation,
+    \begin{equation}
+        u''(z) + p_1(z)u'(z) + p_0(z)u(z) = 0
+    \end{equation}
+    in its normal form,
+    \begin{equation}
+        w''(z) + Q(z)w(z) = 0.
+    \end{equation}
+    where
+    \begin{equation}
+        u(z) = w(z)\exp\left[ -\frac{1}{2}\int^z p_1(t) \dd{t} \right],
+    \end{equation}
+    and
+    \begin{equation}
+        Q(z) = p_(z) - \frac{1}{2}p_1'(z) - \frac{1}{4}p_1^2(z).
+    \end{equation}
+    
+    We look for a solution of the form
+    \begin{equation}
+        w(z) = a(z) \e^{i\Theta(z)}.
+    \end{equation}
+    
+    Suppose that \(Q\) is constant.
+    Then \(a\) will be constant and \(\Theta(z) = \pm \sqrt{Q}z\).
+    
+    Suppose instead that \(Q\) is slowly varying.
+    Then \(a\) will also be slowly varying.
+    We then have
+    \begin{equation}
+        w' = [a' + ia\Theta']\e^{i\Theta}, \qqand w'' = [a'' + 2ia\Theta' + ia\Theta'' - a\Theta'^2]\e^{i\Theta}.
+    \end{equation}
+    Substituting this into our differential equation we have
+    \begin{equation}
+        [a'' + 2ia'\Theta' + ia\Theta'' + (Q - \Theta'^2)]\e^{i\Theta} = 0.
+    \end{equation}
+    If we impose the conditions that \(Q - \Theta'^2 = 0\) and \(a'' + 2ia'\Theta' + ia\Theta'' = 0\) then for \(Q > 0\) we have
+    \begin{equation}
+        \Theta(z) = \pm \int^z \sqrt{Q(t)}\dd{t}.
+    \end{equation}
+    Since \(a\) is slowly varying we have \(a'' \approx 0\) and so we have
+    \begin{equation}
+        \frac{2a'}{a} + \frac{\Theta''}{\Theta'} = 0 \implies 2a'\Theta' + a\Theta' = 0 \implies a^2\Theta = \text{constant},
+    \end{equation}
+    which follows by differentiating \(a^2\Theta\) and dividing through by \(a\).
+    From this we have
+    \begin{equation}
+        a(z) \propto \frac{1}{\sqrt{\Theta'}} \propto Q^{1/4}.
+    \end{equation}
+    Since the integral of \(\sqrt{Q}\) will be proportional to \(1/\sqrt{Q}\).
+    We therefore have
+    \begin{equation}
+        w(z) \approx Q^{-1/4} \left( A \exp\left[ i\int^z \sqrt{Q(t)} \dd{t} \right] + B \exp\left[ -i\int^z \sqrt{Q(t)} \dd{t} \right] \right)
+    \end{equation}
+    for constants \(A\) and \(B\).
+    
+    If \(Q < 0\) then we can derive a similar result using \(\e^{\Theta(z)}\) instead of \(\e^{i\Theta(z)}\).
+    
+    The WKB method only works if we have an essential singularity at infinity.
+    In general as \(z \to \infty\) there are three cases of asymptotic behaviour.
+    Suppose that \(Q \to k\) then if \(k = 0\) the solution goes as \(w(z) = Az + B\), since \(w'' = 0\) in this case.
+    If \(k > 0\) then
+    \begin{equation}
+        w(z) = A\sin(\sqrt{k}z) + B\cos(\sqrt{k}z)
+    \end{equation}
+    which is oscillating.
+    If \(k < 0\) then
+    \begin{equation}
+        w(z) = A\e^{\sqrt{\abs{k}}z} + B\e^{-\sqrt{\abs{k}}z}.
+    \end{equation}
+    
+    \begin{exm}{}{}
+        Consider Bessel's equation,
+        \begin{equation}
+            y''(x) + \frac{1}{x}y'(x) + \left( 1 - \frac{n^2}{x^2} \right)y(x) = 0.
+        \end{equation}
+        This has an essential singularity at infinity.
+        It can be shown that by setting \(y = u/\sqrt{x}\) we get the normal form
+        \begin{equation}
+            w''(x) + \left[ 1 - \left( \frac{n^2}{x^2} - \frac{1}{4x^2} \right) \right]w(x) = 0.
+        \end{equation}
+        From which we see
+        \begin{equation}
+            Q(x) = 1 - \left( \frac{n^2}{x^2} - \frac{1}{4x^2} \right).
+        \end{equation}
+        We make the ansatz that \(w(x) = u(x)\e^{i\Theta(x)}\) with
+        \begin{align}
+            \Theta(x) &= \pm \int^x \sqrt{Q(t)}\dd{t}\\
+            &= \pm \int^x \left( 1 + \frac{1/4 - n^2}{t^2} \right)^{1/2} \dd{t}.
+        \end{align}
+        We then have
+        \begin{equation}
+            u(x) = \frac{1}{\sqrt{x}} \left( 1 + \frac{1/4 - n^2}{x^2} \right)^{-1/4}(A\e^{ix} + B\e^{-ix})
+        \end{equation}
+        where we have used the fact that as \(x \to \infty\) we have \(Q \to 1 > 0\) and so we have oscillating behaviour.
+        The asymptotic behaviour is then
+        \begin{equation}
+            u(x) \sim \frac{1}{\sqrt{x}} (A\e^{ix} + B\e^{-ix}).
+        \end{equation}
+    \end{exm}
+    
+    \chapter{Special Functions}
+    \epigraph{\enquote{It can easily be shown}. LIARS! It's not easy at all.}{Kristel Torokoff}
+    In this chapter we will discuss a few special functions that often appear, usually as the solution to various differential equations.
+    We will start with Legendre's polynomials to develop our methods and then briefly cover other special functions.
+    
+    \section{Legendre Polynomials}
+    \epigraph{For once there is logic.}{Kristel Torokoff}
+    \epigraph{The first step includes magic.}{Kristel Torokoff}
+    Legendre's differential equation is
+    \begin{equation}
+        (1 - x^2)u'' + 2xu' + n(n + 1)u = 0.
+    \end{equation}
+    We saw in \cref{sec:Anzatz (Taylor's Version)} that about the ordinary point \(x = 0\) the solution has a series expansion \(u(x) = \sum_{m=0}^{\infty} c_mx^m\) where
+    \begin{equation}
+        c_{m+2} = \frac{(m - n)(m + n - 1)}{(m + 2)(m + 1)}c_m.
+    \end{equation}
+    
+    The Legendre polynomials are the polynomial solutions to Legendre's differential equation for positive integer \(n\).
+    Recall that the series splits into two, odd and even series, and that if \(n\) is an even (odd) positive integer then the even (odd) series terminates at some finite power giving a polynomial.
+    We denote the resulting polynomial by \(P_n\)\index{\(P_n\)|see{Legendre polynomial}}.
+    
+    It can be shown that
+    \begin{equation}
+        P_n(x) = \sum_{r=0}^{\lfloor n/2 \rfloor} \frac{(-1)^r}{2^nr!(n - r)!} \frac{(2n - 2r)!}{(n - 2r)!} x^{n - 2r}
+    \end{equation}
+    where \(\lfloor - \rfloor\) denotes the floor, or integer part, so, for example, \(\lfloor 3.5 \rfloor = \lfloor 3 \rfloor = \lfloor \pi \rfloor = 3\).
+    
+    \subsection{Rodriguez Formula}
+    \epigraph{The only two tricks in mathematics, multiplying by 1 and adding 0.}{Kristel Torokoff}
+    Consider the derivative
+    \begin{align}
+        \diff*[n]{x^{2n - 2r}}{x} &= \diff*[n-1]{(2n - 2r)x^{2n-2r-1}}{x}\\
+        &= \diff*[n-2]{(2n - 2r - 1)(2n - 2r)x^{2n - 2r - 2}}{x}\\
+        &\vdotswithin{=} \\
+        &= (2n - 2r)(2n - 2r - 1) \dotsm (2n - 2r - (n - 1))x^{2n - 2r - n}\\
+        &= \frac{(2n - 2r)!}{(n - 2r)!}x^{n - 2r}.
+    \end{align}
+    We can identify this as the last two factors in the definition of \(P_n\).
+    Hence,
+    \begin{equation}
+        P_n(x) = \sum_{r=0}^{\lfloor n/2 \rfloor} \frac{(-1)^{r}}{2^nr!(n - r)!} \diff*[n]{x^{2n - 2r}}{x}.
+    \end{equation}
+
+    Suppose we consider some \(r > n/2\), then \(2r > n\) and hence \(2n - 2r > 2n - n = n\), hence
+    \begin{equation}
+        \diff*[n]{x^{2r - 2n}}{x} = 0
+    \end{equation}
+    for these values of \(r > n/2\), since at some point we differentiate away all powers of \(x\).
+    This allows us to extend the sum upwards since this is just adding zero, thus
+    \begin{equation}
+        P_n(x) = \sum_{r=0}^{n} \frac{(-1)^r}{2^nr!(n - r)!} \diff*[n]{x^{2n - 2r}}{x}.
+    \end{equation}
+    Multiplying through by \(n!/n!\) and also moving the derivative and other terms not depending on \(r\) outside of the sum we have
+    \begin{align}
+        P_n(x) &= \frac{1}{2^nn!} \diff[n]{}{x} \sum_{r=0}^{n} \frac{n!}{r!(n - r)!} (-1)^r (x^2)^{n - r}\\
+        &= \frac{1}{2n!} \diff[n]{}{x} \sum_{r=0}^{n} \binom{n}{r} (-1)^{r}(x^2)^{n - r}
+    \end{align}
+    which we can now identify as a binomial expansion of \((x^2 - 1)^n\), so
+    \begin{equation}\label{eqn:rodrigues formula legendre polynomials}
+        P_n(x) = \frac{1}{2^nn!} \diff[n]{}{x}(x^2 - 1)^n.
+    \end{equation}
+    This is \defineindex{Rodrigues Formula} for Legendre polynomials.
+    Many other special functions have a formula also known as Rodrigues formula and derived in a similar way.
+    
+    \subsection{Integral Representations}
+    Using Cauchy's integral formula,
+    \begin{equation}
+        \diff[n]{f}{z^n}[z=z_0] = \frac{n!}{2\pi i} \oint_C \frac{f(z)}{(z - z_0)^{n+1}} \dd{z}
+    \end{equation}
+    for some closed contour, \(C\), going once anticlockwise about \(z = z_0\), we can easily derive an integral representation of the Legendre polynomials by replacing the derivative in Rodrigues formula with an integral:
+    \begin{equation}
+        P_n(x) = \frac{1}{2^{n+1}\pi i} \oint_C \frac{(t^2 - 1)^n}{(t - x)^{n+1}} \dd{t}.
+    \end{equation}
+    This is called \define{Schl\"afli's integral representation}\index{Schlafli's integral representation@Schl\"afli's integral representation} of the Legendre polynomials.
+    
+    We showed from this in a tutorial that the large \(n\) behaviour of \(P_n\) is given by
+    \begin{equation}
+        P_n(\cos\alpha) \sim \sqrt{\frac{2}{\pi n\sin\alpha}} \sin\left( n\alpha + \frac{\alpha}{2} + \frac{\pi}{4} \right).
+    \end{equation}
+    
+    We can obtain a second integral representation by taking the contour in Schl\"afli's integral representation to be a circle centred on \(z\) with radius \(\abs{\sqrt{z^2 - 1}}\).
+    This can be parametrised as
+    \begin{equation}
+        t = z + \sqrt{z^2 - 1}\e^{i\varphi}, \qquad \text{with} \qquad \varphi \in [0, 2\pi].
+    \end{equation}
+    Using this we find the integral representation
+    \begin{equation}
+        P_n(z) = \frac{1}{2\pi} \int_{0}^{2\pi} (z + \sqrt{z^2 - 1}\cos\varphi)^n \dd{\varphi}.
+    \end{equation}
+    This is known as \defineindex{Laplace's integral representation} of the Legendre polynomials.
+    
+    In general there are many integral representations, which we choose to use depends on the problem we wish to solve.
+    
+    \subsection{Generating Function}
+    In this section we introduce the notion of a generating function, which can be useful for finding recursion relations for special functions.
+    Let
+    \begin{equation}
+        F(x, h) = \sum_{m=0}^{\infty} h^m P_m(x)
+    \end{equation}
+    where \(P_m\) are the Legendre polynomials.
+    From this we see that we have
+    \begin{equation}
+        P_m(x) = \frac{1}{m!} \diffp*[m]{F(x, h)}{h}\bigg\vert_{h=0}
+    \end{equation}
+    since lower order terms are differentiated away and higher order terms have a factor of \(h\) still which is set to zero.
+    We call \(F\) a \defineindex{generating function} for the Legendre polynomials.
+    We can compute \(F\) using the integral representation of \(P_n\):
+    \begin{align}
+        F(x, h) &= \sum_{n=0}^{\infty} h^n \frac{1}{2^{n+1}\pi i} \oint_C \frac{(t^2 - 1)^n}{(t - x)^n} \dd{t}\\
+        &= \frac{1}{2\pi i} \oint_C \sum_{m=0}^{\infty}  \left( \frac{h(t^2 - 1)}{2(t - x)} \right)^m \frac{1}{t - x} \dd{t}.
+    \end{align}
+    We can identify this as a geometric series with common ratio
+    \begin{equation}
+        \frac{h(t^2 - 1)}{2(t - x)}
+    \end{equation}
+    which means that the sum gives
+    \begin{equation}
+        \left( 1 - \frac{h(t^2 - 1)}{2(t - x)} \right)^{-1}.
+    \end{equation}
+    Simplifying this and substituting it back in we have
+    \begin{align}
+        F(x, h) &= -\frac{1}{i\pi h} \oint_C \frac{1}{t^2 - 2t/h - (1 - 2x/h)} \dd{t}\\
+        &= -\frac{1}{i\pi h} \oint_C \frac{1}{(t - t_+)(t - t_-)} \dd{t}
+    \end{align}
+    where \(t_{\pm}\) are the roots of the quadratic in the denominator, that is
+    \begin{equation}
+        t_{\pm} = \frac{1}{h}\left( 1 \pm \sqrt{1 + h^2 - 2xh} \right).
+    \end{equation}
+
+    Notice that when \(h \to 0\) we have \(t_+ \to \infty\) and \(t_-\) becomes indeterminate.
+    Applying L'H\^opital's rule we get \(t_- \to x\).
+    Only \(t_-\) is within the contour then since we assume it is at some finite distance from the origin.
+    Applying the residue theorem we can evaluate the integral as
+    \begin{align}
+        F(x, h) &= 2\pi i\Res\left( -\frac{1}{\pi h}\frac{1}{(t - t_+)(t - t_-)}, t_- \right)\\
+        &= -\frac{2}{h} \frac{1}{t_{-} - t_{+}} = \frac{1}{\sqrt{1 - 2xh + h^2}}.\label{eqn:generating func closed form}
+    \end{align}
+    This gives us a closed form for \(F\), which we can differentiate to get \(P_m\).
+    
+    We can also use the closed form to derive a recurrence relation for Legendre polynomials.
+    In particular notice that we have
+    \begin{equation}
+        \diffp{F}{h} = \frac{x - h}{(1 - 2xh + h^2)^{3/2}} = \frac{x - h}{1 - 2xh + h^2}F(x, h)
+    \end{equation}
+    so we can write
+    \begin{equation}\label{eqn:deriving legendre polynomial recurrence relation}
+        (1 - 2hx + h^2)\diffp{F}{h} = (x - h)F(x, h).
+    \end{equation}
+    We can then consider the derivative of the original definition of the generating function, which gives
+    \begin{equation}
+        \diffp{F}{h} = \sum_{m=1}^{\infty} P_m(x)mh^{m-1}.
+    \end{equation}
+    Substituting this into \cref{eqn:deriving legendre polynomial recurrence relation} and we get
+    \begin{equation}
+        \sum_{m=0}^{\infty} P_m m h^{m - 1} - 2x \sum_{m=0}^{\infty} P_mmh^m + \sum_{m=0}^{\infty} P_mmh^{m + 1} = x\sum_{m=0}^{\infty} P_mh^m - \sum_{m=0}^{\infty} P_mh^{m+1}.
+    \end{equation}
+    Now we re-index so that all \(h\) are to the same power.
+    For the first term we re-index to \(m' = m - 1\), and for the third and last terms to \(m' = m + 1\).
+    Dropping the primes this gives
+    \begin{multline}
+        \sum_{m=-1}^{\infty} P_{m+1}(m + 1) h^m - 2x \sum_{m=0}^{\infty} P_mmh^m + \sum_{m=1}^{\infty} P_{m-1} (m - 1)h^m\\
+        = x\sum_{m=1}^{\infty} P_mh^m - \sum_{m=1}^{\infty} P_{m-1}h^m.
+    \end{multline}
+    Equating coefficients of \(h^m\) we see that
+    \begin{equation}
+        (m + 1)P_{m+1}(x) - x(2m + 1)P_m(x) + mP_{m-1}(x) = 0.
+    \end{equation}
+    This is true for positive integer \(m\).
+    
+    If instead we had considered the derivatives \(\diffp{F}/{x}\) then we would have found the recurrence relation
+    \begin{equation}\label{eqn:legendre recursion formula}
+        P_m(x) = P_{m+1}'(x) - 2xP_m'(x) + P_{m+2}'(x).
+    \end{equation}
+
+    \subsubsection{The Generating Function in Electromagnetism}
+    The generating function for the Legendre polynomials appears in electromagnetism when we expand the Coulomb potential, \(V = Q/(4\pi\varepsilon_0r)\), where \(r = \abs{\vv{r_1} - \vv{r_2}}\) is the distance between the point at which we are calculating the field and the position of the charge, \(Q\).
+    Without loss of generality assume \(r_1 > r_2\), also, let \(\vartheta\) be the angle between \(\vv{r_1}\) and \(\vv{r_2}\), and then
+    \begin{align}
+        \frac{1}{\abs{\vv{r_1} - \vv{r_2}}} &= [(\vv{r_1} - \vv{r_2}) \cdot (\vv{r_1} - \vv{r_2})]^{-1/2}\\
+        &= (r_1^2 - 2\vv{r_1} \cdot \vv{r_2} + r_2^2)^{-1/2}\\
+        &= (r_1^2 - 2r_1r_2\cos\vartheta + r_2^2)^{-1/2}\\
+        &= \left[ r_1^2 \left( 1 - 2\frac{r_2}{r_1} + \frac{r_2^2}{r_1^2} \right) \right]^{-1/2}\\
+        &= \frac{1}{r_1} \left[ 1 - 2\frac{r_2}{r_1}\cos\vartheta + \left( \frac{r_2}{r_1} \right)^2 \right]^{-1/2}\\
+        &= \frac{1}{r_1} F\left( \cos\vartheta, \frac{r_2}{r_1} \right)\\
+        &= \frac{1}{r_1} \sum_{n=0}^{\infty} P_n(\cos\vartheta) \left( \frac{r_2}{r_1} \right)^{n}.
+    \end{align}
+    Where in the penultimate step we have identified the closed form of the generating function from \cref{eqn:generating func closed form} with \(h = r_2/r_1\) and \(x = \cos\vartheta\).
+    
+    \subsection{Orthogonality and Completeness}
+    \subsubsection{Orthogonality}
+    The Legendre polynomials are \defineindex{orthogonal}.
+    By this we mean that there is an inner product, \(\innerprod{-}{-}\), with respect to which
+    \begin{equation}
+        \innerprod{P_n}{P_m} \propto \delta_{nm}.
+    \end{equation}
+    In particular the inner product space is \(L^2([-1, 1])\), the space of square integrable functions on the interval \([-1, 1]\), and the inner product is
+    \begin{equation}
+        \innerprod{f}{g} \coloneqq \int_{-1}^{1} f(x)g(x) \dd{x}.
+    \end{equation}
+    
+    To show that the Legendre polynomials are orthogonal with respect to this inner product we use the Sturm--Liouville form of the Legendre equation:
+    \begin{equation}
+        \diff{}{x} [(1 - x^2)P_{l}'(x)] + l(l + 1)P_l(x) = 0.
+    \end{equation}
+    Expanding this we get
+    \begin{equation}
+        -2xP_l'(x) + (1 - x^2)P_l''(x) + l(l + 1)P_l(x) = 0.
+    \end{equation}
+    This is the standard form of Legendre's equation, showing that this is the correct Sturm--Liouville form.
+    Multiplying through by \(P_m\) we get
+    \begin{equation}
+        P_m(x)\diff{}{x} [(1 - x^2)P_l'(x)] + l(l + 1)P_l(x)P_m(x) = 0.
+    \end{equation}
+    Similarly, reversing the indices, we have
+    \begin{equation}
+        P_l(x)\diff{}{x} [(1 - x^2)P_m'(x)] + m(m + 1)P_m(x)P_l(x) = 0.
+    \end{equation}
+    Subtracting this from the previous equation we get
+    \begin{multline}
+        P_m\diff{}{x} [(1 - x^2)P_l'] - P_l\diff{}{x} [(1 - x^2)P_m'] + [l(l + 1) - m(m + 1)]P_mP_l\\
+        = \diff{}{x} [(1 - x^2)(P_mP_l' - P_lP_m')] + [l(l + 1) - m(m + 1)]P_mP_l = 0.
+    \end{multline}
+    Integrating this equation from \(-1\) to \(1\) we get
+    \begin{align}
+        I &= \int_{-1}^{1} \diff{}{x} [(1 - x^2)(P_mP_l' - P_lP_m')] \dd{x}\notag\\
+        &\qquad\qquad+ [l(l + 1) - m(m + 1)] \int_{-1}^{1} P_m P_l \dd{x}\\
+        &= [(1 - x^2)(P_mP_l' - P_lP_m')]_{-1}^{1} + [l(l + 1) - m(m + 1)] \innerprod{P_m}{P_l}\\
+        &= [l(l + 1) - m(m + 1)] \innerprod{P_m}{P_l},
+    \end{align}
+    since \(1 - x^2 = 0\) at both ends of the integration range.
+    It then follows that
+    \begin{equation}
+        \innerprod{P_m}{P_l} = 0
+    \end{equation}
+    as long as \([l(l + 1) - m(m + 1)] \ne 0\), which means \(m \ne l\).
+    
+    Let \(f_m\) be a polynomial of degree \(m\), such that \(f_m(x) = a_0 + a_1x + \dotsb a_mx^m\).
+    Then taking \(m < n\), integrating by parts \(m\) times, and using Rodrigues formula for the Legendre polynomials (\cref{eqn:rodrigues formula legendre polynomials}) we have
+    \begin{align}\label{eqn:inner prod polynomial and legendre polynomial}
+        \innerprod{f_m}{P_n} &= \int_{-1}^{1} f_m(x) P_n(x)\dd{x}\\
+        &= \frac{1}{2^nn!} \int_{-1}^{1} f_m(x) \diff[n]{}{x}(x^2 - 1)^n \dd{x}\\
+        &= \frac{1}{2^nn!} \overbrace{\left[ f_m(x) \diff[n-1]{}{x}(x^2 - 1)^n \right]_{-1}^{1}}^{=0}\\
+        &\qquad\qquad- \frac{1}{2^nn!} \int_{-1}^{1} f_m'(x) \diff[n - 1]{}{x} (x^2 - 1)^n \dd{x}\\
+        &\vdotswithin{=}\\
+        &= (-1)^m \frac{a_mm!}{2^nn!} \int_{-1}^{1} \diff[n-m]{}{x}(x^2 - 1)^n \dd{x}\\
+        &= (-1)^m \frac{a_mm!}{2^nn!} \left[ \diff[n-m-1]{}{x} (x^2 - 1)^n \right]_{-1}^{1}\\
+        &= 0,
+    \end{align}
+    here we have used the fact that
+    \begin{equation}
+        \diff*[n - k]{(x^2 - 1)^n}{x}[n=\pm 1] = 0.
+    \end{equation}
+    
+    If we consider again consider \cref{eqn:inner prod polynomial and legendre polynomial}, but now with \(m = n\), then \(n - m = 0\) and we instead have
+    \begin{equation}
+        \innerprod{f_n}{P_n} = (-1)^n \frac{a_nn!}{2^nn!} \int_{-1}^{1} (x^2 - 1)^n \dd{x}.
+    \end{equation}
+    We can compute this integral, first noticing that the integrand is even, and then we have
+    \begin{equation}\label{eqn:inner prod fn Pn}
+        \innerprod{f_n}{P_n} = 2(-1)^n \frac{a_n}{2^n} \int_{0}^1 (x^2 - 1) \dd{x} = (-1)^{n}\frac{a_n}{2^{n-1}} I_n.
+    \end{equation}
+    Here we define
+    \begin{align}
+        I_n &\coloneqq \int_0^1 (x^2 - 1)^n \dd{x}\\
+        &\hphantom{:}= [x(x^2 - 1)^n]_{0}^{1} - 2n\int_0^1 x^2(x^2 - 1)^{n-1} \dd{x}\\
+        &\hphantom{:}= -2n\int_{0}^{1} \left[ (x^2 - 1)^n + (x^2 - 1)^{n-1} \right] \dd{x}\\
+        &\hphantom{:}= -2n(I_n - I_{n-1}).
+    \end{align}
+    To get this we integrated by parts, using
+    \begin{alignat}{2}
+        u &= (x^2 - 1)^{n-1},     \qquad && \hphantom{'}v= x,\\
+        u' &= 2nx(x^2 - 1)^{n-1}, \qquad && v'= 1.
+    \end{alignat}
+    It follows from this that
+    \begin{equation}
+        I_n = -\frac{2n}{2n + 1} I_{n-1}.
+    \end{equation}
+    Using this, and the easily calculated \(I_0 = 1\), we get
+    \begin{align}
+        I_n &= -\frac{2n}{2n + 1}I_{n - 1}\\
+        &= -\frac{2n}{2n + 1}\left[ -\frac{2(n-1)}{2(n - 1) + 1}I_{n-2} \right]\\
+        &= \frac{2n\cdot 2(n-1)}{(2n+1)(2n-1)}I_{n-2}\\
+        &= \frac{2n\cdot 2(n-1)}{(2n+1)(2n-1)}\left[ -\frac{2(n-2)}{2(n-2) + 1}I_{n-3} \right]\\
+        &= -\frac{2n\cdot 2(n-1) \cdot 2(n-2)}{(2n+1)(2n-1)(2n-3)}I_{n-3}\\
+        &= (-1)^{n} \frac{2n \cdot 2(n - 1) \cdot 2(n - 2) \dotsm 4 \dotsm 2}{(2n + 1)(2n - 1)(2n - 3) \dotsm 5\cdot 3}\\
+        &= (-1)^n \frac{2 \cdot 4 \cdot 6 \dotsm 2n}{3 \cdot 5 \cdot 7 \dotsm (2n + 1)}\\
+        &= (-1)^n \frac{[2 \cdot 4 \cdot 6 \dotsm 2n]\cancel{[2\cdot 4\cdot 6 \dotsm 2n]}}{\cancel{2}\cdot 3 \cdot \cancel{4} \cdot 5 \cdot \cancel{6} \cdot 7 \dotsm \cancel{2n} \cdot (2n + 1)}\\
+        &= (-1)^n \frac{[2 \cdot 4 \cdot 6 \dotsm 2n]^2}{(2n + 1)!!}\\
+        &= (-1)^n \frac{2^{2n}(n!)^2}{(2n+1)!!}.
+    \end{align}
+    Now, if \(f_n\), is also the Legendre polynomial \(P_n\) we have
+    \begin{equation}
+        a_n = \frac{(2n)!}{2^n(n!)^2}.
+    \end{equation}
+    This follows from Rodrigues formula (\cref{eqn:rodrigues formula legendre polynomials}), and the binomial expansion:
+    \begin{align}
+        P_n(x) &= \frac{1}{2^nn!} \diff[n]{}{x} (1 - x^2)^n\\
+        &= \frac{1}{2^nn!} \diff[n]{}{x} \sum_{j=0}^{n} \binom{n}{j}x^{2(n - j)}(-1)^{j}\\
+        &= \frac{1}{2^nn!} \diff[n-1]{}{x} \sum_{j=0}^{n} (2n - 2j)x^{2(n-j)-1}(-1)^{j}\\
+        &\vdotswithin{=}\\
+        &= \frac{1}{2^nn!} \sum_{j=0}^{n} \binom{n}{j} (2n - 2j)(2n - 2j - 1) \dotsm (2n - 2j - n + 1) x^{n - 2j}(-1)^j.
+    \end{align}
+    Considering the \(j = 0\) case we get the coefficient of \(x^n\) in \(P_n\), which is
+    \begin{multline}
+        \frac{1}{2^nn!} \binom{n}{0}2n(2n-1)(2n-2) \dotsm (2n-n+1)(-1)^0 \\
+        = \frac{1}{2^nn!} \frac{n!}{(n-0)!0!} \frac{(2n)!}{n!}
+        = \frac{(2n)!}{2^n(n!)^2}.
+    \end{multline}
+    
+    Finally, putting this in to \cref{eqn:inner prod fn Pn} we get
+    \begin{equation}
+        \innerprod{P_n}{P_n} = \frac{(-1)^n}{2^{n-1}}a_nI_n = \frac{(-1)^n}{2^{n-1}} \frac{(2n)!}{2^n(n!)^2} (-1)^n \frac{2^{2n}n!}{(2n+1)!} = \frac{2}{2n+1}.
+    \end{equation}
+    Hence we have
+    \begin{equation}
+        \innerprod{P_n}{P_m} = \frac{2}{2n+1} \delta_{mn}.
+    \end{equation}
+    So, the Legendre polynomials are orthogonal.
+    
+    \subsubsection{Completeness}
+    The Legendre polynomials are \define{complete}\index{completeness}.
+    By this we mean that we can write any (sufficiently nice) function in \(L^2([-1, 1])\) as a series of Legendre polynomials, that is for \(f \in L^2([-1, 1])\) we have
+    \begin{equation}
+        f(x) = \sum_{l=0}^{\infty} c_lP_l(x)
+    \end{equation}
+    for some \(c_l \in \reals\).
+    To determine \(c_l\) we simply consider the inner product
+    \begin{align}
+        \innerprod{f}{P_m} &= \int_{-1}^{1} f(x)P_m(x)\dd{x}\\
+        &= \int_{-1}^{1} \sum_{l=0}^{\infty} c_lP_m(x)P_l(x)\dd{x}\\
+        &= \sum_{l=0}^{\infty} c_l \int_{-1}^{1} P_m(x)P_l(x)\dd{x}\\
+        &= \sum_{l=0}^{\infty} c_l\frac{2}{2l + 1}\delta_{ml}\\
+        &= c_m\frac{2}{2m + 1}.
+    \end{align}
+    The ability to swap the sum and integral is where the \enquote{sufficiently nice} nature of \(f\) comes in.
+    So,
+    \begin{equation}
+        c_m = \frac{2m + 1}{2}\innerprod{f}{P_m} = \left( m + \frac{1}{2} \right) \int_{-1}^{1} f(x)P_m(x) \dd{x},
+    \end{equation}
+    and
+    \begin{equation}
+        f(x) = \sum_{l=0}^{\infty} \left( l + \frac{1}{2} \right) \left( \int_{-1}^{1} f(t) P_m(t) \dd{t} \right) P_l(x).
+    \end{equation}
+
+    \section{Bessel Functions}
+    Bessel's differential equation is
+    \begin{equation}
+        x^2u'' + xu' + (x^2 - \nu^2)u = 0
+    \end{equation}
+    for some \(\nu \in \reals\).
+    This often appears as the radial part of Laplace's equation in cylindrical coordinates.
+    The origin is a regular singular point for Bessel's differential equation.
+    One solution to Bessel's differential equation are the \define{Bessel functions of the first kind}\index{Bessel function!first kind}, which are given by
+    \begin{equation}
+        J_\nu(x) = \sum_{n=0}^{\infty} \frac{(-1)^n}{n!\Gamma(n + 1 + \nu)} \left( \frac{x}{2} \right)^{2n + \nu}
+    \end{equation}
+    for \(\abs{\nu} \ne 1/2\).
+    
+    Bessel's differential equation is invariant under \(\nu \to -\nu\), and hence \(J_{-\nu}\) is also a solution, for \(\nu \notin \integers\).
+    \begin{equation}
+        J_{-\nu}(x) = \sum_{n = 0}^{\infty} \frac{(-1)^n}{n!\Gamma(n + 1 - \nu)} \left( \frac{x}{2} \right)^{2n - \nu}.
+    \end{equation}
+    These are linearly independent for non-integer \(\nu\).
+    It can be shown that the Wronskian is
+    \begin{equation}
+        W[J_\nu, J_{-\nu}] = -\frac{2\sin(n\pi)}{\pi x}.
+    \end{equation}
+    
+    For \(\nu = m \in \integers\) we have \(J_{-m} = (-1)^mJ_m\), and so clearly \(J_m\) and \(J_{-m}\) are linearly dependent.
+    In this case we define \define{Bessel's functions of the second kind}\index{Bessel function!second kind}, also known as Neumann's functions, \(Y_n\).
+    
+    \subsection{Recursion Relation}
+    Consider the following derivative
+    \begin{align}
+        \diff{}{x}(x^\nu J_\nu(x)) &= \diff{}{x} \left[ \sum_{n=0}^{\infty} \frac{(-1)^{n} x^{2\nu+2n}}{n!\Gamma(n + 1 + \nu)2^{2n+\nu}} \right]\\
+        &= \sum_{n=0}^{\infty} \frac{(-1)^n(2\nu + 2n)x^{2n+2\nu-1}}{n!\Gamma(n+1+2)2^{2n+\nu}}\\
+        &= \sum_{n=0}^{\infty} \frac{(-1)^n x^{2n + 2\nu - 1}}{n! 2^{2n+\nu-1}\Gamma(n+\nu)}\\
+        &= x^\nu J_{\nu-1}(x).
+    \end{align}
+    Here we have used
+    \begin{equation}
+        \frac{2n + 2\nu}{\Gamma(n + \nu + 1)} = 2\frac{n + \nu}{\Gamma(n + \nu + 1)} = 2\frac{n + \nu}{(n + \nu)\Gamma(n + \nu)} = \frac{2}{\Gamma(n + \nu)}
+    \end{equation}
+    which uses the recursive nature of the Gamma function: \(\Gamma(z + 1) = z\Gamma(z)\).
+    
+    We can also compute a similar derivative in a similar way:
+    \begin{equation}
+        \diff{}{x} (x^-\nu J_\nu(x)) = -x^{-\nu} J_{\nu+1}.
+    \end{equation}
+    
+    We can also compute both of these integrals using the product rule to separate the \(x^{\pm \nu}\) and \(J_{\nu}\) terms.
+    Doing so we get
+    \begin{align}
+        \diff{}{x} (x^{\nu} J_\nu) &= \nu x^{\nu - 1} J_\nu + x^\nu J_\nu',\\
+        \diff{}{x} (x^{-\nu} J_\nu) &= -\nu x^{-\nu-1}J_\nu + x^{-\nu}J_\nu'.
+    \end{align}
+    
+    Comparing the two ways of computing these derivatives we have
+    \begin{align}
+        x J_{\nu - 1} &= x J_\nu' + \nu J_\nu,\\
+        -x J_{\nu + 1} &= x J_\nu' - \nu J_\nu.
+    \end{align}
+    Adding these and taking their difference gives us two recursion relations:
+    \begin{align}
+        J_{\nu-1}(x) + J_{\nu + 1}(x) &= \frac{2\nu}{x} J_\nu(x),\\
+        J_{\nu-1}(x) - J_{\nu + 1}(x) &= 2J_\nu'(x).
+    \end{align}
+    
+    \subsection{Generating Function}
+    We can define a generating function by
+    \begin{equation}
+        F(x, h) \coloneqq \sum_{n = -\infty}^{\infty} J_n(x) h^n.
+    \end{equation}
+    Notice that we have to sum over all possible integer \(n\), hence we need to include negative integers as well.
+    Now take the recurrence relation
+    \begin{equation}
+        J_{n-1} + J_{n+1} = \frac{2n}{x}J_n,
+    \end{equation}
+    multiply by \(h^n\), and then sum over \(n\) to get
+    \begin{equation}\label{eqn:deriving bessel recurrence relation}
+        \sum_{n}h^nJ_{n-1} + \sum_{n}h^nJ_{n+1} = \sum_{n}\frac{2n}{x}J_nh^n.
+    \end{equation}
+    Considering the first term we have
+    \begin{equation}
+        \sum_{n=-\infty}^{\infty} h^nJ_{n-1} = \sum_{n'=-\infty}^{\infty} h^{n'+1} J_{n} = h\sum_{n'=-\infty}^{\infty} h^{n'}J_{n'} = hF(x, h).
+    \end{equation}
+    Here we re-indexed to \(n' = n - 1\).
+    Similarly for the second term we have
+    \begin{equation}
+        \sum_{n=-\infty}^{\infty} h^nJ_{n+1} = \frac{1}{h} \sum_{n'=-\infty}^{\infty} h^{n'}J_{n'} = \frac{1}{h}F(x, h).
+    \end{equation}
+    Finally for the third term we have
+    \begin{equation}
+        \diffp{F}{h} = \sum_n nh^{n-1}J_n.
+    \end{equation}
+    Therefore we can rewrite \cref{eqn:deriving bessel recurrence relation} as
+    \begin{equation}
+        hF + \frac{1}{h}F = \frac{2h}{x}\diffp{F}{h}.
+    \end{equation}
+    This is a separable differential equation since we can write it as
+    \begin{equation}
+        \frac{1}{F} \diffp{F}{h} = \frac{x}{2} \left( 1 + \frac{1}{h^2} \right).
+    \end{equation}
+    Integrating over \(h\) on the left hand side we get
+    \begin{equation}
+        \int \frac{1}{F} \diffp{F}{h} \dd{h} = \int \frac{1}{F} \dd{F} = \ln F.
+    \end{equation}
+    On the right hand side we get
+    \begin{equation}
+        \frac{2}{x} \int 1 + \frac{1}{h^2} \dd{h} = \frac{2}{x}\left( h - \frac{1}{h} \right) + \ln[\varphi(x)].
+    \end{equation}
+    Here \(\ln[\varphi(x)]\) is a \enquote{constant} of integration, which depends on the other variable, \(x\).
+    Hence,
+    \begin{equation}\label{eqn:bessel generating function derivation}
+        F(x, h) = \varphi(x) \exp\left[ \frac{x}{2}\left( h - \frac{1}{h} \right) \right].
+    \end{equation}
+    
+    We can do something similar with the second recurrence relation,
+    \begin{equation}
+        J_{n-1} - J_{n+1} = 2J_n'.
+    \end{equation}
+    Multiplying by \(h^n\) and summing over \(n\) we have
+    \begin{align}
+        \sum_n h^nJ_{n-1} - \sum_n h^n J_{n+1} &= \sum_n 2h^nJ_n'\\
+        \implies hF - \frac{1}{F} = 2\diffp{F}{x}.
+    \end{align}
+    Here we have used
+    \begin{equation}
+        \diffp{F}{x} = \diffp{}{x}\sum_{n} h^nJ_n(x) = \sum_n h^n J_n'(x).
+    \end{equation}
+    Inserting \cref{eqn:bessel generating function derivation} into the right hand side we have
+    \begin{align}
+        2\diffp{F}{x} &= 2\diffp{}{x} \left[ \varphi(x) \exp\left[ \frac{x}{2}\left( h - \frac{1}{h} \right) \right] \right]\\
+        &= 2\varphi'(x) \exp\left[ \frac{x}{2}\left( h - \frac{1}{h} \right) \right] + 2 \frac{1}{2}\left( h - \frac{1}{h} \right)\\
+        &= \left( h - \frac{1}{h} \right)F + \varphi'(x) \exp\left[ \frac{x}{2}\left( h - \frac{1}{h} \right) \right].
+    \end{align}
+    For this to be equal to the left hand side, which is \((h - 1/h)F\), we must have \(\varphi'(x) = 0\), and so \(\varphi\) is just a constant.
+    The choice of constant is just a choice of normalisation, and so we are free to choose, and take \(\varphi = 1\).
+    We therefore have
+    \begin{equation}
+        F(x, h) = \exp\left[ \frac{x}{2} \left( h - \frac{1}{h} \right) \right] = \sum_{n = - \infty}^{\infty} J_n(h) h^n.
+    \end{equation}
+    
+    Now that we have a closed form for the generating function, how can we get \(J_n\) from the generating function?
+    We can't simply use the derivative like we did with Legendre polynomials, the doubly infinite sum makes this intractable.
+    Instead consider what happens if we divide through by \(2\pi i h^{n+1}\) and then integrate over \(h\) around an anticlockwise contour, \(C\), which contains the origin.
+    We then have
+    \begin{equation}
+        \frac{1}{2\pi i} \oint_C \frac{1}{h^{n+1}} F(x, t) \dd{h} = \frac{1}{2\pi i} \oint_C \sum_{m=-\infty}^{\infty} \frac{J_m(x)h^m}{h^{n+1}} \dd{h}.
+    \end{equation}
+    Careful consideration of the integral on the right hand side shows that it vanishes whenever \(n \ne m\).
+    Clearly if \(m \ge n + 1\) there are no singularities and so that term of the integral vanishes.
+    If \(m < n\) then we end up with an integrand that goes as \(1/h^{n - m}\), the extra power of \(h\) cancels with the Jacobian when we parametrise the contour, and then taking the contour to infinity the integral vanishes.
+    Further if \(n = m\) we have an integral of \(1/h\), which by the residue theorem just gives \(2\pi i\), which cancels with the existing factor, leaving us with just \(J_n\).
+    Hence,
+    \begin{equation}
+        J_{n}(x) = \frac{1}{2\pi i} \oint_C \frac{\exp\left[ \frac{x}{2}\left( h - \frac{1}{h} \right) \right]}{h^{n + 1}} \dd{h}.
+    \end{equation}
+    This is the Schl\"fli integral representation of the Bessel function of the first kind.
+    Note the similarity to \cref{eqn:hankel function first time integral} for Hankel's function of the first kind, \(H_\nu^{(1)}\), which, along with Hankel's function of the second kind, \(H_\nu^{(2)}\) is closely related to the Bessel function by
+    \begin{equation}
+        H_\nu^(1) \coloneqq J_\nu + iY_\nu, \qqand H_\nu^{(2)} \coloneqq J_\nu - iY_\nu.
+    \end{equation}
+
+    We can derive another integral representation by taking \(h = \e^{i\vartheta}\).
+    We then get
+    \begin{align}
+        J_n(x) &= \frac{1}{2\pi i} \int_{0}^{2\pi} \frac{\exp\left[ \frac{x}{2}(\e^{i\vartheta} - \e^{-i\vartheta}) \right]}{\e^{(n+1)i\vartheta}} i\e^{i\vartheta} \dd{\vartheta}\\
+        &= \frac{1}{2\pi} \int_{0}^{2\pi} \exp\left[ \frac{x}{2}(\e^{i\vartheta} - \e^{-i\vartheta}) - in\vartheta \right] \dd{\vartheta}\\
+        &= \frac{1}{2\pi} \int_{0}^{2\pi} \exp[ix\sin\vartheta - in\vartheta]\\
+        &= \frac{1}{\pi} \int_{0}^{\pi} \cos[x\sin\vartheta - n\vartheta] \dd{\vartheta}.
+    \end{align}
+    Here we have used the fact that \(\sin\)  is odd about \(\pi\), the midpoint of the integration range, and so the \(\sin\) term vanishes.
+    Similarly \(\cos\) is even over this range and so we can half the integration range and double the integral, this is exactly what we usually do with \(\sin\) and \(\cos\) in integrals, we've just shifted the origin slightly to the next point of symmetry.
+    
+    \section{Other Special Functions}
+    Rodrigues' formula has a very general form from which we can define many other special functions.
+    The \(n\)th order polynomials, \(R_n\), with constants \(e_n\) are defined by
+    \begin{equation}
+        R_n(x) \coloneqq \frac{1}{e_nw(x)} \diff[n]{}{x} [w(x) q^n(x)]
+    \end{equation}
+    where \(q\) is some polynomial and \(w\) is a weight function.
+    With respect to this weight function and over the interval \((a, b)\), chosen such that \(q\) vanishes at \(a\) and \(b\), these polynomials are orthogonal, meaning
+    \begin{equation}
+        \int_a^b R_n(x) R_m(x) w(x) \dd{x} = N_n\delta_{mn}
+    \end{equation}
+    where \(\sqrt{N_n}\) is the norm of \(R_n\), defined by
+    \begin{equation}
+        N_n = \int_a^b R_n(x)R_n(x) w(x) \dd{x}.
+    \end{equation}
+    
+    Choosing \(q(x) = x^2 - 1\) and the weight function \(w(x) = (1 - x)^\alpha(1 + x)^\beta\) with \(e_n = 2^nn!\) gives
+    \begin{itemize}
+        \item the Legendre polynomials for \(\alpha = \beta = 0\),
+        \item the \define{Jacobi polynomials}\index{Jacobi polynomial} for \(\alpha, \beta > -1\),
+        \item the \define{Gegenbauer polynomials}\index{Gegenbauer polynomial} for \(\alpha = \beta\), and
+        \item the \define{Chebyshev polynomials}\index{Chebyshev polynomial} for \(\alpha = \beta = \pm 1/2\).
+    \end{itemize}
+    
+    The choice of \(q(x) = 1\) and \(w(x) = \exp[-x^2]\) gives the \define{Hermite polynomials}\index{Hermite polynomial}, \(H_n\)\index{\(H_n\)|see{Hermite polynomial}}.
+    These appear in the wave function of the harmonic oscillator.
+    In particular, up to normalisation, the \(n\)th excited state of the harmonic oscillator of mass \(m\) and frequency \(\omega\) has the wave function \(H_n(x)\), where \(x = \sqrt{m\omega/\hbar}\tilde{x}\) is the dimensionless position, where \(\tilde{x}\) is the position with dimension.
+    
+    The choice of \(q(x) = x\) and \(w(x) = x^\alpha\e^{-x}\) gives the \define{generalised Laguerre polynomials}\index{generalised Laguerre polynomial}, \(L_n^{(\alpha)}\)\index{\(L_n^{(\alpha)}\)|see{generalised Laguerre polynomial}}. 
+    These appear in the radial wave function of the non-relativistic hydrogen atom.
+    In particular the state with principle quantum number \(n\), and angular momentum quantum number, \(l\), has wave function
+    \begin{equation}
+        \rho^lL_{n-l-1}^{2l+1}(\rho) \e^{-\rho/2}
+    \end{equation}
+    where
+    \begin{equation}
+        \rho = \frac{2r}{na_0}
+    \end{equation}
+    and
+    \begin{equation}
+        a_0 \coloneqq \frac{4\pi\varepsilon_{0}\hbar^2}{m_{\mathrm{e}}e^2}
+    \end{equation}
+    is the Bohr radius, defined in terms of the electric constant, \(\varepsilon_{0}\), reduced Planck's constant, \(\hbar\), electron mass, \(m_{\mathrm{e}}\), and elementary charge, \(e\).
+    
+    \part{Integral Transforms}
+    \chapter{Fourier}
+    \begin{rmk}
+        For more details see the Fourier analysis part of the Fourier analysis and statistics course.
+    \end{rmk}
+    \section{Fourier Series}
+    Given a function, \(f \colon [-L, L] \to \complex\) for some \(L \in \reals_{>0}\) we can, under mild conditions, write this function as a superposition of plane waves:
+    \begin{equation}
+        f(x) = \sum_{n=-\infty}^{\infty} C_n\exp\left[ \frac{in\pi x}{L} \right].
+    \end{equation}
+    We call this the \defineindex{Fourier series} of \(f\).
+    It can be further extended to all \(\reals\) by taking this as a periodic function with period \(2L\).
+    
+    To find the value of the constants, \(C_n\), we use the identity from \cref{eqn:integral representation kronecker delta},
+    \begin{equation}
+        \delta_{mn} = \frac{1}{2\pi}\int_{-\pi}^{\pi} \exp[ik(m - n)] \dd{k}.
+    \end{equation}
+    Making a change of variables to \(y = kL/\pi\) we have
+    \begin{equation}
+        \delta_{mn} = \frac{1}{2L} \int_{-L}^{L} \exp\left[ \frac{i\pi(m - n)y}{L} \right] \dd{y}.
+    \end{equation}
+    We therefore have
+    \begin{align}
+        \frac{1}{2L} \int_{-L}^{L} f(x) \exp\left[ -\frac{i\pi nx}{L} \right] \dd{x} &= \frac{1}{2L}\int_{-L}^{L} \sum_{m=-\infty}^{\infty} C_m \exp\left[ \frac{i\pi(m - n)x}{L} \right]\\
+        &= \sum_{m=-\infty}^{\infty} C_m\delta_{mn}\\
+        &= C_n.
+    \end{align}
+    The ability to swap the integral and sum is guaranteed by the aforementioned \enquote{mild conditions}.
+    
+    If \(f\) is an even (odd) function then we can write the exponential in terms of \(\cos\) and \(\sin\) and the symmetry means that the \(\sin\) (\(\cos\)) terms will vanish.
+    If \(f\) is instead defined on \([0, L]\) then we can choose either the odd or even extension to \([-L, L]\), and still get a Fourier series in the same way.
+    If \(f(0) \ne 0\) then we typically choose the even extension as this avoids a discontinuity.
+    
+    It follows easily from the integral representation of \(\delta_{mn}\) above that
+    \begin{align}
+        \frac{1}{L}\int_{-L}^{L} \sin\left( \frac{\pi mx}{L} \right)\sin\left( \frac{\pi nx}{L} \right) \dd{x} = \delta_{mn},\\
+        \frac{1}{L}\int_{-L}^{L} \sin\left( \frac{\pi mx}{L} \right)\sin\left( \frac{\pi nx}{L} \right) \dd{x} = \delta_{mn}.\\
+    \end{align}
+    These can be used to find the coefficients in \(\sin\) or \(\cos\) Fourier series.
+    For example, if \(f\) is given by
+    \begin{equation}
+        f(x) = \sum_{n=1}^{\infty} A_n \sin\left( \frac{n\pi x}{L} \right)
+    \end{equation}
+    then
+    \begin{equation}
+        A_n = \frac{1}{L} \int_{-L}^{L} f(x) \sin\left( \frac{n\pi x}{L} \right) \dd{x} = \frac{2}{L} \int_0^L f(x) \sin\left( \frac{n \pi x}{L} \right) \dd{x}.
+    \end{equation}
+    
+    \section{Fourier Transforms}
+    \begin{dfn}{Fourier Transform}{}
+        Given a function \(f\colon\reals\to\complex\) such that \(f(x) \to 0\) as \(\abs{x} \to \infty\) we define the \defineindex{Fourier transform} to be
+        \begin{equation}
+            \fourierTransform\{f(x)\} = \tilde{f}(k) \coloneqq \int_{-\infty}^{\infty} f(x) \e^{-ikx} \dd{x}.
+        \end{equation}
+        \index{\(\fourierTransform\)|see{Fourier transform}}
+    \end{dfn}
+    This is actually just one of a few conventions for defining Fourier transforms, they may differ in the sign of the exponent, as well as including constants either in front of the integral or in the exponential.
+    There are also several notational conventions for denoting the Fourier transformed function, including \(\tilde{f}\), \(\hat{f}\), \(F\), or \(g\).
+    
+    \begin{thm}{Inversion Theorem}{}
+        Given a function, \(f\), and its Fourier transform, \(\tilde{f}\), we have
+        \begin{equation}
+            f(x) = \inverseFourierTransform\{f(x)\} = \frac{1}{2\pi} \int_{-\infty}^{\infty} \tilde{f}(k) \e^{ikx} \dd{k}.
+        \end{equation}
+        \begin{proof}
+            Recall the integral representation of the Dirac delta given in \cref{eqn:integral representation of dirac delta}:
+            \begin{equation}
+                \delta(x - x') = \frac{1}{2\pi} \int_{-\infty}^{\infty} \e^{ik(x - x')} \dd{k}.
+            \end{equation}
+            We therefore have
+            \begin{align}
+                \frac{1}{2\pi} \int_{-\infty}^{\infty} \textcolor{highlight}{\tilde{f}(k)} \e^{ikx} \dd{k} &= \textcolor{dark}{\frac{1}{2\pi}\int_{-\infty}^{\infty} \dl{k}} \textcolor{highlight}{\int_{-\infty}^{\infty} \dl{x'} \, f(x') \e^{-ikx'}} \textcolor{dark}{\e^{ikx}}\\
+                &= \int_{-\infty}^{\infty} f(x') \textcolor{dark}{\delta(x - x')} \dd{x'}\\
+                &= f(x).
+            \end{align}
+        \end{proof}
+    \end{thm}
+    
+    \subsection{Conventions}
+    There is a lot of freedom in choosing the definition of the Fourier transform.
+    Once it has been defined the inverse transform is automatically fixed, since we require that \(\inverseFourierTransform\{\fourierTransform\{f(x)\}\} = f(x)\).
+    Important features shared between all conventions then mean that
+    \begin{itemize}
+        \item the sign in the exponent must differ between the forward and inverse transform, although which is positive and which is negative is just convention.
+        \item there must be a factor of \(1/(2\pi)\) somewhere between the two transforms, to account for the \(1/(2\pi)\) in the integral representation of the delta distribution.
+        Various conventions put a factor of \(1/(2\pi)\) with the inverse or the forward transform, or split it evenly between the two with factors of \(1/\sqrt{2\pi}\).
+        Sometimes the \(2\pi\) is put in the exponent also.
+    \end{itemize}
+    
+    A few common conventions, and their appropriate inverses, are given below
+    \begin{alignat}{3}
+        \tilde{f}(k) &= \int_{-\infty}^{\infty} f(x)\e^{-ikx} \dd{x}, \qquad && f(x) = \int_{-\infty}^{\infty} \tilde{f}(k)\e^{ikx} \dd{k},\\
+        \tilde{f}(k) &= \frac{1}{2\pi}\int_{-\infty}^{\infty} f(x)\e^{ikx} \dd{x}, \qquad && f(x) = \int_{-\infty}^{\infty} \tilde{f}(k)\e^{-ikx} \dd{k},\\
+        \tilde{f}(k) &= \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} f(x)\e^{-ikx} \dd{x}, \qquad && f(x) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{\infty} \tilde{f}(k) \e^{ikx} \dd{k}.
+    \end{alignat}
+    These are all transformations between \(x\)-space and \(k\)-space, which we interpret as position and wave number.
+    Alternatively we can restrict our integrals to \((0, \infty)\) and replace \(x\) with \(t\) and \(k\) with \(\omega\), which we can then interpret as time and angular frequency.
+    If we include extra factors of \(\hbar\) then we can instead work with \(p = k\hbar\) and \(E = \omega\hbar\) as Fourier variables instead, which we interpret as momentum and energy:
+    \begin{equation}
+        \tilde{f}(p) = \int_{-\infty}^{\infty} f(x)\e^{-ipx/\hbar} \dd{x}, \text{ and } f(x) = \frac{1}{2\pi\hbar} \int_{-\infty}^{\infty} \tilde{f}(p)\e^{ipx/\hbar} \dd{p}.
+    \end{equation}
+    This is common in quantum mechanics\footnote{see quantum theory notes for more details} when moving between the position and momentum bases.
+    
+    \subsection{Higher Dimension}
+    We can easily generalise the Fourier transform to higher dimensions.
+    In particular given some function \(f \colon \reals^n \to \complex\) such that \(f(\vv{x}) \to 0\) as \(\abs{\vv{x}} \to 0\) we define the Fourier transform to be
+    \begin{equation}
+        \fourierTransform\{f(\vv{x})\} = \tilde{f}(\vv{k}) \coloneqq \int_{\reals^n} f(x) \e^{-i\vv{k} \cdot \vv{x}} \dd{^nk}.
+    \end{equation}
+    The inverse Fourier transform is then
+    \begin{equation}
+        \inverseFourierTransform\{\tilde{f}(\vv{k})\} = f(\vv{x}) = \frac{1}{(2\pi)^n} \int_{\reals^n} \tilde{f}(\vv{k}) \e^{i\vv{k} \cdot \vv{x}} \dd{x}.
+    \end{equation}
+    Where possible we choose \(\vv{k}\) to make \(\vv{k} \cdot \vv{x}\) as simple as possible, for example we may choose to have \(\vv{k}\) lie along one of the axes in Fourier-space.
+    
+    \subsubsection{Central Function}
+    Consider the case where \(f\) is a central function, that is a function of distance from the origin, \(r\), in three dimensions.
+    In particular we take \(f(r) = \e^{-r^2/a^2}\) for some constant \(a\), although this analysis should work for any reasonable central function.
+    
+    We work in spherical polar coordinates, so \(\dl[3]{x} = r^2\sin\vartheta\dd{r}\dd{\vartheta}\dd{\varphi}\).
+    We use
+    \begin{equation}
+        \int_{0}^{2\pi} \dl{\varphi} = 2\pi,
+    \end{equation}
+    and
+    \begin{equation}
+        \int_{0}^{\pi} g(\vartheta)\sin\vartheta \dd{\vartheta} = \int_{-1}^{1} g(\vartheta) \dd{(\cos\vartheta)}.
+    \end{equation}
+    This is just the substitution \(u = \cos\vartheta\), and so \(\dl{u} = \dl{(\cos\vartheta)} = -\sin\vartheta\dd{\vartheta}\), and the limits go from \((0, \pi)\), to \((1, -1)\), which is then reversed by the minus sign from the measure.
+    
+    We choose our axes such that \(\vv{k}\) is parallel to the \(z\)-axis, and so \(\vv{k} \cdot \vv{r} = kz = kr\cos\vartheta\).
+    We then have
+    \begin{align}
+        \fourierTransform\{f(r)\} &= \int_{\reals^3} f(r) \e^{-i\vv{k}\cdot\vv{r}} \dd{^3x}\\
+        &= \int_{0}^{\infty} \dl{r} \int_{0}^{\pi} \dl{\vartheta} \int_{0}^{2\pi} \dl{\varphi} \, f(r) \e^{-ikr\cos\vartheta} r^2\sin\vartheta\\
+        &= 2\pi \int_{0}^{\infty} \int_{-1}^{1} \dl{(\cos \vartheta)} r^2 f(r) \e^{-ikr\cos\vartheta}\\
+        &= 2\pi \int_{0}^{\infty} r^2 f(r) \left[ -\frac{\e^{-ikr\cos\vartheta}}{ikr} \right]_{\cos\vartheta=-1}^{\cos\vartheta=1} \dd{r}\\
+        &= -\frac{2\pi}{ik} \int_{0}^{\infty} r f(r) [-\e^{-ikr} + \e^{ikr}] \dd{r}\\
+        &= \frac{4\pi}{ik} \int_{0}^{\infty} r f(r) \sin(kr) \dd{r}.
+    \end{align}
+    So far this holds for any central function \(f\), which vanishes at infinity.
+    This is useful, for example, when computing the matrix elements of scattering from a central potential, which is defined to be proportional to the square of the Fourier transform of the scattering potential\footnote{for more details see the principles of quantum mechanics or quantum theory courses.}.
+    For our case we are best going back a step to the exponentials, since our function is an exponential.
+    We then have
+    \begin{align}
+        \fourierTransform\{f(r)\} &= \frac{2\pi}{ik} \int_{0}^{\infty} r[\e^{ikr} - \e^{-ikr}]\e^{-r^2/a^2} \dd{r}\\
+        &= \frac{2\pi}{ik} \int_{0}^{\infty} r\e^{-r^2/a^2 + ikr} \dd{r} + \frac{2\pi}{ik} \int_{0}^{\infty} r\e^{-r^2/a^2 - ikr} \dd{r}.
+    \end{align}
+    Considering the second integral now we make the change of variables \(r' = -r\), so \(\dl{r'} = -\dl{r}\), and the limits change from \((0, \infty)\) to \((0, -\infty)\).
+    With the extra minus sign from the measure the limits are therefore \((-\infty, 0)\).
+    The integrand changes to \(\exp[-r'^2/a^2 + ikr']\), and so, dropping the primes, we have
+    \begin{align}
+        \fourierTransform\{f(r)\} &= \frac{2\pi}{ik} \int_{0}^{\infty} r\e^{-r^2/a^2 + ikr} \dd{r} + \frac{2\pi}{ik} \int_{-\infty}^{0} r\e^{-r^2/a^2 + ikr} \dd{r}\\
+        &= \frac{2\pi}{ik} \int_{-\infty}^{\infty} r\e^{-r^2/a^2 + ikr} \dd{r}.
+    \end{align}
+    Completing the square we have
+    \begin{equation}
+        -\frac{r^2}{a^2} + ikr = \frac{1}{a^2}\left( r - \frac{1}{2}ia^2k \right)^2 -\frac{1}{4}a^2k^2.
+    \end{equation}
+    Defining
+    \begin{equation}
+        s = r - \frac{ia^2k}{2}
+    \end{equation}
+    we then have
+    \begin{equation}
+        \fourierTransform\{f(r)\} = \frac{2\pi}{ik} \int_{-\infty}^{\infty} \left( s - \frac{ia^2k}{2} \right) \e^{-s^2/a^2}\e^{-k^2a^2/4} \dd{s}.
+    \end{equation}
+    Splitting the bracketed term the first integral, with \(s\), gives zero, since the integrand is odd and the range of integration is symmetric about zero.
+    Thus,
+    \begin{align}
+        \fourierTransform\{f(r)\} &= \frac{2\pi}{ik} \int_{-\infty}^{\infty} -\frac{ia^2k}{2} \e^{-s^2/a^2}\e^{-k^2a^2/4} \dd{s}\\
+        &= \pi a^2\e^{-k^2a^2/4} \int_{-\infty}^{\infty} \e^{-s^2/a^2} \dd{s}\\
+        &= \pi a^2 \sqrt{\pi a^2} \e^{-k^2a^2/4}.
+    \end{align}
+    Here we have used the standard Gaussian integral
+    \begin{equation}
+        \int_{-\infty}^{\infty} \e^{-\alpha x^2} \dd{x} = \sqrt{\frac{\pi}{\alpha}},
+    \end{equation}
+    which holds for all \(\alpha\) with \(\Re(\alpha) > 0\).
+    
+    Identifying our function as a Gaussian we can see that its width is given by \(\sigma_r = a/\sqrt{2}\), since we typically define a Gaussian as
+    \begin{equation}
+        \exp\left[ -\frac{1}{2}\frac{(x - \mu)^2}{\sigma^2} \right]
+    \end{equation}
+    where \(\mu\) is the position of the peak and \(\sigma\) the width.
+    Our Fourier transform is then another, scaled, Gaussian, now with width \(\sigma_k = \sqrt{2}/a\).
+    The product of the widths is then
+    \begin{equation}
+        \sigma_r\sigma_k = \frac{a}{\sqrt{2}} \frac{\sqrt{2}}{a} = 1.
+    \end{equation}
+    This is a common feature of Fourier transforms, if we can define a width for a function then the transformed function will usually have a width that is inversely proportional to the width of the original function.
+    Interpreting the width as a measure of uncertainty we see how this is related to the Heisenberg uncertainty principle.
+    In particular if \(f\) is the unnormalised wave function in position space then we can define normalised wave functions in position and \(k\)-space by
+    \begin{equation}
+        \psi(x) = \left( \frac{2a}{\pi} \right)^{1/4}\e^{-ax^2}, \qqand \tilde{\psi}(k) = \left( \frac{1}{2a\pi} \right)^{1/4} \e^{-k^2/(4a)},
+    \end{equation}
+    We then have
+    \begin{equation}
+        \expected{x^2} = \left( \frac{2a}{\pi} \right)^{1/2} \int_{-\infty}^{\infty} x^2\e^{-2ax^2} \dd{x},
+    \end{equation}
+    which we can compute using the standard integral
+    \begin{equation}
+        \int_{-\infty}^{\infty} x^3\e^{-\alpha x^2} \dd{x} = \frac{1}{a}\sqrt{\frac{\pi}{4a}}.
+    \end{equation}
+    We find that
+    \begin{equation}
+        \expected{x^2} = \left( \frac{2a}{\pi} \right)^{1/2} \frac{1}{2a} \sqrt{\frac{\pi}{8a}} = \frac{1}{4a}.
+    \end{equation}
+    Similarly
+    \begin{equation}
+        \expected{p^2} = \left( \frac{1}{2\pi a} \right)^{1/2} \int_{-\infty}^{\infty} k^2\e^{-k^2/(2a)} \dd{k} = a.
+    \end{equation}
+    
+    The uncertainty in position is
+    \begin{equation}
+        \Delta_x = \sqrt{\expected{x^2} - \expected{x}^2} = \sqrt{\expected{x^2}} = \frac{1}{2\sqrt{a}},
+    \end{equation}
+    and similarly for wave numer
+    \begin{equation}
+        \Delta_k = \sqrt{\expected{k^2} - \expected{k}^2} = \sqrt{\expected{k^2}} = \sqrt{a}.
+    \end{equation}
+    The momentum is related to the wave number by \(\vv{p} = \hbar\vv{k}\), so the uncertainty in momentum is
+    \begin{equation}
+        \Delta_p = \hbar\Delta_k = \hbar\sqrt{a}.
+    \end{equation}
+    Therefore we have
+    \begin{equation}
+        \Delta_x\Delta_p = \frac{1}{2\sqrt{a}} \hbar \sqrt{a} = \frac{\hbar}{2}.
+    \end{equation}
+    
+    \section{Convolutions}
+    \begin{dfn}{Convolution}{}
+        Given two functions, \(f, g \colon \reals \to \complex\), we define their \defineindex{convolution}\index{\(\ast\)|see{convolution}} as
+        \begin{equation}
+            (f \ast g)(x) \coloneqq \int_{-\infty}^{\infty} f(y)f(x - y) \dd{y}
+        \end{equation}
+        for all \(x \in \reals\).
+    \end{dfn}
+    
+    Convolutions arise naturally when combining probability density functions.
+    We can think of them as shifting the functions by some amount and measuring the overlap.
+    They are also common, although in a discrete form, in image processing, where we use them to apply filters.
+    
+    \begin{thm}{Convolution Theorem}{}
+        Given two functions, \(f, g\colon \reals \to \complex\), whose Fourier transforms exist, the following holds
+        \begin{equation}
+            \fourierTransform\{ (f \ast g)(x) \} = \fourierTransform\{f(x)\}\fourierTransform\{g(x)\},
+        \end{equation}
+        and
+        \begin{equation}
+            \fourierTransform\{ f(x)g(x) \} = \frac{1}{2\pi} (\tilde{f} \ast \tilde{g})(x)
+        \end{equation}
+        where \(\tilde{f}(k) = \fourierTransform\{ f(x) \}\), and \(\tilde{g}(k) = \fourierTransform\{ g(x) \}\).
+        
+        \begin{proof}
+            The proof follows easily from the definitions of the Fourier transform and convolution, first for the Fourier transform of a convolution we have
+            \begin{align}
+                \fourierTransform\{ (f \ast g)(x) \} &= \int_{-\infty}^{\infty} \dl{x} \, \e^{-ikx} (f \ast g)(x)\\
+                &= \int_{-\infty}^{\infty} \dl{x} \, \e^{-ikx} \int_{-\infty}^{\infty} \dl{y} \, f(y)g(x - y).
+            \end{align}
+            Now make a change of variables, \(x' = x - y\), so \(x = x' + y\), \(\dl{x'} = \dl{x}\), and the limits are unchanged, since they are infinite.
+            We then have
+            \begin{align}
+                \fourierTransform\{ (f \ast g)(x) \} &= \int_{-\infty}^{\infty} \dl{x'} \, \e^{-ik(x' + y)} \int_{-\infty}^{\infty} \dl{y} \, f(y)g(x')\\
+                &= \int_{-\infty}^{\infty} f(y) \e^{-iky} \dd{y} \int_{-\infty}^{\infty} \e^{-ikx'} g(x') \dd{x'}\\
+                &= \fourierTransform\{ f(y) \} \fourierTransform\{ g(x') \}\\
+                &= \fourierTransform\{ f(x) \} \fourierTransform\{ g(x) \}
+            \end{align}
+            where in the last step we have simply renamed variables to bring the result in line with the hypothesis.
+            
+            For the second statement applying the inverse Fourier transform to both sides we get the equivalent statement
+            \begin{equation}
+                \inverseFourierTransform\{ \fourierTransform\{ f(x)g(x) \} \} = f(x)g(x) = \frac{1}{2\pi} \inverseFourierTransform\{ (\tilde{f} \ast \tilde{g})(k) \}.
+            \end{equation}
+            The proof then proceeds as for the first statement, but using the inverse Fourier transform:
+            \begin{align}
+                \inverseFourierTransform\{ (\tilde{f} \ast \tilde{g})(k) \} &= \frac{1}{2\pi}\int_{-\infty}^{\infty} \dl{k} \, \e^{ikx} (\tilde{f} \ast \tilde{g})(k)\\
+                &= \frac{1}{2\pi}\int_{-\infty}^{\infty} \dl{k} \, \e^{ikx} \int_{-\infty}^{\infty} \dd{y} \, \tilde{f}(y)\tilde{g}(k - y)\\
+                &= \frac{1}{2\pi}\int_{-\infty}^{\infty} \dl{k'} \, \e^{i(k' + y)x} \int_{-\infty}^{\infty} \dl{y} \tilde{f}(y)\tilde{g}(k')\\
+                &= \frac{1}{2\pi} \int_{-\infty}^{\infty} \e^{iyx} \tilde{f}(y) \dd{y} \int_{-\infty}^{\infty} \e^{ik'x} \tilde{g}(k') \dd{k'}\\
+                &= 2\pi \inverseFourierTransform\{ \tilde{f}(y) \} \inverseFourierTransform\{ \tilde{g}(k) \}\\
+                &= 2\pi f(x)g(x).
+            \end{align}
+            This proves the second statement.
+        \end{proof}
+    \end{thm}
+    
+    \begin{crl}{}{}
+        The convolution operation is commutative, that is given two functions \(f, g \colon \reals \to \complex\) we have
+        \begin{equation}
+            f \ast g = g \ast f.
+        \end{equation}
+        \begin{proof}
+            Consider the Fourier transform of the statement:
+            \begin{equation}
+                \fourierTransform\{ (f \ast g)(x) \} = \fourierTransform\{ f(x) \} \fourierTransform\{ g(x) \} = \fourierTransform\{ g(x) \} \fourierTransform\{ f(x) \} = \fourierTransform\{ (g \ast f)(x) \}.
+            \end{equation}
+            Taking the inverse Fourier transform we get the desired statement.
+            Note that the middle equality is valid as it is just normal multiplication in \(\complex\), which is by definition commutative since \(\complex\) is a field.
+        \end{proof}
+    \end{crl}
+    
+    \section{Parseval's Theorem}
+    \begin{thm}{Parseval's Theorem}{}
+        For a function \(f \colon \reals \to \complex\) with Fourier transform \(\tilde{f}\)
+        \begin{equation}
+            \int_{-\infty}^{\infty} \abs{f(x)}^2 \dd{x} = \frac{1}{2\pi} \int_{-\infty}^{\infty} \abs{\tilde{f}(k)}^2 \dd{k}.
+        \end{equation}
+        \begin{proof}
+            The proof follows from writing \(\abs{f(x)}^2 = f(x)f^*(x)\).
+            We therefore have
+            \begin{equation}
+                f^*(x) = \inverseFourierTransform\{ \tilde{f}(k) \}^* = \frac{1}{2\pi} \int_{-\infty}^{\infty} \tilde{f}^*(k) \e^{-ikx} \dd{k}.
+            \end{equation}
+            Hence
+            \begin{align}
+                \int_{-\infty}^{\infty} \abs{f(x)}^2 \dd{x} &= \int_{-\infty}^{\infty} f(x)f^*(x) \dd{x}\\
+                &= \int_{-\infty}^{\infty} \dl{x} \, f(x) \frac{1}{2\pi} \int_{-\infty}^{\infty} \dl{k} \tilde{f}^*(k) \e^{-ikx}\\
+                &= \frac{1}{2\pi} \int_{-\infty}^{\infty} \dl{k} \, \tilde{f}^*(k) \int_{-\infty}^{\infty} \dl{x} \, f(x) \e^{-ikx}\\
+                &= \frac{1}{2\pi} \int_{-\infty}^{\infty} \tilde{f}^*(k) \tilde{f}(k) \dd{k}\\
+                &= \frac{1}{2\pi} \int_{-\infty}^{\infty} \abs{\tilde{f}(k)}^2 \dd{k}.
+            \end{align}
+        \end{proof}
+    \end{thm}
+    
+    \section{A Useful Result}
+    Given some function, \(f\), and its Fourier transform, \(\tilde{f}\), what is the Fourier transform of \(xf(x)\)?
+    This is fairly straight forward to compute:
+    \begin{align}
+        \fourierTransform\{ xf(x) \} &= \int_{-\infty}^{\infty} xf(x) \e^{-ikx} \dd{x}\\
+        &= \int_{-\infty}^{\infty} \dl{x} \, \frac{1}{2\pi} \int_{-\infty}^{\infty} \dl{k} \, x\tilde{f}(k') \e^{-ikx}\e^{ik'x}\\
+        &= \int_{-\infty}^{\infty} \dl{x} \, \frac{1}{2\pi} \int_{-\infty}^{\infty} \dl{k} \, x\tilde{f}(k) \e^{i(k' - k)x}\\
+        &= \frac{1}{2\pi} \int_{-\infty}^{\infty} \dl{x} \, x\bigg( \left[ \tilde{f}(k') \frac{\e^{ix(k' - k)}}{ix}  \right]_{k=-\infty}^{k=\infty}\notag\\
+        &\hspace{4em}- \frac{1}{ix} \int_{-\infty}^{\infty} \tilde{f}'(k') \e^{ix(k' - k)} \dd{k'} \bigg)\\
+        &= \frac{i}{2\pi} \int_{-\infty}^{\infty} \dl{x} \int_{-\infty}^{\infty} \dl{k'} \, \tilde{f}'(k') \e^{ix(k' - k)}\\
+        &= i \int_{-\infty}^{\infty} \delta(k' - k)\tilde{f}'(k') \dd{k}\\
+        &= i\tilde{f}'(k).
+    \end{align}
+    Here we have integrated by parts and then used the fact that \(\tilde{f}\) must vanish at infinity (in order for the inverse transform to exist).
+    
+    \section{Solving ODEs with Fourier Transforms}
+    \subsection{Fourier Transform of Derivative}
+    Given some function, \(f\), and it's Fourier transform, \(\tilde{f}\), it is easy to compute the Fourier transform of its derivative:
+    \begin{align}
+        \fourierTransform\{ f'(x) \} &= \int_{-\infty}^{\infty} f'(x) \e^{-ikx} \dd{x}\\
+        &= [ f(x)\e^{-ikx} ]_{-\infty}^{\infty} + ik \int_{-\infty}^{\infty} f(x)\e^{-ikx} \dd{x}\\
+        &= ik \tilde{f}(k).
+    \end{align}
+    Here we simply integrated by parts and then used the fact that \(f\) must vanish at infinity in order to have a Fourier transform.
+    
+    We can then compute Fourier transforms of second derivatives, or higher, recursively since
+    \begin{equation}
+        \fourierTransform\{f''(x)\} = ik\fourierTransform\{ f'(x) \} = (ik)^2\fourierTransform\{ f(x) \} = -k^2\tilde{f}(k).
+    \end{equation}
+    In general for the \(n\)th derivative we have
+    \begin{equation}
+        \fourierTransform\{ f^{(n)}(x) \} = (ik)^n \tilde{f}(k).
+    \end{equation}
+    
+    \subsection{Differential Equations}
+    Given some ordinary differential equation we can take the Fourier transform and this makes all of the derivatives into purely algebraic statements.
+    We can then (hopefully) solve this to find the Fourier transform of our desired function.
+    We can also transform the boundary or initial conditions to aid us in this step.
+    We then \enquote{simply} invert the transformation to get the desired function.
+    
+    \subsection{Forced, Damped Harmonic Oscillator}
+    The equation of motion for the forced, damped harmonic oscillator is
+    \begin{equation}
+        \ddot{y}(t) + 2\kappa \dot{y} + \Omega^2y(t) = f(t).
+    \end{equation}
+    Thinking of this as a physical system, as opposed to just an abstract differential equation, we take \(t\) as time and \(y\) as the position of the oscillator.
+    We therefore take the Fourier variable to be \(\omega\).
+    We define \(\tilde{y}(\omega) \coloneqq \fourierTransform\{ y(t) \}\) and \(\tilde{f}(\omega) \coloneqq \fourierTransform\{ f(t) \}\).
+    Using the Fourier transform of derivatives from earlier we can take the Fourier transform of this differential equation, giving
+    \begin{equation}
+        (-\omega^2 + 2i\kappa\omega + \Omega^2)\tilde{y}(\omega) = \tilde{f}(\omega).
+    \end{equation}
+    This is now a purely algebraic equation, which we can solve easily for \(\tilde{y}(\omega)\):
+    \begin{equation}
+        \tilde{y}(\omega) = \frac{1}{\Omega^2 + 2i\kappa\omega - \omega^2} \tilde{f}(\omega).
+    \end{equation}
+    
+    Now comes the tricky step, to find the solution we need to invert the Fourier transform.
+    To do so we notice that the right hand side can be viewed as the product of two Fourier transforms, the fraction being one and \(\tilde{f}(\omega)\) the other.
+    Therefore \(y\) is the convolution of some function, \(G\), which is the inverse Fourier transform of the fraction, and the function \(f\), which is some known function.
+    We just need to find out what \(G\) is.
+    We then have
+    \begin{equation}
+        y(t) = (G \ast f)(t) = \int_{-\infty}^{\infty} G(t - t')f(t') \dd{t'}
+    \end{equation}
+    in which \(G\) acts like a Green's function, explaining our choice of notation.
+    So, what is \(G\)?
+    \begin{equation}
+        G(t) = \inverseFourierTransform\left\{ \frac{1}{\Omega^2 + 2i\kappa\omega - \omega^2} \right\} = \inverseFourierTransform\left\{ -\frac{1}{(\omega - \omega_{+})(\omega - \omega_{-})} \right\}
+    \end{equation}
+    here we have factorised the quadratic in the denominator, where
+    \begin{equation}
+        \omega_{\pm} = i\kappa \pm \sqrt{\Omega^2 - \kappa^2}.
+    \end{equation}
+    We therefore have
+    \begin{equation}
+        G(t) = \inverseFourierTransform\left\{ -\frac{1}{(\omega - \omega_{+})(\omega - \omega_{-})} \right\} = -\frac{1}{2\pi} \int_{-\infty}^{\infty} \frac{\e^{i\omega t}}{(\omega - \omega_{+})(\omega - \omega_{-})} \dd{\omega}.
+    \end{equation}
+    We assume that this inverse exists, which means that \(G\) must vanish at infinity.
+    
+    We can evaluate this integral by closing the contour and using the Residue theorem.
+    For \(t > 0\) we close the integral in the upper half plane with a semicircle.
+    In this case \(G(t)\) depends on the position of the poles, \(\omega_{\pm}\), since their imaginary parts are positive for all \(\Omega\) and \(\kappa\).
+    We then have
+    \begin{equation}
+        G(t) = -2\pi i \sum_{\omega_{\pm}} \Res\left( \frac{1}{2\pi} \frac{\e^{i\omega t}}{(\omega - \omega_{+})(\omega - \omega_{-})}, \omega_{i} \right) = -i\left[ \frac{\e^{i\omega_{+}t}}{\omega_{+} - \omega_{-}} + \frac{\e^{i\omega_{-}t}}{\omega_{-} - \omega_{+}} \right].
+    \end{equation}
+    We use Jordan's lemma to argue that the contribution from the semicircle vanishes.
+    
+    For \(t < 0\) we instead close the contour in the lower half plane and therefore there are no residues.
+    We then simply have \(G(t) = 0\) for \(t < 0\).
+    We now consider the nature of \(G(t)\) for \(t > 0\) in three cases.
+    
+    \subsubsection{Under Damped}
+    Suppose \(\Omega > \kappa > 0\).
+    Then both poles have the same imaginary part, namely \(\kappa\), and
+    \begin{equation}
+        \omega_{+} - \omega_{-} = 2\sqrt{\Omega^2 - \kappa^2} > 0.
+    \end{equation}
+    We then have
+    \begin{equation}
+        G(t) = \theta(t) \e^{-\kappa t} \frac{\sin(\sqrt{\Omega^2 - \kappa^2} t)}{\sqrt{\Omega^2 - \kappa^2}}.
+    \end{equation}
+    
+    \subsubsection{Over Damped}
+    Suppose \(\kappa > \Omega > 0\).
+    Then the poles lie on the imaginary axis, \(\omega_{\pm} = -i\kappa \pm i\sqrt{\kappa^2 - \Omega^2}\), and we have
+    \begin{equation}
+        G(t) = \theta(t) \frac{\sinh(\sqrt{\kappa^2 - \Omega^2} t)}{\sqrt{\kappa^2 - \Omega^2}}.
+    \end{equation}
+    
+    \subsubsection{Critical Damping}
+    Suppose \(\kappa = \Omega\).
+    Then the two poles coincide to give a pole of order 2 at \(i\kappa\).
+    For \(t > 0\) we then have
+    \begin{equation}
+        G(t) = 2\pi i\Res\left( -\frac{1}{2\pi}\frac{\e^{i\omega t}}{(\omega - i\kappa)^2}, i\kappa \right) = -i(it)\e^{-\kappa t} = t\e^{-\kappa t}.
+    \end{equation}
+    For all \(t\) we therefore have
+    \begin{equation}
+        G(t) = \theta(t) t\e^{-\kappa t}.
+    \end{equation}
+    
+    \subsection{Boundary Conditions}
+    In the last section we assumed that the Green's function vanished at infinity, as did a suitable number of derivatives in order for everything to converge and all of our integrals to exist.
+    We call the resulting Green's function the \defineindex{fundamental Green's function}.
+    It corresponds to the assumption of homogenous boundary conditions at infinity.
+    
+    In all three cases we find that \(G\) does indeed vanish at infinity, and therefore the resulting function \(y\) that we find by convolving \(f\) with \(G\) is actually a particular solution, rather than a general solution, as we have already applied our boundary conditions.
+    We can construct the general solution by adding solutions to the homogenous equation:
+    \begin{equation}
+        y(t) = \int_{-\infty}^{\infty} G(t - t')f(t') \dd{t'} + A\e^{i\omega_{+}t} + B\e^{-i\omega_{-}t}.
+    \end{equation}
+    
+    We can also derive the same general solution from the Fourier transform of the differential equation by noticing that when solving for \(\tilde{y}\) we risk division by zero when \(\omega = \omega_{\pm}\).
+    We can solve this by adding in suitable delta distributions which gives
+    \begin{equation}
+        \tilde{y}(\omega) = \frac{1}{\Omega^2 + 2i\kappa\omega - \omega^2}\tilde{f}(\omega) + 2\pi A\delta(\omega - \omega_{+}) + 2\pi B \delta(\omega - \omega_{-}),
+    \end{equation}
+    for arbitrary constants \(A\) and \(B\)
+    Inverting this then gives us the extra two terms, which is why we include the \(2\pi\) here, so that \(A\) and \(B\) agree with their previous use, if we hadn't already done this we could drop the \(2\pi\) and our solution would just have \(A/(2\pi)\), which is just a scaled arbitrary constant.
+    
+    It is probably easier to go the way we did however, and solve for the particular solution and then just add in the homogeneous solution.
+    
+    \subsection{Causality}
+    Recall that we interpret
+    \begin{equation}
+        y_{\mathrm{P}}(t) = \int_{-\infty}^{\infty} G(t - t')f(t') \dd{t'}
+    \end{equation}
+    as the integral of a stimulus, \(f\), at time \(t'\) times the response, \(G\), at time \(t\).
+    In our example \(G(t, t') = 0\) for all \(t < t'\), and so there is no response in the past at time \(t\) for some future stimulus at time \(t'\).
+    We say the system is causal, the cause (stimulus) comes before the effect (response).
+    
+    In the limit of \(\kappa \to 0\), that is no damping, the poles, \(\omega_{\pm}\), approach the real axis from above.
+    Therefore for any non-zero amount of damping the poles will be in teh upper half plane, and hence our analysis is valid.
+    But when \(\kappa = 0\) the poles are on the real axis and we would have to treat the contour integral specially.
+    We would not automatically have \(G(t, t') = 0\) for \(t < t'\), instead we would have to impose this as a condition.
+    
+    One fix for this is that we can use the integral representation
+    \begin{equation}
+        \delta(x) = \frac{1}{2\pi} \int_{-\infty - i\varepsilon}^{\infty + i\varepsilon} \e^{ikx} \dd{k}
+    \end{equation}
+    for \(\varepsilon > 0\).
+    We then end up with a contour integral that passes \emph{just} below the real axis, and hence the poles are always included in the interior of the contour when we close in the upper half plane for \(t > 0\).
+    
+    \section{Sine and Cosine Transforms}
+    Certain functions with a high level of symmetry have simplified transforms in terms of sine and cosine.
+    In particular if a function is even, that is \(f(-x) = f(x)\), it has a cosine transformation given by
+    \begin{equation}
+        \tilde{f}(k) = 2\int_{0}^{\infty} f(x)\cos(kx) \dd{x}.
+    \end{equation}
+    Similarly if the function is odd, that is \(g(-x) = -g(x)\), then it  has a sine transformation given by
+    \begin{equation}
+        \tilde{g}(k) = 2\int_{0}^{\infty} g(x) \sin(kx) \dd{x}.
+    \end{equation}
+    The inverse transformations are then
+    \begin{equation}
+        f(x) = \frac{1}{\pi} \int_{0}^{\infty} \tilde{f}(k) \cos(kx) \dd{k}, \quad\text{and}\quad g(x) = \frac{1}{\pi} \int_{0}^{\infty}  \tilde{g}(k) \cos(kx) \dd{k},
+    \end{equation}
+    respectively.
+    These are simply the Fourier transforms but the symmetry causes either the real or imaginary part to vanish.
+    
+    We can also use these transformations for functions defined on \([0, \infty)\), by choosing to extend the definition to \(\reals\) such that the function is either even or odd.
+    The choice is usually obvious, for example we would extend \(f \colon [0, \infty) \to \reals\) such that \(f(x) = x^2\), to \(\reals\) by choosing \(f(x) = x^2\) for all \(x \in \reals\), which is an even extension.
+    Note that if \(f(0) \ne 0\) then the odd extension will have a discontinuity at \(0\) as \(f(\varepsilon)\) jumps to \(f(-\varepsilon) = -f(\varepsilon)\) crossing from positive to negative arguments, for arbitrarily small \(\varepsilon > 0\).
+    
+    \chapter{Laplace}
+    \section{Laplace Transform}
+    \begin{dfn}{Laplace Transform}{}
+        Given a function \(f \colon [0, \infty) \to \complex\) the \defineindex{Laplace transform} is defined as the following integral, if it exists,
+        \begin{equation}
+            \laplaceTransform\{ f(t) \} = F(s) \coloneqq \int_{0}^{\infty} f(t)\e^{-st} \dd{t}.
+        \end{equation}
+    \end{dfn}
+    
+    From the definition we can see that in order for the integral to converge \(\abs{\e^{-\alpha t}f(t)}\), for some \(\alpha\in\complex\) with \(\Re(\alpha) > 0\), must be bounded for large \(t\).
+    Hence we must have \(\abs{f(t)} \le \e^{\alpha t}\).
+    We require that
+    \begin{equation}
+        F(s) \le \int_{0}^{\infty} \e^{(\alpha - s)} \dd{t} < \infty,
+    \end{equation}
+    which means that \(F\) is valid for \(s\) satisfying \(\Re(s) > \Re(\alpha)\).
+    
+    \subsection{Laplace Transforms of Common Functions}
+    The Laplace transform of \(f(t) = 1\) is
+    \begin{equation}
+        \laplaceTransform\{ 1 \} = \int_{0}^{\infty} \e^{-st} = \left[ \frac{\e^{-st}}{s} \right]_{0}^{\infty} = \frac{1}{s}.
+    \end{equation}
+    The Laplace transform of \(f(t) = \e^{\omega t}\) is
+    \begin{equation}
+        \laplaceTransform\{ \e^{\omega t} \} = \int_{0}^{\infty} \e^{(\omega - s)} \dd{t} = \frac{1}{s - \omega}, \quad s > \omega.
+    \end{equation}
+    The Laplace transform of \(\e^{i\omega}\) follows from the previous integral replacing \(\omega \to i\omega\) giving
+    \begin{equation}
+        \laplaceTransform\{ \e^{i\omega t} \} = \frac{1}{s - i\omega} = \frac{s + i\omega}{s^2 + \omega^2}.
+    \end{equation}
+    By the linearity of the integral we have \(\Re(\laplaceTransform\{f(t)\}) = \laplaceTransform\{\Re(f(t))\}\), and similarly for \(\Im\).
+    It then follows that
+    \begin{equation}
+        \Re(\laplaceTransform\{ \e^{i\omega t} \}) = \laplaceTransform\{ \Re(\e^{i\omega t}) \} = \laplaceTransform\{ \cos(\omega t) \} = \Re\left( \frac{s + i\omega}{s^2 + \omega^2} \right) = \frac{s}{s^2 + \omega^2}.
+    \end{equation}
+    Similarly
+    \begin{equation}
+        \laplaceTransform\{ \sin(\omega t) \} = \frac{\omega}{s^2 + \omega^2}.
+    \end{equation}
+    These both hold for \(s > 0\).
+    The Laplace transform of \(f(t) = \delta(t - a)\) for some \(a \in \reals\) is
+    \begin{equation}
+        \laplaceTransform\{ \delta(t - a) \} = \int_{0}^{\infty} \delta(t - a)\e^{-st} \dd{t} = \e^{-sa}, \qquad s > 0.
+    \end{equation}
+    The Laplace transform of \(f(t) = \theta(t - a)\) for some \(a \in \reals\) is
+    \begin{align}
+        \laplaceTransform\{ \theta(t - a) \} &= \int_{0}^{\infty} \theta(t - a)\e^{-st} \dd{t}\\
+        &= \int_{a}^{\infty} \e^{-st} \dd{t}\\
+        &= \left[ -\frac{\e^{-st}}{s} \right]_{a}^{\infty}\\
+        &= \frac{\e^{-sa}}{s}, \qquad s > 0.
+    \end{align}
+    The Laplace transform of \(f(t) = t^n\) for some \(n \in \naturals\) is
+    \begin{align}
+        \laplaceTransform\{ t^n \} &= \int_{0}^{\infty} t^n \e^{-st} \dd{t}\\
+        &= \underbrace{\left[ -\frac{t^n}{s}\e^{-st} \right]_{0}^{\infty}}_{=0} + \frac{1}{s} \int_{0}^{\infty} t^{n-1} \e^{-st} \dd{t}\\
+        &\vdotswithin{=}\\
+        &= \frac{n!}{s^{n+1}}.
+    \end{align}
+    The linearity of the Laplace transform, which follows from the linearity of the integral, then allows us to use this formula to find the Laplace transform of any polynomial or power series.
+    Alternatively by analytic continuation we have
+    \begin{equation}
+        \laplaceTransform\{t^{\nu}\} = \frac{\Gamma(\nu + 1)}{s^{\nu + 1}},
+    \end{equation}
+    which holds for \(\nu > -1\).
+    
+    \subsection{Laplace Transforms of Derivatives}
+    Given a function, \(f\), and its Laplace transform, \(F\), the Laplace transform of \(f'\) is
+    \begin{align}
+        \laplaceTransform\{ f'(t) \} &= \int_{0}^{\infty} f'(t) \e^{-st} \dd{t}\\
+        &= [f(t) \e^{-st}]_{0}^{\infty} + s\int_{0}^{\infty} f(t) \e^{-st} \dd{t}\\
+        &= -f(0^+) + sF(s)
+    \end{align}
+    where \(f(0^+)\) means the value of \(f(t)\) as \(t\) tends to zero from above.
+    
+    The Laplace transform of \(f''\) then follows by applying this twice:
+    \begin{align}
+        \laplaceTransform\{ f''(t) \} &= -f'(0^+) + s\laplaceTransform\{ f'(t) \}\\
+        &= -f'(0^+) - sf(0^+) + s^2F(s).
+    \end{align}
+    Spotting a pattern we see that the Laplace transform of the \(n\)th derivative is
+    \begin{equation}
+        \laplaceTransform\{ f^{(n)}(t) \} = s^nF(s) - s^{n-1}f(0^+) - s^{n-1}f'(0^+) - s^{n-2}f''(0^+) - \dotsb - f^{(n-1)}(0^+).
+    \end{equation}
+    
+    \subsection{Derivatives of Laplace Transforms}
+    Given some function, \(f\), with Laplace transform \(F\) we have
+    \begin{align}
+        \diff{F}{s} &= \diff{}{s} \int_{0}^{\infty} f(t) \e^{-st} \dd{t}\\
+        &= \int_{0}^{\infty} f(t) \diff{}{s} \e^{-st} \dd{t}\\
+        &= \int_{0}^{\infty} f(t)(-t\e^{-st})\dd{t}\\
+        &= -\laplaceTransform\{ tf(t) \}.
+    \end{align}
+    For the second derivative we then have
+    \begin{equation}
+        \diff[2]{F}{s} = \diff{}{s}\laplaceTransform\{ -tf(t) \} = \laplaceTransform\{ t^2f(t) \}.
+    \end{equation}
+    Again spotting a pattern we have
+    \begin{equation}
+        \diff[n]{F}{s} = \laplaceTransform\{ (-t)^nf(t) \}.
+    \end{equation}
+    
+    \subsection{Laplace Transforms of Integrals}
+    Given a function, \(f\), with Laplace transform, \(F\), we have
+    \begin{equation}
+        \laplaceTransform\left\{ \int_{0}^{t} f(w) \dd{w} \right\} = \int_{0}^{\infty} \e^{-st} \int_{0}^{\infty} f(w) \dd{w} \dd{t}.
+    \end{equation}
+    Integrating by parts using
+    \begin{alignat}{3}
+        u &= \int_{0}^{t}f(w)\dd{w}, \qquad & v &= -\frac{\e^{-st}}{s},\\
+        u' &= f(t), \qquad & v' &= \e^{-st},
+    \end{alignat}
+    we have
+    \begin{align}
+        \laplaceTransform\left\{ \int_{0}^{t} f(w) \dd{w} \right\} &= \bigg[ -\underbrace{\vphantom{\int_{0}^{t}}\frac{\e^{-st}}{s}}_{\substack{\to 0\text{as}\\ t \to \infty}} \underbrace{\int_{0}^{t} f(w) \dd{w}}_{\to 0 \text{ as } t \to 0} \bigg]_{0}^{\infty} + \frac{1}{s} \int_{0}^{t} f(t) \e^{-st} \dd{t}\\
+        &= \frac{1}{s}F(s).
+    \end{align}
+    
+    \section{Inversion Theorem}
+    Broadly speaking there are two methods for inverting Laplace transforms, the \enquote{engineering way}, looking the function up in a table of known Laplace transforms, and the \enquote{maths way}, using the inverse integral, which is what we are going to find in this section.
+    
+    By definition for a function, \(f\), with a Fourier transform we have
+    \begin{equation}
+        \inverseFourierTransform\{ \fourierTransform\{ f(t) \} \} = t(t).
+    \end{equation}
+    In particular consider this for some function \(F\) defined by
+    \begin{equation}
+        F(t) = \theta(t) f(t) \e^{-\gamma t}
+    \end{equation}
+    for some constant \(\gamma \in \reals\), which is such that \(\e^{-\gamma t}f(t)\) is bounded.
+    We therefore have
+    \begin{align}
+        \theta(t)f(t) &= e^{\gamma t}\inverseFourierTransform\{ \fourierTransform\{ \e^{-\gamma u}f(t)\theta(t) \} \}\\
+        &= \frac{\e^{\gamma t}}{2\pi} \int_{-\infty}^{\infty} \dl{\omega} \, \e^{i\omega t} \int_{-\infty}^{\infty} \dl{u} , \e^{-i\omega u} \e^{-\gamma u} f(u) \theta(u)\\
+        &= \frac{e^{\gamma t}}{2\pi} \int_{-\infty}^{\infty} \dl{\omega} \, \e^{i\omega t} \int_{0}^{\infty} \dl{u} \, \e^{-i\omega u}\e^{-\gamma u} f(u)\\
+        &= \frac{1}{2\pi} \int_{-\infty}^{\infty} \dl{\omega} \, \e^{i(\omega - i\gamma)t} \int_{0}^{\infty} \dl{u} \, \e^{-iu(\omega - i\gamma)} f(u).
+    \end{align}
+    Now, defining \(s = \gamma + i\omega\) we have \(\dl{s} = i\dd{\omega}\), so \(\dl{\omega} = \dl{s}/i\), and the limits change from \(\pm \infty\) to \(\gamma \pm i\infty\), which gives
+    \begin{align}
+        \theta(t)f(t) &= \frac{1}{2\pi i} \int_{\gamma - i\infty}^{\gamma + i\infty} \dl{s} \, \e^{st} \int_{0}^{\infty} \dl{u} \, \e^{-st}f(u)\\
+        &= \frac{1}{2\pi i} \int_{\gamma - i\infty}^{\gamma + i\infty} \dl{s} \, \e^{st} \laplaceTransform\{ f(u) \}.
+    \end{align}
+    For \(t > 0\) the left hand side is simply \(f(t)\) and we see that this integral is the inverse Laplace transform:
+    \begin{equation}
+        \inverseLaplaceTransform\{ F(s) \} = \frac{1}{2\pi i}\int_{\gamma - i\infty}^{\gamma + i\infty} \e^{st} F(s) \dd{s}.
+    \end{equation}
+    This is known as the \defineindex{Bromwich inversion formula}.
+    
+    Up to now we have been intentionally vague about what exactly \(\gamma\) is.
+    This is because the value depends on the exact nature of \(F\).
+    In particular we choose \(\gamma\) such that all \enquote{interesting} points are to the left in the complex plane.
+    By interesting points we mean poles, branch points, and branch cuts.
+    
+    For large \(s\) and \(t > 0\) we require \(\Re(s) < 0\) for the integral to converge, since it has a factor of \(\e^{st}\).
+    We therefore must close the contour on the left, entering the region of \enquote{interesting} points, the exact way we close the integral again depends on the nature of these interesting points, but ideally we would use a circular arc and if needed a key hole contour for a branch cut.
+    
+    For large \(s\) and \(t < 0\) we require \(\Re(s) > 0\) for the integral to converge.
+    We therefore close the contour on the right, in the region free from \enquote{interesting} points.
+    The integral is then trivially zero, which makes sense as we only define the Laplace transform for \(t > 0\).
+    
+    \begin{exm}{}{}
+        Consider the function \(F(s) = 1/s\).
+        This has a simple pole at \(s = 0\) and therefore for \(t > 0\) we have
+        \begin{equation}
+            f(t) = \frac{1}{2\pi i}\int_{\gamma - i\infty}^{\gamma + i\infty} \frac{\e^{st}}{s} \dd{s} = \Res\left( \frac{\e^{st}}{s}, 0 \right) = \e^{0} = 1.
+        \end{equation}
+        Therefore \(f(t) = \theta(t)\).
+        
+        Now consider \(F(s) = 1/s^{m+1}\),
+        This has a pole of order \(m + 1\) at \(s = 0\) and therefore for \(t > 0\) we have
+        \begin{equation}
+            f(t) = \frac{1}{2\pi i}\int_{\gamma - i\infty}^{\gamma + i\infty} \frac{\e^{st}}{s} \dd{s} = \Res\left( \frac{\e^{st}}{s^{m+1}}, 0 \right) = \frac{t^m}{m!},
+        \end{equation}
+        where we find the residue by considering the \(m\)th order term in the Taylor expansion for \(\e^{st}\), which, when divided by \(s^{m+1}\), gives us a term proportional to \(1/s\), which gives our residue when evaluated at \(s = 0\).
+        We then have \(f(t) = t^m\theta(t)/m!\).
+        This is in agreement with \(\laplaceTransform\{t^\nu\} = \Gamma(\nu + 1) / s^{\nu + 1}\).
+    \end{exm}
+    
+    \section{Convolution}
+    The definition of convolution that we use in the context of Laplace transforms is slightly different.
+    \begin{dfn}{Convolution}{}
+        Given two functions, \(f, g \colon [0, \infty) \to \complex\), we define their \defineindex{convolution} as
+        \begin{equation}
+            (f \circ g)(t) \coloneqq \int_{0}^{t} f(t - y)g(y) \dd{y}.
+        \end{equation}
+    \end{dfn}
+    
+    The reason for restricting the limit is that we require the arguments of the functions, in particular \(t - y\), be positive.
+    Taking the Laplace transform we get
+    \begin{align}
+        \laplaceTransform\{ (f \circ g)(t) \} &= \int_{0}^{\infty} \dl{t} \, \e^{-st}(f \circ g)(t)\\
+        &= \int_{0}^{\infty} \dl{t} \, \e^{-st} \int_{0}^{t} \dl{y} \, f(t - y)g(y)\\
+        &= \int_{0}^{\infty} \dl{y} \int_{y}^{\infty} \dl{t} \, \e^{-st} f(t - y)g(y)\\
+        &= \int_{0}^{\infty} \dl{y} \int_{0}^{\infty} \dl{u} \, \e^{-s(u + z)} f(u)g(y)\\
+        &= \int_{0}^{\infty} \dl{y} \e^{-su} f(u) \int_{0}^{\infty} \e^{sy}g(y)\\
+        &= \laplaceTransform\{ f(t) \} \laplaceTransform\{ g(t) \}.
+    \end{align}
+    Here we made a substitution \(u = t - z\), we also used the fact that integrating for all \(t\) and \(y\) running from \(0\) to \(t\) is the same as integrating for all \(y\) and \(t\) running from \(y\) to \(\infty\).
+    This can be seen by drawing the line \(y = t\) in the \((y,t)\)-plane, the region of integration is the triangle under this line and above the \(y\)-axis.
+    Before we swap the integrals we going up to this line, and then along to infinity.
+    After swapping the integrals we are going from this line to infinity and then down to zero.
+    
+    It can also be shown that
+    \begin{equation}
+        \laplaceTransform\{f(t)g(t)\} = \frac{1}{2\pi i} \int_{\gamma - i\infty}^{\gamma + i\infty} F(z)G(s - z) \dd{z}
+    \end{equation}
+    where \(F = \laplaceTransform\{f\}\) and \(G = \laplaceTransform\{g\}\).
+    
+    \section{Solving ODEs with Laplace Transforms}
+    The general method for solving differential equations with the Laplace transform is the same as for the Fourier transform.
+    Transform the differential equation and boundary conditions, solve the transformed equations, transform back.
+    
+    \subsection{Damped Harmonic Oscillators}
+    We will solve the damped harmonic oscillator equation,
+    \begin{equation}
+        \ddot{u}(t) + 2\kappa\dot{u}(t) + \omega_0^2u(t) = 0,
+    \end{equation}
+    for the initial conditions \(u(0) = u_0\) and \(\dot{u}(0) = v_0\).
+    Defining \(F(s) = \laplaceTransform\{u(t)\}\) we have
+    \begin{align}
+        \laplaceTransform\{\dot{u}(t)\} &= sF(s) - u(0) = sF(s) - u_0,\\
+        \laplaceTransform\{\ddot{u}(t)\} &= sF(s) - su(0) - \dot{u}(0) = sF(s) - su_0 - v_0.
+    \end{align}
+    So, the transformed differential equation is
+    \begin{equation}
+        s^2F(s) - su_0 - v_0 + 2\kappa[sF(s) - u_0] + \omega_0^2 F(s) = 0.
+    \end{equation}
+    Solving for \(F(s)\) we have
+    \begin{equation}
+        F(s) = \frac{(s + 2\kappa)u_0 + v_0}{(s + \kappa)^2 + \omega^2}
+    \end{equation}
+    where we have defined \(\omega^2 \coloneqq \omega_0^2 - \kappa^2\).
+    
+    We now have to invert this to find \(u\).
+    We can do so in two ways.
+    First, using tables of Laplace transforms we find
+    \begin{equation}
+        \laplaceTransform\{\e^{-\kappa t}\cos(\omega t)\} = \frac{s + \kappa}{(s + \kappa)^2 + \omega^2}, \qqand \laplaceTransform\{\e^{-\kappa t}\sin(\omega t)\} = \frac{\omega}{(s + \kappa)^2 + \omega^2}.
+    \end{equation}
+    To use these we write \(F(s)\) as
+    \begin{equation}
+        F(s) = u_0\frac{s + \kappa}{(s + \kappa)^2 + \omega^2} + (u_0\kappa + v_0)\frac{1}{\omega} \frac{\omega}{(s + \kappa)^2 + \omega^2}.
+    \end{equation}
+    We the have
+    \begin{equation}
+        u(t) = u_0\e^{-\kappa t}\cos(\omega t) + (u_0\kappa + v_0)\frac{1}{\omega}\e^{-\kappa t}\sin(\omega t).
+    \end{equation}
+    
+    Second, we can use the inversion theorem and evaluate
+    \begin{equation}
+        u(t) = \frac{1}{2\pi i} \int_{\gamma - i\infty}^{\gamma + i\infty} \frac{(s + 2\kappa)u_0 + v_0}{(s - s_{+})(s - s_{-})} \e^{st} \dd{s}
+    \end{equation}
+    where \(s_{\pm} = -\kappa \pm i\omega\) are the solutions to \((s + \kappa)^2 + \omega^2 = 0\), and \(\gamma > - \kappa\).
+    For \(t > 0\) we close the contour to the left with a semi circle, surrounding both poles.
+    We can argue by bounding that the contribution to the integral from the semicircle vanishes and so the integral around the closed contour is equal to the desired integral.
+    We can then evaluate this with the residue theorem giving
+    \begin{equation}
+        u(t) = \frac{(s_{+} + 2\kappa)u_0 + v_0}{(s_{+} - s_{-})}\e^{s_{+}t} + \frac{(s_{-} + 2\kappa)u_0 + v_0}{s_{-} - s_{+}}\e^{s_{-}t}.
+    \end{equation}
+    Some algebra then shows that this reduces to the same solution.
+    
+    \subsection{Coupled Equations}
+    Consider the decay process where particles of type 1 decay to particles of type 2, which decay to particles of type 3, which decay to a stable product.
+    Let \(N_i(t)\) be the number of particles of type \(i\) at time \(t\).
+    Let \(\lambda_i\) be the decay rate of type \(i\) decaying.
+    As usual the rate at which \(N_i\) is taken to be proportional to the number of particles, so for type 1 we have the standard decay equation
+    \begin{equation}
+        \diff{N_1}{t} = -\lambda_1 N_1.
+    \end{equation}
+    For type 2 the number of particles decreases due to the decay, but also increases due to particles of type 1 decaying into type 2.
+    More precisely
+    \begin{equation}
+        \diff{N_2}{t} = \lambda_1N_1 - \lambda_2N_2.
+    \end{equation}
+    Similarly for type 3
+    \begin{equation}
+        \diff{N_3}{t} = \lambda_2N_2 - \lambda_3N_3.
+    \end{equation}
+    
+    We now have three coupled differential equations.
+    Suppose we wish to solve the for a system which initially has \(N\) particles of type 1 and \(n\) particles of type 3, that is \(N_1(0) = N\), \(N_2(0) = 0\), and \(N_3(0) = n\).
+    Let \(F_i(s) = \laplaceTransform\{N_i(t)\}\).
+    Taking the Laplace transform of our equations we then have
+    \begin{align}
+        sF_1(s) - N &= -\lambda_1F_1(s),\\
+        sF_2(s) &= \lambda_1F_1(s) - \lambda_2F_2(s),\\
+        sF_3(s) - n &= \lambda_2F_2(s) - \lambda_3F_3(s).
+    \end{align}
+    We need to solve for \(F_i\).
+    We can easily the first equation for \(F_1\) giving
+    \begin{equation}
+        F_1(s) = \frac{N}{s + \lambda_1}.
+    \end{equation}
+    Solving the second equation for \(F_2\) and then substituting in our solution for \(F_1\) above we get
+    \begin{equation}
+        F_2(s) = \frac{\lambda_1F_1(s)}{s + \lambda_2} = \frac{\lambda_1N}{(s + \lambda_1)(s + \lambda_2)}.
+    \end{equation}
+    Finally solving the third equation for \(F_3\) and substituting in our solution for \(F_2\) above we get
+    \begin{equation}
+        F_3(s) = \frac{n}{s + \lambda_3} + \lambda_2\frac{F_2(s)}{s + \lambda_3} = \frac{n}{s + \lambda_3} + \frac{\lambda_1\lambda_2N}{(s + \lambda_3)(s + \lambda_2)(s + \lambda_1)}.
+    \end{equation}
+    
+    Suppose that the quantity we are interested in is \(N_3\).
+    We can find this by computing
+    \begin{equation}
+        N_3(t) = \frac{1}{2\pi i} \int_{\gamma - i\infty}^{\gamma + i\infty} \left[ \frac{n}{s + \lambda_3} + \frac{\lambda_1\lambda_2N}{(s + \lambda_3)(s + \lambda_2)(s + \lambda_1)} \right] \e^{st} \dd{s}.
+    \end{equation}
+    We can close the contour and show that the extra part of the contour doesn't contribute and so we can compute this integral by the Rsidue theorem, if we do then we find that
+    \begin{align}
+        N_3(t) = \sum_{i = 1}^{3} \Res(-\lambda_i)\\
+        &= \frac{\lambda_1\lambda_2N\e^{-\lambda_1t}}{(\lambda_2 - \lambda_1)(\lambda_3 - \lambda_1)} + \frac{\lambda_1\lambda_2N\e^{-\lambda_2t}}{(\lambda_1 - \lambda_2)(\lambda_3 - \lambda_2)} + n + \frac{\lambda_1\lambda_2N\e^{-\lambda_3t}}{(\lambda_1 - \lambda_3)(\lambda_2 - \lambda_3)}.
+    \end{align}
+    
+    For large \(t\), since each term, apart from \(n\), is proportional to \(\e^{-\lambda_it}\), the value of \(N_3(t)\) is determined by the term where \(\lambda_i\) has the smallest real part, plus the constant \(n\).
+    For example, if \(\lambda_3\) has the smallest real part then 
+    \begin{equation}
+        N_3(t) \sim \frac{\lambda_1\lambda_2N\e^{-\lambda_3t}}{(\lambda_1 - \lambda_3)(\lambda_2 - \lambda_3)} + n.
+    \end{equation}
+    For even larger times \(N_3(t) \approx n\) and we have a mostly steady-state where the number of particles decaying to type 3 is balanced by the number of particles of type 3 decaying.
+    
+    \subsubsection{Asymptotic Behaviour}
+    We have seen here a general principle of Laplace transform inversion, which is that the asymptotic behaviour is given by the \enquote{singularity}\footnote{we use this word here in the physics sense, to mean poles, branch points, and branch cuts.} closest to the contour, that is the \enquote{singularity} with the largest real part.
+    
+    If the \enquote{singularity}, say \(s_0\), is an isolated pole then we calculate \(\Res(s_0)\) to find the asymptotic behaviour.
+    If the \enquote{singularity} is instead a branch point then we expand around this point and find that
+    \begin{equation}
+        F(s) \sim (s - s_0)^\nu \sum_{n=0}^{\infty} a_n(s - s_0)^n.
+    \end{equation}
+    Note that this is a series around a branch point, so likely won't converge, but this is fine as we are looking at the asymptotic behaviour.
+    
+    \section{Integral Representations}
+    We can use the inversion theorem to find integral representations for special functions.
+    For example we have seen that \(\laplaceTransform\{t^\nu\} = \Gamma(\nu + 1)/s^{\nu + 1}\) for \(\nu > -1\).
+    Therefore
+    \begin{equation}
+        \frac{t^{\nu}}{\Gamma(\nu + 1)} = \inverseLaplaceTransform\left\{ \frac{1}{s^{\nu + 1}} \right\} = \frac{1}{2\pi i} \int_{\gamma - i\infty}^{\gamma + i\infty} \frac{\e^{st}}{s^{\nu + 1}} \dd{s}.
+    \end{equation}
+    For this we require that \(\gamma > 0\) so that we are to the right of \(s = 0\), which is a branch point for non-integer \(\nu\).
+    Take the branch cut to be along the negative real axis.
+    We then Close this contour to the left of \(\gamma\).
+    Doing so we have to avoid the branch cut, which we can do using a Hankel type contour, which looks like a semicircle, except that upon reaching the real axis it goes along the axis to the origin, then back underneath the axis in a way similar to \cref{fig:hankel contour}.
+    
+    The result is a contour containing no singularities.
+    We can show that the integrals not along the branch cut don't contribute as the contour becomes infinitely large.
+    Our inversion integral is then equal to the negative of the contour, \(C\), around the branch cut, which is now exactly like \cref{fig:hankel contour}, except reflected in the imaginary axis.
+    We then have
+    \begin{equation}
+        \frac{1}{\Gamma(\nu + 1)} = t^{-\nu} \frac{1}{2\pi i} \int_{-C} \frac{\e^{st}}{s^{\nu + 1}} \dd{s} = \frac{1}{2\pi i} \int_{-C} \e^{z}z^{-\nu - 1} \dd{z}.
+    \end{equation}
+    Here we have defined \(z = st\).
+    We have found an integral representation of \(1/\Gamma(\nu + 1)\).
+    This can be verified by parametrising the integral above as \(z = \e^{i\pi u}\) and below as \(z = \e^{-i\pi u}\), and then identifying the integral for \(\Gamma(-\nu)\) and using Euler's reflection formula.
+    
+    \chapter{Generalised Transform Method}
+    The Fourier transform and Laplace transform are very similar.
+    In fact there are many transforms that are useful, these are just two of the most common.
+    Another example may be the Mellin Transform, defined as
+    \begin{equation}
+        \varphi(z) = \int_{0}^{\infty} f(t) t^{z-1} \dd{t}, \qqand f(t) = \frac{1}{2\pi i} \int_{c - i\infty}^{c + i\infty} \varphi(z) t^{-z} \dd{z}.
+    \end{equation}
+    This is pretty much the Laplace transform replacing \(\e^{-st}\) with \(t^{z - 1}\).
+    
+    Another transform that one might consider is the Hilbert transform
+    \begin{equation}
+        g(y) = \frac{1}{\pi} \mathsf{P} \!\! \int_{-\infty}^{\infty}\nu\frac{f(x)}{x - y} \dd{x}, \qqand \frac{1}{\pi} \mathsf{P} \! \int_{-\infty}^{\infty} \frac{g(y)}{y - x} \dd{y}.
+    \end{equation}
+    Here \(\mathsf{P}\) denotes the Cauchy principle value of the integral, which is to say we split the integral at the troublesome point, \(x = y\), and compute the integrals either side as we take the limit of the bounds tending to that point.
+    For more details see the complex analysis part of the methods of theoretical physics course.
+    
+    We can define a general integral transform of some function \(v\) into the function \(u\) as
+    \begin{equation}
+        u(z) = \int_{C} v(s) K(z, s) \dd{s}
+    \end{equation}
+    where \(C\) is some contour in \(\complex\), and \(K\) is the \defineindex{kernel}.
+    Some common choices for the kernel include \(\e^{isz}\), like in the Fourier transform, \(\e^{sz}\), like in the Laplace transform, \(z^{-s}\), like in the Mellin transform, \(sJ_n(sz)\), the list goes on.
+    Note that even if we use the Fourier-like kernel the transform is not necessarily the Fourier transform since we are considering some contour \(C\), and the Fourier transform is defined by an integral along the real axis.
+    
+    \section{Solving ODEs}
+    Consider the homogenous linear ODE
+    \begin{equation}
+        \linop_{z}u(z) = 0.
+    \end{equation}
+    We make the ansatz that this has a solution of the form
+    \begin{equation}
+        u(z) = \int_C K(z, s) v(s) \dd{s}.
+    \end{equation}
+    Since \(\linop_z\) acts on \(z\) and the integral is with respect to \(s\) we can swap them giving
+    \begin{equation}
+        0 = \linop_{z}u(z) = \linop_{z} \int_C K(z, s) v(s) \dd{s} = \int_C K(z, s) v(s) \dd{s}.
+    \end{equation}
+    Since \(\linop_z\) acts only on \(z\) it has no effect on \(v(s)\).
+    We can therefore consider \(\linop_z K(z, s)\).
+    What we do is look for some linear operator on \(s\), say \(\mathcal{M}_s\) such that
+    \begin{equation}
+        \linop_{z}K(z, s) = \mathcal{M}_sK(z, s).
+    \end{equation}
+    Once we find a suitable operator we have
+    \begin{equation}
+        0 = \int_{C} [\mathcal{M}_sK(z, s)]v(s)\dd{s}.
+    \end{equation}
+    We can integrate this by parts giving
+    \begin{equation}\label{eqn:laplace method goal}
+        0 = [R(z, s)]_{C} - \int_C K(z, s)[\mathcal{M}_s^\hermit v(s)] \dd{s}.
+    \end{equation}
+    Here \(\mathcal{M}_s^\hermit\) is the adjoint operator of \(\mathcal{M}_s\).
+    Don't worry too much about what this means, its just another operator and we never actually need to compute the adjoint, it appears naturally as we'll see in examples.
+    It is defined such that
+    \begin{equation}
+        \mathcal{M}_s[K(z, s)v(s)] = [\mathcal{M}_sK(z, s)]v(s) + K(z, s)[\mathcal{M}_s^\hermit v(s)].
+    \end{equation}
+    The term \([R(z, s)]_C\) is some boundary term, and the integral is the transform of \(\mathcal{M}_s^\hermit v(s)\).
+    We demand that both the boundary term and transform term vanish independently.
+    Since we can only choose the boundary term to vanish by choosing \(C\) we must therefore have that \(\mathcal{M}_sv(s)\) vanishes in order for the integral to vanish.
+    
+    There are a few standard choices for \(C\):
+    \begin{itemize}
+        \item A closed contour enclosing a region in which \(R\) is analytic.
+        \item An interval with \(R\) vanishing at the endpoints.
+    \end{itemize}
+    If we can continuously deform a contour into another contour without crossing poles, branch points, or branch cuts then the two contours will give the same solution.
+    If we can't then the contours will give linearly independent solutions.
+    
+    \section{Confluent Hypergeometric Equation}
+    The \defineindex{confluent hypergeometric equation} is
+    \begin{equation}
+        zu'' + (c - z)u' - au = 0
+    \end{equation}
+    for some parameters \(a\) and \(c\).
+    We can solve this with a Laplace-like kernel, \(K(z, s) = \e^{sz}\).
+    We make the ansatz that
+    \begin{equation}
+        u(z) = \int_C \e^{sz}v(s) \dd{s}
+    \end{equation}
+    for some function \(v\) and contour \(C\) to be determined.
+    
+    We can calculate the derivatives with respect to \(z\) easily since the integral is with respect to \(s\):
+    \begin{align}
+        u'(z) &= \int_C s\e^{sz}v(s)\dd{s},\\
+        u''(z) &= \int_C s^2\e^{sz}v(s)\dd{s}.
+    \end{align}
+    Substituting these back into the differential equation we get
+    \begin{equation}
+        0 = \int_C [zs^2 + (c - z)s - a]\e^{sz}v(s) \dd{s}.
+    \end{equation}
+    We want to rewrite the term in the square brackets in such a way that separate out the \(z\) part and the non-\(z\) part, which can be done as follows
+    \begin{equation}
+        0 = \int_C [z(s^2 - s)]\e^{sz}v(s) \dd{s} + \int_C [cs - a]\e^{sz}v(s)\dd{z}.
+    \end{equation}
+    We leave the second term as it is, we integrate the first term by parts:
+    \begin{alignat}{2}
+        a &= z(s^2 - s)v(s), \qquad & v\hphantom{'} &= \frac{1}{z}\e^{sz},\\
+        a' &= z(2s - 1)v(s) + z(s^2 - s)v'(s), \qquad & v' &= \e^{sz},
+    \end{alignat}
+    and so the first integral becomes
+    \begin{multline}
+        \left[ z(s^2 - s)v(s)\frac{1}{z}\e^{sz} \right]_C - \int_C \frac{1}{z}\e^{sz}[z(2s - 1)v(s) + z(s^2 - s)v'(s)]\\
+        = [s(s - 1)v(s) \e^{sz}]_C - \int_C \e^{sz}[(2s - 1)v(s) + s(s - 1)v'(s)] \dd{s}.
+    \end{multline}
+    Putting this back with the second integral we have
+    \begin{equation}
+        0 = [s(s - 1)v(s)\e^{sz}]_C + \int_C [\{(cs - a) - (2s - 1)\}v(s) - s(s - 1)v'(s)]\e^{sz} \dd{s}.
+    \end{equation}
+    Which simplifies slightly to
+    \begin{equation}
+        0 = [s(s - 1)v(s)\e^{sz}]_C + \int_C [[s(c - 2) -a + 1]v(s) - s(s - 1)v'(s)] \e^{sz} \dd{s}.
+    \end{equation}
+    This is now in the same form as \cref{eqn:laplace method goal}.
+    
+    We require that the integrand vanishes for all \(s\), which must mean that
+    \begin{equation}
+        [s(c - 2) - a + 1]v(s) - s(s - 1)v'(s) = 0.
+    \end{equation}
+    This is a simple first order separable differential equation, rearranging we have
+    \begin{equation}\label{eqn:hypergeometric transformed}
+        \frac{v'(s)}{v(s)} = \frac{s(c - 2) - a + 1}{s(s - 1)}.
+    \end{equation}
+    A partial fractions decomposition gives
+    \begin{equation}
+        \frac{s(c - 2) - a + 1}{s(s - 1)} = \frac{a - 1}{s} + \frac{c - a + 1}{s - 1}.
+    \end{equation}
+    We can now integrate \cref{eqn:hypergeometric transformed} to get
+    \begin{equation}
+        \ln[v(s)] = (a - 1)\ln s + (c - a + 1)\ln(s - 1) + \mathcal{C}
+    \end{equation}
+    where \(\mathcal{C}\) is some constant of integration.
+    We are free to choose this constant, so we take it to be 0 giving
+    \begin{equation}
+        v(s) = s^{a - 1}(s - 1)^{c - a + 1}.
+    \end{equation}
+    We now know that the solution is
+    \begin{equation}
+        u(z) = \int_C s^{a - 1}(s - 1)^{c - a - 1} \e^{sz} \dd{s}.
+    \end{equation}
+
+    We simply have to choose a contour, \(C\), such that
+    \begin{equation}
+        [s(s - 1)v(s)\e^{sz}]_C = [s^a(s - 1)^{c-a}\e^{sz}]_C = 0.
+    \end{equation}
+    The choice of this contour depends on the nature of \(a\) and \(c\), we will consider a few cases here.
+    
+    \subsection{\texorpdfstring{\(a, c \in \integers\) and \(\Re(z) > 0\)}{Integer a and c and Re(z) > 0}}
+    \subsubsection{\texorpdfstring{\(a \le 0\) and \(c - a \le 0\)}{a and c - a Both Negative}}
+    In this case we have poles at \(s = 0\) and \(s = 1\).
+    Two independent contours that we can choose are closed contours encircling each pole.
+    
+    \subsubsection{\texorpdfstring{\(a > 0\) and \(c - a \le 0\)}{a Positive and c - a Less Than or Equal to Zero}}
+    In this case  there is a pole at \(s = 1\), but no longer at \(s = 0\).
+    We can still use a closed contour around the pole at \(s = 1\).
+    For the second contour we instead choose the interval \((-\infty, 0)\), since \(\e^{sz}\) vanishes at \(s = -\infty\) and \(s^a\) vanishes at \(s = 0\), so the boundary term vanishes at both ends of the interval.
+    
+    \subsubsection{\texorpdfstring{\(a > 0\) and \(c - a > 0\)}{a and c - a Positive}}
+    In this case there are no poles, and hence no closed contours that we can use to get a nontrivial answer.
+    Instead we use two open contours.
+    We can use the \((-\infty, 0)\) contour from the last section, and we can also use \((0, 1)\) since \(s^a\) vanishes at \(s = 0\) and \((s - a)^{c - a}\) vanishes at \(s = 1\).
+    
+    \subsection{\texorpdfstring{\(a \in \integers\), \(c \notin \integers\), and \(\Re(z) > 0\)}{Integer a, Noninteger c, and Positive Re(z)}}
+    \subsubsection{\texorpdfstring{\(a \le 0\)}{a Less Than or Equal to 0}}
+    In this case there is a pole at \(s = 0\).
+    We can therefore choose one contour to be a closed contour about the origin.
+    There is a branch point at \(s = 1\) since \(c - a \notin \integers\).
+    There is a second branch point at infinity.
+    The obvious choice of branch cut is along the positive real axis, starting at \(s = 1\).
+    We can also use a contour from \(-\infty\) to \(s = 0\), since \(\e^{sz}s^a(s - 1)^{c - a}\) vanishes at these two points.
+    
+    \subsection{\texorpdfstring{\(a \notin \integers\), \(c \in \integers\) and \(\Re(z) > 0\)}{Noninteger a, Integer c, and Re(z) Positive}}
+    There are branch points at \(s = 0\) and \(s = 1\), but not at infinity.
+    We therefore consider a branch cut from 0 to 1.
+    
+    \subsubsection{\texorpdfstring{\(\Re(a), \Re(c) > 0\)}{Re(a) and Re(c) Positive}}
+    Since \(s^{a}(s-1)^{c-a}\e^{sz}\) vanishes at \(s = 0, 1, -\infty\) there are 5 possible contours we can choose connecting two points in such a way as to avoid the branch cut, in particular we can choose 0 to \(-\infty\) along the negative real axis, 0 to 1 above the branch cut, 0 to 1 below the branch cut, 1 to \(-\infty\) above the branch cut, or 1 to \(-\infty\) below the branch cut.
+    Any two linearly independent contours from this list should work, for example we may choose 0 to \(-\infty\) and 0 to 1 above the branch cut.
+    We couldn't choose \(0\) to \(-\infty\) and \(1\) to \(-\infty\) since these contours overlap.
+    
+    \subsubsection{\texorpdfstring{\(\Re(a) < 0\) and \(\Re(c) > 0\)}{Re(a) Negative and Re(c) Positive}}
+    One option is to choose one contour from \(0\) to \(-\infty\) and the other to be a loop around the branch cut.
+    
+    \section{Airy Equation}
+    Airy's differential equation is
+    \begin{equation}
+        u''(z) - zu(z) = 0.
+    \end{equation}
+    We will look for a solution of the form
+    \begin{equation}
+        u(z) = \int_C \e^{sz}v(s)\dd{s}.
+    \end{equation}
+    We start by finding the derivatives:
+    \begin{equation}
+        u''(z) = \int_C s^2\e^{sz}v(s) \dd{s}.
+    \end{equation}
+    Substituting this into our differential equation we have
+    \begin{equation}
+        0 = \int_C \e^{sz}[s^2 - z]v(s) \dd{s}.
+    \end{equation}
+    Integrating the second term by parts
+    \begin{alignat}{2}
+        a &= zv(s), \qquad & v\hphantom{'} &= \frac{1}{z}\e^{sz},\\
+        a' &= zv'(s), \qquad & v' &= \e^{sz},
+    \end{alignat}
+    we have
+    \begin{equation}
+        \int_{C} z\e^{sz}v(s) \dd{s} = \left[ \frac{1}{z}\e^{sz}zv(s) \right]_C - \int_C zv'(s)\frac{1}{z}\e^{sz}.
+    \end{equation}
+    Combining this back with the first term we have
+    \begin{equation}
+        -[v(s)\e^{sz}]_C + \int_C \e^{sz}[s^2v(s) + v'(s)]\dd{s} = 0.
+    \end{equation}
+    We therefore choose \(v\) such that
+    \begin{equation}
+        s^2v(s) - v'(s) = 0 \implies \frac{v'}{v} = -s^2 \implies \ln [v(s)] = A\e^{-s^3/3}
+    \end{equation}
+    for some constant of integration, \(A\).
+    
+    We therefore have the solution
+    \begin{equation}
+        u(z) = \int_C \e^{zs - s^3/3} \dd{s}.
+    \end{equation}
+    We choose \(C\) such that
+    \begin{equation}
+        [v(s)\e^{sz}]_C = [\e^{zs - s^3/3}]_C = 0.
+    \end{equation}
+    
+    Now, the integrand for \(u(z)\) above has no singularities, this means that \(C\) cannot be a closed contour.
+    The boundary term has no zeros for finite \(s\), so we must consider infinity.
+    At \(s = \infty\) let \(s = R\e^{i\vartheta}\), and we'll take \(R \to \infty\).
+    The dominating term is
+    \begin{equation}
+        \e^{-s^3/3} = \exp\left[ -\frac{R^3}{3}(\cos(3\vartheta) + i\sin(3\vartheta)) \right],
+    \end{equation}
+    except when \(\cos(3\vartheta) = 0\), in which case \(\e^{sz}\) dominates.
+    We need to determine in what directions the boundary term vanishes as \(s \to \infty\).
+    To do so we rewrite it as
+    \begin{align}
+        \e^{sz-s^3/3} &= \exp\left[ R(\cos\vartheta + i\sin\vartheta)z - \frac{R^3}{3}\{\cos(3\vartheta) + i\sin(3\vartheta)\} \right]\\
+        \abs{\e^{sz - s^3/3}} &= \exp\left[ -\frac{R^3}{3}\cos(3\vartheta)\left\{ 1 - \frac{3z}{R^2}\frac{\cos\vartheta}{\cos(3\vartheta)} \right\} \right].
+    \end{align}
+    For \(\cos(3\vartheta) > 0\) and \(\Re(z) > 0\) this vanishes in the limit \(R \to \infty\).
+    
+    The first requirement, that \(\cos(3\vartheta)\), holds in three regions:
+    \begin{alignat}{4}
+        -\frac{\pi}{2} &< 3\vartheta < \frac{\pi}{2} \qquad\qquad & -\frac{\pi}{6} &< \vartheta < \frac{\pi}{6}\\
+        -\frac{3\pi}{2} &< 3\vartheta < \frac{5\pi}{2} \qquad\qquad & -\frac{\pi}{2} &< \vartheta < \frac{5\pi}{6}\\
+        -\frac{5\pi}{2} &< 3\vartheta < -\frac{3\pi}{2} \qquad\qquad & -\frac{5\pi}{6} &< \vartheta < \frac{\pi}{2}
+    \end{alignat}
+    These are depicted in \cref{fig:airy regions}.
+    Outside of these regions \(\cos(3\vartheta) < 0\) and so for \(\Re(z) > 0\) the function diverges as \(R \to \infty\).
+    The lines separating these regions are known as the \define{Stokes lines}\index{Stokes line}.
+    
+    If we have a contour entirely within one region then in the limit of \(R \to \infty\) the function will vanish everywhere on the contour and so the result is the trivial solution.
+    For nontrivial results we instead require contours that pass between regions.
+    Some possible contours are shown in \cref{fig:airy regions}.
+    We can use these to complete a contour at infinity, by integrating along each contour.
+    Since there are no poles this integral will vanish and the result is that we can determine the integral on one contour entirely from the integrals on the two other contours.
+    This means that there are only two independent contours and hence two solutions.
+    
+    \begin{figure}
+        \tikzsetnextfilename{airy-generalised-transform-regions}
+        \begin{tikzpicture}
+            \begin{scope}
+                \clip (-4, -4) rectangle (4, 4);
+                \fill[highlight] (0, 0) -- (-pi/6 r:5) -- (pi/6 r:5);
+                \fill[highlight] (0, 0) -- (pi/2 r:6.5) -- (5*pi/6 r:6.5);
+                \fill[highlight] (0, 0) -- (-5*pi/6 r:6.5) -- (-pi/2 r:6.5);
+            \end{scope}
+            \draw[dark, very thick] (-2, 4)  .. controls (0, 0) .. (4, 1) node[right] {\(C_1\)};
+            \draw[dark, very thick] (4, -1) node[right] {\(C_2\)}  .. controls (0, 0) .. (-2, -4);
+            \draw[dark, very thick] (-4, -3) .. controls (0, 0) .. (-4, 3) node[left] {\(C_3\)};
+            
+            \coordinate (label 1) at (3.05, 1.95);
+            \node[highlight, rotate around={pi/6 r:(label 1)}, font=\footnotesize] at (label 1) {\(\vartheta \in [-\pi/6, \pi/6]\)};
+            \coordinate (label 2) at (-3.1, 1.59);
+            \node[highlight, rotate around={-pi/6 r:(label 2)}, font=\footnotesize] at (label 2) {\(\vartheta \in [\pi/2, 5\pi/6]\)};
+            \coordinate (label 3) at (-3.05, -1.58);
+            \node[highlight, rotate around={pi/6 r:(label 3)}, font=\footnotesize] at (label 3) {\(\vartheta \in [-5\pi/6, -\pi/2]\)};
+            
+            \draw[very thick, ->] (-4, 0) -- (4, 0) node[right] {\(\Re(s)\)};
+            \draw[very thick, ->] (0, -4) -- (0, 4) node[above] {\(\Im(s)\)};
+        \end{tikzpicture}
+        \caption{The regions in which \(\e^{sz - s^3/3}\) vanishes as \(s \to \infty\).}
+        \label{fig:airy regions}
+    \end{figure}
+
+    \section{Another Example}
+    Consider the differential equation
+    \begin{equation}
+        zu'' + 2au' + zu = 0
+    \end{equation}
+    where \(\Re(a) > 0\).
+    We will solve this with the ansatz
+    \begin{equation}
+        u(z) = \int_{\gamma} \e^{zs} v(s) \dd{s}.
+    \end{equation}
+    As usual the first step is to differentiate the ansatz,
+    \begin{equation}
+        u' = \int_{\gamma} s\e^{sz} \dd{s}, \qqand u'' = \int_{\gamma} s^2 \e^{sz} v(s) \dd{s},
+    \end{equation}
+    and substitute into the differential equation getting
+    \begin{equation}
+        0 = \int_{\gamma} [zs^2 + 2as + z] \e^{sz} v(s) \dd{s}.
+    \end{equation}
+    Rewriting the integral to separate out the \(z\) dependence of the term in square brackets we have
+    \begin{equation}
+        0 = \int_{\gamma} z(s^2 + 1)\e^{sz}v(s) \dd{s} + \int_{\gamma} 2as\e^{sz}v(s) \dd{s}.
+    \end{equation}
+    We then do the first integral by parts:
+    \begin{alignat}{2}
+        a &= z(1 + s^2)v(s), \qquad & v\hphantom{'} &= \frac{1}{z}\e^{sz},\\
+        a' &= z(s^2 + 1)v'(s) + 2zsv(s), \qquad & v' &= \e^{sz},
+    \end{alignat}
+    we get
+    \begin{equation}
+        \left[ z(1 + s^2)v(s)\frac{1}{z}\e^{sz} \right]_{\gamma} - \int_{\gamma} [z(s^2 + 1)v'(s) + 2zsv(s)]\frac{1}{z}\e^{sz} \dd{s}.
+    \end{equation}
+    Putting this back with the other integral we have
+    \begin{equation}
+        0 = [(1 + s^2)v(s)\e^{sz}]_{\gamma} + \int_{\gamma} [2asv(s)-(s^2 + 1)v'(s) - 2sv(s)]\e^{sz}.
+    \end{equation}
+    The integrand should vanish giving
+    \begin{equation}
+        \frac{v'}{v} = \frac{2s(a - 1)}{s^2 + 1} \implies \ln v = (a - 1) \int \frac{2s}{s^2 + 1} \dd{s} = (a - 1) \ln (s^2 + 1).
+    \end{equation}
+    Which gives
+    \begin{equation}
+        v(s) = (s^2 + 1)^{a - 1}.
+    \end{equation}
+    Hence the solution is
+    \begin{equation}
+        u(z) = \int_{\gamma} (s^2 + 1)^{a - 1} \e^{sz} \dd{s}
+    \end{equation}
+    where we choose \(\gamma\) such that \([\e^{sz}(s^2 + 1)^a]_{\gamma} = 0\).
+    We're dealing with a second order differential equation, so we expect two such contours.
+    
+    If \(a \notin \integers\) then we have a branch point at \(s = \pm i, \infty\), recall that we find the branch point at infinity by considering \(s \to 1/t\) and \(t \to 0\),
+    \begin{equation}
+        (s^2 + 1)^{a - 1} \to \left( \frac{1}{t^2} + 1 \right)^{a-1} = \left( \frac{1 + t^2}{t^2} \right)^{a - 1}.
+    \end{equation}
+    This still has a problem point at \(t = 0\), so we have a branch point at infinity.
+    
+    Considering the boundary term, \(\e^{sz}(s^2 + 1)^a\) we see this vanishes at \(s = \pm i\) and \(s = \infty\) for \(\Re(z) < 0\), or \(s = -\infty\) for \(\Re(z) > 0\).
+    There are no poles since \(\Re(a) > 0\) and so we can't choose closed contours.
+    Instead we choose contours joining \(\pm i\).
+    We choose a branch cut going from \(-i\) to \(i\), and then another from \(i\) to \(\infty\), both along the imaginary axis.
+    We choose one contour connecting \(i\) and \(-i\) to the left of the branch point, and one connecting \(i\) and \(-i\) on the right of the contour.
+    
+    Next consider the special case of \(z \in \reals\) and \(a = 1\), so \(a - 1 = 0\), meaning our solution is now of the form
+    \begin{equation}
+        u(z) = \int_{\gamma} (s^2 + 1)^{a - 1} \e^{sz} \dd{s} = \int_{\gamma} \e^{sz} \dd{s}.
+    \end{equation}
+    If \(a = 1\) then here are no branch points.
+    This means that the two contours chosen before give the same value, and so we need a second independent contour.
+    First we can evaluate the integral to find the solution if we take the contour to be the line segment from \(-i\) to \(i\):
+    \begin{align}
+        u_1(z) = \int_{-i}^{i} \e^{sz} \dd{s} = \left[ \frac{1}{z}\e^{sz} \right]_{-i}^{i} = C\frac{1}{z}(\e^{iz} - \e^{-iz}) = \frac{C}{z}\sin z
+    \end{align}
+    for some constant \(C\) to be fixed by the initial conditions.
+    
+    For a second solution we need a new contour.
+    If \(z > 0\) then \(s = -\infty\) is a vanishing point for the boundary term.
+    We can take contours from \(\pm i\) to \(-\infty\), in particular we can choose straight lines parallel to the real axis.
+    We'll take \(-i\) to \(-\infty\).
+    We then have
+    \begin{equation}
+        u_2(z_+) = \int_{-\infty - i}^{-i} \e^{sz} \dd{s} = \left[ \frac{1}{z}\e^{sz} \right]_{-\infty - i}^{-i} = -\frac{1}{z}\e^{-iz}.
+    \end{equation}
+    For \(z < 0\) we instead need \(s = \infty\) and we take \(i\) to \(\infty\) as our contour.
+    We then have
+    \begin{equation}
+        u_2(z_-) = \int_{i}^{\infty + i} \e^{sz} \dd{s} = \left[ \frac{1}{z}\e^{sz} \right]_{i}^{\infty + i} = \frac{1}{z}\e^{iz} = -\frac{1}{\abs{z}}\e^{-i\abs{z}}.
+    \end{equation}
+    We can write these two solutions for positive and negative \(z\) as one, including now an arbitrary constant, which we absorb the overall minus sign with,
+    \begin{equation}
+        u_2(z) = \frac{\tilde{C}}{z}\e^{-i\abs{z}}.
+    \end{equation}
+    Requiring that our two solutions be independent we can expand the exponential using Euler's formula and discard the non-independent sine term giving
+    \begin{equation}
+        u_2(z) = \frac{\hat{C}}{z}\cos z,
+    \end{equation}
+    where \(\hat{C}\) is some constant to be determined from initial conditions.
+    
+    \part{Partial Differential Equations}
+    \chapter{Examinable Partial Differential Equations}
+    When we take the Laplace or Fourier transform of an ordinary differential equation we get an algebraic equation.
+    When we take the Laplace of Fourier transform of a partial differential equation (PDE)\glossary[acronym]{PDE}{partial differential equation} we reduce the number of independent variables by one.
+    This means that if we take the transform of a two independent variable PDE we reduce it to an ODE.
+    
+    \begin{rmk}
+        Partial differential equations are examinable only if they can easily be reduced to ordinary differential equations in this way.
+    \end{rmk}
+    
+    \section{Heat Equation}
+    Consider a well insulated semi-infinite bar, extending from \(0\) to infinity, along the \(x\)-axis.
+    Suppose that the bar is initially at \qty{0}{\degreeCelsius} everywhere, that is \(u(x, 0) = 0\), where \(u(x, t)\) is the temperature of the bar at \(x\) at time \(t\), in degrees celsius.
+    At time \(t = 0\) the end of the bar at \(x = 0\) is heated immediately to \qty{100}{\degreeCelsius} and held there.
+    
+    The temperature in the bar evolves according to the heat equation
+    \begin{equation}
+        \diffp[2]{u}{x} = \frac{1}{\alpha^2}\diffp{u}{t}
+    \end{equation}
+    for some constant \(\alpha\).
+    We can solve this by taking the Lorentz transform with respect to the time variable.
+    Let
+    \begin{equation}
+        U(x, p) = \laplaceTransform_t\{u(x, t)\} = \int_{0}^{\infty} \e^{-pt}u(x, t)\dd{t}.
+    \end{equation}
+    We then have
+    \begin{equation}
+        \laplaceTransform_{t} \left\{ \diffp{u}{t} \right\} = pU(x, p) - u(x, 0) = pU(x, p)
+    \end{equation}
+    since \(u(x, 0) = 0\) by the initial conditions.
+    We also have
+    \begin{equation}
+        \laplaceTransform_t\left\{ \diffp[2]{u}{x} \right\} = \diffp*[2]{\laplaceTransform_{t} \{u\}}{x} = \diffp*[2]{U(x, p)}{x}.
+    \end{equation}
+    
+    Hence the transformed equation is
+    \begin{equation}
+        \diffp*[2]{U(x, p)}{x} = \frac{p}{\alpha^2} U(x, p).
+    \end{equation}
+    Defining \(\tilde{U}(x) = U(x, p)\) we see that this is really an ordinary differential equation in \(x\) for some fixed \(p\):
+    \begin{equation}
+        \diff*[2]{\tilde{U}(x)}{x} = \frac{p}{\alpha^2}\tilde{U}(x).
+    \end{equation}
+    Regardless we continue to work with \(U(x, p)\), and just mentally hold \(p\) constant.
+    
+    This second order ODE can be solved easily by the ansatz \(U(x, p) = \e^{\lambda x}\), which gives \(U''(x, p) = \lambda^2\e^{\lambda x}\) and so
+    \begin{equation}
+        \lambda^2 = \frac{p}{\alpha^2} \implies \lambda = \pm \frac{\sqrt{p}}{\alpha}.
+    \end{equation}
+    The full solution is then
+    \begin{equation}
+        U(x, p) = C_1 \e^{x\sqrt{p}/\alpha} + C_2 \e^{-x\sqrt{p}/\alpha}.
+    \end{equation}
+    
+    Applying the boundary condition that \(u(0, t) = 100\) we need to take the transform of this, which is easy since
+    \begin{equation}
+        \laplaceTransform_{t}\{100\} = 100 \laplaceTransform_{t}\{1\} = 100 \int_{0}^{\infty} \e^{-pt} \dd{t} = 100\left[ \frac{1}{p}\e^{-pt} \right]_{0}^{\infty} = \frac{100}{p}.
+    \end{equation}
+    We also require that \(u \to 0\) as \(x \to \infty\).
+    This is because we need a physical solution, so infinitely far away there can be no change in a finite time.
+    This means that we have \(U \to 0\) as \(x \to 0\), and so the transformed function must also vanish as \(x \to \infty\).
+    Using this we have
+    \begin{equation}
+        0 = \lim_{x\to\infty} U(x, p) = \lim_{x\to 0}\left[ C_1\e^{x\sqrt{p}/\alpha} + C_2\e^{-x\sqrt{p}/\alpha} \right].
+    \end{equation}
+    In order for this to hold we must have \(C_1 = 0\).
+    We can then apply the first condition, that \(U(0, p) = 100/p\), and we have
+    \begin{equation}
+        U(0, p) = C_2 = \frac{100}{p}.
+    \end{equation}
+    Therefore we have
+    \begin{equation}
+        U(x, p) = \frac{100}{p}\e^{-x\sqrt{p}/\alpha}.
+    \end{equation}
+    The final step is to invert this, doing so gives the solution
+    \begin{equation}
+        u(x, t) = 100\erfc\left( \frac{x}{2\alpha\sqrt{t}} \right).
+    \end{equation}
+    
+    \section{Wave Equation}
+    Consider the wave equation
+    \begin{equation}
+        \diffp[2]{u}{x} = \frac{1}{c^2} \diffp[2]{u}{t}.
+    \end{equation}
+    Taking the Fourier transform with respect to \(x\) if we define \(\tilde{u}(k, t) = \fourierTransform_x\{u(x, t)\}\) we have
+    \begin{equation}
+        \fourierTransform_{x}\left\{ \diffp[n]{u}{x} \right\} = (ik)^n\tilde{u}(k, t),
+    \end{equation}
+    and
+    \begin{equation}
+        \fourierTransform_{x}\left\{ \diffp[2]{u}{t} \right\} = \diffp*[2]{\fourierTransform_{x}\{u\}}{t} = \diffp[2]{\tilde{u}}{t}.
+    \end{equation}
+    The transformed wave equation is therefore
+    \begin{equation}
+        -k^2\tilde{u}(k, t) = \frac{1}{c^2}\diffp[2]{\tilde{u}}{t}.
+    \end{equation}
+    This is now an ordinary differential equation in \(t\) for some fixed \(k\).
+    We can solve it by a variety of methods discussed in this course for various initial and boundary conditions.
+    
     %Appendicies
     %\appendixpage
     %\begin{appendices}
