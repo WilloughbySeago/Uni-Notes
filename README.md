@@ -120,4 +120,6 @@ Some of the books I have used to help write these notes:
 * Riley, K. F. et al. _Mathematical Methods for Physics and Engineering_, third edition (Cambridge University Press, Cambridge, 2006)
 * Halliday, D. _Principles of Physics_, tenth edition (Wiley, Hoboken, 2014)
 * Rex, A. _Finn's Thermal Physics_, third edition (CRC Press, Boca Raton, 2017)
-* Feynman, R. P. et al. _Quantum Mechanics and Path Integrals_ emended edition(Dover Publications, Mineloa, 2010)
+* Feynman, R. P. et al. _Quantum Mechanics and Path Integrals_ emended edition (Dover Publications, Mineloa, 2010)
+* Kitel, C. _Introduction to Solid State Physics_, Global edition (Wiley, Hoboken, 2018)
+* Tomson, M. _Modern Particle Physics_, First edition (Cambridge University Press, Cambridge, 2013)
