@@ -27,7 +27,7 @@ Here are all the courses I took.
 * [Relativity, Nuclear, and Particle Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Relativity-Nuclear-and-Particle-Physics) (s1) - composed of three parts:
     * [Relativity](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Relativity-Nuclear-and-Particle-Physics/Relativity)
     * [Nuclear Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Relativity-Nuclear-and-Particle-Physics/Nuclear-Physics)
-    * Particle Physics (hasn't started yet)
+    * [Particle Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Relativity-Nuclear-and-Particle-Physics/Particle-Physics)
 * [Methods of Mathematical Physics (MoMP)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Methods-of-Mathematical-Physics)
 * [Lagrangian Dynamics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Lagrangian-Dynamics) (s1)
 * [Quantum Theory](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Quantum-Theory)  (s1) (see also another student's notes [here](https://github.com/penguinoneshaw/PHYS11019-quantum-theory))
