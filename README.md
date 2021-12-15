@@ -16,7 +16,7 @@ For later courses these notes became part of how I learned the course, I would w
 After the lecture I would then write up my notes compiling my own notes, the lecture notes, and any other relevant sources.
 For this reason the notes becomes more verbose for later courses.
 
-If you have spotted a mistake, have a suggestion or improvement in mind or think something is badly written/explained please contact me, either by creating an issue or emailing me at s1824487@ed.ac.uk.
+If you have spotted a mistake, have a suggestion or improvement in mind or think something is badly written/explained please contact me by creating an issue.
 
 ## Courses
 Here are all the courses I took.
