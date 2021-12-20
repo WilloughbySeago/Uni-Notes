@@ -1,5 +1,7 @@
 \documentclass[fleqn]{NotesClass}
 
+\strictpagecheck  % check what the page is before typesetting marginpars, guarantees they will appear on the correct side
+
 %% Packages
 \usepackage{csquotes}
 \usepackage{slashed}
@@ -40,6 +42,9 @@
 \newcommand{\PDeltapp}{\ensuremath{\PBASE@Delta^{++}}}
 \newcommand{\PDeltap}{\ensuremath{\PBASE@Delta^+}}
 \newcommand{\PDeltam}{\ensuremath{\PBASE@Delta^-}}
+\newcommand{\PWz}{\ensuremath{\mathrm{W}^0}}
+\newcommand{\PBz}{\ensuremath{\mathrm{B}^0}}
+\newcommand{\PH}{\ensuremath{\mathrm{H}}}
 \makeatother
 
 % Tikz stuff
@@ -55,6 +60,11 @@
 % Tikz-Feynman
 \usepackage[compat=1.1.0]{tikz-feynman}
 \tikzfeynmanset{warn luatex=false}
+
+% PGF plots
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{polar}
 
 % Siunitx
 \usepackage{siunitx}
@@ -102,6 +112,11 @@ noabbrev
 \newcommand*{\ident}{I}
 \newcommand*{\strong}{\mathrm{s}}
 \newcommand*{\fermiconst}{G_{\mathrm{F}}}
+\newcommand*{\avogadro}{N_{\mathrm{A}}}
+\undef{\Re}
+\undef{\Im}
+\DeclareMathOperator{\Re}{Re}
+\DeclareMathOperator{\Im}{Im}
 
 % Include
 \includeonly{}
@@ -997,7 +1012,7 @@ noabbrev
     \subsection{\texorpdfstring{S\(\mathsf{p\overline{p}}\)S}{SppS}}
     The super proton antiproton synchrotron (S\Pp\APp S)\glossary[acronym]{S\Pp\APp S}{super proton antiproton synchrotron} was a proton-antiproton collider running at CERN running at ran from 1981 to 1991.
     It had a centre of mass energy of \qty{400}{\giga\electronvolt}.
-    It was \qty{6.9}{\kilo\metre} in diameter and ran two experiments UA1 and UA2 (where UA stands for underground area).
+    It was \qty{6.9}{\kilo\metre} in diameter and ran two experiments UA1 and UA2 (where UA stands for underground area)\glossary[acronym]{UA}{underground area}.
     The 1984 Nobel prize in physics was awarded to Carlo Rubbia and Simon van der Meer who were working with the S\Pp\APp S when they discovered \PW{} and \PZ{} bosons.
     
     \subsection{Tevatron}
@@ -3038,7 +3053,7 @@ noabbrev
     \section{Parity}
     Recall that the parity operator is defined to have the action \(\vv{r} \to -\vv{r}\).
     This means that \(\vv{p} \to -\vv{p}\).
-    However, as pseudo vectors the angular momentum,
+    However, as pseudo vectors, the angular momentum,
     \begin{equation}
         \vv{L} = \vv{r} \times \vv{p} \to (-\vv{r})\times (-\vv{p}) = \vv{L},
     \end{equation}
@@ -3060,6 +3075,648 @@ noabbrev
     
     We find that not only is parity not conserved but that the violation of parity is as large as it could possibly be.
     We say that parity is maximally violated.
+    
+    \chapter{Neutrinos}
+    Neutrinos are nearly massless, spin half, neutral, leptons.
+    There are three flavours, \Pnue, \Pnumu, and \Pnutau.
+    There are similarly three antineutrinos, \APnue, \APnumu, and \APnutau.
+    These carry the associated lepton (flavour) number of \(+1\) for the neutrinos and \(-1\) for the antineutrino.
+    
+    As neutral leptons the only force (other than gravity) through which neutrinos interact is the weak force.
+    This means that neutrinos hardly ever interact, the only reason we can detect them is because there are so many.
+    
+    In one second passing through an area the size of your hand there are approximately
+    \begin{itemize}
+        \item \(5\times 10^{12}\) neutrinos from the sun,
+        \item \(20\) neutrinos from cosmic rays in the atmosphere,
+        \item \(10^{9}\) neutrinos from the Earth,
+        \item \(10^{12}\) neutrinos from supernovae, and
+        \item \(2\times 10^{12}\) neutrinos from the big bang.
+    \end{itemize}
+    The general method for detecting neutrinos involves setting up huge detectors in the hopes that the size and ubiquity of neutrinos allows us to detect some.
+    
+    The existence of neutrinos was first posited based on the energy spectrum of electrons produced in beta decay.
+    In a two-body interaction decay, which is what people thought beta decay was at the time, the energy of the particles should be the same every time.
+    This is not what was observed so Pauli posited that beta decay must be a three-body interaction, with some, as yet, undetected particle.
+    We now know this to be the neutrino.
+    
+    \section{Neutrino Interactions}
+    Neutrinos are produced in beta decay processes, both \Pbetaminus{} and \APbeta.
+    Rotating the Feynman diagrams for these interactions we get the inverse beta decay processes:
+    \begin{equation}
+        \Pn + \Pnue \to \Pp + \Pe, \qqand \Pp + \APnue \to \Pn + \APe.
+    \end{equation}
+    
+    These processes are incredibly unlikely, for example the cross section for the second reaction is
+    \begin{equation}
+        \sigma(\Pp + \APnue \to \Pn + \APe) \approx 5\times10^{-44} \left( \frac{E_{\APnu}}{\unit{\mega\electronvolt}} \right)^2\unit{\centi\metre\squared}.
+    \end{equation}
+    
+    One common detection method for neutrinos is to just have a large tank of water and wait for this interaction and measure the positrons produced.
+    The mean free path for an antineutrino is \(\lambda = 1/(n_{\Pp}\sigma)\), where \(n_{\Pp}\) is the proton density.
+    The mean free path will be very large, meaning we need very large tanks to achieve a reasonable detection rate.
+    We can calculate the proton density, \(n_{\Pp}\), using the density of water, \(\rho = \qty{1}{\gram\per\milli\litre}\), and the molecular mass of water, \(\qty{18}{\gram\per\mole}\).
+    The number of protons per mole of water is then \(10\avogadro\), where we've used the fact that water, \ce{H2O}, has \(10\) protons, 2 from the hydrogens and eight from the oxygen.
+    For a given volume of water, \(V\), with one mole of water we have
+    \begin{equation}
+        n_{\Pp} = \frac{10\avogadro}{V}.
+    \end{equation}
+    The density of the water is \(\rho = \qty{18}{\gram}/V\), and so
+    \begin{equation}
+        n_{\Pp} = \frac{10\avogadro \rho}{\qty{18}{\gram}} \approx \qty{3.34e23}{\per\centi\metre\cubed}.
+    \end{equation}
+    Which gives
+    \begin{equation}
+        \lambda \approx \qty{6e19}{\centi\metre} \approx \qty{60}{light~years}.
+    \end{equation}
+
+    To give another example of just how little neutrinos interact we expect that 1 in \(10^{11}\) neutrinos will interact when passing through the Earth.
+    
+    As a final example a neutrino travelling through interstellar space has a mean free path of approximately \(\lambda \approx 10^{44}\,\unit{\centi\metre} \approx 10^{26}\unit{light~years}\).
+    
+    The only reason we have detected any neutrinos is because there are so many of them.
+    In a detector of \qty{1000}{\kilogram} of water we would expect there to be approximately \(10^{11}\) neutrinos passing through each square centimetre per second.
+    We would therefore expect to have a few interaction events per day.
+    
+    \subsection{Detecting Neutrinos}
+    The first suggestion for detection of neutrinos was to use an atomic bomb test to produce a large number of neutrinos.
+    Remarkably the US government initially agreed to this before someone realised it was a terrible idea.
+    
+    The actual method used to detect neutrinos for the first time was the reaction \(\Pp + \APnue \to \Pn + \APe\), using \ce{Cd} as a source of protons.
+    After this reaction occurs the positron annihilates with an atomic electron producing photons.
+    Approximately \qty{20}{\micro\second} after this the neutron is captured and another photon produced.
+    This whole procedure produces a characteristic double flash which allows us to be fairly certain that we have detected a neutrino.
+    
+    \section{Neutrino Flavours}
+    The process \(\Pmu \to \Pe \Pphoton\) is forbidden.
+    This was the first evidence that made people suspect that muon neutrinos are different to electron neutrinos.
+    In order to test this very high energy neutrinos, in the \unit{\giga\electronvolt} range, were used, since Fermi theory predicts that the cross section increases with energy, so interactions become more likely at high energy.
+    
+    A source of muon neutrinos is pion decay, \(\Ppip \to \APmu\Pnumu\).
+    Placing a detector far away from a beam of pions we can then detect the interaction \(\Pn + \Pnumu \to \Pmu + \Pp\), by detecting the muons.
+    The reason for the large distance is so that most non-neutrinos interact before reaching the detector.
+    In the detector we detect mostly interactions producing muons, rather than electrons, suggesting that muon neutrinos are different to electron neutrinos.
+    
+    \section{Neutrino Oscillations}
+    Between 1967 and the 1990s an experiment was run in the Homestake mine in South Dakota.
+    The experiment was done underground in a mine to block background radiation.
+    The experiment involved 615 tons of cleaning fluid, used as a source of chlorine, for the reaction
+    \begin{equation}
+        \ce{^37Ce} + \Pnue \to \ce{^37Ar} + \Pe.
+    \end{equation}
+    It was possible to extract the argon and count it, giving a measure of the number of interactions.
+    It was predicted that, given a rate of production of solar neutrinos predicted from knowing the processes that occur in the sun, as well as the luminosity of the sun, which is a measure of the rate of these processes, that there would be approximately \(1.5\) argon atoms produced per day.
+    In fact they actually only found about \(0.5\) argon atoms per day.
+    This may seem a small difference but the factor of three made people think.
+    
+    This interaction can only detect electron neutrinos.
+    If neutrinos can change flavour, and do so fairly often, we would expect that by the time they reach the Earth there would be an equal proportion of all three flavours of neutrinos, even though they all started as electron neutrinos.
+    Indeed this is what happens.
+    
+    \subsection{Atmospheric Neutrinos}
+    One of the first experiments designed to detect flavour changing used atmospheric neutrinos.
+    These are produced in cosmic rays by high energy proton showers, which produce pions.
+    These then decay via the weak interaction into muons, which can further decay into electrons, both steps produce neutrinos:
+    \begin{equation}
+        \Ppip \to \APmu \Pnumu, \qqand \APmu \to \APe\Pnue\APnumu.
+    \end{equation}
+    Given this reaction scheme we would expect to measure twice as many muon neutrinos as electron neutrinos.
+    
+    This was tested in the Super-Kamiokande, or SuperK\glossary[acronym]{SuperK}{Super-Kamiokande} experiment in the 1990s.
+    This was a large water Cherenkov detector.
+    It consisted of a large tank of water surrounded by photomultipliers.
+    Neutrinos were detected indirectly via charge current interactions with nuclei:
+    \begin{equation}
+        N + \Pnue \to X + \Pe, \qqand N + \APnumu \to X + \APmu.
+    \end{equation}
+    The electrons and muons produced travel faster than the speed of light in water and so produce Cherenkov radiation, which is detected by the photomultipliers.
+    
+    It was found that fewer muon neutrinos were detected than expected:
+    \begin{equation}
+        \frac{\Pnumu \text{ observed}}{\Pnumu \text{ expected}} = 0.45 \pm 0.02.
+    \end{equation}
+    This result can be interpreted as muon neutrinos oscillating to tau neutrinos.
+    
+    \subsection{Oscillation}
+    For neutrinos to oscillate they must have nonzero mass.
+    This means that we can describe a neutrino as a superposition of either flavour or mass eigenstates.
+    So far we have discussed the flavour, or weak, eigenstates, \Pnue, \Pnumu, and \Pnutau, which are the particles produced in weak interactions.
+    The mass eigenstates, \(\upnu_1\), \(\upnu_2\), and \(\upnu_3\), have definite mass values.
+    
+    Neutrinos propagate as mass mass eigenstates,
+    \begin{equation}
+        \ket{\upnu_i(t)} = \e^{ip\cdot x}\ket{\upnu_i}.
+    \end{equation}
+    The weak eigenstates are then a linear combination of these mass eigenstates.
+    Therefore as the neutrino propagates the superposition changes and the flavour can change, even if the neutrino starts in an initially pure flavour state.
+    
+    For simplicity we consider the case of two neutrino flavours.
+    We then have
+    \begin{equation}
+        \begin{pmatrix}
+            \upnu_1\\ \upnu_2
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            \cos\vartheta & -\sin\vartheta\\
+            \sin\vartheta & \cos\vartheta
+        \end{pmatrix}
+        \begin{pmatrix}
+            \Pnue\\ \Pnumu
+        \end{pmatrix}
+        , \qqor 
+        \begin{pmatrix}
+            \Pnue\\ \Pnumu
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            \cos\vartheta & \sin\vartheta\\
+            -\sin\vartheta & \cos\vartheta
+        \end{pmatrix}
+        \begin{pmatrix}
+            \upnu_1\\ \upnu_2
+        \end{pmatrix}
+        .
+    \end{equation}
+    Here \(\vartheta\) is some parameter called the mixing angle.
+    
+    Since the neutrino mass is small
+    \begin{equation}
+        E_i \approx \abs{\vv{p}} + \frac{m_i^2}{2\abs{\vv{p}}} \implies \Delta E = E_2 - E_1 = \frac{\Delta m^2}{2E},
+    \end{equation}
+    so if the neutrinos have different masses then the phase differs between the two components, which is what allows flavour oscillation to occur.
+    
+    Starting with a neutrino that is in a pure muon neutrino state after some time the probability of interacting as an electron neutrino is given by
+    \begin{equation}
+        P(\Pnumu \to \Pnue) = \sin^2(2\vartheta) \sin^2\left( \frac{\qty{1.27}{\electronvolt} L \Delta m^2 }{E} \right)
+    \end{equation}
+    where \(L\) is the distance travelled by the neutrino in kilometres, and \(E\) is the energy in \unit{\giga\electronvolt}.
+    
+    The results of SuperK gives
+    \begin{equation}
+        \Delta m^2 = 2.3\substack{{}+0.12\\{}-0.08}\times 10^{-3} \,\unit{\electronvolt\squared}.
+    \end{equation}
+    
+    The latest results on neutrino mixing relate the mass and flavour eigenstates as
+    \begin{align}
+        \ket{\upnu_3} &\approx \frac{\sqrt{2}}{2} (\ket{\Pnumu + \Pnutau}),\\
+        \ket{\upnu_2} &\approx 0.53\ket{\Pnue} + 0.60(\ket{\Pnumu} - \ket{\Pnutau}),\\
+        \ket{\upnu_3} &\approx 0.85\ket{\Pnue} - 0.37(\ket{\Pnumu} - \ket{\Pnutau}).\\
+    \end{align}
+    This predicts a relatively large mixing angle.
+    The mass difference is then predicted to be \(\Delta m_{32}^2 \approx \qty{2.5e-3}{\electronvolt\squared}\), and \(\Delta m_{21}^2 \approx \qty{8e-5}{\electronvolt\squared}\).
+    
+    We \emph{don't} know the exact neutrino masses, just how they relate to each other and upper bounds, for example the mass of the electron neutrino is known to be less than \qty{1}{\electronvolt} from the beta decay of tritium.
+    
+    \part{Electroweak Interaction}
+    \chapter{Electroweak Interaction}
+    \section{Weak Force Recap}
+    The weak force is responsible for radioactive decay as well as muon and tau decay.
+    It is propagated by the massive \PWpm, and \PZ{} bosons.
+    Weak interactions have (relatively) long lifetimes, \(10^{-13}\,\unit{\second}\) to \(10^{3}\,\unit{\second}\).
+    The cross section for weak processes is also small, \(10^{-13}\,\unit{\milli\barn}\).
+    The \PW{} and \PZ{} bosons can interact with each other through the weak force, and \PWpm{} can interact through the electromagnetic force as well.
+    
+    \section{Beyond Fermi Theory}
+    Fermi theory is an effective theory.
+    It breaks down as the total cross section increases with energy, so eventually we start finding probabilities greater than one.
+    At low energy the cross section in Fermi theory is given by
+    \begin{equation}
+        \sigma = \frac{\fermiconst^2 s}{\pi}.
+    \end{equation}
+    Here \(s\) is the centre of mass energy, which will eventually be large enough that we get non-physical probabilities.
+    
+    The solution to this is that the \PW{} boson is massive, and so we need to include its mass in the propagator term:
+    \begin{equation}
+        \frac{1}{q^2 - m_{\PW}^2}.
+    \end{equation}
+    This works in many situations to remove divergences.
+    However, some processes still have divergences.
+    One example of a process that is still divergent is \(\Pnue\APnue \to \PWp\PWm\).
+    This interaction occurs via the \(t\)-channel diagram
+    \begin{equation}
+        \tikzsetnextfilename{neutrino-antineutrino-to-WW-via-electron}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \begin{feynman}
+                \vertex (nu) {\Pnue};
+                \vertex (anti nu) at (0, 2) {\APnue};
+                \vertex (a) at (2, 0.5);
+                \vertex (b) at (2, 1.5);
+                \vertex (W+) at (4, 0) {\PWp};
+                \vertex (W-) at (4, 2) {\PWm};
+                \diagram {
+                    (nu) -- [fermion] (a) -- [fermion, edge label=\Pe] (b) -- [boson] (W-);
+                    (anti nu) -- [anti fermion] (b);
+                    (a) -- [boson] (W+);
+                };
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    
+    We can solve this problem by including other diagrams which cancel out the divergences, at least to first order.
+    The simplest diagram that does this is
+    \begin{equation}
+        \tikzsetnextfilename{neutrino-antineutrino-to-WW-via-Z}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \begin{feynman}
+                \vertex (nu) {\Pnue};
+                \vertex (anti nu) at (0, 2) {\APnue};
+                \vertex (a) at (1, 1);
+                \vertex (b) at (2, 1);
+                \vertex (W+) at (3, 0) {\PWp};
+                \vertex (W-) at (3, 2) {\PWm};
+                \diagram {
+                    (nu) -- [fermion] (a) -- [boson, edge label=\PZ] (b) -- [boson] (W+);
+                    (anti nu) -- [anti fermion] (a);
+                    (b) -- [boson] (W-);
+                };
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    This lead to the prediction of neutral current weak interactions.
+    
+    Another very similar diagram is
+    \begin{equation}
+        \tikzsetnextfilename{neutrino-antineutrino-to-WW-via-Z}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \begin{feynman}
+                \vertex (nu) {\Pnue};
+                \vertex (anti nu) at (0, 2) {\APnue};
+                \vertex (a) at (1, 1);
+                \vertex (b) at (2, 1);
+                \vertex (W+) at (3, 0) {\PWp};
+                \vertex (W-) at (3, 2) {\PWm};
+                \diagram {
+                    (nu) -- [fermion] (a) -- [photon, edge label=\Pphoton] (b) -- [boson] (W+);
+                    (anti nu) -- [anti fermion] (a);
+                    (b) -- [boson] (W-);
+                };
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    The similarity between these last two diagrams lead people to wonder if the electromagnetic and weak interactions are related.
+    
+    \section{The Electroweak Model}
+    The most common model relating the electromagnetic and weak force was posited by Glashow, Weinberg, and Slam.
+    In this model there are four massless bosons, \PWp, \PWm, \PWz, and \PBz.
+    These then mix to produce the physical bosons we observe, \PWp, \PWm, \PZzero, and \Pphoton.
+    This mixing happens via
+    \begin{equation}
+        \begin{pmatrix}
+            \Pphoton\\ \PZzero
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            \cos\vartheta_{\PW} & \sin\vartheta_{\PW}\\
+            -\sin\vartheta_{\PW} & \cos\vartheta_{\PW}
+        \end{pmatrix}
+        \begin{pmatrix}
+            \PBz\\ \PWz
+        \end{pmatrix}
+        .
+    \end{equation}
+    This mixing has a single parameter, \(\vartheta_{\PW}\), known as the \defineindex{weak mixing angle} or \define{Weinberg angle}\index{Weinberg angle|see{weak mixing angle}}.
+    Experimentally this has been measured to give \(\sin^2\vartheta_{\PW} = 0.23\).
+    
+    Of these two \enquote{new} bosons the photon, \Pphoton, is massless and the mass of the \PZzero{} is related to the mass of \PW{} via
+    \begin{equation}
+        m_{\PZ}^2 = \frac{m_{\PW}^2}{\cos^2\vartheta_{\PW}}.
+    \end{equation}
+    The interaction of these four bosons, \PWpm, \PZzero, and \Pphoton, is governed by three parameters, namely
+    \begin{equation}
+        \alpha_{\mathrm{EM}} = \frac{e^2}{4\pi}, \qquad \fermiconst = \frac{g_{\PW}^2\sqrt{2}}{8m_{\PW}^2}, \sin\vartheta_{\PW}.
+    \end{equation}
+    
+    Ultimately the fact that the electromagnetic and weak interactions can be described together is due to the fact that there is a single Lagrangian that describes both QED and the weak force.
+    The sudden introduction of massive bosons occurs through the interaction with the Higgs field, which is the topic of discussion of the next part.
+    
+    \section{Experimental Evidence}
+    In 1973 Gargamelle bubble chamber at CERN observed neutral currents for the first time in the interaction
+    \begin{equation}
+        \tikzsetnextfilename{discovery-of-neutral-currents}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \begin{feynman}
+                \vertex (e in) {\Pe};
+                \vertex (e out) at (4, 0) {\Pe};
+                \vertex (nu in) at (0, 2) {\Pnumu};
+                \vertex (nu out) at (4, 2) {\Pnumu};
+                \vertex (interaction e) at (2, 0.5);
+                \vertex (interaction nu) at (2, 1.5);
+                \diagram {
+                    (e in) -- [fermion] (interaction e) -- [fermion] (e out);
+                    (nu in) -- [fermion] (interaction nu) -- [fermion] (nu out);
+                    (interaction e) -- [boson, edge label=\PZ] (interaction nu);
+                };
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    Since \Pnumu{} and \PZ{} can't be seen in the bubble chamber this looks like the electron just changes direction for no reason.
+    
+    In 1976 Carlo Rubbia and Simon van der Meer proposed turning CERN's SPS fixed target proton synchrotron into a proton-antiproton collider to find \PW{} and \PZ{} bosons.
+    This was done creating the S\Pp\APp S collider.
+    Two experiments were run here, underground area one and two, or UA1 and UA2 for short.
+    The main challenge of this experiment was producing an antiproton beam.
+    This was done by hitting a fixed target with a proton beam.
+    The problem was that this produced antiprotons with a wide range of energies and angles.
+    The solution was to inject the antiprotons into an accumulator ring and measure beam properties in the ring and then make small adjustments for them on the opposite side of the ring with finely controlled magnets.
+    This only worked because the signal to adjust the magnets could pass along the diameter of the ring and the antiprotons had to go halfway around the circumference.
+    Making many small adjustments eventually the beam was acceptable for experiments to begin.
+    
+    One of the other problems is how to detect \PW{} and \PZ{} once they have been created.
+    This was done by looking for characteristic signatures.
+    The signature of \PZ{} is an electron-antielectron pair with high momentum transverse to the beam, called high pt\glossary[acronym]{pt}{transverse momentum} electrons.
+    The signature for the \PW{} boson was a single high pt electron and missing transverse energy from the undetected neutrino.
+    
+    \section{Precision Electroweak Measurements at LEP}
+    Between 1989 and 2000 the LEP collider at CERN made precise measurements of properties predicted by electroweak theory.
+    LEP was an electron-positron collider with a \qty{27}{\kilo\metre} circumference ring with four experiments.
+    While it was running data was collected on 16 million \PZ{} events and 30 thousand \PWpm{} events.
+    
+    During its operation the LEP was run at energies ranging from \qty{90}{\giga\electronvolt}, which is the mass of \PZ{}, to \qty{209}{\giga\electronvolt}, which is more than twice the mass of \PW.
+    
+    Many decay products of \PZ{} were observed, including \Pe\APe, \Pmu\APmu, and \Pq\APq{} as well as gluon jets emitted by these hadronic products.
+    
+    At energies below the mass of the \PZ{} boson electron-antielectron annihilation is dominated by photon exchange, leading to cross section proportional to
+    \begin{equation}
+        \abs*{
+            \tikzsetnextfilename{LEP-low-energy}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \begin{feynman}
+                    \vertex (e) {\Pe};
+                    \vertex (ae) at (0, 1) {\APe};
+                    \vertex (annihilate) at (1, 0.5);
+                    \vertex (decay) at (1.75, 0.5);
+                    \vertex (fermion) at (2.75, 0) {\(f\)};
+                    \vertex (anti fermion) at (2.75, 1) {\(\bar{f}\)};
+                    \diagram {
+                        (e) -- [fermion] (annihilate) -- [boson, edge label=\Pphoton] (decay) -- [fermion] (fermion);
+                        (ae) -- [anti fermion] (annihilate);
+                        (decay) -- [anti fermion] (anti fermion);
+                    };
+                \end{feynman}
+            \end{tikzpicture}
+        }^2.
+    \end{equation}
+    At slightly higher energies, even before we reach the mass of \PZ{} the interaction via bosons becomes important, giving matrix elements proportional to
+    \begin{equation}
+        \abs*{
+            \tikzsetnextfilename{LEP-mid-to-low-energy-photon}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \begin{feynman}
+                    \vertex (e) {\Pe};
+                    \vertex (ae) at (0, 1) {\APe};
+                    \vertex (annihilate) at (1, 0.5);
+                    \vertex (decay) at (1.75, 0.5);
+                    \vertex (fermion) at (2.75, 0) {\(f\)};
+                    \vertex (anti fermion) at (2.75, 1) {\(\bar{f}\)};
+                    \diagram {
+                        (e) -- [fermion] (annihilate) -- [boson, edge label=\Pphoton] (decay) -- [fermion] (fermion);
+                        (ae) -- [anti fermion] (annihilate);
+                        (decay) -- [anti fermion] (anti fermion);
+                    };
+                \end{feynman}
+            \end{tikzpicture}
+            +
+            \tikzsetnextfilename{LEP-mid-to-low-energy-Z}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \begin{feynman}
+                    \vertex (e) {\Pe};
+                    \vertex (ae) at (0, 1) {\APe};
+                    \vertex (annihilate) at (1, 0.5);
+                    \vertex (decay) at (1.75, 0.5);
+                    \vertex (fermion) at (2.75, 0) {\(f\)};
+                    \vertex (anti fermion) at (2.75, 1) {\(\bar{f}\)};
+                    \diagram {
+                        (e) -- [fermion] (annihilate) -- [boson, edge label=\PZ] (decay) -- [fermion] (fermion);
+                        (ae) -- [anti fermion] (annihilate);
+                        (decay) -- [anti fermion] (anti fermion);
+                    };
+                \end{feynman}
+            \end{tikzpicture}
+        }^2.
+    \end{equation}
+    At approximately the mass of the \PZ{} boson \PZ{} resonance is achieved and most annihilations produce \PZ{}, so the matrix element is proportional to
+    \begin{equation}
+        \abs*{
+            \tikzsetnextfilename{LEP-Z-resonance}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \begin{feynman}
+                    \vertex (e) {\Pe};
+                    \vertex (ae) at (0, 1) {\APe};
+                    \vertex (annihilate) at (1, 0.5);
+                    \vertex (decay) at (1.75, 0.5);
+                    \vertex (fermion) at (2.75, 0) {\(f\)};
+                    \vertex (anti fermion) at (2.75, 1) {\(\bar{f}\)};
+                    \diagram {
+                        (e) -- [fermion] (annihilate) -- [boson, edge label=\PZ] (decay) -- [fermion] (fermion);
+                        (ae) -- [anti fermion] (annihilate);
+                        (decay) -- [anti fermion] (anti fermion);
+                    };
+                \end{feynman}
+            \end{tikzpicture}
+        }^2.
+    \end{equation}
+    At higher energies, approaching twice the mass of \PW, interactions producing \PWpm{} bosons become dominant and the matrix element is proportional to
+    \begin{equation}
+        \abs*{
+            \tikzsetnextfilename{LEP-high-energi-photon}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \begin{feynman}
+                    \vertex (e) {\Pe};
+                    \vertex (ae) at (0, 1) {\APe};
+                    \vertex (annihilate) at (1, 0.5);
+                    \vertex (decay) at (1.75, 0.5);
+                    \vertex (W+) at (2.75, 0) {\PWp};
+                    \vertex (W-) at (2.75, 1) {\PWm};
+                    \diagram {
+                        (e) -- [fermion] (annihilate) -- [boson, edge label=\Pphoton] (decay) -- [boson] (W+);
+                        (ae) -- [anti fermion] (annihilate);
+                        (decay) -- [boson] (W-);
+                    };
+                \end{feynman}
+            \end{tikzpicture}
+            +
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \begin{feynman}
+                    \vertex (e) {\Pe};
+                    \vertex (ae) at (0, 1) {\APe};
+                    \vertex (annihilate) at (1, 0.5);
+                    \vertex (decay) at (1.75, 0.5);
+                    \vertex (W+) at (2.75, 0) {\PWp};
+                    \vertex (W-) at (2.75, 1) {\PWm};
+                    \diagram {
+                        (e) -- [fermion] (annihilate) -- [boson, edge label=\PZ] (decay) -- [boson] (W+);
+                        (ae) -- [anti fermion] (annihilate);
+                        (decay) -- [boson] (W-);
+                    };
+                \end{feynman}
+            \end{tikzpicture}
+            +
+            \tikzsetnextfilename{LEP-high-energi-W}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \begin{feynman}
+                    \vertex (e) {\Pe};
+                    \vertex (ae) at (0, 1) {\APe};
+                    \vertex (a) at (1.375, 0.2);
+                    \vertex (b) at (1.375, 0.8);
+                    \vertex (W+) at (2.75, 0) {\PWp};
+                    \vertex (W-) at (2.75, 1) {\PWm};
+                    \diagram {
+                        (e) -- [fermion] (a) -- [fermion, edge label=\Pnue] (b) -- [boson] (W-);
+                        (ae) -- [anti fermion] (b);
+                        (a) -- [boson] (W+);
+                    };
+                \end{feynman}
+            \end{tikzpicture}
+        }^2.\notag
+    \end{equation}
+    
+    The experiments at LEP were remarkably precise.
+    In order to verify results they needed to know the beam energies to an incredibly high precision, so precise that they had to account for
+    \begin{itemize}
+        \item The gravity of the moon causing tidal distortion in the ring size. An effect which caused approximately a \qty{1}{\milli\metre} change over the \qty{27}{\kilo\metre} circumference, leading to an approximate change of \qty{10}{\mega\electronvolt} in the beam energy.
+        \item The amount of water in the nearby lake Geneva.
+        \item Current leak from a nearby railway.
+    \end{itemize}
+    
+    Another experiment that was run at LEP was determining the number of neutrino species through \PZ-\Pnu{} coupling.
+    We can measure that
+    \begin{equation}
+        \Gamma(\PZ \to \Pq\APq) = \qty[uncertainty-mode=separate]{1744+-2.0}{\mega\electronvolt}.
+    \end{equation} 
+    As well as
+    \begin{equation}
+        \Gamma(\PZ \to \Pe\APe) \approx \Gamma(\PZ\to \Pmu\APmu) \approx \Gamma(\PZ \to \Ptau\APtau) = \qty[uncertainty-mode=separate]{83.984+-0.086}{\mega\electronvolt}.
+    \end{equation}
+    We predict that
+    \begin{equation}
+        \Gamma(\PZ \to \Pnue\APnue) = \Gamma(\PZ \to \Pnumu\APnumu) = \Gamma(\PZ \to \Pnutau\APnutau) = \qty{167}{\mega\electronvolt}.
+    \end{equation}
+    The total width for \PZ{} is then
+    \begin{equation}
+        \Gamma_{\PZ} = N_{\Pq}\Gamma(\PZ \to \Pq\APq) + N_\ell\Gamma(\PZ \to \ell\bar{\ell}) + N_{\Pnu}\Gamma(\PZ\to\Pnu\APnu),
+    \end{equation}
+    where \(N_{\Pq}\) is the number of quark flavours, \(N_{\ell}\) the number of non-neutrino lepton flavours, and \(N_{\Pnu}\) the number of neutrino flavours.
+    Measurements of \(\Gamma_{\PZ}\) agree with the prediction that \(N_{\Pnu} = 3\), with the results above we get \(N_{\Pnu} = \num{2.9963 +- 0.0074}\).
+    
+    \part{Higgs}
+    \chapter{Higgs}
+    \section{Higgs Mechanism}
+    The electroweak theory relates the bosons \PWpm, \PZzero, and \Pphoton.
+    We find that \PWpm{} and \PZzero{} are massive, while \Pphoton{} is massless.
+    This has profound consequences for the nature of the weak and electromagnetic forces.
+    In the electroweak theory we start with four massless bosons.
+    We then require something breaks the symmetry allowing massive bosons.
+    This process is called the Higgs mechanism.
+    
+    The solution, which was proposed separately by Higgs, Brout and Englert, Guralnik, and, Hagen and Kibble, was the existence of an additional field, \(\varphi\), which gives rise to the potential
+    \begin{equation}
+        V(\varphi) = -\mu^2\abs{\varphi}^2 + \lambda\abs{\varphi}^4.
+    \end{equation}
+    This is shown in \cref{fig:higgs potential}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{higgs-potential}
+        \begin{tikzpicture}
+            \begin{axis}[
+                data cs=polar,
+                samples=30,
+                domain=0:360,
+                y domain=0:10,
+                xlabel={\(\Re(\varphi)\)},
+                ylabel={\(\Im(\varphi)\)},
+                zlabel={\(V(\varphi)\)},
+                title={Higgs Potential},
+                xtick={0},
+                ytick={0},
+                ztick=\empty,
+                declare function={
+                    higgspotential(\r)={-125*\r^2+\r^4};
+                },
+                colormap={mymap}{[1pt] rgb(0pt)=(0.95,0.4,0.1); rgb(1pt)=(0.525,0.247,0.525)},
+                ]
+                \addplot3 [surf,shader=flat,draw=black!75 ,z buffer=sort] {higgspotential(y)};
+            \end{axis}
+        \end{tikzpicture}
+        \caption[Higgs potential.]{Higgs potential, also known as the sombrero potential.}
+        \label{fig:higgs potential}
+    \end{figure}
+    
+    The reason that this potential works as required is that the minimum is not at \(\varphi = 0\), but at \(\abs{\varphi_0} = \sqrt{\mu^2/\lambda} \eqqcolon v\), where the value is \(V(\varphi_{0}) = \lambda v^4/4\).
+    
+    The way that this potential works is that at high energies, such as in the early universe, the electroweak interaction is unified and the high energies mean that the \(\varphi = 0\) state can be achieved easily.
+    At lower energies, later in the universe, the \(\varphi = 0\) state is no longer accessible.
+    It is necessary to pick a direction in which to increase \(\varphi\) in order to move to a lower energy state.
+    This introduces asymmetry, we say that spontaneous symmetry breaking occurs.
+    This allows the \PW{} and \PZ{} bosons to have mass.
+    
+    As well as allowing mass for \PW{} and \PZ{} the field \(\varphi\) actually allows all particles to have mass.
+    To go along with this Peter Higgs predicted a new boson, the \defineindex{Higgs boson}, \PHzero.
+    The Higgs boson is itself massive, and has mass \(m_{\PH} = \mu = v\sqrt{\lambda}\).
+    
+    The vacuum expectation value, \(v\), of the Higgs field is related to the mass of the \PW{} boson by
+    \begin{equation}
+        v = \frac{2m_{\PW}}{g_{\PW}} = \frac{1}{\sqrt{2\fermiconst}} \approx \qty{246}{\giga\electronvolt}.
+    \end{equation}
+    The value of \(\lambda\) is a free parameter in the standard model, this means that \(m_{\PH}\) is a free parameter also, although we can place certain bounds on it, for example in order to have unitary self interaction, that is have probabilities in \([0, 1]\), in the standard model we must have \(m_{\PH} < \qty{1}{\tera\electronvolt}\).
+    The width of the Higgs is
+    \begin{equation}
+        \Gamma_{\PH} = \sum_f \Gamma(\PH \to f\bar{f}) + \Gamma(\PH \to \PWp\PWm) + \Gamma(\PH \to \PZ\PZ) + \Gamma(\PH \to \PH\PH).
+    \end{equation}
+    For heavy Higgs the final, self interaction, term dominates.
+    This leads to a bound on the Higgs mass by requiring that \(\Gamma_{\PH} < m_{\PH}\), which implies
+    \begin{equation}
+        \fermiconst m_{\PH}^3 < m_{\PH} \implies m_{\PH} < \frac{1}{\sqrt{\fermiconst}} = \qty{296}{\giga\electronvolt}.
+    \end{equation}
+    Allowing for radiative corrections we give a reasonable upper bound of \qty{1}{\tera\electronvolt}.
+    
+    The Higgs couples to all massive particles.
+    For fermions the coupling is proportional to the mass of the fermions.
+    This means interactions involving, for example, electrons, are much less likely than those involving muons.
+    
+    \section{Search for the Higgs}
+    Between 1989 and 2000 the LEP serached for the Higgs.
+    Since the Higgs couples to mass the \(s\)-channel process \(\Pe\APe \to \PH \to \Pe\APe\) is incredibly unlikely.
+    Instead the \define{\textit{Higgstrahlung}}\index{Higgstrahlung} process, \(\Pe\APe \to \PZ^* \to \PZ\PH\), was searched for.
+    With a maximum centre of mass energy of \(\sqrt{s} = \qty{207}{\giga\electronvolt}\) LEP was able to detect the Higgs only if its mass was less than \qty{116}{\giga\electronvolt}.
+    During its run LEP set a lower bound on the Higgs mass of \qty{114}{\giga\electronvolt}.
+    
+    There were signals at about \qty{115}{\giga\electronvolt} that some argued where the Higgs.
+    To determine whether this was true would have required delaying the building of the LHC, which it was decided was not worth it.
+    Instead they went with the \enquote{no lose theorem}, that in building the LHC they would either discover the LHC at \qty{115}{\giga\electronvolt}, or at a higher energy, or they would find \emph{something} worth finding.
+    
+    The LHC came online at an energy of \(\sqrt{s} = \qty{7}{\tera\electronvolt}\) in 2010.
+    In 2012 the teams at CERN working on the various experiments announced that they had found the Higgs.
+    A variety of possible production and decay processes were considered, all of which depend on the mass of the Higgs.
+    The predicted cross sections for these interactions ranged from \qty{1}{\pico\barn} to \qty{30}{\pico\barn}, depending on the mass of the Higgs.
+    For an integrated luminosity of \qty{100}{\per\femto\barn} per year we would expect to see between \num{10000} and \num{300000} Higgs per year.
+    
+    In the end the process that lead to the discovery of the Higgs was \(\PH \to \Pphoton\Pphoton\), where a small, but significant, peak was found at \qty{125}{\giga\electronvolt}.
+    Note that the Higgs cannot couple directly to photons, since they are massless, instead there are intermediary virtual particles involved in the process.
+    For example,
+    \begin{equation}
+        \tikzsetnextfilename{higgs-to-photons}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \begin{feynman}
+                \vertex (H) {\PH};
+                \vertex (decay) at (2, 0);
+                \vertex (top) at (4, 1);
+                \vertex (anti top) at (4, -1);
+                \vertex (photon 1) at (5, 1) {\Pphoton};
+                \vertex (photon 2) at (5, -1) {\Pphoton};
+                \diagram {
+                    (H) -- [scalar] (decay) -- [fermion, edge label=\Pt] (top) -- [photon] (photon 1);
+                    (decay) -- [anti fermion, edge label'=\APt] (anti top) -- [photon] (photon 2);
+                    (top) -- [fermion] (anti top);
+                };
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+
+    This measurement was later verified by measurements of a peak at the same location in the process \(\PH \to \PZ^*\PZ \to \Pmu\APmu\Pmu\APmu\).
+    
+    Measurements of the Higgs and its interactions are ongoing.
+    
     
     %Appendicies
     %\appendixpage
