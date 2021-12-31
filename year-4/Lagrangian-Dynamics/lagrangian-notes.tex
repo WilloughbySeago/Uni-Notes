@@ -3,6 +3,10 @@
 %% Packages
 \usepackage{csquotes}
 \usepackage{cancel}
+\usepackage[greek, UKenglish]{babel}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage[version=4]{mhchem}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -15,6 +19,8 @@
 \usetikzlibrary{angles}
 \usetikzlibrary{quotes}
 \usetikzlibrary{3d}
+\usetikzlibrary{calc}
+\usetikzlibrary{decorations.pathmorphing}
 
 % References, should be last things loaded
 \usepackage{hyperref}  % Should be loaded second last (cleveref last)
@@ -57,6 +63,12 @@ noabbrev
 \newcommand*{\other}{\mathrm{other}}
 \newcommand*{\nodependence}[1]{\textcolor{gray}{\cancel{#1}}}
 \newcommand*{\lagrangian}{\mathcal{L}}
+\newcommand*{\hamiltonian}{\mathcal{H}}
+\DeclarePairedDelimiterX{\poissonbracket}[2]{\{}{\}}{#1, #2}
+\DeclarePairedDelimiterX{\commutator}[2]{[}{]}{#1, #2}
+\newcommand*{\DL}[1]{\mathcal{D}#1}
+\newcommand*{\ident}{I}
+\newcommand*{\trans}{\top}
 
 % Include
 \includeonly{parts/appendix-odes}
@@ -229,7 +241,7 @@ noabbrev
     Then we can write \(\vv{F} = -\grad V\) for some scalar function \(V\). The negative sign here is just a convention so that we can minimise the potential, instead of maximising, which better aligns with our intuition and the original definition of potentials before this more general notion.
     We can use this to redo the calculation above:
     \begin{align}
-        W_{AB} = \int_{A}^{B}\vv{F}\cdot\dl{\vv{r}}\\
+        W_{AB} &= \int_{A}^{B}\vv{F}\cdot\dl{\vv{r}}\\
         &= -\int_A^B \grad V \cdot\dl{\vv{r}}\\
         &= -\int_A^B\dd{V}\\
         &= V_B - V_A\label{eqn:W=Vb-Va}
@@ -307,7 +319,7 @@ noabbrev
         &= \diff*{(r\ve{r})}{t}\\
         &= \dot{r}\ve{r} + r\vedot{r}
     \end{align}
-    Notice that, unlike Cartesian unit vectors, the cylindrical unit vectors are time dependent\footnote{rather they're position dependent and the position is time dependent} and so we have a second term involving the derivative of the unit vector.
+    Notice that, unlike Cartesian unit vectors, the cylindrical unit vectors are time dependent\footnote{rather, they're position dependent and the position is time dependent} and so we have a second term involving the derivative of the unit vector.
     We can easily work out what this is by differentiating \cref{eqn:e_r definition}:
     \begin{align}
         \vedot{r} &= \diff*{(\cos\varphi\ve{x} + \sin\varphi\ve{y})}{t}\\
@@ -672,7 +684,7 @@ noabbrev
     
     \subsection{Centre of Momentum Frame}
     \begin{dfn}{Centre of Momentum Frame}{}
-        The \defineindex{centre of momentum frame} (CoM frame)\glossary[acronym]{CoM}{centre of momentum} is defined as the \emph{inertial} frame chosen \emph{instantaneously} such that 
+        We define the \defineindex{centre of momentum frame} (CoM frame)\glossary[acronym]{CoM}{centre of momentum} as the \emph{inertial} frame chosen \emph{instantaneously} such that 
         \begin{equation}
             \vv{P'} = \sum_{a}\vv{p_a'} = \sum_{a} m_a\dot{\vv{r}}\vv{_a'} = \vv{0}.
         \end{equation}
@@ -738,7 +750,7 @@ noabbrev
     \end{equation}
     So, the kinetic energy in some frame, \(S\), is the kinetic energy in the centre of momentum frame plus a contribution due to motion of the centre of mass.
     
-    \section{Rotating Frame}
+    \section{Rotating Frame}\label{sec:rotating frame}
     Occasionally we will have need to work in a rotating frame.
     Note that rotating frames are necessarily non-inertial so the work from earlier on in this chapter \emph{does not apply}.
     We will consider only the simplest example of a frame, \(R\), rotating with respect to some inertial frame, \(S\), with constant angular velocity, \(\vv{\omega}\).
@@ -947,7 +959,7 @@ noabbrev
     
     \chapter{Generalised Quantities}
     Often our degrees of freedom are coordinates, in particular Cartesian coordinates.
-    However, this isn't always the case, for example the angle of rotation is not a Cartesian coordinate.
+    However, this isn't always the case, for example the angle through which a body has rotated is not a Cartesian coordinate.
     Our goal in this chapter is to come up with a generalisation for several classical quantities, specifically coordinates, velocities, and force, which keep the key properties but allow us to be more general.
     We will also see generalised momentum in later chapters.
     
@@ -1197,7 +1209,7 @@ noabbrev
         Other methods, such as conservation of energy, will give us the same result, although with more work.
     \end{exm}
     
-    \section{The Lagrangian}
+    \section{The Lagrangian}\label{sec:the lagrangian}
     Recall that in an instantaneous virtual displacement the work done is
     \begin{equation}
         \delta W = \sum_j Q_j \delta q_j.
@@ -1332,7 +1344,7 @@ noabbrev
     \end{equation}
     We can identify the left hand side as \(mra_{\vartheta}\), where \(a_{\vartheta}\) is the tangential acceleration.
     
-    \section{Atwood's Machine}
+    \section{Atwood's Machine}\label{sec:atwood's machine}
     \defineindex{Atwood's machine} is a smooth pulley with a light inextensible string.
     Attached to each end of the string is are two masses, \(m\) and \(M\).
     See \cref{fig:atwood machine}.
@@ -1665,13 +1677,2436 @@ noabbrev
     If there are as many symmetries as degrees of freedom, as is the case here, then we can often write down a set of first order differential equations like this without having to consider Lagrange's equations at all.
     We call systems where this is possible \defineindex{integrable}.
     
+    \chapter{Calculus of Variations}
+    \section{Functionals}
+    \begin{dfn}{Functional}{}
+        A \defineindex{functional} is a quantity that depends on the value of a function over some finite interval.
+    \end{dfn}
+    \begin{ntn}{Functionals}{}
+        We typically denote functionals with capital letters, for example \(I\).
+        If the functional depends on the value of the function \(y\), which is itself a function of \(s\), then we denote this either \(I[y(s)]\) or \(I[y]\), if \(s\) is obvious, with square brackets to distinguish it from a function.
+    \end{ntn}
+    
+    Often, but not always, functionals are defined as integrals of functions.
+    For example, the following are both functionals
+    \begin{equation}
+        I[y(s)] = \int_{s_1}^{s_2} \abs{y(s)}^2 \dd{s}, \qqand L[y(s)] = \int_{s_1}^{s_2} \sqrt{1 + \left( \diff{y}{x} \right)^2} \dd{s}.
+    \end{equation}
+    The following are \emph{not} functionals, they are merely functions
+    \begin{equation}
+        \sin(y(s)), \qqand y'(s) = \diff{y}{s}.
+    \end{equation}
+    Notice that the value of the derivative does depend on the value of \(y\) at both \(s\) and \(s + \dl{s}\), but for infinitesimal \(\dl{s}\) and so the interval over which \(y'\) depends on \(y\) is not finite.
+    
+    \section{Euler's Equation}\label{sec:Euler's equation}
+    Consider a functional of the form
+    \begin{equation}
+        I[y(s)] = \int_a^b F(y(s), y'(s), s) \dd{s}
+    \end{equation}
+    where \(F\) is a function of the variables \(y\), \(y'\), and \(s\).
+    We treat these as three independent variables.
+    
+    The \defineindex{calculus of variations} asks the question \enquote{what path, \(y\), maximises or minimises \(I[y(s)]\) subject to fixed endpoints \(y(a)\) and \(y(b)\)?}
+    
+    To answer this question we consider a small change in the path,
+    \begin{equation}
+        y(s) \to y(s) + \eta (s),
+    \end{equation}
+    where \(\eta(s)\) is small and vanishes at the endpoints, \(\eta(a) = \eta(b) = 0\), so that the endpoints remain fixed.
+    We then answer this question by finding out when the change in \(I\) is zero, that is when
+    \begin{equation}
+        \delta I = I[y(s) + \eta(s)] - I[y(s)] \stackrel{?}{=} 0,
+    \end{equation}
+    since, as with functions, this corresponds to when the derivative is zero and hence the functional achieves some extreme value.
+    
+    To find this in the most general case consider
+    \begin{equation}
+        I[y(s) + \eta(s)] = \int_a^b F(y(s) + \eta(s), y'(s) + \eta'(s), s) \dd{s}.
+    \end{equation}
+    We can Taylor expand this for small \(\eta\) giving
+    \begin{equation}
+        I[y(s) + \eta(s)] \approx \int_a^b \left[ F(y(s), y'(s), s) + \eta(s)\diffp{F}{y} + \eta'(s)\diffp{F}{y'} \right] \dd{s}.
+    \end{equation}
+    Identifying the first term as \(I[y(s)]\) we see that we have
+    \begin{equation}
+        \delta I = \int_a^b \left[ \eta(s)\diffp{F}{y} + \eta'(s)\diffp{F}{y'} \right]\dd{s}.
+    \end{equation}
+    Consider the second term,
+    \begin{equation}
+        \int_a^b \eta'(s) \diffp{F}{y'} \dd{s}.
+    \end{equation}
+    Integrating by parts we get
+    \begin{equation}
+        \left[ \eta(s) \diffp{F}{y'} \right]_a^b - \int_a^b \eta(s)\diff*{\left( \diffp{F}{y'} \right)}{s} \dd{s} = - \int_a^b \eta(s)\diff*{\left( \diffp{F}{y'} \right)}{s} \dd{s}.
+    \end{equation}
+    The first term vanishes since \(\eta(a) = \eta(b) = 0\).
+    We then have
+    \begin{equation}
+        \delta I = \int_a^b \left[ \diffp{F}{y} - \diff*{\left( \diffp{F}{y'} \right)}{s} \right] \eta(s) \dd{s}.
+    \end{equation}
+    We are looking for \(\delta I\) to vanish for arbitrary small changes, \(\eta\), in the path, and therefore conclude we must have
+    \begin{equation}
+        \diffp{F}{y} - \diff*{\left( \diffp{F}{y'} \right)}{s}.
+    \end{equation}
+    This is \defineindex{Euler's equation}.
+    
+    Notice that if we identify \(F = \lagrangian\), \(y = q\), and \(s = t\) we get Lagrange's equation.
+    For this reason these two equations are often referred to as the \defineindex{Euler--Lagrange equation}.
+    We will come back to what this means later.
+    
+    \section{First Integrals}
+    Suppose that \(F\) doesn't depend on \(y\).
+    From Euler's equation we have
+    \begin{equation}
+        \diffp{F}{y} = \implies \diff*{\left( \diffp{F}{y'} \right)}{s} = 0 \implies \diffp{F}{y'} = \text{constant.}
+    \end{equation}
+    
+    This can often be used to to more easily solve Euler's equation.
+    A similar, but less obvious, result is in the next lemma.
+    
+    \begin{lma}{}{}
+        If \(F\) doesn't depend explicitly on \(s\), so that
+        \begin{equation}
+            \diffp{F}{s} = 0,
+        \end{equation}
+        then
+        \begin{equation}
+            y' \diffp{F}{y'} = F = \text{constant.}
+        \end{equation}
+        \begin{proof}
+            Consider the total derivative
+            \begin{equation}
+                \diff{F}{s} = \diffp{F}{y}y' + \diffp{F}{y'}y'' + \diffp{F}{s} = \diffp{F}{y}y' + \diffp{F}{y'}y''.
+            \end{equation}
+            Where the final derivative vanishes by the hypothesis.
+            Using Euler's equation we can substitute for the first derivative giving
+            \begin{equation}
+                \diff{F}{s} = \left[ \diff*{\left( \diffp{F}{y'} \right)}{s} \right]y' + \diffp{F}{y'}y''.
+            \end{equation}
+            Notice then that by the chain rule we have
+            \begin{equation}
+                \diff*{\left( \diffp{F}{y'}y' \right)}{s} = \left[ \diff*{\left( \diffp{F}{y'} \right)}{s} \right]y' + \diffp{F}{y'}y''
+            \end{equation}
+            and so
+            \begin{equation}
+                \diff{F}{s} = \diff*{\left( y'\diffp{F}{y'} \right)}{s}.
+            \end{equation}
+            It then follows that
+            \begin{equation}
+                \diff*{\left( y'\diffp{F}{y'} \right)}{s} - \diff{F}{s} = \diff{}{s}\left( y'\diffp{F}{y'} - F \right) = 0.
+            \end{equation}
+            From this we get the desired
+            \begin{equation}
+                y'\diffp{F}{y'} - F = \text{constant.}
+            \end{equation}
+        \end{proof}
+    \end{lma}
+    
+    \section{Examples}
+    In this section we solve a few classic calculus of variation problems.
+    
+    \subsection{Shortest Path}
+    \textit{Given two points \((x_1, y_1)\) and \((x_2, y_2)\) in the plane what is the shortest path between them?}
+    
+    Suppose we have a path described by \(y(x)\), we are assuming here that the path doesn't double back on itself, which is reasonable for the shortest path, and therefore can be a function of \(x\).
+    If this were not the case we would need to parametrise \(y\) and \(x\) in terms of some third variable.
+    
+    Consider a small step along the \(x\)-direction, \(\dl{x}\).
+    If we are to stay on the path we will need to make a small step in the \(y\)-direction, \(\dl{y}\).
+    The resulting step length along the path is
+    \begin{equation}
+        \dl{s} = \sqrt{\dl{x}^2 + \dl{y}^2} = \dl{x}\sqrt{1 + \left( \diff{y}{x} \right)^2}.
+    \end{equation}
+    The length of a path is then described by the functional
+    \begin{equation}
+        L[y(s)] = \int_{x_1}^{x_2} \dd{s} = \int_{x_1}^{x_2} \sqrt{1 + \left( \diff{y}{x} \right)^2}\dd{x} = \int_{x_1}^{x_2} \sqrt{1 + (y'(x))^2} \dd{x}.
+    \end{equation}
+
+    This is of the required form to apply Euler's equation with
+    \begin{equation}
+        F(y(x), y'(x), x) = \sqrt{1 + (y'(x))^2}.
+    \end{equation}
+    This is independent of \(y\) and so we have
+    \begin{equation}
+        \diffp{F}{y'} = \text{constant.}
+    \end{equation}
+    That is
+    \begin{equation}
+        \diffp{F}{y'} = \frac{y'}{\sqrt{1 + y'^2}} = p
+    \end{equation}
+    for some constant, \(p\).
+    Inverting this we have
+    \begin{equation}
+        y' = \frac{p}{\sqrt{1 - p^2}} = m
+    \end{equation}
+    for some constant \(m\).
+    Hence \(y = mx + c\), that is the shortest line between two points is a straight line.
+    With the initial condition \(y(x_1) = y_1\) and \(y(x_2) = x_2\) we get \(y_1 = mx_1 + c\) and \(y_2 = mx_2 + c\).
+    Subtracting one from the other we have
+    \begin{equation}
+        y_1 - y_2 = m(x_1 - x_2) \implies m = \frac{y_1 - y_2}{x_1 - x_2},
+    \end{equation}
+    which is simply the gradient of the line as expected.
+    Similarly by considering \(y(0) = c\) we see that \(c\) is the \(y\)-intercept.
+    
+    Here we used the Euclidean metric, \(s^2 = \sum_{i,j}\delta_{ij}x_jx_i\), if instead we used a more general metric, \(s^2 = \sum_{ij} g_{ij}x_jx_i\), then we would get the general equations for a geodesic, which is just the fancy word for the shortest path in a given geometry.
+    
+    \subsection{Brachistochrone}
+    \textit{A smooth wire connects two points, \((x_1, y_1)\) and \((x_2, y_2)\), which are in a plane with gravity acting downwards in the negative \(y\) direction. Find the path such that a bead sliding down the wire from \((x_1, y_1)\), initially at rest, reaches \((x_2, y_2)\), in the least possible time.}
+    
+    \begin{rmk}
+        This problem was the original reason Euler invented variational calculus.
+        Brachistochrone comes from the Greek \textit{\textgreek{βράχιστος}} (\textit{brákhistos}) for \textit{shortest} and \textit{\textgreek{χρόνος}} (\textit{khrónos}) for \textit{time}.
+    \end{rmk}
+    
+    Again, we assume the path doesn't double back on itself so we look for a function \(y(x)\) which minimises the transit time, \(\tau[y(x)]\).
+    In order to find the correct functional, \(\tau\), we consider the velocity at some point, \(x\), along the path..
+    At \((x_1, y_1)\) the velocity is \(0\), since the particle is at rest.
+    At \((x, y)\) the velocity is \(v(x)\).
+    We can then apply conservation of energy and we find that
+    \begin{equation}
+        0 + mgy_1 = \frac{1}{2}mv^2 + mgy(x) \implies v = \sqrt{2g (y_1 - y(x))}.
+    \end{equation}
+    
+    The time, \(\dl{\tau}\), taken to fall along a section of the path of length \(\dl{s}\) is \(\dl{\tau} = \dl{s}/v\).
+    Again we have \(\dl{s} = \sqrt{1 + y'^2}\dl{x}\).
+    Putting this together we have
+    \begin{equation}
+        \tau[y] = \int_{x_1}^{x_2} \dl{\tau} = \int_{x_1}^{x_2} \frac{1}{v}\dd{s} = \int_{x_1}^{x_2} \sqrt{\frac{1 + y'^2}{2g(y_1 - y)}} \dd{x}.
+    \end{equation}
+    This is of the form required to apply Euler's equation with
+    \begin{equation}
+        F(y(x), y'(x), x) = \sqrt{\frac{1 + y'^2}{2g(y_1 - y)}}.
+    \end{equation}
+    
+    This has no explicit \(x\) dependence and hence
+    \begin{equation}
+        y'\diffp{F}{y'} - F = \text{constant.}
+    \end{equation}
+    We have
+    \begin{equation}
+        \diffp{F}{y'} = \frac{y'}{2g(y_1 - y)}\sqrt{\frac{1 + y'^2}{2g(y_1 - y)}} = \frac{Fy'}{1 + y'^2} \implies y'\diffp{F}{y'} = \frac{Fy'^2}{1 + y'^2}.
+    \end{equation}
+    From this we have
+    \begin{equation}
+        y'\diffp{F}{y'} - F = \frac{Fy'^2}{1 + y'^2} - F = -\frac{F}{1 + y'^2} = \text{constant.}
+    \end{equation}
+    Substituting in \(F\) and rearranging we get
+    \begin{equation}
+        \frac{1}{\sqrt{2g(y_1 - y)(1 + y'^2)}} = \text{constant.} \implies (y_1 - y)(1 + y'^2) = \text{constant.}
+    \end{equation}
+    This is the answer as far as variational calculus is concerned, a differential equation that can be solved for the path.
+    Euler, being Euler, recognised it as the equation of a cycloid, which is given parametrically by
+    \begin{equation}
+        x = a(2\psi - \sin(2\psi)) + x_1, \qqand y = a(\cos(2\psi) - 1) + y_1
+    \end{equation}
+    where \(\psi\) is the angle the curve makes to the the upward vertical.
+    The cycloid starts vertical, which gives a large initial acceleration, and then levels out to give a relatively short path once the ring is going quickly.
+    It should be noted that a cycloid is the path traced by a point on a circle rolling along the \(x\)-axis.
+    
+    \begin{figure}
+        \tikzsetnextfilename{brachistochrone}
+        \begin{tikzpicture}
+            \draw[domain=0:3.14, very thick, highlight] plot ({\x - sin(\x r) + 1}, {cos(\x r) + 2});
+            \draw[very thick, ->] (0, 0) -- (0, 4);
+            \draw[very thick, ->] (0, 0) -- (5, 0);
+            \draw[very thick] (1, 0) -- (0, 0) -- (0, 1);
+            \fill[complementaryteal] (1, 3) circle [radius=0.05cm] node[black, above] {\((x_1, y_1)\)};
+            \fill[complementaryteal] (4.14, 1) circle [radius=0.05cm] node[black, below] {\((x_2, y_2)\)};
+        \end{tikzpicture}
+        \caption{The Brachistochrone}
+    \end{figure}
+    
+    \subsection{Soap Film}
+    \epigraph{\ldots minimise its surface area, something something, energy!}{Matt Parker on why the bubble is shaped to minimise its surface area \cite{parker2021}.}
+    \epigraph{Sadly, that's super difficult}{Matt Parker, on doing this calculation \cite{parker2021}.}
+    \textit{Two wire rings of radius \(a\) are held at separation \(2d\). What axially symmetric shape, \(\rho(z)\), minimises the surface area, \(A\), of a soap film connecting them?}
+    
+    \begin{rmk}
+        Minimising the surface area gives the shape of the soap film since the surface tension acts to minimise surface area. We assume that the shape is axially symmetric and so it is only the distance from the axis at some point along the axis that we need to know.
+    \end{rmk}
+    
+    Consider taking a small step, \(\dl{z}\), along the axis of symmetry.
+    In order to stay on the soap film a small step, \(\dl{\rho}\), must be taken along the soap film.
+    The resulting step along the soap film is
+    \begin{equation}
+        \dl{s} = \sqrt{\dl{z}^2 + \dl{\rho}^2} = \dl{z} \sqrt{1 + \rho'(z)^2}.
+    \end{equation}
+    Multiplying by \(2\pi\) gives the area corresponding to this range of \(z\) values and so integrating we have
+    \begin{equation}
+        A[\rho(z)] = \int_{z=-d}^{z=d} 2\pi \rho(z) \dd{s} = 2\pi \int_{-d}^{d} \rho\sqrt{1 + \rho'^2} \dd{z}.
+    \end{equation}
+
+    This is of form required to apply Euler's equation with
+    \begin{equation}
+        F(\rho(z), \rho'(z), z) = \rho\sqrt{1 + \rho'^2}.
+    \end{equation}
+    This has no explicit \(z\) dependence and so
+    \begin{equation}
+        \rho'\diffp{F}{\rho'} - F = \text{constant} = C.
+    \end{equation}
+    From this we get
+    \begin{equation}
+        \rho' \frac{\rho \rho'}{\sqrt{1 + \rho'^2}} - \rho\sqrt{1 + \rho'^2} = C.
+    \end{equation}
+    This can be simplified to
+    \begin{equation}
+        \rho = -C\sqrt{1 + \rho'^2} \implies \diff{\rho}{z} = \sqrt{\left( \frac{\rho(z)}{C} \right)^2 - 1}.
+    \end{equation}
+    This is the solution as far as calculus of variations is concerned.
+    This can be solved by separation of variables to find
+    \begin{equation}
+        \rho(z) = C\cosh\left( \frac{z - z_0}{C} \right)
+    \end{equation}
+    where \(z_0\) is a constant of integration.
+    Including the boundary condition that \(\rho(\pm d) = a\) we get \(z_0 = 0\) and hence
+    \begin{equation}
+        \frac{a}{C} = \cosh\left( \frac{d}{C} \right).
+    \end{equation}
+    This cannot he solved analytically and numerically we find it has answers only if \(d/a < 0.663\dots\).
+    We interpret this as meaning that if the rings are moved too far apart then the soap film pops, and instead fills the rings in flat discs, although the mathematics would suggest an infinitely thin strand connecting the two discs along the axis, but this doesn't happen in reality.
+    
+    \begin{figure}
+        \tikzsetnextfilename{soap-film}
+        \begin{tikzpicture}
+            \draw[very thick, ->] (-2.4, 0) -- (2.4, 0) node[right] {\(z\)};
+            \draw[<->|, thick] (-2.2, 0) -- (-2.2, 0.752) node[left, midway] {\(a\)};
+            \draw[|<->|, thick] (-2, -1) -- (2, -1) node[midway, below] {\(2d\)};
+            \draw[<->] (1.5, 0) -- (1.5, 0.47);
+            \node[font=\tiny] at (1.75, 0.26) {\(\rho(z)\)};
+            \draw[domain=-2:2, very thick, highlight] plot (\x, {0.2*cosh(\x)});
+            \draw[domain=-2:2, very thick, highlight] plot (\x, {-0.2*cosh(\x)});
+            \draw[ultra thick, line cap=round, complementaryteal] (2, -0.752) -- (2, 0.752);
+            \draw[ultra thick, line cap=round, complementaryteal] (-2, -0.752) -- (-2, 0.752);
+        \end{tikzpicture}
+        \caption{Soap film between two rings.}
+    \end{figure}
+    
+    \section{Calculus of Variations for Many Variables}
+    Now consider a functional of many paths given by
+    \begin{equation}
+        I[\{y(s)\}] = \int_a^b F(\{y\}, \{y'\}, s) \dd{s}.
+    \end{equation}
+    With \(\{y\} = y_1, y_2, \dotsc, y_p\) being a set of \(p\) linearly independent functions of the variable \(s\).
+    
+    Consider a small variation \(y_i \to y_i + \eta_i\), where \(\eta_i\) vanishes at the endpoints.
+    We then have
+    \begin{equation}
+        F(\{y + \eta\}, \{y' + \eta'\}, s) \approx F(\{y\}, \{y'\}, s) + \sum_{i=1}^{p} \diffp{F}{y_i}\eta_i(s) + \sum_{i=1}^{p} \diffp{F}{y_i'}\eta_i'(s).
+    \end{equation}
+    Requiring that \(\delta I = 0\) and following the same derivation as the single variable case in \cref{sec:Euler's equation} we get a set of \(p\) equations, one for each \(y_i\), which are
+    \begin{equation}
+        \diff*{\left( \diffp{F}{y_j'} \right)}{s} - \diffp{F}{y_j} = 0.
+    \end{equation}
+    
+    We can similarly derive first integrals the obvious one being if for some specific \(i\) \(F\) doesn't depend on \(y_i\) then we have
+    \begin{equation}
+        \diffp{F}{y_i'} = \text{constant.}
+    \end{equation}
+    There is one of these equations for each variable, \(y_i\), upon which \(F\) does not depend.
+    
+    If \(F\) doesn't depend on \(s\) then
+    \begin{equation}\label{eqn:first integral second kind multivariable}
+        \sum_i y_i'\diffp{F}{y_i'} - F = \text{constant.}
+    \end{equation}
+    There is only one equation here which includes all \(y_i\).
+    
+    \section{Hamilton's Principle}
+    Earlier we commented that Lagrange's equations are just the Euler--Lagrange equations with \(F = \lagrangian\), \(y_i = q_i\), and \(s = t\).
+    This implies that we can view Lagrangian mechanics as the result of demanding that the following functional is stationary:
+    \begin{equation}
+        S[\{q(t)\}] \coloneqq \int_{t_1}^{t_2} \lagrangian(\{q\}, \{\dot{q}\}, t) \dd{t}.
+    \end{equation}
+    We call this the \defineindex{action}.
+    \defineindex{Hamilton's principle} states that the action is stationary, that is
+    \begin{equation}
+        \delta S = 0.
+    \end{equation}
+    
+    Note that Hamilton's principle as stated here involves choosing two times, \(t_1\) and \(t_2\), and requiring that \(\delta S = 0\) while keeping \(\{q(t_1)\}\) and \(\{q(t_2)\}\) fixed.
+    Our preferred boundary conditions would involve one time, \(t_1\), and fixing the initial positions, \(\{q(t_1)\}\), and velocities, \(\{\dot{q}_i(t_1)\}\).
+    Fortunately we can start from Hamilton's principle, derive the Lagrange equations, and then solve them for any boundary conditions we wish, so this isn't a problem.
+    
+    The most general form of Hamilton's principle states that
+    \begin{equation}
+        \delta \int \lagrangian \dd{t} = 0,
+    \end{equation}
+    which is coordinate independent, and hence means that it doesn't mean what choice we make for our generalised coordinates.
+    
+    \subsection{Hamilton's Principle from Newtonian Mechanics}
+    Consider a system of \(N\) particles in three dimensions, so we have \(3N\) degrees of freedom.
+    The kinetic energy in Cartesian coordinates is
+    \begin{equation}
+        T = \sum_i \frac{1}{2}m_i\dot{x}_i^2.
+    \end{equation}
+    
+    Newton's second law can then be written as
+    \begin{equation}
+        \sum_{i} m_i\ddot{x}_i = \diff*{\left( \diffp{T}{\dot{x}_i} \right)}{t} = -\diffp{V}{x_i}
+    \end{equation}
+    assuming a conservative force, and hence a potential, \(V = V(\{x\}, \nodependence{\{\dot{x}\}}, t)\).
+    We can therefore write
+    \begin{equation}
+        \diff*{\left( \diffp{T}{\dot{x}_i} \right)}{t} = -\diffp{V}{x_i} + \diffp{T}{x_i} + \diff*{\left( \diffp{V}{\dot{x}_i} \right)}{t}
+    \end{equation}
+    where the two extra terms are both zero.
+    Defining the Lagrangian to be \(\lagrangian \coloneqq T - V\) and rearranging this we have
+    \begin{equation}
+        \diff*{\left( \diffp{\lagrangian}{\dot{x}_i} \right)}{t} - \diffp{\lagrangian}{x_i} = 0.
+    \end{equation}
+    
+    We can then construct the action
+    \begin{equation}
+        S = \int \lagrangian(\{x\}, \{\dot{x}\}, t) \dd{t},
+    \end{equation}
+    and then Hamilton's principle gives us \(\delta S = 0\) in Cartesian coordinates.
+    However, Hamilton's principle is coordinate independent and so \(\delta S = 0\) holds for any choice of generalised coordinates, \(\{\tilde{q}\}\).
+    We have not yet applied any constraints and so there must be \(3N\) coordinates at this stage.
+    
+    Suppose we have \(M\) holonomic constraints, which can be expressed in Cartesian coordinates as a set of \(M\) algebraic equalities
+    \begin{equation}
+        f_\alpha(\{x\}, t) = 0
+    \end{equation}
+    where \(\alpha = 1, \dotsc, \alpha\).
+    We can then specify our choice of \(3N\) coordinates, \(\{\tilde{q}\} = (\tilde{q}_1, \tilde{q}_2, \dotsc, \tilde{q}_{3N})\), as we wish.
+    We make the following choice:
+    \begin{equation}
+        \{\tilde{q}\} = (q_1, q_2, \dotsc, q_{3N - M}, f_1, f_2, \dotsc, f_M) = \{q, f\}.
+    \end{equation}
+    In other words we choose \(M\) of our constraints to be precisely the values held constant by our constraints.
+    We are therefore left with \(3N - M\) generalised coordinates, \(\{q\}\), which are linearly independent of each other and of the constraints.
+    
+    Hamilton's principle states that for unconstrained motion we have \(\delta S = 0\) and hence
+    \begin{equation}
+        \delta \int \lagrangian(\{q, f\}, \{\dot{q}, \dot{f}\}, t) \dd{t} = 0.
+    \end{equation}
+    For constrained motion we demand that \(f_\alpha = 0\), and hence \(\dot{f}_\alpha = 0\), for all \(\alpha\).
+    It then follows that if we define \(\lagrangian(\{q\}, \{\dot{q}\}, t) \coloneqq \lagrangian(\{q, 0\}, \{\dot{q}, 0\}, t)\) we have
+    \begin{equation}
+        \delta\int \lagrangian(\{q\}, \{\dot{q}\}, t) \dd{t}.
+    \end{equation}
+    
+    Hence Hamilton's principle applies to constrained motion in arbitrary generalised coordinates.
+    From this we can derive the Euler--Lagrange equations
+    \begin{equation}
+        \diff*{\left( \diffp{\lagrangian}{\dot{q}_i} \right)}{t} - \diffp{\lagrangian}{q_i} = 0.
+    \end{equation}
+    So we have derived the key equations for Lagrangian mechanics in a new way.
+    
+    This will be useful when we come to consider modifications, such as allowing velocity dependent potentials, where we will use Hamilton's principle as a starting point.
+    
+    \chapter{Symmetries and Conservation Laws}
+    In this section we will study the Lagrangian, and Euler--Lagrange equations, and look for symmetries which leave the Lagrangian, and equations of motion, invariant.
+    
+    \section{Invariance Properties of the Lagrangian}
+    \subsection{Invariance Under Change of Generalised Coordinates}
+    Consider two sets of generalised coordinates, \(\{q\}\) and \(\{q'\}\), for the same system.
+    Let \(\lagrangian = \lagrangian(\{q\}, \{\dot{q}\}, t)\) be the Lagrangian in the first set of coordinates and \(\lagrangian' = \lagrangian'(\{q'\}, \{\dot{q}'\}, t)\) the Lagrangian in the second set of coordinates.
+    Numerically for the same state we have \(\lagrangian = \lagrangian'\), since both are equal to \(T - V\), which is a physical property independent of the coordinates we choose to define it.
+    However, the equations of motion depend on the \emph{form} of the Lagrangian, not just its numerical value, and so we cannot just assume that being numerically equal means the same equations of motion will be produced.
+    We need to prove that the two Lagrangians are \define{equivalent}\index{equivalent Lagrangians}, by which we mean they lead to the same equations of motion.
+    
+    \begin{thm}{Invariance of the Lagrangian Under Change of Generalised Coordinates}{}
+        Consider two sets of generalised coordinates, \(\{q\}\) and \(\{q'\}\), describing the same system.
+        Then the Lagrangians \(\lagrangian(\{q\}, \{\dot{q}\}, t)\) and \(\lagrangian'(\{q'\}, \{\dot{q}'\}, t)\) are equivalent.
+        
+        \begin{proof}
+            We start with \(\lagrangian\), for which we know that the Euler--Lagrange equations hold:
+            \begin{equation}
+                0 = \diff*{\left( \diffp{\lagrangian}{\dot{q}_j} \right)}{t} - \diffp{\lagrangian}{q_j}.
+            \end{equation}
+            If we can derive the Euler--Lagrange equations but for \(\lagrangian'\), \(q'\), and \(\dot{q}'\), from this then the two Lagrangians are equivalent.
+            
+            For the first step notice that since \(\lagrangian\) and \(\lagrangian'\) are numerically equal we can replace \(\lagrangian\) with \(\lagrangian'\) giving
+            \begin{equation}
+                0 = \diff*{\left( \diffp{\lagrangian'}{\dot{q}_j} \right)}{t} - \diffp{\lagrangian'}{q_j}.
+            \end{equation}
+            Applying the chain rule we get
+            \begin{equation}\label{eqn:invariance of lagrangian under change of generalised coords}
+                0 = \diff{}{t} \bigg[ \sum_i \diffp{\lagrangian'}{\dot{q}_i'}\underbrace{\diffp{q_i'}{\dot{q}_j}}_{=0} + \sum_i \diffp{\lagrangian'}{\dot{q}_i'}\diffp{\dot{q}_i'}{\dot{q}_j}\bigg] - \sum_i \diffp{\lagrangian'}{q_i'}\diffp{q_i'}{q_j} - \sum_i \diffp{\lagrangian'}{\dot{q}_i'}\diffp{\dot{q}_i'}{q_j}.
+            \end{equation}
+            Noticing that we can write \(q_i' = q_i'(\{q\}, \nodependence{\{\dot{q}\}}, t)\) the first term vanishes.
+            The time derivative then distributes over the second term and applying the chain rule the second term becomes
+            \begin{equation}
+                \left[ \diff{}{t}\diffp{\lagrangian'}{\dot{q}_i'} \right] \diffp{\dot{q}_i'}{\dot{q}_j} + \diffp{\lagrangian'}{\dot{q}_i'} \left[ \diff{}{t} \diffp{\dot{q}_i'}{\dot{q}_j} \right].
+            \end{equation}
+            Applying the cancellation of dots rule we have \(\diffp{\dot{q}_i'}/{\dot{q}_j} = \diffp{q_i'}/{q_j}\).
+            We can also apply the commuting derivatives rule to the second term after the cancellation of dots rule giving \(\diffp{\dot{q}_i'}{q_j}\).
+            Then this whole term becomes
+            \begin{equation}
+                \left[ \diff{}{t}\diffp{\lagrangian'}{\dot{q}_i'} \right] \diffp{q_i'}{q_j} + \diffp{\lagrangian'}{\dot{q}_i'} \diffp{\dot{q}_i'}{q_j}.
+            \end{equation}
+            Substituting this back into \cref{eqn:invariance of lagrangian under change of generalised coords} we have
+            \begin{equation}
+                0 = \sum_i\left( \left[ \diff{}{t}\diffp{\lagrangian'}{\dot{q}_i'} \right]\diffp{q_i'}{q_j} + \textcolor{highlight}{\diffp{\lagrangian'}{\dot{q}_i'}\diffp{\dot{q}_i'}{q_j}} - \diffp{\lagrangian'}{q_i'}\diffp{q_i'}{q_j} - \textcolor{highlight}{ \diffp{\lagrangian'}{\dot{q}_i'}\diffp{\dot{q}_i'}{q_j}} \right).
+            \end{equation}
+            Noticing that the second and third term cancel and factoring out the common \(\diffp{q_i'}{q_j}\) we get
+            \begin{equation}
+                0 = \sum_i\left[ \diff*{\left( \diffp{\lagrangian'}{\dot{q}_i'} \right)}{t} - \diffp{\lagrangian'}{q_i'} \right]\diffp{q_i'}{q_j}.
+            \end{equation}
+            Since we can vary \(q_i'\) individually and this must always hold we must have that for every \(i\)
+            \begin{equation}
+                \diff*{\left( \diffp{\lagrangian'}{\dot{q}_i'} \right)}{t} - \diffp{\lagrangian'}{q_i} = 0.
+            \end{equation}
+            These are exactly the Euler--Lagrange equations for \(\lagrangian'\) in terms of \(\{q\}\) and \(\{\dot{q}\}\).
+            This proves the two Lagrangians are equivalent.
+        \end{proof}
+    \end{thm}
+    
+    \subsection{Invariance Under Addition of a Total Derivative}
+    \begin{thm}{Invariance of the Lagrangian Under Addition of a Total Derivative}{}
+        Let \(F = F(\{q\}, \nodependence{\{\dot{q}\}}, t)\) be a function of the generalised position and time, but not the generalised velocities.
+        Then the Lagrangians \(\lagrangian\) and \(\lagrangian' = \lagrangian + \diff{F}/{t}\) are equivalent.
+        \begin{proof}
+            Consider the Euler--Lagrange equations for \(\lagrangian'\):
+            \begin{equation}
+                0 = \diff*{\left( \diffp{\lagrangian'}{\dot{q}} \right)}{t} - \diffp{\lagrangian'}{q}.
+            \end{equation}
+            Substituting in for the definition of \(\lagrangian'\) and using the linearity of the derivative we have
+            \begin{equation}
+                0 = \diff*{\left( \diffp{\lagrangian}{\dot{q}} \right)}{t} + \diff*{\left( \diffp{\dot{F}}{\dot{q}} \right)}{t} - \diffp{\lagrangian}{q} - \diffp{\dot{F}}{q}.
+            \end{equation}
+            Notice that since \(F\) is a function of the positions \(\dot{F}\) may be a function of the velocities.
+            This means we may have \(\diffp{\dot{F}}{\dot{q}} \ne 0\).
+            We can simplify this by taking the second term, applying the cancellation of dots rule and then the commuting derivatives rule which gives
+            \begin{equation}
+                0 = \diff*{\left( \diffp{\lagrangian}{\dot{q}} \right)}{t} + \textcolor{highlight}{\diffp{\dot{F}}{q}} - \diffp{\lagrangian}{q} - \textcolor{highlight}{\diffp{\dot{F}}{q}}.
+            \end{equation}
+            Noticing that the second and third terms cancel we are left with
+            \begin{equation}
+                0 = \diff*{\left( \diffp{\lagrangian}{\dot{q}} \right)}{t} - \diffp{\lagrangian}{q}.
+            \end{equation}
+            This is the Euler--Lagrange equation for \(\lagrangian\), \(q\), and \(\dot{q}\), and so \(\lagrangian\) and \(\lagrangian' = \lagrangian + \dot{F}\) are equivalent.
+        \end{proof}
+    \end{thm}
+    
+    \section{Generalised Momenta}
+    \begin{dfn}{Generalised Momenta}{}
+        The \defineindex{generalised momentum}, or \define{canonical momentum}\index{canonical momentum|see{generalised momentum}} conjugate to the generalised coordinate \(q\) is
+        \begin{equation}
+            p \coloneqq \diffp{\lagrangian}{\dot{q}}.
+        \end{equation}
+    \end{dfn}
+    
+    Using this definition we can write Lagrange's equation as
+    \begin{equation}
+        \diff{p}{t} = \diffp{\lagrangian}{q}.
+    \end{equation}
+    
+    \begin{exm}{}{}
+        Consider a single particle in Cartesian coordinates in a a velocity independent potential.
+        We have
+        \begin{equation}
+            \lagrangian = \frac{1}{2}m\sum_i \dot{x}_i^2 - V(\{x\}, \nodependence{\{\dot{x}\}}, t)
+        \end{equation}
+        and so
+        \begin{equation}
+            p_i = m\dot{x}_i
+        \end{equation}
+        which means that the conjugate momentum of \(x_i\) is just the component of the linear momentum in the \(x_i\) direction.
+    \end{exm}
+    
+    \begin{exm}{}{}
+        Consider a rotating object.
+        The kinetic energy will be of the form
+        \begin{equation}
+            T = T_{\mathrm{linear}} + \frac{1}{2}I\dot{\vartheta}^2
+        \end{equation}
+        where the linear component of the kinetic energy, \(T_{\mathrm{linear}}\), is independent of \(\dot{\vartheta}\), and \(I\) is the moment of inertia.
+        For a velocity independent potential we then have
+        \begin{equation}
+            p_{\vartheta} = I\dot{\vartheta}
+        \end{equation}
+        which is the angular momentum.
+    \end{exm}
+    
+    These two examples justify calling \(\diffp{\lagrangian}/{q}\) the generalised \emph{momentum}, however, it should be noted that \(\diffp{\lagrangian}/{q}\) cannot always be identified as a momentum.
+    
+    Notice that if the Lagrangian doesn't depend on a specific coordinate, \(q_j\), then \(\diffp{\lagrangian}/{q_j} = 0\) and so
+    \begin{equation}
+        \diff{p_j}{t} = 0 \implies p_j = \mathrm{constant}.
+    \end{equation}
+    So \(p_j\) is conserved.
+    In this case we call \(q_j\) a \defineindex{cyclic coordinate} or \defineindex{ignorable coordinate}.
+    We call the conserved momentum a \defineindex{constant of motion}.
+    
+    We can view \(\diffp{\lagrangian}/{q_j}\) as a symmetry of the Lagrangian meaning that we are free to change \(q_j\) by some constant amount and without changing the resulting physics.
+    For example conservation of linear momentum in the \(x_i\) direction corresponds to the ability to make the translation \(x_i \to x_i + \Delta x\) without changing anything, and conservation of angular momentum when rotating about \(\ve{\vartheta}\) corresponds to the ability to make the rotation \(\vartheta \to \vartheta + \Delta \vartheta\) without changing anything.
+    This leads to Noether's theorem, which informally states that every symmetry of the Lagrangian leads to a conserved quantity and vice versa.
+    A more formal statement relates invariance of the Lagrangian under a given Lie group to a conserved current.
+    
+    \section{The Energy Function}
+    \begin{dfn}{Energy Function}{}
+        We define the \defineindex{energy function} as
+        \begin{equation}
+            h(\{q\}, \{\dot{q}\}, t) = \sum_{j} \diffp{\lagrangian}{\dot{q}_j} - \lagrangian(\{q\}, \{\dot{q}\}, t) = \sum_{j} p_j\dot{q}_j - \lagrangian.
+        \end{equation}
+    \end{dfn}
+    
+    If the Lagrangian has no explicit time dependence, so \(\lagrangian = \lagrangian(\{q\}, \{\dot{q}\}, \nodependence{t})\), then we have a first integral similar to the one in \cref{eqn:first integral second kind multivariable}, giving
+    \begin{equation}
+        h = \sum_{j}\dot{q}_j\diffp{\lagrangian}{\dot{q}_j} - \lagrangian = \text{constant}.
+    \end{equation}
+    This means that \(h\) is a conserved quantity.
+    In terms of Noether's theorem this corresponds to invariance of the Lagrangian under time translation.
+    
+    Numerically \(h\) has the same value as the Hamiltonian, \(\hamiltonian\), but \(h\) is a function of the position, velocity, and time, whereas the Hamiltonian is a function of position, momentum, and time.
+    
+    \subsection{Energy Function and the Total Energy}
+    As the name suggests the energy function is a generalisation of the total energy, \(E = T + V\).
+    However, there are times when \(h \ne E\).
+    
+    It turns out that a sufficient condition for \(h = E\) is that the kinetic energy be quadratic in velocity and the potential velocity independent.
+    By this we mean we can write the kinetic energy as
+    \begin{equation}
+        T(\{q\}, \{\dot{q}\}, t) = \frac{1}{2}\sum_i\sum_j T_{ij}(\{q\}, \nodependence{\{\dot{q}\}}, t) \dot{q}_i\dot{q}_j.
+    \end{equation}
+    Here \(T_{ij}\) is a symmetric matrix whose entries are a function of position and time, but not velocity.
+    
+    An obvious example of a quadratic energy is the a set of particles in Cartesian coordinates in which
+    \begin{equation}
+        T = \sum_{i}\frac{1}{2}m_i\dot{x}_i^2 \implies T_{ij} = m_i\delta_{ij}.
+    \end{equation}
+    
+    If we have a kinetic energy that is quadratic in the velocities and a potential that is independent of the velocities then
+    \begin{equation}
+        p_i = \diffp{\lagrangian}{\dot{q}_i} = \diffp{T}{\dot{q}_i} = \sum_j T_{ij}\dot{q}_j
+    \end{equation}
+    and so it follows that
+    \begin{align}
+        h &= \sum_i p_i\dot{q}_i - \lagrangian\\
+        &= \sum_i \sum_j T_{ij}\dot{q}_j\dot{q}_i - T + V\\
+        &= 2T - T + V\\
+        &= T + V\\
+        &= E.
+    \end{align}
+    
+    So we see that in systems where the kinetic energy is quadratic in the velocities (and the potential velocity independent) the energy is conserved.
+    We will now study two similar examples, one where the energy is quadratic in the velocity and one where it isn't.
+    
+    \begin{exm}{Particle on a Rod}{}
+        \textit{A particle slides on a massless rod which is fixed to a pivot at one end.
+        A potential, \(V(r)\), is applied to the particle and has rotational symmetry about the pivot.
+        Find the two constants of motion.}
+    
+        Since the rod can rotate and the particle can slide along it the particle can reach any point in the plane.
+        The sensible choice of coordinates is polar coordinates.
+        The Lagrangian is then
+        \begin{equation}
+            \lagrangian = \frac{1}{2}m(\dot{r} + r^2\dot{\vartheta}^2) - V(r).
+        \end{equation}
+        The generalised momenta are then
+        \begin{equation}
+            p_r = \diffp{\lagrangian}{\dot{r}} = m\dot{r}, \qqand p_\vartheta = \diffp{\lagrangian}{\dot{\vartheta}} = mr^2\dot{\vartheta}.
+        \end{equation}
+        These are exactly the radial component of linear momentum and the angular momentum about the rotation axis.
+        
+        The Lagrangian is independent of \(\vartheta\) and therefore \(p_{\vartheta}\) is conserved.
+        
+        The Lagrangian is independent of time and therefore
+        \begin{equation}
+            h = p_r\dot{r} + p_{\vartheta}\dot{\vartheta} - \lagrangian
+        \end{equation}
+        is conserved.
+        Since \(T\) is quadratic in the velocities this quantity is the total energy.
+    \end{exm}
+    
+    \begin{exm}{Particle on a Rod in Forced Motion}{}
+        \textit{Consider the same set up as the previous example, but now the rod is forced to rotate at a fixed angular velocity \(\dot{\vartheta} = \omega\). Find a constant of the motion.}
+        
+        There is now one degree of freedom, \(r\), and the Lagrangian is
+        \begin{equation}
+            \lagrangian = \frac{1}{2}m(\dot{r}^2 + r^2\omega^2) - V(r).
+        \end{equation}
+        Since \(\omega\) is a constant the kinetic energy is \emph{not} quadratic in the velocity.
+        
+        The canonical momentum is
+        \begin{equation}
+            p_r = \diffp{\lagrangian}{\dot{r}} = m\dot{r}.
+        \end{equation}
+        However, now
+        \begin{equation}
+            \diffp{\lagrangian}{r} = mr\omega^2 - \diffp{V}{r} \ne 0
+        \end{equation}
+        and so the canonical momentum is not conserved\footnote{fine, technically if \(V(r) = mr^2\omega^2/2\) then \(p_r\) will be conserved, but this is just being pedantic.}, even if the potential is zero.
+        Notice that the first term here is the centrifugal force due to the forced rotation.
+        
+        The Lagrangian has no explicit time dependence and so 
+        \begin{equation}
+            h = p_r\dot{r} - \lagrangian = \frac{1}{2}m(\dot{r}^2 - r^2\omega^2) + V(r)
+        \end{equation}
+        is conserved.
+        This is \emph{not} the total energy, which is not conserved in this case.
+        The total energy is
+        \begin{equation}
+            E = \frac{1}{2}m(\dot{r}^2 + r^2\omega^2) + V(r).
+        \end{equation}
+        The tangential acceleration is
+        \begin{equation}
+            a_{\vartheta} = r\ddot{\vartheta} + 2\dot{r}\dot{\vartheta}
+        \end{equation}
+        which corresponds to the constraint force
+        \begin{equation}
+            F = ma_{\vartheta} = 2m\dot{r}\omega
+        \end{equation}
+        where we have used \(\ddot{\theta} = \dot{\omega} = 0\).
+        The work done on the bead is then
+        \begin{equation}
+            Fv_{\vartheta} = 2m\omega^2r\dot{r} = \diff*{(mr^2\omega^2)}{t}.
+        \end{equation}
+        We can identify this quantity as
+        \begin{equation}
+            \diff*{(E - h)}{t} = \diff{E}{t}
+        \end{equation}
+        since \(h\) is conserved.
+        This accounts for the change in energy.
+        
+        Previously we stated that constraint forces do no work, this is only the case for virtual displacements consistent with the constraints.
+        The only virtual displacement here is along the rod, which is perpendicular to \(F\).
+        Constraint forces can still do work in actual motion.
+    \end{exm}
+    
+    \section{Global Symmetries and Conservation Laws}
+    In this section we develop the consequences of two global symmetries.
+    By a \defineindex{global symmetry} we mean a symmetry that applies to all space, rather than just a specific system.
+    We will do so by considering a system of \(N\) particles, which for sufficiently large \(N\) covers all classical systems.
+    We take \(\vv{r_a}\) to be the position of the \(a\)th particle.
+    
+    \subsection{Homogeneity}
+    We assume that space is \defineindex{homogeneous}, by this we mean that it is the same anywhere, in particular we are free to choose our origin to be any point in space.
+    Movement of the origin corresponds to adding a constant to the particle positions, which we can also view as translating the entire system.
+    
+    If space is homogenous then the Lagrangian must be invariant under a simultaneous translation of all particles, that is the coordinate transformation
+    \begin{equation}
+        \vv{r_a} \to \vv{r_a} + \vv{\Delta r_a}
+    \end{equation}
+    for some small constant \(\vv{\Delta r} = (\Delta x, \Delta y, \Delta z)\).
+    Notice that the velocity is unchanged by this translation.
+    The Lagrangian changes from \(\lagrangian \to \lagrangian + \Delta\lagrangian\).
+    The homogeneity of space implies that \(\Delta\lagrangian = 0\).
+    
+    In one dimension with a single particle then to first order in \(\Delta x\) we have
+    \begin{equation}
+        \Delta\lagrangian = \diffp{\lagrangian}{x} \Delta x.
+    \end{equation}
+    In three dimensions with a single particle then to first order in \(\Delta x_i\) we have
+    \begin{equation}
+        \Delta\lagrangian = \diffp{\lagrangian}{x} \Delta x + \diffp{\lagrangian}{y} \Delta y + \diffp{\lagrangian}{z} \Delta z = (\grad \lagrangian) \cdot \vv{\Delta\vv{r}}.
+    \end{equation}
+    For \(N\) particles in three dimensions we then have
+    \begin{equation}
+        \Delta\lagrangian = \sum_a (\grad[\vv{r_a}] \lagrangian) \cdot \vv{\Delta r_a} = 0
+    \end{equation}
+    where \(\grad[\vv{r_a}] = (\partial_{x_a}, \partial_{y_a}, \partial_{z_a})\).
+    Since \(\vv{\Delta r_a}\) is arbitrary we have
+    \begin{equation}
+        \sum_a \grad[\vv{r_a}]\lagrangian = 0.
+    \end{equation}
+    
+    Recalling that we can write the Euler--Lagrange equations in terms of the canonical momenta as
+    \begin{equation}
+        \diff{p_i}{t} = \diffp{\lagrangian}{q_i} \implies \diff{\vv{p}}{t} = \grad \lagrangian
+    \end{equation}
+    we find that
+    \begin{equation}
+        0 = \sum_{a} \diff{\vv{p_a}}{t} = \diff{\vv{P}}{t}.
+    \end{equation}
+    This means that the total momentum, \(\vv{P}\), is conserved.
+    \begin{important}
+        Homogeneity of space implies conservation of total momentum.
+    \end{important}
+
+    \subsection{Isotropy}    
+    We assume that space is \defineindex{isotropic}, by this we mean that it is the same in all directions, in particular we are free to choose our axes to point in any direction.
+    We can view rotations of the axes as rotations of the system by switching between active and passive transformations.
+    
+    If space is isotropic then the Lagrangian must be invariant under a rotation of the entire system.
+    A rotation takes \(\vv{r_a} \to \vv{r_a} + \vv{\Delta r_a}\) where
+    \begin{equation}
+        \vv{\Delta r_a} = \vv{\Phi} \times \vv{r_a}
+    \end{equation}
+    with \(\vv{\Phi} = \Phi\vh{\Phi}\) representing a rotation through a small angle, \(\Phi\), about an axis \(\vh{\Phi}\).
+    
+    Notice that the velocity is not conserved under this since the direction changes.
+    The change in velocity is
+    \begin{equation}
+        \vv{\Delta}\dot{\vv{r}}_{\vv{a}} = \vv{\Phi} \times \dot{\vv{r}}_{\vv{a}}.
+    \end{equation}
+
+    These rotations correspond to infinitesimal rotations but from infinitesimal rotations we can build finite rotations, and so the results of this derivation apply to any rotation.
+    
+    Since the velocity is not constant under this transformation the resulting change in the Lagrangian also contains a term corresponding to the change in velocity, giving
+    \begin{equation}
+        \Delta\lagrangian = \sum_a (\grad[\vv{r_a}]\lagrangian) \cdot \vv{\Delta r_a} + \sum_a (\grad[\dot{\vv{r}}_{\vv{a}}]) \cdot \vv{\Delta}\dot{\vv{r}}_{\vv{a}}.
+    \end{equation}
+    We demand that this is zero if space is isotropic.
+    
+    Substituting for \(\vv{\Delta r_a}\) and \(\vv{\Delta}\dot{\vv{r}}_{\vv{a}}\) we get
+    \begin{equation}
+        0 =  = \sum_a (\grad[\vv{r_a}]\lagrangian) \cdot (\vv{\Phi} \times \vv{r_a}) + \sum_a (\grad[\dot{\vv{r}}_{\vv{a}}]) \cdot (\vv{\Phi} \times \dot{\vv{r}}_{\vv{a}}).
+    \end{equation}
+    Using the Euler--Lagrange equations we have
+    \begin{equation}
+        \diffp{\lagrangian}{x_i} = \diff*{\left( \diffp{\lagrangian}{\dot{x}_i} \right)}{t} \implies \grad[\vv{r}] \lagrangian = \diff*{\grad[\dot{\vv{r}}]}{t} \lagrangian.
+    \end{equation}
+    It then follows that
+    \begin{equation}
+        0 =  = \sum_a \left( \diff*{\grad[\dot{\vv{r}}_{\vv{a}}] \lagrangian}{t} \right) \cdot (\vv{\Phi} \times \vv{r_a}) + \sum_a (\grad[\dot{\vv{r}}_{\vv{a}}]) \cdot (\vv{\Phi} \times \dot{\vv{r}}_{\vv{a}}).
+    \end{equation}
+    The final term is the scalar triple product, which follows the relation \(\vv{a} \cdot (\vv{b} \times \vv{c}) = \vv{b} \cdot (\vv{c} \times \vv{a}) = (\vv{c}\times\vv{b})\cdot\vv{a}\).
+    Applying this we have
+    \begin{align}
+        0 &= \sum_a \left[ \vv{r_a} \times \left( \diff*{\grad[\dot{\vv{r}}_{\vv{a}}] \lagrangian}{t} \right) \right] \cdot\vv{\Phi} + \sum_a [\dot{\vv{r}}_{\vv{a}} \times (\grad[\dot{\vv{r}}_{\vv{a}}])] \cdot (\vv{\Phi} \times \dot{\vv{r}}_{\vv{a}})\\
+        &= \sum_a \left[ \left( \diff*{\grad[\dot{\vv{r}}_{\vv{a}}] \lagrangian}{t} \right) \cdot ( \times \vv{r_a}) + \sum_a [\dot{\vv{r}}_{\vv{a}} \times (\grad[\dot{\vv{r}}_{\vv{a}}])] \times \dot{\vv{r}}_{\vv{a}}) \right] \cdot \vv{\Phi}
+    \end{align}
+    Noticing that since \(\vv{\Phi}\) is constant this is the result of applying the product rule we have
+    \begin{equation}
+        0 = \left[ \diff{}{t} \left( \sum_a \vv{r_a}\times (\grad[\dot{\vv{r}}_{\vv{a}}] \lagrangian) \right) \right] \cdot \vv{\Phi}.
+    \end{equation}
+    Since this holds for arbitrary small \(\vv{\Phi}\) we must have
+    \begin{equation}
+        \diff{}{t}\left( \sum_a \vv{r_a}\times (\grad[\dot{\vv{r}}_{\vv{a}}] \lagrangian) \right) = 0
+    \end{equation}
+    which gives
+    \begin{equation}
+        \sum_a \vv{r_a}\times (\grad[\dot{\vv{r}}_{\vv{a}}] \lagrangian) = \sum_{a} \vv{r_a} \times \vv{p_a} = \vv{L} = \text{constant}.
+    \end{equation}
+    That is the total angular momentum is conserved.
+    \begin{important}
+        Isotropy of space implies conservation of total angular momentum.
+    \end{important}
+    
+    \subsection{Notes}
+    We have proven the above without needing Newton's third law, which shows that conservation of total linear/angular momentum is very fundamental (assuming of course that space is homogenous and isotropic).
+    
+    What we have seen here is another example of Noether's theorem.
+    In particular we have seen that infinitesimal symmetries give rise to global conservation laws.
+    A more mathematically precise statement is that the \enquote{infinitesimal symmetries} are generators for the Lie algebra of the relevant Lie group.
+    The group describing translational symmetries is \(\reals^3\), and the associated Lie algebra is \(\reals^3\) with the Lie bracket \([\vv{a}, \vv{b}] = 0\) for all \(\vv{a}, \vv{b} \in \reals^3\).
+    The generators of \(\reals^3\), as a Lie group, are \(\partial_i\).
+    The rotation group describing rotational symmetry is \(\specialOrthogonal(3)\), and the infinitesimal rotations we have considered are elements of the Lie algebra \(\specialOrthogonalLie(3)\), the generators of \(\specialOrthogonalLie(3)\) are \(T_i\) and satisfy the commutation relations \([T_{i}, T_{k}] = \varepsilon_{ijk}T_k\).
+    
+    Notice that, up to factors of \(\hbar\) and \(i\) the generators of \(\reals^3\) (associated with conservation of momentum) are the momentum operators in quantum mechanics and the generators of \(\specialOrthogonalLie(3)\) (associated with conservation of angular momentum) are the angular momentum operators.
+    This hints at a deep connection between symmetries and fundamental concepts of quantum mechanics, and indeed the Lagrangian formalism can be applied to quantum mechanics to exploit this connection.
+    
+    \chapter{Moving Away From Newtonian Physics}
+    \epigraph{Physics is not broken.}{Jenni Smillie}
+    \section{Velocity-Dependent Forces}
+    In \cref{sec:the lagrangian} when we derived the Euler--Lagrange equations we explicitly ruled out velocity dependent potentials to derive the Euler-Lagrange equation as a special case of the more general
+    \begin{equation}
+        \diff*{\left( \diffp{T}{\dot{q}} \right)}{t} - \diffp{T}{q} = Q.
+    \end{equation}
+    For the velocity-independent case we can find \(V = V(\{q\}, \nodependence{\{\dot{q}\}}, t)\) such that
+    \begin{equation}
+        Q = - \diffp{V}{q}.
+    \end{equation}
+    We also have \(\diffp{V}/{\dot{q}} = 0\), which we used to insert zero into the derivation.
+    
+    If we have velocity dependent forces however then we cannot do this.
+    Suppose instead that we can find a function \(\tilde{V} = \tilde{V}(\{q\}, \{\dot{q}\}, t)\) such that
+    \begin{equation}
+        Q = \diff*{\left( \diffp{\tilde{V}}{\dot{q}} \right)}{t} - \diffp{\tilde{V}}{q}.
+    \end{equation}
+    This is such that if we substitute it in and follow the same process as deriving the original Lagrangian we get the familiar equations
+    \begin{equation}
+        \diff*{\left( \diffp{\lagrangian}{\dot{q}} \right)}{t} - \diffp{\lagrangian}{q},
+    \end{equation}
+    except now \(\lagrangian = T - \tilde{V}\).
+    
+    While \(\tilde{V}\) is not a potential as we normally think of them all of the important results carry over such as Hamilton's principle and conservation laws since these were derived from the form of the Euler--Lagrange equations, which is unchanged.
+    
+    \section{The Lorentz Force}
+    \begin{rmk}
+        See \cref{sec:electromagnetism} for more details on electromagnetism.
+    \end{rmk}
+    
+    Perhaps the most important velocity dependent force is the \defineindex{Lorentz force},
+    \begin{equation}
+        m\ddot{\vv{r}} = \vv{F} = e(\vv{E} + \dot{\vv{r}} \times \vv{B}).
+    \end{equation}
+    Here \(m\) is the mass of the particle, \(e\) is its charge, \(\vv{E}\) and \(\vv{B}\) are some position and time dependent electric and magnetic fields, \(\vv{F}\) is the Lorentz force, and \(\vv{r}\) is the position of the particle.
+    
+    \subsection{Electromagnetic Lagrangian}
+    \begin{wrn}
+        In this section we use index notation and the Einstein summation convention.
+    \end{wrn}
+    We can now derive a Lagrangian that works with velocity dependent Lorentz force.
+    We start with the following result relating the product of Levi-Civita symbols, \(\varepsilon_{ijk}\), to Kronecker deltas, \(\delta_{ij}\)\footnote{see methods of theoretical physics: vectors, tensors and continuum mechanics notes for more details}:
+    \begin{equation}
+        \varepsilon_{ijk}\varepsilon_{klm} = \delta_{il}\delta_{jm} - \delta_{im}\delta_{jl}.
+    \end{equation}
+    
+    In index notation the Lorentz force has a component in the \(x_i\) direction given by
+    \begin{align}
+        F_i &= e\left[ \vv{E} + \dot{\vv{r}} \times \vv{B} \right]_i\\
+        &= e\left[ -\grad\varphi - \diffp{\vv{A}}{t} + \dot{\vv{r}} \times (\curl \vv{A}) \right]_i
+    \end{align}
+    where we have substituted the fields for the potentials.
+    Considering the last term we have
+    \begin{align}
+        [\dot{\vv{r}} \times (\curl \vv{A})]_i &= \varepsilon_{ijk}\dot{x}_j(\curl\vv{A})_k\\
+        &= \varepsilon_{ijk}\dot{x}_j\varepsilon_{klm}\partial_lA_m\\
+        &= \varepsilon_{ijk}\varepsilon_{klm}\dot{x}_j\partial_lA_m\\
+        &= (\delta_{il}\delta_{jm} - \delta_{im}\delta_{jl})\dot{x}_j\partial_lA_m\\
+        &= \dot{x}_j\partial_iA_j - \dot{x}_j\partial_jA_i.
+    \end{align}
+    Here \(\partial_i = \diffp{}/{x_i}\), we will also use \(\partial_t = \diffp{}/{t}\).
+    With this we have \((\grad\varphi)_i = \partial_i\varphi\) and so
+    \begin{equation}
+        F_i = e\left[ -\partial_i\varphi - \partial_tA_i + \dot{x}_j(\partial_iA_j - \partial_jA_i) \right].
+    \end{equation}
+    
+    We wish to identify a function, \(\tilde{V}\), such that
+    \begin{equation}
+        F_i = \diff*{\left( \diffp{\tilde{V}}{\dot{x}_i} \right)}{t} - \diffp{\tilde{V}}{x_i}.
+    \end{equation}
+    There isn't really a trick to this, it just has to be done by inspection and then verified.
+    We start by noting that if we choose
+    \begin{equation}
+        \tilde{V} = e(\varphi - \dot{x}_jA_j)
+    \end{equation}
+    then we have
+    \begin{equation}
+        -\diffp{\tilde{V}}{x_i} = -e\partial_i\varphi + \diffp*{(\dot{x}_jA_j)}{x_i} = -e\partial_i\varphi + \dot{x}_j\partial_iA_j.
+    \end{equation}
+    Note that we treat \(\dot{x}_j\) and \(x_i\) as independent variables.
+    This matches the first and third term of the Lorentz force.
+    
+    Now considering the other terms, and remembering that both the scalar and vector potential are independent of the velocity, so the only velocity dependence is in the \(\dot{x}_j\) term, we have
+    \begin{align}
+        \diff*{\left( \diffp{\tilde{V}}{\dot{x}_i} \right)}{t} &= e\diff{}{t}\left[ 0 - \diffp{\dot{x}_j}{\dot{x}_i}A_j \right]\\
+        &= -e\diff{A_i}{t}\\
+        &= -e\diffp{A_i}{x_j}\diffp{x_j}{t} - e\diffp{A_i}{t}\\
+        &= -e\left[ \partial_tA_i + \dot{x}_j\partial_j A_i \right].
+    \end{align}
+    This matches the second and fourth terms of the Lorentz force.
+    We have therefore demonstrated that \(\tilde{V}\) satisfies the necessary equations and therefore we can use the Lagrangian
+    \begin{equation}
+        \lagrangian = \frac{1}{2}m\dot{x}_i\dot{x}_i - e\left( \varphi - \dot{x}_iA_i \right),
+    \end{equation}
+    or in vector notation
+    \begin{equation}
+        \lagrangian = \frac{1}{2}m\sum_i \dot{x}_i^2 - e[\varphi - \dot{\vv{r}} \cdot \vv{A}].
+    \end{equation}
+    
+    \subsection{Properties Derived from the Lagrangian}
+    The canonical momentum is given by
+    \begin{equation}
+        p_i = \diffp{\lagrangian}{\dot{x}_i} = m\dot{x}_j + eA_j,
+    \end{equation}
+    or in vector form
+    \begin{equation}\label{eqn:canonical momentum EM}
+        \vv{p} = m\vv{v} + e\vv{A},
+    \end{equation}
+    which is \emph{not} equal to the mechanical momentum, \(m\vv{v}\).
+    It is important that when we apply rules, such as conservation of momentum if the Lagrangian is independent of position, that we remember it is the \emph{canonical} momentum that we work with, not the mechanical momentum.
+    
+    The energy function is
+    \begin{align}
+        h &= \vv{p}\cdot\dot{\vv{r}} - \lagrangian\\
+        &= [m\vv{v} + e\vv{A}] \cdot \vv{v} - \frac{1}{2}mv^2 + e(\varphi - \vv{v}\cdot\vv{A})\\
+        &= \frac{1}{2}mv^2 + e\varphi.\label{eqn:energy function EM}
+    \end{align}
+    This quantity is conserved only if \(\lagrangian\) has no explicit time dependence.
+    This requires that \(\varphi\) and \(\vv{A}\) have no explicit time dependence, and hence \(\vv{E}\) and \(\vv{B}\) cannot have any explicit time dependence.
+    
+    When this is the case \(h\) is conserved, and since the kinetic energy is quadratic in the velocities \(h = E\).
+    This result for the energy is what we expect, it is equal to the sum of the kinetic energy and electrostatic energy.
+    Remember that \(\vv{B}\) does no work since \(\vv{v} \times \vv{B}\) is perpendicular to the direction of the velocity.
+    If \(\vv{B}\) is time dependent then the magnetic field still does no work but there is a term \(-\diffp{\vv{A}}/{t}\) in the electric field, which contributes to the energy, but is not accounted for in the energy function.
+    
+    \begin{exm}{}{}
+        Consider a single particle moving in a toroidal \(\vv{B}\)-field with \(\varphi = 0\).
+        Such a field has potential
+        \begin{equation}
+            \vv{A} = (0, 0, A_z) = (0, 0 B\rho)
+        \end{equation}
+        where \(\rho = \sqrt{x^2 + y^2}\).
+        Find two constants of motion of the field.
+        
+        We note here that the magnetic field arising from this potential is
+        \begin{equation}
+            \vv{B} = \curl\vv{A} = \frac{B}{\rho} (y, -x, 0)
+        \end{equation}
+        which gives circles in the \((x, y)\)-plane.
+        It should be noted that we don't actually need to compute \(\vv{B}\), we do so here only to justify calling this a toroidal field.
+        
+        The Lagrangian is
+        \begin{equation}
+            \lagrangian = \frac{1}{2}m(\dot{x}^2 + \dot{y}^2 + \dot{z}^2) + e\dot{z}A_z.
+        \end{equation}
+        Since \(A_z = B\sqrt{x^2 + y^2}\) has no explicit \(z\) dependence the canonical momentum in the \(z\)-direction,
+        \begin{equation}
+            p_z = \diffp{\lagrangian}{\dot{z}} = m\dot{z} + eB\sqrt{x^2 + y^2},
+        \end{equation}
+        is conserved.
+        This is one constant of the motion.
+        
+        The Lagrangian also has no explicit time dependence, hence the energy function,
+        \begin{equation}
+            h = \frac{1}{2}mv^2 + e\varphi = \frac{1}{2}m(\dot{x}^2 + \dot{y}^2 + \dot{z}^2),
+        \end{equation}
+        is conserved.
+        That is the kinetic energy is conserved, which makes sense since the \(\vv{B}\)-field can do no work to change the kinetic energy.
+    \end{exm}
+    
+    \section{Special Relativity}
+    Lagrangian methods can also be applied to special relativity\footnote{For more details on special relativity see the relativity section of the relativity, nuclear, and particle physics course.}.
+    The problem we have is that in special relativity we work with the relativistic three-momentum,
+    \begin{equation}
+        \vv{p} = \gamma(u)m\vv{u}
+    \end{equation}
+    where \(m\) is the mass, \(\vv{u}\) the velocity, and \(\gamma(u) = (1 - u^2/c^2)^{-1/2}\), with \(c\) being the speed of light.
+    The relativistic kinetic energy is
+    \begin{equation}
+        T = (\gamma - 1)mc^2.
+    \end{equation}
+    
+    We want the canonical momentum calculated from the Lagrangian for a free particle to be the relativistic three-momentum, but this isn't what we get with \(\lagrangian = (\gamma - 1)mc^2\).
+    Instead it turns out that the correct Lagrangian is
+    \begin{equation}
+        \lagrangian = -mc^2\sqrt{1 - \frac{u^2}{c^2}} - V(\vv{r}) = -\frac{1}{\gamma(u)}mc^2 - V(\vv{r}).
+    \end{equation}
+    We then have that
+    \begin{equation}
+        p_x = \frac{\lagrangian}{\dot{x}} = \frac{m\dot{x}}{\sqrt{1 - u^2/c^2}} = \gamma(u)m\dot{x}.
+    \end{equation}
+    We then have the required \(\vv{p} = \gamma(u)m\vv{u}\).
+    Using Lagrange's equations written in terms of the momentum,
+    \begin{equation}
+        \diff{p_i}{t} = \diffp{\lagrangian}{x_i}
+    \end{equation}
+    we have
+    \begin{equation}
+        \dot{\vv{p}} = \grad \lagrangian = -\grad V.
+    \end{equation}
+    This is what we would expect, so the Lagrangian gives the correct equations of motion, which justifies the choice.
+    
+    \section{Charged Relativistic Particle in an EM Field}
+    We want to find a Lagrangian that gives the equations of motion
+    \begin{equation}
+        \diff{\vv{p}}{t} = \vv{F} = e(\vv{E} + \vv{u} \times \vv{B}).
+    \end{equation}
+    Where \(\vv{p}\) is the relativistic three-momentum.
+    Fortunately we have already corrected for the velocity dependent potential and different momentum individually and both corrections hold when combined, so the correct Lagrangian is
+    \begin{equation}
+        \lagrangian = -\frac{1}{\gamma(u)}mc^2 - e[\varphi - \vv{u}\cdot\vv{A}].
+    \end{equation}
+    
+    \subsection{Covariant Form}
+    \begin{rmk}
+        This section is non-examinable.
+    \end{rmk}
+    
+    In special relativity we want to write everything in a covariant way using four vectors.
+    Recall that the four-velocity is defined as
+    \begin{equation}
+        u^\mu \coloneqq \diff{x^\mu}{\tau} = \gamma(u)(c, \vv{u})
+    \end{equation}
+    where \(x^\mu = (ct, \vv{x})\) is the four-position and \(\tau\) is the proper time.
+    We also define the four-potential as \(A^\mu \coloneqq (\varphi/c, \vv{A})\).
+    Now consider the scalar product of these two quantities:
+    \begin{align}
+        u^\mu A_\mu = \gamma(u)c\frac{\varphi}{c} - \gamma(u)\vv{u}\cdot\vv{A} = \diff{t}{\tau}(\varphi - \vv{u}\cdot\vv{A})
+    \end{align}
+    where we have used
+    \begin{equation}
+        \diff{t}{\tau} = \gamma \impliedby \gamma\dd{\tau} = \dl{t},
+    \end{equation}
+    which is time dilation.
+    Hence the Lagrangian can be written in a covariant form as
+    \begin{equation}
+        \lagrangian = -mc^2\diff{\tau}{t} - eu^\mu A_\mu \diff{\tau}{t}.
+    \end{equation}
+    Using this we can write the action as
+    \begin{align}
+        S &\coloneqq \int \lagrangian \dd{t}\\
+        &\hphantom{:}= \int \left( -mc^2\diff{\tau}{t} - eu^\mu A_\mu \diff{\tau}{t} \right)\dd{t}\\
+        &\hphantom{:}= -\int (mc^2 + eu^\mu A_\mu) \dd{\tau}.
+    \end{align}
+    For the special case of a free particle we have
+    \begin{equation}
+        S = -mc^2 \int \dl{\tau},
+    \end{equation}
+    which is just \(-mc^2\) times the length of the world line of the particle.
+    We can then apply Hamilton's principle, \(\delta S = 0\), to the action to derive the dynamics of the system.
+    
+    \chapter{Hamiltonian Dynamics}
+    \section{Classical Mechanics Hamiltonian}
+    Recall that we defined the energy function for a system of \(3N - M\) degrees of freedom as
+    \begin{equation}
+        h(\{q\}, \{\dot{q}\}, t) = \sum_i p_i \dot{q}_i - \lagrangian(\{q\}, \{\dot{q}\}, t)
+    \end{equation}
+    where
+    \begin{equation}
+        p_i \coloneqq \diffp{\lagrangian}{\dot{q}_i}
+    \end{equation}
+    are the canonical momenta.
+    The energy function is numerically equal to the function we call the \defineindex{Hamiltonian}, \(\hamiltonian\), its just that this function is written in terms of the canonical momenta instead of the velocity.
+    \begin{dfn}{Hamiltonian}{}
+        \begin{equation}\label{eqn:hamiltonian definition}
+            \hamiltonian(\{q\}, \{p\}, t) \coloneqq \sum_{i} p_i \dot{q}_i - \lagrangian(\{q\}, \{\dot{q}\}, t).
+        \end{equation}
+    \end{dfn}    
+    \begin{exm}{}{exm:1d particle hamiltonian}
+        Consider a particle moving in one dimension in a conservative, time-independent potential \(V(x)\).
+        In this case we have
+        \begin{equation}
+            \lagrangian = \frac{1}{2}m\dot{x}^2 - V(x)
+        \end{equation}
+        and so
+        \begin{equation}
+            p = \diffp{\lagrangian}{\dot{x}} = m\dot{x} \implies \dot{x} = \frac{p}{m}
+        \end{equation}
+        from which we get
+        \begin{equation}
+            \hamiltonian = p\dot{x} - \lagrangian = p\frac{p}{m} - \left( \frac{1}{2}m\dot{x}^2 - V(x) \right) = \frac{p^2}{2m} + V(x).
+        \end{equation}
+        In this case we can identify \(p^2/(2m) = m\dot{x}^2/2 = T\) and so \(\hamiltonian = E = T + V\), although this will not always be the case.
+    \end{exm}
+    
+    Consider the variation of \(\hamiltonian\) due to some arbitrary small variation in its arguments.
+    The change in \(\hamiltonian\) is given by
+    \begin{equation}\label{eqn:change in hamiltonian 1}
+        \delta\hamiltonian = \sum_{i} \left[ \diffp{\hamiltonian}{q_i} \delta q_i + \diffp{\hamiltonian}{p_i}\delta p_i \right] + \diffp{\hamiltonian}{t}\delta t.
+    \end{equation}
+    We can consider the result of the same change in the definition of the Hamiltonian.
+    For example, considering the first term \(p_i\dot{q}_i\) a small change \(p_i \to p_i + \delta p_i\) and \(\dot{q}_i \to \dot{q}_i + \delta q_i\) results in a change
+    \begin{equation}
+        (p_i + \delta p_i)(\dot{q}_i + \delta\dot{q}_i) - p_i\dot{q}_i = p_i\delta\dot{q}_i + q_i\delta p_i
+    \end{equation}
+    where we ignore second order terms.
+    Hence
+    \begin{equation}
+        \delta\hamiltonian = \sum_{i} \left[ \dot{q}_i\delta p_i + p_i\delta\dot{q}_i \right] - \sum_{i} \left[ \diffp{\lagrangian}{q_i}\delta q_i + \diffp{\lagrangian}{\dot{q}_i} \delta \dot{q}_i \right] - \diffp{\lagrangian}{t}\delta t.
+    \end{equation}
+    Identifying \(\diffp{\lagrangian}/{\dot{q}_i} = p_i\) in the last term we see it cancels with the second term.
+    We can also rewrite \(\diffp{\lagrangian}/{q_i} = \dot{p}_i\) for the third term, which is simply a statement of the Euler--Lagrange equations.
+    This then reduces to
+    \begin{equation}\label{eqn:change in hamiltonian 2}
+        \delta\hamiltonian = \sum_{i} [\dot{q}_i\delta p_i - \dot{p}_i\delta q_i] - \diffp{\lagrangian}{t}\delta t.
+    \end{equation}
+    Since this must be true for any variation the coefficients of \(\delta \dot{q}_i\), \(\delta p_i\), and \(\delta t\) in \cref{eqn:change in hamiltonian 1,eqn:change in hamiltonian 2} must match, which gives us
+    \begin{equation}
+        \dot{q}_i = \diffp{\hamiltonian}{p_i}, \qquad \dot{p}_i = - \diffp{\hamiltonian}{q_i}, \qqand \diffp{\hamiltonian}{t} = - \diffp{\lagrangian}{t}.
+    \end{equation}
+    These are \defineindex{Hamilton's equations} of motion.
+    We have replaced the \(3N - M\) second order Euler--Lagrange equations with \(6N - 2M + 1\) first order differential equations, the last being trivial if \(\lagrangian\) has no explicit time dependence.
+    
+    \begin{exm}{}{}
+        Consider the one dimensional particle in a potential \(V(x)\) again.
+        We saw in \cref{exm:1d particle hamiltonian} that \(\hamiltonian = p^2/(2m) + V(x)\).
+        From Hamilton's equations we then get
+        \begin{equation}
+            \dot{x} = \diffp{\hamiltonian}{p} = \frac{p}{m}, \qquad \dot{p} = -\diffp{\hamiltonian}{x} = -V'(x), \qqand 0 = 0.
+        \end{equation}
+        The first of these is just the standard momentum definition, \(p = m\dot{x}\), and the second is the standard force-potential relationship, \(\vv{F} = -\grad V\), in one dimension.
+    \end{exm}
+    
+    It is also possible to Derive Hamilton's equations from Hamilton's principle, \(\delta S = 0\), by writing the action as
+    \begin{equation}
+        S = \int \left[ \sum_i p_i\dot{q}_i - \hamiltonian \right] \dd{t}
+    \end{equation}
+    where the integrand is simply the inversion of \cref{eqn:hamiltonian definition} to give \(\lagrangian\).
+    
+    \begin{exm}{}{}
+        Consider a charged, non-relativistic particle.
+        We found in \cref{eqn:energy function EM} that the energy function was
+        \begin{equation}
+            h = \frac{1}{2}m\vv{v}^2 + e\varphi.
+        \end{equation}
+        We also saw in \cref{eqn:canonical momentum EM} that the canonical momentum is
+        \begin{equation}
+            \vv{p} = m\vv{v} + e\vv{A} \implies \vv{v} = \frac{1}{m}(\vv{p} - e\vv{A}).
+        \end{equation}
+        We can find the Hamiltonian by replacing the velocity in the energy function with the momentum, giving
+        \begin{equation}
+            \hamiltonian = \frac{1}{2}m\left[ \frac{1}{m}\left( \vv{p} - e\vv{A} \right) \right]^2 + e\varphi = \frac{1}{2m}\abs{\vv{p} - e\vv{A}}^2 + e\varphi.
+        \end{equation}
+        Notice that the vector potential, \(\vv{A}\), appears in the Hamiltonian, even though it didn't appear in the energy function.
+        We can apply Hamilton's equations to this to get the Lorentz force law.
+    \end{exm}
+    
+    \subsection{Poisson Brackets}
+    Consider the arbitrary function \(\mathcal{A}\), which is a function of positions, momenta, and time.
+    That is \(\mathcal{A} = \mathcal{A}(\{q\}, \{p\}, t)\).
+    The total time derivative of \(\mathcal{A}\) is
+    \begin{equation}
+        \diff{\mathcal{A}}{t} = \sum_i \left[ \diffp{\mathcal{A}}{q_i}\dot{q}_i + \diffp{\mathcal{A}}{p_i}\dot{p}_i \right] + \diffp{\mathcal{A}}{t}.
+    \end{equation}
+    Applying Hamilton's equations this becomes
+    \begin{equation}
+        \diff{\mathcal{A}}{t} = \sum_i \left[ \diffp{\mathcal{A}}{q_i}\diffp{\hamiltonian}{p_i} - \diffp{\mathcal{A}}{p_i}\diffp{\hamiltonian}{q_i} \right] + \diffp{\mathcal{A}}{t}.
+    \end{equation}
+    
+    \begin{dfn}{Poisson Bracket}{}
+        For two functions, \(\mathcal{A}\) and \(\mathcal{B}\), which depend on position, momenta, and time, we define the \defineindex{Poisson bracket} as
+        \begin{equation}
+            \poissonbracket{\mathcal{A}}{\mathcal{B}} \coloneqq \sum_i \left[ \diffp{\mathcal{A}}{q_i}\diffp{\mathcal{B}}{p_i} - \diffp{\mathcal{A}}{p_i}\diffp{\mathcal{B}}{q_i} \right].
+        \end{equation}
+    \end{dfn}
+
+    We see that 
+    \begin{equation}\label{eqn:dA/dt = poisson bracket}
+        \diff{\mathcal{A}}{t} = \poissonbracket{\mathcal{A}}{\mathcal{B}} + \diffp{\mathcal{A}}{t}.
+    \end{equation}
+    
+    We can use the Poisson brackets to rewrite Hamilton's equations as
+    \begin{equation}
+        \dot{q}_i = \poissonbracket{q_i}{\hamiltonian}, \qquad \dot{p}_i = \poissonbracket{p_i}{\hamiltonian}, \qqand \diffp{\hamiltonian}{t} = - \diffp{\lagrangian}{t}.
+    \end{equation}
+    This is a nice way to write them as the first two equations are symmetric in their signs, although we still have to remember which order the terms in the Poisson bracket are.
+    
+    \section{Quantum Mechanics}
+    \subsection{The Hamiltonian and Quantum Mechanics}
+    \begin{rmk}
+        For more details on quantum mechanics see the notes for principles of quantum mechanics.
+    \end{rmk}
+    Given a classical system with a corresponding Hamiltonian, \(\hamiltonian\), we can create an operator in quantum mechanics by making the replacement
+    \begin{equation}
+        \hamiltonian(q, p, t) \to \operator{\hamiltonian}\left( q, -i\hbar \diffp{}{q}, t \right)
+    \end{equation}
+    which then acts on the wave function in the position basis.
+    This process is called \defineindex{canonical quantisation}.
+    
+    \begin{exm}{}{}
+        For a single particle in one dimension we have
+        \begin{equation}
+            \hamiltonian = \frac{p^2}{2m} + V(x) \to \operator{\hamiltonian} = -\frac{\hbar^2}{2m}\diffp[2]{}{x} + V(x).
+        \end{equation}
+        For a charged particle in an electromagnetic field we have
+        \begin{equation}
+            \hamiltonian = \frac{1}{2m} \abs{\vv{p} - e\vv{A}}^2 + e\varphi
+        \end{equation}
+        and hence
+        \begin{equation}
+            \operator{\hamiltonian} = -\frac{\hbar^2}{2m}\laplacian - \frac{e\hbar}{2im}[2\vv{A} \cdot \grad + (\div \vv{A})] + \frac{e^2}{2m} \abs{\vv{A}}^2 + e\varphi.
+        \end{equation}
+        \begin{rmk}
+            There is some ambiguity in this prescription.
+            For example, classically \(\vv{p} \cdot \vv{A} = \vv{A} \cdot \vv{p}\), but \(\vv{A} \cdot \grad \ne \div\vv{A}\).
+            This is a result of multiple quantum systems having the same classical limit.
+        \end{rmk}
+    \end{exm}
+    
+    To continue on with our quantisation we note that for two classical quantities, \(\mathcal{A}\) and \(\mathcal{B}\), we can make the same change, \(q \to q\), \(p \to =i\hbar\partial_q\), \(t \to t\), to get operators, \(\operator{\mathcal{A}}\) and \(\operator{\mathcal{B}}\) for these two quantities.
+    The commutation relations for these operators follow from
+    \begin{equation}
+        i\hbar\poissonbracket{\mathcal{A}}{\mathcal{B}} = \commutator{\operator{\mathcal{A}}}{\operator{\mathcal{B}}},
+    \end{equation}
+    where
+    \begin{equation}
+        \commutator{\operator{\mathcal{A}}}{\operator{\mathcal{B}}} \coloneqq \operator{\mathcal{A}}\operator{\mathcal{B}} - \operator{\mathcal{B}}\operator{\mathcal{A}}
+    \end{equation}
+    is the \defineindex{commutator}.
+    
+    Multiplying \cref{eqn:dA/dt = poisson bracket} by \(i\hbar\) and then making the replacement of Poisson brackets for commutators and functions for operators we see that
+    \begin{equation}
+        \diff{\operator{\mathcal{A}}}{t} = \commutator{\operator{\mathcal{A}}}{\operator{\hamiltonian}} + i\hbar \diffp{\operator{\mathcal{A}}}{t}.
+    \end{equation}
+    This is Heisenberg's equation of motion for a quantum operator in the Heisenberg picture.
+    
+    \subsection{The Lagrangian and Quantum Mechanics}
+    To finish of the section on quantum mechanics we note that the Lagrangian formalism can also be used in quantum mechanics.
+    In this case we define the transition amplitude for a particle to travel from \(x_a\) at time \(t_a\) to \(x_b\) at time \(t_b\) as
+    \begin{equation}\label{eqn:path integral}
+        \braket{x_b, t_b}{x_a, t_a} = A \sum_{\text{paths}} \exp\left[ \frac{i}{\hbar} S[x(t)] \right] = \int \exp\left[ \frac{i}{\hbar} \int_{t_a}^{t_b} \lagrangian \dd{t} \right] \DL{x}
+    \end{equation}
+    where \(A\) is a normalisation factor, the sum is over all paths from \(x_a\) to \(x_b\), and \(S[x(t)]\) is the classical action,
+    \begin{equation}
+        S[x(t)] = \int_{t_a}^{t_b} \lagrangian(x, \dot{x}) \dd{t}.
+    \end{equation}
+    We define the integral in \cref{eqn:path integral} as the \defineindex{path integral}, from this we can derive all of the same results as we could with the more familiar operator formalism.\footnote{see the notes for the quantum theory course for more details on path integrals}
+    
+    In the limit of \(\hbar \to 0\), i.e. the classical limit, we see that the exponential in the path integral oscillates rapidly, unless we are near an area where the action is stationary.
+    The oscillations mostly cancel out and the integral is dominated by the regions near the stationary action\footnote{this is the same logic as the method of stationary phase, discussed in the notes for methods of mathematical physics.}, i.e. where \(\delta S = 0\), so we recover Hamilton's principle.
+    
+    \part{Rigid Body Motion}
+    \chapter{Euler's Method}
+    \section{Recap}
+    Recall that a rigid body is a system of \(N\) particles, labelled \(a = 1, \dotsc, N\), which have positions \(\vv{r_a} = (x_a, y_a, z_a) = (x_{a1}, x_{a2}, x_{a3})\) and masses \(m_a\).
+    There is also the constraint that the distance between particles is fixed.
+    That is
+    \begin{equation}
+        \abs{\vv{r_a} - \vv{r_b}} = \rho_{ab} = \text{constant}.
+    \end{equation}
+    
+    These are not linearly independent constraints, in fact we have already shown that they combine to imply
+    \begin{equation}
+        M \ddot{\vv{R}} = \vv{F^{\ext}}, \qqand \dot{\vv{L}} = \vv{G^{\ext}}
+    \end{equation}
+    where \(M = \sum_a m_a\)  is the total mass, \(\vv{R} = \sum_a \vv{r_a}/M\) is the centre of mass, \(\vv{F^{\ext}}\) is the net external force on the body, \(\vv{L}\) is the total angular momentum, and \(\vv{G^{\ext}}\) is the net external torque.
+    
+    We also showed that
+    \begin{equation}
+        \vv{L} = \vv{J} + \vv{R} \times \vv{P}, \qqand T = T_{\mathrm{com}} + \frac{1}{2}MV^2
+    \end{equation}
+    where \(\vv{J}\) is the intrinsic angular momentum, which is independent of the choice of origin, \(\vv{P}\) is the total linear momentum, \(T\) is the total kinetic energy, \(T_{\mathrm{com}}\) is the kinetic energy in the centre-of-mass frame, and \(V = \abs{\dot{\vv{R}}}\) is the velocity of the centre of mass.
+    
+    Recall that we defined the centre-of-mass frame as the inertial (i.e. non-rotating) frame in which the centre of mass is stationary, but not necessarily at the origin.
+    In this frame the instantaneous motion of the body is purely rotational.
+    
+    \section{Euler's Theorem}
+    \begin{thm}{Euler's Theorem}{}
+        Any displacement of a rigid body with one point fixed in space\footnote{The requirement that a point stays fixed essentially rules out translations.} can be described as a rotation about some single axis.
+        \begin{proof}
+            Rotations are represented by \(3\times 3\) orthogonal matrices, \(R \in \orthogonal(3)\).
+            An equivalent statement of the theorem is that there is a non-zero vector, \(\vv{n}\) for which \(R\vv{n} = \vv{n}\), i.e. the vector is invariant under this particular rotation.
+            This is the aforementioned \enquote{single axis} of rotation.
+            This statement is equivalent to saying that \(\vv{n}\) is an eigenvector of \(\vv{n}\) with eigenvalue \(1\).
+            Therefore to prove the statement it suffices to prove that all \(R\in\orthogonal(3)\) have 1 as an eigenvalue.
+            
+            We know that \(R \in \orthogonal(3)\), so by definition \(RR^{\trans} = R^{\trans}R = \ident\), i.e \(R^{-1} = R^{\trans}\).
+            By properties of the determinant we then have
+            \begin{equation}
+                1 = \det(\ident) = \det(RR^\trans) = \det(R)\det(R^\trans) = [\det(R)]^2
+            \end{equation}
+            since \(\det(AB) = \det(A)\det(B)\) and \(\det(A^\trans) = \det A\).
+            and so \(\det(R) = \pm 1\), indeed we can define \(\orthogonal(3)\) as the set of \(3\times 3\) real matrices with determinant \(\pm 1\).
+            We suppose that \(R\) is a proper rotation, so \(\det(R) = 1\), that is \(R \in \specialOrthogonal(3)\).
+            
+            Another property of determinants is that \(\det(\lambda A) = \lambda^3\det(A)\) for a \(3\times 3\) matrix \(A\).
+            Using this we have
+            \begin{equation}
+                \det(-A) = (-1)^3\det A = -\det A.
+            \end{equation}
+            Hence, since we assume \(\det R = 1\), we have \(\det R^{-1} = \det R^\trans = \det R = 1\).
+            Thus,
+            \begin{align}
+                \det(R - \ident) &= \det((R - \ident)^{\trans})\\
+                &= \det(R^\trans - \ident)\\
+                &= \det(R^{-1} - R^{-1}R)\\
+                &= \det(R^{-1}(\ident - R))\\
+                &= \det(R^{-1})\det(\ident - R)\\
+                &= \det(\ident - R)\\
+                &= \det(-(R - \ident))\\
+                &= -\det(R - \ident).
+            \end{align}
+            Hence \(\det(R - \ident) = 0\).
+            This is equivalent to stating that \(1\) is an eigenvalue of \(R\), and so we are finished.
+        \end{proof}
+    \end{thm}
+    Note that this theorem only works in odd dimensions, since we used the dimension of the space in the \(\det(\lambda A) = \lambda^3\det(A)\) step to get a negative.
+    
+    To specify a rotation we need 6 degrees of freedom:
+    \begin{itemize}
+        \item 2 degrees of freedom to specify the axis of rotation (we can either give its angle to the \(x\) and \(z\) axis (as in spherical polars) or a unit vector, which is two degrees of freedom since the three degrees of freedom of a vector are reduced to two by the requirement of unit modulus).
+        \item 1 degree of freedom to specify the size of rotation, i.e. the angle through which the object is rotated.
+        \item 3 degrees of freedom to specify the fixed position.
+    \end{itemize}
+    There are other ways to specify rotations, which we will come to later, but the number of degrees of freedom are the same.
+    
+    The velocity of the system also has six degrees of freedom, typically given as the velocity of the centre of mass, \(\dot{\vv{R}}\), and angular velocity, \(\vv{\omega}\).
+    Note that we \emph{cannot} use the quantity \(\vv{\Omega}(t) = \int_0^t \vv{\omega}(t') \dd{t'}\) as a generalised coordinate, in the way we use \(\vv{R}(t) = \int_{0}^{t} \dot{\vv{R}}(t') \dd{t'}\), since rotations don't commute and it is possible that multiple rotations will give the same value for \(\vv{\Omega}(t)\).
+    We will solve this problem later.
+    
+    \section{The Inertia Tensor}
+    In the centre-of-momentum frame, taking the origin as the centre-of-mass the instantaneous velocity of the \(a\)th particle is
+    \begin{equation}
+        \dot{\vv{r}}_a = \vv{\omega}(t) \times \vv{r_a}.
+    \end{equation}
+    The intrinsic angular momentum is then
+    \begin{align}
+        \vv{J} &= \sum_{a} \vv{r_a} \times \vv{p_a}\\
+        &= \sum_{a} m_a (\vv{r_a} \times \dot{\vv{r}}_{\vv{a}})\\
+        &= \sum_{a} m_a (\vv{r_a} \times (\vv{\omega} \times \vv{r_a}))\\
+        &= \sum_{a} m_ar_a^2\vv{\omega} - \sum_{a} m_a \vv{r_a} (\vv{r_a} \cdot \vv{\omega}).\label{eqn:J = Iomeag}
+    \end{align}
+    We have used \(\dot{\vv{r}}_{\vv{a}} = \vv{\omega} \times \vv{r_a}\) and the triple vector identity
+    \begin{equation}
+        \vv{a} \times (\vv{b} \times \vv{c}) = (\vv{a} \cdot \vv{c}) \vv{b} - (\vv{a} \cdot \vv{b}) \vv{c}.
+    \end{equation}
+    
+    Here we have derived an relation between \(\vv{J}\) and \(\vv{\omega}\) that is linear in \(\vv{\omega}\), but where \(\vv{J}\) doesn't necessarily point in the direction of \(\vv{\omega}\) since the second sum is in the direction of \(\vv{r_a}\) and is in general non-zero and not in the direction of \(\vv{\omega}\).
+    A linear relation that changes the direction of the vector can be encoded in a rank 2 tensor as
+    \begin{equation}
+        \vv{J} = I \vv{\omega}, \qquad \text{or} \qquad J_i = \sum_{j=1}^{3} I_{ij}\omega_j.
+    \end{equation}
+    We call \(I\) the \defineindex{inertia tensor}.
+    In Cartesian coordinates by writing out the components of \cref{eqn:J = Iomeag} as
+    \begin{equation}
+        J_i = \sum_a m_a r_a^2 \omega_i - \sum_a m_a x_{ai} \sum_j x_{ai}\omega_j.
+    \end{equation}
+    From which we can identify the Cartesian components are
+    \begin{equation}\label{eqn:inertia tensor componentns}
+        I_{ij} = \sum_{a} m_a [r_a^2 \delta_{ij} - x_{ai}x_{aj}].
+    \end{equation}
+    Writing this out in a matrix we have
+    \begin{equation}
+        I = \sum_a m_a 
+        \begin{pmatrix}
+            y_a^2 + z_a^2 & -x_ay_a & -x_az_a\\
+            -x_ay_a & x_a^2 + z_a^2 & -y_az_a\\
+            -x_ay_a & -y_az_a & x_a^2 + y_z^2
+        \end{pmatrix}
+        .
+    \end{equation}
+    
+    This explicitly involves the particle coordinates which are measured relative to the centre of mass.
+    For a rigid body we can take these coordinates to be constants in the frame of reference in which the body is completely stationary, called the \defineindex{body frame}.
+    This may not be an inertial frame if the body is accelerating, however it is still useful to evaluate the inertia tensor in this frame.
+    
+    In the centre of momentum frame the kinetic energy is
+    \begin{equation}
+        T = \sum_a \frac{1}{2}m_a(\vv{\omega} \times \vv{r_a}) \cdot (\vv{\omega} \times \vv{r_a}).
+    \end{equation}
+    Applying the scalar triple product identity, \((\vv{a} \times \vv{b}) \cdot \vv{c} = \vv{a} \cdot (\vv{b} \times \vv{c})\), we get
+    \begin{equation}
+        T = \frac{1}{2}\vv{\omega} \cdot \sum_a m_a \vv{r_a} \times (\vv{\omega} \times \vv{r_a}) = \frac{1}{2}\vv{\omega} \cdot \vv{J} = \frac{1}{2}\vv{\omega} \cdot I\vv{\omega}.
+    \end{equation}
+    
+    The inertia tensor is symmetric, and hence there exist real eigenvalues, \(\{I_i\}\), which we call the \defineindex{principle moments of inertia}, and mutually orthogonal eigenvectors, \(\{\ve{i}\}\), which we take to be normalised.
+    We define the \(\ve{i}\)-axes as the \defineindex{principle axes} (PA)\glossary[acronym]{PA}{principle axes}.
+    In the \(\{\ve{i}\}\) basis the inertia tensor is diagonal:
+    \begin{equation}
+        I = 
+        \begin{pmatrix}
+            I_1 & 0 & 0\\
+            0 & I_2 & 0\\
+            0 & 0 & I_3
+        \end{pmatrix}
+        .
+    \end{equation}
+    In this basis the intrinsic angular momentum is given by
+    \begin{equation}
+        \vv{J} = (I_1\omega_1, I_2\omega_2, I_3\omega_3),
+    \end{equation}
+    and the kinetic energy by
+    \begin{equation}
+        T = \frac{1}{2}(I_1\omega_1^2 + I_2\omega_2^2 + I_3\omega_3^2)
+    \end{equation}
+    which is the centre-of-mass kinetic energy since the principle-axes frame is a centre of momentum frame.
+    
+    \section{Other Origins}
+    So far we have considered the origin, \(O\), to be the centre of mass.
+    This is a good choice for a body undergoing arbitrary rotations, since there is no other special point to pick.
+    A common case however is of a body in which some other point, \(O'\), is fixed.
+    The most common example being a spinning top which has its point of contact with the table fixed (of course, real spinning tops tend to move about as well but we aren't considering translations here).
+    
+    The total angular momentum about \(O'\) is
+    \begin{equation}
+        \vv{L} = \vv{J} + \vv{R} \times \vv{P}
+    \end{equation}
+    where \(\vv{J}\) is the angular momentum about \(O\), \(\vv{R}\) is the centre of mass, and \(\vv{P}\) is the total linear momentum.
+    Notice that in the case of \(O = O'\) this reduces to \(\vv{L} = \vv{J}\) since \(\vv{R} = \vv{0}\).
+    Euler's theorem, that there is a single axis of rotation, still holds and we have
+    \begin{equation}
+        \vv{L} = I'\vv{\omega},
+    \end{equation}
+    where \(I'\) is the momentum of inertia tensor taking \(O'\) as te origin.
+    We can find this by changing the coordinates in the definition of \(I_{ij}\) (\cref{eqn:inertia tensor componentns}).
+    To do so we use \(\vv{r_a} = \vv{d} + \vv{r_a}'\) where \(\vv{r_a}\) is the position relative to \(O\), \(\vv{r_a}'\) is the position relative to \(O'\), and \(\vv{d}\) is the constant displacement of \(O'\) relative to \(O\), all of these quantities being in the body frame, and so don't change as the object rotates.
+    See \cref{fig:inertia tensor shifted origin}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{shifted-origin-inertia-tensor-coords}
+        \begin{tikzpicture}
+            \draw[very thick, ->] (0, 0) -- ($(2, 1) + (-135:0.1)$) node[midway, below] {\(\vv{r_a}'\)};
+            \draw[very thick, ->] (1, 2) -- ($(0, 0) + (45:0.1)$) node[midway, left] {\(\vv{d}\)};
+            \draw[very thick, ->] (1, 2) -- ($(2, 1) + (135:0.1)$) node[midway, right] {\(\vv{r_a}\)};
+            \fill[highlight] (0, 0) circle [radius = 0.1cm] node[below, black] {\(O'\)};
+            \fill[highlight] (1, 2) circle [radius = 0.1cm] node[above, black] {\(O\)};
+            \fill[highlight] (2, 1) circle [radius = 0.1cm];
+        \end{tikzpicture}
+        \caption{The relationship between the two origins, \(O\) and \(O'\), and some arbitrary point.}
+        \label{fig:inertia tensor shifted origin}
+    \end{figure}
+    
+    The kinetic energy, including that of the centre of mass motion in the principle axis basis, is then given by
+    \begin{equation}
+        T = \frac{1}{2}\vv{\omega} \cdot I' \vv{\omega} = \frac{1}{2}(I_1'\omega_1^2 + I_2\omega_2^2 + I_3\omega_3^2).
+    \end{equation}
+    
+    One common use case is when \(O'\) is a distance, \(l\), from the centre of mass along the \(3\)-axis.
+    In the principle axis basis we then have
+    \begin{equation}
+        I_1' = I_1 + Ml^2, \qquad I_2' = I_2 + Ml^2, \qqand I_3' = I_3.
+    \end{equation}
+    This is the \defineindex{parallel axis theorem}, which relates the moment of inertia about an axis parallel to an axis through the centre of mass with known moment of inertia.
+    
+    \section{The Eulerian Approach}
+    Euler approached the problem of describing a rotating rigid body by considering the noninertial body frame, which rotates with the body.
+    In this frame the principle axes are constant in time, as they too rotate with the body.
+    Consider then some inertial frame, \(S_0\), which coincides instantaneously with the body frame, \(S\).
+    We saw previously in \cref{sec:rotating frame} that for an instantaneous angular velocity of \(\vv{\omega}\) any vector, \(\vv{A}\), evolves according to
+    \begin{equation}
+        [\dot{\vv{A}}]_{S_0} = [\dot{\vv{A}}]_{S} + \vv{\omega} \times [\vv{A}]_{S}.
+    \end{equation}
+    Note that \(\vv{A} = [\vv{A}]_S = [\vv{A}]_{S_0}\) at the instant when the frames coincide.
+    
+    Using this we have the usual equation of motion in frame \(S_0\) that
+    \begin{equation}
+        [\dot{\vv{L}}]_{S_0} = \vv{G},
+    \end{equation}
+    where \(\vv{L}\) is the angular momentum and \(\vv{G}\) is the total external torque on the system.
+    In the body frame we have
+    \begin{equation}
+        \vv{G} = [\dot{\vv{L}}]_S + \vv{\omega} \times [\vv{L}]_S.
+    \end{equation}
+    Since \(S\) is the frame of the principle axes we have
+    \begin{equation}
+        [\vv{L}]_S = \vv{J} = (I_1\omega_1, I_2\omega_2, I_3\omega_3).
+    \end{equation}
+    Therefore we have
+    \begin{align}
+        G_1 &= I_1\dot{\omega}_1 + (I_3 - I_2)\omega_2\omega_3,\\
+        G_2 &= I_2\dot{\omega}_2 + (I_1 - I_3)\omega_3\omega_1,\\
+        G_3 &= I_3\dot{\omega}_3 + (I_2 - I_1)\omega_1\omega_2.
+    \end{align}
+    These are \defineindex{Euler's equations of motion} for rigid body motion.
+    
+    The problem with this approach is that \(\vv{G}\) is usually specified with respect to some set of axes fixed in space.
+    This means we can't write \(\vv{G}\) in the body frame until after we have solved for the motion.
+    This means that the Eulerian approach is typically only useful in the case where \(\vv{G} = \vv{0}\).
+    In which case Euler's equations of motion reduce to
+    \begin{align}
+        I_1\dot{\omega}_1 &= (I_2 - I_3)\omega_2\omega_3,\\
+        I_2\dot{\omega}_2 &= (I_3 - I_1)\omega_3\omega_1,\\
+        I_3\dot{\omega}_3 &= (I_1 - I_2)\omega_1\omega_2.
+    \end{align}
+    These apply in the body frame.
+    Since this is noninertial it isn't necessarily true that \(\vv{\omega} = \vv{0}\), despite the definition as the frame that rotates with the body, since we define \(\vv{\omega}\) to be the rotation velocity relative to an inertial frame.
+    
+    \section{Symmetric Top}
+    The symmetric top is perhaps the simplest example of a rotating body that isn't a sphere.
+    The symmetric top rotates about an axis of symmetry, which we take to be \(I_3\), and the other two principle axes are equal, so \(I_1 = I_2\).
+    In this case Euler's equations of motion in the absence of external torque reduce to
+    \begin{align}
+        I_1\dot{\omega}_1 &= (I_1 - I_3)\omega_2\omega_3,\\
+        I_1\dot{\omega}_2 &= (I_3 - I_1)\omega_3\omega_1,\\
+        I_3\dot{\omega}_3 &= 0.
+    \end{align}
+    Immediately we see from this that \(\omega_3\) is constant and we can write
+    \begin{align}
+        \dot{\omega}_1 &= \frac{I_1 - I_3}{I_1}\omega_3\omega_2 = \Omega\omega_2,\\
+        \dot{\omega}_2 &= \frac{I_3 - I_1}{I_1}\omega_3\omega_1 = -\Omega\omega_1.
+    \end{align}
+    Here we define
+    \begin{equation}
+        \Omega \coloneqq \frac{I_1 - I_3}{I_1}\omega_3,
+    \end{equation}
+    which is constant in time in the body frame.
+    
+    Differentiating the first of these with respect to time and substituting in the second we get
+    \begin{equation}
+        \ddot{\omega}_1 = \Omega\dot{\omega}_2 = -\Omega^2\omega_1,
+    \end{equation}
+    and similarly for the second
+    \begin{equation}
+        \ddot{\omega}_2 = -\Omega\dot{\omega}_1 = -\Omega^2\omega_2.
+    \end{equation}
+    Recognising these as the equations for simple harmonic motion with frequency \(\Omega\) we identify the relative phase between the two as \(\pi/2\) since \(\dot{\omega}_2 = -\Omega\omega_1\), so if \(\omega_2 = A\cos(\Omega t)\) then \(\omega_2 = A\sin(\Omega t) = A\cos(\Omega t + \pi/2)\).
+    This corresponds to circular motion of \(\vv{\omega}\) in the \((1,2)\)-plane, with \(\omega_3\) constant.
+    This means that \(\vv{\omega}\) processes about the \(3\)-axis with frequency \(\Omega\).
+    The precession of \(\omega_3\) traces out what we call the body cone.
+    See \cref{fig:symmetric top precession}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{symmetric-top-precession}
+        \begin{tikzpicture}
+            \path (0, 1) coordinate (C) -- (0, 0) coordinate (B) -- (1, 2) coordinate (A) pic [draw, angle radius=0.8cm, "\(\zeta\)", angle eccentricity=0.75] {angle};
+            \draw[very thick, ->] (0, 0, 0) -- (2, 0, 0) node[right] {2};
+            \draw[very thick, ->] (0, 0, 0) -- (0, 3, 0) node[above] {3};
+            \draw[very thick, ->] (0, 0, 0) -- (0, 0, 3) node[below left] {1};
+            \draw[thick] (0, 2) circle [x radius = 1, y radius=0.25];
+            \draw[highlight, ultra thick, ->] (0, 0) -- (1, 2);
+        \end{tikzpicture}
+        \caption[Symmetric top precession.]{A symmetric top rotating around its axis of symmetry will have an angular momentum, \(\vv{\omega}\), which precesses about the axis of symmetry tracing out a circle.}
+        \label{fig:symmetric top precession}
+    \end{figure}
+    
+    Since the motion is in a circle in the \((1,2)\)-plane the value of \(\omega_1^2 + \omega_2^2\) is constant, it's the radius of the circle squared.
+    We also know that \(\omega_3\) is constant, and therefore \(\omega_3^2\) is constant.
+    Combining these we see that \(\abs{\vv{\omega}} = \sqrt{\omega_1^2 + \omega_2^2 + \omega_3^2}\) is constant.
+    The intrinsic angular momentum, \(\vv{J}\), then satisfies \(\vv{J}^2 = I_1^2A^2 + I_3^2\omega_3^2 = \text{constant}\), where \(A = \sqrt{\omega_1^2 + \omega_2^2}\) is the amplitude of the oscillations in the \(1\) and \(2\) directions, which is also the radius of the circle.
+    We therefore also have \(\vv{J} \cdot \vv{\omega} = \text{constant}\).
+    
+    Since \(\vv{J}\cdot\vv{\omega}\), \(\vv{J}\cdot\ve{3}\), and \(\vv{\omega}\cdot\ve{3}\) are all constant \(\vv{J}\), \(\vv{\omega}\), and \(\ve{3}\) must make constant angles to each other.
+    We can show that \((\vv{J} \times \vv{\omega}) \cdot \ve{3} = 0\), which shows that these three vectors are coplanar.
+    This means that \(\vv{J}\) precesses along with \(\vv{\omega}\), since \(\ve{3}\) is fixed and \(\vv{J}\) must remain in the \(\ve{3}\)-\(\vv{\omega}\) plane.
+    Therefore \(\vv{J}\) precesses with frequency \(\Omega\).
+    
+    Let \(\zeta\) be the angle between \(\ve{e}\) and \(\vv{\omega}\), and \(\tau\) be the angle between \(\ve{3}\) and \(\vv{J}\).
+    Then
+    \begin{equation}
+        \cos \tau = \frac{\vv{J}\cdot\ve{3}}{\abs{\vv{J}}} = \frac{I_3\omega_3}{\sqrt{I_1^2A^2 + I_2^2\omega_3}} = \frac{\omega_3}{\sqrt{\frac{I_1^2}{I_3^2}A^2 + \omega_3^2}}.
+    \end{equation}
+    Similarly
+    \begin{equation}
+        \cos\zeta = \frac{\vv{\omega} \cdot \ve{3}}{\abs{\vv{\omega}}} = \frac{\omega_3}{\sqrt{A^2 + \omega_3^2}}.
+    \end{equation}
+    From this we see that if \(I_1 > I_3\), so \(I_1^2/I_3^2 \in (0, 1)\), then \(\cos\tau > \cos\zeta\), which means that \(\tau < \zeta\), since \(\cos\) is a decreasing function on \([0, \pi]\), which is also the total range of angles that \(\vv{J}\) and \(\vv{\omega}\) can make to \(\ve{3}\).
+    The reverse, that if \(I_1 < I_3\), then \(\tau > \zeta\), also holds.
+    
+    For the special case where \(I_3 = I_1 = I_2\) Euler's equations reduce further to \(\dot{\vv{\omega}} = 0\), which is trivially true since \(\vv{J}\) and \(\vv{\omega}\) are parallel in this case.
+    
+    We wish to translate these results into the lab frame.
+    The vectors \(\vv{J}\), \(\vv{\omega}\), and \(\ve{3}\) remain coplanar.
+    The angular velocity, \(\vv{\omega}\), traces out a cone about \(\vv{J}\), called the space cone.
+    We also know that \(\vv{\omega}\) traces out a body cone about \(\ve{3}\).
+    We therefore find that the body cone rolls without slipping about the outside of the space cone if \(I_3 < I_1\), and inside the space cone if \(I_3 > I_1\).
+    
+    \section{Asymmetric Top}
+    For the most general case in which all three principle moments of inertia are different the general solution to Euler's equations for torque free motion requires elliptic integrals and doesn't teach us much.
+    Instead we will focus on looking for a solution where \(\vv{\omega}\) is constant in the body frame.
+    From Euler's equations we see that this is only possible if two components of \(\vv{\omega}\) are zero in the body frame.
+    Without loss of generality we take \(\omega_3\) to be the only non-zero component of \(\vv{\omega}\) and Euler's equations then give us
+    \begin{align}
+        I_1\dot{\omega}_1 &= (I_2 - I_3)\omega_2\omega_3 = 0,\\
+        I_2\dot{\omega}_2 &= (I_3 - I_1)\omega_3\omega_1 = 0,\\
+        I_3\dot{\omega}_3 &= (I_1 - I_2)\omega_1\omega_3 = 0.
+    \end{align}
+    So we see that as long as two components of \(\vv{\omega}\) are zero in the body frame then \(\vv{\omega}\) is constant.
+    This means that
+    \begin{important}
+        an asymmetric body can only rotate with constant angular velocity if the rotation axis is one of the principal axes.
+    \end{important}
+
+    Suppose we have an asymmetric top rotating such that \(\vv{\omega} = \omega\ve{3}\) is constant.
+    We can investigate the stability by seeing by considering \(\omega_1 = \varepsilon_1\), \(\omega_2 = \varepsilon_2\), and \(\omega_3 = \omega + \varepsilon_3\), where \(\varepsilon_i\) is small compared to \(\omega\).
+    Inserting this in Euler's equations and expanding to first order in \(\varepsilon_i\) we get
+    \begin{align}
+        I_1\dot{\varepsilon}_1 &= (I_2 - I_3)(\omega + \varepsilon_3)\varepsilon_2 \approx (I_2 - I_3)\omega\varepsilon_2,\\
+        I_2\dot{\varepsilon}_2 &= (I_3 - I_1)(\omega + \varepsilon_3)\varepsilon_1 \approx (I_3 - I_1)\omega\varepsilon_1,\\
+        I_3\dot{\varepsilon}_3 &= (I_1 - I_2)\varepsilon_1\varepsilon_2 \approx 0.
+    \end{align}
+    Differentiating the first equation, remembering that \(I_i\) and \(\omega\) are constant, then substituting in the second equation we get
+    \begin{equation}
+        I_1\ddot{\varepsilon}_1 = (I_2 - I_3)\omega\dot{\varepsilon}_2 = (I_2 - I_3)\omega\frac{I_3 - I_1}{I_2}\omega\varepsilon_1,
+    \end{equation}
+    which we rearrange to get
+    \begin{equation}
+        I_1I_2\ddot{\varepsilon}_1 = (I_2 - I_3)(I_3 - I_1)\omega^2\varepsilon_1.
+    \end{equation}
+    If we swap the order of the two equations then we get the same equation but for \(\varepsilon_2\).
+    
+    The general solution to this equation is
+    \begin{equation}
+        \varepsilon_1 = A\e^{i\Omega t} + B\e^{-i\Omega t},
+    \end{equation}
+    and similar for \(\varepsilon_2\), where
+    \begin{equation}
+        \Omega^2 = \frac{(I_1 - I_3)(I_2 - I_3)}{I_1I_2}\omega^2.
+    \end{equation}
+    If \(I_3\) is either the smallest or largest moment of inertia then the right hand side is positive, meaning \(\Omega\) will be real.
+    If \(I_3\) is the middle axis then \(\Omega\) is imaginary and hence \(\varepsilon_1\) grows exponentially as
+    \begin{equation}
+        \varepsilon_1 \sim B\e^{\abs{\Omega}t}.
+    \end{equation}
+    
+    This results in the tennis racket theorem, so called because it is easy to demonstrate by throwing a tennis racket spinning about each of its three axes.
+    \begin{thm}{Tennis Racket Theorem}{}
+        Steady rotation about the intermediate axis is unstable, steady rotation about the major or minor axes is stable.
+    \end{thm}
+    
+    \chapter{Lagrange's Method}
+    Lagrange's method for rigid body motion is suitable for systems with a nonzero external torque.
+    The trade-off with Euler's method is that Lagrange's method assumes that there is a point, \(O\), which is fixed.
+    This point is normally not the centre of mass.
+    We will consider the moment of inertia about \(O\), and call it \(I\) (we were calling the moment of inertia about a non-centre-of-mass point \(I'\) before).
+    
+    The angular momentum about \(O\) is
+    \begin{equation}
+        \vv{L} = I\vv{\omega}.
+    \end{equation}
+    The kinetic energy, including that due to the centre of mass motion, is
+    \begin{equation}
+        T = \frac{1}{2}\vv{\omega} \cdot I \vv{\omega} = \frac{1}{2}(I_1\omega_1^2 + I_2\omega_2^2 + I_3\omega_3^2)
+    \end{equation}
+    where \(I_i\) are the eigenvalues of \(I\), which we take to be arbitrary.
+    
+    We need a set of three generalised coordinates to specify the orientation of the body, fixing \(O\) fixes three of the six degrees of freedom.
+    The canonical choice is to use \defineindex{Euler angles}, \((\vartheta, \varphi, \psi)\), which are defined by a series of rotations.
+    There are multiple ways to define Euler angles which don't work together, we choose to use one convention, called the \(y\) convention, the only real advantage being that they are slightly more natural for the derivation of conservation laws.
+    
+    The process for defining Euler angles starts with the object in a reference state and then three rotations are made so that the object has the desired orientation, each rotation defining an angle:
+    \begin{enumerate}
+        \item Start with the object aligned with the body axes (those that rotate with the body) aligned with the space axes.
+        \item Rotate the body in the \((x, z)\)-plane, the angle is \(\vartheta\).
+        \item Rotate the body about the \(z\)-space-axis defining the angle \(\varphi\).
+        \item Rotate the body about the \(3\)-axis (a body axis), defining the angle \(\psi\).
+    \end{enumerate}
+    These steps are drawn in \cref{fig:euler angles}.
+    
+    \begin{figure}
+        \begin{subfigure}[b]{0.4\textwidth}
+            \tikzsetnextfilename{euler-angle-1}
+            \begin{tikzpicture}
+                \draw[->, thick] (0, 0, 0) -- (3, 0, 0) node[right] {\(y\)};
+                \draw[->, thick] (0, 0, 0) -- (0, 0, 3) node[below left] {\(x\)};
+                \draw[->, thick] (0, 0, 0) -- (0, 3, 0) node[above] {\(z\)};
+                \draw[->, highlight] (0, 0, 0) -- (2, 0, 0) node[below left] {\(2\)};
+                \draw[->, highlight] (0, 0, 0) -- (0, 0, 2) node[above left] {\(1\)};
+                \draw[->, highlight] (0, 0, 0) -- (0, 2, 0) node[below left] {\(3\)};
+            \end{tikzpicture}
+            \caption{Start with the body and space axes aligned.}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.4\textwidth}
+            \tikzsetnextfilename{euler-angle-2}
+            \begin{tikzpicture}
+                \draw[->, thick] (0, 0, 0) -- (3, 0, 0) node[right] {\(y\)};
+                \draw[->, thick] (0, 0, 0) -- (0, 0, 3) node[below left] {\(x\)};
+                \draw[->, thick] (0, 0, 0) -- (0, 3, 0) node[above] {\(z\)};
+                \draw[->, highlight] (0, 0, 0) -- (2, 0, 0) node[below left] {\(2\)};
+                \draw[->, highlight] (0, 0, 0) -- (0, -1.73205, 1) node[below left] {\(1\)};
+                \draw[->, highlight] (0, 0, 0) -- (0, 1, 1.73205) node[above left] {\(3\)};
+                \path[canvas is yz plane at x=0] (1, 0) coordinate (A) -- (0, 0) coordinate (B) -- ({cos(60)}, {sin(60)}) coordinate (C) pic [draw, "\(\vartheta\)", angle eccentricity = 0.7] {angle};
+            \end{tikzpicture}
+            \caption{Rotate through angle \(\vartheta\) about the \(y\)-axis.}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.4\textwidth}
+            \tikzsetnextfilename{euler-angle-3}
+            \begin{tikzpicture}
+                \draw[->, thick] (0, 0, 0) -- (3, 0, 0) node[right] {\(y\)};
+                \draw[->, thick] (0, 0, 0) -- (0, 0, 3) node[below left] {\(x\)};
+                \draw[->, thick] (0, 0, 0) -- (0, 3, 0) node[above] {\(z\)};
+                \draw[->, highlight] (0, 0, 0) -- (1.73205, 1, 0) node[above right] {\(2\)};
+                \draw[->, highlight] (0, 0, 0) -- (0.866025, -1.5, 1) node[below right] {\(1\)};
+                \draw[->, highlight] (0, 0, 0) -- (-0.5, 0.866025, 1.73205) node[above left] {\(3\)};
+                \path (1, 0) coordinate (A) -- (0, 0) coordinate (B) -- ({cos(30)}, {sin(30)}) coordinate (C) pic [draw, "\(\varphi\)", angle eccentricity = 1.3] {angle};
+            \end{tikzpicture}
+            \caption{Rotate through angle \(\varphi\) about the \(z\) axis.}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.4\textwidth}
+            \tikzsetnextfilename{euler-angle-4}
+            \begin{tikzpicture}
+                \draw[->, thick] (0, 0, 0) -- (3, 0, 0) node[right] {\(y\)};
+                \draw[->, thick] (0, 0, 0) -- (0, 0, 3) node[below left] {\(x\)};
+                \draw[->, thick] (0, 0, 0) -- (0, 3, 0) node[above] {\(z\)};
+                \draw[->, highlight] (0, 0, 0) -- (1.06699, 1.61603, -0.5) node[above right] {\(2\)};
+                \draw[->, highlight] (0, 0, 0) -- (1.61603, -0.799038, 0.866025) node[below right] {\(1\)} coordinate (C);
+                \draw[->, highlight] (0, 0, 0) -- (-0.5, 0.866025, 1.73205) node[above left] {\(3\)};
+                \draw[highlight, dashed] (0, 0, 0) -- (0.866025, -1.5, 1) coordinate (A);
+                \path coordinate (B) pic [draw, "\(\psi\)", angle eccentricity = 1.35] {angle};
+            \end{tikzpicture}
+            \caption{Rotate through angle \(\psi\) about the \(3\)-axis.}
+        \end{subfigure}
+        \caption{How to define the rotation of a set of body axes relative to a set of space axes using Euler angles and the \(y\)-convention adopted in this course.}
+        \label{fig:euler angles}
+    \end{figure}
+    
+    \section{The Lagrangian}
+    We want to find a Lagrangian, \(\lagrangian\), where the generalised coordinates are the Euler angles as defined in the previous section.
+    The potential term is straight forward if we restrict ourselves to tops under gravity, the potential is simply
+    \begin{equation}
+        V = Mgl\cos\vartheta
+    \end{equation}
+    where \(l\) is the distance from the fixed point to the centre of mass and \(\vartheta\) is the Euler angle.
+    
+    The kinetic energy is not so straight forward.
+    We know that in general
+    \begin{equation}
+        T = \frac{1}{2}\vv{\omega} \cdot I \vv{\omega} = \frac{1}{2}(I_1\omega_1^2 + I_2\omega_2^2 + I_3\omega_3^2).
+    \end{equation}
+    We therefore require \(\vv{\omega}\) as a function of \(\vartheta\), \(\varphi\), \(\psi\), \(\dot{\vartheta}\), \(\dot{\varphi}\), and \(\dot{\psi}\).
+    
+    Define the axes \(\ve{i}\) in the body frame as usual, and also an intermediate set of axes, \(\ve{i}'\), which are the axes after the second rotation, before the third rotation.
+    Since the third rotation is about the \(3\)-axis we have that \(\ve{3} = \ve{3}'\).
+    Looking down the \(3\)-axis we see that
+    \begin{align}
+        \ve{1} \cdot \ve{1}' &= \cos\psi,\\
+        \ve{1} \cdot \ve{2}' &= \sin\psi,\\
+        \ve{2} \cdot \ve{1}' &= -\sin\psi,\\
+        \ve{2} \cdot \ve{2}' &= \cos\psi,
+    \end{align}
+    since this is simply a rotation in the plane normal to \(\ve{3}\) by angle \(\psi\).
+    
+    We will fist find the components of \(\vv{\omega}\) in the primed basis set.
+    From the definition of the Euler angles we can identify that \(\dot{\vartheta}\) is the rate of rotation about the \(2'\)-axis, \(\dot{\varphi}\) is the rate of rotation about the \(z\)-axis, and \(\dot{\psi}\) is the rate of rotation about the \(3\)-axis.
+    Therefore we have
+    \begin{equation}
+        \vv{\omega} = \dot{\vartheta}\ve{2}' + \dot{\varphi}\vh{z} + \dot{\psi}\ve{3}'.
+    \end{equation}
+    The \(2'\), \(3'\), and \(z\)-axes are not orthogonal, so this doesn't correspond directly to the components of \(\vv{\omega}\) in some orthonormal basis.
+    We can decompose \(\vh{z}\) as
+    \begin{equation}
+        \vh{z} = (\vh{z} \cdot \ve{3}') \ve{3}' + (\vh{z} \cdot \ve{1}') \ve{1}' \ve{3}'\cos\vartheta - \ve{1}'\sin\vartheta.
+    \end{equation}
+    Doing so we get
+    \begin{equation}
+        \vv{\omega} = -\dot{\varphi} \sin\vartheta\ve{1}' + \dot{\vartheta}\ve{2}' + (\dot{\psi} + \dot{\varphi}\cos\vartheta)\ve{3}' = \sum_{i} \omega_i'\ve{i}'.
+    \end{equation}
+    
+    Finally we can move to the unprimed basis using \(\ve{3}' = \ve{3}\) and hence \(\ve{3}' \cdot \ve{1} = \ve{3}' \cdot \ve{2} = 0\) so
+    \begin{align}
+        \omega_1 &= \ve{1} \cdot \vv{\omega} = -\dot{\varphi} \sin\vartheta \cos\psi + \dot{\vartheta} \sin\psi,\\
+        \omega_2 &= \ve{2} \cdot \vv{\omega} = \hphantom{-}\dot{\varphi}\sin\vartheta\sin\psi + \dot{\vartheta\cos\varphi},\\
+        \omega_3 &= \hphantom{-}\dot{\varphi}\cos\vartheta + \dot{\psi}.
+    \end{align}
+    This then gives the kinetic energy as
+    \begin{align}
+        T &= \frac{1}{2}(I_1\omega_1^2 + I_2\omega_2^2 + I_3\omega_3^2)\\
+        &= \frac{1}{2}I_1(-\dot{\varphi}\sin\vartheta\cos\psi + \dot{\vartheta}\sin\psi)^2\\
+        &+ \frac{1}{2}I_2(\dot{\varphi}\sin\vartheta\sin\psi + \dot{\vartheta}\cos\psi)^2\\
+        &+ \frac{1}{2}I_3(\dot{\varphi}\cos\vartheta + \dot{\psi})^2.
+    \end{align}
+    Notice that this is quadratic in the velocities.
+    
+    This simplifies if the \(3\)-axis, which passes through the fixed pivot point, is also a symmetry axis of the body, which is to say that \(I_1 = I_3 = A\), denoting \(I_3 = C\) and expanding we then have
+    \begin{align}
+        T &= \frac{1}{2}[A(\omega_1^2 + \omega_2^2) + C\omega_3^2]\\
+        &= \frac{1}{2}[A(\omega_1'^2 + \omega_2'^2) + C\omega_3^2]\\
+        &= \frac{1}{2}[A(\dot{\vartheta}^2 + \dot{\varphi}^2\sin^2\vartheta) + C(\dot{\varphi}\cos\vartheta + \dot{\psi})].
+    \end{align}
+    Here we have used the fact that the \(1\) and \(2\) axes differ from the \(1'\) and \(2'\) axes by a rotation in the plane and therefore lengths are left unchanged, in particular \(\omega_1^2 + \omega_2^2 = \omega_1'^2 + \omega_2'^2\).
+    This means that the final rotation was not necessary in this case.
+    We could also have argued that the final result must be independent of \(\psi\) by symmetry in this case and then evaluated our earlier result for \(\psi = 0\) to achieve the same result.
+    
+    The Lagrangian is then
+    \begin{equation}
+        \lagrangian = \frac{1}{2}[A(\dot{\vartheta}^2 + \dot{\varphi}^2\sin^2\vartheta) + C(\dot{\varphi}\cos\vartheta + \dot\psi)^2] - Mgl\cos\vartheta.
+    \end{equation}
+    
+    \section{Conservation Laws and Equations of Motion}
+    Now that we have the Lagrangian we go through the usual procedure of deriving the conserved quantities and then the equations of motions.
+    First we note that \(\lagrangian\) doesn't explicitly depend on \(\psi\), and so
+    \begin{equation}
+        p_\psi \coloneqq \diffp{\lagrangian}{\dot{\psi}} = C(\dot{\psi} + \dot{\varphi}\cos\vartheta) = I_3\omega_3
+    \end{equation}
+    is conserved.
+    The reason for this conservation law is the symmetry of the system under rotations of the body about the 3-axis.
+    Since the centre of mass is on the 3-axis the gravitational torque cannot change \(\omega_3\).
+    By convention we define the conserved quantity
+    \begin{equation}
+        n = \omega_3 = \frac{p_\psi}{I_3} = \dot{\psi} + \dot{\varphi} \cos\vartheta
+    \end{equation}
+    which we call the \defineindex{spin}.
+    
+    The Lagrangian is also independent of \(\varphi\), and so
+    \begin{equation}
+        p_{\varphi} \coloneqq \diffp{\lagrangian}{\dot{\varphi}} = A\dot{\varphi}\sin^2\vartheta + C(\dot{\psi} + \dot{\varphi}\cos\vartheta)\cos\vartheta = A\dot{\varphi}\sin^2\vartheta + Cn\cos\vartheta
+    \end{equation}
+    is a conserved quantity.
+    This corresponds to symmetry of the system under rotations about the \(z\)-axis.
+    We can identify that \(p_\varphi = L_z\), is the \(z\) component of the orbital angular momentum.
+    
+    The Lagrangian \emph{does} depend explicitly on \(\vartheta\).
+    The conjugate momentum is
+    \begin{equation}
+        p_{\vartheta} \coloneqq \diffp{\lagrangian}{\dot{\vartheta}} = A\dot{\vartheta}.
+    \end{equation}
+    The Euler--Lagrange equation for \(\vartheta\) is
+    \begin{equation}
+        \dot{p}_{\vartheta} = \diffp{\lagrangian}{\vartheta}
+    \end{equation}
+    which gives
+    \begin{equation}
+        A\ddot{\vartheta} = A\dot{\varphi}^2\sin\vartheta\cos\vartheta - C(\dot{\psi} + \dot{\varphi}\cos\vartheta)\dot{\varphi}\sin\vartheta + Mgl\sin\vartheta.
+    \end{equation}
+    This can be written as
+    \begin{equation}
+        A\ddot{\vartheta} = A\dot{\varphi}^2\sin\vartheta\cos\vartheta - Cn\dot{\varphi}\sin\vartheta + Mgl\sin\vartheta.
+    \end{equation}
+    
+    The Lagrangian doesn't depend explicitly on time, hence the energy function,
+    \begin{equation}
+        h = \sum_{i=1}^{3}\dot{q_i}p_i - \lagrangian
+    \end{equation}
+    is conserved.
+    Since the kinetic energy is quadratic in the velocity the value of the energy function coincides with the total energy \(E = T + V\).
+    We can therefore compute \(T + V\) instead of \(h\) giving
+    \begin{equation}
+        E = \frac{A}{2}(\dot{\vartheta}^2 + \dot{\varphi}^2\sin^2\vartheta) + \frac{C}{2}n^2 + Mgl\cos\vartheta.
+    \end{equation}
+    We can write this as
+    \begin{equation}
+        \dot{\vartheta}^2 + \dot{\varphi}^2\sin^2\vartheta = \frac{2E - Cn^2}{A} - \frac{2Mgl\cos\vartheta}{A}.
+    \end{equation}
+    Substituting in the orbital angular momentum we can write this as
+    \begin{equation}
+        \dot{\vartheta}^2 = \frac{2E - Cn^2}{A} - \frac{2Mgl\cos\vartheta}{A} - \frac{(L_z - Cn\cos\vartheta)^2}{A^2\sin^2\vartheta}.
+    \end{equation}
+    
+    After accounting for conservation laws we have only a single nontrivial degree of freedom, \(\vartheta\), described by a nonlinear first order ODE.
+    
+    \section{The Zone Function}
+    Since \(\dot{\vartheta}\) must be real we require that \(\dot{\vartheta}^2 > 0\).
+    For given value of \(n\), \(L_z\), and \(E\) this will define a zone of allowed values of the quantity \(u \coloneqq \cos\vartheta\).
+    Writing \(\dot{u} = -\dot{\vartheta}\sin\vartheta\) we find that
+    \begin{equation}
+        \dot{u}^2 = \left( \frac{2E - Cn^2}{A} \right)(1 - u^2) - \frac{(L_z - Cnu)^2}{A^2} - \left( \frac{2Mgl}{A} \right) u(1 - u^2) = f(u).
+    \end{equation}
+    This is cubic in \(u\).
+    We will therefore find an interval of values of \(u\) for which \(f(u)\) is positive and in which the initial value of \(f(u)\) lies.
+    
+    \section{Steady Precession}
+    Conservation of energy gives us
+    \begin{equation}
+        \frac{1}{2}A\dot{\vartheta}^2 = E - \frac{Cn^2}{2} - Mgl\cos\vartheta - \frac{(L_z - Cn\cos\vartheta)^2}{2A\sin^2\vartheta} = E' - U(\vartheta).
+    \end{equation}
+    Here we have defined \(E' \coloneqq E - Cn^2/2\), and we define \(U(\vartheta)\) to account for the rest of the equation.
+    We can identify this as the energy equation for a particle of \enquote{mass} \(A\) in a one dimensional potential, \(U(\vartheta)\), with total energy \(E'\).
+    \(U(\vartheta)\) becomes very large as \(\vartheta\) tends to zero, and \(U(\vartheta)\) is bounded below.
+    
+    If \(\dot{\vartheta} = 0\) then we call this \defineindex{steady precession}.
+    This occurs when
+    \begin{equation}
+        E' = \min U(L_z, n)
+    \end{equation}
+    and
+    \begin{equation}
+        \vartheta = \min \vartheta(L_z, n).
+    \end{equation}
+    We then have \(\vartheta = \text{constant}\) and since both \(L_z\) and \(n\) are conserved, and related to the degrees of freedom by
+    \begin{equation}
+        L_z = A\dot{\varphi}\sin^2\vartheta + Cn\cos\vartheta, \qqand n = \dot{\psi} + \dot{\varphi}\cos\vartheta.
+    \end{equation}
+    This means that both \(\dot{\psi}\) and \(\dot{\varphi}\) must also be constant.
+    
+    We find \(\vartheta_0 = \min \vartheta\) by finding where \(\diff{u}/{\vartheta} = 0\).
+    This gives
+    \begin{equation}
+        \sin\vartheta_0 [\dot{\varphi}^2 A\cos\vartheta_0 - \dot{\varphi}Cn + Mgl] = 0.
+    \end{equation}
+    We can also find the same result from the Lagrange equation for \(\vartheta\) by noticing that \(\dot{\theta} = 0\) implies \(\ddot{\vartheta} = 0\).
+    
+    There are two solutions corresponding to two different physical actions:
+    \begin{itemize}
+        \item If \(\sin\vartheta_0 = 0\) then the top spins upright, we call this a \defineindex{sleeping top}.
+        \item If \(\vartheta_0 \ne 0\), then the term in square brackets above must be zero, which we can solve to give
+        \begin{equation}
+            \dot{\varphi} = \frac{Cn \pm \sqrt{C^2n^2 - 4AMgl\cos\vartheta_0}}{2A\cos\vartheta_0}.
+        \end{equation}
+        If \(\cos\vartheta_0 > 0\), which corresponds to a top \emph{not} hanging below its pivot, so, for example, spinning on a table, then steady precession requires
+        \begin{equation}
+            C^2n^2 \ge 4AMgl\cos\vartheta_0.
+        \end{equation}
+        This gives a minimum speed for the top to be spinning to have steady precession.
+    \end{itemize}
+    
+    \section{Fast Top}
+    For a sufficiently fast spinning top we can expand the equation for \(\dot{\varphi}\) in steady state precession to give
+    \begin{align}
+        \dot{\varphi} &= \frac{Cn \pm (C^2n^2 - 4AMgl\cos\vartheta_0)^{1/2}}{2A\cos\vartheta_0}\\
+        &\approx \frac{Cn}{2A\cos\vartheta_0} \left[ 1 \pm \left( 1 - \frac{2AMgl\cos\vartheta_0}{C^2n^2} \right) \right].
+    \end{align}
+    
+    There are two possible roots to this equation:
+    \begin{itemize}
+        \item[\(-\)] Slow precession due to gravity, which has
+        \begin{equation}
+            \dot{\vartheta} = \frac{Mgl}{Cn}.
+        \end{equation}
+        \item[\(+\)] Free precession where
+        \begin{equation}
+            \dot{\varphi} = \frac{Cn}{A\cos\vartheta_0}.
+        \end{equation}
+    \end{itemize}
+    
+    These two limiting cases can also be checked by other methods.
+    For example, for slow precession we can balance the gravitational torque such that\(\dot{\vv{L}}\) is constant.
+    For free precession we can obtain the same result from Euler's equations of motion with zero torque.
+    
+    For a real gyroscope the free precession is damped by air resistance and the slow precession dominates.
+    
+    \section{Nutation}
+    Keeping \(L_z\) fixed and increasing the energy, \(E'\), such that \(E'\) is slightly above \(\min U\) we get oscillations on top of the steady precession, we call this \defineindex{nutation}.
+    The path traced by the \(3\)-axis will trace out either a wave or loops on the surface of a sphere while staying within a zone of values of \(\vartheta\).
+    The path depends on the relative frequencies of the \(\varphi\) and \(\vartheta\) oscillations.
+    For small amplitudes there is simple harmonic motion in \(\vartheta\) with frequency
+    \begin{equation}
+        \Omega_{\mathrm{nut}} = \sqrt{\frac{U''(\vartheta_0)}{A}}.
+    \end{equation}
+    
+    For large enough spin,
+    \begin{equation}
+        Cn \gg \sqrt{4AMgl\cos\vartheta_0}
+    \end{equation}
+    we have \(\Omega_{\mathrm{nut}} \gg \dot{\varphi}\) and there are many oscillations per precession period.
+    
+    \section{Sleeping Top}
+    The sleeping top is the case of \(\vartheta_0 = 0\).
+    Lagrange's equation of motion is
+    \begin{equation}
+        A\ddot{\vartheta} = A\dot{\varphi}^2\sin\vartheta\cos\vartheta - Cn\dot{\varphi}\sin\vartheta + Mgl\sin\vartheta.
+    \end{equation}
+    Expanding this for small \(\vartheta\) we get
+    \begin{equation}
+        A\ddot{\vartheta} = (A\dot{\varphi}^2 - Cn\dot{\varphi} + Mgl)\vartheta.
+    \end{equation}
+    One solution to this is \(\vartheta = 0\).
+    
+    The top starts of upright and \(L_z = Cn\).
+    Since both \(L_z\) and \(Cn\) are conserved this means that
+    \begin{equation}
+        Cn = L_z = A \dot{\varphi}\sin^2\vartheta + Cn\cos\vartheta.
+    \end{equation}
+    Expanding this for small \(\vartheta\) we get
+    \begin{equation}
+        \frac{1}{2}Cn\vartheta^2 = A\dot{\varphi}\vartheta^2.
+    \end{equation}
+    The sleeping top then has
+    \begin{equation}
+        \dot{\vartheta} = \frac{Cn}{2A}.
+    \end{equation}
+    This is the frequency at which a sleeping top precesses when perturbed by an infinitesimal distance from the vertical.
+    We then have
+    \begin{equation}
+        A\ddot{\vartheta} = \left( Mgl - \frac{C^2n^2}{4A} \right)\vartheta.
+    \end{equation}
+    If \(n^2 > 4MglA/C^2\) then we have simple harmonic motion and the motion of the sleeping top is stable.
+    If the spin is too low however then any perturbation will grow exponentially and so the top is unstable.
+    
+    We see this in real life when spinning a top.
+    It will spin upright for a long time slowly decreasing in spin speed due to friction and at some point will rapidly start to veer away from upright before falling over.
+    
+    \part{Oscillations and Lagrange Multipliers}
+    \chapter{Oscillations}
+    \section{Static Equilibrium}
+    Consider a system of \(D\) degrees of freedom in a time-independent conservative potential, that is
+    \begin{equation}
+        V = V(\{q\}, \nodependence{\{\dot{q}\}}, \nodependence{t}) = V(\{q\}), \qquad\text{with} \{q\} = (q_1, \dotsc, q_D).
+    \end{equation}
+    Static equilibrium, that is no motion, is only possible if all of the generalised forces, \(Q_i\), vanish together for some set of coordinates, \(\{q\}_{\mathrm{eq}}\).
+    This set of coordinates defines an equilibrium position.
+    
+    We can redefine our coordinates, \(\{q\} \to \{q\} - \{q\}_{\mathrm{ed}}\), such that the equilibrium position is the origin.
+    We then have
+    \begin{equation}
+        Q_j(\{0\}) = -\diffp{V(\{q\})}{q_j}[\{q\} = 0] = 0
+    \end{equation}
+    for all \(j\).
+    Expanding \(V\) about this point terms linear in \(\{q\}\) vanish and we are left with
+    \begin{equation}
+        V(\{q\}) = V(\{0\}) + \frac{1}{2}\sum_i\sum_j \diffp{V}{q_i,q_j} q_iq_j + \order(\{q\}^3).
+    \end{equation}
+    The first term here is just a constant, which we will neglect.
+    We then write
+    \begin{equation}
+        V(\{q\}) = \frac{1}{2}q_iV_{ij}q_j
+    \end{equation}
+    where we now use the summation convention and we define
+    \begin{equation}
+        V_{ij} \coloneqq \diffp{V}{q_i,q_j}[\{q\} = 0].
+    \end{equation}
+    This is a constant \(D \times D\) matrix of second derivatives evaluated at the origin.
+    This matrix is symmetric (for sufficiently nice \(V\)).
+    If \(\{q\} = 0\) is a local minimum then \(V_{ij}\) will be positive semi-definite, that is the eigenvalues will all be nonnegative, this ensures that we cannot decrease the potential energy by changing the value of any of \(\{q\}\), and hence it is indeed a minimum.
+    
+    \section{The Lagrangian}
+    We will consider only systems where the kinetic energy is time independent and quadratic in the velocities.
+    We then have
+    \begin{equation}
+        T = T(\{q\}, \{\dot{q}\}, \nodependence{t}) = \frac{1}{2}\dot{q}_iT_{ij}\dot{q}_j.
+    \end{equation}
+    Here \(T_{ij}\) is a matrix depending, in general, on the coordinates, \(\{q\}\).
+    
+    For small displacements about the equilibrium we can take \(T_{ij}\) to be an approximately constant matrix.
+    It is convenient to choose \(T_{ij}\) to be symmetric.
+    This is possible since we can always symmetrise any asymmetric matrix, \(\tilde{T}_{ij}\), by writing \((\tilde{T}_{ij} + \tilde{T}_{ji})/2\), without changing the value of \(T\).
+    Kinetic energies are typically positive and so \(T_{ij}\) is positive definite, that is all its eigenvalues are positive.
+    
+    For small displacements the Lagrangian is
+    \begin{equation}
+        \lagrangian = T - V = \frac{1}{2}(\dot{q}_iT_{ij}\dot{q}_j - q_iV_{ij}q_j).
+    \end{equation}
+    Lagrange's equations then give
+    \begin{equation}
+        \diff*{\left( \diffp{\lagrangian}{\dot{q}_i} \right)}{t} = \diffp{\lagrangian}{q_i} \implies T_{ij}\ddot{q}_j = -V_{ij}q_j.
+    \end{equation}
+    These are linear equations, so we say that the system has been linearised by the assumption that the displacements are small.
+    We can then solve the resulting equations with matrix methods.
+    
+    We define \define{normal modes}\index{normal mode} to be the solutions to he equations of motion in which the generalised coordinates all oscillate with the same angular frequency, \(\omega\):
+    \begin{equation}
+        q_j = a_j\cos(\omega t + \varepsilon_j).
+    \end{equation}
+    The equation of motion is then
+    \begin{equation}
+        \omega^2T_{ij}a_j + V_{ij}a_j = 0.
+    \end{equation}
+    Setting \(\lambda \coloneqq \omega^2\) we get
+    \begin{equation}
+        (V_{ij} - \lambda T_{ij})a_j = 0.
+    \end{equation}
+    This is a sort of generalised eigenvalue equation, the basic version being \((M_{ij} - \lambda\delta_{ij})a_j = 0\).
+    The process of solving this equation is very similar to the eigenvalue equation:
+    \begin{enumerate}
+        \item Find the eigenvalues, \(\lambda^{(i)}\), by solving
+        \begin{equation}
+            \det(V - \lambda T) = 0.
+        \end{equation}
+        \item For a given \(\lambda^{(k)}\) write
+        \begin{equation}
+            (V_{ij} - \lambda^{(k)}T_{ij})e_j^{(k)} = 0.
+        \end{equation}
+        This defines an (unnormalised) eigenvector, \(\vv{e^{(k)}}\), for the \(k\)th mode which has \(j\)th component \(e_j^{(k)}\).
+        In general these eigenvectors will not be orthogonal.
+    \end{enumerate}
+    
+    \section{Triatomic Molecule}
+    Consider a triatomic molecule, such as \ce{H2O} or \ce{CO2}, with one central atom of mass \(M\) and two outer atoms of mass \(m\).
+    We can model the bonds as being springs with spring constant \(K\).
+    See \cref{fig:triatomic molecule}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{triatomic-molecule}
+        \begin{tikzpicture}
+            \tikzset{spring/.style = {ultra thick, decoration={zigzag, pre length=0.4cm, post length=0.25cm}, decorate}}
+            \draw[spring] (0, 0) -- (3, 0) node[midway, below] {\(K\)};
+            \draw[spring] (0, 0) -- (-3, 0) node[midway, below] {\(K\)};
+            \fill[highlight] (0, 0) circle [radius = 0.3];
+            \fill[highlight] (3, 0) circle [radius = 0.2];
+            \fill[highlight] (-3, 0) circle [radius = 0.2];
+            \foreach \x in {-3, 0, 3} {
+                \pgfmathsetmacro{\i}{int((\x + 6)/3)}
+                \draw[very thick, |->] (\x, 0.5) -- (\x + 0.75, 0.5) node[right] {\(x_\i\)};
+            }
+            \draw[white] (-3.75, 0) -- (-3.75, 0);
+        \end{tikzpicture}
+        \caption{Triatomic molecule.}
+        \label{fig:triatomic molecule}
+    \end{figure}
+    
+    We define the coordinates \(x_i\) as the displacements of the atoms, as shown in \cref{fig:triatomic molecule}.
+    The kinetic energy is then
+    \begin{equation}
+        T = \frac{1}{2}m(\dot{x}_1^2 + \dot{x}_3^2) + \frac{1}{2}M\dot{x}_2^2.
+    \end{equation}
+    The potential is simply the energy stored in the springs, which is related to the extension of the sprints, \(x_1 - x_2\) and \(x_3 - x_2\):
+    \begin{equation}
+        V = \frac{1}{2}K(x_1 - x_2)^2 + \frac{1}{2}K(x_3 - x_2)^2 = \frac{1}{2}K(x_1^2 + 2x_2^2 + x_3^2 - 2x_1x_2 - 2x_3x_2).
+    \end{equation}
+    Choosing \(x_i\) as our generalised coordinates we find the matrices for \(T\) and \(V\) are
+    \begin{equation}
+        T_{ij} = 
+        \begin{pmatrix}
+            m & 0 & 0\\
+            0 & M & 0\\
+            0 & 0 & m
+        \end{pmatrix}
+        , \qqand V_{ij} = 
+        \begin{pmatrix}
+            K & -K & 0\\
+            -K & 2K & -K\\
+            0 & -K & K
+        \end{pmatrix}
+        .
+    \end{equation}
+    Note that we have chosen \(V_{ij}\) to be symmetric, there are other nonsymmetric matrices that would give the same result, for example
+    \begin{equation}
+        \begin{pmatrix}
+            K & -2K & 0\\
+            0 & 2K & 0\\
+            0 & -2K & K
+        \end{pmatrix}
+        .
+    \end{equation}
+    The generalised eigenvalue problem is then to solve
+    \begin{equation}
+        \begin{vmatrix}
+            K - \lambda m & -K + 7\\
+            -K & 2K - \lambda M & -K\\
+            0 & -K & K - \lambda m
+        \end{vmatrix}
+        = 0.
+    \end{equation}
+    This gives us the characteristic polynomial
+    \begin{equation}
+        \lambda(K - \lambda m)(\lambda mM - (M + 2m)K) = 0.
+    \end{equation}
+    This has roots
+    \begin{equation}
+        \lambda^{(1)} = 0, \qquad \lambda^{(2)} = \frac{K}{m}, \qqand \lambda^{(3)} = \frac{K(2m + M)}{Mm}.
+    \end{equation}
+    To find the eigenvectors, \(\vv{e^{(k)}}\) we solve
+    \begin{equation}
+        (V_{ij} - \lambda^{(k)}T_{ij})e_j^{(k)} = 0.
+    \end{equation}
+    We find that
+    \begin{equation}
+        \vv{e^{(1)}} = (1, 1, 1), \qquad \vv{e^{(2)}} = (1, 0, -1), \qqand \vv{e^{(3)}} = (1, -2m/M, 1).
+    \end{equation}
+    Writing \(\omega_i = \sqrt{\lambda^{(i)}}\) we can interpret these three eigenvectors as describing three linearly independent modes of vibration:
+    \begin{enumerate}
+        \item The first is uniform motion of the whole molecule, all three atoms move the same amount and the oscillation frequency is \(\omega_1 = 0\), since there is no restoring force as the molecule is free to move.
+        \item The second is oscillation at frequency \(\omega_2 = \sqrt{K/m}\), which corresponds to the two outer atoms moving \(\pi\) out of phase with the middle atom stationary.
+        \item The third is oscillation at frequency \(\omega_3 = \sqrt{K(2m + M)/(mM)}\), which corresponds to the two outer atoms moving in the same direction and the central atom moving in the opposite direction.
+    \end{enumerate}
+        
+    The general solution describing the motion is then a linear combination of these three distinct types of motion:
+    \begin{equation}
+        \vv{x}(t) = A_1 \vv{e^{(1)}}\cos(\omega_1t + \varphi_1) + A_2\vv{e^{(2)}}\cos(\omega_2 t + \varphi_2) + A_3 \vv{e^{(3)}} \cos(\omega_3 t + \varphi_3).
+    \end{equation}
+    The amplitudes, \(A_i\), and phases, \(\varphi_i\), are set by the initial conditions, giving 6 constants having solved 3 second order differential equations.
+    
+    In this case since \(\omega_1 = 0\) the cosine factor is just a constant.
+    In addition \(A_1\) can be arbitrarily large.
+    Taking a limit we find that
+    \begin{equation}
+        \lim_{\omega_1 \to 0} A_1\cos(\omega_1 t + \varphi_1) = A + vt
+    \end{equation}
+    for some constants \(A\) and \(v\).
+    This means we should really write the solution as
+    \begin{equation}
+        \vv{x}(t) = (A + vt) \vv{e^{(1)}} + A_2\vv{e^{(2)}}\cos(\omega_2 t + \varphi_2) + A_3 \vv{e^{(3)}} \cos(\omega_3 t + \varphi_3).
+    \end{equation}
+    To avoid this we usually neglect zero modes where the whole system moves together by simply restricting \(V_{ij}\) to be positive definite and treat the motion of the whole system separately.
+    
+    \section{Simultaneous Diagonalisation}
+    The matrix \(T\) is positive definite.
+    We will show that there is a coordinate transformation such that in the transformed coordinates both \(T\) and \(V\), which are symmetric, are simultaneously diagonalised.
+    We start by applying an orthogonal transformation, \(C\), to \(T\) and \(V\) such that \(T\) is diagonalised, defining
+    \begin{equation}
+        T' \coloneqq C^{\trans}TC, \qqand V' \coloneqq C^{\trans}VC.
+    \end{equation}
+    This is always possible since \(T\) is symmetric.
+    We now have
+    \begin{equation}
+        T' = 
+        \begin{pmatrix}
+            T_1 &     &        & \\
+                & T_2 &        & \\
+                &     & \ddots & \\
+                &     &        & T_D
+        \end{pmatrix}
+    \end{equation}
+    Since \(T\) is positive definite and \(T_i\) are the eigenvalues of \(T\) all of \(T_i\) are positive, and hence \(\sqrt{T_i}\) are real.
+    This means we can define the real matrix
+    \begin{equation}
+        K \coloneqq 
+        \begin{pmatrix}
+            1/\sqrt{T_1} &              &        & \\
+                         & 1/\sqrt{T_2} &        & \\
+                         &              & \ddots & \\
+                         &              &        & 1/\sqrt{T_D}
+        \end{pmatrix}
+    \end{equation}
+    We can then apply a transform with this matrix defining
+    \begin{equation}
+        T'' = K^\trans C^\trans TCK, \qqand V'' = K^{\trans}C^{\trans}VCK.
+    \end{equation}
+    The way we have defined \(K\) means that \(T'' = K^{\trans}T'K = KT'K = \ident\).
+    Also \(V''\) is still symmetric.
+    
+    We then apply a final orthogonal transformation, \(D\), to diagonalise \(V''\), which is possible since it is symmetric.
+    This has no effect on \(T''\) since \(T'' = \ident\) so \(D^{\trans}T''D = D^{\trans}\ident D = D^{\trans}D = D^{-1}D = \ident\), since \(D\) is orthogonal.
+    We therefore define \(T''' = DT''D = \ident\) and \(V''' = D^{\trans}V''D\) which gives a diagonal \(V'''\):
+    \begin{equation}
+        V''' =
+        \begin{pmatrix}
+            \lambda_1 &           &        & \\
+                      & \lambda_2 &        & \\
+                      &           & \ddots & \\
+                      &           &        & \lambda_D
+        \end{pmatrix}
+        .
+    \end{equation}
+    Defining \(M \coloneqq CKD\) we have
+    \begin{equation}
+        T''' = M^{\trans}TM = \ident, \qqand V''' = M^{\trans}VM.
+    \end{equation}
+    We can now interpret this as a coordinate transformation:
+    \begin{equation}
+        q_i \to \tilde{q}_i, \qquad\text{with}\qquad q_i = M_{ij}\tilde{q}_j.
+    \end{equation}
+    This is invertible and so \(\{\tilde{q}\}\) are a valid set of generalised coordinates.
+    In general this is \emph{not} an orthogonal transformation, unless \(T_i = 1\) for all \(i\).
+    
+    Dropping the tilde and working exclusively in this simultaneously diagonalised basis we have \(T_{ij} = \delta_{ij}\) and \(V_{ij} = \lambda_i\delta_{ij}\).
+    The Lagrangian is then
+    \begin{equation}
+        \lagrangian = \frac{1}{2}\dot{q}_iT_{ij}\dot{q}_j - \frac{1}{2}q_iV_{ij}q_j = \sum_{i} \left[ \frac{1}{2}\dot{q}_i^2 - \frac{1}{2}\lambda_iq_i^2 \right].
+    \end{equation}
+    We now stop using the summation convention.
+    This form of the Lagrangian is called the \define{normal form}\index{normal!form} and the transformed coordinates the \define{normal coordinates}\index{normal!coordinates}.
+    The Euler--Lagrange equations are now very simple:
+    \begin{equation}
+        \ddot{q}_i = -\lambda_iq_i.
+    \end{equation}
+    Which is simple harmonic motion with the general solution
+    \begin{equation}
+        q_i(t) = A_i\cos(\omega_i t + \varphi_i).
+    \end{equation}
+    Where as usual \(\omega_i = \sqrt{\lambda_i}\), and \(A_i\) and \(\varphi_i\) are constants of integration fixed by the initial conditions.
+    
+    We don't need to sum over all of the modes any more.
+    Each coordinate executes simple harmonic motion independent of the other coordinates.
+    The effort in solving the motion is moved to finding the transformation that diagonalises both matrices simultaneously which allows us to relate the transformed coordinates, which may not have an obvious physical meaning, to a set of more easily understandable generalised coordinates.
+    
+    When solving problems with this method we don't typically find the matrices \(C\), \(K\), and \(D\) separately, instead we identify that \(M_{ij} = e_i^{(j)}\).
+    This shows that the two methods of solving the equations are almost identical since both involve solving the generalised eigenvalue equation \((V_{ij} - \lambda T_{ij})a_j = 0\), and finding the eigenvectors, \(\vv{e^{(k)}}\).
+    The only difference is in how we separate out the individual components of the motion.
+    
+    \chapter{Lagrange Multipliers}
+    Recall that a holonomic constraint is one which can be written in the form \(f(\{q\}, t) = 0\).
+    So far we have been accounting for these by using them to reduce the number of degrees of freedom, and hence the number of generalised coordinates in a problem.
+    There is another method in which we can include them directly in the Lagrangian.
+    This is the method of Lagrange multipliers.
+    This method can also be used in many other optimisation procedures involving minimisation of functionals.
+    
+    Consider a system of two coordinates, \(x\) and \(y\), which are related by the holonomic constraint \(f(x, y) = 0\) for some function \(f\).
+    We construct the Lagrangian, \(\lagrangian = T - V\), as normal using both coordinates treating them as independent.
+    We find that the change in action for a change in the coordinates, \(x \to x + \delta x\) and \(y \to y + \delta y\) is
+    \begin{equation}
+        \delta S = \int \left( \diff*{\left( \diffp{\lagrangian}{\dot{x}} \right)}{t} - \diffp{\lagrangian}{x} \right)\delta x + \left( \diff*{\left( \diffp{\lagrangian}{\dot{y}} \right)}{t} - \diffp{\lagrangian}{y} \right)\delta y \dd{t}.
+    \end{equation}
+    If \(x\) and \(y\) are independent coordinates then both brackets would have to vanish independently.
+    However, we are assuming that they aren't independent.
+    
+    Now consider the Lagrangian
+    \begin{equation}
+        \lagrangian'(x, y, t) = \lagrangian(x, y) + \lambda f(x, y).
+    \end{equation}
+    Note that this has the same numeric value, since \(f(x, y) = 0\), but the functional form is different, which we know can be important for functional calculus.
+    The change in the action can then be written as
+    \begin{equation}
+        \delta S' = \int \left( \diff*{\left( \diffp{\lagrangian}{\dot{x}} \right)}{t} - \diffp{\lagrangian}{x} + \lambda\diffp{f}{x} \right)\delta x + \left( \diff*{\left( \diffp{\lagrangian}{\dot{y}} \right)}{t} - \diffp{\lagrangian}{y} + \lambda\diffp{f}{y} \right).
+    \end{equation}
+    Since \(\lambda\) is arbitrary we can choose it such that each term must be zero.
+    
+    In general if we have \(n\) (not necessarily independent) coordinates and \(m\) constraints, of the form
+    \begin{equation}
+        f_\alpha(q_1, \dotsc, q_n, t) = 0
+    \end{equation}
+    for \(\alpha = 1, \dotsc, m\), then we define the modified Lagrangian
+    \begin{equation}
+        \lagrangian'(q_1, \dotsc, q_n, \lambda_1, \dotsc, \lambda_m) = \lagrangian(q_1, \dotsc, q_n) + \sum_{\alpha} \lambda_\alpha f_\alpha(q_1, \dotsc, q_n, t).
+    \end{equation}
+    We then take all of \(q_i\) and \(\lambda_\alpha\) as our coordinates and form the Euler--Lagrange equations for them.
+    Since there is no \(\dot{\lambda}_\alpha\) dependence in \(\lagrangian'\) the Euler--Lagrange equations for \(\lambda_\alpha\) immediately return the constraint \(f_{\alpha}(\{q\}) = 0\).
+    
+    \section{Holonomic Example}
+    Consider Atwood's machine from \cref{sec:atwood's machine}.
+    Previously we treated the constraint by reducing the number of degrees of freedom.
+    Now we shall do so with Lagrange multipliers.
+    Using the notation of \cref{sec:atwood's machine} we know that the kinetic energy and potential are
+    \begin{equation}
+        T = \frac{1}{2}M\dot{x}^2 + \frac{1}{2}m\dot{y}^2, \qqand V = Mgx + mgy.
+    \end{equation}
+    Our holonomic constraint is \(x + y + \ell = 2h\), which when written in the required form is \(f(x, y) = x + y + \ell - 2h = 0\).
+    
+    The Lagrangian accounting for this constraint is
+    \begin{equation}
+        \lagrangian = \frac{1}{2}M\dot{x}^2 + \frac{1}{2}m\dot{y}^2 - Mgx - mgy + \lambda(x + y + \ell - 2h).
+    \end{equation}
+    We then take \(x\), \(y\), and \(\lambda\) as our coordinates.
+    The Euler--Lagrange equations are then
+    \begin{align}
+        \diff*{\left( \diffp{\lagrangian}{\dot{x}} \right)}{t} &= \diff*{(M\dot{x})}{t} = M\ddot{x} = \diffp{\lagrangian}{x} = -Mg + \lambda,\\
+        \diff*{\left( \diffp{\lagrangian}{\dot{y}} \right)}{t} &= \diff*{(m\dot{y})}{t} = m\ddot{x} = \diffp{\lagrangian}{y} = -mg + \lambda,\\
+        \diff*{\left( \diffp{\lagrangian}{\dot{\lambda}} \right)}{t} = 0 = \diffp{\lagrangian}{\lambda} = x + y + \ell - 2h.
+    \end{align}
+    Notice that we cannot drop the constant terms in order for this method to work, since we need them to ensure that we get the full constraint back.
+    Differentiating the last of these equations twice, which is just the constraint, we get \(\ddot{x} = -\ddot{y}\).
+    We can subtract the second from the first to eliminate \(\lambda\) giving
+    \begin{equation}
+        M\ddot{x} + Mg = -m\ddot{x} + mg.
+    \end{equation}
+    This gives the result
+    \begin{equation}
+        \ddot{x} = -\frac{(M - m)g}{M + m}.
+    \end{equation}
+    This is the same solution we found using the other method.
+    
+    Notice that if we missed the constraint we would have found \(\ddot{x} = \ddot{y} = -g\), which corresponds to both masses being free.
+    This pattern, of missing constraints giving the free case, is fairly common.
+    
+    \section{Non-Holonomic Example}
+    Consider a hanging chain of length \(\ell\) and density \(\rho\) hanging between two points which are the same height and are a distance \(2a\) apart, with \(2a < D\), the length of the chain.
+    The chain will hang in the shape which minimises the potential energy, which is the same as maximising the action, since we are looking for a stationary solution so the kinetic energy is zero.
+    
+    The total energy is given by integrating along the chain:
+    \begin{equation}
+        V = \rho g\int y \dd{s} = \rho g \int_{-a}^{a} y\sqrt{1 + y'^2} \dd{x}.
+    \end{equation}
+    Here we take \(x = 0\) as the midpoint between the two attachment points.
+    
+    The constraint that we need to introduce is the constant length of the chain.
+    This can be written in integral form as
+    \begin{equation}
+        \int \dl{s} = \int \sqrt{1 + y'^2} \dd{x} = D
+    \end{equation}
+    This gives us the functional
+    \begin{equation}
+        I = \int_{-a}^{a} \left[ \rho gy\sqrt{1 + y'^2} + \lambda\left( \sqrt{1 + y'^2} - D \right) \right] \dd{x}.
+    \end{equation}
+    
+    Since there is no explicit dependence on \(x\) we know that the following is constant:
+    \begin{equation}
+        y' \diffp{F}{y'} - F = -\frac{\rho gy + \lambda}{\sqrt{1 + y'^2}} = C.
+    \end{equation}
+    The solution to this is
+    \begin{equation}
+        y(x) = \frac{C}{\rho g} \cosh\left( \frac{\rho g x}{C} \right) - \frac{\lambda}{\rho g}.
+    \end{equation}
+    Requiring \(y(\pm a) = 0\) we get
+    \begin{equation}
+        \lambda = C \cosh\left( \frac{\rho g a}{C} \right).
+    \end{equation}
+    We then find \(C\) by requiring that the total length be \(D\), which gives
+    \begin{equation}
+        D = \int_{-a}^{a}\sqrt{1 + y'^2} \dd{x} = \int_{-a}^{a} \cosh\left( \frac{\rho g x}{C} \right) \dd{x},
+    \end{equation}
+    here we have used
+    \begin{equation}
+        \diff*{\cosh x}{x} = \sinh x, \qqand 1 + \sinh^2 x = \cosh^2 x.
+    \end{equation}
+    
     %Appendicies
     \appendixpage
     \begin{appendices}
         \include{parts/appendix-odes}
+        \chapter{Electromagnetism}\label{sec:electromagnetism}
+        \begin{rmk}
+            For more details see the notes for electromagnetism.
+        \end{rmk}
+        \section{Maxwell's Equations}
+        Maxwell's equations are, in SI units
+        \begin{align}
+            \div \vv{E} &= \frac{\rho}{\varepsilon_0}, \tag{M1}\\
+            \div \vv{B} &= 0, \tag{M2}\\
+            \curl \vv{E} &= -\diffp{\vv{B}}{t}, \tag{M3}\\
+            \curl \vv{B} &= \mu_0\left( \vv{j} + \varepsilon_0\diffp{\vv{E}}{t} \right). \tag{M4}
+        \end{align}
+        Here \(\vv{E}\) and \(\vv{B}\) are the electric and magnetic fields, \(\rho\) is the electric charge density, \(\vv{j}\) is the electric current density, \(\varepsilon_0\) and \(\mu_0\) are the permittivity and permeability of free space, also known as the electric and magnetic constants.
+        The value of \(\varepsilon_0\) and \(\mu_0\), and the speed of light, \(c = 1/\sqrt{\varepsilon_0\mu_0}\), determine the system of units used to measure \(\vv{E}\), \(\vv{B}\), \(\rho\), and \(\vv{j}\).
+        
+        The force on a particle of charge \(e\) in an electromagnetic filed is given by
+        \begin{equation}
+            \vv{F} = e(\vv{E} + \dot{\vv{r}}\times\vv{B})
+        \end{equation}
+        where \(\vv{r}\) is the position of the particle.
+        This force is velocity dependent, and therefore cannot be treated with a simple \(T - V\) Lagrangian (unless \(\vv{B} = \vv{0}\)).
+        
+        \section{Potentials}
+        It is a well known fact of vector calculus that a divergence free vector field, such as \(\vv{B}\), can be written as the curl of a vector field:
+        \begin{equation}
+            \div \vv{B} = 0 \iff \exists \vv{A} \text{ such that } \vv{B} = \curl \vv{A}.
+        \end{equation}
+        In the case of \(\vv{B}\) being the magnetic field we call \(\vv{A}\) the magnetic vector potential.
+        
+        Writing M3 in terms of the vector potential we have
+        \begin{equation}\label{eqn:derivation of electric potential}
+            \curl \vv{E} = -\diffp*{(\curl\vv{A})}{t} \implies \curl \left( \vv{E} + \diffp{\vv{A}}{t} \right) = 0.
+        \end{equation}
+        A standard result of vector calculus is that any curl free field, \(\vv{G}\), such that \(\curl\vv{G} = 0\), can be written as the gradient of a scalar potential, \(\varphi\):
+        \begin{equation}
+            \curl \vv{G} = 0 \iff \exists \varphi \text{ such that } \vv{G} = -\grad\varphi
+        \end{equation}
+        where the negative sign is a convention.
+        From \cref{eqn:derivation of electric potential} we see that
+        \begin{equation}
+            \vv{E} + \diffp{\vv{A}}{t}
+        \end{equation}
+        is curl free, and so there exists a scalar field, \(\varphi\), which we call the scalar electric potential, such that
+        \begin{equation}
+            \vv{E} + \diffp{\vv{A}}{t} = -\grad\varphi \implies \vv{E} = -\grad\varphi - \diffp{\vv{A}}{t}.
+        \end{equation}
+        
+        We can use the potential to rewrite Maxwell's equations as
+        \begin{align}
+            \div \vv{E} &= \frac{\rho}{\varepsilon_0},\\
+            \vv{B} &= \curl\vv{A},\\
+            \vv{E} &= -\grad{\varphi} - \diffp{\vv{A}}{t},\\
+            \curl \vv{B} &= \mu_0\left( \vv{j} + \varepsilon_0\diffp{\vv{E}}{t} \right).
+        \end{align}
     \end{appendices}
     
     \backmatter
+    \begin{thebibliography}{9}
+        \bibitem{parker2021} Matt Parker, \textit{The bubble that breaks maths.} 05/11/2021 \url{https://www.youtube.com/watch?v=31Om4VrSzb8} (accessed 08/11/2021)
+    \end{thebibliography}
     \renewcommand{\glossaryname}{Acronyms}
     \printglossary[acronym]
     \printindex
