@@ -1,0 +1,980 @@
+\documentclass[fleqn]{NotesClass}
+
+\usepackage{siunitx}
+\usepackage{csquotes}
+
+% Tikz stuff
+\usepackage{tikz}
+\tikzset{>=latex}
+% external
+\usetikzlibrary{external}
+\tikzexternalize[prefix=tikz-external/]
+%\tikzexternaldisable
+% other libraries
+
+% References, should be last things loaded
+\usepackage{hyperref}  % Should be loaded second last (cleveref last)
+\colorlet{hyperrefcolor}{blue!60!black}
+\hypersetup{colorlinks=true, linkcolor=hyperrefcolor, urlcolor=hyperrefcolor}
+\usepackage[
+capitalize,
+nameinlink,
+noabbrev
+]{cleveref} % Should be loaded last
+
+% My packages
+\usepackage{mathtools}
+\usepackage{NotesBoxes}
+\usepackage{NotesMaths}
+
+% Title page info
+\title{Statistical Physics}
+\author{Willoughby Seago}
+\date{}
+% \subtitle{}
+% \subsubtitle{}
+
+% Highlight colour
+\definecolor{highlight}{HTML}{6B668E}
+\definecolor{my blue}{HTML}{677C8E}
+\definecolor{my red}{HTML}{8E6C67}
+\definecolor{my green}{HTML}{678E6C}
+\definecolor{my purple}{HTML}{8E6789}
+
+% Commands
+% Maths
+\newcommand*{\boltzmann}{k_{\mathrm{B}}}
+\newcommand*{\cpartition}{Z_{\mathrm{c}}}
+\newcommand*{\gcpartition}{\mathcal{Z}_{\mathrm{gc}}}
+\newcommand*{\e}{\mathrm{e}}
+
+% Include
+\includeonly{}
+
+\begin{document}
+    \frontmatter
+    \titlepage
+    \innertitlepage{} 
+    \tableofcontents
+    \mainmatter
+    
+    \chapter{Missing Information}
+    \section{Probability}
+    There are two common interpretations of probability.
+    The first is the \defineindex{frequentist} approach, in which the probability of getting outcome \(i\), denoted \(p_i\), is defined by
+    \begin{equation}
+        p_i \coloneqq \lim_{N \to \infty} \frac{\text{number of times outcome \(i\) occurs}}{N}
+    \end{equation}
+    where \(N\) is the number of trials that we make.
+    In this approach the probability of \(i\) is the proportion of trials that we expect to give \(i\) as a result.
+    The frequentist definition is often the simplest, but it doesn't apply very well to one-off events.
+    
+    The second approach is \defineindex{Bayesian} statistics, in which \(p_i\) is a quantitative measure of the degree of belief that a rational observer has that the result of a given process will be \(i\).
+    This approach can apply to a one-off event.
+    
+    Whichever approach we take there are some rules regarding the values that \(p_i\) can take.
+    In particular if there are \(r\) mutually exclusive outcomes each with probability \(p_i\) for \(i \in \{1, \dotsc, r\}\) then
+    \begin{itemize}
+        \item \(p_i \in [0, 1]\), with \(0\) representing no chance of happening and \(1\) representing certainty.
+        \item \(p_{i\text{ or } j} = p_i + p_j\), this only applies to mutually exclusive outcomes.
+        \item \(\sum_{i=1}^{r} p_i = 1\), this is simply \(p_{1 \text{ or } 2 \text{ or } \dotsb \text{ or } r}\), which is to say that the probability that one of the outcomes occurs is certain, since something must happen.
+        \item \(\expected{y} = \mean{y} = \sum_{i=1}^{r} p_iy_i\), this is the mean value of \(y\), which is a quantity that takes the value \(y_i\) when outcome \(i\) occurs.
+    \end{itemize}
+    
+    \section{Entropy}
+    There are various definitions of entropy, including, but not limited to
+    \begin{itemize}
+        \item a measure of disorder, and
+        \item a measure of uncertainty.
+    \end{itemize}
+    The second definition here is more useful to us and by the end of this chapter we will have made it rigorous.
+    
+    \subsection{Thermodynamics Definition}
+    We start with the entropy as defined in thermodynamics:
+    \begin{equation}
+        \dl{S} = \frac{\dl{Q_{\mathrm{rev}}}}{T}
+    \end{equation}
+    where \(\dl{Q_{\mathrm{rev}}}\) is the heat absorbed by the system during a reversible process and \(T\) is the temperature.
+    This gives the change in entropy of the system, \(\dl{S}\).
+    In thermodynamics we almost exclusively deal with changes in entropy rather than the absolute value of entropy.
+    One useful thing that we find from this is that entropy has units of \([\mathrm{energy}][\mathrm{temperature}]^{-1}\), so typically we measure entropy in units of \unit{\joule\per\kelvin}.
+    
+    Recall that the second law of thermodynamics states that the entropy of an isolated system can only increase or stay the same, that is
+    \begin{equation}
+        \diffp{S}{t} \ge 0.
+    \end{equation}
+    
+    \subsection{Boltzmann Entropy}
+    The \define{Boltzmann entropy}\index{entropy!Boltzmann} is defined as
+    \begin{equation}
+        S_{\mathrm{B}} \coloneqq \boltzmann \ln \Omega.
+    \end{equation}
+    Here \(\boltzmann = \qty{1.380649e-23}{\joule\per\kelvin}\)\index{kB@\(\boltzmann\), Boltzmann's constant} (exact) is Boltzmann's constant.
+    Recall that a macrostate describes the bulk properties of a system, such as temperature, pressure, or volume.
+    A microstate describes the microscopic properties of a system, such as the velocity or energy of all the particles.
+    In general for each macrostate there are multiple microstates which the system could be in and still have the same macroscopic properties.
+    The quantity \(\Omega\) is then the \defineindex{weight} of the macrostate, which is the number of microstates that correspond to the macrostate.
+    
+    We expect that the entropy is an extrinsic property, that is the more matter we have the greater the entropy.
+    In particular we expect that the entropy is of the form \(S = sN\), where \(N\) is the number of constituents in the system, for example the number of particles.
+    We then have
+    \begin{equation}
+        \Omega = \exp\left( \frac{sN}{\boltzmann} \right).
+    \end{equation}
+    So \(\Omega\) is exponential in \(N\).
+    Therefore the larger \(N\) is the larger \(\Omega\) is, and hence the larger \(S_{\mathrm{B}}\) is.
+    This means we can interpret \(S_{\mathrm{B}}\) as a measure of the uncertainty about which microstate the system is in.
+    
+    \subsection{Gibbs Entropy}
+    The \define{Gibbs entropy}\index{entropy!Gibbs} is defined as
+    \begin{equation}
+        S_{\mathrm{G}} \coloneqq -\boltzmann \sum_{\mathclap{\mathrm{microstates}, i}} p_i \ln p_i
+    \end{equation}
+    where the sum is over microstates and \(p_i\) is the probability that the system is in microstate \(i\).
+    
+    We can show that both the Boltzmann and Gibbs entropies agree when we have an isolated system in a given macrostate with \(\Omega\) microstates.
+    With no further information the only sensible choice is \(p_i = 1/\Omega\), this is called the principle of equal \textit{a priori} probabilities.
+    The sum for the Gibbs entropy then runs over all microstates associated with the given macrostate, meaning that it goes from 1 to \(\Omega\).
+    Hence we have
+    \begin{align}
+        S_{\mathrm{G}} &= -\boltzmann \sum_{i=1}^{\Omega} \frac{1}{\Omega} \ln \frac{1}{\Omega}\\
+        &= \boltzmann \sum_{i=1}^{\Omega} \frac{1}{\Omega} \ln \Omega\\
+        &= \boltzmann \ln \Omega\\
+        &= S_{\mathrm{B}}.
+    \end{align}
+    Here we have used the fact that the terms in the sum are constant so the sum from \(1\) to \(\Omega\) is just \(\Omega\) times this constant.
+    
+    The Gibbs entropy uses the probability of microstates, \(p_i\), whereas the Boltzmann entropy uses the weight of a macrostate.
+    This means that the Gibbs entropy is a microscopic picture of entropy whereas the Boltzmann entropy is a macroscopic picture.
+    This makes the Gibbs entropy a more appropriate definition for developing a fundamental understanding of entropy.
+    
+    The Gibbs entropy also has the advantage of applying to systems which are not large, this allows us to break systems up into smaller subsystems.
+    The Gibbs entropy also applies to systems which are not in thermal equilibrium.
+    
+    \section{Missing Information}
+    Information is a quantity measured in bits.
+    A bit is a quantity that can take one of two value, usually we think of these as 0 or 1, or in physics we may consider spins being up or down.
+    If a system has a single bit that can take either value then we have missing information, the value of the bit.
+    Suppose we then apply some process which fixes the value of the bit, such as applying a magnetic field such that the spin aligns with the field.
+    We then have gained some information since we now know the value of the bit, we have gained \qty{1}{\bit} of information.
+    If we had started off knowing the value of the bit then we would not have gained any information.
+    
+    We wish to generalise this idea of missing some information to systems of more than two states where the probabilities of different states are not necessarily equal.
+    
+    In order to find the correct function to determine the missing information we now list some requirements of this function.
+    To do so we consider the missing information of a system with \(r\) mutually exclusive outcomes, each with probability \(p_i\) of occurring.
+    \begin{enumerate}
+        \item The missing information should be a continuos function of the probabilities, \(p_i\).
+        This means that changing one of the probabilities by only a very small amount should change the missing information by only a small amount, which makes intuitive sense.
+        This means we are looking for a continuous function of the form
+        \begin{equation}
+            S \colon [0, 1]^r \to \reals.
+        \end{equation}
+        \item The missing information should be symmetric in the probabilities.
+        This means if we label the probabilities differently the missing information doesn't change.
+        This makes sense since the missing information should be independent of our choices, such as the way we order outcomes.
+        \item For the case where \(p_1 = \dotsb = p_r = 1/r\) the missing information should reduce to an increasing function of \(r\).
+        That is for equally likely outcomes the more possible outcomes there are the more information will be missing, since there is more uncertainty.
+        \item The missing information should not change based on how we group the outcomes.
+    \end{enumerate}
+    
+    This last point is non-trivial and we will expand upon it.
+    We can divide the outcomes into \(n\) groups labelled \(j = 1, \dotsc, n\), such that each group has \(r_j\) outcomes and the probability of an outcome in group \(j\) is \(w_j\).
+    We should then be able to write the missing information
+    \begin{align}
+        S(\{p\}_r) &= S(\{w\}_n) + w_1S\left( \frac{p_1}{w_1}, \dotsc, \frac{p_{r_{1}}}{w_1} \right) + w_2S\left( \frac{p_{r_1+1}}{w_2}, \dotsc, \frac{p_{r_1 + r_2}}{w_2} \right) + \dotsb\\
+        &= S(\{w\}_{n}) + \sum_{j=1}^{n} w_jS\left( \frac{p_{r_1 + \dotsb + r_{j-1} + 1}}{w_j}, \dotsc, \frac{p_{r_1 + \dotsb + r_j}}{w_j} \right).\label{eqn:entropy grouping}
+    \end{align}
+    The interpretation here is that the first term, \(S(\{w\}_n)\) deals with the missing information about which group the outcome is in, and then the relevant second term deals with the missing information about which element within that group the outcome is.
+    
+    This becomes clearer with an example.
+    Suppose that we have three outcomes, say possible energies of a particle, and these outcomes have associated probabilities \(p_1\), \(p_2\), and \(p_3\).
+    Suppose that outcomes 1 and 2 differ only due to the spin of the particle, and that there is a second observer who can't make measurements as precisely and therefore can't differentiate between the first two outcomes.
+    In this case all they can do is ascribe a single probability, \(p_1 + p_2\), that one of the first two outcomes occurs.
+    The missing information is then
+    \begin{align}
+        S(p_1, p_2, p_3) &= S(w_1, w_2) + w_1S\left( \frac{p_1}{w_1} + \frac{p_2}{w_1} \right) + S\left( \frac{p_3}{w_2} \right)\\
+        &= S(w_1, w_2) + w_1S\left( \frac{p_1}{w_1} + \frac{p_2}{w_1} \right)
+    \end{align}
+    where \(w_1 = p_1 + p_2\) and \(w_2 = p_3\).
+    We have then used \(S(p_3/w_2) = S(1) = 0\).
+    
+    For an even more explicit example consider a procedure with four possible outcomes with probabilities \(p_1 = 1/6\), \(p_2 = 1/3\), and \(p_3 = p_4 = 1/4\).
+    Suppose that the first two outcomes can be grouped together as can the second two.
+    Then we expect
+    \begin{align}
+        S\left( \frac{1}{6}, \frac{1}{3}, \frac{1}{4}, \frac{1}{4} \right) &= S\left( \frac{1}{2}, \frac{1}{2} \right) + \frac{1}{2}S\left( \frac{1/6}{1/2}, \frac{1/3}{1/2} \right) + \frac{1}{2} S\left( \frac{1/4}{1/2}, \frac{1/4}{1/2} \right)\\
+        &= S\left( \frac{1}{2}, \frac{1}{2} \right) + \frac{1}{2}S\left( \frac{1}{3}, \frac{2}{3} \right) + \frac{1}{2} S\left( \frac{1}{2}, \frac{1}{2} \right).
+    \end{align}
+    
+    We make the following ansatz for the form of \(S\):
+    \begin{equation}
+        S(\{p\}_r) = \sum_{i=1}^{r} \varphi(p_i)
+    \end{equation}
+    for some function \(\varphi\).
+    The fact that addition is commutative takes care of the requirement that \(S\) be symmetric.
+    Requiring \(\varphi\) to be continuous also takes care of our continuity conditions.
+    
+    Noticing that adding in outcomes with zero probability cannot change the information content, since we know for certain that these outcomes won't occur, we see that we must have \(\varphi(0) = 0\).
+    Similarly if one outcome is certain, so \(p_i = 1\) for some fixed value of \(i\), and all other outcomes cannot occur, so \(p_j = \delta_{ij}\), then we also have no missing information since the outcome is certain and so we must have \(\varphi(1) = 0\) also so that the sum is zero.
+    
+    Considering the case where \(p_i = 1/r\) we have
+    \begin{equation}
+        S(\{p\}_r) = \sum_{i=1}^{r} \varphi\left( \frac{1}{r} \right) = r\varphi\left( \frac{1}{r} \right).
+    \end{equation}
+    Now dividing the outcome into \(n\) groups with \(m\) outcomes, so \(r = mn\), we have that the probability of being in the \(j\)th group is \(w_j = 1/n = m/r\),.
+    We then have
+    \begin{equation}
+        S(\{w\}_n) = \sum_{j=1}^{n} \varphi\left( \frac{1}{n} \right) = n\varphi\left( \frac{1}{n} \right)
+    \end{equation}
+    and
+    \begin{align}
+        \sum_{j=1}^{n} w_j S\left( \frac{\{p\}_m}{w_j} \right) &= \sum_{j=1}^{n} \frac{1}{n} \varphi\left( \frac{n}{r} \right)\\
+         &= n \frac{1}{n}\varphi\left( \frac{n}{r} \right)\\
+         &= m\varphi\left( \frac{1}{m} \right).
+    \end{align}
+    Hence \cref{eqn:entropy grouping} becomes
+    \begin{equation}
+        r\varphi\left( \frac{1}{r} \right) = \frac{r}{m} \varphi\left( \frac{m}{r} \right) + m \varphi\left( \frac{1}{m} \right).
+    \end{equation}
+    
+    This isn't simple to solve, fortunately others have solved it and we can just check their solution:
+    \begin{equation}
+        \varphi(x) = -kx\ln x
+    \end{equation}
+    for some constant \(k\).
+    With this form the left hand side becomes
+    \begin{equation}
+        r\varphi\left( \frac{1}{r} \right) = r\left( -k\frac{1}{r}\ln\frac{1}{r} \right) = k\ln r.
+    \end{equation}
+    The right hand side becomes
+    \begin{align}
+        \frac{r}{m} \varphi\left( \frac{m}{r} \right) + m \varphi\left( \frac{1}{m} \right)&= \frac{r}{m}\left( -k\frac{m}{r}\ln\frac{m}{r} \right) + m\left( -k\frac{1}{m}\ln\frac{1}{m} \right)\\
+        &= k\ln\frac{r}{m} + k\ln\frac{1}{m} = k\ln r.
+    \end{align}
+    So we see that this is indeed a solution,
+    We also have
+    \begin{equation}
+        \varphi(1) = -k\ln 1 = 0 
+    \end{equation}
+    and
+    \begin{equation}
+        \lim_{x\to 0} -kx\ln x = 0
+    \end{equation}
+    also.
+    This therefore gives all the properties required for the missing information function:
+    \begin{equation}
+        S(\{p\}_r) = -k\sum_{i=1}^{r} p_i\ln p_i.
+    \end{equation}
+    It can be shown that this is the only function satisfying the necessary properties, up to the value of \(k\).
+    We take \(k\) to be positive so that \(S\) is non-negative, since \(p_i \in [0, 1]\) and so \(\ln p_i \le 0\).
+    It can be shown that \(S\) is additive, that \(S\) is maximised when all probabilities are equal, which is when we know the least about the system, and that \(S = 0\) when \(p_j = \delta_{ij}\) for some fixed \(i\), which is when we know everything about the system.
+    
+    To uniquely specify \(S\) all we need to do is pick a value for \(k\).
+    When Claude Shannon first found this function he was studying information theory.
+    For this reason he chose \(k = 1/\ln 2\).
+    His reasoning being if he had a string of \(B\) bits, each being 0 or 1, so some element of \(\{0, 1\}^{B}\), then the total number of possible states for this string is \(2^{B}\).
+    If all states are equally likely then we have
+    \begin{equation}
+        S = -k\sum_{i=1}^{2^B} \frac{1}{2^{B}} \ln \frac{1}{2^{B}} = k\sum_{i=1}^{2^B} \frac{1}{2^B}\ln 2^B = k2^B\frac{1}{2^B}\ln 2^B = k\ln 2^B = Bk\ln 2
+    \end{equation}
+    and so the choice of \(k = 1/\ln 2\) gives the missing information as \(S = B\), which is measured in bits.
+    
+    On the other hand in statistical mechanics we typically take \(k = \boltzmann\), which has units of \([\boltzmann] = [\mathrm{energy}]/[\mathrm{temperature}]\), most commonly \unit{\joule \per \kelvin}.
+    This gives
+    \begin{equation}
+        S = -\boltzmann \sum_{i=1}^{r} p_i\ln p_i = S_{\mathrm{G}}.
+    \end{equation}
+    That is with this choice we have that the missing information is exactly the Gibbs entropy.
+    This is the precise meaning in the statement \enquote{entropy is a measure of disorder}, entropy is a measure of how much information we are missing from a system, which relates to the disorder since the more ordered a system is the more we know and the less information we are missing.
+    
+    \chapter{Formulating Statistical Mechanics}
+    \section{Assignment of Probability}
+    Suppose that we have a system with some constraints, for example the energy may be fixed, or the average of some value might be fixed.
+    We want to assign probabilities, \(\{p\}_r\), to the states.
+    The values of these probabilities should reflect only the information that we have available.
+    Otherwise there would be some bias in the assignment and we cannot then argue that it is a rational assignment of the probabilities.
+    To ensure that we aren't accidentally including more information in the assignment than we actually know we should aim to maximise the missing information.
+    This leads to the following principle.
+    \begin{important}
+        Probabilities should be assigned to states such as to maximise \(S\) subject to known constraints.
+    \end{important}
+    
+    For our purposes constraints usually take the form of fixed expectation values of some observables.
+    We also always have the constraint that
+    \begin{equation}
+        \sum_{i=1}^{r} p_i = 1.
+    \end{equation}
+    We can maximise a quantity subject to constraint's using Lagrange multipliers.
+    
+    \subsection{Lagrange Multipliers}
+    \begin{rmk}
+        For more details about Lagrange multipliers see the notes from the Lagrangian dynamics course.
+    \end{rmk}
+    Suppose we wish to extremise some function, \(f\), which is a function of independent variables, \(x_i\).
+    We want to find a point where \(f\) is stationary so we need
+    \begin{equation}
+        \dl{f} = \sum_{i=1}^{r} \diffp{f}{x_i}\dl{x_i} = 0.
+    \end{equation}
+    Suppose also that we have the constraint that \(g(\{x\}_r) = g_0 = \text{constant}\) for some function \(g\).
+    We cannot therefore assume that \(\diffp{f}/{x_i} = 0\) gives the desired point.
+    
+    What we do is construct the function \(h(\{x\}_r) = f(\{x\}_r) - \lambda g(\{x\}_r)\) where \(\lambda\) is some constant.
+    We then have
+    \begin{equation}
+        \dl{h} = \dl{f} - \lambda\dl{g} = \sum_{i=1}^{r} \left( \diffp{f}{x_i} - \lambda\diffp{g}{x_i}  \right)\dl{x_i} = 0.
+    \end{equation}
+    We can choose \(\lambda\) such that \(\diffp{f}/{x_r} - \lambda \diffp{g}/{x_r} = 0\).
+    Since \(x_i\) are independent variables we can vary them separately and the sum must still give zero, it follows then that for this same value of \(\lambda\) we will have \(\diffp{f}/{x_i} - \lambda \diffp{g}/{x_i} = 0\).
+    
+    The general method then to minimise \(f\) subject to the constraint that \(g(\{x\}_r) = g_0\) is to define
+    \begin{equation}
+        h(\{x\}_r) = f(\{x\}_r) - \lambda g(\{x\}_r).
+    \end{equation}
+    Then extermise \(h\) by requiring that
+    \begin{equation}
+        \diffp{h}{x_i} = 0
+    \end{equation}
+    for all \(x_i\).
+    
+    We apply this method with \(x_i\) being the probabilities \(p_i\), and \(f\) being the entropy, \(S\).
+    We then choose \(\lambda\) such that the constrained quantities have the desired values.
+    If there are several constraints then each constraint gets its own Lagrange multiplier.
+    
+    It is easiest to see why this works geometrically.
+    Suppose we want to extremise \(f(\vv{x})\) subject to the constraint \(g(\vv{x}) = 0\), if instead the constraint is \(g(\vv{x}) = g_0\) we can redefine \(g\), so \(g(\vv{x}) \to g(\vv{x}) - g_0\), to get the desired form.
+    Recall that \(\dl{f} = \dl{\vv{x}} \cdot \grad f\).
+    We must also choose \(\dl{\vv{x}}\) such that \(g\) doesn't change.
+    This means that \(\dl{\vv{x}}\) must be along the level surfaces of \(g\).
+    The level surfaces of \(g\) are perpendicular to \(\grad g\), therefore \(\dl{\vv{x}}\) must be perpendicular to \(\grad g\).
+    This means that we must have \(\dl{\vv{x}} \cdot \grad g = 0\).
+    
+    Therefore at the extremum we have both \(\grad g\) and \(\grad f\) parallel, which means that for some value of \(\lambda\) we must have \(\grad f - \lambda \grad g = 0\).
+    In component form this is
+    \begin{equation}
+        \diffp{f}{x_i} - \lambda \diffp{g}{x_i} = 0,
+    \end{equation}
+    which is exactly what we had before.
+    
+    \begin{exm}{}{exm:microcanonical partition func}
+        Suppose we have no constraints other than the mandatory \(\sum_i p_i = 1\).
+        We then have
+        \begin{equation}
+            h(\{p\}_r) = -k \sum_i p_i \ln p_i - \lambda \sum_i p_i.
+        \end{equation}
+        Taking the derivative we use
+        \begin{equation}
+            \diffp{}{x} x \ln x = \ln x + 1
+        \end{equation}
+        and so
+        \begin{equation}
+            \diffp{h}{p_j} = -k\ln p_j - k - \lambda = 0
+        \end{equation}
+        since all terms with \(p_i\) for \(i \ne j\) vanish in the derivative.
+        Rearranging we have
+        \begin{equation}
+            p_j = \exp\left[ -1 - \frac{\lambda}{k} \right].
+        \end{equation}
+        Noticing that the right hand side here is constant we have
+        \begin{equation}
+            1 = \sum_{i=1}^{r} p_i = \sum_{i=1}^{r} \exp\left[ -1 - \frac{\lambda}{k} \right] = r\exp\left[ -1 - \frac{\lambda}{k} \right].
+        \end{equation}
+        Rearranging this we have
+        \begin{equation}
+            \frac{1}{r} = \exp\left[ -1 - \frac{\lambda}{k} \right] = p_i.
+        \end{equation}
+        So we see that we recover the principle of equal \textit{a priori} probabilities.
+    \end{exm}
+    
+    \begin{exm}{}{exm:grand canonical partition func}
+        Suppose we have two constraints.
+        Namely that the expectation values of two observables, \(y\) and \(z\), are fixed.
+        That is
+        \begin{equation}
+            \expected{y} = \sum_{i} p_iy_i, \qqand \expected{z} = \sum_{i} p_iz_i
+        \end{equation}
+        are fixed values.
+        As well as this we have the requirement that \(\sum_{i} p_i = 1\).
+        
+        We then define
+        \begin{equation}
+            h(\{p\}_r) = -k\sum_{i} p_i\ln p_i - \lambda_1 \sum_i p_i - \lambda_y \sum_i p_iy_i - \lambda_z \sum_i p_i z_i.
+        \end{equation}
+        Differentiating we have
+        \begin{equation}
+            \diffp{h}{p_j} = -k\ln p_j - k - \lambda_1 - \lambda_y y_j - \lambda_z z_j = 0.
+        \end{equation}
+        Thus,
+        \begin{equation}
+            p_j = \exp\left[ -1 - \frac{\lambda_1}{k} - \frac{\lambda_y y_j}{k} - \frac{\lambda_z z_j}{k} \right].
+        \end{equation}
+        Now considering the requirement that \(\sum_j p_j = 1\) we have
+        \begin{align}
+            1 &= \sum_j p_j\\
+            &= \sum_j \exp\left[ -1 - \frac{\lambda_1}{k} - \frac{\lambda_y y_j}{k} - \frac{\lambda_z z_j}{k} \right]\\
+            &= \exp\left[ -1 - \frac{\lambda_1}{k} \right] \sum_j \exp\left[ -\frac{\lambda_y y_j}{k} - \frac{\lambda_z z_j}{k} \right]\\
+            &= Z \exp\left[ -1 - \frac{\lambda_1}{k} \right]\label{eqn:deriving gc partition func}
+        \end{align}
+        where we have defined
+        \begin{equation}
+            Z \coloneqq \sum_j \exp\left[ -\frac{\lambda_y y_j}{k} - \frac{\lambda_z z_j}{k} \right].
+        \end{equation}
+        Rearranging \cref{eqn:deriving gc partition func} we have
+        \begin{equation}
+            \exp\left[ -1 - \frac{\lambda_1}{k} \right] = \frac{1}{Z}.
+        \end{equation}
+        We then have
+        \begin{align}
+            p_j &= \exp\left[ -1 - \frac{\lambda_1}{k} - \frac{\lambda_y y_j}{k} - \frac{\lambda_z z_j}{k} \right]\\
+            &= \exp\left[ -1 - \frac{\lambda_1}{k} \right]\exp\left[ -\frac{\lambda_y y_j}{k} - \frac{\lambda_z z_j}{k} \right]\\
+            &= \frac{1}{Z}\exp\left[ -\frac{\lambda_y y_j}{k} - \frac{\lambda_z z_j}{k} \right].
+        \end{align}
+        We can fix the values of \(\lambda_y\) and \(\lambda_z\) using the constraints that \(\expected{y}\) and \(\expected{z}\) are known, fixed values.
+    \end{exm}
+    
+    \section{Application to Statistical Mechanics}
+    Recall that a microstate is the most detailed description possible of a system.
+    Typically this will correspond to the \(i\)th microstate being the \(i\)th solution to the Schrödinger equation.
+    Let \(E_i\) be the energy of the \(i\)th microstate, this will typically be a function of extensive thermodynamic properties, such as volume.
+    
+    The equilibrium state is specified by the expectation values of extensive observables, such as the internal energy, the expectation value of which is
+    \begin{equation}
+        \mean{E} = \sum_{i} p_i E_i.
+    \end{equation}
+    Note that it is common to drop the overline and simply write \(E\) for this quantity.
+    
+    From here the exact physics depends on which constraints are imposed.
+    We classify the constraints into categories of ensembles, which for now we can think of as being synonymous with probability distributions.
+    
+    \subsection{Microcanonical Ensemble}
+    A \defineindex{microcanonical ensemble} is a completely isolated system.
+    This means that the energy is fixed and so all microstates must have the same energy, \(E_i = \mean{E}\).
+    The only constraint therefore is that \(\sum_i = 1\).
+    This is analogous to \cref{exm:microcanonical partition func} and so
+    \begin{equation}
+        p_i = \frac{1}{\Omega}
+    \end{equation}
+    where \(\Omega\) is the number of microstates, which we called \(r\) in \cref{exm:microcanonical partition func}.
+    So maximising \(S\) in a microcanonical ensemble corresponds to the principle of equal \textit{a priori} probabilities.
+    
+    \subsection{Canonical Ensemble}
+    A \defineindex{canonical ensemble} can explore states of different energies, \(E_i\), we can think of it as being isolated but in contact with some heat reservoir which allows it to change energy.
+    The observable \(\mean{E}\) specifies the equilibrium state.
+    Therefore we need to maximise \(S\) subject to the constraint that \(\mean{E}\) is fixed, as well as the constraint that \(\sum_i p_i = 1\).
+    We therefore have
+    \begin{equation}
+        h(\{p\}_r) = -k\sum_i p_i \ln p_i - \lambda_1 \sum_i p_i - \lambda_E \sum_i p_i E_i.
+    \end{equation}
+    Extremising this we have
+    \begin{equation}
+        \diffp{h}{p_j} = -k\ln p_j - k - \lambda_1 - \lambda_E E_j = 0.
+    \end{equation}
+    Rearranging this gives 
+    \begin{equation}
+        p_j = \exp\left[ -1 - \frac{\lambda_1}{k} - \frac{\lambda_E E_j}{k} \right].
+    \end{equation}
+    The constraint that \(\sum_j p_j = 1\) gives us
+    \begin{align}
+        1 &= \sum_j p_j = \sum_j \exp\left[ -1 - \frac{\lambda_1}{k} - \frac{\lambda_E E_j}{k} \right]\\
+        &= \exp\left[ -1 - \frac{\lambda_1}{k} \right]\sum_j \exp\left[ -\frac{\lambda_E E_j}{k} \right]\\
+        &= \cpartition\exp[-1 - \frac{\lambda_1}{k}]
+    \end{align}
+    where we have defined
+    \begin{equation}
+        \cpartition \coloneqq \sum_j \exp\left[ -\frac{\lambda_E E_j}{k} \right].
+    \end{equation}
+    We therefore have
+    \begin{equation}
+        \exp\left[ -1 - \frac{\lambda_1}{k} \right] = \frac{1}{\cpartition}.
+    \end{equation}
+    It follows that
+    \begin{align}
+        p_j &= \exp\left[ -1 - \frac{\lambda_1}{k} - \frac{\lambda_E E_j}{k} \right]\\
+        &= \exp\left[ -1 - \frac{\lambda_1}{k} \right] \exp\left[ -\frac{\lambda_E E_j}{k} \right]\\
+        &= \frac{1}{\cpartition} \exp\left[ -\frac{\lambda_E E_j}{k} \right].
+    \end{align}
+    Here \(\cpartition\) is the \defineindex{canonical partition function}\index{partition function!canonical}.
+    We will see later that we can identify \(\lambda_E\) in such a way that we recover the Boltzmann distribution.
+    
+    \subsection{Grand Canonical Ensemble}
+    A \defineindex{grand canonical ensemble} can explore states of different energies, but also different numbers of particles.
+    We can think of the system as being in contact with a heat reservoir and a reservoir of particles.
+    We now need to label states both by \(i\), which corresponds to the energy, \(E_i\), but also by the number of particles, \(N\), since in general if \(N\) changes then \(E_i\) will change also.
+    
+    The constraints are then that the following are fixed
+    \begin{equation}
+        \mean{E} = \sum_{i, N} p_{iN} E_{iN}, \qqand \mean{N} = \sum_{i, N} p_{iN}N.
+    \end{equation}
+    As well as the normal \(\sum_{i, N} p_{iN} = 1\).
+    This corresponds to \cref{exm:grand canonical partition func} and we identify
+    \begin{equation}
+        p_{iN} = \frac{1}{\gcpartition} \exp\left[ -\frac{\lambda_E E_{iN}}{k} - \frac{\lambda_N N}{k} \right]
+    \end{equation}
+    where
+    \begin{equation}
+        \gcpartition \coloneqq \sum_{i, N} \exp\left[ -\frac{\lambda_E E_{iN}}{k} - \frac{\lambda_N N}{k} \right]
+    \end{equation}
+    is the \defineindex{grand canonical partition function}\index{partition function!grand canonical}.
+    
+    The next step is to identify the physical interpretation of the Lagrange multipliers.
+    This will be the focus of the next chapter.
+    
+    \chapter{Identifying the Lagrange Multipliers}
+    \section{Thermodynamics Review}
+    \begin{rmk}
+        For more details on thermodynamics see the Thermodynamics notes from the Thermal Physics course.
+    \end{rmk}
+    In order to identify the physical meaning of the Lagrange multipliers we will need to recap some basic thermodynamics.
+    Equilibrium thermodynamic variables are variables which are stationary when the system is in equilibrium and have well defined values, we call these functions of state.
+    The equation of state for a system relates different thermodynamic variables, for example \(PV = nRT\) relates the pressure, \(P\), volume, \(V\), number of moles, \(n\), and temperature, \(T\).
+    
+    In statistical mechanics we replace thermodynamic variables with their expectation values.
+    This is valid since in the thermodynamic limit, where the number of constituents, \(N\), tends to infinity, we get distributions which are sharply peaked about the expected value.
+    
+    The zeroth law of thermodynamics is that heat flows from a hotter body to a colder body.
+    This defines what we mean when we say hot and cold and can be used to define temperature.
+    
+    The first and second laws of thermodynamics can be combined into
+    \begin{equation}
+        \dl{\mean{E}} = T\dd{S} - P\dd{V}
+    \end{equation}
+    where \(\mean{E}\) is the mean (internal) energy (denoted \(U\) in thermodynamics), \(T\) is the temperature, \(S\) is the entropy, \(P\) is the pressure and \(V\) is the volume.
+    This form of the first and second laws is valid for a PVT system, which is a system where the thermodynamic variables are pressure, volume, and temperature.
+    
+    A more general form of this law is
+    \begin{equation}
+        \dl{\mean{E}} = T \dd{S} + \sum_{\gamma} f_\gamma \dd{X_\gamma}.
+    \end{equation}
+    Here \(f_\gamma\) is what we call a \define{thermodynamic force}\index{thermodynamic force|see{generalised force}}, or a \defineindex{generalised force}\footnote{for more on generalised forces and conjugate variables see the notes from the Lagrangian Dynamics course.}.
+    \(X_\gamma\) is then the \define{thermodynamic displacement}\index{thermodynamic displacement|see{conjugate field}}, also known as the \defineindex{conjugate field}.
+    These quantities have units such that their product has dimensions of energy.
+    
+    We've already seen the example of a PVT system where we can identify \(-P\) as a generalised force with the associated conjugate variable \(V\).
+    Another example would be the magnetic field, \(\mu_0\vv{\vv{H}}\), with the conjugate field being the magnetisation, \(\vv{M}\).
+    In this case the term that contributes to \(\dl{\mean{E}}\) is \(\mu_0 \vv{H} \cdot \vv{M}\), that is each component of \(\mu_0\vv{H}\) and \(\vv{M}\) acts as a conjugate pair.
+    
+    Importantly the forces are \defineindex{intensive}, meaning they don't depend on the size of the system, and the displacements are \defineindex{extensive}, meaning they scale linearly with the size of the system.
+    
+    Being even more general the total change in internal energy is
+    \begin{equation}
+        \dl{\mean{E}} = T \dd{S} + \sum_{\gamma} f_\gamma \dd{X_\gamma} + \sum_{\alpha} \mu_\alpha \dd{\mean{N_\alpha}}
+    \end{equation}
+    where \(\mean{N_\alpha}\) is the mean number of particles of species\footnote{this is just a fancy word for \enquote{type of particle} which allows for us to talk about atoms, molecules, colloidal particles, etc.\@ using the same word.} \(\alpha\) and \(\mu_\alpha\) is the associated \defineindex{chemical potential}.
+    We can take this equation to define \(\mu_\alpha\) and so we see that
+    \begin{equation}
+        \mu_\alpha \coloneqq \diffp{\mean{E}}{\mean{N}}[S,\{X\}]
+    \end{equation}
+    where the notation
+    \begin{equation}
+        \diffp{f}{x}[y]
+    \end{equation}
+    means the derivative of \(f\) with respect to \(x\) holding \(y\) constant.
+        
+    The final takeaway is that the entropy, \(S\), conjugate fields, \(\{X\}\), and number of particles, \(\{N\}\), are the natural variables for \(\mean{E}\), meaning that \(\mean{E} = \mean{E}(S, \{X\}, \{N\})\).
+    
+    \section{Identifying the Lagrange Multipliers}
+    \subsection{Canonical}
+    Recall that for the canonical ensemble
+    \begin{equation}
+        p_i = \frac{1}{\cpartition} \exp\left[ -\frac{\lambda_E E_i}{k} \right], \qqwhere \cpartition = \sum_i \exp\left[ -\frac{\lambda_E E_i}{k} \right].
+    \end{equation}
+    We take \(k = \boltzmann\), the Boltzmann constant, in order to get results familiar from thermodynamics.
+    We start by calculating \(\dl{\mean{E}}\).
+    Starting with the definition
+    \begin{equation}
+        \mean{E} \coloneqq \sum_i p_i E_i
+    \end{equation}
+    we see that we can change \(\mean{E}\) in two ways.
+    First, we could change \(p_i\), second we can change \(E_i\), to change \(E_i\) we have to change properties of the system.
+    Say we change the system by \(\dl{X_\gamma}\), then there will be an associated change in \(E_i\), and hence \(\mean{E}\).
+    
+    Putting this together
+    \begin{align}
+        \dl{\mean{E}} &= \dl{\left( \sum_i E_i p_i \right)}\\
+        &= \sum_i \diffp{\mean{E}}{p_i} \dd{p_i} + \sum_\gamma \diffp{\mean{E}}{X_\gamma} \dd{X_\gamma}.
+    \end{align}
+    Identifying
+    \begin{equation}
+        \diffp{\mean{E}}{p_i} = \diffp{}{p_i} \sum_j E_jp_j = E_i
+    \end{equation}
+    we can write this as
+    \begin{equation}\label{eqn:canonical lagrange multiplier derivation}
+        \dl{\mean{E}} = \sum_i E_i \dd{p_i} + \sum_\gamma \diffp{\mean{E}}{X_\gamma} \dd{X_\gamma}.
+    \end{equation}
+    
+    Now consider the entropy
+    \begin{equation}
+        S = -\boltzmann\sum_i p_i \ln p_i.
+    \end{equation}
+    The change in entropy for a change in probabilities is given by the chain rule as
+    \begin{equation}
+        \dl{S} = \sum_i \diffp{S}{p_i} \dl{p_i} = -\boltzmann \sum_i (\ln p_i + 1) \dd{p_i}.
+    \end{equation}
+    Since the total probability must stay constant we must have \(\sum_i \dl{p_i} = 0\) and hence the second term in this sum vanishes and we have
+    \begin{equation}
+        \dl{S} = -\boltzmann \sum_i \ln(p_i)\dd{p_i}.
+    \end{equation}
+    Substituting in 
+    \begin{equation}
+        p_i = \frac{1}{\cpartition} \exp\left[ -\frac{\lambda_E E_i}{\boltzmann} \right]
+    \end{equation}
+    we get
+    \begin{equation}
+        \dl{S} = -\boltzmann \sum_i \left[ -\frac{\lambda_E E_i}{\boltzmann} - \ln \cpartition \right] \dd{p_i}.
+    \end{equation}
+    The second term vanishes again since \(\ln\cpartition\) is a constant and the sum of the changes in probabilities must vanish to maintain constant total probability.
+    We therefore have
+    \begin{equation}
+        \dl{S} = \lambda_E \sum_i E_i \dd{p_i}.
+    \end{equation}
+
+    Substituting this result into \cref{eqn:canonical lagrange multiplier derivation} we get
+    \begin{equation}
+        \dl{\mean{E}} = \frac{1}{\lambda_E} \dd{S} = \sum_\gamma \diffp{\mean{E}}{X_\gamma} \dd{X_\gamma}.
+    \end{equation}
+    Comparing this to
+    \begin{equation}
+        \dl{\mean{E}} = T \dd{S} + \sum_\gamma f_\gamma \dd{X_\gamma}
+    \end{equation}
+    we identify
+    \begin{equation}
+        \lambda_E = \frac{1}{T}.
+    \end{equation}
+    We also get an expression for the thermodynamic force:
+    \begin{equation}\label{eqn: f = dE/dX}
+        f_\gamma = \diffp{\mean{E}}{X_\gamma}.
+    \end{equation}
+    For example,
+    \begin{equation}
+        -P - \diffp{\mean{E}}{V} = \sum_i p_i \diffp{E_i}{V}.
+    \end{equation}
+    We can use this to identify the \defineindex{instantaneous pressure}
+    \begin{equation}
+        P_i \coloneqq - \diffp{E_i}{V}
+    \end{equation}
+    so that the mean pressure takes the expected form
+    \begin{equation}
+        P = \sum_i p_i P_i.
+    \end{equation}
+    
+    Now that we have identified the Lagrange multiplier we can write the canonical distribution in its usual form:
+    \begin{equation}
+        p_i = \frac{1}{\cpartition} \exp\left[ -\frac{E_i}{\boltzmann T} \right], \qqwhere \cpartition = \sum_i \exp\left[ -\frac{E_i}{\boltzmann T} \right].
+    \end{equation}
+    Introducing \(\beta \coloneqq 1/(\boltzmann T)\), which we will use throughout this course as we see fit, we can write this as
+    \begin{important}
+        \vspace{-2.5ex}
+        \begin{equation}
+            p_i = \frac{1}{\cpartition} \e^{-\beta E_i}, \qqwhere \cpartition = \sum_i \e^{-\beta E_i}.
+        \end{equation}
+    \end{important}
+    
+    Considering again the entropy we have
+    \begin{align}
+        S &= -\boltzmann \sum_i p_i \ln p_i\\
+        &= -\boltzmann \sum_i p_i[-\beta E_i - \ln \cpartition]\\
+        &= -\boltzmann \sum_i p_i\left[ -\frac{E_i}{\boltzmann T} - \ln \cpartition \right]\\
+        &= \frac{1}{T} \sum_i p_iE_i + \boltzmann\ln\cpartition \sum_i p_i.
+    \end{align}
+    Identifying the final sum as 1 and rearranging this we see that
+    \begin{equation}
+        -\boltzmann T \ln \cpartition = \mean{E} - TS \eqqcolon F
+    \end{equation}
+    where \(F\) is the \defineindex{Helmholtz free energy}, which we will discuss more in the next chapter.
+    This equation is called a \defineindex{bridge equation} because the left hand side is in terms of the partition function, which is a sum over microstates, and the right hand side is in terms of macroscopic properties such as the energy.
+    Notice that
+    \begin{equation}
+        \dl{F} = \dl{\mean{E}} - T \dd{S} - S\dd{T} = -S\dd{T} + \sum_\gamma f_\gamma \dd{X_\gamma}.
+    \end{equation}
+    Here we used the chain rule to compute \(\dl{(ST)}\) and then recognised
+    \begin{equation}
+        \dl{\mean{E}} - T\dd{S} = \sum_\gamma f_\gamma \dd{X_\gamma}
+    \end{equation}
+    as a rearrangement of the first and second law.
+    From this we see that \(T\) and \(X_\gamma\) are the natural variables to express \(F\).
+    
+    \subsection{Grand Canonical}
+    Recall that for the grand canonical ensemble
+    \begin{equation}
+        p_{iN} = \frac{1}{\gcpartition}\exp\left[ -\frac{\lambda_E E_{iN}}{k} - \frac{\lambda_N N}{k}\right], \qqwhere \gcpartition = \sum_{i, N} \exp\left[ -\frac{\lambda_E E_{iN}}{k} - \frac{\lambda_N N}{k} \right].
+    \end{equation}
+    We take \(k = \boltzmann\), the Boltzmann constant, in order to get results familiar from thermodynamics.
+    We start by calculating \(\dl{\mean{E}}\).
+    By the same logic as the canonical case
+    \begin{align}
+        \dl{\mean{E}} &= \sum_{i,N} \diffp{\mean{E}}{p_{iN}}\dd{p_{iN}} + \sum_{\gamma} \diffp{\mean{E}}{X_\gamma} \dd{X_\gamma}\\
+        &= \sum_{i,N} E_{iN} \dd{p_{iN}} + \sum_\gamma \diffp{\mean{E}}{X_\gamma} \dd{X_\gamma}.
+    \end{align}
+    
+    Now consider the entropy.
+    The change in entropy for a change in probabilities is
+    \begin{align}
+        \dl{S} &= \sum_{i,N} \diffp{S}{p_{iN}} \dd{p_{iN}}\\
+        &= -\boltzmann \sum_{i,N} (\ln p_{iN} + 1) \dd{p_{iN}}\\
+        &= -\boltzmann \sum_{i,N} \ln (p_{iN})\dd{p_{iN}}\\
+        &= -\boltzmann \sum_{i,N} \left[ -\frac{\lambda_E E_{iN}}{\boltzmann} - \frac{\lambda_N N}{\boltzmann} - \ln \gcpartition \right] \dd{p_{iN}}\\
+        &= \lambda_E \sum_{i,N} E_{iN} \dd{p_{iN}} + \lambda_N \sum_{i,N} N\dd{p_{iN}}.
+    \end{align}
+    Here we substituted in the definition of \(S\) to get to the second line.
+    We then identified that \(\sum_{i,N}p_{i,N} = 1\) and so \(\sum_{i,N}\dd{p_{iN}} = 0\) so we can neglect the second term in the second line.
+    In the fourth line we substituted in the definition of \(p_{iN}\) in the grand canonical distribution to get the fourth line.
+    We then identify that \(\ln\gcpartition\) is constant and so the final term of the fourth line vanishes when we sum over \(\dl{p_{iN}}\).
+    
+    We now write
+    \begin{equation}
+        \dl{\mean{N}} = \sum_{i,N} N \dd{p_{iN}}
+    \end{equation}
+    which follows from
+    \begin{equation}
+        \mean{N} = \sum_{i,N} p_{iN}N
+    \end{equation}
+    and noticing that \(N\) is the index of the sum, so is constant in any given term, we have
+    \begin{equation}
+        \diffp{\mean{N}}{p_{iN}} = Np_{iN}.
+    \end{equation}
+    
+    We can then write
+    \begin{equation}
+        \dl{S} = \lambda_E \sum_{i, N} E_{i, N} \dd{p_{i,N}} + \lambda_N \dd{\mean{N}}.
+    \end{equation}
+    Rearranging this we get
+    \begin{equation}
+        \dl{\mean{E}} = \frac{1}{\lambda_E} \dd{S} - \frac{\lambda_N}{\lambda_E} \dd{\mean{N}}.
+    \end{equation}
+    Comparing this to the most general form of the first and second law,
+    \begin{equation}
+        \dl{\mean{E}} = T\dd{S} + \sum_\gamma f_\gamma \dd{X_\gamma} + \mu \dd{N}
+    \end{equation}
+    for a single particle species we can identify
+    \begin{equation}
+        \lambda_E = \frac{1}{T}, \qqand \lambda_N = -\lambda_E \mu = -\frac{\mu}{T}.
+    \end{equation}
+    
+    We have found the standard form of the grand canonical ensemble distribution:
+    \begin{important}
+        \vspace{-2.5ex}
+        \begin{equation}
+            p_{iN} = \frac{1}{\gcpartition} \e^{-\beta(E_{iN} - N\mu)}, \qwhere \gcpartition = \sum_{i,N} \e^{-\beta(E_{iN} - N\mu)}.
+        \end{equation}
+    \end{important}
+    
+    Considering the entropy we have
+    \begin{align}
+        S &= \sum_{i,N} p_{iN} \ln p_{iN}\\
+        &= -\boltzmann\sum_{i,N} p_{iN}[-\beta(E_{iN} - N\mu) - \ln\gcpartition]\\
+        &= \frac{1}{T}\sum_{i,N} p_{iN}E_{iN} - \frac{\mu}{T}\sum_{i,N} p_{iN} N - \boltzmann\ln\gcpartition \sum_{i,N}p_{i,N}\\
+        &= \frac{\mean{E}}{T} - \mu\mean{N} + \boltzmann\ln\gcpartition.
+    \end{align}
+    Rearranging this we have
+    \begin{equation}
+        -\boltzmann T \ln \gcpartition = \mean{E} - TS - \mu \mean{N} = \Phi
+    \end{equation}
+    where \(\Phi\) is the \defineindex{grand potential}, which we will discuss more in the next chapter.
+    This is another bridge equation relating microscopic and macroscopic quantities.
+    
+    \chapter{Thermodynamic Potentials}
+    \section{Thermodynamic Potentials}
+    Recall that for a PVT system with a single species of particle the first and second laws of thermodynamics combine to give the central equation
+    \begin{equation}
+        \dl{\mean{E}} = T\dd{S} - P\dd{V} + \mu\dd{\mean{N}}.
+    \end{equation}
+    There are three conjugate pairs of variables here, \((T, S)\), \((P, V)\), and \((\mu, \mean{N})\).
+    Of these \(S\), \(V\), and \(\mean{N}\) are extensive, and \(T\), \(P\), and \(\mu\) are intensive.
+    The natural variables for \(\mean{E}\) are \(S\), \(V\), and \(\mean{N}\).
+    We can use this to calculate the temperature, pressure, and chemical potential:
+    \begin{equation}\label{eqn:T P chem potential from mean E derivatives}
+        T = \diffp{\mean{E}}{S}[P, \mean{N}], \qquad P = -\diffp{\mean{E}}{V}[S, \mean{N}], \qqand \mu = \diffp{\mean{E}}{\mean{N}}[S, V].
+    \end{equation}
+    
+    The \defineindex{Helmholtz free energy} is defined as
+    \begin{equation}
+        F \coloneqq \mean{E} - TS.
+    \end{equation}
+    Therefore
+    \begin{align}
+        \dl{F} &= \dl{(\mean{E} - TS)}\\
+        &= \dl{\mean{E}} - T\dd{S} - S\dd{T}\\
+        &= T\mean{S} - P\dd{V} + \mu\dd{\mean{N}} - T\dd{S} - S\dd{T}\\
+        &= -S\dd{T} - P\dd{V} - \mu\dd{\mean{N}}.
+    \end{align}
+    This means that \(T\), \(V\), and \(\mean{N}\) are the natural variables for \(F\).
+    This also gives us knew ways to calculate the entropy, pressure, and chemical potential:
+    \begin{equation}
+        S = -\diffp{F}{T}[V, \mean{N}], \qquad P = -\diffp{F}{V}[T, \mean{N}], \mu = -\diffp{\mean{E}}{\mean{N}}[T, V].
+    \end{equation}
+    
+    The \defineindex{grand potential} is defined as
+    \begin{equation}
+        \Phi \coloneqq F - \mu \mean{N}.
+    \end{equation}
+    Hence,
+    \begin{align}
+        \dl{\Phi} &= \dl{(F - \mu\mean{N})}\\
+        &= \dl{F} - \mu\dd{\mean{N}} - \mean{N}\dd{\mu}\\
+        &= -S\dd{T} - P\dd{V} 0 \mu\dd{\mean{N}} - \mu\dd{\mean{N}} - \mean{N}\dd{\mu}\\
+        &= -S\dd{T} - P\dd{V} + \mean{N}\dd{\mu}.
+    \end{align}
+    This means that \(T\), \(V\), and \(\mu\) are the natural variables for \(\Phi\).
+    We can also use this to calculate the entropy, pressure, and mean number of particles:
+    \begin{equation}
+        T = -\diffp{\Phi}{T}[V, \mu], \qquad P = -\diffp{\Phi}{V}[T, \mu], \qqand \mean{N} = \diffp{\Phi}{\mu}[T, V].
+    \end{equation}
+    
+    At this point we see a pattern forming.
+    We take a potential and then subtract the product of conjugate variables to get the next potential.
+    Since we have three pairs of conjugate variables for a PVT single species system there are \(2^3 = 8\) possible potentials, each with three different natural variables.
+    The important ones when it comes to physics are given below.
+    
+    \begin{center}
+         \begin{tabular}{cclc}\toprule
+             Symbol & Definition & Name & Natural Variables \\ \midrule
+             \(\mean{E}\) & & Energy & \(S\), \(V\), \(\mean{N}\)\\
+             \(F\) & \(\mean{E} - TS\) & Helmholtz free energy & \(T\), \(V\), \(\mean{N}\)\\
+             \(H\) & \(\mean{E} + PV\) & Enthalpy & \(S\), \(P\), \(\mean{N}\)\\
+             \(G\) & \(F + PV\) & Gibbs Free Entropy & \(T\), \(P\), \(\mean{N}\)\\
+             \(\Phi\) & \(F - \mu \mean{N}\) & Grand Potential & \(T\), \(V\), \(\mu\)\\ \bottomrule
+         \end{tabular}
+    \end{center}
+    
+    \subsection{Legendre Transforms}
+    \begin{rmk}
+        For more examples of Legendre transforms see the notes from the Lagrangian dynamics course, in particular the Hamiltonian is the Legendre transform of the Lagrangian.
+    \end{rmk}
+    The similarity in these definitions is no accident.
+    The thermodynamic potentials are related by Legendre transforms, which we can think of as a way to define a new function with different variables related to the previous variables in a non-trivial way such that the new function contains all the information of the first.
+    
+    Consider some function, \(f\), which is a function of \(x_i\) for \(i = 1, \dotsc, k\).
+    Then
+    \begin{equation}
+        \dl{f} = \sum_{i = 1}^{k} \diffp{f}{x_i}\dd{x_i} = \sum_{i = 1}^{k} u_i\dd{x_i}, \qqwhere u_i = \diffp{f}{x_i}.
+    \end{equation}
+    We then define a new function,
+    \begin{equation}
+        g \coloneqq f - \sum_{i = r + 1}^{k} u_ix_i.
+    \end{equation}
+    Which means
+    \begin{align}
+        \dd{g} &= \dl{\left( f - \sum_{i = r + 1}^{k} u_i x_i \right)}\\
+        &= \dl{f} - \sum_{i = r + 1}^{k} (u_i \dd{x_i} + x_i \dd{u_i})\\
+        &= \sum_{i=1}^{k} u_i\dd{x_i} - \sum_{i = r + 1}^{k} (u_i \dd{x_i} + x_i \dd{u_i})\\
+        &= \sum_{i=1}^{r} u_i \dd{x_i} - \sum_{i = r + 1}^{k} x_i \dd{u_i}.
+    \end{align}
+    The function \(g\) is then a natural function of the variables \(x_1, \dotsc, x_r, u_{r+1}, \dotsc, u_k\).
+    We say that \(g\) is the \defineindex{Legendre transform} of \(f\).
+    
+    The logic behind Legendre transforms can be explained by a one-dimensional example.
+    Let \(f\) be a function of the single variable \(x\).
+    This function can be defined by the value \(f(x)\) at all possible points \(x\), which is usually done through an equation like \(f(x) = \text{something with }x\).
+    We can also specify \(f\), up to some constant, with the values of the derivative, \(u(x) = \diffp{f}/{x}\), at all points.
+    We can think about this as specifying the gradient of the tangent at each point, \(x\).
+    These tangents are lines with a slope \(u\) and a \(y\)-intercept, which we'll call \(g\).
+    This means that we can express the value at \(x\) as \(f(x) = g + ux\).
+    We can invert this and get \(g(u) = f(x) - ux\).
+    We see that \(g\) contains the same information as \(f\) and is its Legendre transform.
+    
+    \section{Gibbs--Duhem Relation}
+    Consider the energy of the system.
+    This is an extensive value, therefore it should be proportional to the size of the system.
+    Similarly the natural variables for energy, \(S\), \(X_\gamma\), and \(\mean{N_\alpha}\), are extensive and so also proportional to the size of the system.
+    Consider then what happens if we scale the size of the system by some factor, \(b\).
+    On the one hand, the energy is extensive and so scales by \(b\) also, meaning \(\mean{E} \to b\mean{E}\).
+    On the other hand we can also view this as scaling all of the natural variables for \(\mean{E}\) by \(b\), so
+    \begin{equation}
+        \mean{E}(S, \{X\}, \{\mean{N}\}) \to \mean{E}(bS, \{bX\}, \{b\mean{N}\}).
+    \end{equation}
+    We therefore have
+    \begin{equation}
+        b\mean{E}(S, \{X\}, \{\mean{N}\}) = \mean{E}(bS, \{bX\}, \{b\mean{N}\}).
+    \end{equation}
+    
+    Now consider what happens if we differentiate both sides with respect to \(b\), the left hand side is simple:
+    \begin{equation}
+        \diffp{}{b} b\mean{E}(S, \{X\}, \{\mean{N}\}) = \mean{E}(S, \{X\}, \{\mean{N}\}).
+    \end{equation}
+    The right hand side is slightly more complex:
+    \begin{align}
+        \diffp{}{b}\mean{E}(bS, \{bX\}, \{b\mean{N}\}) &= S\diffp{}{S}\mean{E}(bS, \{bX\}, \{b\mean{N}\})\\
+        &\quad+ \sum_{\gamma} X_\gamma\diffp{}{X_{\gamma}}\mean{E}(bS, \{bX\}, \{b\mean{N}\})\\
+        &\quad+ \sum_{\alpha} \mean{N_\alpha} \diffp{}{\mean{N_{\alpha}}}\mean{E}(bS, \{bX\}, \{b\mean{N}\})
+    \end{align}
+
+    Now evaluating at \(b = 1\) the left hand side gives
+    \begin{equation}
+        \diffp{}{b} b\mean{E}(S, \{X\}, \{\mean{N}\}) \bigg\vert_{b=1} = \mean{E}(S, \{X\}, \{\mean{N}\}).
+    \end{equation}
+    The right hand side gives
+    \begin{equation}
+        \diffp{}{b}\mean{E}(bS, \{bX\}, \{b\mean{N}\}) \bigg\vert_{b=1} = S\diffp{\mean{E}}{S} + \sum_{\gamma} X_\gamma\diffp{\mean{E}}{X_\gamma} + \sum_{\alpha} \mean{N_{\alpha}} \diffp{\mean{E}}{\mean{N_\alpha}}.
+    \end{equation}
+    Recognising \(T = \diffp{\mean{E}}{S}\), \(f_\gamma = \diffp{\mean{E}}{X_\gamma}\), and \(\mu_\alpha = \diffp{\mean{E}}{\mean{N_\alpha}}\) from \cref{eqn:T P chem potential from mean E derivatives,eqn: f = dE/dX} we have
+    \begin{equation}
+        \mean{E} = TS \sum_{\gamma} f_\gamma X_\gamma + \sum_{\alpha} \mu_\alpha \mean{N_\alpha}.
+    \end{equation}
+    
+    We can rewrite the two sums using the Gibbs free energy and the grand potential:
+    \begin{align}
+        G &= \mean{E} - TS - \sum_{\gamma} - \sum_{\gamma} f_\gamma X_\gamma = \sum_\alpha \mu_\alpha \mean{N_\alpha}\\
+        \Phi &= \mean{E} - TS - \sum_\alpha \mu_\alpha \mean{N_\alpha} = \sum_\gamma f_\gamma X_\gamma.
+    \end{align}
+    Hence 
+    \begin{equation}
+        \mean{E} = TS + G + \Phi.
+    \end{equation}
+    
+    The important thing is that we can now compute \(\mean{E}\) based solely on the assumption that this is the form of \(\mean{E}\).
+    Doing so we find that
+    \begin{equation}
+        \dl{\mean{E}} = T\dd{S} + S\dd{T} + \sum_\gamma (f_\gamma\dd{X_\gamma} + X_\gamma\dd{f_\gamma}) + \sum_\alpha (\mu_\alpha \dd{\mean{N_\alpha}} + \mean{N_\alpha}\dd{\mu_\alpha}).
+    \end{equation}
+    But from the first and second law we know that
+    \begin{equation}
+        \dl{\mean{E}} = T\dd{S} + \sum_\gamma f_\gamma\dd{X_\gamma} + \sum_\alpha \mu_\alpha \dd{\mean{N_\alpha}}.
+    \end{equation}
+    Subtracting this from the previous expression for \(\dl{\mean{E}}\) we get
+    \begin{equation}
+        0 = S\dd{T} + \sum_\gamma X_\gamma \dd{f_\gamma} + \sum_\alpha \mean{N_\alpha} \dd{\mu_\alpha}.
+    \end{equation}
+    This is the \defineindex{Gibbs-Duhem relation}.
+    It shows that the intensive variables \(T\), \(f_\gamma\), and \(\mu_\alpha\), are not independent.
+    
+    For example, in a PVT system with a single species we have
+    \begin{equation}
+        0 = S\dd{T} - V\dd{P} + \mean{N}\dd{\mu}
+    \end{equation}
+    which means that an increase in, say, the temperature must be balanced by an increase in pressure and/or decrease in the chemical potential.
+    
+    \section{Ensembles}
+    At this point we look slightly more at what we mean by an ensemble.
+    So far we have seen that maximising \(S\) subject to constraints gives the probability associated with each microstate of the system.
+    Different ensembles correspond to different sets of constraints.
+    This works well with the Bayesian view of probability.
+    In this section we will use the frequentist view.
+    
+    We can think of an ensemble as a very large number, \(M\), of the same assembly.
+    Using the frequentist definition of probability the probability of being in microstate \(i\) is given by
+    \begin{equation}
+        p_i = \lim_{M \to \infty} \frac{m_i}{M}
+    \end{equation}
+    where \(m_i\) is the number of assemblies in microstate \(i\).
+    
+    We can think of a volume being divided up into smaller pieces.
+    Although each small piece is small relative to the entire ensemble it still has a large number of particles, say on the order of Avogadro's number.
+    
+    The entire megasystem is isolated from the rest of the universe so all microstates of the megasystem are equally likely, that is the megasystem is a microcanonical ensemble.
+    If we allow the subsystems to exchange energy then each one is a canonical ensemble.
+    If we allow them to exchange particles also then each one is a grand canonical ensemble.
+    
+    It can be shown that using the Boltzmann distribution to describe the entropy of the whole system we get the Gibbs entropy as the definition of the entropy for each assembly.
+    
+    
+%    %   Appdendix
+%    \appendixpage
+%    \begin{appendices}
+%        \include{}
+%    \end{appendices}
+    
+    \backmatter
+    \renewcommand{\glossaryname}{Acronyms}
+    \printglossary[acronym]
+    \printindex
+\end{document}
