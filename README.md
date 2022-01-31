@@ -31,6 +31,10 @@ Here are all the courses I took.
 * [Methods of Mathematical Physics (MoMP)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Methods-of-Mathematical-Physics)
 * [Lagrangian Dynamics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Lagrangian-Dynamics) (s1)
 * [Quantum Theory](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Quantum-Theory)  (s1) (see also another student's notes [here](https://github.com/penguinoneshaw/PHYS11019-quantum-theory))
+* [Symmetries of Quantum Mechanics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Symmetries-of-Quantum-Mechanics) (s2)
+* [General Relativity](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/General-Relativity) (s2)
+* [Statistical Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Statistical-Physics) (s2)
+* [Modelling and Visualisation in Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Modelling-and-Visualisation-in-Physics) (s2)
 
 ### Year 3
 * [Electromagnetism](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Electromagnetism) (y)
@@ -111,6 +115,9 @@ As the main source of this material I would like to thank the following people w
 * [Dr Ingo Loa](https://www.ph.ed.ac.uk/people/ingo-loa)
 * [Dr Jenni Smillie](https://www.ph.ed.ac.uk/people/jenni-smillie)
 * [Dr Roger Horsley](https://www.ph.ed.ac.uk/people/roger-horsley)
+* [Prof John Peacock](https://www.ph.ed.ac.uk/people/john-peacock)
+* [Prof Martin Evans](https://www.ph.ed.ac.uk/people/martin-evans)
+* [Prof Davide Marenduzzo](https://www.ph.ed.ac.uk/people/davide-marenduzzo)
 
 ### Bibliography
 Some of the books I have used to help write these notes:
