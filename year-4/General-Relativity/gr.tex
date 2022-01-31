@@ -1,0 +1,881 @@
+\documentclass[fleqn]{NotesClass}
+
+\usepackage{csquotes}
+\usepackage{tensor}
+\usepackage{siunitx}
+
+% Tikz stuff
+\usepackage{tikz}
+\tikzset{>=latex}
+% external
+\usetikzlibrary{external}
+\tikzexternalize[prefix=tikz-external/]
+%\tikzexternaldisable
+% other libraries
+
+% References, should be last things loaded
+\usepackage{hyperref}  % Should be loaded second last (cleveref last)
+\colorlet{hyperrefcolor}{blue!60!black}
+\hypersetup{colorlinks=true, linkcolor=hyperrefcolor, urlcolor=hyperrefcolor}
+\usepackage[
+capitalize,
+nameinlink,
+noabbrev
+]{cleveref} % Should be loaded last
+
+% My packages
+\usepackage{mathtools}
+\usepackage{NotesBoxes}
+\usepackage{NotesMaths}
+
+% Title page info
+\title{General Relativity}
+\author{Willoughby Seago}
+\date{}
+% \subtitle{}
+% \subsubtitle{}
+
+% Highlight colour
+\definecolor{highlight}{HTML}{FFC800}
+\definecolor{my blue}{HTML}{001BEB}
+\definecolor{my red}{HTML}{EB3300}
+\definecolor{my green}{HTML}{6AEB00}
+\definecolor{my purple}{HTML}{CF00EB}
+
+% Commands
+% Maths
+\newcommand*{\dalembertian}{\mathop{\square}}
+\newcommand*{\christoffel}[3]{\tensor{\Gamma}{^{#1}_{{#2}{#3}}}}
+\newcommand*{\order}{\mathcal{O}}
+
+% Include
+\includeonly{}
+
+\begin{document}
+    \frontmatter
+    \titlepage
+    \innertitlepage{} 
+    \tableofcontents
+    \mainmatter
+    \chapter{Introduction}
+    General relativity (GR) generalises special relativity (SR).
+    SR starts with the requirement that there no preferred frame of reference, which means there is no absolute rest or motion.
+    It follows from this that there is no absolute time.
+    In SR we mostly concern ourselves with observers in uniform motion, although it is possible to treat certain accelerating cases.
+    In GR we will expand relativity to observers in arbitrary motion.
+    An implication that we shall find is that spacetime is curved and that this curvature determines particle dynamics.
+    As a sort of secondary function GR gives us a relativistic theory of gravity, which arises as the cause of the curvature in GR.
+    As the physicist John Archibald Wheeler put it
+    \begin{displayquote}
+        Matter tells spacetime how to curve, and curved spacetime tells matter how to move.
+    \end{displayquote}
+
+    \section{Preliminary Matters}
+    Greek indices, \(\mu\), \(\nu\), etc.\@ run from 0 to 3, with 0 being the time component.
+    Latin indices, \(i\), \(j\), etc.\@ run from 1 to 3, so only for the spacial components.
+    Unless stated otherwise the Einstein summation convention is in effect, meaning that we sum over repeated indices.
+    Four-vector indices must be one up and one down to be summed over whereas three-vector indices don't need to be on different levels.
+    We use the metric signature \(({+}{-}{-}{-})\), meaning that the Minkowski metric is \(\eta = \diag(1, -1, -1, -1)\).
+    
+    \chapter{Special Relativity Tools}
+    \begin{rmk}
+        For more details on special relativity see the relativity section of the notes from relativity, nuclear, and particle physics.
+    \end{rmk}
+    In special relativity (SR) we combine space and time into one object, known collectively as \defineindex{spacetime}.
+    The position and time of something are combined into a single object called an \defineindex{event}.
+    Given two events we can write the interval between them as a \defineindex{contravariant} \define{four-vector}\index{four!vector}:
+    \begin{equation}
+        \dl{x^\mu} = (\dl{x^0}, \dl{x^1}, \dl{x^2}, \dl{x^3}) = (c \dd{t}, \dl{x}, \dl{y}, \dl{z}) = (c\dd{t}, \dl{\vv{x}}).
+    \end{equation}
+    As the notation suggests we will often consider the case of this interval being infinitesimal, although this needn't always be the case.
+    
+    Given a four vector, \(\dl{x^\mu}\), we define a \defineindex{norm}, which is \defineindex{invariant}, meaning the same in all reference frames.
+    To do so we introduce a different kind of vector with lower indices, called a \defineindex{covariant} four-vector:
+    \begin{equation}
+        \dl{x_\mu} = (c\dd{t}, -\dl{x}, -\dl{y}, -\dl{z}) = (c\dd{t}, -\dl{\vv{x}}).
+    \end{equation}
+    These two quantities are related by
+    \begin{equation}
+        \dl{x^\mu} = \eta^{\mu\nu}\dl{x_\nu}, \qqand \dl{x_\mu} = \eta_{\mu\nu}\dl{x^\nu}
+    \end{equation}
+    where \(\eta\) is the Minkowski metric
+    \begin{equation}
+        \eta_{\mu\nu} = \eta^{\mu\nu} = \diag(1, -1, -1, -1).
+    \end{equation}   
+    The invariant norm that we can define from these quantities is then
+    \begin{multline}
+        \dl{x^\mu}\dl{x_\mu} = \dl{x_\mu}\dl{x^\mu} = \eta_{\mu\nu}\dl{x^\mu}\dl{x^\nu} = \eta^{\mu\nu}\dl{x_\mu}\dl{x_\nu}\\
+        = c^2\dd{t}^2 - \dl{x}^2 - \dl{y}^2 - \dl{z}^2 = c^2\dd{t}^2 - \dl{\vv{x}} \cdot \dl{\vv{x}} = c^2\dl{\tau}^2.
+    \end{multline}
+    If this is invariant and the speed of light is invariant then \(\dl{\tau}\) must also be invariant.
+    We call \(\dl{\tau}\) the \defineindex{proper time}.
+    It is the time between two events which occur at the same spacial location in some frame.
+    An alternative way to think about it is the time an observer measures on a clock that they carry with them.
+    
+    This suggests a more general scalar product for four vectors \(A^\mu\) and \(B^\mu\), defined by
+    \begin{multline}
+        A^\mu B_\mu = A_\mu B^\mu = \eta_{\mu\nu}A^\mu B^\nu = \eta^{\mu\nu} A_\mu B_\nu\\
+        = A^0B^0 - A^1B^1 - A^2B^2 - A^3B^3 = A^0B^0 - \vv{A} \cdot \vv{B}.
+    \end{multline}
+    
+    This norm is chosen so that events that are connected by a light signal, say the events \enquote{turned on the torch} and \enquote{the torch light reached the sensor} have \(\dl{x^\mu}\dl{x_\mu} = 0\).
+    Requiring that this holds for all observers is a key step in deriving the results of special relativity.
+    In order to derive these consequences we need to know how to compare events between observers by transforming between frames.
+    
+    Suppose now that an event is measured in two frames.
+    In the unprimed frame the event is \(\dl{x^\mu}\).
+    In the primed frame the event is \(\dl{x'^\mu}\).
+    Suppose that the frames are in the \defineindex{standard configuration}, meaning that both frames coincide at \(t = 0\) and the motion of the primed frame is along the \(x\)-axis of the unprimed frame at speed \(V\).
+    Before special relativity it was assumed that a Galilean transform related the two frames:
+    \begin{equation}
+        \dl{x'^\mu} = (c\dd{t'}, \dl{x'}, \dl{y'}, \dl{z'}) = (c\dd{t}, \dl{x} - V\dl{t}, \dl{y}, \dl{z}).
+    \end{equation}
+    Notice that the time component is unchanged.
+    By comparing the second component of these four-vectors and dividing by \(\dl{t}\) we get
+    \begin{equation}
+        \diff{x'}{t} = \diff{x}{t} - V.
+    \end{equation}
+    This tells us that velocities simply combine additively in a Galilean transform.
+    
+    Problems arise when we start trying to include electrodynamics.
+    One of the fundamental results of electrodynamics being that the speed of light, \(c\), is constant and independent of the observer.
+    The Galilean transformation suggests that by having the second frame move at speed \(V\) along the direction the light travels then an observer in this frame would view the speed of light as \(c - V\).
+    
+    The solution that physicists eventually settled on was that the Galilean transform is wrong, and only holds approximately when \(V \ll c\).
+    Instead we assume that the frames are related by a linear transform
+    \begin{equation}
+        c\dd{t'} = Ac\dd{t} + B\dd{x}, \qqand \dd{x'} = Cc\dd{t} + D\dd{x}.
+    \end{equation}
+    Since all motion is along the \(x\)-axis we can neglect the final two components since \(\dl{y'} = \dl{y}\) and \(\dl{z'} = \dl{z}\).
+    
+    Consider the case where the event occurs at the origin of the primed frame.
+    In this case we have \(\dl{x'} = 0\).
+    If the speed of the frame is \(V\) then we also have \(\diff{x}/{t} = V\) and \(\diff{x'}/{t'} = -V\).
+    From this it is possible to show that the transformation takes the form
+    \begin{equation}
+        \dl{x'^\mu} = \diffp{x'^\mu}{x^\nu} \dd{x^\nu} = \tensor{\Lambda}{^\mu_\nu}.
+    \end{equation}
+    Here \(\tensor{\Lambda}{^\mu_\nu}\) is a Lorentz transform, which, in the standard configuration, takes the form
+    \begin{equation}
+        \tensor{\Lambda}{^\mu_\nu} = 
+        \begin{pmatrix}
+            \gamma & -\beta\gamma & 0 & 0\\
+            -\gamma\beta & \gamma & 0 & 0\\
+            0 & 0 & 1 & 0\\
+            0 & 0 & 0 & 1
+        \end{pmatrix}
+        .
+    \end{equation}
+    Here \(\beta \coloneqq V/c\) and \(\gamma \coloneqq 1/\sqrt{1 - \beta^2}\).
+    From this we can show that \(\dl{x^\mu}\dl{x_\mu}\) is invariant under Lorentz transformations and so the proper time is a relativistic invariant.
+    
+    \subsection{Why do we Need These Upper and Lower Indices?}
+    Normally we work with an orthonormal basis, \(\{\ve{i}\}\), where we can write an arbitrary vector as
+    \begin{equation}
+        \vv{A} = A^i\ve{i}.
+    \end{equation}
+    We then extract the components by taking the scalar product with the relevant basis vectors, since by definition for orthonormal basis vectors \(\ve{i} \cdot \ve{j} = \delta_{ij}\), and so
+    \begin{equation}
+        \ve{j} \cdot \vv{A} = A^i \ve{j} \cdot \ve{i} = A^i\delta_{ji} = A^j.
+    \end{equation}
+    
+    Now suppose that \(\{\ve{i}\}\) is instead a skew basis, meaning it isn't orthonormal.
+    In this case we can still write an arbitrary vector as
+    \begin{equation}
+        \vv{A} = A^i\ve{i},
+    \end{equation}
+    but now \(\ve{i} \cdot \ve{j} \ne \delta_{ij}\) and so
+    \begin{equation}
+        \ve{j} \cdot \vv{A} = A^i\ve{j} \cdot \ve{i} \eqqcolon A_j \ne A^j
+    \end{equation}
+    where we have introduced a new type of component with lower indices which \emph{is} equal to \(\ve{j} \cdot \vv{A}\).
+    
+    We can then define an invariant quantity as
+    \begin{equation}
+        A^2 = \vv{A} \cdot \vv{A} = A^iA^j\ve{i} \cdot \ve{j} = A^iA_i.
+    \end{equation}
+    Notice here that the action of \(\ve{i} \cdot \ve{j}\) is to lower the index and so we can interpret \(\ve{i} \cdot \ve{j}\) as the metric tensor.
+    
+    \subsection{Derivatives}
+    The derivative \(\partial_\mu = \diffp{}/{x^\mu}\) is an example of a covariant four-vector.
+    Notice that the index is an upper index in the denominator, which gives a lower index in the numerator.
+    To see that this is sensible consider the scalar field \(\varphi\).
+    A change in this field is given by
+    \begin{equation}
+        \dl{\varphi} = \diffp{\varphi}{x^\mu} \dd{x^\mu} = \partial_\mu \varphi \dl{x^\mu}
+    \end{equation}
+    which is an invariant quantity, which we should expect, since the value of a scalar is invariant, and so the difference in a scalar field between two points should also be invariant.
+    
+    We can then identify
+    \begin{equation}
+        \partial_\mu = \left( \frac{1}{c}\diffp{}{t}, \grad \right)
+    \end{equation}
+    where \(\grad\) is the normal gradient as defined for three-vectors.
+    We then get the contravariant quantity
+    \begin{equation}
+        \partial^\mu = \left( \frac{1}{c}\diffp{}{t}, -\grad \right).
+    \end{equation}
+    This allows us to define an invariant operator, called the \defineindex{d'Alembertian}:
+    \begin{equation}
+        \partial_\mu\partial^\mu = \frac{1}{c^2}\diffp[2]{}{t} - \laplacian \eqqcolon \dalembertian.
+    \end{equation}
+    This same operator is sometimes denoted \(\partial^2\) or, confusingly, \(\square^2\).
+    
+    Notice that by using the d'Alembertian we can can write the wave equation as
+    \begin{equation}
+        \dalembertian u = 0 \iff \laplacian u = \frac{1}{c^2}\diffp[2]{u}{t}.
+    \end{equation}
+    
+    Let \(\vv{j}\) be a three-current and \(\rho\) the charge density.
+    Then the continuity equation is
+    \begin{equation}
+        \diffp{\rho}{t} + \div \vv{j} = 0.
+    \end{equation}
+    Defining the \define{four-current}\index{four!current}, \(J^\mu = (c\rho, \vv{j})\), we can write the continuity equation compactly as
+    \begin{equation}
+        \partial_\mu J^\mu = 0.
+    \end{equation}
+    This shows that this quantity is invariant and hence the related conserved quantity, in this case the total charge, is conserved.
+    This also applies to other types of current and density where the continuity equation holds, such as the probability current in quantum mechanics\footnote{see the notes for quantum theory, particularly the final section on relativistic quantum mechanics}.
+    
+    \section{Principle of General Covariance}
+    \begin{rmk}
+        The \enquote{covariance} in this principle and the \enquote{covariance} in vectors with lower indices are different concepts and not to be confused.
+    \end{rmk}
+    The \defineindex{principle of general covariance} is
+    \begin{important}
+        Valid laws of physics are independent of the coordinates.
+    \end{important}
+    An alternative formulation is
+    \begin{important}
+        Valid laws of physics hold for all observers.
+    \end{important}
+    
+    In practice this means that the forms of equations shouldn't change between frames.
+    To do this we apply two methods.
+    First, we can write laws in terms of four vectors (and higher rank tensors), such as the law that \(A^\mu = B^\mu\).
+    This law is naturally covariant (in the sense of the principle of general covariance, not covariant vectors, since these are contravariant vectors) since both sides of the equation transform in the same way under a Lorentz transformation, and so if it holds in one frame it holds in all frames.
+    Second, we can use invariant quantities, such as \(A^\mu B_\mu\), and \(c\) to write our equations, since all observers will agree on the value of these quantities as measured in their frames.
+    
+    For example, suppose we have a collection of particles undergoing some interaction.
+    If the momentum of the \(i\)th particle is \(\vv{p_i}\) then conservation of momentum gives us \(\sum_i \Delta\vv{p_i} = \vv{0}\).
+    This is \emph{not} covariant.
+    The natural way to generalise the momentum is to define the four-momentum through the \define{four-velocity}\index{four!velocity}, which is defined in the natural way as the proper time derivative of the position:
+    \begin{equation}
+        U^\mu \coloneqq \diffp{x^\mu}{\tau} = \gamma \diffp{x^\mu}{t} = (\gamma c, \gamma\vv{v}).
+    \end{equation}
+    The \define{four-momentum}\index{four!momentum} is then defined as
+    \begin{equation}
+        P^\mu = mU^\mu = m(\gamma c, \gamma\vv{v}).
+    \end{equation}
+    Conservation of momentum then becomes \(\sum_i \Delta P_i^\mu = 0\).
+    This is covariant since \(P_i^\mu\) is a four-vector since it is defined in terms of the four-velocity, which is a four-vector, and the mass of the particle, which is an invariant quantity.
+    Note that from this we get a natural definition for the \defineindex{relativistic three-momentum}, \(\vv{p_i} \coloneqq \gamma m\vv{v_i}\).
+    We then get two conservation laws, conservation of three-momentum, \(\sum_i \Delta \vv{p_i} = 0\), and we also have conservation of the 0 component: \(\sum_i \Delta P_i^0 = 0\).
+    
+    To see what this second conservation law means consider the proper time derivative of the four-momentum, which, for a constant mass, is related to the \define{four-acceleration}\index{four!acceleration}, \(A^\mu\):
+    \begin{equation}
+        \diff{}{\tau} P^\mu = m \diff{}{\tau} U^\mu = m A^\mu = \left( \gamma \diff{}{t}(\gamma mc), \gamma \diff{\vv{p}}{t} \right).
+    \end{equation}
+    Wishing to keep the usual definition of force as the rate of change of momentum we define the \define{four-force}\index{four!force}, \(F^\mu\), to be
+    \begin{equation}
+        F^\mu \coloneqq \diff{}{\tau} P^\mu = mA^\mu,
+    \end{equation}
+    which is the relativistic generalisation of Newton's second law.
+    
+    We now ask what the time component of \(F^\mu\) is.
+    It must satisfy
+    \begin{equation}
+        F^0 = mA^0 = \gamma \diff{}{t}(\gamma mc),
+    \end{equation}
+    which we can write in terms of the three-force, \(\vv{f}\), using the invariant quantity \(A^\mu U_\mu = 0\).
+    We can prove this in the rest frame of the particle, where \(U^\mu = (U^0, \vv{0})\), and \(\diff{\gamma}/{t} = \diff{1}/{t} = 0\) when the velocity is zero, meaning that \(A^0 = 0\).
+    It follows that in the rest frame of the particle \(A^\mu U_\mu =  0\).
+    Since this quantity is invariant this must hold in all frames.
+    
+    Hence in an arbitrary frame of reference we have
+    \begin{equation}
+        A^\mu U_\mu = \gamma c A^0 - \gamma \vv{v} \cdot \gamma \diff{}{t} (\gamma\vv{v}) = 0.
+    \end{equation}
+    From this we get
+    \begin{equation}
+        F^0 = mA^0 = \frac{\gamma}{c}\vv{v} \cdot \diff{}{t}(\gamma m\vv{v}) = \frac{\gamma}{c}\vv{v} \cdot \vv{f}.
+    \end{equation}
+    From this we get that the time component of \(F^\mu = mA^\mu\) gives us
+    \begin{equation}
+        \frac{\gamma}{c}\vv{v} \cdot \vv{f} = \gamma \diff{}{t}(\gamma m c) \implies \vv{v} \cdot \vv{f} = \diff{}{t}(\gamma mc^2).
+    \end{equation}
+    From this we can identity
+    \begin{equation}
+        \vv{v} \cdot \vv{f} = \diff{}{t}(\vv{x} \cdot \vv{f})
+    \end{equation}
+    as the rate at which work is done by a constant force, \(\vv{f}\).
+    This allows us to identify \(\gamma mc^2\) as the total energy.
+    We can then interpret the conservation law \(\sum_i \Delta P_i^0\) as conservation of energy.
+    We see that energy conservation is a natural consequence of momentum conservation when the four-momentum is \(P^\mu = (E/c, \vv{p})\).
+    
+    \chapter{From SR to GR}
+    \section{A Problem}
+    Consider an observer in arbitrary motion, that is they might be accelerating.
+    The coordinates in two different frames in SR are related by
+    \begin{equation}
+        \dl{x'^\mu} = \tensor{\Lambda}{^\mu_\nu} \dl{x^\nu}.
+    \end{equation}
+    Dividing by \(\dl{\tau}\) we get
+    \begin{equation}
+        \diff{x'^\mu}{\tau} = U'^\mu = \tensor{\Lambda}{^\mu_\nu} \diff{x^\nu}{\tau} = \tensor{\Lambda}{^\mu_\nu}U^\nu.
+    \end{equation}
+    This is all fine so far, we've simply found that the four-velocity is a four-vector in arbitrary motion.
+    The problem occurs when we consider quantities based on the second derivative of position.
+    Taking another derivative we have
+    \begin{equation}
+        A'^\mu = \diff[2]{x'^\mu}{\tau} = \diff{}{\tau}U'^\mu = \diff{}{\tau}(\tensor{\Lambda}{^\mu_\nu} U^\mu) = \tensor{\Lambda}{^\mu_\nu}\diff{}{\tau} U^\nu +  U^\nu\diff{}{\tau} \tensor{\Lambda}{^\mu_\nu} \ne \tensor{\Lambda}{^\mu_\nu}A^\nu.
+    \end{equation}
+    We see that for an observer in arbitrary motion there is no need for \(\tensor{\Lambda}{^\mu_\nu}\) to be constant and therefore the four-acceleration as defined in SR is not necessarily a four-vector.
+    
+    \section{Equivalence Principle}
+    The equivalence principle is at the heart of general relativity.
+    It is a remarkably simple observation which generalises Galileo's observation that all objects fall at the same rate.
+    
+    \subsection{Mass in Newtonian Mechanics}
+    Newton defined force as the rate of change of an objects momentum.
+    For an object with constant mass \(m_{\mathrm{i}}\), the force is therefore
+    \begin{equation}
+        \vv{F} = \diff{}{t} m_{\mathrm{i}}\vv{v} = m_{\mathrm{i}}\ddot{\vv{x}}.
+    \end{equation}
+    Here \(m_{\mathrm{i}}\) is the \defineindex{inertial mass}\index{mass!inertial}.
+    We can think of \(m_{\mathrm{i}}\) as an objects resistance to changing its speed.
+    
+    Newton also observed that the force on an object of constant mass \(m_{\mathrm{gp}}\) due to a gravitational field is
+    \begin{equation}
+        \vv{F} = m_{\mathrm{gp}}\vv{g}
+    \end{equation}
+    where \(\vv{g}\) is the constant acceleration due to gravity and \(m_{\mathrm{gp}}\) is the \defineindex{gravitational potential mass}\index{mass!gravitational potential}.
+    We can think of \(m_{\mathrm{gp}}\) as how strongly a gravitational field can accelerate an object.
+    
+    From these two equations we can readily see that
+    \begin{equation}
+        \ddot{\vv{x}} = \frac{m_{\mathrm{gp}}}{m_{\mathrm{i}}} \vv{g}
+    \end{equation}
+    and that in order for all objects to fall at the same rate we therefore need \(m_{\mathrm{gp}}/m_{\mathrm{i}}\) to be constant, regardless of the composition of the object.
+    We can further choose our units such that \(m_{\mathrm{gp}}/m_{\mathrm{i}} = 1\).
+    
+    There is a third type of mass in Newtonian physics, also associated with gravity.
+    This is the \defineindex{active gravitational mass}\index{mass!active gravitational}, \(m_{\mathrm{ga}}\), which we can think of as the ability of an object to create a gravitational field.
+    This is defined according to the equation
+    \begin{equation}
+        \vv{g} = -\frac{Gm_{\mathrm{ga}}}{r^2}\vh{r}
+    \end{equation}
+    where \(\vv{r}\) is the vector pointing from the object generating the field to the object being attracted, \(r = \abs{\vv{r}}\), and \(\vh{r} = \vv{r}/r\).
+    \(G\) is a constant.
+    
+    Newton's third law gives \(\vv{F_{12}} = -\vv{F_{21}}\), where \(\vv{F_{ij}}\) is the force on body \(i\) due to body \(j\).
+    Adding an index \(i\) to all types of mass for object \(i\) this gives
+    \begin{equation}
+        \frac{Gm_{\mathrm{ga1}}m_{\mathrm{gp2}}}{r^2} = \frac{Gm_{\mathrm{ga2}}m_{\mathrm{gp1}}}{r^2} \implies \frac{m_{\mathrm{ga1}}}{m_{\mathrm{gp1}}} = \frac{m_{\mathrm{ga2}}}{m_{\mathrm{gp2}}} \implies m_{\mathrm{gp}} \propto m_{\mathrm{ga}}.
+    \end{equation}
+    We can further choose the value of \(G\) such that these two different gravitational masses aren't just proportional but equal.
+    We then refer to them as a single quantity the \defineindex{gravitational mass}\index{mass!gravitational}, \(m_{\mathrm{g}}\).
+    
+    \subsection{E\"otv\"os Experiment}
+    In the 1890s E\"otv\"os used a torsion balance to test the theory that \(m_{\mathrm{i}} = m_{\mathrm{g}}\).
+    In the experiment masses of different materials but the same gravitational mass, \(m_{\mathrm{g}}\), were used.
+    It was possible to ensure the masses were the same, within the tolerance of the experiment, using a spring balance.
+    The force on each mass is then the gravitational force plus the force that the balance exerts on it.
+    However, these forces don't match exactly since the balance rotates around the Earth with (very small) acceleration \(\vv{a}\).
+    The difference in force between the different objects must supply a force of \(m_{\mathrm{i}}\vv{a}\) for each mass.
+    Therefore if the inertial masses are different it will be possible to tell by measuring the force supplied to counteract the acceleration of Earth.
+    Since the Earth rotates daily \(\vv{a}\) oscillates with a period of \qty{24}{\hour}.
+    The balance would also have to oscillate with this period if the inertial masses were different.
+    
+    No such oscillations were measured and E\"otv\"os determined that gravitational and inertial masses are equal to 1 part in 20 million.
+    Modern experiments have improved this such that variations in the ratio can be no larger than \(10^{-13}\).
+    
+    \subsection{Inertial Frames}
+    Another problem with Newtonian mechanics is that \(\vv{F} = m\vv{a}\) only applies in inertial frames.
+    So, what is an inertial frame?
+    Well, its a frame in which \(\vv{F} = m\vv{a}\) applies.
+    The definition is circular, however, it is easy enough given an inertial frame to construct some noninertial frame.
+    A simple example is to have a frame accelerating at a constant acceleration \(\vv{g}\), such as if the entire frame were falling.
+    We then find that
+    \begin{equation}
+        \vv{F} = m\vv{a} + m\vv{g}.
+    \end{equation}
+    Another example is a frame rotating at angular velocity \(\vv{\omega}\), so that the point \(\vv{r}\) has linear velocity \(\vv{v}\).
+    In this frame we have
+    \begin{equation}
+        \vv{F} = m\vv{a} + m\vv{\omega} \times (\vv{\omega} \times \vv{r}) - 2m(\vv{v} \times \vv{\omega}) + m\dot{\vv{\omega}} \times \vv{r}.
+    \end{equation}	
+    
+    Both of these examples give the force as \(m\vv{a}\) plus some other forces.
+    These forces are often called \define{fictitious forces}\index{fictitious force|see{inertial force}}, but perhaps a better name is \define{inertial forces}\index{inertial force}.
+    The forces are real and their effects can be measured, there is just no observable physical cause of the forces, they arise due to the acceleration of the frame relative to some inertial frame.
+    
+    In relativity we aim to find a theory that works in all frames and therefore we must find a way to include inertial forces in our theory.
+    
+    Notice that in an inertial frame most of the mass of the universe is at rest.
+    This suggests Mach's principle:
+    \begin{important}
+        All acceleration is relative and hence the inertia of an object depends on the existence of other bodies.
+    \end{important}
+    This was an influence on Einstein when he was developing GR but the final theory of GR turned out to violate this principle entirely.
+    In particular the rest mass of an object, which is measure of its inertia, is invariant and independent of the gravitational environment that the object is in.
+    
+    The important take away is that inertial forces are proportional to the mass of the object, and so are gravitational forces, suggesting a link between inertial and gravitational forces.
+    
+    \subsection{Weak Equivalence Principle}
+    Consider a particle inside a freely-falling box in a gravitational field, \(\vv{g}\).
+    The equation of motion for the particle is
+    \begin{equation}
+        m\diff[2]{\vv{x}}{t} = m\vv{g} + \vv{F}.
+    \end{equation}
+    Here \(\vv{F}\) is the net non-gravitational force.
+    Moving to the rest frame of the box, which can be done by extending Galilean transformations in the logical way to accelerating frames, we get new primed coordinates:
+    \begin{equation}
+        \vv{x}' = \vv{x} - \frac{1}{2}\vv{g}t^2, \qqand t' = t.
+    \end{equation}
+    The equation of motion is them
+    \begin{equation}
+        m \diff[2]{\vv{x}}{t} = m\diff[2]{\vv{x}}{t} - m\vv{g} = \vv{F}.
+    \end{equation}
+    So we see that by making an appropriate transformation we have gotten rid of inertial forces.
+    
+    In terms of an observer in the box it is impossible for them to tell that the box is falling since in their frame there are no inertial forces from the falling of the box.
+    
+    \begin{rmk}
+        The assumption here is that the box is small enough that over the box \(\vv{g}\) is constant as far as any one can tell by making measurements.
+        That is \(\vv{g}\) is locally constant.
+    \end{rmk}
+    
+    This leads to the \define{weak equivalence principle}\index{equivalnce principle!weak} (WEP):
+    \begin{important}
+        At any point in spacetime in an arbitrary gravitational field it is possible to choose a freely-falling \defineindex{locally inertial frame} (LIF) in which the laws of motion are the same as if gravity were absent.
+    \end{important}
+    
+    There are actually infinitely many LIFs at any one spacetime point, related by Lorentz transformations.
+    The WEP holds only if \(m_{\mathrm{g}} = m_{\mathrm{i}}\).
+    Einstein later made a stronger claim in 1907, namely the \define{strong equivalence principle}\index{equivalence principle!strong} (SEP):
+    \begin{important}
+        In a locally inertial frame all SR laws of physics apply.
+    \end{important}
+    This essentially amounts to a claim that in a LIF the gravitational field doesn't exist.
+    
+    From now on we simply assume that the strong equivalence principle holds, and refer to it as \emph{the} \defineindex{equivalence principle} (EP).
+    The EP gives us a starting point for anything in GR, no matter what the gravitational field we can always consider a frame falling in the field and ignore the effects of the field.
+    
+    One caveat is that while we can always transform away the gravitational acceleration, \(\vv{g} = -\grad\Phi\), for some gravitational potential, \(\Phi\), it is not always possible to transform away higher derivatives simultaneously, for example the \defineindex{tidal tensor},
+    \begin{equation}
+        \diffp{\Phi}{x^i, x^j},
+    \end{equation}
+    may not vanish when \(\grad\Phi\) does.
+    By accepting the EP we are implicitly accepting the \defineindex{principle of minimal gravitational coupling}, which states that the laws of SR as deduced in a laboratory on Earth have no explicit dependence on higher order derivatives of \(\Phi\).
+    While this is not guaranteed it has never been observed to be broken.
+    
+    \section{Gravitational Time Dilation}\label{sec:gravitational time dilation}
+    As a test of our new tool the EP we will derive a remarkable property of spacetime.
+    
+    Consider an observer in a box which is accelerating upwards.
+    Suppose the box is of height \(h\) and a clock is mounted at the top of the box.
+    Attach to this clock a light source which pulses every time the clock ticks.
+    
+    If the rocket is accelerating upwards at acceleration \(g\) then the speed of the floor increases by \(v = gh/c\) in the time taken for the light to reach the floor.
+    There will then be a blueshift in the frequency of the photons such that if the photons started with frequency \(\nu\) their frequency will change by \(\Delta \nu\), which is given by
+    \begin{equation}
+        \frac{\Delta \nu}{\nu} = \frac{v}{c} = \frac{gh}{c^2}
+    \end{equation}
+    The rate at which the photons are received by an observer at the bottom of the box will increase by the same factor.
+    
+    Since the rocket can keep accelerating forever, and photons can't be stockpiled somewhere we have to conclude that, from the point of view of an observer on the floor of the box, the clock really is running fast.
+    If the rocket stops accelerating then the clock will have gained a time \(\Delta t\) compared to a clock kept on the floor of the box such that if the floor clock reads time \(t\) the ceiling clock reads \(t + \Delta t\), which is such that
+    \begin{equation}
+        \frac{\Delta t}{t} = \frac{gh}{c^2}.
+    \end{equation}
+    
+    The EP then states that the same effect must occur for a stationary box in a gravitational potential \(\Phi\).
+    In particular we can identify \(gh = \Delta \Phi\) as the difference in gravitational potential between the top and bottom of the box and we have
+    \begin{equation}
+        \frac{\Delta t}{t} = \frac{\Delta \Phi}{c^2}.
+    \end{equation}
+    
+    The effect is that clocks in a gravitational field run slower, a clock at the top of a mountain will run faster than one at the base of the mountain.
+    This effect is small but not negligible in all circumstances.
+    Famously GPS satellites have to account for it.
+    
+    \subsection{Gravity Bends Light}
+    A similar thought experiment has a beam of light crossing the accelerating box.
+    In the time taken to move across the box the box will have moved up slightly.
+    This means the light will reach the opposite wall slightly lower than if the box was stationary.
+    By the EP we then conclude that the same must happen in a gravitational field, meaning that light is bent downwards by a gravitational field.
+    
+    \chapter{GR Spacetime and Equations of Motion}
+    In special relativity the equation of motion of a free particle is
+    \begin{equation}
+        \diff[2]{x^\mu}{\tau} = 0
+    \end{equation}
+    where \(x^\mu\) is the four-position of the particle.
+    This is simply a statement that the particle isn't accelerating.
+    This statement is not covariant (in the sense of the principle of general covariance).
+    It will be our goal to come up with an equivalent statement in general relativity.
+    To do so we will use the equivalence principle.
+    
+    \section{Affine Connection}
+    Consider some freely moving particle in a gravitational field.
+    By the EP there is some locally inertial frame in which the four-position of the particle is \(\xi^\mu = (ct, \vv{x})\).
+    We can parametrise this with the proper time, \(\tau\), so that the coordinates are a function of \(\tau\), \(\xi^\mu(\tau)\).
+    In this locally inertial frame SR holds and so
+    \begin{equation}\label{eqn:LIF EOM}
+        \diff[2]{\xi^\alpha}{\tau} = 0.
+    \end{equation}
+    As well as this we have that the SR spacetime interval is
+    \begin{equation}
+        c^2 \dd{\tau}^2 = c^2\dd{t}^2 - \dl{\vv{x}} \cdot \dl{\vv{x}} = \eta_{\mu\nu}\dl{\xi^\mu}\dl{\xi^\nu}.
+    \end{equation}
+    
+    In a general frame denote the four-position of the particle by \(x^\mu\).
+    The chain rule gives
+    \begin{equation}
+        \dl{\xi^\mu} = \diffp{\xi^\mu}{x^\nu} \dd{x^\nu}.
+    \end{equation}
+    Recall that we are employing the Einstein summation convention so the right hand side is summed over \(\nu\) from 0 to 3.
+    We can also express the time derivative in terms of these arbitrary-frame coordinates:
+    \begin{equation}
+        \diff{}{\tau} = \diff{x^\mu}{\tau} \diffp{}{x^\mu}.
+    \end{equation}
+    Since \(x^\mu = x^\mu(\tau)\) is parametrised by \(\tau\) the first derivative is a total derivative whereas the second is a partial derivative because in general the function to be differentiated will be a function of all four spacetime coordinates.
+    
+    Applying this derivative to \(\xi^\alpha\) we get
+    \begin{equation}
+        \diff{\xi^\alpha}{\tau} = \diff{x^\mu}{\tau}\diffp{\xi^\alpha}{x^\mu}.
+    \end{equation}
+    We want the second proper-time derivative of \(\xi^\alpha\) since this is what appears in \cref{eqn:LIF EOM}.
+    Applying the proper-time derivative a second time and using the product rule we get
+    \begin{align}
+        0 &= \diff[2]{\xi^\alpha}{\tau}\\
+        &= \diff{}{\tau}\left( \diffp{\xi^\alpha}{x^\mu} \diff{x^\mu}{\tau} \right)\\
+        &= \diff{x^\nu}{\tau}\diffp{}{x^\nu}\left( \diffp{\xi^\alpha}{x^\mu} \diff{x^\mu}{\tau} \right)\\
+        &= \diffp{\xi^\alpha}{x^\mu}\diff[2]{x^\mu}{\tau} + \diff{x^\mu}{\tau} \diff{x^\nu}{\tau} \diffp{\xi^\alpha}{x^\mu, x^\nu}.
+    \end{align}
+    
+    We can identify \(\diff[2]{x^\mu}/{\tau}\) as the acceleration in the general frame.
+    We want this quantity on it's own in order to find the equation of motion.
+    However, we can't just divide through by \(\diffp{\xi^\alpha}/{x^\mu}\) since the \(\mu\) is summed over.
+    Instead we multiply the entire equation by \(\diffp{x^\lambda}{\xi^\alpha}\), which seems awfully like dividing by \(\diffp{\xi^\alpha}{x^\mu}\), and then we use
+    \begin{equation}
+        \diffp{\xi^\alpha}{x^\mu}\diffp{x^\lambda}{\xi^\alpha} = \diffp{x^\lambda}{x^\mu} = \tensor{\delta}{^\lambda_\mu}.
+    \end{equation}
+    We can then use \(\tensor{\delta}{^\lambda_\mu}V^\mu = V^\lambda\).
+    Doing this we have
+    \begin{align}
+        0 &= \diffp{x^\lambda}{\xi^\alpha} \diffp{\xi^\alpha}{x^\mu}\diff[2]{x^\mu}{\tau} + \diffp{x^\lambda}{\xi^\alpha} \diff{x^\mu}{\tau} \diff{x^\nu}{\tau} \diffp{\xi^\alpha}{x^\mu, x^\nu} \\
+        &= \tensor{\delta}{^\lambda_\mu} \diff[2]{x^\mu}{\tau} + \diffp{x^\lambda}{\xi^\alpha} \diff{x^\mu}{\tau} \diff{x^\nu}{\tau} \diffp{\xi^\alpha}{x^\mu, x^\nu} \\
+        &= \diff[2]{x^\lambda}{\tau} + \diff{x^\mu}{\tau} \diff{x^\nu}{\tau} \diffp{x^\lambda}{\xi^\alpha} \diffp{\xi^\alpha}{x^\mu, x^\nu} \\
+        &= \diff[2]{x^\lambda}{\tau} + \christoffel{\lambda}{\mu}{\nu} \diff{x^\lambda}{\tau} \diff{x^\nu}{\tau}.
+    \end{align}
+    This final equation is called the \defineindex{geodesic equation} and is the equation of motion for an otherwise free particle in a gravitational field.
+    We identify
+    \begin{equation}
+        \christoffel{\lambda}{\mu}{\nu} \coloneqq \diffp{x^\lambda}{\xi^\alpha}\diffp{\xi^\alpha}{x^\nu, x^\mu}.
+    \end{equation}
+    This is called the \defineindex{affine connection}\index{\(\christoffel{\lambda}{\mu}{\nu}\), affine connection} or \define{Christoffel symbol}\index{Christoffel symbol|see{affine connection}}.
+    This same quantity is sometimes denoted \(\left\{\begin{smallmatrix} \lambda\\ \mu\nu \end{smallmatrix}\right\}\).
+    Notice that due to the commutativity of partial derivatives the affine connection is symmetric in its lower indices so
+    \begin{equation}
+        \christoffel{\lambda}{\mu}{\nu} = \diffp{x^\lambda}{\xi^\alpha} \diffp{\xi^\alpha}{x^\nu, x^\mu} = \diffp{x^\lambda}{\xi^\alpha} \diffp{\xi^\alpha}{x^\mu, x^\nu} = \christoffel{\lambda}{\nu}{\mu}.
+    \end{equation}
+    For future reference the affine connection is \emph{not} a tensor.
+    
+    \subsection{Massless Particles}
+    For a massless particle we cannot use \(\dl{\tau}\) as it s zero.
+    Instead we can use \(\sigma = \xi^0\), which is \(ct\) in the LIF.
+    The exact same logic then leads us to the equation of motion
+    \begin{equation}
+        \diff[2]{x^\lambda} + \christoffel{\lambda}{\mu}{\nu} \diff{x^\mu}{\sigma} \diff{x^\nu}{\sigma} = 0.
+    \end{equation}
+    Notice that we don't need to know what \(\sigma\) or \(\tau\) is in either the massive or massless case since we have four equations here so we can eliminate \(\sigma\) or \(\tau\) and still have enough equations to find the position of the particle, \(\vv{x}\), which is what we really care about.
+    
+    The equation of motion will be the same when ever we replace \(\tau\) with an \defineindex{affine parameter} which is linearly related to \(\tau\).
+    
+    \subsection{Physical Implications}
+    The mathematics that lead to the affine connection and geodesic equation is fiddly, but not that difficult.
+    However, the physical implications of this small amount of maths are profound.
+    
+    Notice that in the arbitrary frame the four-acceleration is quadratic in the four-velocity.
+    So the gravitational force is velocity dependent.
+    Compare this to the Lorentz force, \(\vv{F} = q(\vv{E} + \vv{v} \times \vv{B})\).
+    There is a strong analogy between Newtonian gravity and non-relativistic electrostatics, namely that both follow an inverse square law.
+    If this were to extend to a relativistic theory of gravity then we would expect the existence of \define{gravomagnetic fields}\index{gravomagnetic field}, which are generated by the motion of the mass, in an analogous way to how the magnetic field can be thought of a due to the motion of charge.
+    We would also expect that gravitational effects would propagate as waves at the speed of light, and indeed we will see that this is true.
+    
+    Another even more profound implication is that spacetime is (probably) curved.
+    This is the topic of the next section.
+    
+    \section{Metric Tensor}
+    Consider the spacetime interval from SR in the LIF:
+    \begin{align}
+        c^2\dd{\tau}^2 &= \eta_{\alpha\beta}\dd{\xi^\alpha}\dd{\xi^\beta}\\
+        &= \eta_{\alpha\beta}\left( \diffp{\xi^\alpha}{x^\mu}\dd{x^\mu} \right)\left( \diffp{\xi^\beta}{x^\nu}\dd{x^\nu} \right)\\
+        &= g_{\mu\nu}\dd{x^\mu}\dd{x^\nu}.
+    \end{align}
+    Here we define the \defineindex{metric tensor}
+    \begin{equation}
+        g_{\mu\nu} \coloneqq \diffp{\xi^\alpha}{x^\mu}\diffp{\xi^\beta}{x^n\nu}\eta_{\alpha\beta}.
+    \end{equation}
+    Notice that since \(\eta_{\alpha\beta}\) is symmetric by relabelling \(\alpha \leftrightarrow \beta\) we see that \(g_{\mu\nu}\) is symmetric.
+    
+    By the equivalence principle this metric structure of space carries over to the general frame but the metric is now \(g_{\mu\nu}\), instead of the simpler \(\eta_{\mu\nu}\) of SR.
+    The existence of a nontrivial metric is a big step towards showing that spacetime is curved, but it doesn't quite prove this definitively yet.
+    Consider the example of a sphere of radius \(r\) in polar coordinates a length element on the sphere is \(\dl{l}^2 = r^2(\dl{\vartheta}^2 + \sin^2\vartheta\dl{\varphi}^2) \ne r^2(\dl{\vartheta}^2 + \dl{\varphi}^2)\), so the metric in this case is
+    \begin{equation}
+        g_{\mu\nu} = 
+        \begin{pmatrix}
+            r^2 & 0\\
+            0 & r^2\sin^2\vartheta
+        \end{pmatrix}
+        .
+    \end{equation}
+    The complexity of this is linked to the fact that the sphere is curved.
+    
+    However, consider now the plane parametrised by plane polar coordinates.
+    A line element is \(\dl{l}^2 = \dl{r}^2 + r^2\dl{\varphi}^2\).
+    The metric in this case is
+    \begin{equation}
+        g_{\mu\nu} = 
+        \begin{pmatrix}
+            1 & 0\\
+            0 & r^2
+        \end{pmatrix}
+        .
+    \end{equation}
+    But we know that the plane is flat.
+    Hence the existence of a complicated metric does not prove curvature.
+    
+    We need a way to discuss curvature independent of the coordinate choice, only then can we be sure that spacetime is truly curved, rather than just using coordinates in which the metric looks complicated.
+    We will do this later in the course.
+    
+    \subsection{The Metric and Gravity}
+    Currently the metric and affine connection are expressed as a relation between coordinates in two frames.
+    We will now show that they can be expressed entirely in terms of a single frame in such a way that the metric determines the affine connection.
+    This means that the metric determines particle dynamics and since the only force on the particle is gravity we can identify the metric tensor as a measure of gravity.
+    
+    First recall that
+    \begin{equation}
+        g_{\mu\nu} = \diffp{\xi^\alpha}{x^\mu}\diffp{\xi^\beta}{x^\nu}\eta_{\alpha\beta}.
+    \end{equation}
+    The affine connection has second order derivatives so we differentiate the metric:
+    \begin{equation}
+        \diffp{g_{\mu\nu}}{x^\lambda} = \diffp{\xi^\alpha}{x^\lambda, x^\mu} \diffp{\xi^\beta}{x^\nu} \eta_{\alpha\beta} + \diffp{\xi^\alpha}{x^\mu}\diffp{\xi^\alpha}{x^\lambda, x^\nu} \eta_{\alpha\beta}.
+    \end{equation}
+    Recall that the Minkowski metric, \(\eta_{\alpha\beta}\), is constant.
+    
+    Now consider the definition of the affine connection:
+    \begin{equation}
+        \christoffel{\lambda}{\mu}{\nu} = \diffp{x^\lambda}{\xi^\alpha} \diffp{\xi^\alpha}{x^\nu, x^\mu}.
+    \end{equation}
+    We can see that this term almost appears in the derivative of the metric tensor but in this we have terms like \(\diffp{\xi^\alpha}/{x^\mu}\), which is the wrong way compared to the \(\diffp{x^\lambda}{x^\alpha}\) in the affine connection and the indices don't quite match.
+    We can get around this by multiplying by \(\diffp{\xi^\alpha}{x^\lambda}\) to get a derivative that does match:
+    \begin{equation}
+        \diffp{\xi^\alpha}{x^\lambda} \christoffel{\lambda}{\mu}{\nu} = \diffp{\xi^\alpha}{\lambda} \diffp{x^\lambda}{x^\alpha} \diffp{\xi^\alpha}{x^\nu, x^\mu}.
+    \end{equation}
+    We can then identify this term in the derivative of the metric:
+    \begin{align}
+        \diffp{g_{\mu\nu}}{x^\lambda} &= \christoffel{\rho}{\lambda}{\mu} \diffp{\xi^\alpha}{x^\rho} \diffp{\xi^\beta}{x^\nu} \eta_{\alpha\beta} + \christoffel{\rho}{\lambda}{\nu} \diffp{\xi^\alpha}{x^\mu} \diffp{\xi^\beta}{x^\rho} \eta_{\alpha\beta}\\
+        &= \christoffel{\rho}{\lambda}{\mu} g_{\rho\nu} + \christoffel{\rho}{\nu}{\lambda} g_{\mu\rho}.\label{eqn:christoffel in terms of metric 1}
+    \end{align}
+    Here we have recognised the metric tensor appearing after substituting in the derivative-times-a-Christoffel-symbol.
+    
+    We are free to relabel the free indices as long as we are consistent.
+    Exchanging \(\mu\) and \(\lambda\) we have
+    \begin{equation}
+        \diffp{g_{\lambda\nu}}{x^\mu} = \christoffel{\rho}{\mu}{\lambda} g_{\rho\nu} + \christoffel{\rho}{\lambda}{\nu} g_{\lambda\rho}.\label{eqn:christoffel in terms of metric 2}
+    \end{equation}
+    Notice that in the first term on the right hand side \(\christoffel{\rho}{\mu}{\lambda} = \christoffel{\rho}{\lambda}{\mu}\) by the symmetry of the affine connection in the lower indices.
+    Instead exchanging \(\nu\) and \(\lambda\) we get
+    \begin{equation}
+        \diffp{g_{\mu\lambda}}{x^\nu} = \christoffel{\rho}{\nu}{\mu} g_{\rho \lambda} + \christoffel{\rho}{\nu}{\lambda} g_{\mu\rho}.\label{eqn:christoffel in terms of metric 3}
+    \end{equation}
+    Adding \cref{eqn:christoffel in terms of metric 1,eqn:christoffel in terms of metric 2} and subtracting \cref{eqn:christoffel in terms of metric 3} we get
+    \begin{equation}
+        \diffp{\gamma_{\mu\nu}}{x^\lambda} + \diffp{g_{\lambda\nu}}{x^\mu} - \diffp{g_{\mu\lambda}}{x^\nu} = 2\christoffel{\rho}{\lambda}{\mu}g_{\rho\nu}.
+    \end{equation}
+    
+    We now define the inverse of the metric tensor to be \(g^{\mu\nu}\) which is such that
+    \begin{equation}
+        g^{\mu\nu}g_{\nu\lambda} = \tensor{\delta}{^\mu_\lambda}.
+    \end{equation}
+    We then have
+    \begin{align}
+        \christoffel{\sigma}{\lambda}{\mu} &= \frac{1}{2}g^{\nu\sigma} \left( \diffp{g_{\mu\nu}}{x^\lambda} + \diffp{g_{\lambda\nu}}{x^\mu} - \diffp{g_{\mu\lambda}}{x^\nu} \right)\\
+        &= \frac{1}{2}g^{\nu\sigma} (\partial_\lambda g_{\mu\nu} + \partial_\mu g_{\lambda\nu} - \partial_\nu g_{\mu\lambda}).
+    \end{align}
+    
+    We see that the affine connection, and hence the geodesic equation and the motion of the particle, depends on gradients of \(g_{\mu\nu}\).
+    This justifies us describing \(g_{\mu\nu}\) as gravitational potentials.
+    Notice that there are 10 potentials instead of the single gravitational in Newtonian gravity.
+    There are 10 since \(g_{\mu\nu}\) has \(4\times 4 = 16\) components but setting the upper right triangle fixes the lower left triangle as \(g_{\mu\nu}\) is symmetric, and so there are \(16 - 6 = 10\) free components.
+    
+    If we have \(\gamma_{\mu\nu}\) as a function of position then we can, in theory, solve the geodesic equation for the motion of the particle.
+    If there is some symmetry to the problem there are often simpler approaches, but in general the metric contains all of the information we need.
+    So the only question left is where does the metric come from?
+    The answer is that it is a solution to Einstein's field equations, which we will see later.
+    
+    Note that the inverse metric, \(g^{\mu\nu}\), also forms a metric structure in the sense that
+    \begin{equation}
+        c^2\dd{\tau}^2 = g^{\mu\nu}\dd{x_\mu}\dd{x_\nu} = g_{\mu\nu}\dd{x^\mu}\dd{x^\nu}.
+    \end{equation}
+
+    \chapter{Consequences of the Geodesic Equation}
+    \section{Newtonian Limit}
+    In this section we will consider the Newtonian limit of the geodesic equation.
+    That is we assume that the three-velocity of the particle, \(\vv{v}\), is such that \(v \ll c\).
+    We also assume that the gravitational field is weak and stationary, meaning that any time derivatives disappear (but not proper time derivatives).
+    In full the geodesic equation is
+    \begin{equation}
+        \diff[2]{x^\lambda}{\tau} + \christoffel{\lambda}{\mu}{\nu} \diff{x^\mu}{\tau} \diff{x^\nu}{\tau} = 0.
+    \end{equation}
+    In the Newtonian limit \(\diff{x^i}/{\tau}\) is small compared to \(c\diff{t}/{\tau}\) and so dropping terms where \(\diff{x^i}/{\tau}\) appears we get
+    \begin{equation}
+        \diff[2]{x^\lambda}{\tau} + \christoffel{\lambda}{0}{0} c^2 \left( \diff{t}{\tau} \right)^2 \approx 0.
+    \end{equation}
+    
+    For a stationary field \(\diffp{g_{\mu\nu}}{t} = 0\) and so
+    \begin{equation}
+        \christoffel{\lambda}{0}{0} = \frac{1}{2}g^{\mu\nu} \left( \partial_0 g_{0\nu} + \partial_0 g_{0\nu} - \partial_\nu g_{00} \right) = -\frac{1}{2}g^{\mu\nu}\partial_\nu g_{00}.
+    \end{equation}
+    
+    We can always write
+    \begin{equation}
+        g_{\mu\nu} = \eta_{\mu\nu} + h_{\mu\nu}
+    \end{equation}
+    for some \(h_{\mu\nu}\).
+    The assumption that the gravitational field is weak means that \(\abs{h_{\mu\nu}} \ll 1\), that is the components of \(h\) are small compared to the components of \(\eta\).
+    We therefore have
+    \begin{align}
+        \christoffel{\lambda}{0}{0} &= -\frac{1}{2}g^{\mu\nu}\partial_\nu g_{00}\\
+        &= -\frac{1}{2}(\eta^{\lambda\nu} + h^{\lambda\nu})\partial_\nu(\eta_{00} + h_{00})\\
+        &= -\frac{1}{2} \eta^{\lambda\nu} \partial_\nu h_{00} - \frac{1}{2} h^{\lambda\nu} \partial_\nu h_{00}\\
+        &= -\frac{1}{2} \eta^{\lambda\nu} \partial_\nu h_{00} + \order(h^2).
+    \end{align}
+    For a stationary field \(\partial_0 h_{00} = 0\) and so
+    \begin{equation}
+        \christoffel{i}{0}{0} = -\frac{1}{2}\eta^{ij}\partial_j h_{00}
+    \end{equation}
+    and \(\christoffel{0}{0}{0} = 0\).
+    We then have
+    \begin{equation}
+        \eta^{ij}\partial_j = \partial^i = -\partial_j.
+    \end{equation}
+    The geodesic equation in this approximation is then reduced to
+    \begin{equation}
+        \diff[2]{x^\lambda}{\tau} + \frac{1}{2} c^2 \left( \diff{t}{\tau} \right)^2 \diffp{h_{00}}{x^\lambda}.
+    \end{equation}
+    Considering just the spatial parts we can write this as a three-vector equation:
+    \begin{equation}\label{eqn:newtonian limit of geodesic}
+        \diff[2]{\vv{x}}{\tau} = -\frac{1}{2}c^2 \left( \diff{t}{\tau} \right)^2 \grad h_{00}.
+    \end{equation}
+    The time component is
+    \begin{equation}
+        \diff[2]{x^0}{\tau} = 0
+    \end{equation}
+    since \(\christoffel{0}{0}{0}\) vanishes.
+    The solution to this is \(\dl{t} = A\dd{\tau}\) for some constant \(A\).
+    Substituting \(\dl{t}/A\) for \(\dl{\tau}\) in \cref{eqn:newtonian limit of geodesic} we get
+    \begin{equation}
+        A^2\diff[2]{\vv{x}}{t} = -\frac{1}{2}c^2\left( A\diff{t}{t} \right)^2 \grad h_{00} \implies \diff[2]{\vv{x}}{t} = -\frac{1}{2}c^2 \grad h_{00}.
+    \end{equation}
+    
+    Compare this to the Newtonian equation of motion in a gravitational field, which is \(\diff[2]{\vv{x}}{t} = -\grad \Phi\), where \(\Phi\) is the gravitational field and so \(-\grad \Phi\) is the acceleration due to gravity.
+    We see that
+    \begin{equation}
+        h_{00} = \frac{2\Phi}{c^2} + C.
+    \end{equation}
+    Here \(C\) is some constant.
+    It is conventional to assume that fields vanish at infinity in which case at infinity we should have \(g_{\mu\nu} \to \eta_{\mu\nu}\) and so \(h_{\mu\nu} \to 0\), meaning \(C = 0\).
+    Therefore in the weak field limit we have
+    \begin{equation}
+        g_{00} = 1 + \frac{2\Phi}{c^2}.
+    \end{equation}
+    This is only one of the \enquote{potentials} which contributes.
+    In general all 10 independent components of \(g_{\mu\nu}\) contribute to the affine connection and hence the geodesic equation and particle dynamics.
+    
+    \section{Gravitational Time Dilation}
+    The fact that \(g_{00}\) is not 1 relates to our earlier discovery of gravitational time dilation in \cref{sec:gravitational time dilation}.
+    
+    Consider a particle carrying a clock, this clock defines the proper time elapsed in the particles rest frame.
+    We know that the proper time is given by
+    \begin{equation}
+        c^2\dd{\tau}^2 = g_{\mu\nu}\dd{x^\mu}\dd{x^\nu}.
+    \end{equation}
+    For a stationary clock \(\dl{x^i} = 0\) and so
+    \begin{equation}
+        c^2\dd{\tau}^2 = g_{00}c^2\dd{t^2}.
+    \end{equation}
+    We therefore have
+    \begin{equation}
+        \dl{\tau} = \sqrt{g_{00}} \dd{t}.
+    \end{equation}
+    Therefore for a clock in a gravitational field, in the Newtonian limit, we have
+    \begin{equation}
+        \dl{\tau} \approx \sqrt{1 + \frac{2\Phi}{c^2}} \dd{t} \approx \left( 1 + \frac{\Phi}{c^2} \right)\dd{t}
+    \end{equation}
+    where we have used the binomial expansion to expand the square root.
+    
+    From this we see that the proper time and coordinate time coincide only if there is no gravitational field.
+    The coordinates \(x^\mu = (xt, \vv{x})\) are considered to be global and hence we can determine the spacetime interval between any two events.
+    Further this interval will be agreed upon by any observer in any frame.
+    We can therefore consider \(\dl{t}\) to be the time elapsed on a stationary clock at infinity, where \(\Phi = 0\).
+    From the perspective of this observer the clock in the gravitational well, which is measuring the proper time, \(\dl{\tau}\), runs slow since \(\Phi < 0\) and so \(1 + \Phi/c^2 < 1\).
+    This difference in clock speed is exactly the same as the difference computed using the equivalence principle.
+    
+    \subsection{Gravitational Redshift}
+    As well as gravitational time dilation we argued that the equivalence principle leads to gravitational redshifting.
+    We can explain this also using the Newtonian limit of the geodesic equation.
+    
+    Consider a stationary light emitter at \(\vv{x}_{\mathrm{e}}\) and a stationary observer at \(\vv{x}_{\mathrm{o}}\).
+    Suppose that the time between peaks of the EM radiation emitted is \(\dl{t_{\mathrm{e}}}\), that is if one peak is emitted at time \(t_{\mathrm{e}}\) the next peak is emitted at \(t_{\mathrm{e}} + \dl{t_{\mathrm{e}}}\).
+    This means \(\dl{t_{\mathrm{e}}}\) is the period of the radiation.
+    This light signal propagates at the speed of light.
+    The two peaks arrive at the observer at times \(t_{\mathrm{o}}\) and \(t_{\mathrm{o}} + \dl{t_{\mathrm{o}}}\).
+    That is the observer measures the period of the radiation to be \(\dl{t_{\mathrm{o}}}\).
+    
+    Radiation must follow the \defineindex{null trajectory}, where \(\dl{\tau} = 0\).
+    For a time independent metric we can write the time interval \(t_{\mathrm{o}} - t_{\mathrm{e}}\) as
+    \begin{equation}
+        t_{\mathrm{o}} - t_{\mathrm{e}} = \int f(x) \dd{x}
+    \end{equation}
+    for some function \(f\) of the spatial coordinates and the metric.
+    Since the metric is time independent this coordinate time interval must be the same for all journeys and so \(\dl{t_{\mathrm{e}}} = \dl{t_{\mathrm{o}}} = \dl{t}\).
+    Writing this in terms of proper time intervals in both frames we have
+    \begin{equation}
+        \dl{t} = \frac{\dl{\tau}}{\sqrt{g_{00}}} = \frac{\dl{\tau_{\mathrm{e}}}}{g_{00}(\vv{x}_{\mathrm{e}})} = \frac{\dl{\tau_{\mathrm{o}}}}{\sqrt{g_{00}(\vv{x}_{\mathrm{o}})}}.
+    \end{equation}
+    Rearranging this we have
+    \begin{equation}
+        \diff{\tau_{\mathrm{e}}}{\tau_{\mathrm{o}}} = \sqrt{\frac{g_{00}(\vv{x}_{\mathrm{e}})}{\vv{x}_{\mathrm{o}}}}.
+    \end{equation}
+    
+    This is the ratio of emitted and observed periods and so is the ratio of observed and emitted frequencies, that is
+    \begin{equation}
+        \diff{\tau_{\mathrm{e}}}{\tau_{\mathrm{o}}} = \frac{\nu_{\mathrm{o}}}{\nu_{\mathrm{e}}}.
+    \end{equation}
+    In the Newtonian limit we therefore have
+    \begin{equation}
+        \frac{\nu_{\mathrm{o}}}{\nu_{\mathrm{e}}} \approx \sqrt{\frac{1 + 2\Phi_{\mathrm{o}}/c^2}{1 + 2\Phi_{\mathrm{e}}/c^2}} \approx 1 + \frac{\Phi_{\mathrm{e}}}{c^2} - \frac{\Phi_{\mathrm{o}}}{c^2}
+    \end{equation}
+    where \(\Phi_{\mathrm{e}}\) and \(\Phi_{\mathrm{o}}\) are the gravitational potentials at the emitter and observer, respectively.
+    
+    Defining the \defineindex{gravitational redshift}, \(z_{\mathrm{grav}}\), such that \(1 + z_{\mathrm{grav}} = \nu_{\mathrm{o}}/\nu_{\mathrm{e}}\) we see that
+    \begin{equation}
+        z_{\mathrm{grav}} \approx \frac{\Phi_{\mathrm{e}} - \Phi_{\mathrm{o}}}{c^2}.
+    \end{equation}
+    
+%    %   Appdendix
+%    \appendixpage
+%    \begin{appendices}
+%        \include{}
+%    \end{appendices}
+    
+    \backmatter
+    \renewcommand{\glossaryname}{Acronyms}
+    \printglossary[acronym]
+    \printindex
+\end{document}
