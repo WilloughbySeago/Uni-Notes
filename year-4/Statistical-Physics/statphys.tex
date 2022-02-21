@@ -1,5 +1,7 @@
 \documentclass[fleqn]{NotesClass}
 
+\strictpagecheck
+
 \usepackage{siunitx}
 \usepackage{csquotes}
 
@@ -27,6 +29,8 @@ noabbrev
 \usepackage{NotesBoxes}
 \usepackage{NotesMaths}
 
+\diffdef{p}{long-var-wrap=dv}
+
 % Title page info
 \title{Statistical Physics}
 \author{Willoughby Seago}
@@ -47,6 +51,12 @@ noabbrev
 \newcommand*{\cpartition}{Z_{\mathrm{c}}}
 \newcommand*{\gcpartition}{\mathcal{Z}_{\mathrm{gc}}}
 \newcommand*{\e}{\mathrm{e}}
+\newcommand*{\order}{\mathcal{O}}
+\newcommand*{\ident}{I}
+\newcommand*{\hermit}{\dagger}
+\DeclareMathOperator{\tr}{tr}
+\undef\Re
+\DeclareMathOperator{\Re}{Re}
 
 % Include
 \includeonly{}
@@ -279,6 +289,7 @@ noabbrev
         S = -k\sum_{i=1}^{2^B} \frac{1}{2^{B}} \ln \frac{1}{2^{B}} = k\sum_{i=1}^{2^B} \frac{1}{2^B}\ln 2^B = k2^B\frac{1}{2^B}\ln 2^B = k\ln 2^B = Bk\ln 2
     \end{equation}
     and so the choice of \(k = 1/\ln 2\) gives the missing information as \(S = B\), which is measured in bits.
+    In this case we call this the \define{Shannon entropy}\index{entropy!Shannon}.
     
     On the other hand in statistical mechanics we typically take \(k = \boltzmann\), which has units of \([\boltzmann] = [\mathrm{energy}]/[\mathrm{temperature}]\), most commonly \unit{\joule \per \kelvin}.
     This gives
@@ -965,6 +976,986 @@ noabbrev
     If we allow them to exchange particles also then each one is a grand canonical ensemble.
     
     It can be shown that using the Boltzmann distribution to describe the entropy of the whole system we get the Gibbs entropy as the definition of the entropy for each assembly.
+    
+    \chapter{Fluctuations}
+    \section{Energy Fluctuations}
+    Consider a canonical ensemble.
+    The internal energy fluctuates randomly about the mean value, \(\mean{E}\).
+    In the thermodynamic limit we expect these fluctuations to vanish and we get a sharply defined mean energy, which we take to be \emph{the} energy.
+    For a canonical ensemble we can express the mean energy as
+    \begin{align}
+        \mean{E} &= \sum_i p_iE_i\\
+        &= \frac{1}{\cpartition} \sum_i E_i\e^{-\beta E_i}\\
+        &= \frac{1}{\cpartition} \sum_i \diffp{}{\beta} \e^{-\beta E_i}\\
+        &= \frac{1}{\cpartition} \diffp{}{\beta} \sum_i \e^{-\beta E_i}\\
+        &= \frac{1}{\cpartition} \diffp{\cpartition}{\beta}\\
+        &= -\diffp{}{\beta} \ln \cpartition.
+    \end{align}
+    We will soon see that being able to write thermodynamic variables as \enquote{logarithmic derivatives} of the partition function, by which we mean derivatives of the log of the partition function, is a useful way to write things.
+    
+    We wish to estimate the size of the fluctuation.
+    To do this we consider the heat capacity at constant volume, \(C_V\):
+    \begingroup
+    \allowdisplaybreaks
+    \begin{align}
+        C_V &\coloneqq \diffp{\smash{\mean{E}}}{T}[V]\\
+        &\hphantom{:}= \diff{\beta}{T}\diffp{\mean{E}}{\beta}\\
+        &\hphantom{:}= -\frac{1}{\boltzmann T^2} \diffp{}{\beta}\left( -\frac{1}{\cpartition} \diffp{\cpartition}{\beta} \right)\\
+        &\hphantom{:}= -\frac{1}{\boltzmann T^2} \left[ -\frac{1}{\cpartition} \diffp[2]{\cpartition}{\beta} + \frac{1}{\cpartition^2} \left( \diffp{\cpartition}{\beta} \right)^2 \right]\\
+        &\hphantom{:}= -\frac{1}{\boltzmann T^2} \left[ -\frac{1}{\cpartition} \diffp[2]{}{\beta} \sum_i \e^{-\beta E_i} + \left( \frac{1}{\cpartition} \diffp{\cpartition}{\beta} \right)^2 \right]\\
+        &\hphantom{:}= -\frac{1}{\boltzmann T^2} \left[ -\frac{1}{\cpartition}\sum_i E_i^2\e^{-\beta E_i} + (-\mean{E})^2 \right]\\
+        &\hphantom{:}= -\frac{1}{\boltzmann T^2} \left[ -\sum_i E_i^2p_i + \mean{E}^2 \right]\\
+        &\hphantom{:}= -\frac{1}{\boltzmann T^2} \left[ -\mean{E^2} + \mean{E}^2 \right]\\
+        &\hphantom{:}= \frac{1}{\boltzmann T^2} \left[ \mean{E}^2 - \mean{E^2} \right].
+    \end{align}
+    \endgroup
+    Considering the fluctuation of microstate \(i\) from the mean, \(\Delta E_i \coloneqq E_i - \mean{E}\), we get that the mean-square fluctuation is
+    \begin{align}
+        \mean{\Delta E^2} &\coloneqq \sum_i \Delta E_i^2 p_i\\
+        &\hphantom{:}= \sum_i (E_i - \mean{E})^2p_i\\
+        &\hphantom{:}= \sum_i (E_i^2 + \mean{E}^2 - 2E_i\mean{E})p_i\\
+        &\hphantom{:}= \sum_i E_i^2p_i + \mean{E}^2\sum_i p_i - 2\mean{E}\sum_i E_ip_i\\
+        &\hphantom{:}= \mean{E^2} + \mean{E}^2 - 2\mean{E}^2\\
+        &\hphantom{:}= \mean{E^2} - \mean{E}^2.
+    \end{align}
+    
+    Comparing this to our result for \(C_V\) we see that the root-mean-square fluctuation is
+    \begin{equation}
+        \Delta E_{\mathrm{rms}} \coloneqq \sqrt{\mean{\Delta E^2}} = \sqrt{\boltzmann T^2 C_V}.
+    \end{equation}
+    This quantity is extensive and scales with the total energy of the system.
+    It is more useful to consider a measure of \emph{relative} fluctuation size.
+    Normalising by the mean energy we have
+    \begin{equation}
+        \frac{\Delta E_{\mathrm{rms}}}{\mean{E}} = \frac{\sqrt{\boltzmann T^2C_V}}{\mean{E}} \sim \frac{\sqrt{N}}{N} = \frac{1}{\sqrt{N}}.
+    \end{equation}
+    Hence as the size of the system increases the size of the relative fluctuations vanishes.
+    This ratio, of the standard deviation divided by the mean, is called the \defineindex{coefficient of variation}.
+    For a system of one mole we have \(N \approx 10^{24}\) and so the coefficient of variation is approximately \(10^{-12}\).
+    This fluctuation size is far lower than can be detected by experiments on this scale and so for all intents and purposes the energy is fixed at \(\mean{E}\).
+    If the total energy isn't fluctuating then we expect the canonical ensemble to behave exactly like the microcanonical ensemble in this limit.
+    
+    \section{Magnetic Fluctuations}
+    As a second example consider a system in an external magnetic field, \(\vv{H}\).
+    The energy of a microstate is then given by the normal energy without the field, minus the decrease in energy due to the systems magnetisation aligning with the external field.
+    If the magnetisation of system in microstate \(i\) is \(\vv{M}_i\) then this contribution is \(\mu_0\vv{M}_i \cdot \vv{H}\) and so
+    \begin{equation}
+        E_i(\vv{H}) = E_i(\vv{H} = \vv{0}) - \mu_0\vv{M}_i \cdot \vv{H}.
+    \end{equation}
+    For simplicity we will now only consider the one dimensional case, so \(\vv{M}_i\cdot\vv{H}\) becomes \(M_iH\).
+    
+    Following similar logic to the energy case we have
+    \begin{align}
+        \mean{M} &\coloneqq \sum_i p_iM_i\\
+        &\hphantom{:}= \frac{1}{\cpartition} \sum_i M_i \e^{-\beta E_i(H)}\\
+        &\hphantom{:}= \frac{1}{\cpartition} \sum_i M_i \exp[-\beta(E_i(H = 0) - \mu_0 M_i H)]\\
+        &\hphantom{:}= \frac{1}{\cpartition} \sum_i \frac{1}{\beta \mu_0} \diffp{}{H} \exp[-\beta(E_i(H = 0) - \mu_0 M_i H)]\\
+        &\hphantom{:}= \frac{1}{\cpartition} \frac{1}{\beta \mu_0} \diffp{}{H} \sum_i \exp[-\beta(E_i(H = 0) - \mu_0 M_i H)]\\
+        &\hphantom{:}= \frac{1}{\cpartition} \frac{1}{\beta \mu_0} \diffp{\cpartition}{H}\\
+        &\hphantom{:}= \frac{1}{\beta \mu_0} \diffp{}{H} \ln \cpartition.
+    \end{align}
+    
+    It can then be shown that
+    \begin{equation}
+        \mean{\Delta M^2} = \frac{\boltzmann T}{\mu_0} \chi
+    \end{equation}
+    where \(\chi\) is the isothermal magnetic susceptibility, defined as
+    \begin{equation}
+        \chi \coloneqq \diffp{\smash{M}}{H}[T, V].
+    \end{equation}
+    
+    \section{Density Fluctuations}
+    Now consider grand canonical ensemble and consider the fluctuation of the number of particles.
+    First notice that we can write \(\mean{N}\) as
+    \begin{align}
+        \mean{N} &\coloneqq \sum_{i, N} p_{iN}N\\
+        &\hphantom{:}= \frac{1}{\gcpartition} \sum_{i, N} N\e^{-\beta(E_{iN} - \mu N)}\\
+        &\hphantom{:}= \frac{1}{\gcpartition} \sum_{i, N} \frac{1}{\beta}\diffp{}{\mu} \e^{-\beta(E_{iN} - \mu N)}\\
+        &\hphantom{:}= \frac{1}{\beta} \frac{1}{\gcpartition} \diffp{}{\mu} \sum_{i, N} \e^{-\beta(E_{iN} - \mu N)}\\
+        &\hphantom{:}= \frac{1}{\beta} \frac{1}{\gcpartition} \diffp{\gcpartition}{\mu} = \frac{1}{\beta} \diffp{}{\mu} \ln \gcpartition.
+    \end{align}
+    
+    Recall that in the grand canonical ensemble we have \(\Phi = -\boltzmann T\ln\gcpartition\).
+    This allows us to write
+    \begin{equation}
+        \mean{N} = -\diffp{\Phi}{\mu}[T, V].
+    \end{equation}
+    We can also write
+    \begin{align}
+        \diffp{\smash{\mean{N}}}{\mu}[T,V] &= \frac{1}{\beta} \diffp[2]{}{\mu}\ln\gcpartition\\
+        &= \frac{1}{\beta} \left[ \frac{1}{\gcpartition}\diffp[2]{\gcpartition}{\mu} - \frac{1}{\gcpartition^2}\left( \diffp{\gcpartition}{\mu} \right)^2 \right]\\
+        &= \beta[\mean{N^2} - \mean{N}^2].
+    \end{align}
+    Hence,
+    \begin{equation}
+        \mean{\Delta N^2} = \boltzmann T \diffp{\smash{\mean{N}}}{\mu}[T,V].
+    \end{equation}
+    This is extensive and so it follows that
+    \begin{equation}
+        \frac{\Delta N_{\mathrm{rms}}}{\mean{N}} = \frac{\sqrt{\mean{\Delta N^2}}}{\mean{N}} \sim \frac{1}{\sqrt{\mean{N}}}
+    \end{equation}
+    and so the fluctuations again vanish in the thermodynamic limit.
+    Therefore in this limit we expect the grand canonical ensemble to behave like the canonical ensemble, which we have already shown behaves like a microcanonical ensemble in this limit.
+    
+    It is possible to rewrite this result in terms of the isothermal compressibility, \(\kappa_T\), which is somewhat analogous to \(C_V\), and is defined as
+    \begin{equation}
+        \kappa_T \coloneqq -\frac{1}{v} \diffp{v}{P}[T] = -\frac{1}{V}\diffp{V}{P}[T, \mean{N}]
+    \end{equation}
+    where \(v = V/\mean{N} = 1/\rho\) is the volume per particle.
+    It can then be shown that
+    \begin{equation}
+        \diffp{\mean{N}}{\mu}[T,V] = \rho \kappa_T \mean{N}.
+    \end{equation}
+    From which it again follows that
+    \begin{equation}
+        \frac{\Delta N_{\mathrm{rms}}}{\mean{N}} = \sqrt{\frac{\boltzmann T \rho \kappa_T}{\mean{N}}} \sim \frac{1}{\sqrt{\mean{N}}}.
+    \end{equation}
+    
+    \section{General Theory}
+    We can now formulate our observations above into a general procedure for some observable, \(A\), with conjugate field \(f\), which play the roles of the magnetisation and magnetic field respectively.
+    If in microstate \(i\) the observable takes the value \(A_i\) then the energy can be written as
+    \begin{equation}
+        E_i(f) = E_i(f = 0) - fA_i.
+    \end{equation}
+    In the canonical ensemble we then have
+    \begin{equation}
+        \beta\mean{A} = \diffp{}{f}\ln \cpartition,
+    \end{equation}
+    which follows exactly the same derivation as used for \(\mean{M}\).
+    We can then define the generalised susceptibility, which we call the \defineindex{response function}:
+    \begin{equation}
+        \chi_{AA} = \diffp{\mean{A}}{f}
+    \end{equation}
+    and it can be shown that
+    \begin{equation}
+        \mean{\Delta A^2} = \frac{\chi_{AA}}{\beta}.
+    \end{equation}
+    The double subscript \(A\) on \(\chi_{AA}\) denotes that this is the response of \(A\) in a change to the conjugate field to \(A\).
+    This notation suggests that we may also consider the response of \(A\) due to a change in the conjugate field to some other observable, \(B\), and then define the response function \(\chi_{AB}\), but we won't do so here.
+    
+    In general \(\chi_{AA}\) will be extensive and therefore
+    \begin{equation}
+        \frac{\Delta A_{\mathrm{rms}}}{\mean{N}} = \frac{\sqrt{\mean{\Delta A^2}}}{\mean{N}} \sim \frac{1}{\sqrt{N}}.
+    \end{equation}
+    We therefore expect fluctuations in \(A\) to vanish in the large \(\mean{N}\) limit.
+    
+    The only time that there may be issues with this is if the coefficient of proportionality in \(\chi_{AA} \propto N\) diverges at some point.
+    In this case we get large fluctuations.
+    This typically happens near phase transitions.
+    
+    It is possible to derive a similar general theory for the grand canonical ensemble.
+    
+    \chapter{Weakly Interacting Systems}
+    A system is \defineindex{weakly interacting} if no energy is stored in any interaction potential.
+    This means the energy of the system is entirely due to the kinetic energy of the particles and their interactions with some external potential.
+    The only interactions between particles are exchanging kinetic energy and momentum.
+    Weakly interacting is essentially the closest we can get to no interactions without just having particles that behave like single particles.
+    
+    \section{Localised Particles}
+    Consider a system of \(N\) particles fixed on a lattice.
+    For example we could consider a crystal with atoms fixed at the lattice points.
+    Each particle can be distinguished from the others by its location.
+    We say that the particles are \define{distinguishable}\index{distinguishable particles}.
+    
+    Each particle in this case will have its own energy spectrum.
+    As with a single particle we can label the states by an integer, but we now need another subscript to denote the particle.
+    So the \(m\)th particle may be in state \(j_m\), in which it has energy \(\varepsilon_{j_m}\).
+    The microstate is then a set of labels, \(i = \{j_1, j_2, \dotsc, j_N\}\).
+    For weakly interacting particles (we will show later that) the energy of a given microstate is the sum of the energies of the particles in this microstate:
+    \begin{equation}
+        E_i = \varepsilon_{j_1} + \varepsilon_{j_2} + \dotsb + \varepsilon_{j_N} = \sum_{n=1}^{N} \varepsilon_{j_n}.
+    \end{equation}
+    The partition function in the canonical ensemble is then
+    \begin{align}
+        \cpartition &= \sum_{i} \e^{-\beta E_i}\\
+        &= \sum_{j_1}\sum_{j_2}\dotso\sum_{j_N} \exp\left[ -\beta \sum_{n=1}^{N} \varepsilon_{j_n} \right]\\
+        &= \sum_{j_1}\sum_{j_2}\dotso\sum_{j_N} \prod_{n=1}^{N} \e^{-\beta\varepsilon_{j_n}}\\
+        &= \left( \sum_{j_1} \e^{-\beta\varepsilon_{j_1}} \right)\left( \sum_{j_2} \e^{-\beta\varepsilon_{j_2}} \right) \dotsm \left( \sum_{j_N} \e^{-\beta\varepsilon_{j_N}} \right)\\
+        &= [Z(1)]^N
+    \end{align}
+    where
+    \begin{equation}
+        Z(1) = \sum_{j} \e^{-\beta \varepsilon_j}
+    \end{equation}
+    is the single particle partition function and this sum is over single particle states.
+    
+    The thermodynamics of a weakly interacting system can then be derived using the bridge equation
+    \begin{equation}
+        F = -\boltzmann T \ln \cpartition = -N\boltzmann T \ln(Z(1)).
+    \end{equation}
+    The probability of finding a particular particle in state \(j\) is given by
+    \begin{equation}
+        p_j = \frac{1}{Z(1)}\e^{-\beta \varepsilon_j}.
+    \end{equation}
+    This is the canonical, or Boltzmann, distribution for a single particle.
+    
+    \section{Non-Localised Particles}
+    If the particles aren't localised then there is no way to keep track of them and so we can't distinguish them.
+    We must therefore get the same state if we permute the particles since the final result cannot depend on what we call the particles.
+    
+    The microstate, \(i\), of the assembly is specified by stating how many particles are in each single particle state, \(j\).
+    Therefore \(i\) is specified by \(\{n_j\}\), where \(n_j\) is the number of particles in the single particle state \(j\).
+    
+    A sum over microstates then becomes a sum over allowed occupation numbers.
+    We can write the energy of a microstate as
+    \begin{equation}
+        E_{iN} = \sum_j n_j\varepsilon_j.
+    \end{equation}
+    The total number of particles is simply
+    \begin{equation}
+        N = \sum_{j} n_j.
+    \end{equation}
+    
+    If we work in the canonical ensemble then we are constrained to microstates with a fixed value of \(N\).
+    This makes the sums difficult since we would have to be cautious about partitioning the particles into states.
+    Instead we work in the grand canonical ensemble and we can relax this limit to just having the average number of particles fixed.
+    Doing so we find that
+    \begin{equation}
+        \gcpartition = \sum_{n_1}\sum_{n_2} \dotso \sum_{n_N} \exp\left[ -\beta\left( \sum_{j} n_j\varepsilon_j - \mu\sum_{j} n_j \right) \right] = \prod_j \mathcal{Z}_j.
+    \end{equation}
+    We arrive at this in the same way as we did in the localised canonical case.
+    Again
+    \begin{equation}
+        \mathcal{Z}_j = \sum_{n_j} \e^{-\beta n_j(\varepsilon_j - \mu)}
+    \end{equation}
+    is the single state partition function for state \(j\).
+    Notice that the factorisation is over states here, rather than particles as with the localised canonical case.
+    
+    The probability of finding the system in the microstate \(\{n_j\}\) is
+    \begin{equation}
+        p_{\{n_j\}} = \frac{1}{\gcpartition} \exp\left[ \beta \left( \mu \sum_j n_j - \beta \sum_j n_j\varepsilon_j \right) \right] = \prod_j p_{n_j}.
+    \end{equation}
+    The last term is a product over states and \(p_{n_j}\) is the probability of finding exactly \(n_j\) particles in state \(j\).
+    This is given by
+    \begin{equation}
+        p_{n_j} = \frac{1}{\mathcal{Z}_j} \e^{\beta n_j(\mu - \varepsilon_j)}.
+    \end{equation}
+    
+    The mean number of particles in state \(j\) is then
+    \begin{align}
+        \mean{n_j} &= \sum_{n_k} n_j p_{\{n_k\}}\\
+        &= \sum_{n_j} n_j p_{n_j}\\
+        &= \sum_{n_j} n_j \frac{1}{\mathcal{Z}_j} \e^{\beta n_j(\mu - \varepsilon_j)}\\
+        &= \sum_{n_j} \frac{1}{\mathcal{Z}_j} \frac{1}{\beta} \diffp{}{\mu} \e^{\beta n_j(\mu - \varepsilon_j)}\\
+        &= \frac{1}{\mathcal{Z}_j} \frac{1}{\beta} \diffp{}{\mu} \sum_{n_j} \e^{\beta n_j(\mu - \varepsilon_j)}\\
+        &= \frac{1}{\mathcal{Z}_j} \frac{1}{\beta} \diffp{}{\mu} \mathcal{Z}_j\\
+        &= \frac{1}{\beta} \diffp{}{\mu} \ln \mathcal{Z}_j\\
+        &= \boltzmann T \diffp{}{\mu} \ln \mathcal{Z}_j.
+    \end{align}
+    
+    \section{Fermions and Bosons}
+    In order to perform the sum over allowed occupation numbers we need to distinguish between fermions and bosons.
+    Recall that \define{fermions}\index{fermion} have half integers spin, \(n/2\) for odd \(n\), and the Pauli exclusion principle applies meaning that no two fermions can be in the same state.
+    On the other hand, \define{bosons}\index{boson} have integer spin and there is no Pauli exclusion principle.
+    
+    \subsection{Fermions}
+    For fermions the Pauli exclusion principle means that the only allowed occupation numbers are \(0\) and \(1\) since if \(n_j = 2\) then there are two particles in state \(j\), which isn't allowed.
+    Hence
+    \begin{equation}
+        \mathcal{Z}_j = \sum_{n_j} \e^{\beta n_j(\mu - \varepsilon_j)} = \e^{0} + \e^{\beta (\mu - \varepsilon_1)} = 1 + \e^{\beta(\mu - \varepsilon_1)}.
+    \end{equation}
+    
+    \subsection{Bosons}
+    For bosons the occupation number can be any natural number\footnote{\(\naturals = \{0, 1, 2, \dotsc\}\).}.
+    Hence
+    \begin{align}
+        \mathcal{Z}_j &= \sum_{n_j = 0}^{\infty} \e^{\beta n_j(\mu - \varepsilon_j)}\\
+        &= \sum_{n_j = 0}^{\infty} (\e^{\beta(\mu - \varepsilon_j)})^{n_j}\\
+        &= \frac{1}{1 - \e^{\beta(\mu - \varepsilon_j)}}.
+    \end{align}
+    Here we have identified a geometric series, \(\sum_{n = 0}^{\infty} x^n = 1/(1 - x)\), which converges uniformly for \(\abs{x} < 1\), which is indeed the case here since \(\mu\) is negative and \(-\varepsilon_j\) is negative and \(\beta\) is positive so we have \(x\) being \(e\) raised to some negative power, which will always give something in the range \((0, 1)\).
+    
+    \subsection{Both}
+    It is possible to write both of these in one by taking \(+\) for the case of fermions and \(-\) for bosons in the following:
+    \begin{equation}\label{eqn:single particle grand canonical partition function}
+        \mathcal{Z}_j = [1 \pm \e^{\beta(\mu - \varepsilon_j)}]^{\pm 1}.
+    \end{equation}
+    
+    We can then compute the mean number of particles in state \(n_j\):
+    \begin{align}
+        \mean{n_j} &= \frac{1}{\beta} \diffp{}{\mu} \ln \mathcal{Z}_j\\
+        &= \frac{1}{\beta} \diffp{}{\mu} \ln [1 \pm \e^{\beta(\mu - \varepsilon_j)}]^{\pm 1}\\
+        &= \pm \frac{1}{\beta} \diffp{}{\mu} \ln [1 \pm \e^{\beta(\mu - \varepsilon_j)}]\\
+        &= \frac{\e^{\beta(\mu - \varepsilon_j)}}{1 \pm \e^{\beta(\mu - \varepsilon_j)}}\\
+        &= \frac{1}{\e^{\beta(\varepsilon_j - \mu)} \pm 1}\\
+        &= f_{\pm}(\varepsilon_j, \mu).
+    \end{align}
+    Taking \(+\) for fermions and \(-\) for Bosons we get the \defineindex{Fermi--Dirac distribution},
+    \begin{equation}
+        \mean{n} = f_{+}(\varepsilon, \mu) = \frac{1}{\e^{\beta(\varepsilon - \mu)} + 1},
+    \end{equation}
+    and \defineindex{Bose--Einstein distribution},
+    \begin{equation}
+        \mean{n} = f_{-}(\varepsilon, \mu) = \frac{1}{\e^{\beta(\varepsilon - \mu)} - 1},
+    \end{equation}
+    respectively.
+    To remember the sign we can use the fact that \(+\) represents \textbf{\textcolor{highlight}{a}}dditiion and this goes with the Fermi--Dir\textbf{\textcolor{highlight}{a}}c distribution and \(-\) represents \textbf{\textcolor{highlight}{s}}ubtraction and this goes with the Bo\textbf{\textcolor{highlight}{s}}e--Ein\textbf{\textcolor{highlight}{s}}tein distribution.
+    
+    \chapter{Dilute Limit}
+    \section{Dilute Limit}
+    At high temperatures and low particle densities, this is known as the \defineindex{dilute limit}.
+    In this limit the de Broglie wavelength is much less than the mean interparticle separation, and so particles are sufficiently separated that they behave as distinct particles and are essentially distinguishable.
+    The chance of any one state being occupied in this limit is low and so we don't need to worry about the fermion/boson distinction since the probability of two particles trying to occupy the same state is negligible.
+    We therefore expect the Fermi--Dirac and Bose--Einstein distributions to be the same in this limit.
+    
+    The way we achieve this limit mathematically is by taking \(\e^{\beta\mu} \ll 1\).
+    We have to be careful since \(\mu\) is a typically increasing function of \(T\) and \(\beta \propto 1/T\).
+    
+    Without loss of generality we can take the lowest energy state to define zero energy, \(\varepsilon_0 = 0\), so for all other states, \(i\), we have \(\varepsilon_i \ge 0\).
+    In this case we have
+    \begin{equation}
+        \e^{\beta(\mu - \varepsilon_i)} \ll 1 \implies \e^{\beta(\varepsilon_i - \mu)} \gg 1.
+    \end{equation}
+    This means that adding or subtracting 1 from this quantity is negligible so we have
+    \begin{equation}
+        \mean{n_i} = f_{\pm}(\varepsilon_i, \mu) = \frac{1}{\e^{\beta(\varepsilon_i - \mu)} \pm 1} \approx \frac{1}{\e^{\beta(\varepsilon_i - \mu)}} = \e^{\beta(\mu - \varepsilon_i)}.
+    \end{equation}
+    So we get something similar to the Boltzmann distribution, \(\e^{-\beta\varepsilon_i}\), and this result is the same for both fermions and bosons.
+    
+    If we had classically distinguishable particles then we would have
+    \begin{equation}
+        \mean{n_i} = \mean{N} p_i = \mean{N}\frac{\e^{-\beta\varepsilon_i}}{Z(1)}.
+    \end{equation}
+    Therefore in the dilute limit we have
+    \begin{equation}
+        \mean{n_i} \approx \e^{\beta(\mu - \varepsilon_i)} \approx \frac{\mean{N}}{Z(1)}\e^{-\beta\varepsilon_i} \implies \e^{\beta\mu} \approx \frac{\mean{N}}{Z(1)}.
+    \end{equation}
+    
+    \section{Semi-Classical Approximation}
+    Consider \(\ln\mathcal{Z}_j\) in the dilute limit, using \cref{eqn:single particle grand canonical partition function} we have
+    \begin{equation}
+        \ln\mathcal{Z}_j = \pm \ln[1 \pm \e^{\beta(\mu - \varepsilon_j)}] \approx \e^{\beta(\mu - \varepsilon_j)}.
+    \end{equation}
+    Where we've used the Taylor expansion \(\ln(1 \pm x) \approx \pm x\) for small \(x\).
+    
+    Now consider the grand potential, \(\Phi\):
+    \begin{align}
+        \Phi &= -\boltzmann T\ln \gcpartition\\
+        &= -\boltzmann T \sum_j \ln \mathcal{Z}_j\\
+        &\approx -\boltzmann T\sum_j \e^{\beta(\mu - \varepsilon_j)}\\
+        &= -\boltzmann T \e^{\beta\mu} \sum_j \e^{-\beta\varepsilon_j}\\
+        &\approx -\boltzmann T\e^{\beta\mu}Z(1)\\
+        &\approx -\mean{N}\boltzmann T.
+    \end{align}
+    Here we have used the approximation \(\e^{\beta\mu}Z(1) = \mean{N}\) in the dilute limit.
+    
+    Consider instead the Helmholtz free energy, using \(\e^{\beta\mu}Z(1) = \mean{N}\) again, now rearranged to give \(\mu = \ln(\mean{N}/Z(1))/\beta\), we get
+    \begin{align}
+        F &= \Phi + \textcolor{highlight}{\mu}\mean{N}\\
+        &\approx -\boltzmann T \mean{N} + \textcolor{highlight}{\boltzmann T}\mean{N} \textcolor{highlight}{\ln\left[ \frac{\mean{N}}{Z(1)} \right]}\\
+        &= \boltzmann T(\textcolor{my blue}{\mean{N}\ln \mean{N} - \mean{N}} - \mean{N}\ln[Z(1)])\\
+        &\approx \boltzmann T(\textcolor{my blue}{\ln(\mean{N}!)} - \ln(Z(1)^{\mean{N}}))\\
+        &= -\boltzmann T \mean{N} \ln\left[ \frac{Z(1)^{\mean{N}}}{\mean{N}!} \right].
+    \end{align}
+    Here we have used \defineindex{Stirling's approximation}
+    \begin{equation}
+        \ln(N!) \sim N\ln N - N
+    \end{equation}
+    for large \(N\).
+    Using
+    \begin{equation}
+        F = -\boltzmann T\ln \cpartition
+    \end{equation}
+    we can identify that in the dilute limit
+    \begin{equation}
+        \cpartition = \frac{Z(1)^{\mean{N}}}{\mean{N}!}.
+    \end{equation}
+    This is the \defineindex{semi-classical approximation}.
+    \begin{rmk}
+        Recall that in the statistical mechanics part of the thermal physics course we arrived at this result by a not particularly convincing argument of fixing the overcounting of states which occurs due to failing to account for the indistinguishability of particles.
+    \end{rmk}
+
+    \chapter{Density of States}
+    To calculate thermodynamic properties we need to perform sums over states.
+    This is not that easy to do.
+    Instead we can often approximate the sums as integrals, which can then be computed more easily, or numerically, or just looked up.
+    The goal of this section will be to find the \defineindex{density of states} in energy-space, \(g\), which is a function such that \(g(\varepsilon)\dd{\varepsilon}\) is the number of states with energies in the interval \([\varepsilon, \varepsilon + \dl{\varepsilon}]\).
+    This function is such that
+    \begin{equation}
+        \mean{N} = \sum_j \mean{n_j} = \sum_j f(\varepsilon_j, \mu) \approx \int_{0}^{\infty} f(\varepsilon, \mu) g(\varepsilon) \dd{\varepsilon}.
+    \end{equation}
+    
+    This approximation is generally valid when there are many states with similar energies, so that the discrete steps between states in the sum are small, and the sum can be approximated by the continuous integral.
+    Generally we get states with close energy levels at high temperatures.
+    So we expect the density of states to be a good approximation when the temperature of the system is high enough that the higher energy states dominate.
+    
+    \section{Density of States for a Particle in a Box}
+    Consider a particle in a box, which we take to be a cube for simplicity.
+    Mathematically the states are given by the solutions to the time independent Schrödinger equation for a free particle,
+    \begin{equation}
+        -\frac{\hbar^2}{2m}\laplacian \psi = \varepsilon\psi,
+    \end{equation}
+    over the region \([0, L]^3\), with the boundary condition that \(\psi = 0\) when any of \(x\), \(y\), or \(z\) are either \(0\) or \(L\).
+    This is simply an eigenvalue problem.
+    
+    The eigenfunctions of the Laplacian are \(\sin\) and \(\cos\), for our particular boundary conditions we take
+    \begin{equation}
+        \psi = A\sin(k_x x) \sin(k_y y) \sin(k_z z).
+    \end{equation}
+    If we take \(k_i = n_i\pi/L\) for \(n_i = 1, 2, \dotsc\) then we satisfy the boundary conditions.
+    We can easily show that
+    \begin{equation}
+        \laplacian\psi = -(k_x^2 + k_y^2 + k_z^2)^2\psi = -k^2\psi
+    \end{equation}
+    where \(k = \abs{\vv{k}}\) with \(\vv{k} = (k_x, k_y, k_z)\) being a vector in \(k\)-space.
+    We can also write\footnote{\(\integers_{>0} = \{1, 2, \dotsc\} = \naturals\setminus\{0\}\)} \(\vv{k} = \pi\vv{n}/L\) where \(\vv{n} \in \integers_{>0}^3\) is a vector in \(n\)-space.
+    We can then identify
+    \begin{equation}
+        \varepsilon = \frac{\hbar^2}{2m}k^2.
+    \end{equation}
+    
+    \subsection{Two Dimensions}
+    The states are spaced \(\pi/L\) apart in \(k\)-space.
+    In two dimensions this means that the area per state is \((\pi/L)^2\).
+    We are only interested in states with \(k_x, k_y \ge 0\).
+    This corresponds to only considering the top right quadrant, which in turn we can do by considering all four quadrants and including factors of \(1/4\) as necessary.
+    
+    The area of an annulus of inner radius \(k\) and thickness \(\dl{k}\) in the top right quadrant is
+    \begin{equation}
+        A = \frac{1}{4} [\pi (k + \dl{k})^2 - \pi k^2] = \frac{1}{4}2\pi k\dd{k} + \order(\dl{k}^2) \approx \frac{\pi}{2}k\dl{k}.
+    \end{equation}
+    This means that this quarter annulus contains
+    \begin{equation}
+        \frac{\pi k \dl{k}/2}{(\pi/L)^2} = \frac{L^2}{2\pi} k\dd{k}
+    \end{equation}
+    states.
+    
+    \subsection{Three Dimensions}
+    In three dimensions the volume per state is \((\pi/L)^3\).
+    Again we are only interested in states where \(k_x, k_y, k_z \ge 0\).
+    This now means we only care about one out of eight octants, so we include a factor of \(1/8\).
+    The volume of a spherical shell of inner radius \(k\) and thickness \(\dl{k}\) in this octant is
+    \begin{equation}
+        \frac{1}{8}\left[ \frac{4}{3}\pi(k + \dl{k})^3 - \frac{4}{3}\pi k^3 \right] = \frac{1}{8}4\pi k^2\dl{k} + \order(\dl{k}^2) \approx \frac{\pi}{2}k^2\dd{k}.
+    \end{equation}
+    The number of states in this eighth of a spherical shell is then
+    \begin{equation}
+        \frac{\pi k^2\dd{k}/2}{(\pi/L)^3} = \frac{L^3}{2\pi^2} k^2\dd{k}.
+    \end{equation}
+    
+    Now define \(\Gamma\) to be the density of states in \(k\)-space, so that \(\Gamma(k)\dl{l}\) is the number of states with wave vectors in the interval \([k, k + \dl{k}]\).
+    We can relate this to the density of states in energy-space by a simple change of variables.
+    First we notice that since |\(\varepsilon = \hbar^2k/(2m)\)
+    \begin{equation}
+        \diff{\varepsilon}{k} = \frac{\hbar^2}{m}k = \sqrt{\frac{2\hbar^2}{m}}\sqrt{\varepsilon}.
+    \end{equation}
+    Hence
+    \begin{equation}
+        g(\varepsilon)\dd{\varepsilon} = \Gamma(k)\dd{k} = \frac{L^3}{2\pi^2} k^2 \dd{k} = \frac{V}{2\pi^2}k^2\dd{k}
+    \end{equation}
+    where \(V = L^3\) is the volume of the cube.
+    Putting in
+    \begin{equation}
+        \dl{k} = \sqrt{\frac{2\hbar^2}{m}} \sqrt{\varepsilon} \dd{\varepsilon}
+    \end{equation}
+    and \(k^2 = 2m\varepsilon/\hbar^2\) we get
+    \begin{equation}
+        g(\varepsilon) = \left( \frac{2m}{\hbar} \right)^{3/2} \frac{V}{4\pi^2} \sqrt{\varepsilon}.
+    \end{equation}
+    The important thing here is that \(g(\varepsilon)\) scales linearly with the volume and as \(\sqrt{\varepsilon}\).
+    
+    \chapter{Statistical Mechanics and Quantum Mechanics}
+    \section{Many Particle Schrödinger Equation}
+    In statistical mechanics we are interested in many particle systems.
+    To fully treat these systems we need to solve the time independent many particle Schrödinger equation:
+    \begin{equation}
+        \operator{H}\Psi(\vv{r_1}, \vv{r_2}, \dotsc, \vv{r_N}) = E\Psi(\vv{r_1}, \vv{r_2}, \dotsc, \vv{r_N}).
+    \end{equation}
+    Here \(\vv{r_i}\) is the position of the \(i\)th particle, \(\Psi\) is the wave function for the state, \(E\) is the energy of the state and \(\operator{H}\) is the Hamiltonian.
+    
+    The most general Hamiltonian is
+    \begin{equation}
+        \operator{H} = -\sum_{k=1}^{N} \frac{\hbar^2}{2m_k}\laplacian[k] + U(\vv{r_1}, \vv{r_2}, \dotsc, \vv{r_N}).
+    \end{equation}
+    Here \(m_k\) is the mass of the \(k\)th particle, from now on we will assume all particles have the same mass.
+    \(\laplacian[k]\) is the Laplacian operator acting only on \(\vv{r_k}\), that is if \(\vv{r_k} = (x_k, y_k, z_k)\) then
+    \begin{equation}
+        \laplacian[k] \coloneqq \diffp[2]{}{x_k} + \diffp[2]{}{{y_k}} + \diffp[2]{}{z_k}.
+    \end{equation}
+    \(U\) is the interaction potential, which in general depends on the positions of all particles.
+    
+    Often we can write \(U\) as a sum of interactions between pairs of particles, such as the case where the only interactions are electrostatic, we then have
+    \begin{equation}
+        U(\vv{r_1}, \vv{r_2}, \dotsc, \vv{r_N}) = \sum_{l < k}\sum_{k = 1}^{N} \varphi(\abs{\vv{r_k} - \vv{r_l}})
+    \end{equation}
+    where \(\varphi(r) = q^2/(r\pi\varepsilon_0 r^2)\) where \(q\) is the charge carried by each particle.
+    
+    For the case of weakly interacting particles the potential depends only on the external potential, \(V\), felt by each particle and so
+    \begin{equation}
+        U(\vv{r_1}, \vv{r_2}, \dotsc, \vv{r_N}) = \sum_{k = 1}^{N} V(\vv{r_k}).
+    \end{equation}
+    In this case we can write the Hamiltonian as
+    \begin{equation}
+        \operator{H}(\vv{r_1}, \vv{r_2}, \dotsc, \vv{r_N}) = \sum_{k = 1}^{N} \operator{h}_k(\vv{r_k}).
+    \end{equation}
+    Here
+    \begin{equation}
+        \operator{h}_k(\vv{r_k}) \coloneqq -\frac{\hbar^2}{2m} \laplacian[k] + V(\vv{r_k}).
+    \end{equation}
+    
+    The single particle Hamiltonians \(\operator{h}_k\) have wave functions \(\psi_i\) as solutions and corresponding energies \(\varepsilon_i\).
+    These solutions are common between all particles.
+    The many body wave function is then factorised in terms of these single-particles solutions so
+    \begin{equation}
+        \Psi(\vv{r_1}, \vv{r_2}, \dotsc, \vv{r_N}) = \prod_{k = 1}^{N} \psi_{\alpha_k} (\vv{r_k})
+    \end{equation}
+    and
+    \begin{equation}
+        E = \sum_{k = 1}^{N} \varepsilon_{\alpha_k}
+    \end{equation}
+    where \(\alpha_k\) are integers labelling the states of each individual particle.
+    
+    It should be noted that this form is for localised or otherwise distinguishable particles.
+    For indistinguishable particles this form over counts and instead we take suitable symmetrised combinations of the single-particle eigenstates to get the multi-particle state.
+    What the \enquote{suitable} symmetrised combination is depends on whether we are dealing with fermions or bosons.
+    
+    For bosons the wave function should be symmetric under exchanging two particles.
+    In this case the most general wave function is a sum over all permutations:
+    \begin{equation}
+        \Psi(\vv{r_1}, \vv{r_2}, \dotsc, \vv{r_N}) \propto \sum_{\sigma \in S_N} \psi_{\alpha_{\sigma(1)}} (\vv{r_1}) \psi_{\alpha_{\sigma(2)}}(\vv{r_2}) \dotsm \psi_{\alpha_{\sigma(N)}} (\vv{r_N}).
+    \end{equation}
+    Here \(S_n\) is the permutation group on \(n\) objects and \(\sigma\) is a permutation.
+    For the case of \(N = 2\) this means that
+    \begin{equation}
+        \Psi(\vv{r_1}, \vv{r_2}) = \frac{\sqrt{2}}{2}[\psi_{\alpha_1}(\vv{r_1})\psi_{\alpha_2}(\vv{r_2}) + \psi_{\alpha_2}(\vv{r_1})\psi_{\alpha_1}(\vv{r_2})].
+    \end{equation}
+    
+    For fermions the wave function should be antisymmetric under exchanging two particles.
+    Therefore the most general wave function comes from summing over all permutations and the totally antisymmetric Levi-Civita symbol, \(\varepsilon(\sigma) = \varepsilon_{\sigma(1)\sigma(2)\dotso\sigma(N)}\), which is defined to be 1 if \(\sigma\) is an even permutation and \(-1\) if \(\sigma\) is an odd permutation:
+    \begin{equation}
+        \Psi(\vv{r_1}, \vv{r_2}, \dotsc, \vv{r_N}) \propto \sum_{\sigma \in S_N} \varepsilon(\sigma)\psi_{\alpha_{\sigma(1)}}(\vv{r_1}) \psi_{\alpha_{\sigma(2)}}(\vv{r_2}) \dotsm \psi_{\alpha_{\sigma(N)}}(\vv{r_N}).
+    \end{equation}
+    For the case of \(N = 2\) this means that
+    \begin{equation}
+        \Psi(\vv{r_1}, \vv{r_2}) = \frac{\sqrt{2}}{2} [\psi_{\alpha_1}(\vv{r_1})\psi_{\alpha_2}(\vv{r_2}) - \psi_{\alpha_2}(\vv{r_1})\psi_{\alpha_1}(\vv{r_2})].
+    \end{equation}
+    
+    \section{A Tale of Two Probabilities}
+    Things get a bit confusing when we start to introduce quantum mechanics to statistical mechanics\footnote{or introduce statistical mechanics to quantum mechanics. See the principles of quantum mechanics notes for that perspective} due to the fact that we have two notions of probability.
+    In statistical mechanics we have been considering classical probabilities, such as the probability of finding a system in a given state, \(p_i = \e^{-\beta E_i}/\cpartition\) for a canonical ensemble.
+    
+    On the other hand in quantum mechanics we usually assume that the state is known and that the inherent probability aspect to quantum mechanics occurs when making measurements which give specific results with specific probabilities given by projecting the state onto the relevant eigenspace of the measurement operator.
+    
+    We now have to deal with both of these and we will do so by coming up with a mathematical notion unifying them.
+    But first, a recap of quantum mechanics.
+    
+    \section{Quantum Mechanics Recap}
+    \begin{rmk}
+        For more details on quantum mechanics see the notes from principles of quantum mechanics.
+    \end{rmk}
+    In quantum mechanics we typically use braket notation.
+    The state of a particle is a vector, \(\ket{\psi}\), in some Hilbert space.
+    The energy eigenstates are the eigenvectors of the Hamiltonian operator, \(\operator{H}\), and the energy is the associated eigenvalue.
+    That is \(\operator{H}\ket{i} = E_i\ket{i}\), where \(\operator{H}\) is the Hamiltonian operator, \(\{\ket{i}\}\) are the energy eigenvalues and \(E_i\) is the energy of a particle in state \(\ket{i}\).
+    
+    Since \(\operator{H}\) is Hermitian \(\{\ket{i}\}\) are orthogonal, and we take them to be normalised so the energy eigenstates are orthonormal and so
+    \begin{equation}
+        \braket{i}{j} = \delta_{ij}.
+    \end{equation}
+    
+    The identity can then be written as
+    \begin{equation}
+        \ident = \sum_i \ket{i}\bra{i}.
+    \end{equation}
+    We can write a general wave function using projection operators as
+    \begin{equation}
+        \ket{\psi} = \ident\ket{\psi} = \sum_i \ket{i}\braket{i}{\psi} = \sum_i c_i\ket{i}
+    \end{equation}
+    where \(c_i = \braket{i}{\psi} \in \complex\).
+    
+    Given an observable, \(A\), there is an associated operator, \(\operator{A}\).
+    The expected value of a measurement of \(A\) is
+    \begin{equation*}
+        \expected{A} = \bra{\psi}\operator{A}\ket{\psi} = \left( \sum_i c_i^*\bra{i} \right) \operator{A} \left( \sum_j \ket{j} \right) = \sum_i\sum_j c_i^*c_j\bra{i}\operator{A}\ket{j} = \sum_i \sum_j c_i^* c_j A_{ij}
+    \end{equation*}
+    where \(A_{ij} \coloneqq \bra{i}\operator{A}\ket{j}\) are the matrix elements of \(\operator{A}\) in the energy eigenbasis.
+    
+    For example, in the energy eigenbasis \(\bra{i}\operator{H}\ket{j} = E_i\delta_{ij}\) and so
+    \begin{equation}
+        \expected{E} = \sum_i\sum_j c_i^*c_j E_i\delta_{ij} = \sum_i \abs{c_i}^2 E_i.
+    \end{equation}
+    
+    The problem that we face when it comes to including statistical mechanics is that in statistical mechanics the mean value of an observable \(A\) is
+    \begin{equation}
+        \mean{A} = \sum_i p_i A_i.
+    \end{equation}
+    Identifying \(A_{ii} = A_i\) we therefore want the mean in statistical mechanics to be
+    \begin{equation}
+        \mean{A} = \sum_i p_i A_{ii} = \sum_i p_i \bra{i} \operator{A} \ket{i}.
+    \end{equation}
+    Unfortunately this can't be written as a simple superposition.
+    Suppose we could write it as
+    \begin{equation}
+        \ket{\psi} = \sum_i \sqrt{p_i} \ket{i},
+    \end{equation}
+    then
+    \begin{equation}
+        \expected{A} = \sum_i \sum_j \sqrt{p_ip_j}A_{ij}.
+    \end{equation}
+    Identifying \(A_i = A_{ii}\) we see that this is almost what we wanted but we have off diagonal terms which don't necessarily vanish.
+    
+    \section{Density Matrix}
+    The resolution to this problem is to introduce the \defineindex{density matrix}, \(\rho\).
+    First we define the density matrix as the diagonal matrix with the classical probabilities as its diagonal, that is \(\rho_{ij} \coloneqq p_i\delta_{ij}\).
+    Then
+    \begin{equation}
+        \tr(\rho\operator{A}) = \sum_i (\rho\operator{A})_{ii} = \sum_i \sum_j \rho_{ij}A_{ji} = \sum_i\sum_j p_i \delta_{ij}A_{ji} = \sum_{i} p_i A_{ii} = \mean{A}.
+    \end{equation}
+    So we see that we recover the statistical mechanics mean in this case by taking \(\expected{A} \coloneqq \tr(\rho\operator{A})\).
+    
+    We can do this same calculation in braket notation as
+    \begin{equation}
+        \rho \coloneqq \sum_i p_i \ket{i}\bra{i}.
+    \end{equation}
+    Then
+    \begin{multline}
+        \tr(\rho\operator{A}) = \sum_j \bra{j} \rho\operator{A}\ket{j} = \sum_j \sum_i \bra{j} p_i \ket{i}\bra{i} \operator{A} \ket{j}\\
+        = \sum_i \sum_j p_{ij} \delta_{ij} \bra{j}\operator{A}\ket{j} = \sum_i p_i \bra{i} \operator{A} \ket{i}.
+    \end{multline}
+    Which was what we wanted the statistical mechanics mean to be in braket notation.
+    
+    Recall that we can define the exponential of an operator through a power series:
+    \begin{equation}
+        \e^{\operator{A}} \coloneqq \sum_{n = 0}^{\infty} \frac{1}{n!} \operator{A}^n = \operator{1} + \operator{A} + \frac{1}{2}\operator{A}^2 + \frac{1}{3!}\operator{A}^3 + \dotsb.
+    \end{equation}
+    We therefore have
+    \begin{equation}
+        \e^{-\beta\operator{H}}\ket{i} = \sum_{n=0}^{\infty} \frac{1}{n!} (-\beta)^n \operator{H}^n \ket{i} = \sum_{n = 0}^{\infty} \frac{1}{n!} (-\beta)^n E_i^n = \e^{-\beta E_i}.
+    \end{equation}
+    Hence we have
+    \begin{multline}
+        \rho \coloneqq \sum_i p_i \ket{i}\bra{i} = \frac{1}{\cpartition}\sum_i \e^{-\beta E_i}\ket{i}\bra{i} = \frac{1}{\cpartition} \sum_i \e^{-\beta\operator{H}}\ket{i}\bra{i}\\
+        = \frac{1}{\cpartition} \e^{-\beta\operator{H}} \sum_{i} \ket{i}\bra{i} = \frac{1}{\cpartition} \e^{-\beta\operator{H}}.
+    \end{multline}
+    Notice the resemblance between \(p_i = \e^{-\beta E_i}/\cpartition\) and \(\rho = \e^{-\beta \operator{H}}\).
+    
+     We can write the canonical partition function as the trace of \(\e^{-\beta\operator{H}}\) since
+    \begin{equation}
+        \tr(\e^{-\beta\operator{H}}) = \sum_{i = 0}^{\infty} \bra{i} \e^{-\beta\operator{H}}\ket{i} = \sum_{i = 0}^{\infty} \e^{-\beta E_i} \braket{i}{i} = \sum_{i = 0}^{\infty} \e^{-\beta E_i} = \cpartition.
+    \end{equation}
+    
+    Now consider what happens if instead \(\rho \coloneqq \ket{\psi}\bra{\psi}\).
+    Then
+    \begin{multline}
+        \expected{A} = \tr(\rho\operator{A}) = \sum_j \braket{j}{\psi}\bra{\psi}\operator{A}\ket{j} = \sum_{j} c_j\bra{\psi}\operator{A}\ket{j}\\
+        = \sum_j\sum_i c_jc_i^* \bra{j}A\ket{i} = \sum_j\sum_i c_i^*c_j A_{ij}.
+    \end{multline}
+    So we recover the expectation value in quantum mechanics.
+    Now we just need to find a way to make these two definitions work together so we can do quantum mechanics and statistical mechanics at the same time.
+    
+    What we have been discussing so far is the density matrix for a canonical ensemble.
+    The most general form of density matrix arises when we have double probability.
+    First we have the inherent quantum probability, but suppose we also don't know what state the system is in, just that it is in a state \(\ket{\psi_i}\) with probability \(p_i\).
+    We then can define the density operator
+    \begin{equation}
+        \rho = \sum_i p_i \ket{\psi_i}\bra{\psi_i}.
+    \end{equation}
+    This is called a \defineindex{mixed state}, as opposed to when we know for sure the state of the system is \(\ket{\psi}\), which we call a \defineindex{pure state}.
+    In this case the expectation value for an operator is still given as
+    \begin{equation}
+        \expected{A} = \mean{A} = \tr(\rho\operator{A})
+    \end{equation}
+    and this correctly accounts for both the statistical mechanics and quantum mechanics.
+    
+    \subsection{Von Neumann Entropy}
+    We can further generalise the entropy of the system to the \define{von Neumann entropy}\index{entropy!von Neumann}, which is defined to be
+    \begin{equation}
+        S \coloneqq -k\tr(\rho\ln \rho).
+    \end{equation}
+    The logarithm is defined through its power series:
+    \begin{multline}
+        \ln \rho = \ln[1 + (\rho - 1)] = \sum_{n = 1}^{\infty} \frac{(-1)^{n + 1}}{n}(\rho - 1)^n\\
+        = (\rho - 1) - \frac{1}{2}(\rho - 1)^2 + \frac{1}{3}(\rho - 1)^3 + \dotsb.
+    \end{multline}
+    Taking \(k = \boltzmann\) in this gives a definition that coincides with the Gibbs entropy for a canonical ensemble.
+    
+    \chapter{Vibrations in a Solid}
+    In this chapter we will look at vibrations in a solid as an example of a many body problem.
+    In a general many body problem we want to solve the time independent Schrödinger equation
+    \begin{equation}
+        \operator{H}\Psi(\vv{r_1}, \vv{r_2}, \dotsc, \vv{r_N}) = E\Psi(\vv{r_1}, \vv{r_2}, \dotsc, \vv{r_N})
+    \end{equation}
+    where
+    \begin{equation}
+        \operator{H} = -\sum_{k = 1}^{N} \frac{\hbar^2}{2m} \laplacian[k] + U(\vv{r_1}, \vv{r_2}, \dotsc, \vv{r_N}).
+    \end{equation}
+    The problem is if \(U\) is not a sum of single particle potentials we can't, except in very special cases, solve the many body Schrödinger equation.
+    
+    If \(U\) is a sum of single particle potentials, \(V\), then the Hamiltonian can be written as a sum of single particle Hamiltonians:
+    \begin{equation}
+        \operator{H}(\vv{r_1}, \vv{r_2}, \dotsc, \vv{r_N}) = \sum_{k = 1}^{N} \operator{h}_k(\vv{r_k}), \qwhere \operator{h}_k(\vv{r_k}) = -\frac{\hbar^2}{2m} \laplacian[k] + V(\vv{r_k}).
+    \end{equation}
+    This then has a factorised solution
+    \begin{equation}
+        \Psi(\vv{r_1}, \vv{r_2}, \dotsc, \vv{r_N}) = \prod_{k = 1}^{N} \psi_{\alpha_k}(\vv{r_k})
+    \end{equation}
+    which has energy
+    \begin{equation}
+        E = \sum_{k = 1}^{N} \varepsilon_{\alpha_k}.
+    \end{equation}
+    Here \(\psi_{\alpha_k}\) is the wave function of the \(k\)th particle in state \(\alpha_k\) and \(\varepsilon_{\alpha_k}\) is the energy of this particle.
+    We call this the diagonal form of the Hamiltonian since the particles aren't coupled by off diagonal terms.
+    A lot of the work of many body physics involves making appropriate transformations and approximations to get the Hamiltonian into a diagonal form.
+    
+    \section{Einstein Model}
+    Consider a crystalline solid of \(N\) atoms arranged in a regular lattice.
+    Since the atoms are localised they are distinguishable.
+    Let \(\vv{r_k}\) be the displacement of the \(k\)th atom from its equilibrium position.
+    
+    The basis of the Einstein model is to replace the complicated potential that each atom experiences with a single particle potential.
+    The obvious choice being the harmonic potential, either because we can imagine expanding the potential to second order around a minimum and choosing for the constant term to be zero or just because physicists love harmonic oscillators.
+    If we do this then homogeneity and isotropy of the crystal means that all atoms should have the same spring constant and hence the same angular momentum.
+    The form of the Hamiltonian is then
+    \begin{equation}
+        \operator{H} = \sum_{k = 1}^{N} \left[ -\frac{\hbar^2}{2m}\laplacian[k] + \frac{1}{2}m\omega^2\abs{\vv{r_k}}^2 \right].
+    \end{equation}
+    The angular frequency, \(\omega\), is to be determined from experimental measurements.
+    
+    The Hamiltonian is then a sum of \(N\) three-dimensional quantum harmonic oscillators.
+    This further simplifies since it is easy to show via separation of variables that a three-dimensional quantum harmonic oscillator behaves as three independent one-dimensional quantum harmonic oscillators.
+    Therefore the system can be considered as \(3N\) one-dimensional quantum harmonic oscillators, which we label with \(k\).
+    The energy of a quantum harmonic oscillator is \(\hbar\omega(n + 1/2)\) where \(n \in \naturals\)\footnote{\(\naturals = \{0, 1, 2, \dotsc\}\)}.
+    The total energy is then
+    \begin{equation}
+        E = \sum_{k = 1}^{3N} \varepsilon_k \qqwhere \varepsilon_k = \hbar\omega\left( n_k + \frac{1}{2} \right)
+    \end{equation}
+    for non-negative integer \(n_k\).
+    
+    As the number of atoms is fixed we are working in the canonical ensemble and since the particles are weakly interacting the partition function is
+    \begin{equation}
+        \cpartition = [Z(1)]^{3N}
+    \end{equation}
+    with the single particle partition function given by
+    \begin{align}
+        Z(1) &= \sum_{n = 0}^{\infty} \exp\left[ -\beta\hbar\omega\left( n + \frac{1}{2} \right) \right]\\
+        &= \e^{-\beta\hbar\omega/2} \sum_{n = 0}^{\infty} \e^{-\beta\hbar\omega n}\\
+        &= \frac{\e^{-\beta\hbar\omega/2}}{1 - \e^{-\beta\hbar\omega}}.
+    \end{align}
+    Here we have used the fact that this is a geometric series, and \(\abs{\e^{-\beta\hbar\omega}} < 1\) so it converges.
+    Notice that up to a factor of \(\e^{-\beta\hbar\omega}\) this is the same as the single particle partition function for bosons and so we can think of the quanta of energy in the harmonic oscillator as a boson.
+    
+    We can calculate the average energy:
+    \begin{align}
+        \mean{E} &= - \diffp{}{\beta} \ln \cpartition\\
+        &= -\diffp{}{\beta} \ln\left[ \left( \frac{\e^{-\beta\hbar\omega/2}}{1 - \e^{-\beta\hbar\omega}} \right)^{3N} \right]\\
+        &= -3N \diffp{}{\beta} \left[ -\frac{1}{2}\beta\hbar\omega - \ln(1 - \e^{-\beta\hbar\omega}) \right]\\
+        &= \frac{3}{2}N\hbar\omega + 3N\hbar\omega\frac{\e^{-\beta\hbar\omega}}{1 - \e^{-\beta\hbar\omega}}\\
+        &= \frac{3}{2}N\hbar\omega + \frac{3N\hbar\omega}{\e^{\beta\hbar\omega} - 1}
+    \end{align}
+    The heat capacity is then given by
+    \begin{align}
+        C_V &\coloneqq \diffp{\smash{\mean{E}}}{T}[V]\\
+        &\hphantom{:}= \diffp{\beta}{T}\diffp{\mean{E}}{\beta}\\
+        &\hphantom{:}= -\frac{1}{\boltzmann T^2} \diffp{}{\beta} \frac{3N\hbar\omega}{\e^{\beta\hbar\omega} - 1}\\
+        &\hphantom{:}= \frac{1}{\boltzmann T^2} 3N (\hbar\omega)^2 \frac{\e^{\beta\hbar\omega}}{(1 - \e^{-\beta\hbar\omega})^2}\\
+        &\hphantom{:}= 3N\boltzmann(\hbar\omega\beta)^2 \frac{\e^{\beta\hbar\omega}}{(\e^{\beta\hbar\omega} - 1)^2}.
+    \end{align}
+    
+    At high temperatures \(\beta\) is small and so we can expand about \(\beta = 0\), doing so we have
+    \begin{equation}
+        \e^{\beta\hbar\omega} \approx 1,
+    \end{equation}
+    and
+    \begin{equation}
+        (\e^{\beta\hbar\omega} - 1)^{2} \approx (1 + \beta\hbar\omega - 1)^2 = (\beta\hbar\omega)^2,
+    \end{equation}
+    hence,
+    \begin{equation}
+        C_V \approx 3N\boltzmann.
+    \end{equation}
+    This is the same result that we get by applying the equipartition theorem to the \(3N\) harmonic oscillators, each of which has two quadratic degrees of freedom, the kinetic energy and potential energy, each quadratic degree of freedom contributing \(\boltzmann T/2\) to the specific heat capacity.
+    
+    At low temperatures \(\beta\) is large and so \(\e^{\beta\hbar\omega} - 1 \approx \e^{\beta\hbar\omega}\) meaning
+    \begin{equation}
+        C_V \approx 3N\boltzmann(\hbar\omega\beta)^2 \e^{-\beta\hbar\omega}.
+    \end{equation}
+    This tends to zero as \(T \to 0\), as it should.
+    However, the Einstein model predicts that the heat capacity goes to zero exponentially, when careful measurements show that the heat capacity follows a cubic law and so a better model is needed.
+    The problem is that the Einstein model doesn't account for interactions between atoms, the next model does.
+    
+    \section{Debye Model}
+    Keeping with the notation of \(\vv{r_k}\) as the displacement of the \(k\)th atom from its equilibrium we introduce \(x_k^i\) as the \(i\)th Cartesian coordinate of this displacement.
+    The general potential, \(U\), could be a very complicated function of the displacements of the atoms, however, as long as these displacements are small we can always Taylor expand.
+    This is slightly complicated because \(U\) is a function of \(3N\) variables, \(x_k^i\), but not that much more complicated that the one dimensional case, we just need sums:
+    \begin{equation}
+        U = U_0 + \sum_{k}\sum_{i} \diffp{U}{x_k^i}\bigg|_{0}x_k^i + \frac{1}{2} \sum_{k}\sum_{i}\sum_{l}\sum_{j} \diffp{U}{x_k^i, x_l^j} \bigg|_{0} x_k^ix_l^j + \dotsb.
+    \end{equation}
+    We are free to choose \(U_0 = 0\) and the first derivative vanishes since we are expanding about the equilibrium, which is a minimum.
+    Therefore the lowest order term is the quadratic term.
+    We don't know the second derivative, since we don't know \(U\), but we can just hide all of that away by defining
+    \begin{equation}
+        A_{kl}^{ij} \coloneqq \diffp{U}{x_k^i, x_l^i}
+    \end{equation}
+    and so the Hamiltonian takes the form
+    \begin{equation}
+        \operator{H} = -\frac{\hbar^2}{2m} \sum_{k = 1}^{N} \laplacian[k] + \frac{1}{2}\sum_{\clap{k, l, i, j}} A_{kl}^{ij} x_k^ix_l^j.
+    \end{equation}
+    This leaves us with a pairwise potential which is quadratic in the displacements.
+    
+    By choosing an appropriate set of coordinates it is possible to diagonalise the Hamiltonian.
+    We know this is possible since this is the Hamiltonian of 3N coupled harmonic oscillators.
+    Recall that coupled oscillators have normal modes in which all displacements oscillate with the same frequency.
+    The actual motion of the system is then a superposition of these normal modes and the energy is the sum of the energies of each normal mode.
+    We define some transformation matrix, \(L_r\), such that we can define \defineindex{normal coordinates}, \(q_r\) which diagonalise the Hamiltonian:
+    \begin{equation}
+        q_r \coloneqq \sum_{k,i} L_{r,ki}x_k^i
+    \end{equation}
+    for \(r = 1, \dotsc, 3N\).
+    Notice that these normal coordinates in general depend on all \(3N\) physical coordinates and describe oscillations of the whole system.
+    Since there are \(3N\) coordinates there are \(3N\) normal modes.
+    After diagonalising the Hamiltonian becomes
+    \begin{equation}
+        \operator{H} = \sum_{r = 1}^{3N} \left[ -\frac{\hbar^2}{2m} \diffp[2]{}{q_r} + \frac{1}{2}m\omega_r^2q_r^2 \right].
+    \end{equation}
+    From here the process is very similar to the Einstein model so we won't go into too much detail.
+    
+    The normal modes are quantum oscillators.
+    We call the quanta of energy \defineindex{phonons}.
+    The total energy is
+    \begin{equation}
+        E = \sum_{r = 1}^{3N} \hbar\omega_r\left( n_r + \frac{1}{2} \right)
+    \end{equation}
+    where \(n_r\) is the number of phonons in mode \(r\).
+    The canonical partition function is then
+    \begin{equation}
+        \cpartition = \prod_{r=1}^{3N} Z_r
+    \end{equation}
+    where \(Z_r\) is the partition function for mode \(r\) and is given by
+    \begin{equation}
+        Z_r = \frac{\e^{\beta\hbar\omega_r/2}}{1 - \e^{-\beta\hbar\omega_r}}.
+    \end{equation}
+    The average energy is then
+    \begin{equation}
+        \mean{E} = -\diffp{}{\beta} \ln \cpartition = \text{constant} + \sum_r \frac{\hbar\omega_r}{\e^{\beta\hbar\omega_r} - 1}.
+    \end{equation}
+    The constant term isn't important since we are interested in the heat capacity, which is defined as the temperature derivative of this.
+    
+    The second term is the same as an ideal Bose gas at \(\mu = 0\), so phonons behave as if they were bosons.
+    The factor \(1/(\exp(\beta\hbar\omega) - 1)\) can then be interpreted as the mean number of phonons in mode \(r\) and \(\hbar\omega_r = E_r\) as the energy of a phonon in mode \(r\).
+    We can treat the system as an ideal Bose gas of free phonons, free since \(\mu = 0\).
+    The number of phonons is not conserved, which is why \(\mu = 0\), essentially it takes no energy to create or remove phonons, so long as the net energy remains constant the number of phonons is free to change.
+    
+    If we assume that the density of modes, \(g\), is known as a function of \(\omega\) then we can write the sum as an integral over the density of modes:
+    \begin{equation}
+        \mean{E} \approx \text{constant} + \int \frac{\hbar\omega}{\e^{\beta\hbar\omega} - 1} g(\omega) \dd{\omega}.
+    \end{equation}
+    The problem is that we cannot in general accurately calculate \(g\), since for any reasonable number of particles the calculation becomes quickly infeasible.
+    Instead we need an approximation.
+    
+    \subsection{Debye Theory}
+    Debye theory is an approximation of the density of modes.
+    Recall that for a gas of free particles, which we can treat the phonons as, the density of states in energy-space is
+    \begin{equation}
+        g(\varepsilon) = \frac{\Gamma(k)}{\diff{\varepsilon}/{k}} \qqwhere \Gamma(k) = g_{\mathrm{s}} \frac{V}{2\pi^2}k^2
+    \end{equation}
+    where we have added a spin degeneracy factor, \(g_{\mathrm{s}}\).
+    
+    In Debye theory we regard phonons as sound waves and we can then use the same density of modes that follows from the relation
+    \begin{equation}
+        k = \frac{\omega}{c_{\mathrm{s}}}
+    \end{equation}
+    where \(c_{\mathrm{s}}\) is the speed of sound in the material, which we assume to be constant.
+    There are two transverse and one longitudinal wave modes and so \(g_{\mathrm{s}} = 3\).
+    Changing variables to \(\omega = \varepsilon/\hbar\) we have
+    \begin{equation}
+        g(\omega) \dd{\omega} = \Gamma(k) \dd{k}
+    \end{equation}
+    which gives
+    \begin{equation}
+        g(\omega) \dd{\omega} = 3\frac{V}{2\pi^2} \left( \frac{\omega}{c_{\mathrm{s}}} \right)^{2} \frac{1}{c_{\mathrm{s}}} \dd{\omega}
+    \end{equation}
+    and so
+    \begin{equation}
+        g(\omega) = 3\frac{V}{2\pi^2} \frac{\omega^2}{c_{\mathrm{s}}^3} \eqqcolon AV\omega^2
+    \end{equation}
+    where we define the constant \(A \coloneqq 3/(2\pi^2 c_{\mathrm{s}}^3)\) for notational simplicity.
+    Debye theory simply posits that this is the correct form for the density of modes.
+    
+    Recall that there are \(3N\) normal modes.
+    We therefore need to introduce an cut-off frequency, \(\omega_{\mathrm{max}}\) so that
+    \begin{equation}
+        \int_{0}^{\omega_{\mathrm{max}}} g(\omega) \dd{\omega} = 3N.
+    \end{equation}
+    This gives
+    \begin{equation}
+        \omega_{\mathrm{max}} = \left( \frac{9}{A} \frac{N}{V} \right)^{1/3} = \left( 6\pi^2 \frac{N}{V} \right)^{1/3} c_{\mathrm{s}}.
+    \end{equation}
+    Notice that this depends only on the number density, \(N/V\), of the phonons.
+    We can define a characteristic temperature, \(\Theta_{\mathrm{D}}\), called the \defineindex{Debye temperature}:
+    \begin{equation}
+        \boltzmann\Theta_{\mathrm{D}} = \hbar\omega_{\mathrm{max}}.
+    \end{equation}
+    We can then take \(\Theta_{\mathrm{D}}\) as a free material dependent parameter to be determined from experiments.
+    
+    The mean energy is then
+    \begin{align}
+        \mean{E} &= \int_{0}^{\infty} \hbar\omega g(\omega) \mean{n(\omega)} \dd{\omega}\\
+        &= AV\hbar \int_{0}^{\omega_{\mathrm{max}}} \frac{\omega^3}{\e^{\beta\hbar\omega} - 1}\dd{\omega}.
+    \end{align}
+
+    We first consider the high temperature limit, \(T \gg \Theta_{\mathrm{D}}\).
+    This implies \(\hbar\omega/(\boltzmann T) \ll 1\) and we can expand \(\e^{\beta\hbar\omega} \approx 1 + \beta\hbar\omega\).
+    We then get
+    \begin{equation}
+        \mean{E} \approx AV\hbar \int_{0}^{\omega_{\mathrm{max}}} \frac{\omega^3}{\beta\hbar\omega} \dd{\omega} = 3N\boltzmann T.
+    \end{equation}
+    This is, as expected, the same result as we get from equipartition and the Einstein model, which we know work well in the high temperature regions.
+    
+    In the lower temperature limit, \(T \ll \Theta_{\mathrm{D}}\) a change of variables to \(x = \beta\hbar\omega\) gives the mean energy as a constant times a dimensionless integral:
+    \begin{equation}
+        \mean{E} = \frac{AV\hbar}{(\beta\hbar)^4} \int_{0}^{\Theta_{\mathrm{D}}/T} \frac{x^3}{\e^{x} - 1}.
+    \end{equation}
+    For \(T \ll \Theta_{\mathrm{D}}\) we can replace the upper limit with \(\infty\).
+    This integral can be done analytically or numerically estimated, either way its value is \(\pi^4/15\).
+    The important thing is it is a finite, nonzero, constant.
+    At low temperatures we can see that \(\mean{E} \propto T^4\) and so \(C_V \propto T^3\), which agrees well with experiments.
+    
+    At low temperatures only low frequency (and so low energy) modes are excited and it is these modes which are modelled well by the Debye theory as sound waves.
+    This allows Debye theory to work at low and high temperatures, but in between it is approximate.
+    
+    \subsection{The Integral}
+    While the exact value of the integral isn't important it is my favourite integral so it would be amiss not to demonstrate how one can come to an analytic solution.
+    We do so for a more general integral,
+    \begin{equation}
+        I = \int_{0}^{\infty} \frac{x^{p - 1}}{\e^{x} - 1} \dd{x}.
+    \end{equation}
+    First we need a few facts from complex analysis, first the Riemann zeta function is defined for \(s\in\complex\) with \(\Re(s) \ge 1\) as
+    \begin{equation}
+        \zeta(s) \coloneqq \sum_{n = 1}^{\infty} \frac{1}{n^s}.
+    \end{equation}
+    The gamma function is defined for \(z \in \complex\) with \(\Re(z) > 0\) by the integral
+    \begin{equation}
+        \Gamma(z) \coloneqq \int_{0}^{\infty} t^{z - 1} \e^{-t} \dd{t}.
+    \end{equation}
+    
+    We therefore have
+    \begin{align}
+        I &= \int_{0}^{\infty} \frac{x^{p - 1}}{\e^{x} - 1} \dd{x}\\
+        &= \int_{0}^{\infty} x^{p - 1} \e^{-x} \frac{1}{1 - \e^{-x}} \dd{x}\\
+        &= \int_{0}^{\infty} x^{p - 1} \e^{-x} \sum_{n = 0}^{\infty} \e^{-nx} \dd{x}.
+    \end{align}
+    Here we have identified the geometric series which converges uniformly for \(\abs{\e^{-x}} < 1\), which is always the case for \(x \in \reals\) and so we can exchange the sum and the integral giving
+    \begin{align}
+        I &= \sum_{n = 0}^{\infty} \int_{0}^{\infty} x^{p - 1} \e^{-x} \e^{-nx} \dd{x}\\
+        &= \sum_{n = 0}^{\infty} \int_{0}^{\infty} x^{p - 1} \e^{-x(n + 1)} \dd{x}.
+    \end{align}
+    Reindexing the sum to start at \(n = 1\) this becomes
+    \begin{equation}
+        I = \sum_{n = 1}^{\infty} \int_{0}^{\infty} x^{p - 1} \e^{-xn} \dd{x}.
+    \end{equation}
+    Now let \(y = nnx\) and so \(\dl{y} = n\dd{x}\) and we have
+    \begin{align}
+        I &= \sum_{n = 1}^{\infty} \int_{0}^{\infty} \frac{y^{p - 1}}{n^{p - 1}} \e^{-y} \frac{\dl{y}}{n}\\
+        &= \sum_{n = 1}^{\infty} \frac{1}{n^p} \int_{0}^{\infty} y^{p - 1} \e^{-y} \dd{y}\\
+        &= \zeta(p)\Gamma(p).
+    \end{align}
+    
+    The Riemann zeta function and gamma function can be evaluated to arbitrary precision and for some values can be evaluated exactly.
+    \(p = 4\) is one of these values giving \(\zeta(4) = \pi^4/90\) and \(\Gamma(4) = 3! = 6\), hence
+    \begin{equation}
+        \int_{0}^{\infty} \frac{x^3}{\e^{x} - 1} \dd{x} = \zeta(4)\Gamma(4) = \frac{\pi^4}{15}.
+    \end{equation}
+
     
     
 %    %   Appdendix
