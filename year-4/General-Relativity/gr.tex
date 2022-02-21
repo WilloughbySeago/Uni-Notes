@@ -12,6 +12,13 @@
 \tikzexternalize[prefix=tikz-external/]
 %\tikzexternaldisable
 % other libraries
+\usetikzlibrary{shapes.misc}
+\usetikzlibrary{angles}
+\usetikzlibrary{quotes}
+
+% PGF plots
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
 
 % References, should be last things loaded
 \usepackage{hyperref}  % Should be loaded second last (cleveref last)
@@ -42,11 +49,21 @@ noabbrev
 \definecolor{my green}{HTML}{6AEB00}
 \definecolor{my purple}{HTML}{CF00EB}
 
+\hyphenation{Schwarz-schild}
+
 % Commands
 % Maths
 \newcommand*{\dalembertian}{\mathop{\square}}
 \newcommand*{\christoffel}[3]{\tensor{\Gamma}{^{#1}_{{#2}{#3}}}}
 \newcommand*{\order}{\mathcal{O}}
+\newcommand*{\lagrangian}{\mathcal{L}}
+\newcommand*{\category}[1]{\mathbf{#1}}
+\DeclareMathOperator{\End}{End}
+\newcommand*{\cv}[1]{\bm{\tilde{#1}}}
+\newcommand*{\cve}[1]{\bm{\tilde{e}^{#1}}}
+\newcommand*{\vep}[1]{\bm{e'_{#1}}}
+\newcommand*{\cvep}[1]{\bm{\tilde{e}'^{#1}}}
+\newcommand*{\trans}{\top}
 
 % Include
 \includeonly{}
@@ -54,7 +71,7 @@ noabbrev
 \begin{document}
     \frontmatter
     \titlepage
-    \innertitlepage{} 
+    \innertitlepage{tikz-external/effective-schwarzschild-potential}
     \tableofcontents
     \mainmatter
     \chapter{Introduction}
@@ -867,6 +884,1461 @@ noabbrev
     \begin{equation}
         z_{\mathrm{grav}} \approx \frac{\Phi_{\mathrm{e}} - \Phi_{\mathrm{o}}}{c^2}.
     \end{equation}
+    
+    \chapter{Variational Formulation of GR}
+    \section{Variational Principle}
+    \begin{rmk}
+        For more on variational methods and the Lagrangian method see thee notes from the Lagrangian Dynamics course.
+    \end{rmk}
+    The geodesic equation is named as such as the solutions are geodesics, by which we mean they are the shortest paths when accounting for curvature.
+    Solving the equations of motion for a particle the correspond to extremising the path.
+    Consider the SR situation of finding the path taken between two points.
+    A straight line is the shortest path between the points.
+    If the particle somehow made the same journey in the same time but the path is not straight then the particle must necessarily be moving faster on this non-straight path and hence will have \(\gamma > 1\), and so the proper time will be less since \(\Delta t = \gamma \Delta \tau\) is fixed.
+    
+    We can extract from this special relativity case of flat spacetime a general principle that \(\Delta \tau\) is maximised by whatever trajectory the particle takes.
+    We can state this as a variational principle that
+    \begin{equation}
+        \delta \int \dl{\tau} = 0.
+    \end{equation}
+    We now notice an analogy with Lagrangian dynamics where we have Hamilton's principle, which states that the action \(S\) is maximised, and the action is given by an integral over the Lagrangian, \(\lagrangian(q, \dot{q})\), here \(q\) and \(\dot{q}\) are a generalised coordinate and generalised velocity.
+    Hamilton's principle is then
+    \begin{equation}
+        \delta S = \int \lagrangian \dd{t} = 0.
+    \end{equation}
+    
+    In classical mechanics the Lagrangian is given by \(\lagrangian = T - V\), where \(T\) is the kinetic energy and \(V\) is the (conservative) potential.
+    For a free particle in one dimension we have \(T = m\dot{x}^2/2\) and \(V = V(x)\).
+    We can then apply the Euler--Lagrange equations,
+    \begin{equation}
+        \diff*{\left( \diffp{\lagrangian}{\dot{q}} \right)}{t} - \diffp{\lagrangian}{q} = 0.
+    \end{equation}
+    In this one-dimensional free case we get
+    \begin{equation}
+        \diffp{\lagrangian}{x} =  -\diffp{V}{x} = m\ddot{x} = \diff*{(m\dot{x})}{t} = \diff*{\left( \diffp{\lagrangian}{\dot{x}} \right)}{t}.
+    \end{equation}
+    This is simply Newton's second law.
+    
+    In general relativity we can write the proper time between events \(A\) and \(B\) as an integral.
+    We can then perform a change of variables to some parameter, \(p\), which increases monotonically along the world line:
+    \begin{equation}
+        c\tau_{AB} = c\int_{A}^{B} \dl{\tau} = c\int_{A}^{B} \diff{\tau}{p}\dd{p} = \int_{A}^{B} \lagrangian(x^\mu, \dot{x}^\mu) \dd{p}.
+    \end{equation}
+    Here we know we are looking for an equivalent to the Lagrangian in Hamilton's principle and so we identify the integrand as the Lagrangian:
+    \begin{equation}
+        \lagrangian(x^\mu, \dot{x}^\mu) = c\diff{\tau}{p}.
+    \end{equation}
+    We use the notation \(\dot{x} = \diff{x}/{p}\) in analogy to classical mechanics where \(\dot{x} = \diff{x}{t}\), since \(t\) plays the role of our parameter, \(p\), as it monotonically increases along the path in non-relativistic mechanics.
+    
+    In special relativity we can show that the Lagrangian takes the form
+    \begin{equation}
+        \lagrangian = c\diff{\tau}{p} = \sqrt{\eta_{\mu\nu} \diff{x^\mu}{p} \diff{x^\nu}{p}} = \sqrt{c^2\dot{t}^2 - \dot{x}^2 - \dot{y}^2 - \dot{z}^2}.
+    \end{equation}
+    For a free particle the Euler--Lagrange equations should give a solution of the form \(x^i = A + Bt\) for some constants \(A\) and \(B\).
+    That is we should have motion in a straight line.
+    
+    The square root complicates the algebra somewhat so it would be nice to get rid of it.
+    Fortunately we can do this by considering \(\lagrangian^2\).
+    The justification for this is that if
+    \begin{equation}
+        c\Delta \tau = c\int \dl{\tau}
+    \end{equation}
+    then taking \(p = \tau\) we have \(\lagrangian = c\).
+    In this case \(\lagrangian^2 = c^2\).
+    We therefore have
+    \begin{equation}
+        \int \lagrangian^2 \dd{\tau} = c^2\int \dd{\tau} \implies \delta \int \lagrangian^2 \dd{\tau} = c^2 \, \delta\int \dd{\tau} = 0
+    \end{equation}
+    so \(\lagrangian^2\) is also such as to find a stationary path, meaning we can apply the Euler--Lagrange equations.
+    
+    First notice that
+    \begin{equation}
+        \diffp{\lagrangian^2}{x^\mu} = 0
+    \end{equation}
+    and so the Euler--Lagrange equations for \(\lagrangian^2\) are
+    \begin{equation}
+        \diff*{\left( \diffp{\lagrangian^2}{\dot{x}^\mu} \right)}{\tau} - \diffp{\lagrangian^2}{x^\mu} = \diff*{\left( \diffp{\lagrangian^2}{\dot{x}^\mu} \right)}{\tau} = 0.
+    \end{equation}
+    We can integrate this to get
+    \begin{equation}
+        \diffp{\lagrangian^2}{\dot{x}^\mu} = \text{constant}.
+    \end{equation}
+    The solution to this is then that \(x^\mu = A^\mu + B^\mu\tau\) for some constants \(A^\mu\) and \(B^\mu\) which are specific to each coordinate but don't necessarily form four-vectors.
+    This means that we get motion along a straight line at constant velocity.
+    Any accelerated trajectory differing from this will have a shorter proper time.
+    
+    At this point one may wonder why we introduced the parameter \(p\) if we were just immediately going to replace it with \(\tau\).
+    The answer is we have to consider massless particles.
+    Since these travel at the speed of light \(\tau = 0\), and so \(\tau\) cannot be used as a parameter.
+    Instead we can use an affine parameter, which is a linear function of \(\tau\), say \(p \propto \tau\).
+    In particular we could choose \(p \propto \gamma \tau = t\), since for massless particles \(t\) increases monotonically along the trajectory.
+    The only difference is we instead have \(\lagrangian^2 = 0\) for massless particles.
+    The result is the same and we usually aren't explicit about what \(p\) is since we eliminate it from any equations.
+    
+    By the equivalence principle in general relativity we can find the path by maximising \(\tau\) in a locally inertial frame.
+    However, since \(\tau\) is an invariant this is equivalent to maximising \(\tau\) in any frame.
+    The Lagrangian generalises in the obvious way, replacing \(\eta_{\mu\nu}\) with \(g_{\mu\nu}\), and the geodesic principle for \(\lagrangian^2\) holds so
+    \begin{equation}
+        \delta \int \lagrangian \dd{p} = 0, \qqwhere \lagrangian^2 = g_{\mu\nu} \diff{x^\mu}{p} \diff{x^\nu}{p}.
+    \end{equation}
+    
+    \section{Calculating the Affine Connection}
+    We now have a general scheme for calculating the affine connection, \(\christoffel{\lambda}{\mu}{\nu}\), without needing to compute derivatives of the metric.
+    The process is as follows:
+    \begin{enumerate}
+        \item Write down the relativistic line element associated with the given spacetime.
+        This is equal to \(c^2\dd{\tau}^2\)
+        \item Convert this to \(\lagrangian^2\) by identifying \(\dl{x^\mu} \to \dot{x}^\mu\).
+        \item Write down the Euler--Lagrange equations for \(\lagrangian^2\), remember that \(x^\mu\) and \(\dot{x}^\mu\) are independent variables.
+        \item Rearrange these equations to the form \(\ddot{x}^\lambda + \tensor{[\text{something}]}{^\lambda_{\mu\nu}} \dot{x}^\mu \dot{x}^\nu = 0\).
+        \item Identify \(\christoffel{\lambda}{\mu}{\nu} = \tensor{[\text{something}]}{^\lambda_{\mu\nu}}\).
+        \item When \(\mu \ne \nu\) divide by 2.
+        This is because \(\christoffel{\lambda}{\mu}{\nu} = \christoffel{\lambda}{\nu}{\mu}\) and in the geodesic equation we sum over \(\mu\) and \(\nu\) but in the Euler--Lagrange equations we don't, therefore both \(\christoffel{\lambda}{\mu}{\nu}\) and \(\christoffel{\lambda}{\nu}{\mu}\) are combined into one term in the Euler--Lagrange equations.
+        \item If any set of indices for \(\Gamma\) don't appear in the equations then \(\Gamma\) is zero for these indices.
+    \end{enumerate}
+    
+    \begin{exm}{Geodesics on a Sphere}{}
+        On a sphere of radius \(R\) we can parametrise points by the polar coordinates \((\vartheta, \varphi)\).
+        The line element between \((\vartheta, \varphi)\) and \((\vartheta + \dl{\vartheta}, \varphi + \dl{\varphi})\) is then
+        \begin{equation}
+            \dl{\ell}^2 = R^2 \dd{\vartheta}^2 + R^2\sin^2(\vartheta) \dd{\varphi}^2.
+        \end{equation}
+        Converting this to \(\lagrangian^2\) we get
+        \begin{equation}
+            \lagrangian^2 = R^2 \dot{\vartheta}^2 + R^2\sin^2(\vartheta) \dot{\varphi}^2.
+        \end{equation}
+        
+        Applying the Euler--Lagrange equations for \(\lagrangian^2\) with respect to \(\vartheta\) we get
+        \begin{align}
+            \diffp{\lagrangian^2}{\vartheta} &= \diffp*{(R^2\dot{\vartheta}^2 + R^2\sin^2(\vartheta) \dot{\varphi}^2)}{\vartheta} = 2R^2\sin(\vartheta)\cos(\vartheta) \dot{\varphi}^2,\\
+            \diff*{\left( \diffp{\lagrangian^2}{\dot{\vartheta}} \right)}{p} &= \diff*{\left( \diffp*{(R^2\dot{\vartheta}^2 + R^2\sin^2(\vartheta) \dot{\varphi}^2)}{\dot{\vartheta}} \right)}{p} = \diff*{(2R^2\dot{\vartheta})}{p} = 2R^2\ddot{\vartheta},\notag
+        \end{align}
+        and so
+        \begin{equation}
+            2R^2\ddot{\vartheta} - 2R^2\sin(\vartheta)\cos(\vartheta) \dot{\varphi}^2 = 0 \implies \ddot{\vartheta} - \sin(\vartheta)\cos(\vartheta) \dot{\varphi}^2 = 0.
+        \end{equation}
+        To aid in reading off the affine connection we write this with \(x^\vartheta = \vartheta\) and \(x^\varphi = \varphi\):
+        \begin{equation}
+            \ddot{x}^\vartheta - \sin(x^\vartheta)\cos(x^\vartheta) \dot{x}^\varphi \dot{x}^\varphi = 0.
+        \end{equation}
+        From this we compare to \(\ddot{x}^\lambda + \christoffel{\lambda}{\mu}{\nu} \dot{x}^\mu\dot{x}^\nu\) and we see that
+        \begin{equation}
+            \christoffel{\vartheta}{\varphi}{\varphi} = -\sin(\vartheta)\cos(\vartheta).
+        \end{equation}
+        
+        Applying the Euler--Lagrange equations for \(\lagrangian^2\) with respect to \(\varphi\) we get
+        \begin{align}
+            \diffp{\lagrangian^2}{\varphi} &= \diffp*{(R^2\dot{\vartheta}^2 + R^2\sin^2(\vartheta)\dot{\varphi}^2)}{\varphi} = 0,\\
+            \diff*{\left( \diffp{\lagrangian^2}{\dot{\varphi}} \right)}{p} &= \diff*{\left( \diffp*{(R^2\dot{\vartheta}^2 + R^2\sin^2(\vartheta)\dot{\varphi}^2)}{\dot{\varphi}} \right)}{p}\\
+            &= \diff*{(2R^2\sin^2(\vartheta)\dot{\varphi})}{p} = 2R^2\sin^2(\vartheta)\ddot{\varphi} + 4R^2\sin(\vartheta)\cos(\vartheta) \dot{\vartheta}\dot{\varphi},
+        \end{align}
+        and so
+        \begin{equation}
+            2R^2\sin^2(\vartheta) \ddot{\varphi} + 4R^2\sin(\vartheta)\cos(\vartheta) \dot{\vartheta}\dot{\varphi} = 0 \implies \ddot{\varphi} + \cot(\vartheta) \dot{\vartheta} \dot{\varphi} = 0.
+        \end{equation}
+        Which we can rewrite as
+        \begin{equation}
+            \ddot{x}^\varphi + 2\cot(\vartheta) \dot{x}^\vartheta \dot{x}^\varphi = 0.
+        \end{equation}
+        We can then read off
+        \begin{equation}
+            \christoffel{\varphi}{\vartheta}{\varphi} = \christoffel{\varphi}{\varphi}{\vartheta} = \cot\vartheta.
+        \end{equation}
+        Be careful since in the Euler--Lagrange equation as written what we identify as \(\tensor{[\text{something}]}{^\vartheta_{\varphi\vartheta}}\) is actually \(\christoffel{\vartheta}{\varphi}{\vartheta} + \christoffel{\vartheta}{\vartheta}{\varphi} = 2\christoffel{\vartheta}{\varphi}{\vartheta}\), so we need to divide by 2.
+        
+        All affine connections which we haven't seen must be zero since we have accounted for all degrees of freedom in the Euler--Lagrange equations.
+        
+        For future use we write these affine connections as \(2 \times 2\) matrices, \(\Gamma_\mu\), where \(\tensor{(\Gamma_\mu)}{^\lambda_\nu} = \christoffel{\lambda}{\mu}{\nu}\):
+        \begin{equation}
+            \Gamma_\vartheta = 
+            \begin{pmatrix}
+                0 & 0\\
+                0 & \cot\vartheta
+            \end{pmatrix}
+            , \qqand \Gamma_\varphi = 
+            \begin{pmatrix}
+                0             & -\sin\vartheta\cos\vartheta\\
+                \cot\vartheta & 0
+            \end{pmatrix}
+            .
+        \end{equation}
+    \end{exm}
+    
+    \chapter{Schwarzschild Metric}
+    As an example of the tools we have developed so far we will consider the Schwarzschild metric.
+    In October of 1915 Einstein published his field equations, which we will see in detail later, these relate gravity and energy and their solutions are the metric for the spacetime in question.
+    In December 1915, while fighting in World War I, Karl Schwarzschild solved Einstein's field equations for the case of a spherically symmetric point mass.
+    This was the first exact solution any one found to Einstein's field equations.
+    In analogy with Gauss' law in electromagnetism this solution also holds outside of a spherically symmetric mass distribution, this is known as Birkhoff's theorem.
+    However, unlike in electromagnetism we cannot then integrate over point masses to get all solutions since this only works if the superposition principle holds, which it doesn't for gravitational fields, which are nonlinear in nature.
+    While Schwarzschild's original solutions allowed for a time dependent mass distribution we will assume here that the mass distribution is static.
+    
+    \section{Coordinate Freedom}
+    \subsection{Distances on the 2-Sphere}
+    In order to start our derivation of the Schwarzschild metric we will make use of the coordinate freedom that we have in general relativity, namely that we can choose various coordinate systems to describe the same spacetime.
+    As an example of this we consider again a two-dimensional sphere of radius \(R\).
+    We previously used the polar coordinates \((\vartheta, \varphi)\) to parametrise the sphere.
+    Instead we can let \(r = R\vartheta\), \(r\) here is called the \defineindex{geodesic distance}.
+    We can then parametrise the surface with the coordinates \((r, \varphi)\).
+    
+    The line element is then transformed from
+    \begin{equation}
+        \dl{\ell}^2 = R^2\dd{\vartheta}^2 + R^2\sin^2(\vartheta)\dd{\varphi}^2
+    \end{equation}
+    to
+    \begin{equation}
+        \dl{\ell}^2 = \dl{r}^2 + R^2\sin^2(r/R)\dd{\varphi}^2.
+    \end{equation}
+    The first term is now as simple as possible, and the second is more complicated.
+    In the limit of \(R \to \infty\) we have
+    \begin{align}
+        \lim_{R \to \infty} R\sin(r/R) &= \lim_{R \to \infty} \frac{\sin(r/R)}{1/R}\\
+        &= \lim_{R\to\infty} \frac{-rR^{-2}\cos(r/R)}{-R^{-2}}\\
+        &= \lim_{R \to \infty} r\cos(r/R) = r
+    \end{align}
+    and we get
+    \begin{equation}
+        \dl{\ell}^2 = \dl{r}^2 + r^2\dd{\varphi}^2.
+    \end{equation}
+    This is the metric for a plane in polar coordinates, we can think of this as the generalisation of a straight line being a circle with infinite radius.
+    
+    There is no reason why we should make the first term simple and the second complicated.
+    There is actually an infinite number of ways we can write the line element.
+    For example if we want to make the second term simpler we might take \(\rho = R\sin(r/R)\) and so \(\dl{\rho} = \cos(r/R)\dd{r} = \sqrt{1 - \rho^2/R^2}\dl{r}\), which gives the line element as
+    \begin{equation}
+        \dl{\ell}^2 = \frac{\dl{\rho}^2}{1 0 \kappa \rho^2} + \rho^2 \dd{\varphi}^2
+    \end{equation}
+    where \(\kappa \coloneqq 1/R^2\).
+    This form has the advantage that we can identify \(\kappa\) as the curvature of the sphere.
+    We call \(\rho\) the \defineindex{angular diameter distance} since it can be be shown that the angle subtended by a line of length \(\dl{\ell_\perp}\) perpendicular to the line-of-sight is \(\dl{\varphi} = \dl{\ell_\perp}/\rho\).
+    
+    This form of the metric also generalises, clearly it holds for spheres, \(\kappa > 0\), but it also holds for planes, \(\kappa = 0\), and hyperbolic surfaces, \(\kappa < 0\).
+    
+    \subsection{SR Metric in Spherical Coordinates}
+    In special relativity the line element is
+    \begin{equation}
+        c^2\dd{\tau}^2 = c^2\dd{t}^2 - \dl{\ell}^2.
+    \end{equation}
+    The spatial part can take the form
+    \begin{equation}
+        \dl{\ell}^2 = \dl{x}^2 + \dl{y}^2 + \dl{z}^2
+    \end{equation}
+    in Cartesian coordinates, \((x, y, z)\), or
+    \begin{equation}
+        \dl{\ell}^2 = \dl{r}^2 + r^2 \dd{\vartheta}^2 + r^2\sin^2(\vartheta) \dd{\varphi}^2
+    \end{equation}
+    in spherical coordinates, \((r, \vartheta, \varphi)\).
+    We can also define \(\dl{\psi}^2 \coloneqq \dl{\vartheta}^2 + \sin^2(\vartheta) \dd{\varphi}^2\) and so
+    \begin{equation}
+        \dl{\ell}^2 = \dl{r}^2 + r^2 \dd{\psi}^2.
+    \end{equation}
+    We can identify \(\dl{\psi}\) as the angle between radial lines separated by \((\dl{\vartheta}, \dl{\varphi})\) on the surface of the sphere.
+    The SR metric can then be written as
+    \begin{equation}
+        c^2\dd{\tau}^2 = c^2\dd{t}^2 - [\dl{r}^2 + r^2(\dl{\vartheta}^2 + \sin^2(\vartheta) \dd{\varphi}^2)].
+    \end{equation}
+    
+    \section{Schwarzschild Metric in Spherical Coordinates}
+    The \defineindex{Schwarzschild metric} applies outside of the point mass/spherically symmetric mass distribution, and hence in an empty, but curved, spacetime.
+    The spherical symmetry of this setup gets us a fair way in finding the form of the metric.
+    Clearly in a spherical geometry like this we should work in spherical coordinates.
+    
+    We can then assume that the Schwarzschild metric is a modified version of the SR metric in spherical polars, in particular that it takes the form
+    \begin{align}
+        c^2\dd{\tau}^2 &= e(r)c^2\dd{t}^2 - f(r)^2\dd{r}^2 - g(r)^2 r^2(\dl{\vartheta}^2 + \sin^2(\vartheta)\dd{\varphi}^2)\\
+        &= e(rc^2\dd{t})^2 - f(r)^2\dd{r}^2 - g(r)^2 r^2 \dd{\psi}^2.
+    \end{align}
+    Here \(e\), \(f\), and \(g\) are spherically symmetric functions, hence depend only on \(r\), which we need to determine.
+    They are also independent of time since we are assuming a stationary mass distribution.
+    
+    This is where the freedom of coordinates comes in.
+    If \(e\), \(f\), and \(g\) are monotonic we are free to define \(r'\) such that \(r'^2 = g(r)^2r^2\).
+    This works since our radial coordinate only needs to be monotonically increasing with distance from the point mass, so we can adopt \(r'\) as our radial coordinate.
+    We can then rewrite the metric in terms of \(r'\) and the \(g(r)^2r^2\) term becomes unity.
+    Doing so and dropping the prime we get
+    \begin{equation}
+        c^2\dd{\tau}^2 = e(r)c^2\dd{t}^2 - f(r)\dd{r}^2 - r^2(\dd{\vartheta}^2 + \sin^2(\vartheta) \dd{\varphi}^2).
+    \end{equation}
+    
+    At large distances it is physically reasonable to assume the effect of the mass becomes small and we should recover the weak field approximation, and at infinity we should recover the special relativity metric.
+    Recall that in the weak field limit \(g_{00} \approx 1 + 2\Phi/c^2\).
+    
+    Without using Einstein's field equations this is as far as we can get.
+    We therefore simply quote the full solution which we will derive later:
+    \begin{equation}
+        c^2\dd{\tau}^2 = \alpha c^2\dd{t}^2 - \frac{1}{\alpha}\dd{r}^2 - r^2(\dl{\vartheta}^2 + \sin^2(\vartheta) \dd{\varphi}^2).
+    \end{equation}
+    Here
+    \begin{equation}
+        \alpha \coloneqq 1 + \frac{2\Phi}{c^2} = 1 - \frac{2GM}{c^2r} = 1 - \frac{r_{\mathrm{s}}}{r}
+    \end{equation}
+    where \(r_{\mathrm{s}} = 2GM/c^2\) is the \defineindex{Schwarzschild radius}.
+    
+    Some comments on the Schwarzschild metric:
+    \begin{itemize}
+        \item \(t\) is the coordinate time, corresponding to the time measured on a stationary clock at infinity.
+        The proper time for a stationary clock at \((r, \vartheta, \varphi)\) is
+        \begin{equation}
+            \dl{\tau} = \dl{t}\sqrt{1 - \frac{2GM}{rc^2}} = \dl{t}\sqrt{1 + \frac{2\Phi}{c^2}} = \dl{t}\sqrt{1 - \frac{r_{\mathrm{s}}}{r}}
+        \end{equation}
+        which coincides with the weak field approximation when \(r \gg GM/c^2\), since we can then apply the binomial expansion to the square root to get
+        \begin{equation}
+            \dl{\tau} \approx \dl{t}\left( 1 - \frac{GM}{rc^2} \right) = \dl{t}\left( 1 + \frac{\Phi}{c^2} \right) = \dl{t}\left( 1 - \frac{r_{\mathrm{s}}}{2r} \right).
+        \end{equation}
+        \item Time is curved, since \(g_{00} = 1 + 2\Phi/c^2 \ne 1\).
+        \item Space is curved a similar amount, since \(g_{rr} = -1/\alpha \approx -1 - GM/(rc^2)\) to first order in \(1/r\), which has a similar absolute value to \(g_{00}\).
+        This surprised Einstein who expected that the curvature would occur for time only.
+        \item Something strange occurs when \(r = r_{\mathrm{s}}\).
+        Setting \(\dl{\tau} = 0\), so considering massless particles, we see that the coordinate speed of light is \(\diff{r}/{t} = 0\) at \(r = r_{\mathrm{s}}\), meaning that light signals cannot reach \(r < r_{\mathrm{s}}\), we have an event horizon.
+    \end{itemize}
+
+    \chapter{Orbits in the Schwarzschild Metric}
+    \section{Basic Orbits}
+    We can now start deriving equations of motion for particles orbiting a point mass or some other spherically symmetric mass distribution.
+    We start by writing the squared Lagrangian in the Schwarzschild metric, which we do by taking the metric,
+    \begin{equation}
+        c^2 \dd{\tau}^2 = \alpha c^2 \dd{t}^2 - \frac{1}{\alpha}\dd{r}^2 - r^2(\dd{\vartheta}^2 + \sin^2(\vartheta)\dd{\varphi}^2)
+    \end{equation}
+    and changing \((\dd{x}^\mu)^2 \to (\dot{x}^\mu)^2\):
+    \begin{equation}
+        \lagrangian^2 = \alpha c^2 \dot{t}^2 - \frac{1}{\alpha} \dot{r}^2 - r^2 (\dot{\vartheta}^2 + \sin^2(\vartheta)\dot{\varphi}^2).
+    \end{equation}
+    We now apply the Euler--Lagrange equations to this.
+    Starting with \(t\) we have
+    \begin{equation}
+        \diffp{\lagrangian^2}{t} = 0 \implies \diffp{\lagrangian^2}{\dot{t}} = 2\alpha c^2\dot{t} = \text{constant}.
+    \end{equation}
+    Remembering that \(\alpha\) depends on \(r\) we have
+    \begin{equation}
+        \alpha \dot{t} = k = \text{constant}.
+    \end{equation}
+
+    We interpret this as saying that there is time dilation, since if there wasn't then we would expect \(\dot{t} = 0\).
+    This form makes sense when considering non-relativistic weak fields.
+    We would expect both special-relativistic time dilation, providing a factor of \(\gamma\), and gravitational time dilation, providing a factor of \(1 + GM/(c^2r)\).
+    As a result we expect
+    \begin{equation}
+        \dl{t} = \gamma \left( 1 + \frac{GM}{c^2r} \right) \dl{\tau} \implies \diff{t}{\tau} = \gamma \left( 1 + \frac{GM}{c^2r} \right).
+    \end{equation}
+    Expanding \(\gamma \approx 1 + v^2/(2c^2)\) we get
+    \begin{equation}
+        \dot{t} \approx 1 + \frac{v^2}{2c^2} + \frac{GM}{c^2r}.
+    \end{equation}
+    Noticing that \(v^2/2 - GM/r = E\) is the total energy per unit mass this result is equal to the full GR time dilation equation to first order when we set \(k = 1 + E/c^2\) or \(k = E/c^2\) if we include the rest mass in the total energy.
+    
+    The \(\varphi\) Euler--Lagrange equations give
+    \begin{equation}
+        \diffp{\lagrangian^2}{\varphi} = 0 \implies \diffp{\lagrangian^2}{\dot{\varphi}} = -2r^2\sin^2(\vartheta)\dot{\varphi} = \text{constant}.
+    \end{equation}
+    We are free to choose the orbit to occur in the \(\vartheta = \pi/2\) plane and hence this becomes
+    \begingroup
+    \setlength{\abovedisplayskip}{-5pt}
+    \begin{equation}
+        -2r^2\dot{\varphi} = \text{constant}
+    \end{equation}
+    \endgroup
+    so we define
+    \begin{equation}
+        r^2\dot{\varphi} = h = \text{constant}.
+    \end{equation}
+    We can identify \(h\) as the \defineindex{specific angular momentum}, which is the angular momentum per unit mass and this equation is therefore conservation of angular momentum.
+    
+    The radial Euler--Lagrange equation is significantly more complicated, since \(\alpha\) depends on \(r\).
+    Fortunately we can use the fact that \(\lagrangian^2 = c^2\) for a massive particle to rearrange the Lagrangian-squared into a more familiar form.
+    Currently, after inserting our newly defined constants, the Lagrangian-squared equation reads
+    \begin{equation}
+        \lagrangian^2 = c^2 = c^2\alpha\frac{k^2}{\alpha^2} - \frac{\dot{r}^2}{\alpha} - r^2\frac{h^2}{r^4}.
+    \end{equation}
+    Rearranging this we get
+    \begin{equation}
+        \dot{r}^2 + \alpha\frac{h^2}{r^2}  = c^2(k^2 - \alpha) = c^2k^2 - c^2 + \frac{2GM}{r}.
+    \end{equation}
+
+    Compare this to the Newtonian result for orbits
+    \begin{equation}
+        \diff[2]{r}{t} = -\frac{GM}{r^2} + \frac{v_{\perp}^2}{r} = -\frac{GM}{r^2} + \frac{h_{\mathrm{N}}^2}{r^3}.
+    \end{equation}
+    Here \(v_{\perp}\) is the velocity perpendicular to \(\ve{r}\) and so \(h_{\mathrm{N}} = v_{\perp}r\) is the Newtonian specific angular momentum.
+    Multiplying this by \(\diff{r}/{t}\) we get
+    \begin{equation}
+        \diff[2]{r}{t}\diff{r}{t} + \frac{GM}{r^2}\diff{r}{t} - \frac{h_{\mathrm{N}}^2}{r^3}\diff{r}{t} = 0.
+    \end{equation}
+    Integrating this with respect to time we get
+    \begin{equation}
+        \frac{1}{2}\left( \diff{r}{t} \right)^2 + \frac{h_{\mathrm{N}}^2}{r^2} - \frac{GM}{r} = \text{constant}.
+    \end{equation}
+    
+    We can write the GR result as
+    \begin{equation}\label{eqn:schwarzschild geodesic}
+        \frac{\dot{r}^2}{2} + \frac{h^2}{2r^2} - \frac{GM}{r} - \frac{GMh^2}{r^3c^2} = \frac{1}{2}c^2(k^2 - 1) = \text{constant}.
+    \end{equation}
+    We see that the form of these equations is the same except that time is replaced with proper time in the GR case and the Newtonian specific angular momentum is replaced with the GR specific angular momentum.
+    There is also an extra term in the GR equation which couples the gravitational field and angular momentum.
+    This term has the same sign as the gravitational field and so acts as an additional attractive radial force.
+    The origin of this term is the factor of \(1/\alpha\) in the radial component of the metric.
+    This in turn arises because spacetime experiences spatial curvature as well as the time dilation predicted by the equivalence principle.
+    
+    \section{Effective Potentials}
+    We can identify the first term of the GR radial energy equation as the kinetic energy per unit mass to first order and write the equation as
+    \begin{equation}
+        \frac{\dot{r}}{2} + \tilde{V}_{\mathrm{eff}} = \text{constant}.
+    \end{equation}
+    Here we've defined an effective potential per unit mass,
+    \begin{equation}
+        \tilde{V}_{\mathrm{eff}} \coloneqq -\frac{GM}{r} + \frac{h^2}{2r^2} - \frac{GMh^2}{r^3c^2}.
+    \end{equation}
+    
+    We can make this equation dimensionless by defining a \enquote{gravitational radius}, \(r_{\mathrm{g}} \coloneqq GM/c^2 = r_{\mathrm{s}}/2\), a dimensionless radius, \(R \coloneqq r/r_{\mathrm{g}}\), a dimensionless angular momentum, \(H \coloneqq h / (r_{\mathrm{g}} c)\), and a dimensionless effective potential, \(V_{\mathrm{eff}} = \tilde{V}_{\mathrm{eff}}/c^2\).
+    We then have the dimensionless equation
+    \begin{equation}
+        V_{\mathrm{eff}} = -\frac{1}{R} + \frac{H^2}{2R^2} - \frac{H^2}{R^3}.
+    \end{equation}
+    The third term means that our analysis of an orbit depends on the value of \(H\).
+    
+    This equation for the radial energy with an effective potential is very informative.
+    The simplest orbits are circular, with \(\dot{r} = 0\).
+    These orbits occur at the minima of the effective potential.
+    For the Newtonian case there is always a minimum.
+    Coming in from infinity the potential becomes gradually more negative before the centrifugal barrier, \(H^2/(2R^2)\), begins to dominate at small distances and so the particle never reaches the origin.
+    The energy in this case will be whatever the energy is at the minimum of the potential.
+    If we raise the energy above the minimum while keeping \(H\) fixed then we get radial oscillations which lead to an elliptical orbit in the Newtonian case.
+    
+    We can differentiate the radial energy equation to get a force law (per unit mass).
+    Since
+    \begin{equation}
+        \diff{}{r} = \diff{\tau}{r}\diff{}{\tau} = \frac{1}{\dot{r}}\diff{}{\tau}
+    \end{equation}
+    differentiating the radial energy equation gives
+    \begin{equation}
+        \ddot{r} + \diff{V_{\mathrm{eff}}}{r} = 0.
+    \end{equation}
+    So it is not enough to have \(\dot{r} = 0\), we also need the gradient of \(V_-\mathrm{eff}\) to vanish to have a stable circular orbit.
+    Solving for when this happens we find that
+    \begin{equation}
+        H = \frac{R}{\sqrt{R - 3}} \implies R = \frac{1}{2}(H^2 \pm \sqrt{H^4 - 12H^2}).
+    \end{equation}
+    In the Newtonian case we had \(R = H^2\).
+    
+    The fact that we have two different values of \(R\) for a given value of \(H\) is confusing.
+    The reason is clear if we differentiate again the derivative will have opposite signs at these two positions and we find that the stable orbit occurs when \(R = (H^2 + \sqrt{H^4 - 12H^2})/2\).
+    The inner orbit is a maximum and so is unstable.
+    At \(H = \sqrt{12}\) these two orbits coincide.
+    For smaller values of \(H\) there are no stable orbits as there is no longer a minimum in \(V_{\mathrm{eff}}\).
+    This means there is an \defineindex{innermost stable orbit}, which is not something we see in Newtonian orbits.
+    This innermost stable orbit occurs at \(R = 6\), any circular orbit closer to the origin is unstable.
+    The effective potential, and its Newtonian counterpart, are plotted in \cref{fig:effective potential}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{effective-schwarzschild-potential}
+        \begin{tikzpicture}
+            \begin{semilogxaxis}[
+                no markers,
+                domain=1:100,
+                ymin = -0.2,
+                ymax = 0.2,
+                xlabel = {Radius \(r/(GM/c^2)\)},
+                ylabel = {Potential \(V_{\mathrm{eff}}/c^2\)},
+                title = {Effective Potential as a Function of Radial Distance},
+                width=0.9\textwidth,
+                samples=100,
+                legend style = {font = \footnotesize},
+                legend entries = {1,,2,,\(\sqrt{12}\),,4,,5,,6,,},
+                log ticks with fixed point
+                ]
+                \addplot[highlight] {-1/x + 1 / (2*x*x) - 1 / (x*x*x)};
+                \addplot[highlight, dashed] {-1/x + 1 / (2*x*x)};
+                \addplot[my blue] {-1/x + 4 / (2*x*x) - 4 / (x*x*x)};
+                \addplot[my blue, dashed] {-1/x + 4 / (2*x*x)};
+                \addplot[my red] {-1/x + 12 / (2*x*x) - 12 / (x*x*x)};
+                \addplot[my red, dashed] {-1/x + 12 / (2*x*x)};
+                \addplot[my green] {-1/x + 16 / (2*x*x) - 16 / (x*x*x)};
+                \addplot[my green, dashed] {-1/x + 16 / (2*x*x)};
+                \addplot[my purple] {-1/x + 25 / (2*x*x) - 25 / (x*x*x)};
+                \addplot[my purple, dashed] {-1/x + 25 / (2*x*x)};
+                \addplot[orange, domain=2:3] {-1/x + 36 / (2*x*x) - 36 / (x*x*x)};
+                \addplot[orange, domain=4:100] {-1/x + 36 / (2*x*x) - 36 / (x*x*x)};
+                \addplot[orange, dashed, domain=6:100] {-1/x + 36 / (2*x*x)};
+                
+                \tikzset{min node/.style={#1, fill=#1, inner sep=0pt, minimum width=5pt, circle}}
+                \tikzset{cross/.style={cross out, draw=#1, minimum size=2*(2.5pt-\pgflinewidth), inner sep=0pt, outer sep=0pt}}
+                
+                \node[cross=highlight] at (axis cs: 1, -0.5) {};
+                \node[cross=my blue] at (axis cs: 4, -1/8) {};
+                \node[cross=my red] at (axis cs: 12, -1/24) {};
+                \node[cross=my green] at (axis cs: 16, -1/32) {};
+                \node[cross=my purple] at (axis cs: 25, -1/50) {};
+                \node[cross=orange] at (axis cs: 36, -1/72) {};
+                
+                \node[min node=my red] at (axis cs: 6, -1/18) {};
+                \node[min node=my green] at (axis cs: 12, -1/27) {};
+                \node[min node=my purple] at (axis cs: 21.51, -0.022) {};
+                \node[min node=orange] at (axis cs: 32.7, -0.015) {};
+            \end{semilogxaxis}
+        \end{tikzpicture}
+        \caption{The effective potential, \(V_{\mathrm{eff}}\), plotted for \(H = 1, 2, \sqrt{12}, 4, 5, 6\), increasing in energy as \(H\) increases. The dashed line is the Newtonian effective potential at the same angular momentum. The minima are indicated with circles (GR) and crosses (Newtonian). Strictly for the \(H = \sqrt{12}\) case its actually a point of inflection rather than a minimum.}
+        \label{fig:effective potential}
+    \end{figure}
+    
+    In a Newtonian orbit the velocity is \(v = L/r\), where \(L\) is the Newtonian specific angular momentum.
+    We know that \(L \propto \sqrt{r}\) and so \(v \propto 1/\sqrt{r}\) so the velocity increases as \(r\) becomes smaller.
+    It is a sensible assumption then that the \(R = 3\) orbit corresponds to the point where a particle in a Newtonian orbit must achieve light speed travel.
+    That is, the radius \(R = 3\) corresponds to the radius of the \defineindex{photon sphere}, which is the radius at which light orbits the mass.
+    We can verify this fairly easily.
+    The geodesic equation for photons are almost the same as for massive particles but instead of \(\lagrangian^2 = c^2\) we have \(\lagrangian^2 = 0\), which means that our equations have one fewer term and the radial energy equation for light is simply
+    \begin{equation}
+        \frac{\dot{r}^2}{2} = \frac{1}{2}\left( c^2k^2 - \frac{h^2\alpha}{r^2} \right) = 0.
+    \end{equation}
+    The effective potential is then
+    \begin{equation}
+        V_{\mathrm{eff}} = \frac{h^2\alpha}{2r^2}
+    \end{equation}
+    and the condition for a circular orbit is still that the gradient of the potential vanishes.
+    This can be shown to happen at \(R = 3\).
+    The second derivative at \(R = 3\) is still negative and so this is an unstable orbit.
+    Photons can orbit at \(R = 3\) but will eventually either fall into the centre or escape to infinity.
+    
+    It's worth noting that for the sun \(R = 3\) corresponds to an orbiting distance of only \qty{4430}{\metre}, and that the Schwarzschild metric doesn't apply inside the mass.
+    This means that light orbiting a mass only really applies when said mass is a black hole.
+    
+    \section{Binding Energy and Accretion Efficiency}
+    In the Lagrangian formalism if the Lagrangian doesn't depend explicitly on a given coordinate, \(q\), so \(\diffp{\lagrangian}/{q} = 0\), there is a conserved quantity, \(\diffp{\lagrangian}/{\dot{q}}\).
+    In addition if the Lagrangian doesn't depend on time then the Hamiltonian is conserved, which in most cases is the total energy.
+    In GR time is a coordinate and if the Lagrangian doesn't depend explicitly on the time coordinate there is an energy-like conserved quantity, \(\diffp{\lagrangian}/{\dot{t}}\).
+    We can compute this quantity using the chain rule:
+    \begin{equation}
+        \diffp{\lagrangian^2}{\dot{t}} = \diffp{\lagrangian^2}{\lagrangian} \diffp{\lagrangian}{\dot{t}} = 2\lagrangian \diffp{\lagrangian}{\dot{t}} \implies \diffp{\lagrangian}{\dot{t}} = \frac{1}{2\lagrangian}\diffp{\lagrangian^2}{\dot{t}} = \frac{1}{2c}\diffp{\lagrangian^2}{\dot{t}}
+    \end{equation}
+    where the last equality holds for a massive particle.
+    
+    Since \(\lagrangian^2 = g_{\mu\nu}\dot{x}^\mu \dot{x}^\nu\) only the terms with \(\dot{t}\) contribute so for the purposes of this derivative \(\lagrangian^2 = 2g_{0\mu} c\dot{t}\dot{x}^\mu\) plus terms independent of \(\dot{t}\).
+    Here we have used the fact that \(g_{\mu\nu}\) is symmetric so both terms where \(\dot{x}^\mu = c\dot{t}\) and terms where \(\dot{x}^\nu = c\dot{t}\) can be written in this form, hence the factor of 2.
+    We then have
+    \begin{equation}
+        \diffp{\lagrangian^2}{\dot{t}} = \diffp{}{\dot{t}} (2c g_{0\mu} \dot{t} \dot{x}^\mu) = 2cg_{0\mu}\dot{x}^\mu = 2c\dot{x}_0.
+    \end{equation}
+    In the SR limit we identify \(\diffp{\lagrangian}/{\dot{t}} = \gamma c\), since \(\dot{x}_\mu = (\gamma c, -\gamma\vv{v})\).
+    This SR result is \(1/c\) times the energy per unit mass.
+    In the GR Schwarzschild case we have \(\diffp{\lagrangian}/{\dot{t}} = \alpha c\dot{t}\) so we can identify \(k = \alpha\dot{t}\) as \(E/(mc^2)\), the ratio of the total energy to the rest mass.
+    It then follows that
+    \begin{equation}
+        \alpha \frac{h^2}{r^2} = c^2(k^2 - \alpha) \implies k = \sqrt{\alpha\left( 1 + \frac{h^2}{r^2c^2} \right)}.
+    \end{equation}
+    For the innermost stable orbit, \(R = 6\) and \(H = \sqrt{12}\), we get
+    \begin{equation}
+        k = \sqrt{\frac{8}{9}} \approx 0.943.
+    \end{equation}
+    
+    What this means is that a particle at the innermost stable orbit has a total energy about \qty{6}{\percent} less than its rest mass.
+    To have reached this point the particle must have somehow converted its missing energy into another form.
+    A black hole will usually have an \defineindex{accretion disc} of orbiting matter which is flattened by rotating.
+    Different orbital angular velocities at different radii leads to friction in the accretion disc which radiates away energy as heat.
+    We typically assume that the accretion disc has its innermost inner edge at the innermost stable orbit, beyond this matter rapidly falls into the black hole.
+    This accretion process therefore liberates approximately \qty{6}{\percent} of the mass energy of the accreted matter as radiation.
+    It is possible to achieve even higher efficiencies if the black hole is spinning, but for this we need the \defineindex{Kerr metric} instead of the Schwarzschild metric.
+    
+    \chapter{GR in the Solar System}
+    In this chapter we will look at evidence for general relativity based on measurements taken within the solar system of various effects which cannot be explained with just Newtonian gravity.
+    
+    \section{Advance of the Perihelion of Mercury}
+    We can apply the previous chapter on orbits to the Solar System.
+    This was first done by Einstein in 1916 for Mercury.
+    He wanted to know if GR could account for a peculiarity in Mercury's orbit which was unexplained at the time.
+    There are two arguments to follow, the simple one and the hard one.
+    The simple one treats orbits as perturbations on circular orbits, and the harder one treats orbits as perturbations on elliptical orbits.
+    The simple one contains all the important ideas but the harder one is important to verify that what we are calculating for circular orbits does really generalise.
+    
+    \subsection{Simple Version}
+    Start with the radial force equation
+    \begin{equation}
+        \ddot{r} = -\diff{V_{\mathrm{eff}}}{r}.
+    \end{equation}
+    Suppose we have an orbit that is very nearly circular, that is it's radial component is \(r = r_{\mathrm{c}} + \varepsilon\) where \(r_{\mathrm{c}}\) is a constant and \(\varepsilon\) is a time dependent parameter such that \(\varepsilon \ll r_{\mathrm{c}}\).
+    We can then expand the potential in a Taylor series given
+    \begin{equation}
+        V_{\mathrm{eff}}(r) = V_0 + \diff{V_{\mathrm{eff}}}{r}\varepsilon + \order(\varepsilon^2).
+    \end{equation}
+    The left hand side of the force equation gives us \(\ddot{r} = \ddot{\varepsilon}\), and so\\
+    \begin{align}
+        \ddot{\varepsilon} &= -\diff{}{r}\left[ V_0 + \diff{V_{\mathrm{eff}}}{r}\varepsilon + \order(\varepsilon^2) \right]\\
+        &= =\diff[2]{V_{\mathrm{eff}}}{r}\varepsilon + \order(\varepsilon^2).
+    \end{align}
+    So, to first order, the radius undergoes harmonic oscillations with angular frequency
+    \begin{equation}
+        \omega = \sqrt{\diff[2]{V_{\mathrm{eff}}}{r}}.
+    \end{equation}
+    
+    The second derivative of \(V_{\mathrm{eff}}\) is not difficult to compute.
+    The first derivative gives
+    \begin{equation}
+        \diff{V_{\mathrm{eff}}}{r} = \frac{GM}{r^2} - \frac{h^2}{r^3} + \frac{3GMh^2}{r^4c^2}
+    \end{equation}
+    We can eliminate one since we know \(\diff{V_{\mathrm{eff}}}/{r} = 0\) at \(r_{\mathrm{c}}\) and so
+    \begin{equation}
+        \frac{GM}{r^2} = \textcolor{my blue}{\frac{h^2}{r^3} - \frac{3GMh^2}{r^4c^2}}.
+    \end{equation}
+    The second derivative is
+    \begin{equation}
+        \diff[2]{V_{\mathrm{eff}}}{r} = -\frac{2GM}{r^3} + \frac{3h^2}{r^4} - \frac{12GMh^2}{r^5c^2}.
+    \end{equation}
+    Which we can then write as
+    \begin{equation}
+        \diff[2]{V_{\mathrm{eff}}}{r} = -\frac{2}{r}\left( \textcolor{my blue}{\frac{h^2}{r^3} - \frac{3GMh^2}{r^4c^2}} \right) + \frac{3h^2}{r^4} - \frac{12GMh^2}{r^5c^2}.
+    \end{equation}
+    A bit of rearranging then gives
+    \begin{equation}
+        \diff[2]{V_{\mathrm{eff}}}{r} = \frac{h^2}{r^4}\left( 1 - \frac{6GM}{c^2r} \right).
+    \end{equation}
+    
+    For a Newtonian circular orbit with angular frequency \(\omega\) we would have \(h = r^2\omega\) and so \(\omega^2 = h^2/r^4\).
+    This means that if the \(6GM/(c^2 r)\) term were absent or negligible the orbital and radial oscillation frequencies would be the same and so the orbit would close into an ellipse.
+    However, if the \(6GM/(c^2 r)\) term is not negligible then this equality fails and so the perturbation reduces the frequency of the radial oscillations and the orbit has to make more than a whole rotation between two occurrences of \defineindex{perihelion}\footnote{closest approach to the sun}.
+    The resulting orbit is a \defineindex{rosette orbit} undergoing \defineindex{precession}, meaning the perihelion point moves around as the body orbits, an example is shown in \cref{fig:rosette orbit}.
+    Since \(h^2 \approx GMr\) the change in phase per orbit, which is \(\delta\omega (2\pi/\omega)\), can be written as
+    \begin{equation}
+        \Delta\varphi = \frac{6\pi GM}{c^2 r} \text{ radians per orbit}.
+    \end{equation}
+    
+    \begin{figure}
+        \tikzsetnextfilename{rosette-orbit}
+        \begin{tikzpicture}
+            \draw[domain=0:15*180, samples=1000, very thick] plot (\x:{1/(1+0.82*cos(\x*0.82))});
+        \end{tikzpicture}
+        \caption{A rosette orbit. Notice that the orbit doesn't close. This is far more exaggerated than any real orbit in the solar system.}
+        \label{fig:rosette orbit}
+    \end{figure}
+    
+    \subsection{Hard Version}
+    The simple version assumes circular orbits.
+    A more general approach assumes elliptical orbits.
+    It is convenient to make a change of parameters by defining \(u \coloneqq 1/r\).
+    Since we are interested in the shape of orbits, rather than how they evolve, we want to eliminate time and parametrise the orbit by \(\varphi\).
+    We can do so by noticing that
+    \begin{equation}
+        \dot{r} = \diff{r}{\tau} = \diff{r}{\varphi}\diff{\varphi}{\tau} = \diff{r}{u}\diff{u}{\varphi}\diff{\varphi}{\tau} = \diff*{\left( \frac{1}{u} \right)}{u}\diff{u}{\varphi}\diff{\varphi}{\tau} = -\frac{1}{u^2}\diff{u}{\varphi}hu^2 = -h\diff{u}{\varphi}
+    \end{equation}
+    where we have used \(h = r^2\dot{\varphi}\) so \(\dot{\varphi} = h/r^2 = hu^2\).
+    \Cref{eqn:schwarzschild geodesic} then becomes
+    \begin{equation}
+        \frac{h^2}{2}\left( \diff{u}{\varphi} \right)^2 + \frac{h^2u^2}{2} - GMu - \frac{GMh^2u^3}{c^2} = \frac{1}{2}c^2(k^2 - 1) = \text{constant}.
+    \end{equation}
+    Differentiating with respect to \(\varphi\) we get
+    \begin{equation}
+        h^2\diff{u}{\varphi}\diff[2]{u}{\varphi} + h^2u\diff{u}{\varphi} - GM\diff{u}{\varphi} - \frac{3GMh^2}{c^2}u^2\diff{u}{\varphi} = 0.
+    \end{equation}
+    Dividing by \(\diff{u}/{\varphi}\) we then have
+    \begin{equation}
+        \diff[2]{u}{\varphi} + u = \frac{GM}{h^2} + \frac{3GM}{c^2}u^2.
+    \end{equation}
+    In a Newtonian calculation the final term would be absent and this would give the equation for an elliptical orbit,
+    \begin{equation}
+        u(\varphi) = \frac{GM}{h^2}(1 + e\cos(\varphi))
+    \end{equation}
+    where \(e\) is the \defineindex{eccentricity} or \define{ellipticity}\index{ellipticity|see{eccentricity}} of the orbit and we have chosen \(\varphi = 0\) to be the perihelion.
+    
+    The final term corresponding to the GR correction is very small for Mercury's orbit, its approximately 10 million times smaller than the \(GM/h^2\) term.
+    This means we can treat it as a perturbation.
+    In order to do this we first define a dimensionless quantity
+    \begin{equation}
+        U \coloneqq u\frac{h^2}{GM}
+    \end{equation}
+    and so the equation of motion becomes
+    \begin{equation}
+        \diff[2]{U}{\varphi} + U = 1 + \varepsilon U^2 \qqwhere \varepsilon = \frac{3G^2M^2}{c^2h^2}.
+    \end{equation}
+    We can expand the solution as \(U = U_0 + U_1\), where \(U_0\) is the unperturbed Newtonian orbit, the solution for \(\varepsilon = 0\), which we know to be an ellipse given by \(U_0 = 1 + e\cos\varphi\).
+    The perturbation, \(U_1\), is \(\order(\varepsilon)\) and so to linear order in \(\varepsilon\) we can replace \(U\) in \(\varepsilon U^2\) with \(\varepsilon U_0^2\), since any terms with \(\varepsilon U_1^2\) are \(\order(\varepsilon^3)\).
+    The unperturbed equation, \(\diff[2]{U_0}/{\varphi} + U_0 = 1\), can be subtracted from the equation of motion above giving the equation
+    \begin{align}
+        \diff[2]{U_1}{\varphi^2} + U_1 &= \varepsilon U_0^2\\
+        &= \varepsilon(1 + e\cos\varphi)^2\\
+        &= \varepsilon(1 + 2e\cos\varphi + e^2\cos^2\varphi)\\
+        &= \varepsilon\left( 1 + 2e\cos\varphi + \frac{e^2}{2}[1 + \cos(2\varphi)] \right),
+    \end{align}
+    where we have used the trig identity \(\cos^2\varphi = (1 + \cos(2\varphi))/2\) in the last step.
+    The complementary function, that is the solution to the homogeneous equation, doesn't add anything new since it is proportional to \(U_0\) and so the solution is
+    \begin{equation}
+        U_1 = A + B\varphi \sin\varphi + C\cos(2\varphi).
+    \end{equation}
+    We need the extra factor of \(\varphi\) since \(\sin\varphi\) appears in the complementary function.
+    The solution is then
+    \begin{equation}
+        U_1 = \varepsilon\left[ \left( 1 + \frac{e^2}{2} \right) + e\varphi\sin\varphi - \frac{e^2}{6}\cos(2\varphi) \right].
+    \end{equation}
+    We can take \(\varphi\) to be arbitrarily large so we can ignore all terms not proportional to \(\varphi\) and we get
+    \begin{align}
+        U &\approx 1 + e\cos\varphi + \varepsilon e \varphi \sin \varphi\\
+        &\approx 1 _ e \cos[\varphi(1 - \varepsilon)].
+    \end{align}
+    This is accurate to \(\order(\varepsilon)\).
+    The orbit is periodic in \(\varphi\) with period \(2\pi/(1 - \varepsilon)\).
+    The result is that the perihelion moves forward through an angle of \(2\pi\varepsilon\) per orbit.
+    This agrees with the circular orbit case to first order in \(\varepsilon\) and is independent of \(e\).
+    
+    It was known from about 1860 that the perihelion of Mercury was precessing and many solutions were sought before the existence of GR.
+    The total observed effect is approximately \num{5600} arc seconds\footnote{1 arcsecond is \(1/3600\)th of a degree} per century.
+    The majority of this, approximately 5026 arcseconds per century, can be explained by the precession of Earth's spin axis.
+    The next largest contribution is explained by perturbations from the gravitational fields of the other planets, this explains another 531 arcseconds per century.
+    There is a resulting 43 arcseconds per century drift that couldn't be explained before GR.
+    One attempted fix was to posit a planet orbiting within the orbit of Mercury, this idea was popular enough that they named the planet, Vulcan, but this planet was obviously never observed.
+    Including the GR correction for Mercury's orbit of \(T = 88\) days at \(r = \qty{5.8e10}{\metre}\) and \(e = 0.2\) we predict the required advance of Mercury's perihelion by 43 arcseconds per century.
+    This was an early success for GR.
+    
+    Sceptics of GR could claim that all this calculation shows is the need for an extra \(1/r^3\) term in the potential, as might arise from a quadrupole moment, which would occur if the sun were less spherical, and it wouldn't even have to be that much less spherical to get the size of quadrupole moment needed.
+    However, GR also predicts deviations for light which this quadrupole momentum couldn't explain.
+    
+    \section{Bending of Light around the Sun}
+    \define{Gravitational lensing}\index{gravitational lensing} is the process by which light bends around a massive body, as if it was passing through a convex lens.
+    We've discussed the bending of light qualitatively from the equivalence principle.
+    Suppose a box contains a laser which points from one side of the box to the other, and the box accelerates perpendicular to the laser beam.
+    Then in the time taken for the light to cross the box the wall of the box on the opposite side will have moved slightly and the laser will hit slightly lower than it would have had the box not been accelerating.
+    By the equivalence principle a gravitational field will therefore result in light following a curved path.
+    Of course, we know that light follows geodesics in spacetime, so we can interpret this curved path as the spatial part of a straight spacetime world line through a curved spacetime.
+    
+    The calculation for the magnitude of the bending of the light is not quite as simple as other effects of GR which can be seen from the equivalence principle.
+    First, we consider the Newtonian argument which Einstein made in about 1912.
+    Think of the photon as a massive particle moving at speed \(c\) and apply the equivalence principle to Galileo's \enquote{all objects fall equally fast}.
+    We are interested in the deflection of the light, rather than the total effect on its velocity, and so we consider the gravitational acceleration, \(a_{\perp}\), perpendicular to the straight path that the light would follow absent the massive body.
+    The equivalence principle suggests that this acceleration will correspond to a change in the perpendicular momentum, according to Newton's second law, with the \enquote{mass} of the light played by \(E/c^2 = p/c\):
+    \begin{equation}
+        \diff{p_{\perp}}{t} = a_\perp \frac{E}{c^2} = a_{\perp} \frac{p}{c}.
+    \end{equation}
+    To calculate the angle of deflection we just have to integrate this over the path of the light.
+    The deflection angle is then given by
+    \begin{equation}
+        \vartheta = \frac{\delta p_{\perp}}{p} = \frac{1}{p} \int \diff{p_{\perp}}{t}t = \frac{1}{c}\int a_{\perp} \dd{t}.
+    \end{equation}
+    
+    We assume that the deflection angle is small, which is normally the case.
+    For small deflections we can use the \defineindex{Born approximation} to calculate this integral.
+    This entails assuming that the photon follows some straight unperturbed trajectory and the acceleration at the photons actual position is close enough to the acceleration at the corresponding point on this straight trajectory that the difference is negligible.
+    
+    \begin{figure}
+        \tikzsetnextfilename{light-bend}
+        \begin{tikzpicture}
+            \fill[yellow] (0, 0) circle [radius = 0.5];
+            \draw[very thick, red] (-3, 1) -- (3, 1) node[text=black, right] {Unperturbed Path};
+            \draw[red, domain=-3:3] plot (\x, -0.6/9*\x*\x + 1) node[right, text=black] {Perturbed Path};
+            \draw (0, 0) coordinate (A) -- (0, 1) coordinate(C) node[pos=0.6, right] {\(R\)};
+            \draw (0, 0) -- (-2, 1) coordinate(B) node[midway, below] {\(r\)};
+            \path pic[draw, "\(\varphi\)", angle eccentricity=1.3] {angle};
+            \path (0, 1) -- (-2, 1) node[midway, above] {\(x\)};
+        \end{tikzpicture}
+        \caption{Light passing the sun follows a curved path, which we can approximate as a straight path. This path can be parametrised by \(x\). Defining the distance of closest approach to be \(R\) we then get that the distance between the mass and the photon is \(r = \sqrt{x^2 + R^2}\).}
+    \end{figure}
+    
+    We consider the case of a point mass \(M\) being the gravitational source and, borrowing more terminology from scattering experiments we define the \defineindex{impact parameter}, \(R\), to be the closest distance of approach (this is usually called \(b\) in a scattering experiment).
+    We parametrise the straight path with \(x\), defining \(x = 0\) to be the point of closest approach with \(x < 0\) before this point is reached and \(x > 0\) after the photon passes this point.
+    The distance from the mass to the photon is then \(r\), which we can easily find from Pythagoras: \(r^2 = x^2 + R^2\).
+    The perpendicular component of the acceleration is \(a_{\perp} = a\sin\varphi\) where \(\sin\varphi = R / r\)/
+    It then follows that
+    \begin{equation}
+        a_{\perp} = a\sin\varphi = \frac{GM}{r^2} \frac{R}{r}.
+    \end{equation}
+    The position along the unperturbed path and the time are simply related by \(x = ct\), and so \(\dl{t} = \dl{t}/c\).
+    The deflection angle is then given by integrating over the entire straight path:
+    \begin{align}
+        \vartheta &= \frac{1}{c^2}\int_{-\infty}^{\infty} \frac{GM}{r^2}\frac{R}{r} \dd{x}\\
+        &= \frac{GM}{c^2R} \int_{-\infty}^{\infty} \frac{R^2}{r^3} \dd{x}\\
+        &= \frac{GM}{c^2R} \int_{-\infty}^{\infty} \frac{(x^2 + R^2)^{3/2}}{R^2} \dd{x}\\
+        &= \frac{GM}{c^2R} \int_{-\infty}^{\infty} \frac{1}{(1 + y^2)^{3/2}} \dd{y}
+    \end{align}
+    where we have used a substitution \(y = x/R\).
+    we can then do a further substitution, \(y = \tan u\), so \(\dl{y} = \sec^2(u) \dd{u}\).
+    We then have
+    \begin{equation}
+        (1 + y^2)^{3/2} = (1 + \tan^2 u)^{3/2} = (\sec^2 u)^{3/2} = \sec^3u.
+    \end{equation}
+    The integrand is even so we can modify the limits to \((0, \infty)\) and double the integral.
+    The limits after substitution become the solutions to \(0 = \tan u\), which gives \(u = 0\), and \(\infty = \tan u\), which gives \(u = \pi/2\).
+    Hence,
+    \begin{align}
+        \vartheta &= \frac{2GM}{c^2R} \int_{0}^{\pi/2} \frac{1}{\sec^3 u} \sec^2(u) \dd{u}\\
+        &= \frac{2GM}{c^2R} \int_{0}^{\pi/2} \cos u \dd{u}\\
+        &= \frac{2GM}{c^2R}[\sin u]_{0}^{\pi/2}\\
+        &= \frac{2GM}{c^2R}.
+    \end{align}
+    
+    The problem with this is that its wrong.
+    It turns out to be half the size of the actual deflection.
+    This is because we have failed to take into account the curvature of space.
+    We are interested in weak gravitational fields outside a spherically symmetric mass.
+    Spacetime is then described by the Schwarzschild metric
+    \begin{equation}
+        c^2\dd{\tau}^2 = \left( 1 + \frac{2\Phi}{c^2} \right)c^2\dd{t}^2 - \left( 1 - \frac{2\Phi}{c^2} \right)\dd{r}^2 - r^2(\dl{\vartheta}^2 + \sin^2\vartheta \dd{\varphi}^2).
+    \end{equation}
+    Here \(\Phi = -GM/r\) is the Newtonian potential.
+    
+    This form has been useful so far but it has one peculiarity.
+    The curvature of space is constrained to the radial direction, the angular terms appear exactly the same as they do in a flat spacetime.
+    This is due to our choice of radial coordinate, a mostly arbitrary choice which we can change.
+    Suppose we define \(r' = r(1 + \Phi/c^2)\).
+    Then since \(r\Phi = -GM\) is constant it follows that \(\dl{r'} = \dl{r}\).
+    Changing the radial coordinate to \(r'\) also includes a factor of \(1(1 + \Phi/c^2)^2\) in the angular part of the metric, which we can expand for weak fields to give a factor of \(1 - 2\Phi/c^2\).
+    The resulting form of the metric is called the \defineindex{isotropic form} of the metric, dropping the prime on the \(r\) this is:
+    \begin{align}
+        c^2\dd{\tau}^2 &= \left( 1 + \frac{2\Phi}{c^2} \right)c^2\dd{t}^2 - \left( 1 - \frac{2\Phi}{c^2} \right) \dd{r}^2 - \left( 1 - \frac{2\Phi}{c^2} \right) r'^2 (\dl{\vartheta}^2 + \sin^2 \vartheta \dd{\varphi}^2)\\
+        &= \left( 1 + \frac{2\Phi}{c^2} \right) c^2 \dd{t}^2 - \left( 1 - \frac{2\Phi}{c^2} \right)(\dl{r}^2 + r^2[\dl{\vartheta}^2 + \sin^2\vartheta \dd{\varphi}^2])\\
+        &= \left( 1 + \frac{2\Phi}{c^2} \right) c^2 \dd{t}^2 + \left( 1 - \frac{2\Phi}{c^2} \right)(\dl{x}^2 + \dl{y}^2 + \dl{z}^2).
+    \end{align}
+    In the last step we identified \(\dl{r}^2 + r^2(\dl{\vartheta}^2 + \sin^2\vartheta \dd{\varphi}^2)\) as the spatial component of a flat metric in spherical polars, which is necessarily the same as the spatial part of a flat metric in Cartesian coordinates, so we switch back to Cartesian coordinates.
+    The curvature in this form is the same in all three Cartesian directions, as it must be since the mass is spherically symmetric.
+    It turns out that this form of the metric actually applies to any static weak gravitational field, not just to the spherically symmetric mass.
+    
+    Now consider this metric for light, we then have \(\dl{\tau} = 0\), and so
+    \begin{equation}
+        \left( 1 + \frac{2\Phi}{c^2} \right) c^2 \dd{t}^2 = \left( 1 - \frac{2\Phi}{c^2} \right)\dl{\vv{x}}^2.
+    \end{equation}
+    This then gives us
+    \begin{equation}
+        \left( 1 + \frac{2\Phi}{c^2} \right) \left( 1 - \frac{2\Phi}{c^2} \right)^{-1} c^2 = \left( \diff{\vv{x}}{t} \right)^2.
+    \end{equation}
+    Expanding the second bracket we have \((1 - 2\Phi/c^2)^{-1} \approx 1 + 2\Phi/c^2\) and so taking the square root we get
+    \begin{equation}
+        \abs*{\diff{\vv{x}}{t}} = c\left( 1 + \frac{2\Phi}{c^2} \right).
+    \end{equation}
+    We can interpret this as the \defineindex{coordinate speed} of light.
+    Notice that since \(\Phi < 0\) this is less than the speed of light.
+    We can think of this as spacetime behaving like a medium with a refractive index \(1 + 2\Phi/c^2\), which depends on the gravitational field and hence, in general, on the position.
+    
+    It's clear from the derivation here that the temporal and spatial curvature give equal contributions to the change in the speed.
+    In our earlier derivation of the deflection of light we considered only the temporal curvature.
+    This explains why we were a factor of 2 too low.
+    We were lead astray because our equivalence principle argument failed to account for the curvature of the spatial part of the metric since non-relativistic particles are not sensitive to the spatial curvature.
+    
+    We can now go through a full derivation of the light bending using the geodesic equation for a massless particle.
+    The proper time for the photon is zero, \(\dl{\tau} = 0\), and so we instead use some affine parameter, \(p\).
+    For a massless particle \(\lagrangian^2 = 0\) and we can apply the Euler--Lagrange equations to the Lagrangian
+    \begin{equation}
+        \lagrangian^2 = \alpha c^2\dot{t}^2 - \frac{1}{\alpha}\dot{r}^2 - r^2(\dot{\vartheta}^2 + \sin^2(\vartheta) \dot{\varphi}^2),
+    \end{equation}
+    which is exactly the same form as for a massive particle, except now \(\dot{x} = \diff{x}/{p}\).
+    Applying the Euler--Lagrange equations for \(t\) and \(\varphi\) we get the same results,
+    \begin{equation}
+        \alpha\dot{t} = k, \qqand r^2\dot{\varphi} = h.
+    \end{equation}
+    The next step is slightly simpler since \(\lagrangian^2 = 0\) and so our radial energy equation is
+    \begin{equation}
+        0 = \alpha c^2 \dot{t}^2 - \frac{\dot{r}^2}{\alpha} - r^2 \dot{\varphi}^2,
+    \end{equation}
+    again choosing the orbit to be in the \(\vartheta = \pi/2\) plane.
+    Rearranging this and writing \(u = 1/r\) we get
+    \begin{equation}
+        h^2 = \left( \diff{u}{\varphi} \right)^2 = c^2k^2 - \alpha h^2 u^2 = c^2k^2 - h^2u^2 + \frac{2GM}{c^2}h^2u^3.
+    \end{equation}
+    This is the same as the massive case except with one fewer term since \(\lagrangian^2 = 0\).
+    Differentiating with respect to \(\varphi\) and dividing through by \(\diff{u}/{\varphi}\) we get
+    \begin{equation}
+        \diff[2]{u}{\varphi} + u = \frac{3GM}{c^2}u^2.
+    \end{equation}
+    
+    We can treat this as a perturbation on the straight line orbit, which is given by \(u_0 = 1/r_0 = \sin(\varphi)/R\), where \(r_0\) is the distance to the unperturbed path and \(R\) is the distance of closest approach.
+    We can then write \(u = u_0 + u_1\) for some small perturbation \(u_1\).
+    Putting this into the differential equation above and using
+    \begin{equation}
+        \diff[2]{u_0}{\varphi} + u_0 = 0,
+    \end{equation}
+    as this is the unperturbed path we get
+    \begin{equation}
+        \diff[2]{u_1}{\varphi} + u_1 = \frac{3GM}{c^2R^2} \sin^2\varphi = \frac{3GM}{2c^2R^2}(1 - \cos(2\varphi)).
+    \end{equation}
+    It can be shown that to first order the solution to this is
+    \begin{equation}
+        u = \frac{\sin\varphi}{R} + \frac{3GM}{2c^2R^2} \left( 1 + \frac{1}{3}\cos(2\varphi) \right).
+    \end{equation}
+    
+    At a large distance before the light passes the mass \(u \approx 0\) and \(\varphi\) is small so \(\sin\varphi \approx \varphi\) and \(\cos(2\varphi) \approx 1\).
+    We can then consider when the photon is at negative infinity setting \(u_{-\infty} = 0\) and expanding the trig gives
+    \begin{equation}
+        0 = \frac{\varphi_{-\infty}}{R} + \frac{3GM}{2c^2R^2} \frac{4}{3} \implies \varphi_{-\infty} = -\frac{2GM}{c^2R}.
+    \end{equation}
+    Similarly once the light passes the mass at large distances \(u \approx 0\) and \(\varphi - \pi \approx 0\) so we can expand \(\sin(\varphi) = -\sin(\varphi - \pi) \approx \pi - \varphi\), and \(\cos(2\varphi) = \cos(2\varphi + 2\pi) \approx 1\) giving
+    \begin{equation}
+        0 = \frac{\pi - \varphi_{+\infty}}{R} + \frac{3GM}{2c^2R^2} \frac{4}{3} \implies \varphi_{+\infty} = \pi + \frac{2GM}{c^2R}.
+    \end{equation}
+    This angle would be \(\pi\) if not for the deflection, so the deflection is \(2GM/(c^2R)\).
+    The total deflection is then
+    \begin{equation}
+        \Delta \varphi_{\mathrm{GR}} = \frac{4GM}{c^2R}.
+    \end{equation}
+    This is, as expected, twice as large as our more naive calculation.
+    This result agrees well with 1919 measurements during a solar eclipse, the eclipse being necessary to see stars behind the sun.
+    Putting in the mass of the sun as \(M\) and the radius of the sun as \(R\) we see that for light that just grazes the surface of the sun as it passes we expect an deflection of \(1.75\) arcseconds, a very small amount that is not easy to measure.
+    
+    \section{Time Delay of Light}
+    The final test of GR in the solar system was proposed later than the two previous tests, since it required human inventions, rather than the normal dynamics of the solar system.
+    In 1964 Irwin Shapiro suggested that a radar signal could be bounced off of Venus and the time for the round trip measured.
+    He then went on to complete exactly this measurement in 1966.
+    He proposed that if this was done at a time when the radar signal had to pass the sun to reach Venus the signal would be slowed by the previously mentioned changing coordinate speed of light and that this could be measured.
+    
+    Since the change in the coordinate speed of light is a factor of \(1 + 2\Phi/c^2 = 1 + 2GM/(c^2r)\) the accumulated time delay over a journey through a distance \(\dl{x}\) is
+    \begin{equation}
+        \Delta t = \frac{2GM}{c^2r} \frac{\dl{x}}{c}.
+    \end{equation}
+    Taking \(x\) as a parameter increasing along the straight line between the two planets this is related to the distance to the sun by \(r^2 = x^2 + R^2\), where once again \(R\) is the distance of closest approach.
+    We then have \(\dl{x} = r \dd{r} / \sqrt{r^2 - R^2}\).
+    
+    The time delay for the entire journey is given by integrating the path from Earth to Venus, and then doubling to account for the return journey.
+    The one subtlety is that this is a principle value integral since at \(r = R\) the integrand diverges.
+    So we split the integral at this point and consider a limiting process of the limits tending to \(R\).
+    The resulting time delay can then be calculated as
+    \begin{equation}
+        \Delta t = \frac{4GM}{c^3} \left( \int_R^{r_{\mathrm{E}}} \frac{1}{\sqrt{r^2 - R^2}} \dd{r} + \int_{R}^{r_{\mathrm{V}}} \frac{1}{\sqrt{r^2 - R^2}} \dd{r} \right).
+    \end{equation}
+    Here \(r_{\mathrm{E}}\) and \(r_{\mathrm{V}}\) are the radii of Earth and Venus's orbits respectively, these are the end points since we are assuming that Earth and Venus are approximately on opposite sides of the sun and hence the first path takes us from Earth to the sun and the second from the sun to the Earth.
+    
+    Notice that both integrals have \(R\) as a lower boundary.
+    This is because for the first integral the path goes from Earth to the sun, but since \(x\) is negative here we get \(\dl{r}\) as the negative root but then use this negative sign to reverse the order of the integration limits.
+    
+    These integrals aren't too difficult and we can define \(u = r / R\) and recognise the resulting integral as inverse hyperbolic cosine and so the first integral gives
+    \begin{equation}
+        \ln\left[ \frac{r_{\mathrm{E}}}{R} + \sqrt{ \frac{r_{\mathrm{E}}}{R} - 1} \right],
+    \end{equation}
+    and the second integral is the same substituting for the radius of Venus's orbit.
+    
+    In the limit of where the orbital radii are much greater than the distance of closest approach these integrals simplify to
+    \begin{equation}
+        \ln\left( \frac{2r_{\mathrm{E}}}{R} \right),
+    \end{equation}
+    and similar for the second integral.
+    A reasonable approximation for the total delay is then
+    \begin{equation}
+        \Delta t \approx \frac{4GM}{c^3} \ln\left( \frac{4r_{\mathrm{E}}r_{\mathrm{V}}}{R^2} \right).
+    \end{equation}
+    
+    This is the dominant term but there are other terms of order \(GM/c^3\).
+    One of these terms appears because this is a delay in the elapsed coordinate time but we want the elapsed proper time on Earth, which is given by
+    \begin{equation}
+        c^2 \dd{\tau}^2 = \left( 1 - \frac{2GM}{r_{\mathrm{E}}c^2} \right)c^2\dd{t}^2 - r_{\mathrm{E}}^2\dd{\varphi}^2.
+    \end{equation}
+    Here we are treating the orbit as circular so \(\dl{r} = 0\).
+    The proper time elapsed on Earth during the experiment is then
+    \begin{equation}
+        \tau = \sqrt{\alpha(r_{\mathrm{E}}) - \frac{r_{\mathrm{E}}^2}{c^2} \left( \diff{\varphi}{t} \right)^2 t}.
+    \end{equation}
+    The angular velocity of the Earth obeys, at least in the Newtonian approximation, the relation \((\diff{\varphi}/{t})^2 = GM/r_{\mathrm{E}}^3\) and so
+    \begin{equation}
+        \frac{\tau}{t} = \sqrt{1 - \frac{2GM}{r_{\mathrm{E}}c^2} - \frac{GM}{r_{\mathrm{E}}c^2}} = \sqrt{1 - \frac{3GM}{r_{\mathrm{E}}c^2}}.
+    \end{equation}
+    The total journey time is approximately \(r_{\mathrm{E}}/c\) and so the offset between the coordinate time and proper time at the end of the experiment is approximately \(GM/c^3\).
+    This is negligible compared to the log term we first derived.
+    
+    We used the Born approximation, that the deviation from a straight path is sufficiently small for us to integrate along the unperturbed path.
+    This is justified only by the fact that it works, as can be demonstrated using the geodesic equations.
+    As before we have \(\alpha\dot{t} = k\) and \(r^2\dot{\varphi} = h\), with dots denoting derivatives with respect to some affine parameter, and the \(\lagrangian^2 = 0\) radial energy equation is
+    \begin{equation}
+        \alpha c^2 \dot{t}^2 - \frac{\dot{r}^2}{\alpha} - r^2\dot{\varphi}^2 = 0 \implies \dot{r}^2 + \frac{\alpha h^2}{r^2} = k^2c^.
+    \end{equation}
+    The point of closest approach, known as the perihelion since we are considering an orbit rather than the Born approximation, is a turning point and so \(\dot{r} = 0\).
+    We then have \(k^2c^2 = h^2 \alpha(R)/R^2\) and we can use this to eliminate \(k\).
+    We can also use the time equation to convert
+    \begin{equation}
+        \diff{r}{t} = \diff{r}{p} \diff{p}{t} = \frac{\dot{r}}{\dot{t}}
+    \end{equation}
+    and so
+    \begin{equation}
+        \diff{r}{t} = \pm \frac{\alpha(r)Rc}{\sqrt{\alpha(R)}} \sqrt{\frac{\alpha(R)}{R^2} - \frac{\alpha(r)}{r^2}}.
+    \end{equation}
+    We can expand this to first order in \(M\), which is the same order as the logarithmic answer we got with the Born approximation, and we find that, after some algebra or use of a computer,
+    \begin{equation}
+        \diff{t}{r} = \frac{r}{\sqrt{r^2 - R^2}} + \frac{2r + 3R}{(r + R)\sqrt{r^2 - R^2}} \frac{GM}{c^3}.
+    \end{equation}
+    Integrating this from \(R\) to \(r\) we get
+    \begin{equation}
+        \Delta t = \frac{\sqrt{r^2 - R^2}}{c} + \left( \frac{\sqrt{r^2 - R^2}}{r + R} - 2\ln R + 2\ln (r + \sqrt{r^2 - R^2}) \right) \frac{GM}{c^3}.
+    \end{equation}
+    The first term is the time taken in the absence of gravitational effects. The GR correction, for \(r \gg R\), is dominated by
+    \begin{equation}
+        2\ln\left( \frac{2r}{R} \right)\frac{GM}{c^3}.
+    \end{equation}
+    This is for a one way trip from the perihelion to one of the planets.
+    Doubling this for a two way trip and also including both parts of the journey, from a planet to the perihelion and then onto the next planet, we get \(4\ln(4r_{\mathrm{E}}r_{\mathrm{V}}/R^2)GM/c^3\) as before.
+    The delay is therefore dominated by the reduced coordinate speed of light.
+    
+    When \(R\) is small, say \(R\) is the radius of the sun, so the radar signal just grazes the sun, the total delay is around \qty{200}{\micro\second}.
+    In the 1960s when the experiment was first performed this could be verified to about \qty{5}{\percent}.
+    Now using various solar system space craft the agreement with the GR prediction has been shown to be accurate to about \qty{0.002}{\percent}, or one part in \num{50000}.
+    
+    \chapter{Mathematical Formalism}
+    So far we have been quite informal with the maths we've used.
+    We can get quite a long way using just the maths of special relativity, but at some point we need to introduce new concepts, and that is the purpose of this chapter.
+    Our goal is now to develop the mathematics of tensor calculus.
+    We follow a mostly coordinate based approach emphasising the geometric nature of the mathematics that we do.
+    
+    We will not make assumptions about dimensions here apart from where specifically stated so indices run from \(1\) to \(n\), where \(n \in \integers_{>0}\) is some positive integer, namely the dimension of the space in question.
+    We also apply the Einstein summation convention for repeated indices.
+    
+    I go into far more detail here than the original course does.
+    I also make statements like \enquote{\(\category{Top}\) is the category of topological spaces with continuous functions as morphisms and homeomorphisms as isomorphisms} without explanation, these aren't important if you don't understand them.
+    
+    \section{Manifolds}
+    Manifolds are the stage for the maths of GR, and in fact most physics.
+    We start with a rough definition of a manifold which lacks a few details which we will fill out later.
+    For our purposes this rough definition is sufficient and the full definition is for completeness.
+    \begin{dfn}{Manifold}{}
+        A \defineindex{manifold} is a space where we can locally introduce Cartesian coordinates such that different choices of local coordinates will give compatible descriptions and by defining sets of local coordinates covering the whole space we have complete information about the space.
+    \end{dfn}
+    
+    A manifold is parametrised continuously and differentiably as an \(n\)-tuple of real numbers, \((x^1, \dotsc, x^n) \in \reals^n\), which are the coordinates of the point.
+    We can connect two points with a curve parametrised by some \(\lambda \in \reals\) such that derivatives of the coordinates along this path exist, that is \(\diff{x^i}/{\lambda}\) exists for all \(i = 1, \dotsc, n\).
+    
+    By this definition it should be clear that Euclidean space, where non-relativistic mechanics takes place, is a manifold.
+    However, not all manifolds are as nice as Euclidean space, for example Euclidean space has a metric (way to measure distance), which not all manifolds do.
+    Locally all manifolds behave like a subset of Euclidean space due to their differentiable nature.
+    
+    \subsection{Topology}
+    \begin{dfn}{Topological Space}{}
+        A \define{topological space}\index{topological!space}, \((X, \mathcal{T})\), is a set, \(X\), and a collection of subsets of \(X\), \(\mathcal{T} \subset \mathcal{P}(X)\), called the \defineindex{topology}, such that
+        \begin{itemize}
+            \item \(X \in \mathcal{T}\),
+            \item \(\emptysetAlt \in \mathcal{T}\),
+            \item \(\mathcal{T}\) is closed under unions, that is if \(\{U_i\}_{i \in I} \subseteq \mathcal{T}\) then\vspace{-1ex}
+            \begin{equation}
+                \bigcup_{i\in I} U_i \in \mathcal{T},
+            \end{equation}\vspace{-4ex}
+            \item \(\mathcal{T}\) is closed under finite intersections, that is if \(\{U_i, \dotsc, U_N\} \subseteq \mathcal{T}\) then\vspace{-4ex}
+            \begin{equation}
+                \bigcap_{i = 1}^{N} U_i \in \mathcal{T}.
+            \end{equation}
+        \end{itemize}\vspace{-1ex}
+        We call the elements of \(\mathcal{T}\) \define{open sets}\index{open set}.
+    \end{dfn}
+    
+    It is common to refer to \(X\) as a topological space and then specify \(\mathcal{T}\) separately, or just leave \(\mathcal{T}\) implicit, much in the same way that we might define a group \(G\) and operation \(\cdot\), when more formally it might be more correct to call \((G, \cdot)\) and \(G\) the underlying set.
+    
+    Topological spaces can be quite abstract, for example the following topology makes \((\{a, b, c, d\}, \mathcal{T})\) a topological space:
+    \begin{equation}
+        \mathcal{T} = \{\emptysetAlt, \{a, b, c, d\}, \{a, b\}, \{c, d\}\}.
+    \end{equation}
+    We only deal with more familiar topological spaces.
+    We can define topologies through the notion of a basis.
+    
+    \begin{dfn}{Topological Basis}{}
+        A \define{basis}\index{topological!basis} for a topology on some set \(X\) is a collection of sets, \(\mathcal{B} \subseteq \mathcal{P}(X)\) such that
+        \begin{itemize}
+            \item the elements of \(\mathcal{B}\) cover \(X\), that is for all \(x \in X\) there exists some \(B \in \mathcal{B}\) such that \(x \in B\).
+            \item given \(B_1, B_2 \in \mathcal{B}\) for all \(x \in B_1 \cap B_2\) there exists some \(B \in \mathcal{B}\) such that \(x \in B\) and \(B_3 \subseteq B_1 \cap B_2\).
+        \end{itemize}
+        The topology generated by a basis, \(\mathcal{B}\), is then defined to be the set of all subsets \(U \subseteq X\) such that\vspace{-0.5ex}
+        \begin{equation}
+            U = \bigcup_{B_i \in B \subseteq \mathcal{B}} B_i.
+        \end{equation}\vspace{-0.5ex}
+        That is all elements of the topology are unions of basis sets.
+    \end{dfn}
+    
+    Using this definition we can define the \defineindex{standard topology} on \(\reals^n\) as the topology generated by the basis of open balls in \(\reals^n\), where by an open ball we mean
+    \begin{equation}
+        B = \{\vv{r} \in \reals^n \mid \abs{\vv{r} - \vv{a}}^{n} \text{ for some } \vv{a} \in \reals^n\}
+    \end{equation}
+    with \(\abs{\vv{r}} = \sum_i x_i^2\) being the usual Euclidean metric.
+    This is not the only topology on \(\reals^n\) but it is the only one we care about.
+    
+    Let \(X\) and \(Y\) be topological spaces with topologies \(\mathcal{T}_X\) and \(\mathcal{T}_Y\) respectively.
+    Then we can define a function, \(f \colon X \to Y\).
+    The \defineindex{preimage} of some \(S \subseteq Y\) under this function is the set
+    \begin{equation}
+        f^*(S) = f^{-1}(S) \coloneqq \{a \in X \mid f(a) \in S\} \subseteq X.
+    \end{equation}
+    The notation \(f^{-1}\) suggests that this is related to the inverse of the function \(f\), and indeed if the inverse exists then it is, as the preimage is the image of the inverse restricted to \(S\).
+    
+    The function \(f \colon X \to Y\) is \defineindex{continuous} if all preimages of open sets of \(Y\) are open sets of \(X\), that is if \(f^*(U_Y) \in \mathcal{T}_X\) for all \(U_Y \in \mathcal{T}_Y\).
+    With the standard topology for \(\reals^n\) this definition coincides with the normal \(\varepsilon\)-\(\delta\) definition of continuity from analysis.
+    
+    An invertible (and hence bijective) continuous function between topological spaces is called a \defineindex{homeomorphism}.
+    If there exist homeomorphisms between two topological spaces we say those spaces are \defineindex{homeomorphic}.
+    \(\category{Top}\) is the category of topological spaces with continuous functions as morphisms and homeomorphisms as isomorphisms.
+    
+    \subsection{Charts}
+    In order to be able to define differentiation in topological spaces we need them to look locally like \(\reals^n\).
+    By \enquote{look like} we mean we want there to be a homeomorphism between neighbourhoods of a topological space and \(\reals^n\).
+    Homeomorphisms preserve topological properties so this allows us to translate things into Euclidean terms, perform calculations, and then convert the results back to the topological space.
+    This isn't possible for all topological spaces but is a defining property of manifolds.
+    
+    To better define the notion of \enquote{looks like} we define charts.
+    
+    \begin{dfn}{Chart}{}
+        Given a topological space, \((X, \mathcal{T})\), a \defineindex{chart}, \(C\), is an ordered pair \(C = (U, \varphi)\), where \(U \in \mathcal{T}\) and \(\varphi\) is a homeomorphism
+        \begin{equation}
+            \varphi \colon U \to \mathop{\mathrm{im}}\varphi \subseteq \reals^n.
+        \end{equation}
+        We call \(n \in \integers_{>0}\) the \defineindex{dimension} of \(U\), it is independent of \(\varphi\).
+    \end{dfn}
+    
+    Simply put a chart associates with each neighbourhood in a topological space an open subset of \(\reals^n\) and gives us a way to move between \(U\) and this open subset while preserving key topological properties.
+    
+    \subsection{Topological Manifolds}
+    For our first definition of a manifold we will need a few preliminary definitions.
+    \begin{dfn}{Locally Euclidean}{}
+        A topological space, \(X\), is \defineindex{locally Euclidean} if there exists \(n \in \integers_{>0}\) such that for every point, \(p \in X\) there is a chart, \(C = (U, \varphi)\), such that \(p \in U\).
+    \end{dfn}
+    
+    That is \(X\) must be covered by the open sets \(\{U_i\}_{i\in I}\) and for each open set in this covering there must be an associated chart, \(C_i = (U_i, \varphi_i)\).
+
+    \begin{dfn}{Hausdorff}{}
+        Let \(X\) be a topological space.
+        Then \(x, y \in X\) are separated by neighbourhoods if there exists some open sets \(U \ni x\) and \(V \ni y\) such that \(U \cap V = \emptysetAlt\).
+        
+        \(X\) is a \defineindex{Hausdorff space} if all distinct points in \(X\) are pairwise neighbourhood separable.
+    \end{dfn}
+    Roughly put the condition of being Hausdorff means for any two points we can find sufficiently small neighbourhoods around the two points such that the two points aren't both in the neighbourhoods.
+    Take for example, \(\reals^2\), the plane with the standard topology.
+    Since the standard topology here is the topology generated by the open discs we can draw two discs around any two points such that the discs don't overlap and so \(\reals^2\) is Hausdorff.
+    
+    \begin{dfn}{Topological Manifold}{}
+        A \define{topological manifold}\index{topological!manifold}\index{manifold!topological} is a Hausdorff space, \(M\), which is locally Euclidean.
+    \end{dfn}
+    
+    It is common to include extra conditions, such as being \defineindex{second-countable}, which means that the topology is generated by a countable basis.
+
+    A topological manifold is the simplest manifold, and all manifolds are topological manifolds.
+    However, topological manifolds don't have the required structure for our purposes, since there is still no sense of differentiation on general topological manifolds.
+    We will need a more specific type of manifold, which we will develop in the next few sections.
+    
+    \subsection{Local Coordinates}
+    Charts allow us to rigorously define the notion local coordinates.
+    Intuitively local coordinates are a way to parametrise a neighbourhood with tuples in \(\reals^n\), formally local coordinates are defined as follows.
+    
+    \begin{dfn}{Local Coordinates}{}
+        Let \(M\) be a topological manifold and \(U\) an open subset of \(M\) such that \((U, \varphi)\) is a chart.
+        The coordinates of some point \(p \in U\) are the Cartesian coordinates, \(\vv{x}_p\), given by \(\varphi(p) \in \reals^n\).
+    \end{dfn}
+    
+    In general charts are not unique and it is important that the physics we do doesn't depend on the choice of coordinate system, since coordinates are a man made construction and don't actually reflect nature, they just let us apply maths.
+    This means we need charts to be compatible in the following sense.
+    
+    \begin{dfn}{Compatible Charts}{}
+        Let \(M\) be a topological manifold with charts \(C_1 = (U_1, \varphi_1)\) and \(C_2 = (U_2, \varphi_2)\).
+        If \(U_1 \cap U_2 \ne \emptysetAlt\) we can define the \defineindex{transition maps} to be
+        \begin{align}
+            \varphi_1 \circ \varphi_2^{-1} \colon \varphi_2(U_1 \cap U_2) &\to \varphi_1(U_1 \cap U_2),\\
+            \varphi_2 \circ \varphi_1^{-1} \colon \varphi_1(U_1 \cap U_2) &\to \varphi_2(U_1 \cap U_2).
+        \end{align}
+        We say that \(C_1\) and \(C_2\) are \define{compatible}\index{compatible!charts} if either the transition maps are homeomorphisms or \(U_1 \cap U_2 = \emptysetAlt\).
+        
+        We say that \(C_1\) and \(C_2\) are \defineindex{smoothly compatible} if they are compatible and the transitions functions, if defined, are smooth.
+    \end{dfn}
+    
+    We can think of the two charts as two separate sets of local coordinates and the transition maps as coordinate transformations, that is
+    \begin{align}
+        (\varphi_1 \circ \varphi_2^{-1})(\vv{x}_p^{(2)}) &= \varphi_1(p) = \vv{x}_p^{(1)},\\
+        (\varphi_2 \circ \varphi_1^{-1})(\vv{x}_p^{(1)}) &= \varphi_1(p) = \vv{x}_p^{(2)}.
+    \end{align}
+    
+    We can use local coordinates to express functions on some manifold in terms of local coordinates.
+    
+    \begin{dfn}{Local Function}{}
+        Given a continuous function, \(f \colon M \to \reals\) for some topological manifold, \(M\), and a chart, \(C = (U, \varphi)\), we can associate the restriction of \(f\) to \(U\) with the function \(f_U = f \circ \varphi^{-1}\) so
+        \begin{equation}
+            f_U \colon \varphi(U) \subseteq \reals^n \to \reals
+        \end{equation}
+        is defined by
+        \begin{equation}
+            f(p) = f_U(\vv{x}_p)
+        \end{equation}
+        for \(p \in U\).
+    \end{dfn}
+    
+    This is useful since we can deal with functions \(\reals^n \to \reals\) using the normal tools of vector calculus.
+    
+    For compatible charts we can represent the function in two different ways in terms of local coordinates.
+    namely by the functions \(f_{U_i}\) with \(i = 1, 2\).
+    On the intersection \(U_1 \cap U_2\) we define \(f = f_1 \circ \varphi_1 = f_2 \circ \varphi_2\) so rearranging this final equality \(f_2 = f_1 \circ \varphi_1 \circ \varphi_2^{-1}\) and \(f_1 = f_2 \circ \varphi_2 \circ \varphi_1^{-1}\).
+    We can think of these as the same function with a change of variables, so \(f_1(\vv{x}_p^{(1)}) = f_2(\vv{x}_p^{(2)})\).
+    
+    \subsection{Smooth Manifold}
+    \begin{dfn}{Smooth Atlas}{}
+        A \defineindex{smooth atlas}, \(\mathcal{A}(M)\), for a topological manifold, \(M\), is a family of charts, \(\{C_a = (U_a, \varphi_a)\}\), which cover \(M\), so \(p \in U_a\) for some \(a\) for all \(p \in M\), such that the charts are all mutually smoothly compatible.
+        
+        Two smooth atlases, \(\mathcal{A}_1(M)\) and \(\mathcal{A}_2(M)\), are said to be \define{compatible}\index{compatible!atlases} if all of the charts of \(\mathcal{A}_1\) are compatible with all of the charts of \(\mathcal{A}_2\).
+    \end{dfn}
+    
+    We can think of charts as mapping the manifold and then the name atlas is naturally a collection of maps.
+    Compatibility defines an equivalence relation on the set of all atlases for a given manifold.
+    
+    \begin{dfn}{Smooth Manifold}{}
+        A \define{smooth structure}\index{smooth!structure} on a topological manifold, \(M\), is an equivalence class of smooth atlases:
+        \begin{equation}
+            \mathcal{S}(M) = [\mathcal{A}(M)],
+        \end{equation}
+        that is \(\mathcal{S}(M)\) is the set of all atlases compatible with \(\mathcal{A}(M)\).
+        
+        A \define{smooth manifold}\index{smooth!manifold} is a topological manifold, \(M\), equipped with a smooth structure, \(\mathcal{S}\).
+    \end{dfn}
+    
+    \begin{dfn}{Smooth Functions and Maps}{}\
+        A function, \(f \colon M \to \reals\), on a smooth manifold, \(M\), is said to be \define{smooth}\index{smooth!function} if all of its local coordinate representatives, 
+        \begin{equation}
+            f_a = f \circ \varphi_a^{-1} \colon \varphi(U_a) \to \reals,
+        \end{equation}
+        are smooth.
+        
+        Let \(M\) and \(V\) be smooth manifolds of dimensions \(m\) and \(n\) with charts \((U_a, \varphi_a)\) and \((V_b, \psi_b)\) respectively.
+        Then the map \(\mu \colon M \to N\) is \define{smooth}\index{smooth!map} if all of its local coordinate representatives,
+        \begin{equation}
+            \mu_{ab} = \psi_b \circ \mu \circ \varphi_a^{-1} \colon \varphi_a(U_a) \subseteq \reals^m \to \psi_b(V_b) \subseteq \reals^n
+        \end{equation}
+        are smooth.
+        Smooth invertible maps between manifolds are also called \define{diffeomorphisms}\index{diffeomorphism}.
+    \end{dfn}
+    
+    It is possible to differentiate smooth functions and maps by first differentiating the local coordinates and then mapping the result back to the manifolds.
+    
+    \(\category{SmoothMan}\) is the category of smooth manifolds with smooth maps as homomorphisms and diffeomorphisms as isomorphisms.
+    
+    Smooth manifolds are the most common type of manifolds, and are the type we will be using, but there are other types.
+    For example, we can define \(C^k\)-differentiable manifolds by replacing the requirement that the transition functions be smooth (\(C^{\infty}\)) with requirements for transition functions to be \(C^k\)-differentiable.
+    We can define real analytic manifolds by requiring that transition functions are real analytic functions.
+    We can define complex smooth manifolds by replacing \(\reals\) with \(\complex\) and requiring that transition functions be holomorphic.
+    The list of possible manifold types goes on.
+    
+    \subsection{Examples of Manifolds}
+    Now that we've had quite an abstract introduction to manifolds it helps to discuss a few examples.
+    The first and most obvious example is Euclidean space itself, which has an atlas consisting or a single chart, \((\reals^n, \mathrm{id})\), where \(\mathrm{id}\) is the identity function.
+    
+    Our next example is the circle, \(S^1\).
+    This is a one-dimensional manifold.
+    It takes at least two charts to form an atlas.
+    One chart can be given by defining \(\vartheta = 0\) to be the top of the circle, and to wrap around to \(2\pi\).
+    The definition of a chart requires that the image of an open set is open in \(\reals\), in this case this means we can't include \(0\) or \(2\pi\) in the neighbour hood, so our neighbour hood is \((0, 2\pi)\).
+    We can introduce another chart that defines \(\vartheta' = 0\) to be the right most point of the circle and similarly wraps around to \(2\pi\), this again maps to the neighbourhood \((0, 2\pi)\) and covers the point excluded in the first chart.
+    
+    The circle is fairly obviously a manifold since it is usually viewed embedded in Euclidean space.
+    This isn't necessary for all manifolds however.
+    A more abstract manifold is \(\specialOrthogonal(3)\), the group of rotations in three dimensions.
+    This is continuously parametrised by three Euler angles, and so is a three-dimensional manifold.
+    The Lorentz group, \(\orthogonal(1, 3)\), is a three dimensional manifold parametrised by the three components of the velocity of the frame.
+    
+    For a system of \(N\) particles their phase space, consisting of their positions and momenta, is a \(6N\)-dimensional manifold.
+    
+    Given an equation with two variables, \(x\) and \(y\), we can define the set of all \((x, y)\) to be a manifold and any particular solution to the equation is a curve in this manifold.
+    
+    Vector spaces are manifolds, in particular real finite-dimensional vector spaces.
+    To see this we simply construct a basis and then parametrise the vectors by the coefficients of the basis vectors.
+    
+    \section{Vectors, Covectors, and Tensors}
+    \subsection{Tangent Space}
+    One of the main changes when moving from discussing vectors in Euclidean space to vectors in some manifold is that it becomes important where the vector is on the manifold.
+    In Euclidean geometry we usually think of vectors as being at the origin, but we can also move them around freely, say to add them by combining them tip to tail.
+    This doesn't work on a general manifold as we will see later.
+    
+    Let \(M\) be a smooth manifold.
+    For each point, \(p \in M\), we define a \defineindex{tangent space} at \(p\), \(T_pM\), and we can treat the vectors in this tangent space as Euclidean vectors.
+    A tangent vector is a vector in the tangent space.
+    The formal definition of a tangent space is a bit abstract:
+    \begin{dfn}{Tangent Space}{}
+        Let \(M\) be a smooth manifold and \(f \colon M \to \reals\) a smooth function on \(M\).
+        The set of all smooth functions on \(M\), denoted \(\End(M)\) or \(C^{\infty}(M)\), is a real associative algebra under point wise addition and products, that is for \(f, g \in \End(M)\) we define \((f + g)(p) = f(p) + g(p)\) and \(fg(p) = f(p)g(p)\).
+        
+        A \defineindex{derivation} at \(p \in M\) is a linear map, \(D \colon \End(M) \to \reals\) satisfying the Leibniz identity,
+        \begin{equation}
+            D(fg) = D(f)g(p) + f(p)D(g)
+        \end{equation}
+        for all \(f, g \in \End(M)\).
+        Note the similarity to the product rule.
+        
+        Define addition and scalar multiplication of derivations at \(p\) by
+        \begin{equation}
+            (D_1 + D_2)(f) = D_1(f) + D_2(f), \qand (\lambda D)(f) = \lambda D(f)
+        \end{equation}
+        for derivations at \(p\) \(D_1\), \(D_2\), and \(D\), and some \(\lambda \in \reals\).
+        This makes the space of derivations a real vector space and this is the space we define as the tangent space, \(T_pM\).
+        
+        We can then define the \defineindex{tangent bundle}, \(TM\), as the disjoint union of all tangent spaces,
+        \begin{equation}
+            TM \coloneqq \bigsqcup_{p \in M} T_pM = \{(p, x) \mid p \in M, x \in T_pM\}.
+        \end{equation}
+        That is we combine all vectors in any tangent space, \(T_pM\), into a single set and tag each one with the point \(p\), to keep track of \(p\), since this is important.
+    \end{dfn}
+    
+    Given this definition we can define a vector field as an assignment of a tangent vector to each point in the manifold.
+    More formally we define a vector field, \(V \colon M \to TM\) such that \(\pi \circ V\) is the identity mapping on \(M\) where \(\pi \colon TM \to M\) is defined to be the projection \(\pi(p, x) = p\).
+    
+    So far these definitions of tangent vectors have been coordinate free.
+    This is how mathematicians like to do general relativity, but its not the easiest way to do calculations so we introduce coordinates.
+    
+    For an \(n\)-dimensional manifold we can define \(n\) coordinates, \(x^i\).
+    We can also define a path parametrised smoothly by \(\lambda\) such that \(\diff{x^i}{\lambda}\) exists.
+    We can then identify tangent vectors as derivatives, \(\diff{}/{\lambda}\) evaluated at a point, hence the name \enquote{derivations}.
+    This can then be expanded as
+    \begin{equation}
+        \diff{}{\lambda} = \diff{x^i}{\lambda} \diffp{}{x^i} = \diff{x^i}{\lambda}\partial_i
+    \end{equation}
+    and we can identify \(\partial_i \coloneqq \diffp{}/{x^i}\) as basis tangent vectors.
+    Notice that this expansion is simply the chain rule, which it can be shown holds for all derivations.
+    The basis, \(\{\partial_i\}\), is derived from a set of coordinates and so is called a \defineindex{coordinate basis}.
+    There are other non-coordinate bases but they are harder to find and coordinate bases will be enough for us.
+    
+    The good thing about this definition of a basis is that the transformation laws for the components of tangent vectors are immediately obvious.
+    Suppose we have some other set of coordinates, \(x'^i\).
+    It follows by the chain rule that
+    \begin{equation}
+        \diffp{}{x'^i} = \diffp{x^j}{x'^i}\diffp{}{x^j}.
+    \end{equation}
+    Denoting an arbitrary vector's components as \(V^i\), so the vector is \(V = V^i\partial_i\), it follows that
+    \begin{equation}
+        V = V'^i\diffp{}{x'^i} = V'^i \diffp{x^j}{x'^i}\diffp{}{x^j} = V^j \diffp{}{x^j}
+    \end{equation}
+    and so we can identify the transformation law for the components as
+    \begin{equation}
+        V'^i = \diffp{x'^i}{x^j}V^j.
+    \end{equation}
+    We'll come back to this when we discuss tensors.
+    
+    \subsection{Covectors}
+    Given a vector space, \(V\), over some field, \(\field\), we can define its dual space, \(V^*\) as the space of linear forms on \(V\), which is to say the space of maps \(V \to \field\).
+    \(V^*\) is also a vector space over \(\field\) and has the same dimension as \(V\).
+    Vectors in \(V^*\) are sometimes called \define{covectors}\index{covector}.
+    
+    \begin{dfn}{Cotangent Space}{}
+        Given a manifold, \(M\), and some point \(p \in M\) we define the \defineindex{cotangent space} at \(p\), \(T_p^*M\), to be the dual space to the tangent space at \(p\), that is \(T_p*M = (T_pM)^*\).
+    \end{dfn}
+    
+    The elements of \(T_p^*M\) are then linear maps \(T_pM \to \reals\), in this context we call elements of \(T_p^*M\) \define{one-forms}\index{one-form}\index{1-form|see{one-form}}.
+    This means if \(\vv{v}, \vv{w} \in T_pM\), \(\cv{\omega} \in T_p^*M\), and \(a, b \in \reals\) then
+    \begin{equation}
+        \omega(a\vv{v} + b\vv{w}) = a\cv{\omega}(\vv{v}) + b\cv{\omega}(\vv{w}) \in \reals.
+    \end{equation}
+    Since \(T_p^*M\) is itself a vector space if \(\psi \in T_p^*M\) also we have
+    \begin{equation}
+        (a\cv{\omega} + b\cv{\psi})(\vv{v}) = a\cv{\omega}(\vv{v}) + b\cv{\psi}(\vv{v}),
+    \end{equation}
+    which gives a nice symmetry between \(T_pM\) and \(T_p^*M\).
+    
+    This symmetry suggests it is sensible to define the action of \(T_pM\) on \(T_p^*M\), and indeed it is.
+    We can define \(\vv{v}(\cv{\omega}) \coloneqq \cv{\omega}(\vv{v})\).
+    
+    Geometrically we can think of vectors as lines with direction and length.
+    The dual concept to a line in three dimensions is a plane.
+    We can think of one-forms as planes arranged in space.
+    The value \(\cv{\omega}(\vv{v}) = \vv{v}(\cv{\omega})\) is then a measure of how many planes associated with \(\cv{\omega}\) the vector \(\vv{v}\) cuts through.
+    
+    \subsection{Tensors}
+    Tensors generalise the notion of one-forms and vectors.
+    
+    \begin{dfn}{Tensor}{}
+        A \define{\(\bm{(n, m)}\)-tensor}\index{tensor} or \(\left( \begin{smallmatrix} n \\ m \end{smallmatrix} \right)\)-tensor is a multilinear map
+        \begin{equation}
+            T \colon T_p^*M^n \times T_pM^m \to \reals.
+        \end{equation}
+    \end{dfn}
+    By multilinear we mean
+    \begin{align*}
+        T(\cv{\omega}_1, \dotsc, a\cv{\omega}_i + b\cv{\omega}_i' ,\dotsc, \cv{\omega}_n, \vv{v}_1, \dotsc, \vv{v}_m) &= aT(\cv{\omega}_1, \dotsc, \cv{\omega}_i, \dotsc, \cv{\omega}_n, \vv{v}_1, \dotsc, \vv{v}_m)\\
+        &+ bT(\cv{\omega}_1, \dotsc, \cv{\omega}_i', \dotsc, \cv{\omega}_n, \vv{v}_1, \dotsc, \vv{v}_m),\\
+        T(\cv{\omega}_1, \dotsc, \cv{\omega}_n, \vv{v}_1, \dotsc, a\vv{v}_i + b\vv{v}_i', \dotsc \vv{v}_m) &= aT(\cv{\omega}_1, \dotsc, \cv{\omega}_n, \vv{v}_1, \dotsc, \vv{v}_i, \dotsc, \vv{v}_m)\\
+        &+ bT(\cv{\omega}_1, \dotsc, \cv{\omega}_n, \vv{v}_1, \dotsc, \vv{v}_i', \dotsc \vv{v}_m).
+    \end{align*}
+    For example, this means for a \((1, 1)\) tensor
+    \begin{equation}
+        T(a\cv{\omega} + b\cv{\psi}, c\vv{v} + d\vv{w}) = acT(\cv{\omega}, \vv{v}) + adT(\cv{\omega}, \vv{w}) + bcT(\cv{\psi}, \vv{v}) + bdT(\cv{\psi}, \vv{w}).
+    \end{equation}
+    
+    We can then identify a scalar as a \((0, 0)\)-tensor, a vector as a \((1, 0)\)-tensor, and a covector as a \((0, 1)\)-tensor.
+    
+    \subsection{Bases}
+    Let \(\{\ve{i}\}\) be a basis for vectors.
+    We can then write \(\vv{v} = v^i\ve{i}\).
+    Using the linearity of the one-form we can write
+    \begin{equation}
+        \cv{\omega}(\vv{v}) = \cv{\omega}(v^i\ve{i}) = v^i\cv{\omega}(\ve{i}) = v^i\omega_i
+    \end{equation}
+    where we define \(\omega_i \coloneqq \cv{\omega}(\ve{i})\).
+    We can define a \defineindex{dual basis}, \(\{\cve{i}\}\), which is such that
+    \begin{equation}
+        \cve{i}(\ve{j}) = \ve{j}(\cve{i}) = \tensor{\delta}{^i_j}.
+    \end{equation}
+    We then have
+    \begin{align}
+        \cv{\omega}(\ve{i}) &= \omega_j\cve{j}(\ve{i}) = \omega_j\tensor{\delta}{^j_i} = \omega_i,\\
+        \vv{v}(\cve{i}) &= v^j\ve{j}(\cve{i}) = v^j\tensor{\delta}{^i_j} = v^i.
+    \end{align}
+    So, we can identify the components of a vector as the result of acting on the dual basis, and the components of a dual vector as the result of acting on the basis.
+    
+    We can generalise this to tensors and define the \define{components of a tensor}\index{tensor components} as the result of evaluating the tensor on the dual basis and basis.
+    Keeping the notation consistent with the vectors and covectors above we denote the result of acting on the dual basis with upper indices acting on the basis with lower indices, so for an \((n, m)\)-tensor, \(T\), we define the components
+    \begin{equation}
+        \tensor{T}{^{i_1i_2\dotso i_n}_{j_1j_2\dotso j_m}} \coloneqq T(\ve{i_1}, \ve{i_2}, \dotsc, \ve{i_n}, \cve{j_1}, \cve{j_2}, \dotsc, \cve{j_m}).
+    \end{equation}
+    
+    For completeness we now mention that we can interpret these components as the coefficients of basis tensors, which are given by tensor products of basis vectors and covectors and so
+    \begin{equation}
+        T = \tensor{T}{^{i_1i_2\dotso i_n}_{j_1j_2\dotso j_m}} \ve{i_1} \otimes \ve{i_2} \otimes \dotsb \otimes \ve{i_n} \otimes \cve{j_1} \otimes \cve{j_2} \otimes \dotsb \otimes \cve{j_m}.
+    \end{equation}
+    The tensor product in term is a way of combining a \((m, n)\)-tensor, \(T\), and a \((k, l)\)-tensor, \(S\), to produce a \((m + k, n + l)\)-tensor, \(T \otimes S\), defined by
+    \begin{multline}
+        (T\otimes S) (\cv{\omega}_1, \dotsc, \cv{\omega}_{m + k}, \vv{v}_1, \dotsc, \vv{v}_{n + l})\\
+        \coloneqq T(\cv{\omega}_1 \dotsc, \cv{\omega}_{m}, \vv{v_1}, \dotsc, \vv{v}_n) S(\cv{\omega}_{m + 1}, \dotsc, \cv{\omega}_{m + k}, \vv{v}_{n + 1}, \dotsc, \vv{v}_{n + l}).
+    \end{multline}
+    
+    In general the order of the indices is important, that is \(T^{ij} \ne T^{ij}\) and \(\tensor{T}{^i_j^k} \ne \tensor{T}{^i_k^j}\).
+    If the order doesn't matter between two indices then we say that the tensor is \define{symmetric}\index{symmetric tensor} in those indices, and we may be a bit more sloppy about separating upper and lower indices.
+    For example, the Kronecker delta is symmetric in both of its indices and so \(\tensor{\delta}{^i_j} = \tensor{\delta}{_j^i} = \delta^i_j\).
+    
+    \subsubsection{Metric}
+    \begin{dfn}{Metric Tensor}{}
+        The \defineindex{metric tensor}, \(g\), is defined to be a \((0, 2)\)-tensor which is symmetric in its arguments, so \(g(\vv{v}, \vv{u}) = g(\vv{u}, \vv{v})\).
+    \end{dfn}
+    We then have
+    \begin{equation}
+        g(\vv{v}, \vv{u}) = g(v^i\ve{i}, u^j\ve{j}) = v^iu^jg(\ve{i}, \ve{j}) = v^iu^jg_{ij}.
+    \end{equation}
+    Previously we have called \(g_{\mu\nu}\) the metric tensor, but we now see that these are actually the components of the metric tensor, although we will most likely refer to \(g_{\mu\nu}\) as the metric tensor in the future.
+    
+    We can use the metric to define a basis for the dual space, although it is not necessarily a dual basis, since the vectors in this basis won't be dual to the vectors in the normal basis unless the metric happens to be diagonal.
+    We can think of the function one-form \(f = g(\ve{j}, -)\), defined by\(f(\ve{i}) \coloneqq g(\ve{j}, \ve{i})\) as the basis one-form \(\cve{j}\).
+    
+    It is possible to construct a dual basis even without a metric structure however.
+    
+    \subsection{Transformation Laws}
+    Consider a basis transformation, which we take to be linear so that the new basis is a complete set, this can be written as \(\vep{j} = \alpha^i_j \ve{i}\).
+    Note that \(\alpha^i_j\) here is \emph{not} a tensor, it is just a matrix defining this coordinate transformation.
+    We can similarly define a way to transform the dual basis, \(\cvep{j} = \beta^j_i\cve{i}\).
+    
+    To maintain duality we require that
+    \begin{equation}
+        \tensor{\delta}{^i_j} = \cvep{i}(\vep{j}) = \beta^i_k\cve{k}(\alpha^l_i\ve{l}) = \beta^i_k \alpha^l_i\cve{k}(\ve{l}) = \beta^i_k\alpha^l_i \tensor{\delta}{^k_l} = \beta^i_k\alpha^k_i.
+    \end{equation}
+    This shows that \(\beta = (\alpha^\trans)^{-1}\).
+    
+    For a coordinate basis we saw that \(\ve{i} = \partial_i\) and then the transformation matrices are just derivatives between the old and new coordinates.
+    \begin{equation}
+        \alpha^i_j = \diffp{x^i}{x'^j}.
+    \end{equation}
+    From this we then have that
+    \begin{equation}
+        \beta^i_j = \diffp{x'^i}{x^j}.
+    \end{equation}
+    
+    It follows then that
+    \begin{equation}
+        v'^j = \cvep{j}(\vv{v}) = \beta^j_k \cve{k}(\vv{v}) = \beta^j_k v^k,
+    \end{equation}
+    so the vector components transform in the opposite ways to the basis vectors, which is why we call them \emph{contra}variant.
+    Similarly the components of a dual vector transform as
+    \begin{equation}
+        \omega'_j = \ve{j}(\cv{\omega}) = \alpha^k_j \ve{k}(\cve{\omega}) = \alpha^k_j \omega_k.
+    \end{equation}
+
+    \section{Other Matters}
+    \subsection{Affine Geometry}
+    \begin{dfn}{Affine Transformation}{}
+        An \defineindex{affine transformation} is a translation, \(\vv{b}\), combined with a linear transformation, \(A\), such that \(\vv{v} \mapsto A\vv{v} + \vv{b}\).
+    \end{dfn}
+    In the same way that invariance under rotation defines a vector space we can define an \defineindex{affine space} as the space that is invariant under affine transformations.
+    This is more general than a vector space since we can think of it as a vector space but dropping the requirement that there is a zero vector, since we now allow translations.
+    
+    Poincar\'e transformations are examples of affine transformations.
+    Recall that Poincar\'e transformations are Lorentz transformations plus translations\footnote{Where by \enquote{plus} we really mean a semidirect product, see the symmetries of quantum mechanics notes.}.
+    
+    Affine spaces don't require a metric structure to exist, in fact affine translations don't in general preserve lengths.
+    However, affine translations do keep parallel lines parallel, which means distances along parallel lines are preserved relative to each other.
+    
+    \tikzexternaldisable
+    An example of an affine space is colour space.
+    We can think of this as a three dimensional affine space with basis \(\{\textcolor{red}{\text{red}}, \textcolor{green}{\text{green}}, \textcolor{blue}{\text{blue}}\}\).
+    We can compare the intensity when the colour balance is unchanged, for example \((\textcolor{red}{1}, \textcolor{green}{0.75}, \textcolor{blue}{0.5})\) (\definecolor{rgb1}{rgb}{1,0.75,0.5}\tikz{\fill[rgb1] (0, 0) circle [radius = 0.75ex];}) is more intense than \((\textcolor{red}{0.8}, \textcolor{green}{0.6}, \textcolor{blue}{0.4})\) (\definecolor{rgb2}{rgb}{0.8,0.6,0.4}\tikz{\fill[rgb2] (0, 0)circle [radius = 0.75ex];}), which is the result of scaling all components by \(0.8\), but there is no intensity comparison with \((\textcolor{red}{0.3}, \textcolor{green}{0.5}, \textcolor{blue}{0.96})\) (\definecolor{rgb3}{rgb}{0.3,0.8,0.96}\tikz{\fill[rgb3] (0, 0) circle [radius = 0.75ex];}).
+    Even though \(\sqrt{1^2 + 0.75^2 + 0.5^2} \approx \sqrt{0.3^2 + 0.8^2 + 0.96^2}\).
+    \tikzexternalenable
+    
     
 %    %   Appdendix
 %    \appendixpage
