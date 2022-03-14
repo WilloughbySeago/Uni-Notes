@@ -1,0 +1,2471 @@
+\part{Representation Theory}
+\chapter{Basics of Representation Theory}\label{chap:basics of representation theory}
+\begin{rmk}
+    Material in this section applies both to finite groups and compact
+    groups.
+    We won't worry too much about what it means for a group to be compact,
+    we just note that the Lie groups \(\unitary(1) \isomorphic
+    \specialOrthogonal(2)\) and \(\specialOrthogonal(3) \isomorphic
+    \specialUnitary(2) / \integers_2\) are compact.
+    More generally \(\orthogonal(n)\), \(\specialOrthogonal(n)\),
+    \(\Spin(n)\), \(\unitary(n)\), and \(\specialUnitary(n)\) are compact.
+\end{rmk}
+
+\section{Representation Definition}
+There are two essentially equivalent definitions of a representation:
+\begin{dfn}{Representation}{}
+    A \defineindex{representation} of a group, \(G\), is a group action of
+    \(G\) on a linear space, \(V\).
+    That is \(\varphi \colon G \times V \to V\) is a representation if it is
+    a group action.
+    
+    A \defineindex{representation} of a group, \(G\), is a homomorphism with
+    the automorphism group of a linear space.
+    That is \(\rho \colon G \to \generalLinear(V)\) is a representation if
+    it is a homomorphism.
+\end{dfn}
+The equivalence of these two definitions is simple, if \(\varphi(g, \vv{v})
+= g \action \vv{v} = \rho(g)\vv{v}\) for all \(g \in G\) and \(\vv{v} \in V\)
+then \(\varphi\) and \(\rho\) are the same representation in the two slightly
+different definitions.
+
+When the homomorphism is clear it is common to refer to \(V\) as the
+representation, rather than \(\rho\).
+
+Representation theory gives us a way to do concrete calculations in a group.
+We have implicitly been using representation theory already, for example we
+have used \(\integers_n = \{\e^{2i\pi m/n} \mid m = 0, \dotsc, n - 1\}\) as
+\emph{the} cyclic group of order \(n\).
+Strictly this is actually a representation of a more general cyclic group,
+defined by \(\presentation{g}{g^n = e}\).
+The linear space in question is \(\complex\), and \(\generalLinear(\complex)
+= \complex\setminus\{0\}\).
+The group action is rotation by \(2\pi m/n\).
+
+Representation theory is particularly useful because we have developed a lot
+of tools for dealing with computations in linear spaces since they are common in
+other areas of maths and physics.
+Representation theory allows us to use these to work with groups.
+
+\begin{app}{}{}
+    When we solve the quantum harmonic oscillator we can do so in different
+    linear spaces, such position space, \(\ket{x}\), momentum space, \(\ket{p}\), or
+    number-of-particles space, \(\ket{n}\).
+    Each one of these corresponds to studying the same underlying physics on
+    a different linear space, which we can think of as being different
+    representations.
+    
+    If a system has a certain symmetry described by a group, \(G\), then
+    this is expressed in the mathematics by \(G\) acting on the Hilbert space of
+    states, which is to say as a representation of \(G\) on the Hilbert space of
+    states.
+\end{app}
+
+If the relevant linear space is finite dimensional, say \(\dim V = n\) then
+we can associate \(\generalLinear(V)\) with \(\generalLinear(n, \field)\), the
+group of \(n \times n\) matrices with entries in \(\field\), and so we can
+associate \(\rho(g)\) with a matrix.
+
+\section{Pedestrian Approach}
+\begin{rmk}
+    In this section we will get an idea of how representation can be used
+    without being too worried about precise definitions.
+\end{rmk}
+
+Consider \(S_3\).
+By \cref{lma:transpositions 1 a generate Sn} \(\{\cycle{1, 2}, \cycle{1,
+    3}\}\) generates \(S_n\), so we can define a representation by how it maps these
+two elements to the linear space.
+Inspired by \(S_3\) as a permutation group we look for a representation that
+conserves this permuting ability.
+In particular the obvious choice of 3 things to act on in a linear space are
+the 3 basis vectors of a 3-dimensional space, such as \(\reals^3\).
+We use the standard basis, \(\ve{1} = (1, 0, 0)^\trans\), \(\ve{2} = (0, 1,
+0)^\trans\), and \(\ve{3} = (0, 0, 1)^\trans\).
+We can easily construct matrices that permute these, for example we want
+\(\rho(\cycle{1, 2})\ve{1} = \ve{2}\), \(\rho(\cycle{1, 2})\ve{2} = \ve{2}\) and
+\(\rho(\cycle{1, 2})\ve{3} = \ve{3}\).
+This fully determines the matrix \(\rho(\cycle{1, 2})\):
+\begin{equation}
+    \rho(\cycle{1, 2}) = 
+    \begin{pmatrix}
+        0 & 1 & 0\\
+        1 & 0 & 0\\
+        0 & 0 & 1
+    \end{pmatrix}
+    .
+\end{equation}
+Similarly, we have
+\begin{equation}
+    \rho(\cycle{1, 3}) = 
+    \begin{pmatrix}
+        0 & 0 & 1\\
+        0 & 1 & 0\\
+        1 & 0 & 0
+    \end{pmatrix}
+    .
+\end{equation}
+This is called the \defineindex{permutation representation} of \(S_3\), and
+can easily be generalised to \(S_n\).
+
+At this point there are a few questions we should consider.
+First, are there any other representations?
+The answer to this is yes, and we'll see some later.
+The second is can we find a simpler representation, for some sense of
+simpler.
+The answer is again yes.
+In particular notice that \(\vv{v} = (1, 1, 1)^{\trans}\) is a common
+eigenvector for both of these matrices, and hence there is an invariant
+subspace, \(\spn\{\vv{v}\}\), which is unchanged by this representation.
+It can be shown that this allows us to perform a basis change and write
+these matrices in block diagonal form.
+We can then define a new representation, \(\rho'\), in this block diagonal
+basis such that
+\begin{equation}
+    \rho'(\cycle{1, 2}) = 
+    \begin{pmatrix}
+        1 & 0 & 0\\
+        0 & a_{11} & a_{12}\\
+        0 & a_{21} & a_{22}
+    \end{pmatrix}
+    ,\qqand \rho'(\cycle{1, 3}) = 
+    \begin{pmatrix}
+        1 & 0 & 0\\
+        0 & b_{11} & b_{12}\\
+        0 & b_{21} & b_{22}
+    \end{pmatrix}
+    .
+\end{equation}
+This is simpler because it is fully determined by the \(2\times 2\) block
+matrices on the diagonal.
+We say that the permutation representation is reducible.
+
+\section{Basic Definitions}
+\begin{dfn}{Faithful}{}
+    If \(\rho \colon G \to \generalLinear(V)\) is a representation of \(G\)
+    then we say \(\rho\) is \define{faithful}\index{faithful representation} if it
+    is injective, that is \(\rho(g) = \rho(g')\) implies \(g = g'\).
+    If this is not the case then we say \(\rho\) is
+    \define{unfaithful}\index{unfaithful representation}.
+\end{dfn}
+
+The permutation representation of \(S_3\) is faithful.
+
+\begin{dfn}{Trivial Representation}{}
+    \emph{A} \defineindex{trivial representation} is \(\rho\colon G \to
+    \generalLinear(V)\) defined by \(\rho(g) = \rho(e) = \ident_V\), where
+    \(\ident_V\) is the identity in \(\generalLinear(V)\) and \(V\) is an
+    \emph{arbitrary vector space}.
+    
+    \emph{The} \define{trivial representation} is \(\rho\colon G \to
+    \generalLinear(V)\) defined by \(\rho(g) = \rho(e) = \ident_V\), where
+    \(\ident_V\) is the identity in \(\generalLinear(V)\) and \(V\) is a
+    \emph{one-dimensional vector space}.
+\end{dfn}
+
+A trivial representation is maximally unfaithful since all elements map to
+the same operator.
+
+\begin{dfn}{Unitary Representation}{}
+    If \(\rho \colon G \to \unitary(V)\) is a homomorphism then we say that
+    \(\rho\) is a \defineindex{unitary representation}.
+    That is a unitary representation is one in which \(\rho(g)\) is a
+    unitary operator for all \(g \in G\).
+\end{dfn}
+
+We have been working with a unitary representation of \(\integers_n\) as
+\(\{\e^{2i\pi m/n} \mid m = 0, \dotsc, n - 1\}\).
+
+\begin{dfn}{Equivalence of Representations}{}
+    If \(\rho\) and \(\rho'\) are representations of \(G\) on \(V\) we say
+    that \(\rho\) and \(\rho'\) are \define{equivalent}\index{equivalence of
+        representations} if they are represented by a \defineindex{similarity
+        transform}, that is \(\rho(g) = S\rho'(g)S^{-1}\) for some \(S \in
+    \generalLinear(V)\).
+    Notice that \(S\) must be the same for all \(g \in G\).
+\end{dfn}
+
+As the name suggests the equivalence of representations, \(\sim\), is an
+equivalence relation.
+Clearly \(\rho \sim \rho\) since \(\rho(g) = \ident_V\rho(g)\ident_V^{-1}\).
+Also, if \(\rho \sim \rho'\) then \(\rho(g) = S\rho'(g)S^{-1}\) for some \(S
+\in \generalLinear(V)\), and so \(\rho'(g) = S^{-1}\rho(g)S\), identifying \(S =
+(S^{-1})^{-1}\) and knowing that if \(S \in \generalLinear(V)\) we also have
+\(S^{-1} \in \generalLinear(V)\) we see that \(\rho' \sim \rho\).
+Finally, if \(\rho \sim \rho'\) and \(\rho' \sim \rho''\) there exists \(S,
+T \in \generalLinear(V)\) such that \(\rho(g) = S\rho'(g)S^{-1}\) and \(\rho'(g)
+= T\rho''(g)T^{-1}\), and hence \(\rho(g) = ST\rho''(g)T^{-1}S^{-1} =
+(ST)\rho(g)(ST)^{-1}\) and since \(S, T \in \generalLinear(V)\) it follows that
+\(ST \in \generalLinear(V)\), and hence \(\rho \sim \rho''\).
+
+\begin{dfn}{Invariant Subspace}{}
+    Let \(\rho \colon G \to \generalLinear(V)\) be a representation of the
+    group \(G\) on the linear space \(V\).
+    Let \(W\) be a subspace of \(V\).
+    Then we call \(W\) an \defineindex{invariant subspace} if
+    \(\rho(g)\vv{w} \in W\) for all \(g \in G\) and \(\vv{w} \in W\).
+    
+    Using the group-action definition of a representation \(W\) is an
+    invariant subspace if \(\Orb(\vv{w}) \subseteq W\) for all \(\vv{w} \in W\).
+\end{dfn}
+
+A trivial representation, \(\rho(g) = \ident_V\), has \(V\) as an invariant
+subspace.
+Our earlier example of \(S_3\) in the permutation representation has
+\(\spn\{(1, 1, 1)^\trans\}\) as an invariant subspace.
+All representations leave the trivial subspace, \(\{\vv{0}\}\), invariant.
+
+\begin{dfn}{Irreducible}{}
+    We call a representation \define{irreducible}\index{irreducible
+        representation} if it has no invariant subspaces, apart from the trivial
+    zero-dimensional subspace, \(\{\vv{0}\}\).
+    If a representation can be written in block diagonal form then it is
+    \define{reducible}\index{reducible representation}
+\end{dfn}
+
+It is common to shorten \enquote{irreducible representation} to
+\define{irrep}\index{irrep|see{irreducible representation}}.
+
+For finite groups and continuous compact groups the reducible
+representations can be written as a direct sum of irreducible representations.
+For this reason we often care only about irreducible representations.
+
+The permutation representation of \(S_3\) is reducible.
+
+\begin{lma}{}{}
+    If a representation has invariant subspaces then we can write it in
+    block diagonal form.
+\end{lma}
+
+\begin{dfn}{Real and Complex Representations}{}
+    A representation, \(\rho \colon G \to \generalLinear(V)\), is
+    \define{real}\index{real representation} if either \(V\) is a real vector space
+    or the representation is equivalent to a representation which can be thought of
+    as acting on a real vector space by reducing the field of scalars to \(\reals\).
+    Alternatively \(\rho\) is equivalent to \(\rho^*\).
+    
+    A \defineindex{complex representation} is a representation, \(\rho
+    \colon G \to \generalLinear(V)\), where \(\rho\) is not equivalent to
+    \(\rho^*\).
+\end{dfn}
+
+We will refine this notion later to include pseudo-real representations.
+
+The permutation representation of \(S_3\) is real, and hence so is
+\(\rho'\), even though it is possible that \(a_{ij}\) and/or \(b_{ij}\) are not
+real, since \(\rho\) and \(\rho'\) are equivalent.
+
+\begin{app}{}{}
+    Unitary representations are important in quantum physics.
+    They are the natural language to describe symmetries on the Hilbert
+    space of states since they preserve the inner product, and hence the probability
+    of being in a given state.
+    
+    Further there is a certain view from which particles \emph{are}
+    irreducible representations of the Poincar\'e group, \(\reals^{1, 3} \ltimes
+    \orthogonal(1, 3)\).
+    We then associate complex representations with charged particles and
+    real representations with neutral particles.
+\end{app}
+
+\section{Some Theorems}
+\begin{thm}{Maschke's Theorem}{thm:maschke's theorem}\index{Maschke's
+        theorem}
+    Any representation of a finite group is equivalent to a unitary
+    representation.
+    
+    \begin{proof}
+        Let \(G\) be a finite group, \(V\) a vector space, and \(\rho\colon
+        G \to \generalLinear(V)\) a representation.
+        Let \(\innerprod{-}{-}\) be an inner product on \(G\).
+        The statement of the theorem is equivalent to stating that we can
+        define a new inner product on \(V\) such that this inner product is invariant
+        under the action of this representation.
+        This works since the two inner products will be related by a change
+        of basis, and hence this new inner product can be viewed as the old inner
+        product after a similarity transform.
+        
+        The inner product that we define is \(\innerprod{-}{-}_G\), it is
+        defined for \(x, y \in V\) as
+        \begin{equation}
+            \innerprod{x}{y}_G \coloneqq \frac{1}{\abs{G}} \sum_{g \in G}
+            \innerprod{\rho(g)x}{\rho(g)y}.
+        \end{equation}
+        We can think of this inner product being defined by acting on the
+        old inner product with the representation and then averaging over \(G\).
+        
+        We need to show that \(\innerprod{-}{-}_G\) is an inner product and
+        that it is invariant with respect to the representation.
+        By definition \(\rho(g)x, \rho(g)y \in V\) and so
+        \(\innerprod{\rho(g)x}{\rho(g)y}\) is positive definite.
+        This carries through the sum and so \(\innerprod{x}{y}_G\) is
+        positive definite.
+        Linearity and conjugate symmetry of \(\innerprod{-}{-}_G\) similarly
+        follows from these same properties for \(\innerprod{-}{-}\) without any
+        complications since \(G\) is finite.
+        
+        Now consider what happens when we first act on \(V\) with
+        \(\rho(g')\) for some \(g' \in G\).
+        Using the fact that \(\rho\) is a homomorphism we then have
+        \begin{align}
+            \innerprod{\rho(g')x}{\rho(g')y}_G &= \frac{1}{\abs{G}} \sum_{g
+                \in G} \innerprod{\rho(g)\rho(g')x}{\rho(g)\rho(g')y}\\
+            &= \sum_{g\in G} \innerprod{\rho(gg')x}{\rho(gg')y}\\
+            &= \sum_{g''\in G} \innerprod{\rho(g'')x}{\rho(g'')y}\\
+            &= \innerprod{x}{y}_G.
+        \end{align}
+        In the penultimate step we have used the fact that as \(g\) takes on
+        all values in \(G\) \(gg'\) necessarily also takes on all values in \(G\).
+        This is due to the fact that in a Cayley table each column must
+        contain every element of \(G\) exactly once.
+        Hence, summing over \(g\) with factors of \(gg'\) is the same as
+        summing over \(g'' = gg'\), only the order of the terms changes and since the
+        inner product gives an element of the base field this sum is commutative.
+        
+        Finally, we remark that 
+        \begin{equation}
+            \innerprod{x}{y}_G = \innerprod{\rho(g')x}{\rho(g')y}_G =
+            \innerprod{\rho(g')^\hermit \rho(g') x}{y}_G
+        \end{equation}
+        using the property of inner products that \(\innerprod{x}{Ay} =
+        \innerprod{A^\hermit x}{y}\) for any inner product, \(\innerprod{-}{-}\), and
+        operator \(A\).
+        Hence, we can identify that \(\rho(g')^\hermit \rho(g') = \ident\),
+        and so \(\rho\) is a unitary representation.
+    \end{proof}
+\end{thm}
+
+It turns out that being irreducible is an incredibly strong requirement, so
+much so that it doesn't really leave much wiggle room, as the next theorem
+shows.
+Schur's lemma states that there is no room for non-trivial homomorphisms
+between irreducible representations.
+
+\begin{thm}{Schur's Lemma}{thm:schurs lemma}\index{Schur's lemma}
+    Let \(\rho\colon G \to \generalLinear(V)\) and \(\rho\colon G \to
+    \generalLinear(V')\) be irreducible representations of the group \(G\) on some
+    finite dimensional vector spaces \(V\) and \(V'\).
+    Let \(T \colon V \to V'\) be a linear map satisfying \(\rho'(g) \circ T
+    = T \circ \rho(g)\) for all \(g \in G\) where \(\circ\) is composition of
+    functions.
+    Then
+    \begin{enumerate}
+        \item either \(T\) is an isomorphism or \(T\) is trivial.
+        \item If \(V = V'\) then \(T = \lambda\ident\) for \(\lambda \in
+        \complex\) and \(\ident\) being the identity map on \(V\).
+    \end{enumerate}
+    \begin{proof}
+        The first step is to notice that \(\ker T\) and \(\image T\) are
+        invariant subspaces.
+        Recall that \(\ker T \coloneqq \{v \in V \mid Tv = 0\}\).
+        To show that \(\ker T\) is an invariant subspace we need to show
+        that \(\rho(g)v \in \ker T\) for all \(v \in \ker T\).
+        To do this we notice that for \(v\in\ker T\) we have
+        \begin{multline}
+            T\rho(g)v = (T \circ \rho(g))v = (\rho'(g) \circ T)v\\
+            = \rho'(g)Tv = \rho'(g)(Tv) = \rho'(g)0 = 0
+        \end{multline}
+        where the final equality follows since linear maps map 0 to 0.
+        We have therefore shown that \(T\rho(g)v = 0\) for all \(v \in \ker
+        T\) and hence \(\rho(g)v \in \ker T\) so \(\ker T\) is an invariant subspace of
+        \(V\) under \(\rho\).
+        
+        Now recall that \(\image T = \{v' \in V' \mid v' = T(v) \text{ for
+            some } v \in V\}\).
+        This is an invariant subspace if \(\rho'(g)v \in \image T\) for all
+        \(v' \in \image T\).
+        To show this we notice that for \(v' \in \image T\) we have \(v\in
+        V\) such that \(v' = Tv\) and so
+        \begin{equation}
+            \rho'(g)v' = \rho'(g)Tv = (\rho'(g) \circ T)v = (T\circ
+            \rho(g))v = T\rho(g)v
+        \end{equation}
+        and so \(\rho'(g)v'\) is of the form \(T\rho(g)v\) and \(\rho(g)v
+        \in V\) meaning \(\rho'(g) v' \in \image T\).
+        Hence, \(\image T\) is an invariant subspace of \(V'\) under
+        \(\rho'\).
+        
+        By definition \(\rho\) and \(\rho'\) are irreducible representations
+        and therefore have no nontrivial invariant subspaces.
+        This means that the invariant subspace \(\ker T\) must be \(\{0\}\)
+        or \(V\), and similarly \(\image T\) must be \(\{0\}\) or \(V'\).
+        We now treat this by cases.
+        \begin{itemize}
+            \item Suppose \(\ker T = \{0\}\).
+            Then \(\image T \ne \{0\}\) since all \(v \in V\) with \(v \ne
+            0\) map to something other than \(0\), meaning that \(\image T\) must contain
+            nonzero elements.
+            Hence, \(\image T = V'\).
+            It follows that \(T\) is an isomorphism since a trivial kernel
+            implies that \(T \colon V \to V'\) is injective since \(V' = \image T\) this map
+            is also surjective.
+            \item Suppose \(\ker T = V\).
+            Then \(\image T = \{0\}\), since by definition all \(v \in V\)
+            map to \(0\).
+            Hence, \(T\) is the trivial zero function, \(T(v) = 0\) for all
+            \(v \in V\).
+        \end{itemize}
+        This finishes the proof of the first statement.
+        
+        For the second statement suppose \(T\) is nontrivial, that is \(T
+        \ne 0\).
+        Then \(T\) has at least one nonzero eigenvalue, \(\lambda \in
+        \complex\), since if all eigenvalues are zero then \(T\) is trivial.
+        Now define a second linear map \(U \coloneqq T - \lambda\ident\).
+        Then by construction at least one eigenvalue of \(U\) is 0 and so
+        \(U\) is not an isomorphism, since all vectors parallel to the eigenvector with
+        eigenvalue 0 are mapped to 0.
+        More formally this means that \(\dim(\ker U) \ge 1\), in fact the
+        dimension is the multiplicity of the eigenvalue 0.
+        
+        Since \(U = T - \lambda \ident\) it is clear that \(\rho'(g) \circ U
+        = U \circ \rho(g)\) and so by the first part of this theorem \(U = 0\), since
+        \(U\) is not an isomorphism.
+        Hence, \(U = 0 = T - \lambda \ident\) which we can rearrange to get
+        \(T = \lambda \ident\).
+    \end{proof}
+\end{thm}
+
+An equivalent statement to the first part of Schur's lemma is that the
+following diagram commuting for all \(g \in G\) only if \(T\) is trivial or an
+isomorphism:
+\begin{equation}
+    \tikzexternaldisable
+    \begin{tikzcd}
+        V \ar[r, "T"]\ar[d, "\rho(g)"'] & V' \ar[d, "\rho'(g)"]\\
+        V \ar[r, "T"]& V'
+    \end{tikzcd}
+\end{equation}
+
+An alternative statement of the second part of Schur's lemma, which is often
+state as the full version of Schur's lemma in the physics literature, is the
+following corollary.
+\begin{crl}{}{}
+    Let \(\rho\) be an irreducible representation of a group \(G\) on some
+    finite dimensional vector space, \(V\), and \(T\) be some linear map on this
+    same vector space such that \(\commutator{T}{\rho(g)} = 0\) for all \(g \in G\).
+    Then \(T = \lambda\ident\).
+    
+    \begin{rmk}
+        Here \(\commutator{A}{B} \coloneqq AB - BA\) is the usual
+        \defineindex{commutator}.
+    \end{rmk}
+\end{crl}
+
+The final theorem for this section relates writing representations as direct
+sums of irreducible representations.
+See \cref{dfn:direct sum} for the definition of direct sums.
+
+\begin{thm}{Decomposability Theorem}{thm:decomposability}\index{decomposability theorem}
+    Let \(\rho \colon G \to \generalLinear(V)\) be a reducible
+    representation for some compact group \(G\).
+    Then we can write
+    \begin{equation}
+        \rho(g) = m_1 \rho_1(g) \directsum m_2 \rho_2(g) \directsum \dotsb
+        \directsum m_k\rho_k(g) = \bigoplus_{i=1}^{k} m_i\rho_i(g)
+    \end{equation}
+    where \(\rho_i \colon G \to \generalLinear(V)\) are irreducible
+    representations and \(m_i \in \positiveintegers\).
+    By \(m_i \rho_i(g)\) we mean
+    \begin{equation}
+        m_i \rho_i(g) \coloneqq \underbrace{\rho_i(g) \directsum \dotsb
+            \directsum \rho_i(g)}_{m_i \text{ times}} = \bigoplus_{j = 1}^{m_i} \rho_i(g).
+    \end{equation}
+    
+    \begin{proof}
+        % TODO: prove this, wikipedia recommends
+        %            [1] Serre, Jean-Pierre (1977), Linear Representations of Finite
+        %Groups, New York: Springer Verlag, ISBN 0-387-90190-6
+        %            [2] Fulton, William; Harris, Joe: Representation Theory A First
+        %Course. Springer-Verlag, New York 1991, ISBN 0-387-97527-6.
+    \end{proof}
+\end{thm}
+
+\chapter{Character Theory of Finite Groups}
+\section{Basics of Character Theory}
+\begin{dfn}{Character}{}
+    Let \(G\) be a finite group and \(\rho\) a representation of \(G\).
+    Then we define the \defineindex{character}, \(\chi(g)\), of some \(g \in
+    G\) as
+    \begin{equation}
+        \chi(g) \coloneqq \tr[\rho(g)].
+    \end{equation}
+\end{dfn}
+\begin{ntn}{}{}
+    When discussing multiple representations of \(G\) we will denote the
+    representation being considered by a subscript, so \(\chi_\rho(g) =
+    \tr[\rho(g)]\) and \(\chi_{\rho'}(g) = \tr[\rho'(g)]\).
+\end{ntn}
+
+\begin{lma}{}{lma:characters of equivalent representations are equal}
+    The characters of two equivalent representations are equal.
+    \begin{proof}
+        Recall that the representations \(\rho\) and \(\rho'\) of \(G\) on
+        \(V\) are equivalent if there exists \(S \in \generalLinear(V)\) such that
+        \(\rho'(g) = S\rho(g) S^{-1}\) for all \(g \in G\).
+        Therefore,
+        \begin{align}
+            \chi_{\rho'}(g) &\coloneqq \tr[\rho'(g)]\\
+            &\hphantom{:}= \tr[S\rho(g)S^{-1}]\\
+            &\hphantom{:}= \tr[S^{-1}S\rho(g)]\\
+            &\hphantom{:}= \tr[\rho(g)]\\
+            &\hphantom{:}\eqqcolon \chi_{\rho}(g).
+        \end{align}
+        Here we have used the cyclic property of the trace, \(\tr(ABC) =
+        \tr(CAB)\).
+    \end{proof}
+\end{lma}
+
+Recall that an equivalence relation is a relation which is symmetric,
+reflexive, and transitive.
+The equivalence class of \(a \in A\) under some equivalence relation,
+\(\sim\), is the set \([a] \coloneqq \{b \in A \mid a \sim b\}\).
+The set of all equivalence classes is denoted \(A/\sim\).
+
+\begin{dfn}{}{}
+    A \defineindex{class function} is a function, \(f \colon A \to B\),
+    which takes on the same value for all \(b \in [a]\), where \([a]\) is an
+    equivalence class of \(A\) under some equivalence relation.
+    
+    We can therefore define a similar function \(\tilde{f} \colon A/\sim \to
+    B\) defined by \(\tilde{f}([a]) = f(a)\), which is well defined for class
+    functions \(f\).
+    We typically don't distinguish between \(f\) and \(\tilde{f}\).
+\end{dfn}
+
+Recall that \(x \sim y\) if \(x = gyg^{-1}\) is an equivalence relation,
+called conjugacy, and the equivalence classes of this equivalence relation are
+called conjugacy classes.
+
+\begin{lma}{}{}
+    The character is a class function on the conjugacy classes.
+    
+    \begin{proof}
+        Let \(x, y \in G\) be in the same conjugacy class.
+        Then \(x = gyg^{-1}\) for some \(g \in G\).
+        Let \(\rho\) be a representation of \(G\).
+        Then
+        \begin{align}
+            \chi_{\rho}(x) &\coloneqq \tr[\rho(x)]\\
+            &\hphantom{:}= \tr[\rho(gyg^{-1})]\\
+            &\hphantom{:}= \tr[\rho(g)\rho(y)\rho(g^{-1})]\\
+            &\hphantom{:}= \tr[\rho(g)\rho(y)\rho(g)^{-1}]\\
+            &\hphantom{:}= \tr[\rho(g)^{-1}\rho(g)\rho(y)]\\
+            &\hphantom{:}= \tr[\rho(y)]\\
+            &\hphantom{:}\eqqcolon \chi_\rho(y).
+        \end{align}
+        Here we have used the fact that \(\rho\) is a homomorphism so
+        \(\rho(ab) = \rho(a)\rho(b)\) and \(\rho(a^{-1}) = \rho(a)^{-1}\).
+        We have also used the cyclic property of the trace, \(\tr(ABC) =
+        \tr(CAB)\).
+        Hence, \(\chi_\rho(x) = \chi_\rho(y)\) for all \(x, y \in [x] \in
+        G/\sim\) where \(\sim\) is conjugacy.
+    \end{proof}
+\end{lma}
+
+\begin{lma}{}{lma:character of direct prod/sum is prod/sum of characters}
+    Let \(\rho\) and \(\rho'\) be representations of \(G\).
+    Then \(\chi_{\rho\directsum\rho'}(g) = \chi_\rho(g) + \chi_{\rho'}(g)\)
+    for all \(g \in G\) and \(\chi_{\rho\directproduct\rho'}(g) =
+    \chi_\rho(g)\chi_{\rho'}(g)\).
+    \begin{proof}
+        In this proof we use braket notation.
+        Let \(\{\ket{i}\}\) be an orthonormal basis.
+        Then in braket notation with the Einstein summation convention
+        \begin{equation}
+            \tr(A) \coloneqq \bra{i}A\ket{i}.
+        \end{equation}
+        Therefore,
+        \begin{align}
+            \chi_{\rho\directsum\rho'}(g) &\coloneqq
+            \tr[(\rho\directsum\rho')(g)]\\
+            &\hphantom{:}= \tr[\rho(g)\directsum\rho'(g)]\\
+            &\hphantom{:}= \bra{i}(\rho(g)\directsum\rho'(g))\ket{i}\\
+            &\hphantom{:}= \bra{i}\rho(g)\ket{i} + \bra{i}\rho'(g)\ket{i}\\
+            &\hphantom{:}= \tr[\rho(g)] + \tr[\rho'(g)]\\
+            &\hphantom{:}\eqqcolon \chi_\rho(g) + \chi_{\rho'}(g).
+        \end{align}
+        Here we have used the fact that
+        \begin{equation}
+            (A \directsum B)(\ket{v} \directsum \ket{w}) = A\ket{v}
+            \directsum B\ket{w}
+        \end{equation}
+        and so
+        \begin{align}
+            (\bra{v'} \directsum \bra{w'}) (A \directsum B) (\ket{v}
+            \directsum \ket{w}) &= (\bra{v'} \directsum \bra{w'}) (A\ket{v} \directsum
+            B\ket{w})\\
+            &= \bra{v'}A\ket{v} + \bra{w'}B\ket{w}.
+        \end{align}
+        
+        Similarly,
+        \begin{align}
+            \chi_{\rho\directproduct\rho'}(g) &\coloneqq
+            \tr[(\rho\directproduct\rho')(g)]\\
+            &\hphantom{:}= \tr[\rho(g) \directproduct \rho'(g)]\\
+            &\hphantom{:}= \bra{i}(\rho(g)\directproduct\rho'(g))\ket{i}\\
+            &\hphantom{:}= \bra{i}\rho(g)\ket{i}\bra{i}\rho'(g)\ket{i}\\
+            &\hphantom{:}= \tr[\rho(g)]\tr[\rho'(g)]\\
+            &\hphantom{:}\eqqcolon \chi_\rho(g) \chi_{\rho'}(g).
+        \end{align}
+        Here we have used the fact that
+        \begin{equation}
+            (A\directproduct B) (\ket{v} \directproduct \ket{w}) = A\ket{v}
+            \directproduct B\ket{w}.
+        \end{equation}
+    \end{proof}
+\end{lma}
+
+\begin{lma}{}{}
+    Let \(G\) be a finite group and \(\rho\) a representation of \(G\).
+    Then \(\chi_\rho(g^{-1}) = \chi_\rho(g)^*\) for all \(g \in G\).
+    \begin{proof}
+        By \cref{thm:maschke's theorem} \(\rho\) is equivalent to a unitary
+        representation, \(\rho'\).
+        By \cref{lma:characters of equivalent representations are equal}
+        \(\chi_{\rho}(g) = \chi_{\rho'}(g)\) for all \(g \in G\).
+        Since \(\rho'\) is a homomorphism \(\rho'(g^{-1}) = \rho'(g)^{-1}\)
+        by \cref{lma:homomorphism maps inverse to inverse}.
+        \(\rho'\) is unitary so \(\rho'(g)^{-1} = \rho'(g)^{\hermit}\).
+        Transposing a matrix leaves the diagonal invariant so \(\tr(A) =
+        \tr(A^\trans)\), it follows that \(\tr(A^\hermit) = \tr(A^*) = \tr(A)^*\).
+        Hence,
+        \begin{multline}
+            \chi_{\rho}(g^{-1}) = \chi_{\rho'}(g^{-1}) = \tr[\rho'(g^{-1})]
+            = \tr[\rho'(g)^{-1}]\\
+            = \tr[\rho'(g)^{\hermit}] = \tr[\rho'(g)]^* \eqqcolon
+            \chi_{\rho'}(g)^* = \chi_{\rho}(g)^*.
+        \end{multline}
+    \end{proof}
+\end{lma}
+
+\begin{lma}{}{}
+    Let \(G\) be a finite group and \(\rho\) a one-dimensional
+    representation of \(G\).
+    Then \(\chi_\rho(g) = \rho(g)\), where we make the natural
+    identification of \(\rho(g)\) as a \(1\times 1\) matrix with the matrix element
+    \(\rho(g)_{11}\).
+    \begin{proof}
+        This is trivially true since the trace of \((z)\) is \(\tr[(z)] =
+        z\), so \(\rho(g) = (z)\) for some \(z \in \complex\) and \(\chi_\rho(g) =
+        \tr[\rho(g)] = \tr[(z)] = z\).
+    \end{proof}
+\end{lma}
+
+\section{Space of Characters}
+We can view the characters of a given representation as forming vectors.
+Given a finite group, \(G\), and a representation \(\rho\) we define a
+vector
+\begin{equation}
+    \chi_\rho = (\chi_{\rho}(e), \chi_{\rho}(g_1), \dotsc,
+    \chi_{\rho}(g_{N_\mathrm{c}})) \in \complex^{N_{\mathrm{c}}}
+\end{equation}
+where \(g_i\) is in the \(k\)th conjugacy class of \(G\) and
+\(N_{\mathrm{c}}\) is the total number of conjugacy classes.
+It is simply a matter of convention to assign the first conjugacy class to
+be the one containing the identity.
+
+\begin{dfn}{Inner product on the space of characters}{def:inner prod space
+        of chars}
+    We can define an inner product on the space of characters as follows:
+    \begin{equation}
+        \innerprod{\chi_{\rho_a}}{\chi_{\rho_b}} \coloneqq \frac{1}{\abs{G}}
+        \sum_{g\in G} \chi_{\rho_a}(g)^{*} \chi_{\rho_b}(g) = \frac{1}{\abs{G}} \sum_{k
+            = 1}^{N_{\mathrm{c}}} c_k \chi^*_{ak}\chi^{\phantom{*}}_{bk}
+    \end{equation}
+    where \(c_k\) is the number of elements in the \(k\)th conjugacy class
+    and \(\chi_{ak} \coloneqq \chi_{\rho_a}(g_k)\) with \(g_k\) being a
+    representative member of the \(k\)th conjugacy class.
+\end{dfn}
+
+The following theorem gives us a useful way to test if a representation is
+irreducible.
+
+\begin{thm}{First Orthogonality Theorem}{thm:first orthog thm}
+    The irreducible representations form an orthonormal set in the space of
+    characters.
+    
+    \begin{proof}
+        \begin{rmk}
+            This proof is beyond the scope of this course.
+        \end{rmk}
+        \vspace{1.5ex}
+        Suppose \(V_a\) and \(V_b\) are irreducible
+        representations\footnote{Of course, we're being a bit sloppy with the language
+            here, but this is standard, what we really mean is there exist irreducible
+            representations, \(G \to \generalLinear(V_a)\) and \(G \to
+            \generalLinear(V_b)\).} of some finite group, \(G\).
+        Denote these representations by \(\rho_{V_a}\) and \(\rho_{V_b}\)
+        respectively.
+        The space of all homomorphisms \(V_a \to V_b\) is denoted
+        \(\Hom(V_a, V_b)\), and is equal to \(V_a^* \directproduct V_b\) where \(V_a^*\)
+        is the dual vector space of \(V_a\), we can think of this informally as going
+        from kets to bras, or more formally as the space of linear functions, \(V_a \to
+        \field\), where \(\field\) is the base field of \(V_a\).
+        
+        Let \(V_0\) denote the vector space of trivial representations, that
+        is the vector space with the associated representation \(\rho_{V_0}(g) =
+        \ident_{V_0}\) for all \(g \in G\).
+        
+        Schur's lemma (\cref{thm:schurs lemma}) states that the only
+        nontrivial homomorphisms compatible with the group structure are isomorphisms.
+        Hence, there are only nontrivial homomorphisms if \(V_a \isomorphic
+        V_b\), projecting onto the \(V_0\) we then have \(\dim(\Hom(V_a, V_b)_0) = 1\).
+        On the other hand if \(V_a \not\isomorphic V_b\) then
+        \(\dim(\Hom(V_a, V_b)) = 0\).
+        We can sum this up as \(\dim(\Hom(V_a, V_b)_0) = \delta_{ab}\).
+        
+        The character of the representation \(V_a^* \directproduct V_b\) is
+        given by
+        \begin{equation}
+            \chi_{\rho_{V_a^* \directproduct V_b}} = \chi_{\rho_{V_a}}
+            \chi_{\rho_{V_b}},
+        \end{equation}
+        which follows from \cref{lma:character of direct prod/sum is
+            prod/sum of characters} applied to each component of the vectors \(\chi_{\rho}\)
+        with component wise multiplication, that is \((\chi_\rho \chi_{\rho'})(g) =
+        \chi_\rho(g)\chi_{\rho'}(g)\) for all \(g \in G\).
+        Further
+        \begin{equation}
+            \chi_{\rho_{V_a^*}} = \chi_{\rho_{V_a}}^*
+        \end{equation}
+        since
+        \begin{equation}
+            \chi_{\rho_{V_a^*}}(g) = \tr[\rho_{V_a^*}(g)] =
+            \tr[\rho_{V_a}(g)^\hermit] = \tr[\rho_{V_a}(g)]^* = \chi_{\rho_{V_a}}(g)^*,
+        \end{equation}
+        which follows from the fact that the adjoint (Hermitian conjugate)
+        of a vector is an element of the dual space and vice versa.
+        We therefore have
+        \begin{equation}
+            \chi_{\rho_{V_a^* \directproduct V_b}} =
+            \chi_{\rho_{V_a}}^*\chi_{\rho_{V_b}}.
+        \end{equation}
+        
+        Now define the operator \(\varphi\) according to
+        \begin{equation}
+            \varphi = \frac{1}{\abs{G}} \sum_{g \in G} \rho_V(g).
+        \end{equation}
+        This is a projection operator, meaning \(\varphi^2 = \varphi\), in
+        particular it projects onto \(V_0\).
+        This means \(\varphi v_0 = v_0\) for all \(v_0 \in V_0\) and
+        \(\varphi v_0^\perp = 0\) where \(v_0^\perp\) is an element of the orthogonal
+        space to \(V_0\), which we denote \(V_0^\perp\) and is the space such that
+        \(V_0^\perp \directsum V_0 = V\), note that all vectors in \(V_0^\perp\) are by
+        construction orthogonal to all vectors in \(V_0\).
+        
+        To see that \(\varphi\) has these properties notice that applying
+        \(\varphi\) to a vector gives an invariant vector and the only invariant vectors
+        correspond to vectors in the trivial representation subspace.
+        Further, applying \(\varphi\) a second time just rearranges the
+        order of the vectors in the sum, which has no effect since we are averaging over
+        the whole group.
+        The dimension of the space projected onto by a projector is simply
+        the trace of said projector, since we can write a projector in a diagonal form
+        with 1 on the diagonal for basis vectors spanning the subspace and 0 for the
+        other diagonal components.
+        Using the linearity of the trace we then have
+        \begin{equation}
+            \dim(V_0) = \tr \varphi = \frac{1}{\abs{G}} \tr[\rho_V(g)] =
+            \frac{1}{\abs{G}} \sum_{g \in G} \chi_{\rho_V}(g).
+        \end{equation}
+        
+        Combining all of the above we have
+        \begin{align}
+            \delta_{ab} &= \dim(\Hom(V_a, V_b))\\
+            &= \dim((V_a^* \directproduct V_b)_0)\\
+            &= \frac{1}{\abs{G}} \sum_{g\in G} \chi_{\rho_{V_a^*
+                    \directproduct V_b}}(g)\\
+            &= \frac{1}{\abs{G}} \sum_{g\in G}
+            \chi_{\rho_{V_a}}(g)^*\chi_{\rho_{V_b}}(g)\\
+            &\eqqcolon \innerprod{\chi_{\rho_{V_a}}}{\chi_{\rho_{V_b}}}.
+        \end{align}
+        This completes the proof.
+    \end{proof}
+\end{thm}
+
+The important thing about the orthogonality theorem is all of the
+corollaries we can prove from it.
+In the following let \(\rho\) be a representation of some finite group
+\(G\).
+We can write \(\rho\) as
+\begin{equation}
+    \rho = \bigoplus_{i = 1}^{k} m_i \rho_i = \bigoplus_{i = 1}^{k}
+    \rho_i^{\directsum m_i} = m_1 \rho_i \directsum \dotsb \directsum m_k\rho_k
+\end{equation}
+where \(\rho_i\) are irreducible representations and \(m_i \in
+\positiveintegers\).
+
+\begin{crl}{}{}
+    A representation is fully characterised by its character since the
+    distinct \(\rho_i\) correspond to linearly independent, in fact orthonormal,
+    vectors in the character space.
+    We have
+    \begin{equation}
+        \chi_\rho(g) = \sum_{i = 1}^{k} m_i \chi_{\rho_i}(g).
+    \end{equation}
+\end{crl}
+
+\begin{crl}{}{}
+    The multiplicity of some particular irreducible representation,
+    \(\rho_a\), in the decomposition of \(\rho\) is
+    \begin{equation}
+        m_a = \innerprod{\chi_{\rho_a}}{\chi_{\rho}}
+    \end{equation}
+    \begin{proof}
+        By the linearity of the character
+        \begin{align}
+            \chi_{\rho} = \sum_{i = 1}^{k} m_i\chi{\rho_i}
+        \end{align}
+        Then by the linearity of the inner product we have
+        \begin{align}
+            \innerprod{\chi_{\rho_a}}{\chi_{\rho}} &=
+            \innerprod*{\chi_{\rho_a}}{\sum_{i=1}^{k}m_i\chi_{\rho_i}}\\
+            &= \sum_{i = 1}^{k} m_i
+            \innerprod{\chi_{\rho_a}}{\chi_{\rho_i}}\\
+            &= \sum_{i = 1}^{k} m_i \delta_{ai}\\
+            &= m_a
+        \end{align}
+        which completes the proof.
+    \end{proof}
+\end{crl}
+
+Compare this to the standard way of finding the components of a vector:
+\begin{equation}
+    v^i = \ve{i} \cdot \vv{v}.
+\end{equation}
+
+\begin{crl}{}{}
+    We can define a norm on the space of characters by
+    \begin{equation}
+        \norm{\chi_\rho}^{2} \coloneqq \innerprod{\chi_\rho}{\chi_\rho} =
+        \sum_{i} m_i^2
+    \end{equation}
+    and \(\rho\) is irreducible if and only if \(\norm{\chi_\rho} = 1\).
+    \begin{proof}
+        Suppose \(\rho\) is irreducible.
+        Then we can think of \(\rho\) as being decomposed as \(\rho =
+        1\rho\), that is \(k = 1\) and \(m_1 = 1\).
+        Hence, we trivially have \(\norm{\chi_\rho} = 1\).
+        Suppose instead that \(\norm{\chi_\rho} = 1\).
+        Then it follows that \(m_1^2 + \dotsb + m_k^2 = 1\).
+        Since \(m_i \in \positiveintegers\) it follows that \(m_i = 0\) for
+        all but one value of \(i\) and for that value of \(i\) \(m_i = 1\), which means
+        \(\rho = 1\rho_i = \rho_i\), so \(\rho\) is irreducible.
+    \end{proof}
+\end{crl}
+
+% TODO: Calculate norm of permutation representation of S_3
+
+\begin{lma}{}{lma:dim irrep = char e}
+    The  character of the identity element corresponds to the dimension of
+    the representation.
+    That is
+    \begin{equation}
+        \chi_{\rho_i}(e) = \dim V_i.
+    \end{equation}
+    \begin{proof}
+        For any representation, \(\rho \colon G \to V\) since \(\rho\) is a
+        homomorphism we have \(\rho(e) = \ident_{V}\) by \cref{lma:homomorphism maps
+            identity to identity} and for any finite dimensional vector space, \(V\), we
+        have \(\tr\ident_{V} = \dim V\), since \(\ident_V\) is just a matrix with ones
+        on the diagonal.
+    \end{proof}
+\end{lma}
+
+\begin{lma}{}{}
+    Let \(\rho_0\) be the trivial representation of some finite group,
+    \(G\).
+    Then \(\chi_{\rho_0} = (1, \dotsc, 1) \in \complex^{N_{\mathrm{c}}}\).
+    \begin{proof}
+        This follows since the characters of the trivial representation are
+        all one since \(\chi_{\rho_0}(g) = \tr[\rho_0(g)] = \tr\ident_{V_0}\) and the
+        vector space of \emph{the} trivial representation is one dimensional so \(\tr
+        \ident_{V_0} = 1\).
+    \end{proof}
+\end{lma}
+
+\subsection{Dimensionality Theorem}
+\begin{dfn}{Regular Representation}{def:regular rep}
+    Let \(V\) be a vector space of dimension \(\abs{G}\).
+    Let \(\{\ve{g}\}\) be a set of \(\abs{G}\) linearly independent vectors
+    in \(V\) which we label with group elements, \(g \in G\).
+    Such a set is guaranteed to exist since \(V\) is
+    \(\abs{G}\)-dimensional.
+    We can think of \(V\) as the space spanned by these vectors.
+    
+    Define a left action of \(G\) on \(\{\ve{g}\}\) in the obvious way by
+    \begin{equation}
+        g \action \ve{g'} \coloneqq \ve{gg'}.
+    \end{equation}
+    
+    The \defineindex{regular representation}, \(\rho_{\mathrm{R}} \colon G
+    \to \generalLinear(V)\) is defined as the representation associated with this
+    action, that is
+    \begin{equation}
+        \rho_{\mathrm{R}}(g) \ve{g'} = \ve{gg'}.
+    \end{equation}
+\end{dfn}
+
+The regular representation is, in general, reducible, however it does have
+the following useful property:
+\begin{equation}
+    \chi_{\rho_{\mathrm{R}}}(g) = 
+    \begin{cases}
+        0 & \text{if } g \ne e,\\
+        \abs{G} & \text{if } g = e.
+    \end{cases}
+\end{equation}
+This follows since for \(g \ne e\) the diagonal of \(\rho_{\mathrm{R}}(g)\)
+must be zero, since if they weren't, it would mean that \(\ve{gg} = \ve{g}\),
+which means that \(g^2 = g\), which can only happen for \(g = e\).
+Additionally \(\rho_{\mathrm{R}}(e) = \ident_{V}\) and so
+\(\chi_{\mathrm{R}}(e) = \tr\ident_V = \dim V = \abs{G}\).
+
+The regular representation can also be viewed as the induced representation
+of the trivial representation.
+Induced representations will be defined in . % TODO: add link to where
+%induced representations are defined
+
+The main use of the regular representation for us is to prove the following
+theorem which aids in classifying the irreducible representations.
+
+\begin{thm}{Dimensionality Theorem}{thm:dimensionality thm}
+    Let \(G\) be a group and \(\{V_i\}\) be the irreducible representations
+    of \(G\), then
+    \begin{equation}
+        \abs{G} = \sum_{i = 1}^{N_{\mathrm{c}}} \dim(V_i)^2.
+    \end{equation}
+    \begin{proof}
+        Let \(\rho_{\mathrm{R}}\) be the regular representation.
+        This can be written as
+        \begin{equation}
+            \rho_R = \bigoplus_{i = 1}^{k} \rho_i^{\directsum m_i}.
+        \end{equation}
+        Notice that we then have
+        \begin{align}
+            m_i &= \innerprod{\chi_{\rho_i}}{\chi_{\rho_{\mathrm{R}}}}\\
+            &\eqqcolon \frac{1}{\abs{G}} \sum_{g \in G} \chi_{\rho_i}(g)^*
+            \chi_{\rho_{\mathrm{R}}}(g)\\
+            &= \chi_{\rho_i}(e)^*\\
+            &= \dim V_i.
+        \end{align}
+        Here we have used the fact that \(\chi_{\rho_{\mathrm{R}}}(g) = 0\)
+        for \(g \ne e\) and so all terms in the sum vanish apart from the \(g = e\)
+        term.
+        The regular representation contributes a factor of \(\abs{G}\) to
+        this term, which cancels with the existing normalisation factor to leave just
+        \(\chi_{\rho_i}(e)^*\), since \(g = e\) in this term.
+        We then apply \cref{lma:dim irrep = char e} to get
+        \(\chi_{\rho_i}(e) = \dim V_i\), and since this is real the complex conjugate
+        does nothing.
+        
+        Using \(m_i = \dim V_i\) we then have
+        \begin{equation}
+            \chi_{\rho_{\mathrm{R}}}(g) = \sum_{i = 1}^{k} m_i
+            \chi_{\rho_i}(g) = \sum_{i = 1}^{k} \dim(V_i) \chi_{\rho_i}(g).
+        \end{equation}
+        Considering the specific case of \(g = e\) this then becomes
+        \begin{equation}
+            \abs{G} = \chi_{\rho_{\mathrm{R}}}(e) = \sum_{i = 1}^{k}
+            \dim(V_i) \chi_{\rho_i}(e) = \sum_{i = 1}^{k} \dim(V_i)^2
+        \end{equation}
+        where we have used \cref{lma:dim irrep = char e} again in the last
+        equality.
+    \end{proof}
+\end{thm}
+
+The dimensionality theorem quickly allows us to limit the possible
+irreducible representations.
+For example, \(S_3\) (\(\abs{S_3} = 3! = 6\)) could have either 6
+one-dimensional irreducible representations (\(6 \cdot 1^2 = 6\)) or 2
+one-dimensional irreducible representations and 1 two-dimensional irreducible
+representation (\(2 \cdot 1^2 + 1\cdot 2^2 = 6\)).
+It turns out that the latter is correct.
+
+\section{Character Tables}
+The common way to give the information on the characters of the irreducible
+representations is as a \defineindex{character table}.
+Since the character is a class function, that is, it is the same for all
+group elements sharing a conjugacy class, we only write out the conjugacy
+classes for the character table, rather than the full group.
+We then have an optional line for the order of the classes.
+The rows below then list the characters of the irreducible representations
+on the conjugacy classes.
+Typically, we list the conjugacy class containing the identity first and the
+trivial representation (one dimensional representation given by the trivial
+action) first which means that the first row contains all ones.
+
+As an example we now give the character table of \(S_3\), but there are some
+details here we have yet to discuss.
+\begin{equation}
+    \begin{array}{r|ccc}
+        S_3\text{ classes} & [()] & [\cycle{1,2}] & [\cycle{1,2,3}] \\
+        \text{Order} & 1 & 3 & 2 \\ \hline 
+        & & & \\[-2ex]
+        \text{Trivial} & 1 & 1 & 1 \\
+        \text{Alternating} & 1 & -1 & 1 \\
+        \text{Standard} & 2 & 0 & -1 \\
+    \end{array}
+\end{equation}
+The labels down the side label the irreducible representations, we haven't
+yet defined the alternating or standard representations so don't worry too much
+about them.
+
+In this section we will write statements like \enquote{the character table
+    is square}.
+What we mean by the character table here is the numbers that we fill in for
+each conjugacy class and representation ignoring the labels that we give along
+the edges.
+
+\begin{thm}{}{thm:the char table is square}
+    The character table is square.
+    
+    \begin{proof}
+        \begin{rmk}
+            This proof is beyond the scope of this course.
+        \end{rmk}
+        \vspace{1ex}
+        The total number of irreducible representations must be at most the
+        number of conjugacy classes since the irreducible representations form a basis
+        in the space of class functions, which is a space of dimension 
+        \(N_\mathrm{c}\).
+        
+        Suppose there is a class function, \(f \colon G \to \complex\), such
+        that \(f\) is orthogonal to all of the characters of the irreducible
+        representations, that is
+        \begin{equation}
+            \innerprod{f}{\chi_{\rho_i}} = 0
+        \end{equation}
+        for all irreducible representations, \(\rho_i\).
+        If we can show that this necessarily means \(f = (0, \dotsc, 0) \in
+        \complex^{N_{\mathrm{c}}}\) then this shows that the characters form a complete
+        set of vectors on the class function space, and hence the number of characters
+        is equal to the dimension of the space.
+        
+        Consider the map
+        \begin{equation}
+            \varphi \colon V_i \to V_i \qqwhere \varphi \coloneqq \sum_{g
+                \in G} f(g)^* \rho_i(\gamma).
+        \end{equation}
+        Here \(V_i\) is the vector space associated with the irreducible
+        representation \(\rho_i\).
+        It can easily be seen that
+        \begin{align}
+            \varphi \rho_i(g') &= \sum_{g\in G} f(g)^* \rho_i(g)\rho_i(g')\\
+            &= \sum_{g\in G} f(g)^* \rho_i(gg')\\
+            &= \sum_{g''\in G} f(g'')^* \rho_i(g'')\\
+            &= \sum_{g'''\in G} \rho_i(g')f(g''')^*\rho_i(g''')\\
+            &= \rho_i(g') \sum_{g'''\in G} f(g''')^*
+        \end{align}
+        where we use the fact that we are averaging over the group so
+        averaging \(gg'\) over \(g\) is the same as averaging over \(g'' = gg'\).
+        We then have by Schur's lemma (\cref{thm:schurs lemma}) that
+        \(\varphi = \lambda\ident\).
+        Hence,
+        \begin{equation}
+            \tr\varphi = \lambda\dim V_i
+        \end{equation}
+        and
+        \begin{equation}
+            \tr\varphi = \sum_{g \in G} f(g)^* \chi_{\rho_i}(g) = \abs{G}
+            \innerprod{f}{\chi_{\rho_i}} = 0.
+        \end{equation}
+        The last equality being by our assumption that \(f\) is orthogonal
+        to all of the characters.
+        We therefore must have that either \(\lambda = 0\), in which case
+        \(f(g) = 0\) for all \(g \in G\), or
+        \begin{equation}
+            \sum_{g\in G} f^*(g)\rho_i(g) = 0
+        \end{equation}
+        holds for all irreducible representations, and hence for all
+        representations since they can be written as a sum of irreducible
+        representations.
+        
+        In particular this must hold for the regular representation,
+        \(\rho_{\mathrm{R}}\).
+        However, since \(\rho_{\mathrm{R}}(g)\) are all linearly independent
+        by definition this means \(f(g) = 0\) for all \(g \in G\).
+        Either way the result is that \(f = (0, \dotsc, 0)\) and so the
+        characters form a complete basis and hence the number of irreducible
+        representations is equal to the number of conjugacy classes.
+    \end{proof}
+\end{thm}
+
+The following theorem is useful, but the proof requires somewhat complicated
+linear algebra, so we omit it.
+\begin{thm}{}{thm:dim irrep divides |G|}
+    This dimension of any irreducible representation divides the order of
+    the group.
+    That is \(\abs{G} / \dim V_i \in \positiveintegers\) where \(\rho_i
+    \colon G \to \generalLinear(V_i)\) is an irreducible representation.
+    
+    Further \(\dim V_i\) divides \(G / Z(G)\), where \(Z(G)\) is the centre
+    of the group, which is the normal subgroup of all commuting elements.
+\end{thm}
+
+\begin{crl}{}{}
+    All irreducible representations of an Abelian group are one dimensional.
+    
+    \begin{proof}
+        Let \(G\) be an Abelian group.
+        Since the group is Abelian \(gg'g^{-1} = g'gg^{-1} = g'\) for all
+        \(g, g' \in G\), and so every conjugacy class contains exactly one element.
+        Hence, \(N_{\mathrm{c}} = \abs{G}\).
+        By the dimensionality theorem (\cref{thm:dimensionality thm})
+        \begin{equation}
+            \abs{G} = \sum_{i = 1}^{N_{\mathrm{c}}} \dim(V_i)^2 = \sum_{i =
+                1}^{\abs{G}} \dim(V_i)^2.
+        \end{equation}
+        Since \(\dim V_i\) divides \(\abs{G}\) by \cref{thm:dim irrep
+            divides |G|} it follows that \(\dim V_i \ne 0\) and so \(\dim V_i = 1\) is the
+        only way to have this equation hold.
+    \end{proof}
+\end{crl}
+
+The past few theorems combined shows that we know quite a lot about the
+dimensions of the irreducible representations before we even start to work out
+what the representations are.
+This mostly stems from Schur's lemma.
+We can sum it up in a set of diophantine equations (equations with integer
+solutions) which must be satisfied.
+\begin{important}
+    \begin{itemize}
+        \item \(\abs{G} = 1 + \dim(V_2)^2 + \dotsb + \dim(V_k)^2\),
+        \item \(k = N_{\mathrm{c}}\), and
+        \item \(\abs{G} / \dim V_i \in \positiveintegers\).
+    \end{itemize}
+\end{important}
+The \(1\) in the first equation corresponds to the dimension of the trivial
+representation, which is always present.
+These equations are often enough to allow us to work out the dimensions of
+the irreducible representations without having to explicitly compute them.
+
+\begin{dfn}{Inner product on the space of classes}{}
+    We can define an inner product on the class space as
+    \begin{equation}
+        \innerprod{\chi_\rho([g])}{\chi_\rho([g'])}_{\mathrm{c}} =
+        \frac{c_{[g]}}{\abs{G}} \sum_{i = 1}^{N_{\mathrm{c}}}
+        \chi_{\rho_i}([g])^*\chi_{\rho_i}([g']).
+    \end{equation}
+    Here \(c_{[g]}\) is the size of the conjugacy class containing \(g\),
+    \(\rho_i\) are the irreducible representations appearing in the decomposition of
+    \(\rho\), and \(\chi_\rho([g])\) is defined to be \(\chi_\rho(g)\), which is
+    well defined since \(\chi\) is a class function.
+\end{dfn}
+
+The asymmetry in the above definition, that there is a scale factor of
+\(c_{[g]}\) but note \(c_{[g']}\) is in anticipation of the following theorem.
+
+\begin{thm}{Second Orthogonality Theorem}{}
+    The conjugacy classes are orthonormal with respect to the above inner
+    product.
+    That is
+    \begin{equation}
+        \innerprod{\chi_\rho([g])}{\chi_\rho([g'])}_{\mathrm{c}} =
+        \delta_{[g][g']}.
+    \end{equation}
+    \begin{proof}
+        The proof relies on the fact that for a finite unitary \(n \times
+        n\) matrix, \(U\), we have
+        \begin{equation}
+            UU^\hermit = U^\hermit U = \ident.
+        \end{equation}
+        The first equation can be taken as the definition of unitarity and
+        the second follows from taking the Hermitian conjugate.
+        
+        Define the matrix \(U\) to have components
+        \begin{equation}
+            U_{a[g]} = \sqrt{\frac{c_{[g]}}{\abs{G}}} \chi_{\rho_a}([g]).
+        \end{equation}
+        This will give a square matrix since by \cref{thm:the char table is
+            square} there are \(N_{\mathrm{c}}\) irreducible representations, \(\rho_a\),
+        and \(N_{\mathrm{c}}\) conjugacy classes, \([g]\).
+        
+        Now consider the product \(UU^\hermit\):
+        \begin{align}
+            (UU^\hermit)_{ab} &= \sum_{\mathclap{[g] \in G/\sim}}
+            U_{a[g]}(U^{\hermit})_{[g]b}\\
+            &= \sum_{\mathclap{g \in G/\sim}}
+            U_{a[g]}^{\phantom{*}}U_{b[g]}^{*}\\
+            &= \sum_{\mathclap{g \in G/\sim}} \sqrt{\frac{c_{[g]}}{\abs{G}}}
+            \chi_{\rho_a}([g]) \sqrt{\frac{c_{[g]}}{\abs{G}}} \chi_{\rho_{b}}([g])^*\\
+            &= \frac{1}{\abs{G}} \sum_{k = 1}^{N_{\mathrm{c}}} c_{k}
+            \chi_{\rho_a}(g_k)\chi_{\rho_b}(g_k)^*\\
+            &= \frac{1}{\abs{G}} \sum_{k = 1}^{N_{\mathrm{c}}} c_k
+            \chi_{ak}^{\phantom{*}}\chi_{bk}^{*}\\
+            &= \delta_{ab}.
+        \end{align}
+        Note that \(G/{\sim} = \{[g] \mid g \in G\}\) is the set of
+        conjugacy classes.
+        In the penultimate step we have rewritten in the notation of
+        \cref{def:inner prod space of chars}.
+        The final step is then the result of the first orthogonality theorem
+        (\cref{thm:first orthog thm}).
+        This shows that \(U\) is a unitary matrix.
+        
+        We now consider the product \(U^\hermit U\), which we know is
+        \(\ident\) since \(U\) is unitary.
+        We have
+        \begingroup
+        \allowdisplaybreaks
+        \begin{align}
+            (U^\hermit U)_{[g][g']} &= \sum_{a = 1}^{N_{\mathrm{c}}}
+            (U^\hermit)_{[g]a}U_{a[g']}\\
+            &= \sum_{a = 1}^{N_{\mathrm{c}}}
+            U_{a[g]}^*U_{a[g']}^{\phantom{*}}\\
+            &= \sum_{a = 1}^{N_{\mathrm{c}}} \sqrt{\frac{c_{[g]}}{\abs{G}}}
+            \chi_{\rho_a}([g])^* \sqrt{\frac{c_{[g']}}{\abs{G}}} \chi_{\rho_a}([g'])\\
+            &= \sqrt{\frac{c_{[g']}}{c_{[g]}}} \frac{c_{[g]}}{\abs{G}}
+            \sum_{a = 1}^{N_{\mathrm{c}}}  \chi_{\rho_a}([g])^* \chi_{\rho_a}([g'])\\
+            &= \sqrt{\frac{c_{[g']}}{c_{[g]}}}
+            \innerprod{\chi_{\rho}([g])}{\chi_{\rho}([g'])}_{\mathrm{c}}\\
+            &= \delta_{[g][g']}.
+        \end{align}
+        \endgroup
+        The final equality holds since \(U\) is unitary so \((U^\hermit
+        U)_{[g][g']} = \delta_{[g][g']}\).
+        When \([g] = [g']\) we have
+        \begin{equation}
+            \sqrt{\frac{c_{[g]}}{c_{[g']}}} = 1 \implies
+            \innerprod{\chi_{\rho}([g])}{\chi_{\rho}([g])}_{\mathrm{c}} = 1,
+        \end{equation}
+        and when \([g] \ne [g']\) we have
+        \begin{equation}
+            \innerprod{\chi_{\rho}([g])}{\chi_{\rho}([g'])}_{\mathrm{c}} = 0
+        \end{equation}
+        and so we have
+        \begin{equation}
+            \innerprod{\chi_{\rho}([g])}{\chi_{\rho}([g'])}_{\mathrm{c}} =
+            \delta_{[g][g']}
+        \end{equation}
+        completing the proof.
+    \end{proof}
+\end{thm}
+
+\section{Constructing Character Tables}
+Often we have enough information to complete the character table using the
+diophantine equations and orthogonality theorems.
+We will demonstrate the process with \(S_3\).
+First we need a few results about the conjugacy classes of \(S_n\).
+The lemmas just ensure that \enquote{cycle type} is well defined and that
+the first corollary, which is the statement we care about, holds.
+
+\begin{lma}{}{}
+    Every permutation in \(S_n\) has a cycle decomposition which is unique
+    up to the ordering of the cycles and cyclic permutations of the elements within
+    each cycle.
+    
+    \begin{proof}
+        Let \(\sigma \in S_n\) act on \(X = (1, \dotsc, n)\) by permutation.
+        Define \(G = \langle \sigma \rangle\) to be the subgroup of \(S_n\)
+        generated by \(\sigma\).
+        Then \(G\) acts on \(X\) by restricting the group action of \(S_n\).
+        By the orbit-stabiliser theorem (\cref{thm:orbit stabiliser}) this
+        results in a partition of \(X\) into unique sets of orbits.
+        For any orbit \(\Orb_{G}(x)\) we then have a bijection associating
+        \(\sigma\action x\) and \(\sigma\Stab_G(x)\).
+        
+        Since \(G\) is cyclic (as it is generated by a single element) it
+        follows that \(G/\Stab_G(x)\) is cyclic.
+        Its order is the smallest positive integer, \(d\), such that
+        \(\sigma^d \in \Stab_G(x)\).
+        We know that \(d = \abs{\Stab(x)} = \groupindex{G}{\Stab_G(x)}\) and
+        so with the aforementioned bijection we have that the unique cosets of
+        \(\Stab_G(x)\) in \(G\) are
+        \begin{equation}
+            \Stab_G(x), \sigma\Stab_G(x), \dotsc , \sigma^{d - 1}
+            \Stab_G(x).
+        \end{equation}
+        The elements of \(\Orb_G(x)\) are then
+        \begin{equation}
+            x, \sigma\action x, \dotsc, \sigma^{d - 1} \action x.
+        \end{equation}
+        Therefore on any orbit of size \(d\) \(\sigma\) is a \(d\)-cycle.
+        This shows the existence of a cycle decomposition.
+        
+        Uniqueness is then fairly simple.
+        Each cycle determined by \(\sigma\) on an element of order \(d\) is
+        determined uniquely by construction from \(x\).
+        Choosing a different element in the same orbit, say \(\sigma^j x\)
+        instead gives
+        \begin{equation}
+            \sigma^j\action x, \sigma^{j + 1} \action x, \dotsc, \sigma^{d -
+                1} \action x, x, \sigma \action x, \dotsc, \sigma^{j - 1} \action x.
+        \end{equation}
+        This is the same cycle permuted left by \(j\).
+    \end{proof}
+\end{lma}
+
+\begin{dfn}{Cycle Type}{}
+    Given \(\sigma \in S_n\) we can write \(\sigma\) as the product of \(k\)
+    disjoint cycles of lengths \(n_1, \dotsc, n_k\), where, since disjoint cycles
+    commute, we can take \(n_i \le n_{i + 1}\).
+    We then define \(n_1, \dotsc, n_k\) to be the \defineindex{cycle type}
+    of \(\sigma\).
+    This is well defined by the uniqueness part of the previous lemma.
+\end{dfn}
+
+\begin{lma}{}{}
+    Two permutations are conjugate if and only if they have the same cycle
+    type.
+    \begin{proof}
+        Let \(\sigma, \tau \in S_n\).
+        Suppose \(\sigma\) and \(\tau\) are conjugate.
+        Then there exists \(\rho \in S_n\) such that \(\tau = \rho \sigma
+        \rho^{-1}\).
+        We can write \(\sigma\) as a product of disjoint cycles.
+        To show that \(\sigma\) and \(\tau\) have the same cycle type it
+        suffices to show that if \(j\) follows \(i\) in the cycle decomposition of
+        \(\sigma\) then \(\rho(j)\) follows \(\rho(i)\) in the cycle decomposition of
+        \(\tau\).
+        Suppose that \(\rho(i) = j\).
+        Then
+        \begin{equation}
+            \tau(\rho(i)) = \rho \sigma \rho^{-1}(\rho(i)) = \rho \sigma(i)
+            = \rho(j)
+        \end{equation}
+        and so \(\rho(j)\) does indeed follow \(\rho(i)\).
+        This proves that conjugate elements of \(S_n\) have the same cycle
+        type.
+        
+        Suppose instead that \(\sigma\) and \(\tau\) have the same cycle
+        type.
+        We can then write them as products of disjoint cycles in increasing
+        cycle length, including 1-cycles.
+        So, for example,
+        \begin{equation}
+            \sigma = \cycle{a_1}\cycle{a_2, a_3, a_4}\cycle{a_5, \dotsc,
+                a_n}, \qqand \tau = \cycle{b_1}\cycle{b_2, b_3, b_4} \cycle{b_5, \dotsc, b_n}.
+        \end{equation}
+        Define \(\rho\) to be the permutation taking \(a_i\) to \(b_i\).
+        Since the cycle types match we have
+        \begin{equation}
+            \rho\sigma\rho^{-1}(b_i) = \rho\sigma(a_i) = \rho(a_j) = b_j.
+        \end{equation}
+        With \(a_j\) and \(b_j\) being the elements after \(a_i\) and
+        \(b_i\) in their respective cycles.
+        We therefore have \(\tau = \rho \sigma \rho^{-1}\) and so we have
+        proven \(\sigma\) and \(\tau\) are conjugate.
+    \end{proof}
+\end{lma}
+
+\begin{dfn}{Integer Partition}{}
+    Given some positive integer, \(n \in \positiveintegers\) a
+    \defineindex{integer partition} is a sum \(m_1 + \dotsb + m_k = n\), with \(m_i
+    \in \positiveintegers\) where without loss of generality we can assume \(m_i \le
+    m_{i + 1}\).
+\end{dfn}
+
+\begin{crl}{}{}
+    The number of conjugacy classes in \(S_n\) is the number of partitions
+    of \(n\).
+    \begin{proof}
+        Each distinct cycle type in \(S_n\) represents a distinct partition
+        of \(n\), and each cycle type represents a conjugacy class since elements of
+        \(S_n\) are conjugate if and only if they have the same conjugacy class.
+    \end{proof}
+\end{crl}
+
+\begin{crl}{}{}
+    Let \(m_1, m_2, \dotsc, m_r\) be the distinct integers appearing cycle
+    type of some permutation \(\sigma \in S_n\) and let there be \(k_i\) cycles of
+    order \(m_i\).
+    Then
+    \begin{equation}
+        \abs{[\sigma]} = n! \prod_{i = 1}^{r} \frac{1}{k_i!m_i^{k_i}}.
+    \end{equation}
+    Consider a given arrangement of \(1, \dotsc, n\).
+    There are \(n!\) such arrangements.
+    For each arrangement we there are \(k_i\) cycles of order \(m_i\) and
+    each can be written in \(m_i\) different ways by starting with a different
+    element in the cycle.
+    The \(m_i\)-cycles can appear in any of \(k_i!\) possible orders since
+    they are disjoint and so commute.
+    This means that we have \(n!\) overall arrangements but of these
+    \(k_i!m_i^{k_i}\) are equivalent and result only in \(m_i\)-cycles changing.
+    The main result follows by accounting for cycles of all orders.
+\end{crl}
+
+\subsection{Character Table of \texorpdfstring{\(S_3\)}{S3}}
+The number 3 has 3 distinct partitions.
+The first is \(3 = 1 + 1 + 1\), this corresponds to the cycle type
+\(\cycle{a}\cycle{b}\cycle{c} = ()\), and so to the conjugacy class
+\([\cycle{}]\).
+The second is \(3 = 1 + 2\), this corresponds to the cycle type
+\(\cycle{a}\cycle{b,c} = \cycle{b,c}\), and so to the conjugacy class
+\([\cycle{1,2}]\).
+The third is \(3 = 3\), this corresponds to the cycle type
+\(\cycle{a,b,c}\), and so to the conjugacy class \([\cycle{1,2,3}]\).
+
+As always we have the trivial representation, which is one dimensional.
+In this section, and much of the rest of the text, we will follow the
+convention of labelling representations by their dimension.
+The trivial representation is one-dimensional, so we call it \(\rep{1}\).
+The trivial representation is \(\rep{1} \colon S_3 \to
+\generalLinear(\complex)\), defined by \(\rep{1}(\sigma) = 1\) for all \(\sigma
+\in S_3\).
+This has character \(\chi_{\rep{1}}(\sigma) = \tr[\rep{1}(\sigma)] = \tr[1]
+= 1\).
+The first row of the character table is thus
+\begin{equation}
+    \begin{array}{c|ccc}
+        S_3 & [\cycle{}] & [\cycle{1,2}] & [\cycle{1,2,3}]\\
+        \abs{[g]} & 1 & 3 & 2 \\ \hline
+        \rep{1} & 1 & 1 & 1
+    \end{array}
+\end{equation}
+
+For the permutation group there is a second one-dimensional representation,
+\(\rep{1}'\) that we can define.
+\begin{dfn}{Alternating Representation}{}
+    The \defineindex{alternating representation}, \(\rho_{\mathrm{alt}}\) or
+    \(\rep{1}'\), is defined to be the representation \(\rho_{\mathrm{alt}}\colon
+    S_n \to \generalLinear(\complex)\) such that \(\rho_{\mathrm{alt}}(\sigma) =
+    \sgn(\sigma)\).
+    Here \(\sgn\colon S_n \to \{\pm 1\}\) is the sign of the permutation.
+\end{dfn}
+
+The character of \(\rep{1}'\) is simply \(\chi_{\rep{1}'}(\sigma) =
+\tr[\rep{1}'(\sigma)] = \tr[\sgn(\sigma)] = \sgn(\sigma)\).
+Allowing us to add a second row to the character table:
+\begin{equation}
+    \begin{array}{c|ccc}
+        S_3 & [\cycle{}] & [\cycle{1,2}] & [\cycle{1,2,3}]\\
+        \abs{[g]} & 1 & 3 & 2 \\ \hline
+        \rep{1} & 1 & 1 & 1 \\
+        \rep{1}\mathrlap{'} & 1 & -1 & 1
+    \end{array}
+\end{equation}
+Here we have used the fact that \(\cycle{} = \cycle{1,2}\cycle{1,2}\) is an
+even permutation, 2-cycles are odd permutations, and 3-cycles can be written as
+a product of two 2-cycles, so are even permutations.
+
+Since \(S_3\) has 3 conjugacy classes it also has 3 irreducible
+representations.
+The simplest way to work out the final row of the character table is to
+ensure that this third representation is orthogonal to the trivial and
+alternating representations.
+To do so we need to know the dimension of this representation.
+For this we turn to the diophantine equation
+\begin{equation}
+    \abs{G} = 1 + \dim(V_2)^2 + \dotsb + \dim(V_k)^2.
+\end{equation}
+For \(S_3\) with the existing information this gives us
+\begin{equation}
+    \abs{S_3} = 6 = 1 + 1^2 + n^2 \implies n = 2
+\end{equation}
+so our final representation is \(\rep{2}\), which we call the
+\defineindex{standard representation} of \(S_3\).
+More generally for \(S_n\) the standard representation is such that
+\(\rho_{\mathrm{triv}} \directsum \rho_{\mathrm{stand}} =
+\rho_{\mathrm{perm}}\).
+
+We now use the fact that the permutation representation, which is
+3-dimensional, must decompose as a sum of irreducible representations.
+There are multiple ways that this could occur, it could be three copies of
+the trivial and alternating representations, or one copy of the trivial or
+alternating representation and one copy of \(\rep{2}\).
+It turns out to be the latter.
+
+We then use the simple formula
+\begin{equation}
+    \chi_{\rho_1 \directsum \rho_2} = \chi_{\rho_1} + \chi_{\rho_2}
+\end{equation}
+and \(\chi_{\rep{1}} = (1, 1, 1)\) and \(\chi_{\rho_{\mathrm{stand}}} = (3,
+1, 0)\), which can be seen easily by either writing out all matrices in the
+standard representation or by noting that in the permutation representation the
+trace of a matrix is the number of ones on the diagonal, which is the number of
+elements left invariant by the permutation and the identity leaves all 3
+elements invariant while 2-cycles leave 1 element invariant and 3-cycles change
+all elements.
+Hence, we have
+\begin{equation}
+    \chi_{\rho_{\mathrm{stand}}} = \chi_{\rep{1} \directsum \rep{2}} =
+    \chi_{\rep{1}} + \chi_{\rep{2}} \implies \chi_{\rep{2}} = (3, 1, 0) - (1, 1, 1)
+    = (2, 0, -1).
+\end{equation}
+This allows us to fill out the final line of our character table:
+\begin{equation}
+    \begin{array}{c|ccc}
+        S_3 & [\cycle{}] & [\cycle{1,2}] & [\cycle{1,2,3}]\\
+        \abs{[g]} & 1 & 3 & 2 \\ \hline
+        \rep{1} & 1 & 1 & 1 \\
+        \rep{1}\mathrlap{'} & 1 & -1 & 1\\
+        \rep{2} & 2 & 0 & -1
+    \end{array}
+\end{equation}
+
+\subsection{Character Table of \texorpdfstring{\(S_4\)}{S4}}
+Four has the following partitions with the corresponding conjugacy classes
+\begin{alignat}{2}
+    4 &= 1 + 1 + 1 + 1 && \leftrightarrow [\cycle{}],\\
+    4 &= 1 + 1 + 2 && \leftrightarrow [\cycle{1,2}],\\
+    4 &= 2 + 2 && \leftrightarrow [\cycle{1,2}\cycle{3,4}],\\
+    4 &= 1 + 3 && \leftrightarrow [\cycle{1,2,3}],\\
+    4 &= 4 && \leftrightarrow [\cycle{1,2,3,4}]
+\end{alignat}
+These are of size 1, 6, 3, 8, and 6 respectively.
+
+The dimensions of the irreducible representations are the solutions to
+\begin{equation}
+    \abs{S_4} = 24 = 1 + 1^2 + d_3^2 + d_4^2 + d_5^2
+\end{equation}
+where the first two terms correspond to the dimensions of the trivial and
+alternating representations.
+We stop at \(5\) since there are 5 conjugacy classes, and hence 5
+irreducible representations.
+The solutions to this are fairly easy to find, we have \(d_3 = 2\), \(d_4 =
+3\), and \(d_5 = 3\).
+
+Filling in the first two rows of the table we have
+\begin{equation}
+    \begin{array}{c|ccccc}
+        S_4 & [\cycle{}] & [\cycle{1,2}] & [\cycle{1,2}\cycle{3,4}] &
+        [\cycle{1,2,3}] & [\cycle{1,2,3,4}]\\
+        \abs{[g]} & 1 & 6 & 3 & 8 & 6 \\ \hline
+        \rep{1} & 1 & 1 & 1 & 1 & 1 \\
+        \rep{1}\mathrlap{'} & 1 & -1 & 1 & 1 & -1\\
+    \end{array}
+\end{equation} 
+
+The standard representation for \(S_4\) is 3-dimensional, since
+\(\rho_{\mathrm{stand}} \directsum \rho_{\mathrm{triv}} = \rho_{\mathrm{perm}}\)
+and the permutation representation is 4-dimensional, with the character given by
+the number of elements left invariant.
+We have that
+\begin{equation}
+    \chi_{\rep{1} \directsum \rep{3}} = \chi_{\rep{1}} + \chi_{\rep{3}}
+    \implies \chi_{\rep{3}} = (4, 2, 0, 1, 0) - (1, 1, 1, 1, 1) = (3, 1, -1, 0, -1).
+\end{equation}
+
+There is another representation which corresponds to multiplying the
+standard representation by the alternating representation, giving
+\begin{equation}
+    \chi_{\rep{3}'}(\sigma) = \chi_{\rep{1}' \directproduct \rep{3}}(\sigma)
+    = \chi_{\rep{1}'}(\sigma) \chi_{\rep{3}}(\sigma) =
+    \sgn(\sigma)\chi_{\rep{3}}(\sigma) \implies \chi_{\rep{3}'} = (3, -1, -1, 0, 1).
+\end{equation}
+Putting these in the table we have
+\begin{equation}
+    \begin{array}{c|ccccc}
+        S_4 & [\cycle{}] & [\cycle{1,2}] & [\cycle{1,2}\cycle{3,4}] &
+        [\cycle{1,2,3}] & [\cycle{1,2,3,4}]\\
+        \abs{[g]} & 1 & 6 & 3 & 8 & 6 \\ \hline
+        \rep{1} & 1 & 1 & 1 & 1 & 1 \\
+        \rep{1}\mathrlap{'} & 1 & -1 & 1 & 1 & -1\\
+        \rep{2} & \cdot & \cdot & \cdot & \cdot & \cdot \\
+        \rep{3} & 3 & 1 & -1 & 0 & -1\\
+        \rep{3}\mathrlap{'} & 3 & -1 & -1 & 0 & 1
+    \end{array}
+\end{equation} 
+
+We can find the character of the final irreducible representation,
+\(\rep{2}\), by requiring that it is orthogonal to the other irreducible
+representations.
+
+Let \(\chi_{\rep{2}} = (a, b, c, d, e)\).
+We know that \(\chi_{\rep{2}}(\cycle{}) = 2\), since the character of an
+irreducible representation on the identity gives the dimension of the
+representation.
+The second orthogonality theorem gives
+\begin{align}
+    \innerprod{\chi_{\rep{2}}([\cycle{}])}{\chi_{\rep{2}}([\cycle{1,2}])} &=
+    \frac{1}{24} \sum_{i = 1}^{5} \chi_{\rho_i}(\cycle{})^*
+    \chi_{\rho_i}(\cycle{1,2})\\
+    &= \frac{1}{24}(1\cdot 1 + 1 \cdot (-1) + 2 \cdot b + 3\cdot 1 +
+    3\cdot(-1))\\
+    &= \frac{b}{12}\\
+    &= 0
+\end{align}
+so we have \(b = 0\).
+
+The first orthogonality theorem gives
+\begin{align}
+    \innerprod{\chi_{\rep{1}}}{\chi_{\rep{2}}} &= \frac{1}{24} \sum_{k =
+        1}^{5} c_k \chi_{\rep{1}}(g_k)^*\chi_{\rep{2}}(g_k)\\
+    &= \frac{1}{24} (1\cdot 1 \cdot 2 + 6 \cdot 1 \cdot 0 + 3 \cdot 1 \cdot
+    c + 8 \cdot 1 \cdot d + 6 \cdot 1 \cdot e)\\
+    &= \frac{1}{24}(2 + 3c + 8d + 6e)\\
+    &= 0.
+\end{align}
+This has as a solution \(c = 2\), \(d = -1\), and \(e = 0\).
+Thus the complete character table is
+\begin{equation}
+    \begin{array}{c|ccccc}
+        S_4 & [\cycle{}] & [\cycle{1,2}] & [\cycle{1,2}\cycle{3,4}] &
+        [\cycle{1,2,3}] & [\cycle{1,2,3,4}]\\
+        \abs{[g]} & 1 & 6 & 3 & 8 & 6 \\ \hline
+        \rep{1} & 1 & 1 & 1 & 1 & 1 \\
+        \rep{1}\mathrlap{'} & 1 & -1 & 1 & 1 & -1\\
+        \rep{2} & 2 & 0 &  2 & -1 & 0 \\
+        \rep{3} & 3 & 1 & -1 & 0 & -1\\
+        \rep{3}\mathrlap{'} & 3 & -1 & -1 & 0 & 1
+    \end{array}
+\end{equation} 
+
+\section{Complex, Real, and Pseudo-Real Representations}
+\begin{dfn}{Complex, Real, and Pseudo-Real Representations}{}
+    Let \(\rho \colon G \to \generalLinear(V)\) be a representation of the
+    group \(G\) on the vector space \(V\).
+    If \(\rho\) is inequivalent to its complex conjugate, \(\overline{\rho}
+    = \rho^*\), defined by \(\overline{\rho}(g) = \overline{\rho(g)}\), then we say
+    that \(\rho\) is a \defineindex{complex representation}.
+    
+    If there exists a basis such that the components of \(\rho(g)\) are real
+    for all \(g \in G\) then we say that \(\rho\) is a \defineindex{real
+        representation}.
+    
+    Surprisingly, there is a third type representation.
+    It turns out that it is possible for \(\rho\) to be equivalent to
+    \(\overline{\rho}\) and yet there be no basis such that the elements of
+    \(\rho(g)\) are always real.
+    In this case we call \(\rho\) a \defineindex{pseudo-real representation}
+    or \define{quaternionic representation}\index{quaternionic
+        representation|see{pseudo-real representation}}.
+\end{dfn}
+
+An alternative definition of these three types is as follows.
+A \defineindex{complex representation} is a group homomorphism, \(\rho
+\colon G \to \generalLinear(V, \complex)\).
+
+Both real and pseudo-real representations are isomorphic to their
+conjugates.
+This forces the existence of an equivariant anti-linear map, \(j \colon V
+\to V\), which is simply the isomorphism composed with conjugation.
+\define{Equivariant}\index{equivariant} means that if the group \(H\) acts
+on \(V\) then \(h\action j(v) = j(h\action v)\) for all \(h \in H\) and \(v \in
+V\).
+It should be noted that by Schur's lemma (\cref{thm:schurs lemma}) the only
+equivariant maps \(V \to V\) square to a multiple of the identity,
+\(\lambda\ident_V\), and if \(\lambda > 0\) we say \(j\) is a real form, and if
+\(\lambda < 0\) we say \(j\) is a quaternionic form.
+
+A \defineindex{real representation} is a group homomorphism, \(\rho \colon G
+\to \generalLinear(V, \reals)\) with an antilinear equivariant map, \(j \colon V
+\to V\), such that \(j^2 = +1\).
+\define{Antilinear}\index{antilinear} means that \(j(\lambda v) = \lambda^*
+j(v)\) for all \(v\in V\) and \(\lambda \in \complex\), as well as \(j(v + w) =
+j(v) + j(w)\) for \(v, w \in V\).
+A \defineindex{pseudo-real representation} is a group homomorphism, \(\rho
+\colon G \to \generalLinear(V, \reals)\) with an antilinear equivariant map, \(j
+\colon V \to V\), such that \(j^2 = -1\).
+
+This structure on \(V\) for a pseudo-real representation makes \(V\) a
+quaternionic vector space, which is to say an \(\quaternions\)-module.
+Recall that an \(R\)-module is what we get if we replace a field in the
+vector space definition with a ring, \(R\), in this case the division ring of
+quaternions.
+We can instead view a \defineindex{pseudo-real representation} as a group
+homomorphism, \(\rho \colon G \to \generalLinear(V, \quaternions)\).
+
+\begin{exm}{}{}
+    The most obvious example of a pseudo-real or quaternionic representation
+    is the quaternion group,
+    \begin{equation}
+        Q \coloneqq \presentation{-e, I, J, K}{(-e)^2 = e, I^2 = J^2 = K^2 =
+            IJK = -e}.
+    \end{equation}
+    It just so happens that \(Q\) has five irreducible representations,
+    three of which are one-dimensional and one of which is two-dimensional.
+    
+    The two-dimensional representation is pseudo-real.
+    This representation is defined by \(\rho_{\rep{2}}(e) = \ident\),
+    \(\rho_{\rep{2}}(I) = i\sigma_1\), \(\rho_{\rep{2}}(J) = i\sigma_2\), and
+    \(\rho_{\rep{2}}(K) = i\sigma_3\), where \(\sigma_i\) are the \defineindex{Pauli
+        matrices} defined by
+    \begin{equation}
+        \sigma_1 \coloneqq 
+        \begin{pmatrix}
+            0 & 1\\
+            1 & 0
+        \end{pmatrix}
+        , \qquad\sigma_2 \coloneqq 
+        \begin{pmatrix}
+            0 & -i\\
+            i & 0
+        \end{pmatrix}
+        , \qqand \sigma_3 \coloneqq
+        \begin{pmatrix}
+            1 & 0\\
+            0 & -1
+        \end{pmatrix}
+        .
+    \end{equation}
+    Recall that \(\sigma_i^2 = \ident\) and so \((i\sigma_i)^2 = -\ident\).
+    
+    The fact that this is a pseudo-real representation means that there is
+    no basis in which all three Pauli matrices have real components.
+    
+    There is a four-dimensional real reducible representation of \(Q\) given
+    by
+    \begin{alignat}{3}
+        \rho(e) &= \left(
+        \begin{array}{rrrr}
+            1 & 0 & 0 & 0\\
+            0 & 1 & 0 & 0\\
+            0 & 0 & 1 & 0\\
+            0 & 0 & 0 & 1
+        \end{array}
+        \right), \qquad && \rho(I) &= \left(
+        \begin{array}{rrrr}
+            0 & 1 & 0 & 0\\
+            \mathllap{-}1 & 0 & 0 & 0\\
+            0 & 0 & 0 & \mathllap{-}1\\
+            0 & 0 & 1 & 0
+        \end{array}
+        \right),\\
+        \rho(J) &= \left(
+        \begin{array}{rrrr}
+            0 & 0 & 1 & 0\\
+            0 & 0 & 0 & 1\\
+            \mathllap{-}1 & 0 & 0 & 0\\
+            0 & \mathllap{-}1 & 0 & 0
+        \end{array}
+        \right), \qquad && \rho(K) &{} = \left(
+        \begin{array}{rrrr}
+            0 & 0 & 0 & 1\\
+            0 & 0 & \mathllap{-}1 & 0\\
+            0 & 1 & 0 & 0\\
+            \mathllap{-}1 & 0 & 0 & 0
+        \end{array}
+        \right).
+    \end{alignat}
+\end{exm}
+
+We can define two quantities, \(A\) and \(B\), according to
+\begin{equation}
+    A(\rho) \coloneqq \innerprod{\chi_{\overline{\rho}}}{\chi_{\rho}} =
+    \frac{1}{\abs{G}} \sum_{g \in G} \chi_{\rho}(g)^2,
+\end{equation}
+and
+\begin{equation}
+    B(\rho) \coloneqq \frac{1}{\abs{G}} \sum_{g \in G} \chi_{\rho}(g^2).
+\end{equation}
+
+It turns out that for irreducible representations the values of these depend
+only on the type of the representation according to
+\begin{equation}
+    \begin{array}{rcc}\toprule
+        \text{Type} & A(\rho) & B(\rho)\\ \midrule
+        \text{Complex} & 0 & 0\\
+        \text{Real} & 1 & 1\\
+        \text{Pseudo-Real} & 1 & -1 \\ \bottomrule
+    \end{array}
+\end{equation}
+The first column follows from the fact that for (pseudo-)real
+representations \(\rho \sim \overline{\rho}\) whereas for complex
+representations \(\rho \not\sim \overline{\rho}\) and so the first orthogonality
+theorem (\cref{thm:first orthog thm}) gives this result.
+If you get anything other than 0 or 1 for the first result then the
+representation isn't irreducible.
+For the second column we can identify \(B\) as being related to the
+aforementioned equivariant anti-linear map, \(j\).
+
+\begin{exm}{}{}
+    For the pseudo-real two-dimensional representation of the quaternion
+    group we have
+    \begin{equation}
+        A(\rho_{\rep{2}}) = \frac{1}{\abs{G}} \sum_{g\in G}
+        \chi_{\rep{2}}(g)^2 \frac{1}{8}(4 \cdot 2) = 1
+    \end{equation}
+    which follows since \(\chi_{\rho_{\rep{2}}}(g) = 0\) for \(g = I, J, K\)
+    and \(\chi_{\rho_{\rep{2}}}(g) = \pm 2\) for \(g = \pm e\).
+    Similarly
+    \begin{equation}
+        B(\rho_{\rep{2}}) = \frac{1}{\abs{G}} \sum_{g \in G}
+        \chi_{\rep{2}}(g) = \frac{1}{8} (2 \cdot 2 + 6 (-2)) = -1
+    \end{equation}
+    which follows from the fact that \(e^2 = (-e)^2 = e\) and \(I^2 = J^2 =
+    K^2 = -e\) which have characters \(\chi_{\rep{2}}(e) = 2\) and
+    \(\chi_{\rep{2}}(-e) = -2\).
+\end{exm}
+
+The reason that pseudo-real representations are a possibility is due to the
+fact that we can decompose \(V \directproduct V\) into a symmetric and
+antisymmetric part:
+\begin{equation}
+    V \directproduct V = \mathop{\mathrm{Sym}}(V \directproduct V)
+    \directsum \mathop{\mathrm{Asym}}(V \directproduct V).
+\end{equation}
+If \(V\) is the vector space for a non-complex representation and the
+trivial representation falls into the \(\mathop{\mathrm{Sym}}(V \directproduct
+V)\) part of the decomposition then the representation is real.
+On the other hand if the trivial representation falls in the
+\(\mathop{\mathrm{Asym}}(V \directproduct V)\) part then it is pseudo-real.
+The antisymmetric nature results in getting \(-1\) instead of \(1\) for
+\(B(\rho)\).
+
+\section{Branching Rules}
+Let \(G\) be a finite group and \(H\) a subgroup of \(G\).
+If \(\rho \colon G \to \generalLinear(V)\) is a representation then
+\(\rho|_H\) is certainly a representation, where by \(\rho|_H\) we mean \(\rho\)
+restricted to \(H\), so \(\rho|_H \colon H \to \generalLinear(V)\) is defined by
+\(\rho|_H(h) = \rho(h)\) for all \(h \in H\).
+Crucially it is possible that \(\rho\) is irreducible but \(\rho|_H\) is
+reducible.
+The decomposability theorem then means we can decompose \(\rho|_H\) into a
+sum of irreducible representations of \(H\) as follows:
+\begin{equation}
+    \rho|_H(h) = m_1\rho_1(h) \directsum \dotsb \directsum m_k \rho_k(h)
+\end{equation}
+where \(\rho_i\) are irreducible representations of \(H\) and \(m_i \in
+\naturals\) and \(k\) is the number of conjugacy classes of \(H\).
+
+In physics we often call such decompositions \defineindex{branching rules}.
+It is possible to construct branching rules systematically from the
+character tables for \(G\) and \(H\).
+Often it is possible to do so with even less information.
+
+\begin{exm}{}{}
+    Consider the case of \(G = S_3\) and \(H = \integers_3\), which we view
+    as a subgroup of \(S_3\) by identifying \(\integers_3 =
+    \presentation{\cycle{1,2,3}}{\cycle{1,2,3}^3 = \cycle{}}\).
+    Note that the transpositions do not appear in \(\integers_3\).
+    The character table for \(S_3\) is
+    \begin{equation}
+        \begin{array}{c|ccc}
+            S_3 & [\cycle{}] & [\cycle{1,2}] & [\cycle{1,2,3}]\\
+            \abs{[g]} & 1 & 3 & 2 \\ \hline
+            \rep{1} & 1 & 1 & 1 \\
+            \rep{1}\mathrlap{'} & 1 & -1 & 1\\
+            \rep{2} & 2 & 0 & -1
+        \end{array}
+    \end{equation}
+    Since \(\integers_3\) is Abelian all of its irreducible representations
+    are one-dimensional, and each element is in a conjugacy class of its own, so
+    there are three conjugacy classes.
+    All representations map the identity to 1.
+    Clearly there is the trivial representation, \(\rho_{\rep{1}}(h) = 1\)
+    for all \(h \in \integers_3\).
+    Another representation is given by \(\rho_{\rep{1}'}(1) = \e^{2\pi
+        i/3}\) and \(\rho_{\rep{1}'}(2) = \e^{2\pi i2/3} = \e^{-2\pi i/3}\), where we
+    use \(\integers_3\) as the group of integers under addition modulo 3, and notice
+    that this representation gives the other familiar definition of \(\integers_3\)
+    as roots of unity.
+    The third and final representation of \(\integers_3\) is defined by
+    \(\rho_{\rep{1}''}(1) = \e^{-2\pi i/3}\) and \(\rho_{\rep{1}''}(2) = \e^{2\pi
+        i/3}\).
+    This allows us to complete the character table for \(\integers_3\):
+    \begin{equation}
+        \begin{array}{c|ccc}
+            \integers_3 & [\cycle{}] & [\cycle{1,2,3}] & [\cycle{1,3,2}]\\
+            \abs{[h]} & 1 & 1 & 1 \\ \hline
+            \rep{1} & 1 & 1 & 1 \\
+            \rep{1}\mathrlap{'} & 1 & \omega & \omega\mathrlap{^*}\\
+            \rep{1}\mathrlap{''} & 1 & \omega\mathrlap{^*} & \omega
+        \end{array}
+    \end{equation}
+    where \(\omega \coloneqq \e^{2\pi i/3}\).
+    
+    Given some irreducible representation of \(S_3\), \(\rho_{S_3, i}\), we
+    are looking for a way to decompose the restriction of this representation to
+    \(\integers_3\):
+    \begin{equation}
+        \rho_{S_3, i}|_{\integers_3} = \bigotimes_{j = 1}^{3} m_{ij}
+        \rho_{\integers_3, j}
+    \end{equation}
+    where \(\rho_{\integers_3, j}\) are the irreducible representations of
+    \(\integers_3\) and \(m_{ij} \in \naturals\).
+    The coefficients are given by
+    \begin{equation}
+        m_{ij} = \innerprod{\chi_{\rho_{S_3, i}}}{\chi_{\rho_{\integers_3,
+                    j}}}_{\integers_3} \coloneqq \frac{1}{\abs{\integers_3}} \sum_{h \in
+            \integers_3} \chi_{\rho_{S_3,i}}(h)^* \chi_{\rho_{\integers_3,j}}(h).
+    \end{equation}
+    
+    Given the character tables above it is possible to calculate this inner
+    product for all pairs of irreducible representations and the only nonvanishing
+    cases are
+    \begin{equation}
+        \innerprod{\chi_{\rep{1}_{S_3}}}{\chi_{\rep{1}_{\integers_3}}} = 
+        \innerprod{\chi_{\rep{1'_{S_3}}}}{\chi_{\rep{1}_{\integers_3}}} = 
+        \innerprod{\chi_{\rep{2}_{S_3}}}{\chi_{\rep{1}'_{\integers_3}}} = 
+        \innerprod{\chi_{\rep{2}_{S_3}}}{\chi_{\rep{1}''_{\integers_3}}} = 1.
+    \end{equation}
+    This gives the branching rules
+    \begin{alignat}{4}
+        \rho_{\rep{1}_{S_3}}|_{\integers_3} &= \rho_{\rep{1}_{\integers_3}}
+        \qquad & \rep{1}_{S_3} &\to \rep{1}_{\integers_3},\\
+        \rho_{\rep{1}'_{S_3}}|_{\integers_3} &= \rho_{\rep{1}_{\integers_3}}
+        \qquad & \rep{1}'_{S_3} &\to \rep{1}_{\integers_3},\\
+        \rho_{\rep{2}_{S_3}}|_{\integers_3} &= \rho_{\rep{1}'_{\integers_3}}
+        \directsum \rho_{\rep{1}''_{\integers_3}} \qquad & \rep{2}_{S_3} &\to
+        \rep{1}'_{\integers_3} \directsum \rep{1}''_{\integers_3}.
+    \end{alignat}
+    Here we have used two alternative notations for the same thing.
+\end{exm}
+
+The method used here is guaranteed to work, but is often more work than the
+following method which relies on a few key observations.
+
+\begin{exm}{}{}
+    As a general rule the trivial representation is always mapped to the
+    trivial representation, since \(\rho(g) = 1\) for all \(g \in G\) implies
+    \(\rho|_H(h) = 1\) for all \(h \in H\).
+    Hence \(\rep{1}_{S_3} \to \rep{1}_{\integers_3}\).
+    
+    The alternating representation, \(\rep{1}'_{S_3}\), differs from the
+    trivial representation by a negative sign on odd permutations.
+    However, \(\integers_3\) has no odd permutations since it is generated
+    by \(\cycle{1,2,3} = \cycle{1,2}\cycle{2,3}\), which is even.
+    Hence there is no difference between the trivial and alternating
+    representation when restricted to \(\integers_3\) and so \(\rep{1}'_{S_3} \to
+    \rep{1}_{\integers_3}\).
+    
+    The standard representation, \(\rep{2}_{S_3}\), has to branch into two
+    one dimensional representations of \(\integers_3\) since the dimension of
+    \(\rep{2}_{S_3}\) is 2, and the dimension of a direct sum is the sum of the
+    dimensions of the things being summed.
+    Since \(\rep{2}_{S_3}\) is a real representation it can split either
+    into \(2\cdot \rep{1}_{\integers_3}\) or \(\rep{1}'_{\integers_3} \directsum
+    \rep{1}''_{\integers_3}\).
+    It is not possible for it to split into \(\rep{1}_{\integers_3}
+    \directsum \rep{1}'_{\integers_3}\) since this is not real, which can be seen
+    from
+    \begin{equation}
+        \overline{\rep{1}_{\integers_3} \directsum \rep{1}'_{\integers_3}} =
+        \overline{\rep{1}_{\integers_3}} \directsum \overline{\rep{1}'_{\integers_3}} =
+        \rep{1}_{\integers_3} \directsum \rep{1}''_{\integers_3}
+    \end{equation}
+    where we have used the fact that \(\overline{\rep{1}_{\integers_3}} =
+    \rep{1}_{\integers_3}\) since the trivial representation is real and
+    \(\overline{\rep{1}'_{\integers_3}} = \rep{1}''_{\integers_3}\).
+    The same logic forbids splitting into \(\rep{1}_{\integers_3} \directsum
+    \rep{1}''_{\integers_3}\).
+    
+    We can rule out the split into \(2\cdot \rep{1}_{\integers_3}\) since
+    this is not faithful, and neither are the two other irreducible representations,
+    and it can be shown that every group with a cyclic centre has at least one
+    faithful representation.
+    Therefore, we must have \(\rep{2}_{S_3} \to \rep{1}'_{\integers_3}
+    \directsum \rep{1}''_{\integers_3}\).
+\end{exm}
+
+Branching rules are useful in physics when the system of interest has a
+given symmetry, \(G\), and then something happens that disrupts the symmetry so
+that only a subgroup, \(H\), of the original symmetry applies.
+An example might by rotational symmetry, \(\specialOrthogonal(3)\), being
+broken by turning on an external field which gives a preferred direction,
+breaking to rotational symmetry about this axis, \(\specialOrthogonal(2)\).
+In this case \(\rep{3}_{\specialOrthogonal(3)} \to
+\rep{1}_{\specialOrthogonal(2)} \directsum \rep{2}_{\specialOrthogonal(2)}\).
+
+\section{Constructing Representations}
+\subsection{Irreducible Representations of
+    \texorpdfstring{\(S_n\)}{Sn}}\label{sec:irrep Sn}
+In this section we state a few facts about the irreducible representations
+of \(S_n\) without proof.
+We will work with \(S_5\) as an example where appropriate.
+First recall that the number of conjugacy classes of \(S_n\) is given by the
+number of partitions of \(n\), and is also equal to the number of irreducible
+representations.
+The conjugacy classes are given by cycle type.
+
+There is a graphical way to view partitions, using \defineindex{Young
+    tableau}.
+A partition of \(n\) given by \(n = n_1 + n_2 + \dotsb + n_k\) with \(n_{i}
+\ge n_{i + 1}\) is represented by a row of \(n_1\) squares, with a row of
+\(n_{2}\) squares below, with a row of \(n_3\) squares below and so on for a
+total of \(n\) squares.
+For example,
+\begin{alignat}{3}
+    5 &= 5 && = \ydiagram{5}\,,\\
+    &= 4 + 1 && = \ydiagram{4,1}\,,\\
+    &= 3 + 2 && = \ydiagram{3,2}\,,\\
+    &= 3 + 1 + 1 && = \ydiagram{3,1,1}\,,\\
+    &= 2 + 2 + 1 && = \ydiagram{2,2,1}\,,\\
+    &= 2 + 1 + 1 + 1 && = \ydiagram{2,1,1,1}\,,\\
+    &= 1 + 1 + 1 + 1 + 1 && = \ydiagram{1,1,1,1,1}\,.
+\end{alignat}
+Notice the symmetry here.
+The last Young tableau is given by reflecting the first in a diagonal line
+from top left to top right:
+\begin{equation}\tikzsetnextfilename{ytableau-symmetry}
+    \begin{tikzpicture}
+        \node (A) {\ydiagram{5}};
+        \draw[dashed] ($(A.north west) + (135:0.1)$) -- ++ (-45:2.4);
+        \node[highlight] at (-0.561, -0.561) {\ydiagram{1,1,1,1,1}};
+    \end{tikzpicture}
+\end{equation}
+The same is then true of the second and penultimate tableau and so on.
+In the case where there is an odd number of tableaus the odd one out will
+end up being symmetric to itself under this reflection:
+\begin{equation}\tikzsetnextfilename{ytableau-symmetry-2}
+    \begin{tikzpicture}
+        \node (A) {\ydiagram{3,1,1}};
+        \draw[dashed] ($(A.north west) + (135:0.1)$) -- ++ (-45:1.6);
+    \end{tikzpicture}
+\end{equation}
+
+For each square in a Young tableau we can define a quantity called the
+\defineindex{hook number}.
+This is the number of squares to the right of or below the square, plus the
+square itself.
+Most of the time these boxes form a right angled hook shape.
+This is shown in \cref{fig:hook length} in detail for \(5 = 3 + 2\).
+The hook lengths for all Young tableau's of 5 are given below:
+\begin{gather}
+    \ytableaushort{54321}\,, \qquad \ytableaushort{5321,1}\,, \qquad
+    \ytableaushort{431,21}\,, \qquad \ytableaushort{521,2,1}\,,\\
+    \ytableaushort{42,31,1}\,, \qquad \ytableaushort{51,321}\,, \qquad
+    \ytableaushort{5,4,3,2,1}\,.
+\end{gather}
+
+\begin{figure}
+    \tikzsetnextfilename{hook-length}
+    \begin{tikzpicture}[scale=0.5]
+        \draw (0, 0) -- (3, 0) -- (3, -1) -- (2, -1) -- (2, -2) -- (0, -2)
+        -- cycle;
+        \draw (0, -1) -- (2, -1);
+        \draw (1, -2) -- (1, 0);
+        \draw (2, 0) -- (2, -1);
+        \draw[very thick, highlight] (0, 0) -- (3, 0) -- (3, -1) -- (1, -1)
+        -- (1, -2) -- (0, -2) -- cycle;
+        \node[highlight] at (0.5, -0.5) {4};
+        
+        \begin{scope}[xshift=3.5cm]
+            \draw (0, 0) -- (3, 0) -- (3, -1) -- (2, -1) -- (2, -2) -- (0,
+            -2) -- cycle;
+            \draw (0, -1) -- (2, -1);
+            \draw (1, -2) -- (1, 0);
+            \draw (2, 0) -- (2, -1);
+            \draw (3, 0) -- (3, -1);
+            \draw[very thick, highlight] (1, 0) -- (3, 0) -- (3, -1) -- (2,
+            -1) -- (2, -2) -- (1, -2) -- cycle;
+            \node[highlight] at (1.5, -0.5) {3};
+        \end{scope}
+        
+        \begin{scope}[xshift=7cm]
+            \draw (0, 0) -- (3, 0) -- (3, -1) -- (2, -1) -- (2, -2) -- (0,
+            -2) -- cycle;
+            \draw (0, -1) -- (2, -1);
+            \draw (1, -2) -- (1, 0);
+            \draw (2, 0) -- (2, -1);
+            \draw (3, 0) -- (3, -1);
+            \draw[very thick, highlight] (2, 0) rectangle (3, -1);
+            \node[highlight] at (2.5, -0.5) {1};
+        \end{scope}
+        
+        \begin{scope}[yshift=-2.5cm, xshift=1.5cm]
+            \draw (0, 0) -- (3, 0) -- (3, -1) -- (2, -1) -- (2, -2) -- (0,
+            -2) -- cycle;
+            \draw (0, -1) -- (2, -1);
+            \draw (1, -2) -- (1, 0);
+            \draw (2, 0) -- (2, -1);
+            \draw[very thick, highlight] (0, -1) rectangle (2, -2);
+            \node[highlight] at (0.5, -1.5) {2};
+        \end{scope}
+        
+        \begin{scope}[yshift=-2.5cm, xshift=5cm]
+            \draw (0, 0) -- (3, 0) -- (3, -1) -- (2, -1) -- (2, -2) -- (0,
+            -2) -- cycle;
+            \draw (0, -1) -- (2, -1);
+            \draw (1, -2) -- (1, 0);
+            \draw (2, 0) -- (2, -1);
+            \draw[very thick, highlight] (1, -1) rectangle (2, -2);
+            \node[highlight] at (1.5, -1.5) {1};
+        \end{scope}
+    \end{tikzpicture}
+    \caption[Hook length.]{Calculating the hook lengths for the \(5 = 3 +
+        2\) partition. The hook length is the number of squares to the right or below a
+        given square, plus the square itself, so in this drawing the hook length of a
+        square is the number of squares in the purple hook when that square is at the
+        top left of the hook.}
+    \label{fig:hook length}
+\end{figure}
+
+The reason that we care about the hook length is because there is a rather
+remarkable theorem which states that the dimension of a irreducible
+representation of \(S_n\) is given by
+\begin{equation}
+    \dim V_i = \frac{n!}{\prod \text{hook lengths}}
+\end{equation}
+where the product is of all hook lengths appearing in Young tableau
+associated with the representation.
+In the case of \(S_5\) this means
+\begin{alignat}{5}
+    \dim V_1 &= \frac{5!}{5!} &&= 1, \qquad &&\ytableaushort{54321}\,,\\
+    \dim V_2 &= \frac{5!}{5\cdot 3!} &&= 4, \qquad &&
+    \ytableaushort{5321,1}\,,\\
+    \dim V_3 &= \frac{5!}{4!} &&= 5, \qquad && \ytableaushort{431,21}\,,\\
+    \dim V_4 &= \frac{5!}{5\cdot 2 \cdot 2} &&= 6\qquad
+    &&\ytableaushort{521,2,1}\,,\\
+    \dim V_5 &= \frac{5!}{4!} &&= 5 \qquad &&\ytableaushort{42,31,1}\,,\\
+    \dim V_6 &= \frac{5!}{5\cdot 3!} &&= 4 \qquad
+    &&\ytableaushort{51,321}\,,\\
+    \dim V_7 &= \frac{5!}{5!} &&= 1 \qquad && \ytableaushort{5,4,3,2,1}\,.
+\end{alignat}
+While we won't prove that this works we can check that it doesn't violate
+the dimensionality theorem (\cref{thm:dimensionality thm}):
+\begin{equation}
+    1^2 + 4^2 + 5^2 + 6^2 + 5^2 + 4^2 + 1^1 = 120 = 5! = \abs{S_5}.
+\end{equation}
+
+The mirror symmetry between certain pairs of Young tableaus reflects a
+symmetry in the character tables.
+Namely that if \(\rho\) and \(\rho_{\mathrm{mirror}}\) are irreducible
+representations corresponding to Young tableaus which are mirror images then
+\begin{equation}
+    \chi_{\rho}(g) = \sgn(g)\chi_{\rho_{\mathrm{mirror}}}(g)
+\end{equation}
+where \(\sgn(g)\) is the sign of the permutation \(g \in S_n\).
+Noticing that the \(5 = 3 + 1 + 1\) partition, corresponding to the
+\(\rep{6}\) representation, is its own mirror image this must mean that for all
+odd \(g \in S_5\) we have \(\chi_{\rep{6}}(g) =
+\sgn(g)\chi_{\rep{6}_{\mathrm{mirror}}}(g) = -\chi_{\rep{6}}(g)\), so we have
+\(\chi_{\rep{6}}(g) = 0\) for all odd \(g \in S_5\).
+
+\subsection{Direct Product Representations}
+So far we have focused on building the irreducible representations.
+Given two representations, \(\rho_a \colon G \to \generalLinear(V_1)\) and
+\(\rho_b \colon G \to \generalLinear(V_b)\), it is possible to build a new
+representation, \(\rho_a \directproduct \rho_b\), called the \defineindex{tensor
+    product} of the representations which acts on the tensor product space \(V_a
+\directproduct V_b\).
+In general this won't be irreducible but can be decomposed.
+The fact that \(\rho_a \directproduct \rho_b\) is a representation follows
+simply because the direct product of group homomorphisms is another group
+homomorphism.
+We can decompose \(\rho_a \directproduct \rho_b\) as
+\begin{equation}
+    \rho_a \directproduct \rho_b = m_{ab}^{1} \rho_{1} \directsum \dotsb
+    \directsum m_{ab}^{k} \rho_{\rho_k} = \bigoplus_{c = 1}^{k} m_{ab}^{c} \rho_c',
+\end{equation}
+with \(m_{ab}^c \in \positiveintegers\).
+Direct products of representations are commonly called \define{Kronecker
+    products}, or when viewed as a direct sum like this decomposition
+\defineindex{Clebsch--Gordan series}.
+Since \(\dim(V_a \directproduct V_b) = \dim(V_a) \dim(V_b)\) and \(\dim(V_i
+\directproduct V_j) = \dim(V_i) + \dim(V_j)\) it follows that
+\begin{equation}
+    \dim(V_a)\dim(V_b) = \sum_{c = 1}^{k} m_{ab}^c \dim V_c,
+\end{equation}
+which is another diophantine equation that can be used to predict the
+dimensions of irreducible representations.
+
+\subsubsection{Motivation for Decompositions of Direct Product
+    Representations}
+There are two motivating arguments for why direct products decompose into
+smaller representations.
+First, is an argument for finite groups.
+The direct product of the largest irreducible representation of a finite
+group must decompose since otherwise it is not the largest irreducible
+representation (unless one of the representations is one-dimensional, in which
+case the direct product isn't really interesting).
+This would also cause a conflict with the dimensionality theorem, with the
+dimension of the direct product being larger than the order of the group.
+
+There is also a physical argument that the direct product representation
+should decompose based on the addition of angular momenta.
+This might make more sense after the next chapter on continuous groups.
+If a state has angular momentum \(l = 1\) then it transforms as a vector
+under \(\specialOrthogonal(3)\).
+Consider two three dimensional vectors, \(\vv{v}, \vv{w} \in \reals^3\),
+which transforms under an \(l = 1\) irreducible representation of the rotation
+group, \(\specialOrthogonal(3)\).
+The direct product of these can be written as the vector with components
+\begin{equation}
+    v_iw_j = A_{ij} + B_{ij}
+\end{equation}
+where
+\begin{equation}
+    A_{ij} = v_iw_j - \frac{1}{3}\delta_{ij} \vv{v}\cdot \vv{w}
+\end{equation}
+is traceless and
+\begin{equation}
+    B_{ij} = \frac{1}{3}\delta_{ij} \vv{v}\cdot\vv{w}.
+\end{equation}
+The trace part cannot transform under rotations since it is defined by a
+scalar product.
+Also the trace is invariant under basis changes, which we can view as a
+superset of rotations.
+This means \(B_{ij}\) is a scalar (despite having two indices).
+This should be clear since \(B_{ij}\) is simply a scalar
+(\(\vv{v}\cdot\vv{w}\)) multiple of the identity matrix (\(\delta_{ij}\)).
+Scalars transform under an \(l = 0\) irreducible representation of
+\(\specialOrthogonal(3)\).
+
+The trace free part has an \(l = 1\) antisymmetric and \(l = 2\) symmetric
+irreducible representation.
+Motivated by the fact we can get a vector from two vectors via the cross
+product, \(\vv{x} = \vv{v} \times \vv{w}\), which is antisymmetric we suppose
+that this corresponds to the antisymmetric \(l = 1\) part.
+Recalling that addition of angular momentum means two states with angular
+momentum \(l_1\) and \(l_2\) can form states with angular momentum \(\abs{l_1 -
+    l_2}\), \(\abs{l_1 - l_2} + 1\), and so on up to states with angular momentum
+\(l_1 + l_2\) we see that for two \(l = 1\) states we can form states with
+angular momentum \(l = 0, 1, 2\).
+The reason for this should become clear in the next part when we consider
+the Lie group \(\specialOrthogonal(3)\) and the corresponding Lie algebra,
+\(\specialOrthogonalLie(3)\).
+
+\subsubsection{Multiplicities}
+We can calculate the multiplicities appearing in the decomposition of the
+direct product of representations using an inner product:
+\begin{align}
+    m_{ab}^c &= \innerprod{\chi_{\rho_a \directproduct
+            \rho_b}}{\chi_{\rho_c}}\\
+    &= \frac{1}{\abs{G}} \sum_{g \in G} \chi_{\rho_{a} \directproduct
+        \rho_{b}}(g)^* \chi_{\rho_c}(g)\\
+    &= \frac{1}{\abs{G}} \sum_{g \in G} \chi_{\rho_a}(g)^*
+    \chi_{\rho_b}(g)^* \chi_{\rho_c}(g).
+\end{align}
+This leads to the following corollary.
+
+\begin{crl}{}{}
+    The Kronecker product of two irreducible representations, \(\rho_a\) and
+    \(\rho_b\), contains the trivial representation with multiplicity 1 if and only
+    if \(\rho_a = \overline{\rho_b}\).
+    \begin{rmk}
+        If \(\rho_a\) and \(\rho_b\) are not irreducible then the
+        multiplicity can be greater than 1.
+    \end{rmk}
+    \begin{proof}
+        Let \(\rho_a\) and \(\rho_b\) be irreducible representations of some
+        finite group \(G\).
+        Then
+        \begin{align}
+            m_{ab}^{\rep{1}} &= \frac{1}{\abs{G}} \sum_{g \in G}
+            \chi_{\rho_a}(g)^* \chi_{\rho_b}(g)^*\chi_{\rep{1}}(g)\\
+            &= \frac{1}{\abs{G}} \sum_{g \in G} \chi_{\rho_a}(g)^*
+            \chi_{\rho_b}(g)^*
+        \end{align}
+        where we have used the fact that \(\chi_{\rep{1}}(g) = 1\) for all
+        \(g \in G\) since \(\rep{1}\) maps all \(g \in G\) to 1.
+        Now using the fact that \(\chi_{\rho}(g)^* =
+        \chi_{\overline{\rho}}(g)\) we have
+        \begin{equation}
+            m_{ab}^{\rep{q}} = \frac{1}{\abs{G}}\sum_{g \in G}
+            \chi_{\rho_a}(g)\chi_{\overline{b}}(g) =
+            \innerprod{\chi_{\rho_a}}{\chi_{\overline{\rho_b}}} = \delta_{a\overline{b}}.
+        \end{equation}
+        This is 1 if and only if \(\rho_{a} = \overline{\rho_b}\), and zero
+        otherwise.
+    \end{proof}
+\end{crl}
+
+If instead we allowed on or both of the representations above to be
+reducible we could simply use the linearity of the inner product to derive a
+similar results.
+
+We can use the Kronecker product to understand the mirror representations of
+\(S_n\) from \cref{sec:irrep Sn}.
+The mirror representation is related to the original representation by a
+Kronecker product with the alternating representation.
+That is
+\begin{equation}
+    \rho_{\mathrm{mirror}} = \rho_{\rep{1}'} \directproduct \rho.
+\end{equation}
+
+\subsection{Induced Representations}
+Induced representations can be thought of as the opposite of branching
+rules.
+Given two groups, \(G\) and \(H\), with \(H\) a subgroup of \(G\) we can,
+given a representation, \(\rho_a \colon H \to \generalLinear(V_a)\), of \(H\)
+define a representation of \(G\).
+
+There are two essential steps.
+First let \(g_{n_i}\) be representatives of distinct cosets for \(i = 1,
+\dotsc, \groupindex{G}{H}\).
+Define \(W\) as
+\begin{equation}
+    W \isomorphic \bigoplus_{i = 1}^{\groupindex{G}{H}} g_{n_i} V_a
+\end{equation}
+where each \(g_{n_i}V_a\) is an isomorphic copy distinguished by the
+\(g_{n_i}\)s from each other.
+This means that \(\dim W = \groupindex{G}{H}\dim V_a\).
+We can then define some vector \(g_{n_i}\vv{v} \in g_{n_i}V_a\) for \(\vv{v}
+\in V_a\).
+For different values of \(i\) these will correspond to, by construction,
+linearly independent vectors in \(W\).
+The second step is to recognise that for arbitrary \(g \in G\) we can write
+\begin{equation}
+    g g_{n_i} = g_{m_i} h_i
+\end{equation}
+for some \(h_i \in H\).
+This is possible since \(gg_{n_i} \in g_{m_i}H\) for some \(m_i\) since the
+left cosets, \(g_{m_i}H\), partition \(G\).
+The induced representation is then defined to act on \(\vv{w} \coloneqq
+\bigoplus_{i = 1}^{\groupindex{G}{H}} g_{n_i}\vv{v}_{n'_i} \in W\) by
+\begin{equation}
+    \rho_{\mathrm{induced}}(g) \vv{w} g \bigoplus_{i =
+        1}^{\groupindex{G}{H}} g_{n_i}\vv{v}_{n'_i} = \bigoplus_{i =
+        1}^{\groupindex{G}{H}} g_{m_i} \rho_a(h_i) \vv{v}_{n'_i}.
+\end{equation}
+The dimension of the induced representation is the dimension of \(W\).
+In general the induced representation is not irreducible.
+
+The regular representation can be seen as the representation induced by the
+case where \(H\) is the trivial subgroup and \(\rho_a\) is the trivial
+representation.
+The vector space is \(V_0 = \reals\) and we identify \(g\vv{v} \in gV_0\) as
+\(\ve{g}\) comparing to the notation of the original definition of the regular
+representation in \cref{def:regular rep}.
+
+\section{Applications}
+\subsection{Distortion of Lattices}
+Consider a cubic lattice.
+A single cell of this lattice is a cube and so has the symmetry of a cube,
+which has symmetry group \(S_4\).
+We will consider two distortions of this cube breaking the symmetry from
+\(S_4\) to some subgroup.
+For simplicity we work with crystallographic coordinates\footnote{see the
+    notes from the Introduction to Condensed Matter Physics.}, where the cube has
+corners at \((0, 0, 0)\), \((0, 0, 1)\), \((0, 1, 0)\) and so on.
+
+First, consider a distortion in the \(z\)-direction.
+In this case the symmetry breaks to \(D_4\), since we lose the ability to
+swap the side faces with the top and so the only symmetries are rotating around
+the \(z\) axis and rotating the whole cuboid to swap the top and bottom faces.
+This is depicted in \cref{fig:cube z distortion}
+
+\begin{figure}
+    \tikzsetnextfilename{cube-distortion-z}
+    \begin{tikzpicture}
+        \draw[thick, ->] (0, 0, 0) -- (3, 0, 0) node[right] {\(y\)};
+        \draw[thick, ->] (0, 0, 0) -- (0, 3.5, 0) node[above] {\(z\)};
+        \draw[thick, ->] (0, 0, 0) -- (0, 0, 3) node[below left] {\(x\)};
+        \draw[ultra thick, highlight] (0, 0, 0) rectangle (2, 2, 0);
+        \draw[ultra thick, highlight] (0, 0, 2) rectangle (2, 2, 2);
+        \draw[ultra thick, highlight, canvas is yz plane at x=0, rounded
+        corners=0.01] (0, 0) rectangle (2, 2);
+        \draw[ultra thick, highlight, canvas is yz plane at x=2, rounded
+        corners=0.01] (0, 0) rectangle (2, 2);
+        \begin{scope}[xshift=5cm]
+            \draw[thick, ->] (0, 0, 0) -- (3, 0, 0) node[right] {\(y\)};
+            \draw[thick, ->] (0, 0, 0) -- (0, 3.5, 0) node[above] {\(z\)};
+            \draw[thick, ->] (0, 0, 0) -- (0, 0, 3) node[below left]
+            {\(x\)};
+            \draw[ultra thick, highlight] (0, 0, 0) rectangle (2, 3, 0);
+            \draw[ultra thick, highlight] (0, 0, 2) rectangle (2, 3, 2);
+            \draw[ultra thick, highlight, canvas is yz plane at x=0, rounded
+            corners=0.01] (0, 0) rectangle (3, 2);
+            \draw[ultra thick, highlight, canvas is yz plane at x=2, rounded
+            corners=0.01] (0, 0) rectangle (3, 2);
+        \end{scope}
+    \end{tikzpicture}
+    \caption[A cube distorted along the \(z\)-direction.]{A cube distorted along the \(z\)-direction breaks symmetry
+        \(S_4 \to D_4\).}
+    \label{fig:cube z distortion}
+\end{figure}
+
+Second, consider a distortion in the \((1, 1, 1)\)-direction.
+This is depicted in \cref{fig:cube 111 distortion}.
+This also breaks the symmetry and the resulting symmetry group is \(D_3\).
+This is because we can view the distorted cube along the \((1, 1,
+1)\)-direction and end on we see a hexagon with three lines from its centre to
+three corners.
+This is depicted in \cref{fig:cube corner on}.
+This then has the same symmetry as an equilateral triangle, \(D_3\).
+
+\begin{figure}
+    \tikzsetnextfilename{cube-distortion-111}
+    \begin{tikzpicture}
+        \draw[thick, ->] (0, 0, 0) -- (3, 0, 0) node[right] {\(y\)};
+        \draw[thick, ->] (0, 0, 0) -- (0, 3.5, 0) node[above] {\(z\)};
+        \draw[thick, ->] (0, 0, 0) -- (0, 0, 3) node[below left] {\(x\)};
+        \draw[ultra thick, highlight] (0, 0, 0) rectangle (2, 2, 0);
+        \draw[ultra thick, highlight] (0, 0, 2) rectangle (2, 2, 2);
+        \draw[ultra thick, highlight, canvas is yz plane at x=0, rounded
+        corners=0.01] (0, 0) rectangle (2, 2);
+        \draw[ultra thick, highlight, canvas is yz plane at x=2, rounded
+        corners=0.01] (0, 0) rectangle (2, 2);
+        \begin{scope}[xshift=5cm]
+            \pgfmathsetmacro{\d}{0.3}
+            \coordinate (000) at (0, 0, 0);
+            \coordinate (001) at (\d, \d, 2);
+            \coordinate (010) at (0, 2, 0);
+            \coordinate (011) at (\d, \d + 2, 2);
+            \coordinate (100) at (2, \d, \d);
+            \coordinate (101) at (2 + \d, 2*\d, 2 + \d);
+            \coordinate (110) at (2, 2 + \d, \d);
+            \coordinate (111) at (2 + \d, 2 + 2*\d, 2 + \d);
+            
+            \draw[thick, ->] (0, 0, 0) -- (3, 0, 0) node[right] {\(y\)};
+            \draw[thick, ->] (0, 0, 0) -- (0, 3, 0) node[above] {\(z\)};
+            \draw[thick, ->] (0, 0, 0) -- (0, 0, 3) node[below left]
+            {\(x\)};
+            \draw[ultra thick, highlight, rounded corners=0.01] (000) --
+            (100) -- (110) -- (010) -- cycle;
+            \draw[ultra thick, highlight, rounded corners=0.01] (001) --
+            (101) -- (111) -- (011) -- cycle;
+            \draw[ultra thick, highlight, rounded corners=0.01] (000) --
+            (001) -- (011) -- (010) -- cycle;
+            \draw[ultra thick, highlight, rounded corners=0.01] (100) --
+            (101) -- (111) -- (110) -- cycle;
+        \end{scope}
+    \end{tikzpicture}
+    \caption[A cube distorted along the \((1, 1, 1)\)-direction]{A cube distorted along the \((1, 1, 1)\)-direction breaks
+        symmetry \(S_4 \to D_3\).}
+    \label{fig:cube 111 distortion}
+\end{figure}
+
+\begin{figure}
+    \tikzsetnextfilename{cube-corner-on}
+    \begin{tikzpicture}
+        \foreach \a in {0, 60, ..., 300} {
+            \coordinate (\a) at (\a+90:2);
+        }
+        \draw[ultra thick, highlight] (0) -- (60) -- (120) -- (180) -- (240)
+        -- (300) -- cycle;
+        \draw[ultra thick, highlight] (60) -- (0, 0);
+        \draw[ultra thick, highlight] (180) -- (0, 0);
+        \draw[ultra thick, highlight] (300) -- (0, 0);
+    \end{tikzpicture}
+    \caption[A cube distorted along the \((1, 1, 1)\)-direction viewed point on.]{A cube distorted along the \((1, 1, 1)\)-direction still has
+        \(D_3\) symmetry as it can be viewed corner on as depicted here.}
+    \label{fig:cube corner on}
+\end{figure}
+
+\subsection{Fermi--Bose Statistics}
+In quantum mechanics weird things happen when we have identical particles.
+In classical mechanics we can (in theory) track the trajectory of each
+particle and therefore distinguish even identical particles, based on some
+initial arbitrary labelling.
+In quantum mechanics we can't do this as there are no trajectories to
+follow.
+
+Consider an ensemble of \(N\) non-interacting identical particles.
+The state of this system can be written as a tensor product of the states of
+the individual particles.
+Let \(\hilbert\) be the state space of a single particle and denote by
+\(\ket{\varphi_i}\) a single particle state.
+Then the state space of the multi-particle system is
+\(\hilbert^{\directproduct n}\).
+A given state then has the form
+\begin{equation}
+    \ket{\Phi} = \ket{\varphi_1} \directproduct \ket{\varphi_2}
+    \directproduct \dotsb \directproduct \ket{\varphi_N} = \ket{\varphi_1 \directproduct \varphi_2 \directproduct \dotsb \directproduct \varphi_N}
+\end{equation}
+where the last equality is just a notational convenience.
+It should be noted that by the assumption the particles are non-interacting we know they are not entangled and so it is possible to factorise the state into a product of single particle states.
+If there were interactions and entanglement this would not be the case and we would have some linear combination of factorised states instead.
+
+The generic state vector can be in any irreducible representation of the symmetric permutation group, \(S_N\), reflecting the fact that we can swap particles.
+The question is which representation will it be in?
+For large \(N\), say \(N = N_{\mathrm{A}} = \num{6e23}\) the number of irreducible representations is very large.
+
+The two important cases of particles are bosons, particles with integer spin, \(s = 0, 1, 2, \dotsc\), and fermions, particles with half integer spin, \(s = 1/2, 3/2, 5/3, \dotsc\).
+For bosons the wave function is in the trivial representation, since exchanging two particles does nothing.
+For fermions the wave function is in the alternating representation, since exchanging two particles changes the sign.
+
+As a concrete example consider the case of \(N = 2\).
+We then have
+\begin{align}
+    \ket{\Phi_{\mathrm{bosons}}} &= \frac{\sqrt{2}}{2} (\ket{\varphi_1 \directproduct \varphi_2} + \ket{\varphi_2 \directproduct \varphi_1}),\\
+    \ket{\Phi_{\mathrm{fermions}}} &= \frac{\sqrt{2}}{2} (\ket{\varphi_1 \directproduct \varphi_2} - \ket{\varphi_2 \directproduct \varphi_1}).
+\end{align}
+
+One of the most important implications of this is that no two fermions can be in the same state, since in this case the wave function would vanish.
+This leads to Pauli's exclusion principle.
+The fact that this doesn't apply to bosons means that they can all occupy the same energy level, meaning at low temperatures they all fall into the ground state, or other low energy states.
+This leads to weird behaviour such as superfluidity and superconductivity.
+For fermions this isn't possible so we get a zero point pressure which prevents all of the fermions from being in the ground state.
+In a neutron star this zero point pressure balances the gravitational attraction and prevents the star from collapsing into a black hole.
+
+The general connection between spin and statistics, namely that bosons have symmetric wave functions and fermions antisymmetric wave functions, is called the \defineindex{spin statistics theorem}.
+Its proof is on quantum field theory and is beyond this course but it relies on a complexification of the Lorentz group.
+
+Perhaps the most surprising thing about all of this is that none of the other representations of \(S_N\) appear.
+The statistics of particles acting under these in between representations, known as \defineindex{parastatistics}, can be shown to be equivalent to either the trivial or alternating representation with some extra global symmetry, and therefore they don't bring anything new.
