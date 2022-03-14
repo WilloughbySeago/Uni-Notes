@@ -13,6 +13,8 @@
 \tikzexternalize[prefix=tikz-external/]
 %\tikzexternaldisable
 % other libraries
+\usetikzlibrary{hobby}
+\usetikzlibrary{calc}
 
 % References, should be last things loaded
 \usepackage{hyperref}  % Should be loaded second last (cleveref last)
@@ -34,7 +36,7 @@ noabbrev
 % Title page info
 \title{Statistical Physics}
 \author{Willoughby Seago}
-\date{}
+\date{February 18, 2022}
 % \subtitle{}
 % \subsubtitle{}
 
@@ -57,6 +59,7 @@ noabbrev
 \DeclareMathOperator{\tr}{tr}
 \undef\Re
 \DeclareMathOperator{\Re}{Re}
+\DeclareMathOperator{\Cov}{Cov}
 
 % Include
 \includeonly{}
@@ -64,8 +67,9 @@ noabbrev
 \begin{document}
     \frontmatter
     \titlepage
-    \innertitlepage{} 
+    \innertitlepage{tikz-external/comparison-dos-crystal}
     \tableofcontents
+    \listoffigures
     \mainmatter
     
     \chapter{Missing Information}
@@ -1956,6 +1960,860 @@ noabbrev
         \int_{0}^{\infty} \frac{x^3}{\e^{x} - 1} \dd{x} = \zeta(4)\Gamma(4) = \frac{\pi^4}{15}.
     \end{equation}
 
+    \section{Comparison of Models}
+    In the Einstein model we assume independent oscillators all of the same frequency, \(\omega_{\mathrm{E}}\).
+    This corresponds to a density of states given by \(\delta(\omega - \omega_{\mathrm{E}})\).
+    In the Debye model we allow for two-point correlations, that is interactions between two particles, but not interactions involving three particles.
+    This happens because we expand the potential to second order, so we have terms like \(x_k^i x_l^j\).
+    The result is that we end up with a quadratic density of states, up to a certain cut-off frequency, \(\omega_{\mathrm{D}}\), above which the density of states vanishes.
+    
+    The true density of states is nearly impossible to actually know, but there are improvements we can make upon the Debye model, such as density functional theory.
+    The results broadly follow the quadratic shape of Debye theory, after all to second order they agree, but there are typically more details that are missed by Debye theory.
+    Qualitatively we can compare the three densities of states in \cref{fig:compare dos}.
+    
+    \begin{figure}[b]
+        \tikzsetnextfilename{comparison-dos-crystal}
+        \begin{tikzpicture}
+            \draw[very thick, <->] (0, 5) node[left] {\(g(\omega)\)} -- (0, 0) -- (5, 0) node[below] {\(\omega\)};
+            \draw[highlight, ultra thick] (0, 0) -- (4.9, 0);
+            \draw[highlight, ultra thick] (2.5, 0) -- ++ (0, 5);
+            \draw[my blue, ultra thick, domain=0:3, rounded corners=0.01] plot (\x, 0.5*\x*\x) -- (3, 4.5) -- (3, 0) -- (4.9, 0);
+            \def\ycoord#1{\pgfmathparse{{0.5*#1*#1 + (rand + 1)/2}} \pgfmathresult}
+            \draw[my red, ultra thick, rounded corners=0.01] (0, 0) -- (0.1, 0) -- (0.2, 0.153) -- (0.3, 0.214) -- (0.4, 0.244) -- (0.5, 0.193) -- (0.6, 0.444) -- (0.7, 0.087) -- (0.8, 0.035) -- (0.9, 0.707) -- (1, 0.527) -- (1.1, 1.1) -- (1.2, 1.09) -- (1.3, 0.726) -- (1.4, 0.938) -- (1.5, 1.032) -- (1.6, 1.388) -- (1.7, 1.806) -- (1.8, 1.856) -- (1.9, 1.391) -- (2, 2.391) -- (2.1, 2.648) -- (2.2, 2.285) -- (2.3, 2.474) -- (2.4, 2.554) -- (2.5, 2.697) -- (2.6, 2.953) -- (2.7, 3.868) -- (2.8, 4.046) -- (2.9, 3.756) -- (3, 4.845) -- (3.01, 4) -- (3.02, 3.5) -- (3.04, 3) -- (3.06, 2.7) -- (3.1, 2) -- (3.13, 1.5) -- (3.17, 1) -- (3.2, 0.5) -- (3.24, 0) -- (4.9, 0);
+            \draw[highlight, ultra thick] (4, 3) -- ++ (0.5, 0) node[right, black] {Einstein};
+            \draw[my blue, ultra thick] (4, 2.5) -- ++ (0.5, 0) node[right, black] {Debye};
+            \draw[my red, ultra thick] (4, 2) -- ++ (0.5, 0) node[right, black] {Realistic};
+            \node[below] at (2.5, 0) {\(\omega_{\mathrlap{\mathrm{E}}}\)};
+            \node[below] at (3, 0) {\(\omega_{\mathrlap{\mathrm{D}}}\)};
+        \end{tikzpicture}
+        \caption[Density of States Comparison.]{The density of states for the Einstein and Debye models and a qualitative depiction of the true density of states.}
+        \label{fig:compare dos}
+    \end{figure}
+    
+    
+    \chapter{Interactions in Classical Fluids}
+    \section{Interactions and Correlations}
+    Two random variables, \(x\) and \(y\), are \define{independent}\index{independent variables} if their joint probability distribution factorises:
+    \begin{equation}
+        P(x, y) = P(x)P(y).
+    \end{equation}
+    This extends to \(N\) random variables, \(x_i\), which are independent if
+    \begin{equation}
+        P(x_1, \dotsc, x_N) = \prod_{i = 1}^{N} P(x_i).
+    \end{equation}
+    
+    If two random variables \emph{aren't} independent then they are \define{dependent}\index{dependent variables}.
+    For any two random variables, \(x\) and \(y\), we can always write their joint probability distribution as
+    \begin{equation}
+        P(x, y) = P(x \mid y)P(y) = P(y \mid x) P(x)
+    \end{equation}
+    where \(P(x \mid y)\) is the probability distribution for \(x\) given a particular value of \(y\).
+    In the case of independent variables the probability distribution of \(x\) doesn't depend on the value of \(y\) and so \(P(x \mid y) = P(x)\), giving the factorisation result above.
+    
+    \begin{exm}{}
+        Consider the result of rolling two dice.
+        The result of the first dice doesn't effect the result of the second dice and for fair six sided dice all outcomes of a single dice have probability \(1/6\), so the probability of getting one result on the first dice and another result on the second is \(1/36\).
+        
+        In the grand canonical ensemble we have
+        \begin{equation}
+            P(\{n_j\}) = \prod_j P(n_j),
+        \end{equation}
+        which shows that the occupation numbers of each state are independent.
+        
+        An example we will come to soon is a gas.
+        Let \(\rho_1(\vv{r})\) be the probability of finding a gas particle at \(\vv{r}\) and \(\rho_2(\vv{r_1}, \vv{r_2})\) the probability of finding a gas particle at both \(\vv{r_1}\) and \(\vv{r_2}\).
+        For an ideal gas, which has no interactions, the particles are all independent and so the presence or lack of presence of a particle at \(\vv{r_1}\) doesn't effect the probability of finding a particle at \(\vv{r_2}\) and so we have
+        \begin{equation}
+            \rho_2(\vv{r_1}, \vv{r_2}) = \rho_1(\vv{r_1}) \rho_1(\vv{r_2}).
+        \end{equation}
+        On the other hand if we consider a gas of particles with some nonzero volume, such as a van der Waals gas, then if \(\vv{r_1}\) and \(\vv{r_2}\) are sufficiently close together we can't have a particle at both of them, and so we lose the independence of the ideal gas.
+    \end{exm}
+    
+    The last example here points to a key physical idea.
+    If we have interactions then this causes some dependence between different variables.
+    To quantify this we use the \defineindex{covariance}, which is defined for random variables \(x\) and \(y\) as
+    \begin{equation}
+        \Cov(x, y) \coloneqq \mean{(x - \mean{x})(y - \mean{y})} = \mean{\Delta x\, \Delta y}.
+    \end{equation}
+    We use the covariance as a measure of correlation, in particular if \(\Cov(x, y) > 0\) we say that \(x\) and \(y\) are \defineindex{correlated}, if \(\Cov(x, y) < 0\) we say that \(x\) and \(y\) are \defineindex{anticorrelated}, and if \(\Cov(x, y) = 0\) we say that \(x\) and \(y\) are \defineindex{uncorrelated}.
+    We also say the variables are correlated when we mean that they are either correlated or anticorrelated, that they are not uncorrelated.
+    
+    In general independent variables are uncorrelated, however, it is possible to have zero correlation between dependent variables.
+    Examples of this tend to be quite perverse though and are more of an issue for mathematicians than in the real world.
+    As an example, consider \(x\) to be uniformly distributed on \((-1, 1)\) and set \(y = x^2\).
+    Clearly \(y\) depends on \(x\).
+    However, \(\mean{x} = 0\) and \(\mean{y} = 0.5\), so
+    \begin{equation}
+        \Cov(x, y) = \mean{x(y - 0.5)} = \mean{xy} - 0.5\mean{x} = \mean{x^3} = 0.
+    \end{equation}
+    
+    Correlations between particles typically imply a gain in information, that is if two particles are (anti)correlated and we know a property of one particle then we are more likely to be able to correctly predict something about the second particle.
+    This means that interactions generally generate correlations which reduce the missing information, and hence entropy.
+    
+    \section{Classical Statistical Mechanics}
+    In the coming section we will consider a classical fluid and try to improve on the ideal gas model.
+    A classical fluid of \(N\) particles of mass \(m\) in a volume \(V\) has an average (number) density \(\rho = N/V\).
+    An ideal gas has no interactions, which is of course not realistic.
+    We will assume that this density is low enough that there are relatively few interactions and the interactions that do occur are weak.
+    We can then treat the interactions as a perturbation on the ideal gas.
+    We will, mostly, ignore quantum effects, such as quantisation of states, keeping only the ones known to be important to give the correct result, we give no further motivation for which quantum effects to consider other than someone else has already done this and worked out which effects can't be neglected.
+    
+    For a system of \(N\) particles the \(i\)th particle has position\footnote{we denote positions by \(q\) in this section to emphasise the conjugate nature of position and momenta, see the notes from the Lagrangian dynamics course for more on conjugate variables.} \(\vv{q}_i\) and momentum \(\vv{p}_i\), which means that we have \(6N\) degrees of freedom in the system, assuming a gas in three-dimensional space.
+    This means we have a \(6N\)-dimensional phase space, recall that the phase space is the space of all possible configurations of the system, which in this case means each point in phase space corresponds to a set of positions and momenta for all \(N\) particles.
+    
+    The problem which we now face is that \(\vv{q}\) and \(\vv{p}\) are continuous and so there is an uncountably infinite number of states.
+    This breaks several things, such as the Boltzmann definition of the entropy, since the weight of any macrostate will always be infinite and so its logarithm will diverge.
+    
+    The solution is to quantise phase space into cells of side \(\delta q_i\) and \(\delta p_i\), note that \(i = x, y, z\) here, rather than running over particle numbers.
+    For simplicity, we take \(\delta q_i\) to be the same for all directions and \(\delta p_i\) to be the same for all directions, so we drop the \(i\) label.
+    This results in cells of \enquote{volume} \(h^3 \coloneqq \delta q^3 \delta p^3\).
+    Notice that \([h] = [q][p] = LMLT^{-1} = ML^2T^{-1}\), which are units of angular momentum.
+    
+    In quantum mechanics we would interpret this as an example of the uncertainty principle, interpreting \(h\) as Planck's constant.
+    In classical mechanics we can instead interpret the cells as uncertainty in some measurement of position and momentum, which was the view of Maxwell when he developed this theory before quantum mechanics was well understood.
+    It turns out that \(h\) vanishes in our final result so we can think of it just as a mathematical trick.
+    Of course, if we do interpret \(h\) as Planck's constant then it must vanish from our formulae if we are to demand \enquote{classical} results.
+    We can then interpret a single state with each cell in phase space, and there are a countable number of cells.
+    
+    We can use the semi-classical approximation for the canonical partition function, which fixes over-counting by dividing by \(N!\).
+    We then have
+    \begin{equation}
+        \cpartition = \frac{1}{N!} \sum_{\mathclap{\mathrm{cells}}} \exp[-\beta E(\{\vv{q}\}, \{\vv{p}\})]
+    \end{equation}
+    where \(E\) is some function of the positions, \(\{\vv{q}\}\), and momenta, \(\{\vv{p}\}\), giving the energy in a given state.
+    
+    For a sufficiently small cell size the energy varies slowly between neighbouring cells and we can approximate the sum as an integral over phase space:
+    \begin{equation}
+        \sum_{\mathclap{\mathrm{cells}}} \to \frac{1}{h^3} \int \dl{q_x} \dd{q_y} \dd{q_z} \int \dl{p_x} \dd{p_y} \dd{p_z}.
+    \end{equation}
+    Notice that we divide by the \enquote{volume} of the cells so that this integral over the constant function \(1\) gives the volume of phase space divided by the cell volume, which gives the number of cells, which is the number of states.
+    
+    The canonical partition function is then given by integrating over each cell:
+    \begin{equation}
+        \cpartition = \frac{1}{N!} \frac{1}{h^{3N}} \prod_{i = 1}^{N} \int \dl{^3q_i} \dd{^3p_i} \exp[-\beta E(\{\vv{q}\}, \{\vv{p}\})].
+    \end{equation}
+    
+    \section{Recovery of Ideal Gas}
+    To demonstrate the use fo this partition function we use it to recover the ideal gas.
+    For a classical ideal gas there are no interactions and so the energy of the \(i\)th particle is then
+    \begin{equation}
+        \varepsilon_i(\vv{q}_i, \vv{p}_i) = \frac{\vv{p}_i^2}{2m}.
+    \end{equation}
+    The energy of the system is simply the sum of the energies of the particles.
+    Since the energy is independent of position the volume integrals in the partition function simply give the spatial volume, \(V\), and so in the product we get \(V^N\):
+    \begin{align}
+        Z_{\mathrm{ideal}} &= \frac{1}{N!} \frac{1}{h^{3N}} \prod_{i = 1}^{N} \int \dl{^3q_i} \dd{^3p_i} \exp\left[ -\beta\frac{\vv{p}_i^2}{2m} \right]\\
+        &= \frac{V^N}{N! h^{3N}} \prod_{i = 1}^{N} \int \dl{^3p_i} \exp\left[ -\beta\frac{\vv{p}_i^2}{2m} \right]\\
+        &= \frac{V^N}{N! h^{3N}} \left( \int \dl{^3p_i} \exp\left[ -\beta\frac{\vv{p}_i^2}{2m} \right] \right)^N\\
+        &= \frac{V^N}{N! h^{3N}} \left( \int \dl{^3p_i} \exp\left[ -\frac{\beta}{2m}(p_{ix}^2 + p_{iy}^2 + p_{iz}^2) \right] \right)^N\\
+        &= \frac{V^N}{N! h^{3N}} \bigg ( \int \exp\left[ -\frac{\beta}{2m}p_{ix}^2 \right] \dd{p_{ix}} \int \exp\left[ -\frac{\beta}{2m}p_{iy}^2 \right] \dd{p_{iy}}\\
+        &\times \int \exp\left[ -\frac{\beta}{2m}p_{iz}^2 \right] \dd{p_{iz}} \bigg)^N\\
+        &= \frac{V^N}{N! h^{3N}} \left( \int \dl{p} \exp\left[ -\frac{\beta}{2m}p^2 \right] \right)^{3N}\\
+        &= \frac{V^N}{N! h^{3N}} \left( \sqrt{\frac{2m\pi}{\beta}} \right)^{3N}\\
+        &= \frac{1}{N!} \left( \frac{V}{\lambda_{T}^3} \right)^N
+    \end{align}
+    where
+    \begin{equation}
+        \lambda_T \coloneqq \sqrt{\frac{h^2}{2\pi m\boltzmann T}}.
+    \end{equation}
+    The subscript \(T\) reminds us that \(\lambda\) depends on the temperature, which will be important later.
+    
+    Here we have used the fact that the momentum integral can be split into three separate integrals over the three components of the momentum of the \(i\)th particle, and that this integral is identical for all particles.
+    We then recognise the resulting integral as a Gaussian and use the standard result
+    \begin{equation}
+        \int_{-\infty}^{\infty} \e^{-\alpha x^2} \dd{x} = \sqrt{\frac{\pi}{\alpha}}.
+    \end{equation}
+    In our case \(\alpha = \beta/(2m)\).
+    
+    Notice that \(Z_{\mathrm{ideal}}\) depends on \(h\) through \(\lambda_T\).
+    This means that quantities like the free energy or entropy will depend on \(h\) as an additive constant.
+    However, it is only differences in these quantities that we can measure and in these \(h\) will cancel out, as it must for classical results.
+    
+    The free energy of an ideal gas is therefore
+    \begin{align}
+        F_{\mathrm{ideal}} &= -\boltzmann T \ln Z_{\mathrm{ideal}}\\
+        &= -\boltzmann T \ln\left( \frac{1}{N!} \left( \frac{V}{\lambda_T^3} \right)^N \right)\\
+        &= -\boltzmann T \left[ N\ln \frac{V}{\lambda_T^3} - \ln N! \right]\\
+        &\approx -\boltzmann T N \left[ \ln\frac{V}{\lambda_T^3} - \ln N + 1 \right]\\
+        &= -\boltzmann T N \left[ \ln \frac{V}{N\lambda_T^3} + 1 \right].
+    \end{align}
+    The pressure is then
+    \begin{align}
+        P_{\mathrm{ideal}} &= - \diffp{F_{\mathrm{ideal}}}{V}[T, N]\\
+        &= -\diffp{}{V} \left( -\boltzmann T N \left[ \ln\frac{V}{N\lambda_T^3} + 1 \right] \right)\\
+        &= \boltzmann T N \diffp{}{V} \ln V\\
+        &= \frac{N \boltzmann T}{V},
+    \end{align}
+    which is exactly what we expect for an ideal gas.
+    The entropy is
+    \begin{align}
+        S_{\mathrm{ideal}} &= -\diffp{F_{\mathrm{ideal}}}{T}[V, N]\\
+        &= -\diffp{}{T}\left( -\boltzmann T N \left[ \ln\frac{V}{N\lambda_T^3} + 1 \right] \right)\\
+        &= \boltzmann N \left( \ln \frac{V}{N\lambda_T^3} + 1 \right) + \boltzmann T N \diffp{}{T} \ln \frac{V}{N\lambda_T^3}\\
+        &= \boltzmann N \left( \ln\frac{V}{N\lambda_T^3} + 1 \right) - \frac{3 \boltzmann T N}{\lambda_T} \diffp{\lambda_T}{T}\\
+        &= \boltzmann N \left( \ln\frac{V}{N\lambda_T^3} + 1 \right) - 3 \boltzmann T N \sqrt{\frac{2\pi m \boltzmann T}{h^2}} \diffp{}{T} \sqrt{\frac{h^2}{2\pi m\boltzmann T}}\\
+        &= \boltzmann N \left( \ln\frac{V}{N\lambda_T^3} + 1 \right) + \frac{3}{2} \boltzmann T N \sqrt{\frac{2\pi m \boltzmann T}{h^2}}\sqrt{\frac{h^2}{2\pi m \boltzmann T^3}}\\
+        &= \boltzmann N \left( \ln\frac{V}{N\lambda_T^3} + 1 \right) + \frac{3}{2}\boltzmann N\\
+        &= \boltzmann N \left( \ln\frac{V}{N\lambda_T^3} + \frac{5}{2} \right).
+    \end{align}
+    This is exactly the result we would expect for an ideal gas.
+    
+    \section{Configurational Integral}
+    Returning to a gas with interactions we can make an important simplification by assuming that the interaction potential doesn't depend on the particle momenta.
+    That is, the energy is given by
+    \begin{equation}
+        E(\{\vv{q}\}, \{\vv{p}\}) = \sum_{i = 1}^{N} \frac{\vv{p}_i^2}{2m} + U(\vv{q}_1, \dotsc, \vv{q}_N).
+    \end{equation}
+    In this case \(\cpartition\) factors into two separate products:
+    \begin{equation*}
+        \cpartition = \frac{1}{N!h^{3N}} \left[ \prod_{i = 1}^{N} \int \exp\left[ -\beta\sum_{i=1}^{N} \frac{\vv{p}_i^2}{2m} \right] \dd{^3 p_i} \right] \left[ \prod_{i=1}^{N} \int \exp[ -\beta U(\vv{q}_1, \dotsc, \vv{q}_N) ] \dd{^3q_i} \right].
+    \end{equation*}
+    We can then identify the momentum integral and the prefactor as corresponding to \(Z_{\mathrm{ideal}} / V^N\), in which case we can write
+    \begin{equation}
+        \cpartition = Z_{\mathrm{ideal}} Q
+    \end{equation}
+    where
+    \begin{equation}
+        Z_{\mathrm{ideal}} = \frac{1}{N!} \left( \frac{V}{\lambda_T^3} \right)^N,
+    \end{equation}
+    and
+    \begin{equation}
+        Q \coloneqq \frac{1}{V^N} \prod_{i = 1}^{N} \int \exp[-\beta U(\vv{q}_1, \dotsc, \vv{q}_N)] \dd{^3q_i}.
+    \end{equation}
+    This is called the \defineindex{configurational integral}.
+    Interactions between particles enter only through \(Q\).
+    If we can evaluate \(Q\) we can find pretty much any quantity we want, for example
+    \begin{equation}
+        F = -\boltzmann T \ln \cpartition = -\boltzmann T \ln Z_{\mathrm{ideal}} - \boltzmann T \ln Q
+    \end{equation}
+    which we can view as the ideal gas free energy plus a correction term due to interactions.
+    Similarly
+    \begin{equation}
+        P = - \diffp{F}{V} = \frac{N\boltzmann T}{V} + \boltzmann T \diffp{}{V} \ln Q = P_{\mathrm{ideal}} + P_{\mathrm{conf}}
+    \end{equation}
+    where \(P_{\mathrm{conf}}\) is the configurational pressure, which is the pressure due to interactions.
+    
+    The problem is that computing \(Q\) is often not easy.
+    
+    \section{Virial Expansion}
+    An important case where we can approximate the configuration integral is when the interaction potential can be written as
+    \begin{equation}
+        U(\vv{q}_1, \dotsc, \vv{q}_N)  = \frac{1}{2} \sum_{i \ne j} \varphi(\abs{\vv{q}_i - \vv{q}_j}) = \sum_{i < j} \varphi_{ij}
+    \end{equation}
+    where \(\varphi_{ij} \coloneqq \varphi(\abs{\vv{q}_i - \vv{q}_j})\).
+    This assumption implies only two-body interactions, which is reasonable for a dilute gas as if two-particle interactions are rare then three-particle interactions will be even rarer.
+    It also assumes a central potential which is isotropic, meaning that only the distance between the particles is important.
+    
+    There are a variety of common interaction potentials which take this form.
+    The simplest example is the hardcore potential, which is zero above a certain distance and infinite below it:
+    \begin{equation}
+        \varphi(r) \coloneqq
+        \begin{cases}
+            \infty & r \le a,\\
+            0 & r > a.
+        \end{cases}
+    \end{equation}
+    We can think of this as modelling the particles as hard spheres which can't overlap.
+    Another example would be the Lennard-Jones potential\footnote{see the notes for either the matter part of the fields and matter course, or introduction to condensed matter physics for more on the Lennard-Jones potential.}, which is strongly repulsive at low distances, attractive at medium distances and goes to zero at infinity:
+    \begin{equation}
+        \varphi(r) \coloneqq 4\varepsilon \left[ \left( \frac{\sigma}{r} \right)^{12} - \left( \frac{\sigma}{r} \right)^6 \right].
+    \end{equation}
+    Here \(\varepsilon\) is related to the depth of the attractive well and \(\sigma\) to the hardcore radius.
+    
+    We wish to compute the configurational integral in a general way for any interaction potential which can be written as a sum over an isotropic two particle interaction potential.
+    As such we start by writing the configurational integral as
+    \begin{equation}
+        Q = \frac{1}{V^N} \prod_{i = 1}^{N} \prod_{i < j} \int F_{ij} \dd{^3q_i}
+    \end{equation}
+    where
+    \begin{equation}
+        F_{ij} \coloneqq \exp[-\beta \varphi_{ij}] = \exp[-\beta \varphi(\abs{\vv{q}_i - \vv{q}_j})].
+    \end{equation}
+    This double product is slightly confusing so we write it out for clarity:
+    \begin{equation}
+        Q = \frac{1}{V^N} \int \dl{^3q_1} \dotsm \dl{^3q_N} F_{12}F_{13} \dotsm F_{1N}F_{23} \dotsm F_{2N} \dotsm F_{N-1,N}.
+    \end{equation}
+    Notice that there are \(N - 1\) \(F_{ij}\) factors with \(i = 1\) and \(j = 2, \dotsc, N\), similarly there are \(N - 2\) \(F_{ij}\) factors with \(i = 2\) and \(j = 3, \dotsc, N\), and so on until there is a single \(F_{ij}\) term with \(i = N - 1\) and \(j = N\).
+    Therefore there are
+    \begin{equation}
+        (N - 1) + (N - 2) + \dotsb + 1 = \sum_{k = 1}^{N} k = \frac{N}{2}(N - 1) = \binom{N}{2}.
+    \end{equation}
+    factors of \(F_{ij}\) appearing in this product.
+    
+    The form of the \(Q\) integral is reminiscent of an average, integrating over space and then dividing by the volume.
+    We therefore write this integral as
+    \begin{equation}
+        Q = \expected[\bigg]{ \raisebox{0.6ex}{\(\displaystyle\prod_{\smash{i < j}}\)} F_{ij} }
+    \end{equation}
+    where
+    \begin{equation}
+        \expected{x} \coloneqq \frac{1}{V^N}\prod_{i=1}^{N} \int x \dd{^3q_i}.
+    \end{equation}
+    In general, it is not easy to compute \(Q\) this way because \(F_{ij}\) and \(F_{ik}\) are correlated.
+    However, we can approximate \(F_{ij}\) and \(F_{ik}\) as uncorrelated in which case \(Q\) factorises as
+    \begin{equation}
+        Q = \prod_{i < j} \expected{F_{ij}} = \expected{F}^{\binom{N}{2}}.
+    \end{equation}
+    Since we expect that \(F_{ij}\) doesn't depend on the indices of the particles, which are just labels we give them, so we let \(\expected{F_{ij}} = \expected{F}\).
+    
+    We can then compute \(\expected{F}\):
+    \begin{equation}
+        \expected{F_{ij}} = \frac{1}{V^N} \prod_{k = 1}^{N} \int F_{ij} \dd{^3 q_k}.
+    \end{equation}
+    First notice that for \(k \ne i, j\) this is an integral over \(1\) and just gives \(V\) so this quickly simplifies to
+    \begin{equation}
+        \expected{F_{ij}} = \frac{1}{V^2} \int \exp[-\beta \varphi(\abs{\vv{q}_i - \vv{q}_j})] \dd{^3q_i} \dd{^3q_j}.
+    \end{equation}
+    In order to compute this we switch to centre-of-mass coordinates, \(\vv{r} = \vv{q}_i - \vv{q}_j\) and \(\vv{R} = (\vv{q}_i + \vv{q}_j)/2\).
+    This then turns our integral into
+    \begin{equation}
+        \expected{F_{ij}} = \frac{1}{V^2} \int \exp[-\beta \varphi(r)] \dd{^3r}\dd{^3R} = \frac{1}{V} \int \exp[-\beta \varphi(r)] \dd{^3r}.
+    \end{equation}
+    Here we have used the fact that the integral has no \(R\) dependence and so the integral over \(R\) just gives another factor of \(V\).
+    
+    We now rewrite \(F_{ij}\) as
+    \begin{equation}
+        F_{ij} = 1 + f_{ij}
+    \end{equation}
+    with
+    \begin{equation}
+        f_{ij} \coloneqq \exp[-\beta \varphi_{ij}] - 1.
+    \end{equation}
+    Note that this is exact, not an approximation.
+    Considering the limits of \(f_{ij}\) we have
+    \begin{equation}
+        f_{ij} \to
+        \begin{cases}
+            0 & \text{as } r \to \infty,\\
+            -1 & \text{as } r \to 0. 
+        \end{cases}
+    \end{equation}
+    In a dilute gas, where separations are large, we therefore expect \(f_{ij}\) to be small.
+    Using this
+    \begin{align}
+        \expected{F_{ij}} &= \frac{1}{V} \int (1 + f_{ij}) \dd{^3r}\\
+        &= \frac{1}{V} \int \dd{^3r} + \frac{1}{V}\int (\exp[-\beta \varphi(r)] - 1) \dd{^3r}\\
+        &= 1 + \frac{1}{V} \int (\exp[-\beta\varphi(r)] - 1) \dd{^3 r}\\
+        &= 1 - \frac{2}{V}B_2
+    \end{align}
+    where
+    \begin{equation}
+        B_2 \coloneqq -\frac{1}{2} \int (\exp[-\beta \varphi(r)] - 1) \dd{^3r} = -2\pi \int (\exp[-\beta\varphi(r)] - 1)r^2 \dd{r}.
+    \end{equation}
+    This is called the \defineindex{second virial coefficient}\index{B2@\(B_2\)|see{second virial coefficient}}, the reason it is the second, and the reason for the factor of \(-1/2\), is that it appears as part of an expansion as we will soon see.
+    
+    Within this approximation we then have the configurational integral as
+    \begin{equation}
+        Q = \left( 1 - \frac{2}{V}B_2 \right)^{\binom{N}{2}}.
+    \end{equation}
+    We therefore have
+    \begin{equation}
+        F = F_{\mathrm{ideal}} - \boltzmann T \ln Q \approx F_{\mathrm{ideal}} + \frac{N^2 \boltzmann T}{V} B_2.
+    \end{equation}
+    Here we have made the approximation
+    \begin{equation}
+        \binom{N}{2} = \frac{N}{2}(N - 1) \approx \frac{N^2}{2}
+    \end{equation}
+    for large \(N\).
+    We have also expanded
+    \begin{equation}
+        \ln\left( 1 - \frac{2}{V}B_2 \right) \approx -\frac{2}{V}B_2.
+    \end{equation}
+    We therefore have that the pressure is given
+    \begin{equation}
+        \beta P = \rho + B_2 \rho^2
+    \end{equation}
+    where \(\rho = N / V\) is the number density.
+    This corresponds to the first two terms in the \defineindex{virial expansion} of the pressure in terms of the density, hence calling \(B_2\) the \emph{second} virial coefficient, the first being \(B_1 = 1\), and the choice of normalisation factor \(-1/2\).
+    
+    Note that we can also compute the entropy in this approximation:
+    \begin{equation}
+        S = -\diffp{F}{T}[V,N] = S_{\mathrm{ideal}} - N\boltzmann \rho \diffp{}{T}(TB_2).
+    \end{equation}
+    
+    The virial expansion is a perturbation expansion in the density about the ideal gas.
+    That is we have a series
+    \begin{equation}
+        \beta P = \sum_{n = 1}^{\infty} B_n \rho^n.
+    \end{equation}
+    The virial coefficients are then computed in a similar way to \(B_2\) as functions of the interaction potential \(\varphi\).
+    A simple approximation for a generic \(\varphi\), which is repulsive nearby, attractive in the middle, and goes to zero at infinity, yields \(B_2 = b_0 - a_0\beta\) for positive constants \(b_0\) and \(a_0\).
+    This allows us to recover the equation of state for a van der Waals gas,
+    \begin{equation}
+        (P + \rho^2 a_0) = \frac{N \boltzmann T}{V - N b_0}
+    \end{equation}
+    from the second order virial expansion.
+    
+    It can also be shown that the entropy here is lower than for an ideal gas.
+    This is what we would expect from an information theoretic point of view since knowledge of the interactions should increase the information available so the entropy, which measures missing information, should decrease.
+    
+    We can expand the series to higher order.
+    To do so we write
+    \begin{equation}
+        F_{ij} = \expected{F} + \lambda_{ij}
+    \end{equation}
+    where \(\lambda_{ij}\) is the deviation of \(F_{ij}\) from its average spatial value, which is such that \(\expected{\lambda_{ij}} = 0\).
+    We then expand in powers of \(\lambda_{ij}\) and the result is
+    \begin{align}
+        Q &= \expected[\Bigg]{\raisebox{0.6ex}{\(\displaystyle\prod_{i<j}\)} (\expected{F} + \lambda_{ij})}\\
+        &= \expected{F}^{\binom{N}{2}} + \binom{N}{2}\expected{F}^{\binom{N}{2} - 1} \expected{\lambda_{ij}}\\
+        &\qquad+ \expected{F}^{\binom{N}{2} - 2} \left[ \binom{N}{4} \expected{\lambda_{ij}\lambda_{kl}} + \binom{N}{3}\expected{\lambda_{ij}\lambda_{jl}} \right] + \order(\lambda^3).
+    \end{align}
+    Note that we have to account for when the indices match or don't match.
+    It turns out that expectation value of the \(\lambda\)s vanishes a lot of the time.
+    The first non-vanishing erm in this series, other than \(\expected{F}^{\binom{N}{2}}\), is the \(\expected{\lambda_{ij}\lambda_{jk}\lambda_{ik}}\) term.
+    
+    It is possible to construct the non-vanishing terms using a diagrammatic process.
+    In this we write out all indices appearing in a term and connect two indices, say \(i\) and \(j\), if \(\lambda_{ij}\) appears in the term.
+    The only non-vanishing terms are then those where the diagram forms a closed loop.
+    We can then compute the sum as a sum over closed diagrams.
+    For example, the \(\expected{\lambda_{ij}\lambda_{jk}\lambda_{kl}}\) term corresponds to the diagram
+    \begin{equation}\tikzsetnextfilename{diagrammatic-expansion-1}
+        \begin{tikzpicture}
+            \coordinate (i) at (210:0.5);
+            \coordinate (k) at (90:0.5);
+            \coordinate (j) at (-30:0.5);
+            \node[below left] at (i) {\(i\)};
+            \node[above] at (k) {\(k\)};
+            \node[below right] at (j) {\(j.\)};
+            \draw (i) -- (j) -- (k) -- cycle;
+        \end{tikzpicture}
+    \end{equation}
+    Another non-vanishing term would be given by the diagram
+    \begin{equation}\tikzsetnextfilename{diagrammatic-expansion-2}
+        \begin{tikzpicture}
+            \draw (0, 0) rectangle (0.75, 0.75);
+            \node[below left] at (0, 0) {\(i\)};
+            \node[below right] at (0.75, 0) {\(j.\)};
+            \node[above right] at (0.75, 0.75) {\(k\)};
+            \node[above left] at (0, 0.75) {\(l\)};.
+        \end{tikzpicture}
+    \end{equation}
+    This corresponds to the term \(\expected{\lambda_{ij}\lambda_{jk}\lambda_{kl}\lambda_{li}}\).
+    
+    At high densities the expansion can fail, meaning either the series doesn't converge or one of the virial coefficients diverges.
+    Both of these typically indicate a phase transition.
+    
+    The higher order terms represent interactions between more particles, so the \(\expected{\lambda_{ij}\lambda_{jk}\lambda_{ki}}\) term represents three particle interactions and so on.
+    For this reason this is called a \defineindex{cluster expansion} or a \defineindex{Mayer expansion!see{cluster expansion}}.
+    
+    \chapter{Debye--H\"uckle Theory}
+    \section{Distribution Functions}
+    In this section we consider \define{reduced density functions}\index{reduced density function}.
+    In general
+    \begin{equation}
+        \rho_m(\vv{r}_1, \dotsc, \vv{r}_2)
+    \end{equation}
+    is the probability density function for any particle to be at \(\vv{r}_1\), some other particle to be at \(\vv{r}_2\), and so on.
+    
+    The one-particle reduced density function, \(\rho_1(\vv{r})\), is the probability density function for a particle to be at location \(\vv{r}\).
+    By this we mean the probability of finding a particle in a region \(\dl{^3r}\) centred on \(\vv{r}\) is \(\rho_1(\vv{r})\dd{^3r}\).
+    For a homogeneous material the one-particle reduced density function doesn't depend on position so
+    \begin{equation}
+        \rho_1(\vv{r}) = \frac{N}{V} = \rho.
+    \end{equation}
+    
+    The two-particle reduced density function, \(\rho_2(\vv{r}_1, \vv{r}_2)\) is the probability density function for finding a particle at \(\vv{r}_1\) and simultaneously at \(\vv{r}_2\).
+    That is \(\rho_2(\vv{r}_1, \vv{r}_2)\dd{^3r_1}\dd{^3r_2}\) is the probability that there is a particle in the volume \(\dl{^3r_1}\) centred on \(\vv{r}_1\) and a particle in the volume \(\dl{^3r_2}\) centred on \(\vv{r}_2\).
+    For a homogeneous material the two-particle reduced density function doesn't depend on the absolute position of the particles, only their relative positions, so it is a function of \(\vv{r}_1 - \vv{r}_2\).
+    If the material is also isotropic then the two-particle reduced density function doesn't depend on the orientation of the particles, only the distance between them, and so it is a function of \(\abs{\vv{r}_1 - \vv{r}_2}\).
+    We will assume that this is the case so we can write
+    \begin{equation}
+        \rho_2(\vv{r}_1, \vv{r}_2) = \rho^2 g(\abs{\vv{r}_1 - \vv{r}_2}).
+    \end{equation}
+    This defines \(g\), which we call the \defineindex{radial distribution function} or \define{pair distribution function}\index{pair distribution function|see{radial distribution function}} or \define{pair correlation function}\index{pair correlation function|see{radial distribution function}}.
+    
+    To understand what \(g\) represents recall that we can write the two-particle reduced density function as
+    \begin{equation}
+        \rho_2(\vv{r}_1, \vv{r}_2) = \rho_2(\vv{r}_1 \mid \vv{r}_2) \rho_1(\vv{r}_2)
+    \end{equation}
+    where \(\rho_2(\vv{r}_1 \mid \vv{r}_2)\) is the conditional probability density of a particle being at \(\vv{r}_1\) given that there is a particle at \(\vv{r}_2\), and \(\rho_1\) is the one-particle reduced density function.
+    Since we are considering a homogeneous material we have \(\rho_1(\vv{r}_2) = \rho\) and so we have
+    \begin{equation}
+        \rho_2(\vv{r}_1, \vv{r}_2) = \rho_2(\vv{r}_1 \mid \vv{r}_2) \rho = \rho g(\abs{\vv{r}_1 - \vv{r}_2}).
+    \end{equation}
+    This means we can interpret \(\rho g\) as the conditional probability of their being a particle at a point a distance \(r\) from the origin given that there is a particle at the origin.
+    Therefore \(g\) measures the local density at a distance \(r\) given that there is a particle at the origin.
+    We can ensure that this condition is satisfied by working in the rest frame of some randomly chosen particle.
+    
+    For non-interacting particles the particle positions are uncorrelated and we have \(\rho_2 = (N/V)^2 = \rho^2\).
+    This means that \(g(r) = 1\).
+    
+    For a real gas \(g(r) \to 1\) as \(r \to \infty\), which is to say that interactions only have a finite range and so can't effect the distribution of particles at infinity.
+    We also have \(g(0) = 0\), which reflects the fact that we can't have two particles at the same point.
+    If \(g(r) > 1\) then the probabilities of finding particles at \(\vv{r}_1\) and \(\vv{r}_2\) are correlated.
+    If \(g(r) < 1\) then the probabilities of finding particles at \(\vv{r}_1\) and \(\vv{r}_2\) are anticorrelated.
+    
+    The idea of a radial distribution function is very general.
+    We have already discussed the ideal gas case (\(g(r) = 1\)).
+    Another simple example is a crystal.
+    Here the particles are highly localised in a regular pattern and so \(g\) is sharply peaked at each nearest neighbour distance.
+    Typically the height of these peaks increases with distance since the number of \(k\)-nearest neighbours typically increases with \(k\).
+    Something similar happens in glasses and liquids, but less regularly.
+    The radial distribution will oscillate as we go through coordination shells.
+    This is demonstrated in \cref{fig:radial distribution function}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{radial-distribution-function}
+        \begin{tikzpicture}
+            \draw[very thick, <->] (0, 5) node[left] {\(g(r)\)} -- (0, 0) -- (5, 0) node[below] {\(r\)};
+            \draw[highlight, ultra thick] (0, 3) -- (5, 3);
+            \draw[my blue, ultra thick, use Hobby shortcut] (0, 0) .. (0.2, 0.5) .. (0.5, 1) .. (0.75, 2.3) .. (1, 3) .. (1.2, 3.3) .. (1.5, 3.5) .. (1.8, 3.2) .. (2, 3) .. (2.4, 2.4) .. (2.6, 2.6) .. (3, 3) .. (3.5, 3.4) .. (3.9, 3) .. (4.2, 2.5) .. (4.8, 2.6) .. (5, 2.9);
+            \draw[my red, ultra thick, rounded corners] (1, 0) -- (1.1, 4) -- (1.2, 0);
+            \draw[my red, ultra thick, rounded corners] (3, 0) -- (3.1, 4) -- (3.2, 0);
+            \draw[highlight, ultra thick] (5.1, 3) -- ++ (0.5, 0) node[right, black] {Ideal Gas};
+            \draw[my blue, ultra thick] (5.1, 2.5) -- ++ (0.5, 0) node[right, black] {Liquid};
+            \draw[my red, ultra thick] (5.1, 2) -- ++ (0.5, 0) node[right, black] {Crystal};
+        \end{tikzpicture}
+        \caption[Radial distribution function.]{The radial distribution function for an ideal gas (\(g(r) = 1\)), liquid, and crystal (sharply peaked).}
+        \label{fig:radial distribution function}
+    \end{figure}
+
+    The radial distribution function can be measured by diffraction experiments, but is generally difficult to calculate exactly.
+    However, a simple approximation for \(g(r)\) is
+    \begin{equation}
+        g(r) = \exp[-\beta \varphi(r)]
+    \end{equation}
+    where \(\varphi\) is the two-particle interaction potential.
+    This ignores interactions between more than two particles.
+    This approximation is motivated by giving the right limiting behaviour, as \(r \to \infty\) we have \(\varphi \to 0\), since we assume short ranged interactions, and so \(g \to 1\), and as \(r \to 0\) we have \(\varphi \to \infty\), representing a hardcore potential, and so \(g \to 0\).
+    The other motivation is simply that this is statistical mechanics and so Boltzmann factors like this appear everywhere.
+    
+    \section{Virial Equation of State}
+    It can be shown that the assumption that \(g\) is of the form \(g(r) = \exp[-\beta\varphi(r)]\) is equivalent to the assumption that \(Q = \expected{F}^{\binom{N}{2}}\), that is that the two particle correlation functions, \(F_{ij}\) and \(F_{ik}\), are uncorrelated.
+    We start with the assumption that the interaction energy is pairwise additive, so
+    \begin{equation}
+        U(\{\vv{r}\}) = \sum_{i < j} \varphi(r_{ij})
+    \end{equation}
+    where \(r_{ij} = \abs{\vv{r}_i - \vv{r}_j}\).
+    We then ave a general formula for the pressure given by
+    \begin{equation}
+        P = P_{\mathrm{ideal}} + P_{\mathrm{conf}} = \rho \boltzmann T - \frac{\rho^2}{6} \int_{0}^{\infty} r\diff{\varphi}{r} g(r) 4\pi r^2 \dd{r}.
+    \end{equation}
+    This is the \defineindex{virial equation of state}, which is more general than the previous virial expansion as we have not yet made any approximations.
+    We will now demonstrate how one arrives at this formula.
+    
+    We start by introducing the coordinates \(\tilde{\vv{r}} = \vv{r} / L\) where \(L = V^{1/3}\).
+    We then have
+    \begin{align}
+        Q &= \frac{1}{V^N} \prod_{i = 1}^{N} \exp[-\beta U(\{\vv{r}\})] \dd{^3r_i}\\
+        &= \prod_{i = 1}^{N} \int \tilde{r}_i \exp\left[ -\beta \sum_{i < j} \varphi(L \tilde{r}_{ij}) \right] \dd{^3\tilde{r}_i}
+    \end{align}
+    where \(\tilde{r}_{ij} = r_{ij}/L\).
+    The limits of integration are independent of \(L\), whereas before the change of variable they were from 0 to \(L\).
+    We then have the configurational free energy, \(F_{\mathrm{conf}} = -\boltzmann T \ln Q\), which gives the configurational pressure
+    \begin{align}
+        P_{\mathrm{conf}} &= -\diffp{F_{\mathrm{conf}}}{V}[T]\\
+        &= \boltzmann T \diffp{}{V}\ln Q\\
+        &= \frac{\boltzmann T}{3L^2} \frac{1}{Q} \diffp{}{L} \prod_{i = 1}^{N} \int \exp\left[ -\beta \sum_{i < j} \varphi(L\tilde{r}_{ij}) \right] \dd{^3\tilde{r}_i}\\
+        &= - \frac{1}{3V} \frac{1}{V^NQ} \prod_{i = 1}^{N} \int \sum_{i < j} r_{ij} \varphi'(r_{ij}) \exp\left[ -\beta \sum_{i < j} \varphi(r_{ij}) \right] \dd{^3r_i}\\
+        &= - \frac{1}{3V} \prod_{i = 1}^{N} \int \sum_{i < j} r_{ij} \varphi'(r_{ij}) p(\vv{r}_1, \dotsc, \vv{r}_N) \dd{^3r_i}.
+    \end{align}
+    Performing all but the \(i\)th and \(j\)th integrals this becomes
+    \begin{align}
+        P_{\mathrm{conf}} &= -\frac{1}{3V} \sum_{i < j} \int r_{ij} \varphi'(r_{ij}) \frac{\rho_2(\vv{r}_i, \vv{r}_2)}{N(N - 1)} \dd{^3r_i} \dd{^3r_j}\\
+        &= -\frac{1}{6V} \int r_{12} \varphi'(r_{12}) \rho_2(\vv{r}_1, \vv{r}_2) \dd{^3r_1} \dd{^3r_2}\\
+        &- -\frac{\rho^2}{6V} \int r_{12} \varphi'(r_{12}) g(r_{12}) \dd{^3r_1}\dd{^3r_2}.
+    \end{align}
+    Here we have simply chosen to number our particles such that the two particles we care about are particles 1 and 2.
+    Note that the factor of \(1/2\) taking us from \(1/(3V)\) to \(1/(6V)\) comes in the sum which gives a factor of \(N(N - 1)/2\).
+    We then identify \(\rho^2g(r_{12}) = \rho_2(\vv{r}_1, \vv{r}_2)\), and we arrive at this result.
+    
+    The final step is to change variables to centre of mass coordinates again, so \(\vv{r} = \vv{r}_1 - \vv{r}_2\), so \(r = r_{12}\), and \(\vv{R} = (\vv{r}_1 + \vv{r}_2) / 2\), and use the fact that the integral over \(R\) just gives a factor of \(V\), since there is no \(R\) dependence in the integrand and so we achieve the result:
+    \begin{align}
+        P_{\mathrm{conf}} &= -\frac{\rho^2}{6V} \int r \varphi'(r) g(r) \dd{^3r} \dd{^3R}\\
+        &= -\frac{\rho^2}{6} r \diff{\varphi}{r} g(r) 4\pi r^2 \dd{r}
+    \end{align}
+    where the factor of \(r^2\) comes from the Jacobian in spherical polar coordinates and the factor of \(4\pi\) comes from performing the integrals over the angular variables, since our isotropic functions have no angular dependence.
+    
+    The virial equation of state shows that for pairwise interactions both the configurational integral and the raidal distribution function contain the same information.
+    Unfortunately neither can be computed exactly and so we resort to approximations.
+    
+    It is possible to recover the virial expansion from the virial equation of state by expanding \(g\) in powers of \(\rho\):
+    \begin{equation}
+        g(r) = g_0(r) + \rho g_1(r) + \order(\rho^2).
+    \end{equation}
+    The leading correction to the pressure is obtained from \(g_0(r)\), which gives
+    \begin{align}
+        P_{\mathrm{conf}} &= B_2 \rho^2 \boltzmann T\\
+        &= -\boltzmann T\frac{\rho^2}{2} \int_{0}^{\infty} (\exp[-\beta \varphi(r)] - 1) 4\pi r^2 \dd{r}\\
+        &= -\boltzmann T\frac{\rho^2}{2} \bigg( \left[(\exp[-\beta \varphi(r)] - 1)\frac{4}{3}\pi r^3 \right]_{0}^{\infty}\notag\\
+        &\qquad\qquad- \int_0^\infty \diff{}{r}\left[(\exp[-\beta \varphi(r) - 1]) \frac{4}{3}\pi r^3 \right] \dd{r} \bigg)\\
+        &= -\frac{\rho^2}{6} \int_{0}^{\infty} r \varphi'(r) \exp[-\beta\varphi(r)] 4\pi r^2 \dd{r}.
+    \end{align}
+    This is achieved by integrating by parts and noticing that for large \(r\) we need \(\varphi(r) \sim 1/r^{3 + \varepsilon}\) for some \(\varepsilon > 0\) so that \(r^3(\exp[-\beta\varphi(r) - 1]) \approx -r^3\beta\varphi(r) \sim 1/r^\varepsilon\) vanishes for large \(r\).
+    If this is the case we recover the previous virial expansion.
+    Therefore the approximation that \(g(r) = \exp[-\beta\varphi(r)]\) gives the same as the approximation that \(Q = \expected{F}^{\binom{N}{2}}\), that is if we want \(P\) to second order in \(\rho\) we need only expand \(g\) to zeroth order in \(\rho\), which gives the Boltzmann factor for two particle interaction energy, evaluated as if there were no other particles.
+    
+    \subsection{High Density Fluids}
+    For an ordinary, uncharged, dense fluid the main problem is short range forces.
+    For a single species fluid there are several approaches, but we won't go into detail on any.
+    
+    We can start with the pair correlation function, \(\rho_2\), and write down an expression for this quantity in terms of the unknown three-particle distribution function, \(\rho_3\).
+    We can then express \(\rho_3\) in terms of \(\rho_4\) and so on.
+    The higher order distributions are more complicated but the advantage of this is that we can truncate this process at some point with a \defineindex{closure equation}, such as
+    \begin{equation}
+        \rho_3(\vv{r}_1, \vv{r}_2, \vv{r}_3) = \rho_2(\vv{r}_1, \vv{r}_2) \rho_2(\vv{r}_2, \vv{r}_3) \rho_2(\vv{r}_1, \vv{r}_3).
+    \end{equation}
+    This scheme is called a Kirkwood hierarchy.
+    With this assumption we get a closed system of equations from which we can work out \(g(r)\), and hence the virial equation of state.
+    
+    The exact way to perform the closure is somewhat of a guess and there are various schemes which give fairly good results, many of which can accurately predict a gas-liquid phase transition.
+    Since closure schemes ignore or approximate higher order correlation functions they are an example of a mean field theory.
+    
+    \chapter{Debye--H\"uckel Theory}
+    A \defineindex{plasma} is a fluid of charged particles.
+    The problem with this is that the Coulomb potential goes as \(\varphi(r) \sim 1 / r\), which means that the virial equation of state will diverge, since it requires \(\varphi(r) \sim 1 / r^{3 + \varepsilon}\) for \(\varepsilon > 0\).
+    The solution to this will become clear later but involves shielding of charges by the background charge.
+    
+    \begin{ntn}{}{}
+        Unfortunately we now have a notation clash.
+        We have been using \(\rho\) for number densities and \(\varphi\) for potential energies.
+        In electromagnetism we usually reserve \(\rho\) for charge densities and \(\varphi\) for electric potentials.
+        We will change to denoting number densities by \(n\) and the potential energy due to the electric potential \(\varphi\) is simply \(q\varphi\), where \(q\) is the charge of our particle.
+    \end{ntn}
+    
+    We will consider a one component plasma, which is a gas of point particles of charge \(q\) with average number density \(n_{\infty}\).
+    We can think of this as the number density infinitely far away.
+    We will consider the case where there is a constant background density \(-qn_{\infty}\), which ensures that the net charge is zero.
+    An example of such a plasma would be electrons in a semiconductor where the background is provided by the fixed ions and the electron density is sufficiently low that the classical limit holds.
+    It is possible to carry out similar calculations to those we are about to do but allowing both positive and negative charges to move.
+    This might be needed to consider a salt solution or interstellar gas.
+    
+    \subsection{Poisson--Boltzmann Equation}
+    The radial distribution function, \(g\), is defined such that \(n(r) = n_{\infty}g(r)\) is the number density at a distance \(r\) from the origin, assuming there is a particle at the origin.
+    Using our previous approximation of \(g(r) = \exp[-\beta q\varphi(r)]\) (where we now use \(q\varphi\) as the interaction energy since \(\varphi\) is the electromagnetic potential) we have
+    \begin{equation}
+        n(r) = n_{\infty} \exp[-\beta q \varphi(r)].
+    \end{equation}
+    Here \(\varphi(r) = kq/r\) is the Coulomb potential due to another particle of charge \(q\) at the origin.
+    In SI units \(k = 1/(r\pi\varepsilon)\), where \(\varepsilon = \varepsilon_0 \varepsilon_{\mathrm{r}}\) is the permittivity of the medium and \(\varepsilon_{\mathrm{r}}\) is the relative permittivity.
+    
+    The electric potential, \(\varphi\), obeys Poisson's equation:
+    \begin{equation}
+        \laplacian \varphi = -\frac{\rho}{\varepsilon}
+    \end{equation}
+    where \(\rho\) is the charge density, which in general depends on the distance from the origin.
+    There are three contributions to the charge density in this case:
+    \begin{enumerate}
+        \item The point charge, \(q\), at the origin which contributes
+        \begin{equation}
+            \rho_0(r) = q\delta(\vv{r}) = q\delta(r)
+        \end{equation}
+        where \(\delta\) is a Dirac delta distribution.
+        \item The fixed background charge density,
+        \begin{equation}
+            \rho_{\mathrm{fixed}}(r) = -qn_{\infty}.
+        \end{equation}
+        \item The charge density due to all other free charges in the plasma.
+        We assume that these charges are arranged around the central charge according to \(g\) and so
+        \begin{equation}
+            \rho_{\mathrm{free}}(r) = qn_{\infty}g(r) = qn_{\infty} \exp[-\beta q\varphi(r)].
+        \end{equation}
+    \end{enumerate}
+    The total charge density is then
+    \begin{equation}
+        \rho = \rho_0 + \rho_{\mathrm{fixed}} + \rho_{\mathrm{free}} = -\frac{n_{\infty}q}{\varepsilon}(\exp[-\beta q\varphi(r)] - 1) - \frac{q}{\varepsilon}\delta(r).
+    \end{equation}
+    Hence Poisson's equation becomes
+    \begin{equation}
+        \laplacian\varphi = -\frac{n_{\infty}q}{\varepsilon}(\exp[-\beta q\varphi(r)] - 1) - \frac{q}{\varepsilon}\delta(r).
+    \end{equation}
+    This is called the \defineindex{Poisson--Boltzmann} equation.
+    Note that this is not exact since we have ignored higher order correlations in the arrangement of free charges about the origin.
+    
+    The Poisson--Boltzmann equation is nonlinear, due to the \(\exp[-\beta q\varphi(r)]\) term.
+    It can be solved numerically in order to find \(\varphi\).
+    We can also consider the case where thermal fluctuations dominate, so \(\varphi \ll \boltzmann T\), which requires low charge densities or high temperatures.
+    In this case we Taylor expand the exponential giveing
+    \begin{equation}
+        \exp[-\beta q \varphi(r)] - 1 \approx -\beta q \varphi(r)
+    \end{equation}
+    and we get a linearised version of the Poisson--Boltzmann equation:
+    \begin{equation}
+        \laplacian \varphi = \frac{n_{\infty}q}{\varepsilon} \beta\varphi - \frac{q}{\varepsilon}\delta(r).
+    \end{equation}
+    Rearranging this we get
+    \begin{equation}
+        \laplacian\varphi - \frac{\varphi}{\lambda_{\mathrm{D}}^2} = -\frac{q}{\varepsilon}\delta(r)
+    \end{equation}
+    where
+    \begin{equation}
+        \lambda_{\mathrm{D}} \coloneqq \sqrt{\frac{\boltzmann T\varepsilon}{q^2n_{\infty}}}.
+    \end{equation}
+    This is called the \defineindex{Debye--H\"uckel equation}.
+    The constant \(\lambda_{\mathrm{D}}\) has units of length and is called the \defineindex{Debye screening length}.
+    We will see that it plays the role in our equation of a decay constant, hence our choice of calling it \(\lambda\).
+    
+    The Debye--H\"uckel equation is a Green's function for a charge \(q\) at the origin.
+    The equation can be solved by Fourier transforming to \(k\)-space.
+    However, we will simply state and check the result.
+    First recall that for a function, \(f\), with no angular dependence
+    \begin{equation}
+        \laplacian f = \frac{1}{r^2} \diffp{}{r}\left( r^2 \diffp{f}{r} \right) = \frac{1}{r} \diffp[2]{}{r} (rf).
+    \end{equation}
+    We make an ansatz, based on the similarity to a point charge in free space, that the solution is of the form
+    \begin{equation}
+        \varphi(r) = \frac{A}{r}f(r)
+    \end{equation}
+    for some function \(f\) to be determined.
+    We then have
+    \begin{equation}
+        \laplacian\varphi = \frac{1}{r}\diffp[2]{f}{r}, \qqand -\frac{1}{\lambda_{\mathrm{D}}^2} \varphi(r) = -\frac{1}{\lambda_{\mathrm{D}}^2} \frac{A}{r}f(r).
+    \end{equation}
+    Putting this together we have
+    \begin{equation}
+        \frac{A}{r} \left[ f''(r) - \frac{1}{\lambda_{\mathrm{D}}^2} f(r) \right] = -\frac{q}{\varepsilon}\delta(r).
+    \end{equation}
+    For \(r \ne 0\) this is a homogeneous second order differential equation with the solution
+    \begin{equation}
+        f(r) = B\exp[r/\lambda_{\mathrm{D}}] + C\exp[-r/\lambda_{\mathrm{D}}].
+    \end{equation}
+    In order for this not to diverge at infinity we require that \(B = 0\) and so we have
+    \begin{equation}
+        \varphi(r) = \frac{A}{r}\exp[-r/\lambda_{\mathrm{D}}],
+    \end{equation}
+    where we absorb the constant \(C\) into the definition of \(A\).
+    
+    We can find \(A\) by requiring Gauss' law to hold, namely that for some small volume, \(V\), given by a sphere of radius \(\delta\) centred on the origin
+    \begin{align}
+        \int_V \left[ \laplacian \varphi - \frac{\varphi}{\lambda_{\mathrm{D}}^2} \right] \dd{^3r} &= \int_{r \le \delta} \left[ \laplacian \varphi - \frac{\varphi}{\lambda_{\mathrm{D}}^2} \right] \dd{^3r}\\
+        &= \int_{r = \delta} \grad \varphi \cdot \dd{\vv{S}} + \order(\delta^2)\\
+        &= -4\pi A + \order(\delta^2)
+    \end{align}
+    and since there is a point charge, \(q\), at the origin we also have
+    \begin{equation}
+        \int_V -\frac{q}{\varepsilon}\delta(r) \dd{^3r} = -\frac{q}{\varepsilon}.
+    \end{equation}
+    Combining these and taking \(\delta \to 0\) we get
+    \begin{equation}
+        A = \frac{q}{4\pi\varepsilon},
+    \end{equation}
+    which is exactly the same factor we would get for a point charge in a vacuum.
+    
+    Therefore the solution is
+    \begin{equation}
+        \varphi(r) = \frac{q}{4\pi\varepsilon} \frac{1}{r} \exp[-r/\lambda_{\mathrm{D}}].
+    \end{equation}
+    This is called the \defineindex{screened Coulomb potential}, since for small \(r\) it goes as \(1/r\) like a normal Coulomb potential but for larger \(r\) it rapidly goes to zero.
+    The interpretation is that at larger distances the background negative charge screens the charge at the origin and the electromagnetic effects are negligible.
+    The distance at which this happens is controlled by \(\lambda_{\mathrm{D}}\).
+    The radial density distribution and number density are plotted in \cref{fig:plasma distribution}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{screened-coulomb}
+        \begin{tikzpicture}
+            \draw[very thick, <->] (0, 4) node[left] {\(g(r)\)} -- (0, 0) -- (4, 0) node[below] {\(r\)};
+            \begin{scope}
+                \clip (0, 0) rectangle (4, 4);
+                \draw[highlight, thick, domain=0.25:4, dashed, samples=100] plot (\x, 1/\x);
+                \draw[highlight, ultra thick, domain=0.2:4, samples=100] plot (\x, {exp(-\x)/\x});
+            \end{scope}
+            \draw[|-|] (0, -0.3) -- ++ (1, 0) node[midway, below] {\(\lambda_{\mathrm{D}}\)};
+            \draw[thick, dashed, highlight] (1, -1) -- ++ (0.5, 0) node[right, black] {\(q/(4\pi\varepsilon r)\)};
+            \draw[ultra thick, highlight] (1, -1.5) -- ++ (0.5, 0) node[right, black] {\(g(r)\)};
+            \begin{scope}[xshift=5cm]
+                \draw[very thick, <->] (0, 4) node[left] {\(n(r)\)} -- (0, 0) -- (4, 0) node[below] {\(r\)};
+                \begin{scope}
+                    \clip (0, 0) rectangle (4, 4);
+                    \draw[highlight, thick, domain=0.25:4, dashed] (0, 3) -- (4, 3);
+                    \draw[highlight, ultra thick, domain=0.01:4, samples=100] plot (\x, {3*exp(-exp(-\x)/\x)});
+                    \node[left] at (0, 3) {\(n_\infty\)};
+                \end{scope}
+                \draw[thick, dashed, highlight] (1, -1) -- ++ (0.5, 0) node[right, black] {\(n_{\infty}\)};
+                \draw[ultra thick, highlight] (1, -1.5) -- ++ (0.5, 0) node[right, black] {\(n(r)\)};
+                \draw[|-|] (0, -0.3) -- ++ (1, 0) node[midway, below] {\(\lambda_{\mathrm{D}}\)};
+            \end{scope}
+        \end{tikzpicture}
+        \caption[Plasma distributions]{The radial density distribution, \(g\), and number density, \(n\), for a plasma. Note the characteristic length \(\lambda_{\mathrm{D}}\) and the equivalent quantities ignoring all correlations shown as dashed lines.}
+        \label{fig:plasma distribution}
+    \end{figure}
+    
+    This process can readily be modified for slightly different setups.
+    For example, we can include multiple species of charged particles.
+    The main change is then that we end up with \(\lambda_{\mathrm{D}}\) as a sum over the species.
+    We could also consider a charged plane of with a plasma on one side.
+    We then account for the plane by treating it as a boundary condition for the resulting differential equation.
+    
+    Debye--H\"uckel theory is a self consistent theory, in the sense that \(\varphi\) depends on \(n\) and \(n\) determines \(\varphi\), so we get the values of \(\varphi\) and \(n\) by looking for solutions consistent with these interdependencies.
+    It is also a non-perturbative theory, there isn't a systematic way to improve by including higher order terms in the same way there was for the virial expansion.
+    In order to improve the results here we would need new insights.
+    
+    Debye--H\"ukel theory is a mean field theory, meaning it ignores higher order correlations.
+    In this case we consider two-point correlations, that is interactions of two particles, through the two particle potential, \(\varphi\), but we ignore three-point correlations.
+    
+    \chapter{Phase Transitions}
+    \section{Solid-Liquid-Gas}
+    Consider a system with three phases, solid, liquid, or gas.
+    We can plot a phase diagram of pressure against temperature separating the plane into regions associated with each phase.
+    Along the boundaries the neighbouring phases can coexist.
+    A phase diagram is shown in \cref{fig:phase diagram}, this is qualitative and the exact details will depend on the material in question.
+    
+    \begin{figure}
+        \tikzsetnextfilename{phase-diagram}
+        \begin{tikzpicture}
+            \draw[very thick, <->] (0, 5) node[left] {\(P\)} -- (0, 0) -- (6, 0) node[below] {\(T\)};
+            \draw[highlight, ultra thick, domain=1:4, samples=100] plot (\x, {sqrt(\x - 1)});
+            \fill[highlight] (4, {sqrt(3)}) circle [radius = 0.07];
+            \node[below right, font=\footnotesize] at (3.9, 1.8) {\parbox{1cm}{\centering Critical Point}};
+            \draw[dashed, highlight, very thick] (4, {sqrt(3)}) -- (4, 0) node[below, black] {\(T_{\mathrm{c}}\)};
+            \draw[dashed, highlight, very thick] (4, {sqrt(3)}) -- (0, {sqrt(3)}) node[left, black] {\(P_{\mathrm{c}}\)};
+            \fill[highlight] (2, 1) circle [radius = 0.07];
+            \node[below right, font=\footnotesize] at (1.8, 1) {\parbox{1cm}{\centering Triple Point}};
+            \draw[highlight, ultra thick, domain=0:0.75, xshift=2cm, yshift=1cm, ->] plot (\x, {4*sqrt(\x)});
+            \node[highlight, font=\sffamily\bfseries] at (1, 3) {Solid};
+            \node[highlight, font=\sffamily\bfseries] at (3, 2.5) {Liquid};
+            \node[highlight, font=\sffamily\bfseries] at (3.4, 0.75) {Gas};
+            \node[highlight, font=\footnotesize\sffamily\bfseries, right] at (3.8, 2.3) {\parbox{2cm}{\centering Supercritical Fluid}};
+        \end{tikzpicture}
+        \caption[Phase diagram]{A \((T, P)\) diagram showing the triple point and critical point, \((T_{\mathrm{c}}, P_{\mathrm{c}})\), as well as regions where the phase is solid, liquid, gas, and supercritical fluid.}
+        \label{fig:phase diagram}
+    \end{figure}
+    
+    The \defineindex{triple point} is defined as the point where all three phases can coexist, that is where the sold-liquid, solid-gas, and liquid-gas phase boundaries meet.
+    The \defineindex{critical point} is defined as the end of the coexistence curve, beyond this point instead of liquid and gas as two separate phases we instead get a supercritical fluid.
+    The critical point has the unique thermodynamic coordinates \(T_{\mathrm{c}}\), \(P_{\mathrm{c}}\), and \(\rho_{\mathrm{c}}\), for temperature, pressure and number density respectively.
+    
+    The critical isotherm, that is the isotherm at temperature \(T_{\mathrm{c}}\), has zero slope at \(\rho_{\mathrm{c}}\).
+    This means that the \defineindex{isothermal compressibility}, given by
+    \begin{equation}
+        \kappa_{T} = -\frac{1}{V} \diffp{V}{P}[T],
+    \end{equation}
+    diverges at the critical point.
+    This means that we will see large scale fluctuations in the volume and density.
+    
+    Below the critical isotherm there is a coexistence region where the density of the gas phase, \(\rho_{\mathrm{g}}\), and the density of the liquid phase, \(\rho_{\mathrm{l}}\), combine to give the total density, \(\rho\).
+    In this region changing the overall density doesn't effect the pressure, it just causes the system to move toward one of the phases, increasing density promotes the liquid phase and decreasing promotes the gas phase.
+    This region is shown in \cref{fig:phase diagram density}
+    
+    \begin{figure}
+        \tikzsetnextfilename{phase-diagram-density}
+        \begin{tikzpicture}
+            \draw[very thick, <->] (0, 5) node[left] {\(P\)} -- (0, 0) -- (5, 0) node[below] {\(\rho\)};
+            \draw[ultra thick, highlight, use Hobby shortcut] (0, 0) .. (0.5, 0.5) .. (1, 0.8) .. (2, 1.3) .. (3, 1.6) .. (4, 2.5) .. (5, 4);
+            \node[right] at (5, 4) {\(T > T_{\mathrm{c}}\)};
+            \draw[ultra thick, my blue, use Hobby shortcut] (0, 0) .. (0.5, 0.4) .. (1, 0.5) .. (2, 0.6) .. (3, 1.2) .. (4, 2) .. (5, 3);
+            \node[right] at (5, 3) {\(T = T_{\mathrm{c}}\)};
+            \node[above, font=\scriptsize] (poi) at (1, 2) {\parbox{1cm}{\centering Point of Inflection}};
+            \draw[->, thick] (1.4, 0.52) to[bend left] (poi.south);
+            \fill[my blue] (1.4, 0.52) circle [radius = 0.075];
+            \draw[ultra thick, my red, use Hobby shortcut] (0, 0) .. (0.3, 0.2) .. (0.5, 0.25) .. (1, 0.29) -- (1.8, 0.31) .. (2.4, 0.5) .. (3, 0.8) .. (4, 1.5) .. (5, 2.2);
+            \node[right] at (5, 2.2) {\(T < T_{\mathrm{c}}\)};
+            \draw[my blue, dotted, thick] (1.4, 0.52) -- (1.4, 0) node[below, black] {\(\rho_{\mathrlap{\mathrm{c}}}\)};
+            \draw[my red, dotted, thick] (1, 0.29) -- (1, 0) node[below, black] {\(\rho_{\mathrlap{\mathrm{g}}}\)};
+            \draw[my red, dotted, thick] (1.8, 0.29) -- (1.8, 0) node[below, black] {\(\rho_{\mathrlap{\mathrm{l}}}\)};
+            \node[right, font=\scriptsize] at (1.8, 0.15) {Critical Region};
+            \node[font=\scriptsize] (lin reg) at (1, -0.6) {Linear Region};
+            \draw[thick, ->] ($(lin reg.north west) + (0.1, -0.1)$) to[bend left] (0.1, 0.1);
+            \begin{scope}
+                \clip (0, 0) rectangle (5, 5);
+                \draw[dashed] (0, 0) circle [radius = 0.4];
+                \draw[dashed] (1.4, 0) circle [radius = 0.52];
+            \end{scope}
+        \end{tikzpicture}
+        \caption[Phase diagram showing the density]{A \((\rho, P)\) phase diagram showing three isotherms, one higher than the critical temperature, one lower, and one at the critical temperature. Notice the flat region for isotherms lower than the critical temperature where changing the density doesn't change the pressure, just the amount of the system in the solid and liquid phases which coexist in this region. For low densities we can approximate the isotherms as linear, which is the case for an ideal gas.}
+        \label{fig:phase diagram density}
+    \end{figure}
     
     
 %    %   Appdendix
