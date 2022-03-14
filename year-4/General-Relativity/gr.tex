@@ -3,6 +3,7 @@
 \usepackage{csquotes}
 \usepackage{tensor}
 \usepackage{siunitx}
+\usepackage{enumitem}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -15,6 +16,7 @@
 \usetikzlibrary{shapes.misc}
 \usetikzlibrary{angles}
 \usetikzlibrary{quotes}
+\usetikzlibrary{calc}
 
 % PGF plots
 \usepackage{pgfplots}
@@ -38,7 +40,7 @@ noabbrev
 % Title page info
 \title{General Relativity}
 \author{Willoughby Seago}
-\date{}
+\date{February 17, 2022}
 % \subtitle{}
 % \subsubtitle{}
 
@@ -64,15 +66,55 @@ noabbrev
 \newcommand*{\vep}[1]{\bm{e'_{#1}}}
 \newcommand*{\cvep}[1]{\bm{\tilde{e}'^{#1}}}
 \newcommand*{\trans}{\top}
+\newcommand*{\covariantDerivative}[1]{\nabla_{\!#1}}
+\newcommand*{\e}{\mathrm{e}}
+\diffdef{covariant}{
+    op-symbol=\mathrm{D},
+    op-symbol-alt=\mathrm{d}
+}
+\NewDocumentCommand{\diffcov}{}{\diff.covariant.}
+\newcommand*{\christoffeldef}[4]{%
+    \frac{1}{2} g^{#4#1} ( \partial_{#2} g_{#3#4} + \partial_{#3}  g_{#2#4} - \partial_{#4} g_{#3#2} )
+}
+\ExplSyntaxOn
+\prop_new:N \l_willoughby_color_prop
+\prop_clear:N \l_willoughby_color_prop
+\prop_set_from_keyval:Nn \l_willoughby_color_prop {
+    i = red,
+    j = blue,
+    k = green,
+    l = magenta,
+    m = orange,
+    n = yellow
+}
+
+\cs_new:Npn \willoughby_index_color:n #1 {
+    \str_set:Nn \l_tmpa_str { #1 }
+    \prop_if_in:NVTF \l_willoughby_color_prop \l_tmpa_str {
+        \textcolor{
+            \exp_args:NNV \prop_item:Nn \l_willoughby_color_prop { \l_tmpa_str }
+        } {
+            #1
+        }
+    } { #1 }
+}
+
+\NewDocumentCommand{\indexcolor}{ m }{ {\willoughby_index_color:n { #1 }} }
+\NewDocumentCommand{\setindexcolor}{ m }{
+    \prop_clear:N \l_willougbhy_color_prop
+    \prop_set_from_keyval:Nn \l_willoughby_color_prop { #1 }
+}
+\ExplSyntaxOff
 
 % Include
-\includeonly{}
+\includeonly{parts/graphical-notation-appendix}
 
 \begin{document}
     \frontmatter
     \titlepage
     \innertitlepage{tikz-external/effective-schwarzschild-potential}
     \tableofcontents
+    \listoffigures
     \mainmatter
     \chapter{Introduction}
     General relativity (GR) generalises special relativity (SR).
@@ -98,6 +140,7 @@ noabbrev
     \begin{rmk}
         For more details on special relativity see the relativity section of the notes from relativity, nuclear, and particle physics.
     \end{rmk}
+    \section{Vectors}
     In special relativity (SR) we combine space and time into one object, known collectively as \defineindex{spacetime}.
     The position and time of something are combined into a single object called an \defineindex{event}.
     Given two events we can write the interval between them as a \defineindex{contravariant} \define{four-vector}\index{four!vector}:
@@ -590,7 +633,7 @@ noabbrev
     \end{align}
     This final equation is called the \defineindex{geodesic equation} and is the equation of motion for an otherwise free particle in a gravitational field.
     We identify
-    \begin{equation}
+    \begin{equation}\label{eqn:affine connection}
         \christoffel{\lambda}{\mu}{\nu} \coloneqq \diffp{x^\lambda}{\xi^\alpha}\diffp{\xi^\alpha}{x^\nu, x^\mu}.
     \end{equation}
     This is called the \defineindex{affine connection}\index{\(\christoffel{\lambda}{\mu}{\nu}\), affine connection} or \define{Christoffel symbol}\index{Christoffel symbol|see{affine connection}}.
@@ -606,7 +649,7 @@ noabbrev
     Instead we can use \(\sigma = \xi^0\), which is \(ct\) in the LIF.
     The exact same logic then leads us to the equation of motion
     \begin{equation}
-        \diff[2]{x^\lambda} + \christoffel{\lambda}{\mu}{\nu} \diff{x^\mu}{\sigma} \diff{x^\nu}{\sigma} = 0.
+        \diff[2]{x^\lambda}{\sigma} + \christoffel{\lambda}{\mu}{\nu} \diff{x^\mu}{\sigma} \diff{x^\nu}{\sigma} = 0.
     \end{equation}
     Notice that we don't need to know what \(\sigma\) or \(\tau\) is in either the massive or massless case since we have four equations here so we can eliminate \(\sigma\) or \(\tau\) and still have enough equations to find the position of the particle, \(\vv{x}\), which is what we really care about.
     
@@ -634,7 +677,7 @@ noabbrev
         &= g_{\mu\nu}\dd{x^\mu}\dd{x^\nu}.
     \end{align}
     Here we define the \defineindex{metric tensor}
-    \begin{equation}
+    \begin{equation}\label{eqn:metric tensor}
         g_{\mu\nu} \coloneqq \diffp{\xi^\alpha}{x^\mu}\diffp{\xi^\beta}{x^n\nu}\eta_{\alpha\beta}.
     \end{equation}
     Notice that since \(\eta_{\alpha\beta}\) is symmetric by relabelling \(\alpha \leftrightarrow \beta\) we see that \(g_{\mu\nu}\) is symmetric.
@@ -987,7 +1030,7 @@ noabbrev
     The process is as follows:
     \begin{enumerate}
         \item Write down the relativistic line element associated with the given spacetime.
-        This is equal to \(c^2\dd{\tau}^2\)
+        This is equal to \(c^2\dd{\tau}^2\).
         \item Convert this to \(\lagrangian^2\) by identifying \(\dl{x^\mu} \to \dot{x}^\mu\).
         \item Write down the Euler--Lagrange equations for \(\lagrangian^2\), remember that \(x^\mu\) and \(\dot{x}^\mu\) are independent variables.
         \item Rearrange these equations to the form \(\ddot{x}^\lambda + \tensor{[\text{something}]}{^\lambda_{\mu\nu}} \dot{x}^\mu \dot{x}^\nu = 0\).
@@ -1049,7 +1092,7 @@ noabbrev
         All affine connections which we haven't seen must be zero since we have accounted for all degrees of freedom in the Euler--Lagrange equations.
         
         For future use we write these affine connections as \(2 \times 2\) matrices, \(\Gamma_\mu\), where \(\tensor{(\Gamma_\mu)}{^\lambda_\nu} = \christoffel{\lambda}{\mu}{\nu}\):
-        \begin{equation}
+        \begin{equation}\label{eqn:christoffel matrices S1}
             \Gamma_\vartheta = 
             \begin{pmatrix}
                 0 & 0\\
@@ -1375,7 +1418,7 @@ noabbrev
                 \node[min node=orange] at (axis cs: 32.7, -0.015) {};
             \end{semilogxaxis}
         \end{tikzpicture}
-        \caption{The effective potential, \(V_{\mathrm{eff}}\), plotted for \(H = 1, 2, \sqrt{12}, 4, 5, 6\), increasing in energy as \(H\) increases. The dashed line is the Newtonian effective potential at the same angular momentum. The minima are indicated with circles (GR) and crosses (Newtonian). Strictly for the \(H = \sqrt{12}\) case its actually a point of inflection rather than a minimum.}
+        \caption[Effective Schwarzschild potential.]{The effective potential, \(V_{\mathrm{eff}}\), plotted for \(H = 1, 2, \sqrt{12}, 4, 5, 6\), increasing in energy as \(H\) increases. The dashed line is the Newtonian effective potential at the same angular momentum. The minima are indicated with circles (GR) and crosses (Newtonian). Strictly for the \(H = \sqrt{12}\) case its actually a point of inflection rather than a minimum.}
         \label{fig:effective potential}
     \end{figure}
     
@@ -1503,7 +1546,7 @@ noabbrev
         \begin{tikzpicture}
             \draw[domain=0:15*180, samples=1000, very thick] plot (\x:{1/(1+0.82*cos(\x*0.82))});
         \end{tikzpicture}
-        \caption{A rosette orbit. Notice that the orbit doesn't close. This is far more exaggerated than any real orbit in the solar system.}
+        \caption[Rosette orbit.]{A rosette orbit. Notice that the orbit doesn't close. This is far more exaggerated than any real orbit in the solar system.}
         \label{fig:rosette orbit}
     \end{figure}
     
@@ -1623,7 +1666,7 @@ noabbrev
             \path pic[draw, "\(\varphi\)", angle eccentricity=1.3] {angle};
             \path (0, 1) -- (-2, 1) node[midway, above] {\(x\)};
         \end{tikzpicture}
-        \caption{Light passing the sun follows a curved path, which we can approximate as a straight path. This path can be parametrised by \(x\). Defining the distance of closest approach to be \(R\) we then get that the distance between the mass and the photon is \(r = \sqrt{x^2 + R^2}\).}
+        \caption[Light bending around the sun.]{Light passing the sun follows a curved path, which we can approximate as a straight path. This path can be parametrised by \(x\). Defining the distance of closest approach to be \(R\) we then get that the distance between the mass and the photon is \(r = \sqrt{x^2 + R^2}\).}
     \end{figure}
     
     We consider the case of a point mass \(M\) being the gravitational source and, borrowing more terminology from scattering experiments we define the \defineindex{impact parameter}, \(R\), to be the closest distance of approach (this is usually called \(b\) in a scattering experiment).
@@ -1868,7 +1911,7 @@ noabbrev
     We also apply the Einstein summation convention for repeated indices.
     
     I go into far more detail here than the original course does.
-    I also make statements like \enquote{\(\category{Top}\) is the category of topological spaces with continuous functions as morphisms and homeomorphisms as isomorphisms} without explanation, these aren't important if you don't understand them.
+    I also make statements like \enquote{\(\category{Top}\) is the category of topological spaces with continuous functions as morphisms and homeomorphisms as isomorphisms} without explanation, these sorts of statement aren't important if you don't understand them.
     
     \section{Manifolds}
     Manifolds are the stage for the maths of GR, and in fact most physics.
@@ -2046,7 +2089,7 @@ noabbrev
     
     \subsection{Smooth Manifold}
     \begin{dfn}{Smooth Atlas}{}
-        A \defineindex{smooth atlas}, \(\mathcal{A}(M)\), for a topological manifold, \(M\), is a family of charts, \(\{C_a = (U_a, \varphi_a)\}\), which cover \(M\), so \(p \in U_a\) for some \(a\) for all \(p \in M\), such that the charts are all mutually smoothly compatible.
+        A \define{smooth atlas}\index{smooth!atlas}, \(\mathcal{A}(M)\), for a topological manifold, \(M\), is a family of charts, \(\{C_a = (U_a, \varphi_a)\}\), which cover \(M\), so \(p \in U_a\) for some \(a\) for all \(p \in M\), such that the charts are all mutually smoothly compatible.
         
         Two smooth atlases, \(\mathcal{A}_1(M)\) and \(\mathcal{A}_2(M)\), are said to be \define{compatible}\index{compatible!atlases} if all of the charts of \(\mathcal{A}_1\) are compatible with all of the charts of \(\mathcal{A}_2\).
     \end{dfn}
@@ -2061,7 +2104,7 @@ noabbrev
         \end{equation}
         that is \(\mathcal{S}(M)\) is the set of all atlases compatible with \(\mathcal{A}(M)\).
         
-        A \define{smooth manifold}\index{smooth!manifold} is a topological manifold, \(M\), equipped with a smooth structure, \(\mathcal{S}\).
+        A \define{smooth manifold}\index{smooth!manifold}\index{manifold!smooth} is a topological manifold, \(M\), equipped with a smooth structure, \(\mathcal{S}\).
     \end{dfn}
     
     \begin{dfn}{Smooth Functions and Maps}{}\
@@ -2189,7 +2232,7 @@ noabbrev
     Vectors in \(V^*\) are sometimes called \define{covectors}\index{covector}.
     
     \begin{dfn}{Cotangent Space}{}
-        Given a manifold, \(M\), and some point \(p \in M\) we define the \defineindex{cotangent space} at \(p\), \(T_p^*M\), to be the dual space to the tangent space at \(p\), that is \(T_p*M = (T_pM)^*\).
+        Given a manifold, \(M\), and some point \(p \in M\) we define the \defineindex{cotangent space} at \(p\), \(T_p^*M\), to be the dual space to the tangent space at \(p\), that is \(T_p^*M = (T_pM)^*\).
     \end{dfn}
     
     The elements of \(T_p^*M\) are then linear maps \(T_pM \to \reals\), in this context we call elements of \(T_p^*M\) \define{one-forms}\index{one-form}\index{1-form|see{one-form}}.
@@ -2197,7 +2240,7 @@ noabbrev
     \begin{equation}
         \omega(a\vv{v} + b\vv{w}) = a\cv{\omega}(\vv{v}) + b\cv{\omega}(\vv{w}) \in \reals.
     \end{equation}
-    Since \(T_p^*M\) is itself a vector space if \(\psi \in T_p^*M\) also we have
+    Since \(T_p^*M\) is itself a vector space if \(\cv{\psi} \in T_p^*M\) also we have
     \begin{equation}
         (a\cv{\omega} + b\cv{\psi})(\vv{v}) = a\cv{\omega}(\vv{v}) + b\cv{\psi}(\vv{v}),
     \end{equation}
@@ -2288,6 +2331,37 @@ noabbrev
     
     It is possible to construct a dual basis even without a metric structure however.
     
+    \subsection{Manifolds in GR}
+    \begin{dfn}{Riemannian Manifold}{}
+        A \defineindex{Riemannian manifold}\index{manifold!Riemannian}, \((M, g)\), is a real, smooth manifold, \(M\), equipped with a positive definite inner-product, \(g_p\), defined on the tangent space, \(T_pM\), at each point \(p\).
+        The family \(g_p\) is called a \defineindex{Riemannian metric}.
+        
+        If we relax the condition that \(g_p\) be positive definite, but keep the requirement that \(g_p\) is everywhere non-degenerate, so \(g_p(\vv{v}, \vv{w}) = 0\) only if \(\vv{v} = \vv{w}\), then we call the resulting space a \defineindex{pseudo-Riemannian manifold}\index{manifold!pseudo-Riemannian} and \(g_p\) is called a \defineindex{pseudo-Riemannian metric}.
+        It should be noted that \(g_p\) is technically no longer a metric if it is allowed to be negative.
+    \end{dfn}
+
+    \begin{dfn}{Metric Signature}{}
+        Given a manifold, \(M\), and an inner product, \(g_p\), defined on the tangent space, \(T_pM\), for \(p \in M\) we define the \defineindex{metric signature} to be \((p, q, r)\) for non-negative integers \(p\), \(q\), and \(r\), defined such that the quadratic form defined by \(Q(\vv{v}) \coloneqq g(\vv{v}, \vv{v})\) gives \(p\) positive results, \(q\) negative results, and \(r\) zero results when applied to the basis vectors.
+        The metric signature is independent of the choice of basis.
+        When \(r = 0\) it is common to write \((p, q)\).
+    \end{dfn}
+    
+    In Newtonian mechanics, SR, and GR everything happens in three very similar manifolds.
+    We shall call these \(\reals^{1, 3}\), where the \(1\) corresponds to the single time dimension and the \(3\) to the three spatial dimensions.
+    These spaces differ in their metric structure.
+    In Newtonian mechanics we consider Galilean transformations, which are transformations preserving Euclidean distance.
+    The Euclidean group consists of all maps preserving Euclidean distance and it is generated by the rotations, reflections, and translations.
+    
+    In SR we consider the Poincar\'e group, which consists of all maps preserving the invariant spacetime interval.
+    This is generated by translations, rotations, and boosts.
+    The metric structure in this case is simply the Minkowski metric, \(\eta\), defined by \(\eta = \diag(-1, 1, 1, 1)\).
+    
+    A Riemannian manifold has a metric signature \((n, 0, 0)\), since the metric is positive definite.
+    A pseudo Riemannian manifold has a metric signature \((p, n - p)\), since the metric is non-degenerate.
+    A \defineindex{Lorentzian manifold}\index{manifold!Lorentzian} is a pseudo-Riemannian manifold with a metric signature \((1, n - 1)\).
+    
+    General relativity takes place on a Lorentzian manifold with a smooth, symmetric, non-degenerate metric.
+    
     \subsection{Transformation Laws}
     Consider a basis transformation, which we take to be linear so that the new basis is a complete set, this can be written as \(\vep{j} = \alpha^i_j \ve{i}\).
     Note that \(\alpha^i_j\) here is \emph{not} a tensor, it is just a matrix defining this coordinate transformation.
@@ -2320,10 +2394,27 @@ noabbrev
 
     \section{Other Matters}
     \subsection{Affine Geometry}
-    \begin{dfn}{Affine Transformation}{}
-        An \defineindex{affine transformation} is a translation, \(\vv{b}\), combined with a linear transformation, \(A\), such that \(\vv{v} \mapsto A\vv{v} + \vv{b}\).
+    \begin{dfn}{Affine Space}{}
+        An \defineindex{affine space} is a set, \(A\), together with a vector space, \(V\), which acts freely and transitively as an additive group on the set \(A\).
+        The action is a mapping \(A \times V \to A\) such that \((a, v) \mapsto a + v\).
+        This has the following properties:
+        \begin{itemize}
+            \item Right identity: for all \(a \in A\) \(a + 0 = a\), where \(0 \in V\) is the zero vector.
+            \item Associativity: for all \(v, w \in V\) and for all \(a \in A\) \(a + (v + w) = (a + v) + w\), where the first, third and fourth \(+\) are the group action and the second \(+\) is vector addition.
+            \item The action is free and transitive: For all \(a \in A\) the mapping \(V \to  A\) defined by \(v \mapsto a + v\) is a bijection.
+        \end{itemize}
+        The first two properties define a right group action and the third characterises a free and transitive action.
     \end{dfn}
-    In the same way that invariance under rotation defines a vector space we can define an \defineindex{affine space} as the space that is invariant under affine transformations.
+    
+    This immediately defines two new properties:
+    \begin{itemize}[resume]
+        \item Existence of bijective translations: for all \(v \in V\) the mapping \(A \to A\) defined by \(a \mapsto a + v\) is a bijection.
+        \item Subtraction: for all \(a, b \in A\) there exists unique \(v \in V\) such that \(b = a + v\), we denote \(v\) as \(b - a\).
+    \end{itemize}
+    
+    Most of the time when we consider affine spaces \(A\) and \(V\) have the same underlying set and so the right action is the obvious extension of vector addition considered as a group action.
+    
+    In the same way that invariance of length under rotation defines a vector space we can think of an affine space as the space that is invariant under \define{affine transformations}\index{affine transformation}, which are rotations and translations, with a general affine transformation taking the form \(\vv{x} \mapsto A\vv{x} + \vv{y}\).
     This is more general than a vector space since we can think of it as a vector space but dropping the requirement that there is a zero vector, since we now allow translations.
     
     Poincar\'e transformations are examples of affine transformations.
@@ -2339,12 +2430,834 @@ noabbrev
     Even though \(\sqrt{1^2 + 0.75^2 + 0.5^2} \approx \sqrt{0.3^2 + 0.8^2 + 0.96^2}\).
     \tikzexternalenable
     
+    \subsection{Differential Forms}
+    The name \enquote{one-form} suggests the existence of \(k\)-forms, for some \(k \in \integers_{>0}\).
+    More generally we call these \define{differential forms}\index{differential form}.
+    These are \((0, k)\)-tensors which are completely antisymmetric in their arguments, for example if \(\cv{\beta}\) is a two-form then \(\cv{\beta}(\vv{v}, \vv{w}) = -\cv{\beta}(\vv{w}, \vv{v})\).
+    It is common to write the basis \(1\)-forms in this context as \(\{\dl{x^i}\}\).
     
-%    %   Appdendix
-%    \appendixpage
-%    \begin{appendices}
-%        \include{}
-%    \end{appendices}
+    A simple example is the area of a parallelogram.
+    We can define a parallelogram by taking two vectors, \(\vv{a}\) and \(\vv{b}\), as two adjacent sides.
+    There must then be some function \(\mathop{\mathrm{area}} \colon \reals^2 \to \reals\) such that \(\mathop{\mathrm{area}}(\vv{a}, \vv{b})\) is the area of the parallelogram defined by \(\vv{a}\) and \(\vv{b}\).
+    Making the only sensible choice of defining \(\mathop{\mathrm{area}}(\vv{a}, \vv{a}) = 0\) we must then have
+    \begin{align}
+        0 &= \mathop{\mathrm{area}}(\vv{a} + \vv{b}, \vv{a} + \vv{b})\\
+        &= \mathop{\mathrm{area}}(\vv{a}, \vv{a} + \vv{b}) + \mathop{\mathrm{area}}(\vv{b}, \vv{a} + \vv{b})\\
+        &= \mathop{\mathrm{area}}(\vv{a}, \vv{a}) + \mathop{\mathrm{area}}(\vv{a}, \vv{b}) + \mathop{\mathrm{area}}(\vv{b}, \vv{a}) + \mathop(\vv{b}, \vv{b})\\
+        &= \mathop{\mathrm{area}}(\vv{a}, \vv{b}) + \mathop{\mathrm{area}}(\vv{b}, \vv{a}).
+    \end{align}
+    This can hold only if
+    \begin{equation}
+        \mathop{\mathrm{area}}(\vv{a}, \vv{b}) = -\mathop{\mathrm{area}}(\vv{b}, \vv{a}),
+    \end{equation}
+    that is, \(\mathop{\mathrm{area}}\) is antisymmetric.
+    Since \(\mathop{\mathrm{area}}\) is antisymmetric and takes two vectors to a scalar we can identify it as a two-form.
+    
+    Given a basis of one-forms we can define higher order forms using the \defineindex{wedge product}, \(\wedge\), as a linear combination of basis \(k\)-forms, where the basis \(k\)-forms are all distinct combinations of basis one-forms.
+    In three dimensions there are three basis one-forms, \(\{\dl{x}, \dl{y}, \dl{z}\}\), there are then three basis two-forms, \(\{\dl{x} \wedge \dl{y}, \dl{y} \wedge \dl{z}, \dl{z} \wedge \dl{x}\}\).
+    Other possible combinations, such as \(\dl{x} \wedge \dl{z}\), are proportional to one of these by the antisymmetric property, \(\dl{x} \wedge \dl{z} = - \dl{z} \wedge \dl{x}\).
+    There is only one basis three-form in three dimensions, namely \(\dl{x} \wedge \dl{y} \wedge \dl{z}\).
+    There are \(m\) choose \(n\) basis \(m\)-forms in \(n\) dimensions.
+    
+    The wedge product can then be extended linearly to all \(k\)-forms.
+    It turns out that this can be written in terms of the tensor product:
+    \begin{equation}
+        \cv{\alpha} \wedge \cv{\beta} = \cv{\alpha} \otimes \cv{\beta} - \cv{\beta} \otimes \cv{\alpha}.
+    \end{equation}
+    
+    The area example may seem familiar.
+    In \(\reals^3\) we can define a parallelogram like this and the oriented area is given by \(\vv{a} \times \vv{b}\).
+    We can now see that this is just a special case of the wedge product using the fact that \({\reals^3}^* = \reals^3\) with the normal dot product defining \(\cv{a}(\vv{b}) = \vv{b}(\cv{a}) = \cv{a} \cdot \vv{b}\).
+    
+    \chapter{Tensor Analysis}
+    In GR we consider a Lorentzian manifold, \(M\), and define vectors to be elements of the tangent space, \(T_pM\), at some point \(p \in M\).
+    We then define covectors to be elements of the dual space, \(T^*PM\), which we can think of as the space of functions \(T_pM \to \reals\).
+    We call elements of \(\reals\) scalars.
+    We can then define more general \((n, m)\)-tensors as multilinear maps \(T_p^*M^n \times T_pM \to \reals\).
+    We define the components of these objects by evaluating them on a given basis.
+    This definition is far too abstract for day to day use and so in this section we start by introducing the \enquote{physicist's definition} of scalars, vectors, covectors, and tensors.
+    This definition works in GR because of the structure of pseudo-Riemannian manifolds, but isn't quite as general as the previous definition.
+    We'll start with the simplest, scalars.
+    
+    All of these definitions are based on the way the components of these objects transform under some coordinate transformation, \(x \mapsto x'\).
+    
+    \section{Scalars}
+    \begin{dfn}{Scalar}{}
+        A scalar is an object with no indices which is invariant under a general coordinate transformation.
+    \end{dfn}
+    
+    A \defineindex{scalar field} is then a scalar valued function, \(\varphi\), such that \(\varphi'(x') = \varphi(x)\), here the two primes on the left hand side means that under the coordinate transformation \(x \mapsto x'\) the scalar field, \(\varphi\), transforms as \(\varphi \mapsto \varphi'\), in such a way that the resulting scalar value is unchanged.
+    
+    Scalars are relativistic invariants.
+    An important example is the proper time, \(\tau(x)\).
+    Another example is the mass of an object, \(m\).
+    
+    Not all numbers are scalars.
+    For example, the number density, \(n\), is not a scalar due to length contraction, which means that the volume can change without the number of particles changing resulting in different densities.
+    The same applies to other densities, such as the energy density, \(\rho c^2\) (where \(\rho\) is the mass density), here the problem is even worse since energy is also a frame dependent quantity, as well as volume.
+    Another important example of a non-scalar are the components of other higher order tensors, as we will see.
+    
+    \section{Vectors}
+    \subsection{Contravariant Vectors}
+    \begin{dfn}{Contravariant Vectors}{}
+        A \defineindex{contravariant vector}, or simply  \define{vector}\index{vector|see{contravariant vector}} is an object with components \(V^\mu\) which transform according to the following equation under a coordinate transformation \(x \mapsto x'\):
+        \begin{equation}
+            V'^\mu = \diffp{x'^\mu}{x^\nu} V^\nu.
+        \end{equation}
+    \end{dfn}
+    
+    This follows by the application of the chain rule to the four-vector line element, \(\dl{x^\mu}\):
+    \begin{equation}
+        \dl{x'^\mu} = \diffp{x'^\mu}{x^\nu}\dd{x^\nu}.
+    \end{equation}
+    
+    It is common to call \(V^\mu\) a vector, when what we really mean is that it is a component of a vector.
+    
+    For a Lorentz transform the coordinate transformation is \(x^\mu \mapsto x'^\mu = \tensor{\Lambda}{^\mu_\nu}x^\nu\) and so for constant boosts
+    \begin{equation}
+        \diffp{x'^\mu}{x^\nu} = \tensor{\Lambda}{^\mu_\nu} \implies V'^\mu = \tensor{\Lambda}{^\mu_\nu} V^\nu,
+    \end{equation}
+    which is the usual SR definition of a four-vector.
+    
+    These vectors are called contravariant because the components transform (vary) in the opposite (contra) way to the basis vectors.
+    
+    Many familiar vectors are contravariant vectors, including the four-position, four-velocity, four-momentum, and most other four-vectors.
+    
+    \subsection{Covariant Vectors}
+    \begin{dfn}{Covariant Vectors}{}
+        A \defineindex{covariant vector}, or \defineindex{covector}, is an object with components \(U_\mu\) which transform according to the following equation under a coordinate transformation \(x \mapsto x'\):
+        \begin{equation}
+            U'_\mu = \diffp{x^\nu}{x'^\mu}U_\nu.
+        \end{equation}
+    \end{dfn}
+    
+    It is common to call \(U_\mu\) a covariant vector, when what we really mean is that it is a component of a covariant vector.
+    
+    These vectors are called covariant because the components transform (vary) in the same way (co, with) as the basis vectors.
+    
+    \begin{exm}{}{}
+        Let \(\varphi\) be a scalar field.
+        Then \(\diffp{\varphi}/{x^\mu}\) is a covector.
+        This follows since
+        \begin{equation}
+            \dl{\varphi} = \diffp{\varphi}{x^\nu}\dd{x^\nu},
+        \end{equation}
+        by the chain rule and since \(\dl{\varphi}\) inherits its scalar nature from \(\varphi\), since if \(\varphi\) is invariant so are changes in \(\varphi\), we must then have that
+        \begin{equation}
+            \diffp{\varphi}{x'^\mu} = \diffp{x^\nu}{x'^\mu} \diffp{\varphi}{x^\nu}
+        \end{equation}
+        so that
+        \begin{equation}
+            \dl{\varphi'} = \diffp{\varphi}{x'^\nu}\dd{x'^\nu} = \diffp{x^\rho}{x^\mu} \diffp{\varphi}{x^\rho} \diffp{x'^\nu}{x^\mu} \dd{x^\mu} = \diffp{\varphi}{x^\mu}\dd{x^\mu} = \dl{\varphi}.
+        \end{equation}
+    \end{exm}
+    
+    \begin{ntn}{}{}
+        We write
+        \begin{equation}
+            \partial_\mu \coloneqq \diffp{}{x^\mu}.
+        \end{equation}
+        Notice that a lower index is equivalent to an upper index in the denominator.
+        We also use a comma notation\index{\(,-\), derivative notation} to write coordinate derivatives, so
+        \begin{equation}
+            \varphi_{,\mu} \coloneqq \partial_\mu \varphi = \diffp{\varphi}{x^\mu}.
+        \end{equation}
+        This notation extends not just to scalars, so, for example, we may write
+        \begin{equation}
+            \tensor{T}{^\mu_{\nu\rho,\sigma}} = \partial_\sigma \tensor{T}{^\mu_{\nu\rho}} = \diffp*{\tensor{T}{^\mu_{\nu\rho}}}{x^\sigma}.
+        \end{equation}
+        
+        Similarly for derivatives with respect to contravariant coordinates we write
+        \begin{equation}
+            \partial^\mu \coloneqq \diffp{}{x_\mu}
+        \end{equation}
+        and
+        \begin{equation}
+            \varphi^{,\mu} = \partial^\mu \varphi = \diffp{\varphi}{x_\mu}.
+        \end{equation}
+    \end{ntn}
+    
+    \subsection{Scalar Product}
+    Given a contravariant vector with components \(V^\mu\) and a covariant vector with components \(U_\mu\) we can construct a scalar value \(V^\mu U_\mu\).
+    This works because
+    \begin{align}
+        V'^\mu U'_\mu &= \diffp{x'^\mu}{x^\nu} V^\nu \diffp{x^\rho}{x'^\mu} U_\rho\\
+        &= \diffp{x'^\mu}{x^\nu} \diffp{x^\rho}{x'^\mu} V^\nu U_\rho\\
+        &= \tensor{\delta}{^\rho_\nu} V^\nu U_\rho\\
+        &= V^\nu U_\nu.
+    \end{align}
+    It is important that this involves contraction (summing over) indices of both a co- and contravariant nature, since the two transformations cancel out to give \(\tensor{\delta}{^\mu_\nu}\).
+    This means that quantities like \(V^\mu V^\mu\), or \(U_\mu U_\mu\) aren't, in general, invariant.
+    
+    \section{Tensors of Arbitrary Rank}
+    \begin{dfn}{Tensors}{}
+        A rank \(n\) \defineindex{tensor} is an object with \(n\) indices, more specifically an \((k, l)\)-tensor has \(k\) upper indices and \(l\) lower indices, with \(k + l = n\).
+        Upper indices transform like contravariant vectors and lower indices like covariant vectors, so a tensor transforms like
+        \begin{equation}
+            \tensor{{T'}}{^{\mu_1 \dotso \mu_k}_{\nu_1 \dotso \nu_k}} = \diffp{x'^{\mu_1}}{x^{\rho_1}} \dotsm \diffp{x'^{\mu_m}}{x^{\rho_m}} \diffp{x^{\sigma_1}}{x'^{\nu_1}} \dotsm \diffp{x^{\sigma_l}}{x'^{\nu_l}} \tensor{T}{^{\rho_1\dotso \rho_k}_{\sigma_1\dotso \sigma_l}}.
+        \end{equation}
+    \end{dfn}
+    
+    The above definition is probably clearer with a specific example of a rank 3 tensor with components \(\tensor{T}{^\mu_{\nu\rho}}\), which transforms like
+    \begin{equation}
+        \tensor{{T'}}{^{\mu}_{\nu\rho}} = \diffp{x'^\mu}{x^\alpha} \diffp{x^\beta}{x'^\nu} \diffp{x^\gamma}{x'^\rho} \tensor{T}{^\alpha_{\beta\gamma}}.
+    \end{equation}
+    
+    In terms of transforming we can think of tensors as being a product of vector components, so \(\tensor{T}{^\mu_{\nu\rho}}\) transforms like \(V^\mu U_\nu W_\rho\).
+    However, not all tensors can actually be written as a product of vectors\footnote{This is the difference between non-entangled multi-particle states like \(\ket{1} \otimes \ket{0} = \ket{10}\), and entangled states, like \((\ket{1}\otimes \ket{0} + \ket{0}\otimes\ket{1})/\sqrt{2} = (\ket{10} + \ket{01})/\sqrt{2}\), in quantum mechanics.}.
+    
+    \begin{exm}{Kronecker Delta}{}
+        The \defineindex{Kronecker delta} is a rank 2 tensor of type \((1, 1)\), \(\tensor{\delta}{^\mu_\nu}\) defined the same in all frames by \(\tensor{\delta}{^\mu_\nu} = 1\) if \(\mu = \nu\) and \(\tensor{\delta}{^\mu_\nu} = 0\) if \(\mu \ne \nu\).
+        This transforms according to
+        \begin{equation}
+            \tensor{{\delta'}}{^\mu_\nu} = \diffp{x'^\mu}{x^\alpha} \diffp{x^\beta}{x'^\nu} \tensor{\delta}{^\alpha_\beta} = \diffp{x'^\mu}{x^\alpha}\diffp{x^\alpha}{x'^\nu} = \diffp{x'^\mu}{x'^\nu} = \tensor{\delta}{^\mu_\nu}.
+        \end{equation}
+        So the Kronecker delta is the same in all frames as required.
+    \end{exm}
+    
+    For a general tensor the location of the indices is important, for example \(\tensor{T}{^\mu_{\nu\rho}} \ne \tensor{T}{_\nu^\mu_\rho} \ne \tensor{T}{_{\nu\rho}^\mu}\).
+    This isn't the case for symmetric tensors.
+    Recall that a tensor is symmetric in two indices if swapping the indices doesn't change the value.
+    In this case we might be more sloppy about the locations, for example, we may write \(\tensor{\delta}{^\mu_\nu} = \tensor{\delta}{_\nu^\mu} = \delta^\mu_\nu\).
+    
+    In general if we contract all covariant indices with a contravariant index and vice versa we will get a scalar.
+    For example,
+    \begin{align}
+        \tensor{{T'}}{_{\mu\nu}}{A'}^{\mu}{B'}^{\nu} = \tensor{{T'}}{_{\mu\nu}} \diffp{x'^\mu}{x^\alpha} A^\alpha \diffp{x'^\nu}{x^\beta}B^\beta.
+    \end{align}
+    Demanding that this is equal to \(T_{\alpha\beta}A^\alpha B^\beta\) we must have
+    \begin{equation}
+        \tensor{{T'}}{_{\mu\nu}} = \diffp{x^\alpha}{x'^\mu} \diffp{x^\beta}{x'^\nu} \tensor{T}{_{\alpha\beta}}.
+    \end{equation}
+    This then gives
+    \begin{align}
+        \tensor{{T'}}{_{\mu\nu}}{A'}^{\mu}{B'}^{\nu} &= \diffp{x^\alpha}{x'^\mu} \diffp{x^\beta}{x'^\nu} \tensor{T}{_{\alpha\beta}} \diffp{x'^\mu}{x^\gamma} A^\gamma \diffp{x'^\nu}{x^\delta} B^\delta\\
+        &= \diffp{x^\alpha}{x^\gamma} \diffp{x^\beta}{x^\delta} T_{\alpha\beta} A^\gamma B^\delta\\
+        &= \tensor{\delta}{^\alpha_\gamma} \tensor{\delta}{^\beta_\delta} T_{\alpha\beta} A^\gamma B^\delta\\
+        &= T_{\alpha\beta} A^\alpha B^\beta.
+    \end{align}
+    
+    Physical laws cannot depend on the frame of reference.
+    We can use this to inform the structure of physical laws.
+    The \defineindex{principle of manifest covariance} says that equations should be written in terms of tensors such that free indices match on both sides of the equation and non-free indices are contracted with an index of the opposite type.
+    For example, under this the following would be a valid physical law: \(A^{\alpha\beta}B_\alpha C_\beta D^\gamma = 17 E^\gamma\), of course to be useful we also have to identify \(A\), \(B\), \(C\), \(D\), and \(E\) with physical quantities.
+    
+    The converse to this principle is that if we are told an equation is covariant (in the sense that it follows the above principle) and we know all but one object are some form of tensor then the unknown object must be a suitable type of tensor for covariance to hold, so for example in \(F^\mu = m A^\mu\) we know that if \(m\) is a scalar (the mass) and \(A\) is a vector (the four-acceleration) then \(F\) must be a vector (the four-force).
+    
+    As a final note not all objects with indices are tensors.
+    For example, the affine connections, \(\christoffel{\alpha}{\beta}{\gamma}\), are not tensors.
+    This is because these appear in the geodesic equation of motion,
+    \begin{equation}
+        \diff{U^\mu}{\tau} + \christoffel{\mu}{\alpha}{\beta} U^\alpha U^\beta = 0,
+    \end{equation}
+    which is covariant, but \(\diff{U^\mu}/{\tau}\) is not a four-vector in general and so \(\christoffel{\mu}{\alpha}{\beta}\) is also not a four vector in such a way that the entire equation remains covariant.
+    
+    \section{Metric Tensor}
+    We have seen that the metric tensor, with components \(g_{\mu\nu}\), is such that
+    \begin{equation}
+        c^2 \dd{\tau^2} = g_{\mu\nu} \dd{x^\mu} \dd{x^\nu}.
+    \end{equation}
+    We defined the metric tensor in \cref{eqn:metric tensor} to be such that
+    \begin{equation}
+        g_{\mu\nu} = \diffp{\xi^\alpha}{x^\mu} \diffp{\xi^\beta}{x^\nu} \eta_{\alpha\beta}.
+    \end{equation}
+    Identifying the Minkowski metric as the metric tensor in a locally inertial frame with coordinates \(\xi^\alpha\) we see that this is just the tensor transformation law after we change \(g_{\mu\nu} \to g'_{\mu\nu}\), \(\eta_{\alpha\beta} \to g_{\alpha\beta}\), \(\xi^\alpha \to x^\alpha\), and \(x^\mu \to x'^\mu\).
+    
+    Since \(\eta_{\mu\nu}\) is symmetric the we must also have that \(g_{\mu\nu}\) is symmetric.
+    This is good since a metric tensor is required to be symmetric.
+    
+    In special relativity we wrote \(c^2 \dd{\tau^2} = \dl{x_\mu}\dd{x^\mu}\) and following along with this notation we defined \(V_\mu = \eta_{\mu\nu}V^\nu\).
+    We can generalise this to general relativity defining
+    \begin{equation}
+        V_\mu \coloneqq g_{\mu\nu}V^\nu,
+    \end{equation}
+    which allows us to define a covariant vector from a contravariant vector.
+    We can readily check that the resulting vector is indeed covariant:
+    \begin{align}
+        V'_\mu &= g'_{\mu\nu}V'^\nu\\
+        &= \diffp{x^\alpha}{x'^\mu} \diffp{x^\beta}{x'^\nu} g_{\alpha\beta} \diffp{x'^\nu}{x^\gamma} V^\gamma\\
+        &= \diffp{x^\alpha}{x'^\mu} \diffp{x^\beta}{x^\gamma} g_{\alpha\beta} V^\gamma\\
+        &= \diffp{x^\alpha}{x'^\mu} \tensor{\delta}{^\beta_\gamma} g_{\alpha\beta} V^\gamma\\
+        &= \diffp{x^\alpha}{x'^\mu} g_{\alpha\beta} V^\beta,
+    \end{align}
+    which shows that \(V_\alpha = g_{\alpha\beta}V^\beta\) transforms like a covariant vector.
+    
+    We say that \(g_{\mu\nu}\) \define{lowers indices}\index{lowering indices}.
+    This generalises to all tensors, for example
+    \begin{equation}
+        T_{\mu\nu} = g_{\mu\alpha}\tensor{T}{^\alpha_\nu} = g_{\mu\alpha}g_{\nu\nu}T^{\alpha\beta}.
+    \end{equation}
+    
+    Now define \(g^{\mu\nu}\) to be the components of the inverse of the metric tensor, such that
+    \begin{equation}
+        g^{\mu\alpha}g_{\nu\alpha} = \tensor{\delta}{^\mu_\nu}.
+    \end{equation}
+    We can then use this to \define{raise indices}\index{raising indices}:
+    \begin{equation}
+        V^\mu = g^{\mu\nu}V_\nu = g^{\mu\nu}g_{\nu\rho}V^\rho = \tensor{\delta}{^\mu_\rho} V^\rho = V^\mu.
+    \end{equation}
+    
+    These equations, along with the principle of manifest invariance, show that \(g^{\mu\nu}\) are the components of a tensor, and that said tensor is symmetric.
+    
+    \chapter{Covariant Derivative}
+    \section{The Problem}
+    Our goal is to define the derivative of a vector field, \(V\).
+    We will suppose that our vector field is parametrised by some affine parameter, \(\lambda\).
+    The obvious definition is to define the derivative as a vector with components given by the following limit, where it exists, 
+    \begin{equation}
+        \lim_{\Delta \lambda \to 0} \frac{V^\mu(\lambda + \Delta \lambda) - V^\mu(\lambda)}{\Delta \lambda}.
+    \end{equation}
+    
+    However, there is a subtlety to vectors on a manifold which is not present in Euclidean geometry and means this doesn't work.
+    The issue is that in this limit we are comparing two vectors (\(V^\mu(\lambda + \Delta \lambda)\) and \(V^\mu(\lambda)\)) which are defined at different points on the manifold.
+    In Euclidean geometry this is fine since the point at which a vector is defined isn't important.
+    On a general manifold it is important, since we consider tangent spaces, \(T_pM\), defined at a point.
+    We say that in Euclidean geometry it is possible to \defineindex{parallel transport} vectors, moving the base point where they are defined.
+    We will see that this is possible by moving along a geodesic.
+    
+    Consider the example of the two-dimensional manifold \(S^2\), a sphere.
+    This can be embedded in \(\reals^3\) with a general vector given by \(\vv{r} = R(\sin\vartheta\cos\varphi, \sin\vartheta\sin\varphi, \cos\vartheta)\), where \(R\) is the constant radius of the sphere and \(\vartheta\) and \(\varphi\) are the coordinates.
+    A point on the sphere can be given as a linear combination of the two basis vectors
+    \begin{align}
+        \ve{\vartheta} &= \diffp{\vv{r}}{\vartheta} = R(\cos\vartheta\cos\varphi, \cos\vartheta\sin\varphi, -\sin\vartheta),\\
+        \ve{\varphi} &= \diffp{\vv{r}}{\varphi} = R(-\sin\vartheta\sin\varphi, \sin\vartheta\cos\varphi, 0).
+    \end{align}
+    Consider changing \(\vartheta\) by a small amount.
+    The change in \(\ve{\vartheta}\) is perpendicular to \(\ve{\varphi}\) and the change in \(\ve{\varphi}\) is perpendicular to \(\ve{\vartheta}\).
+    This means that transporting these vectors along a geodesic (which is a great circle on the sphere) at constant \(\varphi\) will not rotate the basis.
+    On the other hand moving along a non-great circle at constant \(\vartheta\) will rotate the vectors.
+    The dot product between the change in one basis vector and the other basis vector will be non-zero if \(\vartheta \ne \pi/2\).
+    
+    \section{Covariant Derivative}\label{sec:covariant derivative}
+    We now assume that there is a means of parallel transport, which allows for comparison of vectors at different points.
+    This allows us to define the \defineindex{covariant derivative} of a vector, \(\vv{u}\), which we can take to be a tangent vector, \(\diff{}/{\mu}\), to a curve parametrised by \(\mu\), along a curve parametrised by \(\lambda\), that is in the direction of a tangent vector, \(\vv{v} = \diff{}/{\lambda}\).
+    The covariant derivative is defined by the following limit, when it exists:
+    \begin{equation}
+        \covariantDerivative{\vv{v}} \vv{u} \coloneqq \lim_{\Delta \lambda \to 0} \frac{\vv{u}(\lambda + \Delta \lambda) - \vv{u}_{\|}(\lambda + \Delta \lambda)}{\Delta \lambda}.
+    \end{equation}
+    Here \(\vv{u}_{\|}(\lambda + \Delta \lambda)\) denotes the vector \(\vv{u}(\lambda)\) parallel transported to \(\lambda + \Delta\lambda\).
+    
+    We can also define the covariant derivative of a scalar field, \(f\), which are trivial to parallel transport since they don't change so \(f_{\|}(\lambda + \Delta \lambda) = f(\lambda)\) and hence
+    \begin{equation}
+        \covariantDerivative{\vv{v}} f = \lim_{\Delta \lambda \to 0} \frac{f(\lambda + \Delta \lambda) - f_{\|}(\lambda + \Delta \lambda)}{\Delta \lambda} = \lim_{\Delta \lambda \to 0} \frac{f(\lambda + \Delta \lambda) - f(\lambda)}{\Delta \lambda} = \diff{f}{\lambda}.
+    \end{equation}
+    
+    The covariant derivative should not be confused with the \defineindex{Lie derivative}, which is just the commutator of the two tangent vectors:
+    \begin{equation}
+        \mathcal{L}_{\vv{v}} \vv{u} \coloneqq [\vv{v}, \vv{u}] = \diff{}{\lambda}\diff{}{\mu} - \diff{}{\mu}\diff{}{\lambda}.
+    \end{equation}
+
+    Parallel transport is reversible, in the sense that if you parallel transport a vector along a path and then back along the same path it returns to its initial value.
+    The same is not true of parallel transporting a vector around a loop.
+    For example, suppose you stand at the North pole looking south along the Greenwich Meridian.
+    Walk south to the equator, then walk \ang{90} west, still looking south.
+    Walk North until you reach the North pole again, still looking south.
+    This is equivalent to having turned \ang{90} on the spot.
+    
+    \section{Components of the Covariant Derivative}
+    We define the covariant derivative of a basis vector, \(\ve{j}\), with respect to another basis vector, \(\ve{i}\), to be
+    \begin{equation}\label{eqn:affine connection again}
+        \covariantDerivative{\ve{i}} \ve{j} \coloneqq \christoffel{k}{j}{i} \ve{k}.
+    \end{equation}
+    We take this here as the definition of \(\christoffel{k}{j}{i}\), which we will soon show is equal to the \defineindex{affine connection} which appears in the geodesic equation, this also justifies the name \enquote{affine connection} since the covariant derivative compares vectors at two positions, so connected by an affine transformation.
+    This definition makes sense since we can think of \(\Gamma^k\ve{k}\) as a vector given by a linear combination of basis vectors and these components depend in general on \(i\) and \(j\) through \(\covariantDerivative{\ve{i}}\ve{j}\) and \(\christoffel{k}{j}{i}\).
+    
+    For a general vector, \(\vv{v} = v^i\ve{i}\), we expect the covariant derivative to be linear in the components, meaning \(\covariantDerivative{\vv{v}}\vv{u} = v^i\covariantDerivative{\ve{i}}\vv{u}\).
+    We also expect that the normal product rule should hold, also known as the \defineindex{Leibniz rule}.
+    This means that \(\covariantDerivative{\vv{v}} (u^i\ve{i}) = \ve{i}\covariantDerivative{\vv{v}} u^i + u^i\covariantDerivative{\vv{v}} \ve{i}\).
+    We also use the fact that \(\covariantDerivative{\ve{i}} f = \diffp{f}/{x^i}\) for all scalar fields, \(f\).
+    Putting this together we get
+    \begin{align}
+        \covariantDerivative{\vv{v}}\vv{u} &= \covariantDerivative{v^j\ve{j}} (u^i\ve{i})\\
+        &= v^j\covariantDerivative{\ve{j}} (u^i\ve{i})\\
+        &= v^ju^i \covariantDerivative{\ve{j}} \ve{i} + v^j\ve{i} \covariantDerivative{\ve{j}} u^i\\
+        &= v^ju^i \christoffel{k}{i}{j} + v^j\ve{i}\diffp{u^i}{x^j}.
+    \end{align}
+    With some relabelling changing \(i \to k\) in the second term we get
+    \begin{equation}
+        \covariantDerivative{\vv{v}}\vv{u} = \left( v^ju^i\christoffel{k}{i}{j} + v^j\diffp{u^k}{x^j} \right) \ve{k}.
+    \end{equation}
+    
+    Now, consider the case when both vectors involved are the four-velocity.
+    The components in the above equation then become
+    \begin{align}
+        U^\alpha \diffp{U^\mu}{x^\alpha} + \christoffel{\mu}{\alpha}{\beta} U^\alpha U^\beta  &= \diff{x^\alpha}{\tau} \diffp{U^\mu}{x^\alpha} + \christoffel{\mu}{\alpha}{\beta} U^\alpha U^\beta\\
+        &= \diff{U^\mu}{\tau} + \christoffel{\mu}{\alpha}{\beta} U^\alpha U^\beta\\
+        &= 0.
+    \end{align}
+    We can identify this as the geodesic equation, which demands that this quantity vanishes.
+    This also shows that \(\christoffel{\mu}{\alpha}{\beta}\) is indeed the affine connection.
+    
+    This allows us to write the geodesic equation in coordinate free notation as
+    \begin{equation}
+        \covariantDerivative{\vv{v}} \vv{v} = 0.
+    \end{equation}
+    This shows that we can parallel transport a vector by moving it along a geodesic to which it is tangent at the point it is defined.
+    We can think of the covariant derivative as modifying the derivative to subtract the extra term added by parallel transporting the vector.
+    For an infinitesimal parallel transportation the amount the vector changes is proportional to the vector and to the distance travelled, hence it is of the form
+    \begin{equation}
+        \dl{V_{\|}^\mu} = -\christoffel{\mu}{\alpha}{\beta} V^\alpha \dd{x^\beta}.
+    \end{equation}
+    We can take this as the definition of the affine connection.
+    The total change when the vector is moved around a closed loop is then
+    \begin{equation}
+        \delta V_{\|}^\mu = -\oint \christoffel{\mu}{\alpha}{\beta} V^\alpha \dd{x^\beta}.
+    \end{equation}
+    This does not, in general, vanish, consider the example of walking on the surface of Earth at the end of \cref{sec:covariant derivative}.
+    Compare the result above to rotation of a vector, where the change in the vector is proportional to the length of the vector and the angle rotated through, for sufficiently small angles.
+    
+    We can now construct the components of the covariant derivative of a vector.
+    These components are given by taking the limit of \(\delta V^\mu / \delta x^\nu\).
+    The observable change is \(V^\mu(x^\nu + \delta x^\nu)\) minus \(V^\mu(x^\nu)\) after parallel transporting to \(x^\nu + \delta x^\nu\).
+    We therefore have that the components of the covariant derivative of \(V\) are
+    \begin{equation}
+        \covariantDerivative{\nu} V^\mu = \diffp{V^\mu}{x^\nu} + \christoffel{\mu}{\alpha}{\nu} V^\alpha
+    \end{equation}
+    
+    \begin{ntn}{}{}
+        We write
+        \begin{equation}
+            \tensor{V}{^\mu_{;\nu}} \coloneqq \covariantDerivative{\nu} V^\mu
+        \end{equation}
+        for the \(\nu\) component of the covariant derivative of \(V^\mu\).
+    \end{ntn}
+    
+    With the above notation, and the notation \(\diffp{\varphi}/{x^\nu} = \partial_\nu \varphi = \varphi_{,\nu}\) the components of the covariant derivative are given by
+    \begin{equation}
+        \covariantDerivative{\nu} V^\mu = \tensor{V}{^\mu_{;\nu}} = \partial_\nu V^\mu + \christoffel{\mu}{\alpha}{\nu} V^\alpha = \tensor{V}{^\mu_{,\nu}} + \christoffel{\mu}{\alpha}{\nu} V^\alpha.
+    \end{equation}
+    
+    \subsection{Covariant Derivatives of Other Quantities}
+    The result \(\tensor{V}{^\mu_{;\nu}} = \tensor{V}{^\mu_{,\nu}} + \christoffel{\mu}{\alpha}{\nu}\) only holds for a contravariant vector.
+    For other objects the components of their covariant derivatives are different, but they can fairly easily be worked out using the two following facts:
+    \begin{itemize}
+        \item The covariant derivative is a derivation, that is its linear and the Leibniz rule applies, \(D(fg) = fD(g) + D(f)g\), and
+        \item The covariant derivative of a scalar field is just a normal derivative.
+    \end{itemize}
+    
+    For example, suppose we wish to know the components of a covariant vector, \(V_\mu\).
+    We can use the fact that \(U^\mu V_\mu\) is a scalar for a contravariant vector \(U^\mu\).
+    By the second property above we then have
+    \begin{equation}
+        (U^\mu V_\mu)_{;\nu} = (U^\mu V_\mu)_{,\nu} = \tensor{U}{^\mu_{,\nu}}V_\mu + U^\mu\tensor{V}{_{\mu,\nu}}.
+    \end{equation}
+    By the first property we have
+    \begin{equation}
+        (U^\mu V_\mu)_{;\nu} = U^\mu \tensor{V}{_{\mu;\nu}} + \tensor{U}{^\mu_{;\nu}}V_\mu = U^\mu \tensor{V}{_{\mu;\nu}} + \tensor{U}{^\mu_{,\nu}}V_\mu + \christoffel{\mu}{\alpha}{\nu}U^\alpha V_\mu.
+    \end{equation}
+    Reindexing in the last term, \(\alpha \leftrightarrow \mu\), we then have
+    \begin{equation}
+        (U^\mu V_\mu)_{;\nu} = U^\mu V_{\mu;\nu} + \tensor{U}{^\mu_{,\nu}} V_\mu + \christoffel{\alpha}{\mu}{\nu} U^\mu V_\alpha.
+    \end{equation}
+    Equating these two results we have
+    \begin{equation}
+        \tensor{U}{^\mu_{,\nu}} V_{\mu} + U^\mu V_{\mu,\nu} = U^\mu V_{\mu;\nu} + \tensor{U}{^\mu_{,\nu}} V_\mu + \christoffel{\alpha}{\mu}{\nu} U^\mu V_\alpha.
+    \end{equation}
+    Rearranging this we have
+    \begin{equation}
+        U^\mu V_{\mu;\nu} = U^\mu V_{\mu,\nu} - \christoffel{\alpha}{\mu}{\nu} U^\mu V_\alpha.
+    \end{equation}
+    Demanding that this holds for all contravariant vectors, \(U\), we must have that
+    \begin{equation}
+        \covariantDerivative{\nu} V_\mu = V_{\mu;\nu} = V_{\mu,\nu} - \christoffel{\alpha}{\mu}{\nu} V_\alpha.
+    \end{equation}
+
+    This is very similar to the contravariant result, the main difference is the sign of the second term, and due to the different index placement we now sum over the upper index of the affine connection instead of one of the lower indices.
+    
+    Suppose instead that we want to know the the components of the covariant derivative of some tensor with components \(T^{\mu\nu}\).
+    We can work this out using the fact that all such tensors transform the same as \(V^\mu U^\nu\) for contravariant vectors \(V\) and \(U\), even though not all such tensors can be written as a product of vectors.
+    The transformation rules are what informs the parallel transport and so are the only things important in computing the components of the covariant derivative for a general tensor.
+    Applying the Leibniz rule we have
+    \begin{align}
+        \covariantDerivative{\alpha} (V^\mu U^\nu) &= (V^\mu U^\nu)_{;\alpha}\\
+        &= \tensor{V}{^\mu_{;\alpha}} U^\nu + V^\mu \tensor{U}{^\nu_{;\alpha}}\\
+        &= (\tensor{V}{^\mu_{,\alpha}} + \christoffel{\mu}{\beta}{\alpha} V^\beta) U^\nu + V^\mu (\tensor{U}{^\nu_{,\alpha}} + \christoffel{\nu}{\beta}{\alpha}U^\alpha)\\
+        &= \tensor{V}{^\mu_{,\alpha}}U^\nu + V^\mu\tensor{U}{^\nu_{,\alpha}} + \christoffel{\mu}{\beta}{\alpha} V^\beta U^\nu + \christoffel{\nu}{\beta}{\alpha} V^\mu U^\beta\\
+        &= (V^\mu U^\nu)_{,\alpha} + \christoffel{\mu}{\beta}{\alpha} V^\beta U^\nu + \christoffel{\nu}{\beta}{\alpha} V^\mu U^\beta.
+    \end{align}
+    It then follows that for any tensor with components \(T^{\mu\nu}\), even non-simple tensors, we have
+    \begin{equation}
+        \covariantDerivative{\alpha} = \tensor{T}{^{\mu\nu}_{;\alpha}} = \tensor{T}{^{\mu\nu}_{,\alpha}} + \christoffel{\mu}{\beta}{\alpha} T^{\beta\nu} + \christoffel{\nu}{\beta}{\alpha} T^{\mu\beta}.
+    \end{equation}
+    
+    This same logic can be applied to tensors with an arbitrary number of upper indices.
+    We can also use the contraction-of-indices-to-give-a-scalar-for-which-we-just-get-a-normal-derivative trick to find the components of covariant derivatives of tensors with lower indices.
+    In general the result will be that we have a normal derivative plus a term for each index proportional to the affine connection with an appropriate sum over indices, with plus signs for upper indices and minus signs for lower indices.
+    For example, the covariant derivative of a tensor with components \(T_{\mu\nu}\) is
+    \begin{equation}
+        \covariantDerivative{\alpha} T_{\mu\nu} = T_{\mu\nu;\alpha} = T_{\mu\nu,\alpha} - \christoffel{\beta}{\alpha}{\mu} T_{\beta\nu} - \christoffel{\beta}{\alpha}{\nu} T_{\mu\beta},
+    \end{equation}
+    and the covariant derivative of the mixed tensor with components \(\tensor{T}{^\mu_\nu}\) is
+    \begin{equation}
+        \covariantDerivative{\alpha} \tensor{T}{^\mu_\nu} = \tensor{T}{^\mu_{\nu;\alpha}} = \tensor{T}{^\mu_{\nu,\alpha}} - \christoffel{\mu}{\beta}{\alpha}\tensor{T}{^\beta_\nu} - \christoffel{\beta}{\alpha}{\nu} \tensor{T}{^\mu_\beta}.
+    \end{equation}
+    
+    \subsection{Covariant Derivative Along a Curve}
+    Some quantities only make sense to consider along the world line of a particle.
+    For example, the momentum, \(p^\mu(\tau)\), only has meaning along the world line \(x^\mu(\tau)\).
+    Consider some four-vector \(A^\mu\).
+    We can project this along a path using the four-velocity, \(U^\mu\), so that
+    \begin{equation}
+        U^\nu \partial_\nu A^\mu = \diff{x^\nu}{\tau} \diffp{A^\mu}{x^\nu} = \diff{A^\nu}{\tau}.
+    \end{equation}
+    This is not, in general, a covariant quantity.
+    We can make it generally covariant by replacing \(\partial_\nu\) with \(\covariantDerivative{\nu}\).
+    This allows us to define another derivative type, \(\diffcov{}/{\tau}\)\index{D/dt@\(\diffcov{}/{\tau}\)}:
+    \begin{equation}
+        \diffcov{A^\mu}{\tau} \coloneqq U^\nu \covariantDerivative{\nu} A^\mu = \diff{A^\mu}{\tau} + \christoffel{\mu}{\sigma}{\nu} \diff{x^\nu}{\tau} A^\sigma.
+    \end{equation}
+    If \(A^\mu(\tau)\) is a contravariant vector then so is \(\diffcov{A^\mu}/{\tau}\).
+    Similarly for a covariant vector we can define
+    \begin{equation}
+        \diffcov{A_\mu}{\tau} \coloneqq U^\nu \covariantDerivative{\nu} A_\mu = \diff{A_\mu}{\tau} - \christoffel{\nu}{\mu}{\sigma} \diff{x^\sigma}{\tau} A_\nu
+    \end{equation}
+    
+    \subsection{Covariant Derivative of the Metric}
+    In \cref{eqn:affine connection} at the start of the course we defined the affine connection as
+    \begin{equation}
+        \christoffel{\lambda}{\mu}{\nu} \coloneqq \diffp{x^\lambda}{\xi^\alpha} \diffp{\xi^\alpha}{x^\nu, x^\mu}
+    \end{equation}
+    where \(x^\mu\) are arbitrary coordinates and \(\xi^\mu\) are coordinates in a locally inertial frame.
+    Using this we showed that the affine connections naturally appear in derivatives of the metric.
+    We then redefined the affine connection in \cref{eqn:affine connection again} by the equation
+    \begin{equation}
+        \covariantDerivative{\ve{i}}\ve{j} \coloneqq \christoffel{k}{j}{i} \ve{k}.
+    \end{equation}
+    In order to complete this section on the covariant derivative we will show that the affine connections as defined here cause contravariant derivatives of the metric to vanish.
+    
+    To show this we start by requiring that parallel transport doesn't change the \enquote{length} of a four-vector.
+    By which we mean \(\sqrt{g_{\mu\nu}V^\mu V^\nu}\) should be constant.
+    If this is constant then \(g_{\mu\nu}V^\mu V^\nu\) should also be constant, and this is easier to work with.
+    This tells us that the covariant derivative of this quantity should vanish, so
+    \begin{equation}
+        \covariantDerivative{\nu} g_{\alpha\beta} V^\alpha_{\|} V^\beta_{\|} = 0,
+    \end{equation}
+    here \(V^\alpha_{\|}\) are the components of \(V^\alpha\) after parallel transportation.
+    We know that \(\covariantDerivative{\nu}V^\alpha_{\|} = 0\) by the definition of the covariant derivative.
+    We also require the Leibniz rule to hold and so
+    \begin{equation}
+        \covariantDerivative{\nu} g_{\alpha\beta} V^\alpha_{\|}V^\beta_{\|} = (\covariantDerivative{\nu}g_{\alpha\beta}) V^\alpha_{\|}V^\beta_{\|} + g_{\alpha\beta}(\covariantDerivative{\nu}V^\alpha_{\|})V^\beta_{\|} + g_{\alpha\beta}V^\alpha_{\|}\covariantDerivative{\nu}V^\beta_{\|} = V^\alpha_{\|}V^\beta_{\|}\covariantDerivative{\nu}g_{\alpha\beta}.
+    \end{equation}
+    Demanding that this quantity vanishes and holds for a general four-vector \(V^\mu\) we must have that
+    \begin{equation}
+        \covariantDerivative{\sigma}g_{\mu\nu} = \diffp{g_{\mu\nu}}{x^\sigma}  - \christoffel{\rho}{\sigma}{\mu} g_{\rho\nu} - \christoffel{\rho}{\sigma}{\nu} g_{\mu\rho} = 0
+    \end{equation}
+    where the middle term is simply the definition of the components of the covariant derivative of a tensor with two covariant indices, which the metric is.
+    
+    This property is useful since it shows that raising and lowering indices commutes with the covariant derivative since
+    \begin{align}
+        \covariantDerivative{\nu} V_\mu &= \covariantDerivative{\nu} g_{\mu\sigma}V^\sigma\\
+        &= (\covariantDerivative{\nu} g_{\mu\sigma}) V^\sigma + g_{\mu\sigma} \covariantDerivative{\nu} V^\sigma\\
+        &= g_{\mu\sigma} \covariantDerivative{\nu} V^\sigma.
+    \end{align}
+    
+    It is also possible to show that the covariant derivative of the metric vanishes by writing out the components of the covariant derivative using
+    \begin{equation}
+        \christoffel{\sigma}{\lambda}{\mu} = \frac{1}{2}g^{\nu\sigma} ( \partial_\lambda g_{\mu\nu} + \partial_\mu g_{\lambda\nu} - \partial_\nu g_{\mu\lambda} ).
+    \end{equation}
+    This then gives
+    \begingroup
+    \setindexcolor{\sigma = highlight!90!black, \mu = my blue, \nu = my red, \rho = my green, \alpha = my purple}
+    \allowdisplaybreaks
+    \begin{align}
+        \covariantDerivative{\indexcolor{\sigma}} g_{\indexcolor{\mu}\indexcolor{\nu}} &= \partial_{\indexcolor{\sigma}} g_{\indexcolor{\mu}\indexcolor{\nu}} - \christoffel{\indexcolor{\rho}}{\indexcolor{\sigma}}{\indexcolor{\mu}} g_{\indexcolor{\rho}\indexcolor{\nu}} - \christoffel{\indexcolor{\rho}}{\indexcolor{\sigma}}{\indexcolor{\nu}} g_{\indexcolor{\mu}\indexcolor{\rho}}\\
+        &= \partial_{\indexcolor{\sigma}} g_{\indexcolor{\mu}\indexcolor{\nu}} - \christoffeldef{\indexcolor{\rho}}{\indexcolor{\sigma}}{\indexcolor{\mu}}{\indexcolor{\alpha}} g_{\indexcolor{\rho}\indexcolor{\nu}}\notag\\
+        &\qquad- \christoffeldef{\indexcolor{\rho}}{\indexcolor{\sigma}}{\indexcolor{\nu}}{\indexcolor{\alpha}} g_{\indexcolor{\mu}\indexcolor{\rho}}\\
+        &= \partial_{\indexcolor{\sigma}} g_{\indexcolor{\mu}\indexcolor{\nu}} - \frac{1}{2} \tensor{\delta}{^{\indexcolor{\alpha}}_{\indexcolor{\nu}}} (\partial_{\indexcolor{\sigma}} g_{\indexcolor{\mu} \indexcolor{\alpha}} + \partial_{\indexcolor{\mu}} g_{\indexcolor{\sigma}\indexcolor{\alpha}} - \partial_{\indexcolor{\alpha}} g_{\indexcolor{\mu}\indexcolor{\sigma}})\notag\\
+        &\qquad- \frac{1}{2}\tensor{\delta}{^{\indexcolor{\alpha}}_{\indexcolor{\mu}}} (\partial_{\indexcolor{\sigma}} g_{\indexcolor{\nu}\indexcolor{\alpha}} + \partial_{\indexcolor{\nu}} g_{\indexcolor{\sigma}\indexcolor{\alpha}} - \partial_{\indexcolor{\alpha}} g_{\indexcolor{\nu} \indexcolor{\sigma}})\\
+        &= \partial_{\indexcolor{\sigma}} g_{\indexcolor{\mu}\indexcolor{\nu}} - \frac{1}{2}(\partial_{\indexcolor{\sigma}} g_{\indexcolor{\mu} \indexcolor{\nu}} + \partial_{\indexcolor{\mu}} g_{\indexcolor{\sigma}\indexcolor{\nu}} - \partial_{\indexcolor{\nu}} g_{\indexcolor{\mu} \indexcolor{\sigma}})\notag\\
+        &\qquad- \frac{1}{2}(\partial_{\indexcolor{\sigma}} g_{\indexcolor{\nu} \indexcolor{\mu}} + \partial_{\indexcolor{\nu}} g_{\indexcolor{\sigma} \indexcolor{\mu}} - \partial_{\indexcolor{\mu}} g_{\indexcolor{\nu} \indexcolor{\sigma}})\\
+        &= \partial_{\indexcolor{\sigma}} g_{\indexcolor{\mu}\indexcolor{\nu}} - \frac{1}{2}(\partial_{\indexcolor{\sigma}} g_{\indexcolor{\mu} \indexcolor{\nu}} + \partial_{\indexcolor{\mu}} g_{\indexcolor{\sigma}\indexcolor{\nu}} - \partial_{\indexcolor{\nu}} g_{\indexcolor{\mu} \indexcolor{\sigma}})\notag\\
+        &\qquad- \frac{1}{2}(\partial_{\indexcolor{\sigma}} g_{\indexcolor{\nu} \indexcolor{\mu}} + \partial_{\indexcolor{\nu}} g_{\indexcolor{\sigma} \indexcolor{\mu}} - \partial_{\indexcolor{\mu}} g_{\indexcolor{\nu} \indexcolor{\sigma}})\\
+        &= 0.
+    \end{align}
+    \endgroup
+    
+    \section{Why Modify the Derivative?}
+    The need to modify the derivative to get the covariant derivative is related to a very fundamental fact in physics.
+    Changes in the maths that don't result in physical changes cannot be allowed to change equations.
+    The classic example of this is electromagnetism.
+    
+    The Schrödinger equation is
+    \begin{equation}
+        \left[ \frac{\vecoperator{p}^2}{2m} + V \right]\psi = \left[ -\frac{\hbar^2}{2m} + V \right] \psi = i\hbar\diffp{\psi}{t}.
+    \end{equation}
+    In quantum mechanics the only physical meaning of the wave function is the resulting probability density, \(\abs{\psi}^2\).
+    This means that the physics doesn't depend on the phase of \(\psi\), only its absolute value.
+    Therefore the physics doesn't change under the transformation
+    \begin{equation}
+        \psi \to \e^{i\alpha} \psi.
+    \end{equation}
+    Indeed, if \(\varphi\) is constant, in which case we call it a global phase, then this is easy to show:
+    \begin{equation}
+        \laplacian (\e^{i\alpha} \psi) = \e^{i\alpha}\laplacian \psi
+    \end{equation}
+    and so we can divide a factor of \(\e^{i\alpha}\) out of the Schrödinger equation.
+    
+    However, a global phase is non-relativistic.
+    If we make a change to the phase at one place this cannot propagate instantly across the entire universe.
+    Therefore, a better model is a local phase, \(\alpha(\vv{r}, t)\).
+    The problem with this is we then get
+    \begin{equation}
+        \grad(\e^{i\alpha}\psi) = \e^{i\alpha}\grad\psi + \psi \grad\e^{i\alpha} = \e^{i\alpha}\grad\psi + i\e^{i\alpha}\psi\grad\alpha.
+    \end{equation}
+    The problem then gets even worse when we take the divergence to get the Laplacian.
+    We also have a problem with the other side of the Schrödinger equation:
+    \begin{equation}
+        \diffp*{(\e^{i\alpha}\psi)}{t} = \e^{i\alpha}\diffp{\psi}{t} + i\e^{i\alpha}\diffp{\alpha}{t}.
+    \end{equation}
+    
+    The solution is to modify the derivatives in such a way that when the transformation \(\psi \to \e^{i\alpha}\psi\) occurs this exactly cancels with the modification of the derivative.
+    We can recognise the effect of changing the phase as the same as making the substitutions
+    \begin{equation}
+        \grad \to \grad + i\grad \alpha, \qqand \diffp{}{t} \to \diffp{}{t} + i \diffp{\alpha}{t}.
+    \end{equation}
+    Therefore we can define new, \define{gauge-covariant derivatives}\index{gauge-covariant derivative}
+    \begin{equation}
+        \grad \to \grad + \vv{F}(\vv{r}, t), \qqand \diffp{}{t} \to \diffp{}{t} + f(\vv{r}, t)
+    \end{equation}
+    where \(\vv{F}\) and \(f\) are called the \define{gauge fields}\index{gauge field} and need to transform as follows:
+    \begin{equation}
+        \vv{F} \to \vv{F} - i\grad\alpha, \qqand f \to f - i \diffp{\alpha}{t}.
+    \end{equation}
+    We can identify these as exactly the gauge freedom of the vector and scalar potential in electromagnetism, \(\vv{A}\) and \(\varphi\), respectively.
+    That is, if we add the gradient of a function to the vector potential and the time derivative of a function to the scalar potential the resulting electric and magnetic fields are unchanged.
+    
+    We can therefore see electromagnetism as a consequence of requiring that the wave functions phase is \defineindex{gauge invariant}.
+    It can also be shown, although not as simply, that the weak and strong force exist due to similar gauge invariance requirements, just for more complicated gauge transformations.
+    The symmetry\footnote{See the notes from the symmetries of quantum mechanics course} associated with the phase transformation is \(\unitary(1)\).
+    The symmetry of the electroweak interaction is \(\unitary(1)\times\specialUnitary(2)\) and the symmetry of the strong force is \(\specialUnitary(3)\).
+    Combined, the symmetry of the standard model is \(\unitary(1)\times\specialUnitary(2)\times\specialUnitary(3)\).
+    
+    In the same way general relativity can be said to be a gauge theory of gravity with the symmetry being invariance under diffeomorphisms.
+    This is why we add something to the derivatives, in this case a term proportional to the affine connection, in order to have the resulting equations be gauge invariant.
+    
+    \section{Principle of Manifest Covariance}
+    We can now give an algorithm for generating covariant equations in general relativity.
+    This is based on the observation that a covariant equation must be written in terms of tensors (including scalars and vectors) and must reduce to special relativity in the absence of gravity, when \(g_{\mu\nu} = \eta_{\mu\nu}\) and \(\christoffel{\rho}{\mu}{\nu} = 0\).
+    The process for creating an equation which holds in all frames in general relativity is then as follows:
+    \begin{itemize}
+        \item Take an equation from special relativity which holds in the absence of gravity.
+        \item Replace \(g_{\mu\nu}\) with \(\eta_{\mu\nu}\).
+        \item Replace coordinate derivatives, \(\partial_\mu\), with covariant derivatives, \(\covariantDerivative{\mu}\).
+    \end{itemize}
+    
+    An example of this would be the continuity equation from electromagnetism.
+    Recall that for a conserved quantity with density \(\rho\) and current density \(\vv{j}\) we define the four current to be \(J^\mu = (c\rho, \vv{j})\).
+    The continuity equation for \(\rho\) and \(\vv{j}\) is
+    \begin{equation}
+        \diffp{\rho}{t} + \div\vv{j} = 0.
+    \end{equation}
+    This can be written with the notation of special relativity as
+    \begin{equation}
+        \partial_\mu J^\mu = 0.
+    \end{equation}
+    We then get the general relativistic version of this by replacing the derivative with the covariant derivative:
+    \begin{equation}
+        \covariantDerivative{\mu} J^\mu.
+    \end{equation}
+    
+    This principle works in reverse also.
+    Suppose we have some quantity, \(T\), which we know to be a tensor with components \(T^{\alpha\beta\gamma}\) and we want to know if \(T^{\alpha\beta\gamma} = 0\) is a valid law of physics.
+    We can write this quantity in a locally inertial frame and it will probably simplify since we can replace covariant derivatives with coordinate derivatives, the general metric with the Minkowski metric, and all affine connections will vanish (although derivatives of affine connections won't).
+    If \(T^{\alpha\beta\gamma} = 0\) holds in this locally inertial frame then it must hold in all frames and so we know that the full version with covariant derivatives, the general metric and affine connections must hold in all frames.
+    
+    An example where we have already used this is in deriving the geodesic equation,\vspace{-2.5ex}
+    \begin{equation}
+        \diff{U^\mu}{\tau} + \christoffel{\mu}{\alpha}{\beta} U^\alpha U^\beta = 0,
+    \end{equation}
+    which is covariant but not manifestly since \(\diff{U^\mu}/{\tau}\) and \(\christoffel{\mu}{\alpha}{\beta}\) are not tensors on their own, but they do for a tensor when combined in this way.
+    
+    \chapter{Curvature}
+    \section{Riemann Curvature Tensor}
+    \begin{figure}
+        \tikzsetnextfilename{parallel-transport}
+        \begin{tikzpicture}
+            \draw[->] (0, 0) -- ++ (2, 3) node[pos=0.6, left] {\(b^\mu\)};
+            \draw[->] (2, 3) -- ++ (2, 1) node[midway, above] {\(a^\mu\)};
+            \draw[->] (0, 0) -- ++ (2, 1) node[midway, below] {\(a^\mu\)};
+            \draw[->] (2, 1) -- ++ (2, 3) node[pos=0.4, right] {\(b^\mu\)};
+            \node[below left] at (0, 0) {\(A\)};
+            \node[below right] at (2, 1) {\(B\)};
+            \node[above right] at (4, 4) {\(C\)};
+            \node[above left] at (2, 3) {\(D\)};
+        \end{tikzpicture}
+        \caption{Parallel transport around a parallelogram to define curvature.}
+        \label{fig:parallel transport}
+    \end{figure}
+    
+    We introduced parallel transport to get around the effects of curvature.
+    We can also use parallel transport as a way to quantify curvature.
+    The more we have to change the vector as we parallel transport it the more curvature there is.
+    Consider what happens when we parallel transport a vector, \(V^\mu\), around a small parallelogram with sides \(a^\mu\) and \(b^\mu\) as shown in \cref{fig:parallel transport}.
+    The change in a vector due to parallel transporting along a displacement \(\delta x^\beta\) is
+    \begin{equation}
+        \delta V^\mu = -\christoffel{\mu}{\alpha}{\beta} V^\alpha \delta x^\beta.
+    \end{equation}
+    The total change due to parallel transporting around the parallelogram is equal to the difference in going along \(ABC\) or \(ADC\).
+    This is given by
+    \begin{multline}
+        \delta V^\mu = -\christoffel{\mu}{\alpha}{\beta}(x) V^\alpha(x) a^\beta - \christoffel{\mu}{\alpha}{\beta}(x + a) V_{\|}^{\alpha}(x + a) b^\beta\\
+        + \christoffel{\mu}{\alpha}{\beta} V^\alpha(x)b^\beta + \christoffel{\mu}{\alpha}{\beta}(x + b) V_{\|}^\alpha (x + b) a^\beta
+    \end{multline}
+    where we make explicit where the vector fields and affine connections are evaluated.
+    The first term is the change in the vector due to the parallel transport along \(AB\), the next term is for \(BC\), the third term is for \(CD\) and the final term for \(DA\).
+    
+    For a small parallelogram the form of the second and fourth terms suggests we should Taylor expand.
+    Doing so we get
+    \begin{equation}
+        \christoffel{\mu}{\alpha}{\beta} (x + a) V_{\|}^{\alpha} (x + a) \approx \christoffel{\mu}{\alpha}{\beta} V^\alpha + a^\nu \partial_\nu \christoffel{\mu}{\alpha}{\beta}V_{\|}^{\alpha} + \order(a^2),
+    \end{equation}
+    where when not explicitly written we evaluate quantities at \(x\).
+    We drop the \(\|\) subscript on the first occurrence of \(V^\alpha\) since \(V_{\|}^\alpha(x) = V^\alpha(x)\).
+    We will get the same for \(b\):
+    \begin{equation}
+        \christoffel{\mu}{\alpha}{\beta}(x + b)V_{\|}^\alpha(x + b) \approx \christoffel{\mu}{\alpha}{\beta}(x) V^\alpha(x) + b^\nu \partial_\nu \christoffel{\mu}{\alpha}{\beta} V_{\|}^\alpha + \order(b^2).
+    \end{equation}
+    Consider the first order term:
+    \begin{align}
+        a^\nu \partial_\nu \christoffel{\mu}{\alpha}{\beta}V_{\|}^{\alpha} &= a^\nu V^\alpha \partial_\nu \christoffel{\mu}{\alpha}{\beta} + \alpha^\nu \christoffel{\mu}{\alpha}{\beta} \partial_\nu V_{\|}^\alpha\\
+        &= a^\nu V^\alpha \partial_\nu \christoffel{\mu}{\alpha}{\beta} + \alpha^\nu \christoffel{\mu}{\alpha}{\beta} (-\christoffel{\alpha}{\sigma}{\nu} V^\sigma).
+    \end{align}
+    Here we have used the fact that the action of the derivative on \(V_{\|}\) is to parallel transport it, giving the affine connection.
+    Doing the same with the fourth term for \(b\) we get
+    \begin{equation}
+        b^\nu \partial_\nu \christoffel{\mu}{\alpha}{\beta} V_{\|}^\alpha = b^\nu V^\alpha\partial_\nu \christoffel{\mu}{\alpha}{\beta} b^\nu \christoffel{\mu}{\alpha}{\beta}(-\christoffel{\alpha}{\sigma}{\nu}).
+    \end{equation}
+    
+    Now put this back in the calculation of \(\delta V^\mu\) and change the dummy indices \(\alpha \leftrightarrow \beta\) in the final term to get matching factors of \(a^\beta b^\alpha\) giving
+    \begin{equation}
+        \delta V^\mu = [V^\nu\partial_\alpha \christoffel{\mu}{\beta}{\nu} - \christoffel{\mu}{\beta}{\nu} \christoffel{\nu}{\sigma}{\alpha} V^\sigma - V^\nu\partial_\beta \christoffel{\mu}{\alpha}{\nu} + \christoffel{\mu}{\alpha}{\nu} \christoffel{\nu}{\sigma}{\beta} V^\sigma] a^\beta b^\alpha.
+    \end{equation}
+    We now relabel dummy indices to make all \(V\) terms \(V^\sigma\) and we get
+    \begin{equation}
+        \delta V^\mu = \tensor{R}{^\mu_{\sigma\alpha\beta}} V^\sigma a^\beta b^\alpha
+    \end{equation}
+    where
+    \begin{equation}
+        \tensor{R}{^\mu_{\sigma\alpha\beta}} \coloneqq \partial_\alpha \christoffel{\mu}{\beta}{\sigma} - \partial_\beta \christoffel{\mu}{\alpha}{\sigma} + \christoffel{\mu}{\alpha}{\nu} \christoffel{\nu}{\sigma}{\beta} - \christoffel{\mu}{\beta}{\nu} \christoffel{\nu}{\sigma}{\alpha}
+    \end{equation}
+    is the \defineindex{Riemann curvature tensor}.
+    
+    Since the Riemann curvature tensor is written in terms of affine connections, which are not themselves tensors, it is not immediately obvious that the Riemann curvature tensor is a tensor, but it is.
+    One way to show this is through the following identity:
+    \begin{equation}
+        [\covariantDerivative{\gamma}\covariantDerivative{\beta} - \covariantDerivative{\beta}\covariantDerivative{\gamma}] V_\alpha = \tensor{R}{^\mu_{\alpha\beta\gamma}} V_\mu.
+    \end{equation}
+    This is covariant and since \(\covariantDerivative{\mu}\) and \(V_\mu\) are both tensorial quantities \(\tensor{R}{^\mu_{\alpha\beta\gamma}}\) is also a tensor.
+    This identity can be proven by expanding in a locally inertial frame, where \(\christoffel{\mu}{\alpha}{\beta}\) vanish, but derivatives of \(\christoffel{\mu}{\alpha}{\beta}\) don't necessarily.
+    
+    A mathematician would define the Riemann tensor geometrically as
+    \begin{equation}
+        \mathop{\mathrm{Rm}}(\vv{v}, \vv{u}, -, -) \coloneqq [\covariantDerivative{\vv{v}}, \covariantDerivative{\vv{u}}] - \covariantDerivative{[\vv{v}, \vv{u}]}
+    \end{equation}
+    where \([-,-]\) is the commutator.
+    The two empty slots are for a vector and a one-form.
+    The covariant derivatives turn the vector into another vector and then it combines with the one-form to produce a scalar, making the Riemann curvature tensor a multilinear map
+    \begin{equation}
+        \mathop{\mathrm{Rm}}\colon T_pM \times T_pM \times T_pM \times T^*_pM \to \reals.
+    \end{equation}
+    That is, the Riemann curvature tensor is a \((1, 3)\)-tensor.
+    It can alternatively be defined as a multilinear map
+    \begin{equation}
+        \mathop{\mathrm{Rm}}\colon T_pM \times T_pM \times T_pM \to T_pM
+    \end{equation}
+    by dropping the slot for the one-form.
+    
+    The interpretation of the Riemann curvature tensor is that if there is no curvature then the vector parallel transported around a loop will not change, for any loop at any position.
+    If there is some non-zero curvature then there will be a loop and a vector such that parallel transporting the vector around the loop results in a non-zero change in the components of the vector.
+    If the Riemann curvature tensor is zero in one frame then it will be zero in all frames, meaning that all observers agree upon whether space is flat or curved, although they may measure different amounts of non-zero curvature.
+    
+    \section{Calculating the Riemann Curvature Tensor}
+    At first glance \(\tensor{R}{^\mu_{\alpha\beta\gamma}}\) has four indices, each of which can take on four values, for a total of \(4^4 = 256\) components.
+    Fortunately there are several symmetries which reduces the number of degrees of freedom.
+    We can also define matrices from the affine connections and Riemann tensor which make computations easier.
+    
+    Starting with the Christoffel symbols, \(\christoffel{\alpha}{\beta}{\gamma}\), we can define matrices \(\Gamma_\beta\) which have components \(\tensor{(\Gamma_\beta)}{^\alpha_\gamma} \coloneqq \christoffel{\alpha}{\beta}{\gamma}\).
+    For example, see \cref{eqn:christoffel matrices S1}.
+    There are four such matrices, and each one is a \(4 \times 4\) matrix.
+    
+    From the Riemann tensor, \(\tensor{R}{^\alpha_{\gamma\rho\sigma}}\) we can define 16 matrices, \(B_{\rho\sigma}\), which are \(4\times 4\) matrices with components
+    \begin{equation}
+        \tensor{(B_{\rho\sigma})}{^\alpha_\gamma} \coloneqq \tensor{R}{^\alpha_{\gamma\rho\sigma}}.
+    \end{equation}
+    We can then relate these matrices through the matrix equation
+    \begin{equation}
+        B_{\rho\sigma} = \partial_\rho \Gamma_\sigma - \partial_\sigma \Gamma_\rho + \Gamma_\rho \Gamma_\sigma - \Gamma_\sigma \Gamma_\rho.
+    \end{equation}
+    From this it is clear that \(B_{\rho\sigma}\) is antisymmetric in \(\rho\) and \(\sigma\).
+    This means of the 16 matrices we actually only need to compute 6, since \(B_{\rho\sigma} = -B_{\sigma\rho}\) also implies \(B_{\rho\rho} = 0\) (no summation convention).
+    Constructing \(B\) as a block matrix with the matrices \(B_{\rho\sigma}\) as the components we can think of the antisymmetry as fixing the diagonal to zero and the lower triangle must be equal to the negative of the upper triangle.
+    
+    Further simplifications come due to symmetries of the Riemann tensor.
+    We will state some here without proof.
+    To prove these we would work in a locally inertial frame with the affine connections vanishing, but not their derivatives.
+    Since the Riemann tensor is defined in terms of affine connections and we can express affine connections in terms of derivatives of the metric we can express the Riemann tensor in terms of derivatives of the metric:
+    \begin{equation}
+        2R_{\alpha\beta\gamma\delta} = g_{\alpha\delta,\beta\gamma} - g_{\beta\delta,\alpha\gamma} + g_{\beta\gamma,\alpha\delta} - g_{\alpha\gamma,\beta\delta}.
+    \end{equation}
+    This leads to the following symmetry properties:
+    \begingroup
+    \setindexcolor{\rho = highlight!80!black, \sigma = my red, \mu = my blue, \alpha = my purple}
+    \begin{align}
+        \tensor{R}{^\alpha_{\mu\indexcolor{\rho}\indexcolor{\sigma}}} &= - \tensor{R}{^\alpha_{\mu\indexcolor{\sigma}\indexcolor{\rho}}},\\
+        \tensor{R}{^\alpha_{\indexcolor{\rho}\indexcolor{\sigma}\indexcolor{\mu}}} + \tensor{R}{^\alpha_{\indexcolor{\sigma}\indexcolor{\mu}\indexcolor{\rho}}} + \tensor{R}{^\alpha_{\indexcolor{\mu}\indexcolor{\rho}\indexcolor{\sigma}}} &= 0,\\
+        R_{\indexcolor{\alpha}\indexcolor{\mu}\rho\sigma} &= -R_{\indexcolor{\mu}\indexcolor{\alpha}\rho\sigma},\\
+        \setindexcolor{\rho = highlight!80!black, \sigma = highlight!90!black, \mu = my red, \alpha = my red}
+        R_{\indexcolor{\alpha}\indexcolor{\mu}\indexcolor{\rho}\indexcolor{\sigma}} = R_{\indexcolor{\rho}\indexcolor{\sigma}\indexcolor{\alpha}\indexcolor{\mu}}.
+    \end{align}
+    \endgroup
+    These symmetries reduce the number of independent components from 256 to 20.
+    In general in \(n\) dimensions the Riemann curvature tensor has \(n^2(n^2 - 1) / 12\) degrees of freedom.
+    
+    From the Riemann curvature tensor we can define two new quantities by contracting the Riemann tensor with itself.
+    Since a contraction must occur across an upper and lower index there are three choices for which index pair to contract.
+    However, since \(R_{\mu\alpha\beta\gamma} = -R_{\alpha\mu\beta\gamma}\) we know that \(\tensor{R}{^\mu_{\mu\beta\gamma}} = 0\), so this isn't interesting.
+    Then since \(\tensor{R}{^\mu_{\alpha\beta\gamma}} = -\tensor{R}{^\mu_{\alpha\gamma\beta}}\) the other choices only differ by a minus sign.
+    It is then a matter of convention which we choose, and in this course we choose to define
+    \begin{equation}
+        R_{\alpha\beta} \coloneqq \tensor{R}{^\mu_{\alpha\beta\mu}}
+    \end{equation}
+    as the \defineindex{Ricci tensor}.
+    This quantity is a symmetric rank 2 tensor.
+    In physics we differentiate between the Riemann tensor and the Ricci tensor by the number of indices.
+    In maths or index free notation the Ricci tensor is denoted \(\mathop{\mathrm{Ric}}\), which would be defined as a bilinear map
+    \begin{equation}
+        \mathop{\mathrm{Ric}}\colon T_p M \times T_p M \to \reals.
+    \end{equation}
+    The Ricci tensor is important and so we give here an explicit form for its components:
+    \begin{align}
+        R_{\mu\nu} &= \partial_\nu \christoffel{\alpha}{\mu}{\alpha} - \partial_\alpha \christoffel{\alpha}{\mu}{\nu} + \christoffel{\alpha}{\mu}{\beta}\christoffel{\beta}{\alpha}{\nu} + \christoffel{\alpha}{\alpha}{\beta}\christoffel{\beta}{\mu}{\nu}\\
+        &= \christoffel{\alpha}{\mu}{\alpha,\nu} - \christoffel{\alpha}{\mu}{\nu,\alpha} + \christoffel{\alpha}{\mu}{\beta}\christoffel{\beta}{\alpha}{\nu} + \christoffel{\alpha}{\alpha}{\beta}\christoffel{\beta}{\mu}{\nu}
+    \end{align}
+    
+    Further contracting the indices on the Ricci tensor we define its trace as the \defineindex{Ricci scalar}:
+    \begin{equation}
+        R \coloneqq \tensor{R}{^\alpha_\alpha} = g^{\alpha\beta}R_{\alpha\beta} = g^{\alpha\beta}\tensor{R}{^\mu_{\alpha\beta\mu}} = \tensor{R}{^{\mu\alpha}_{\alpha\mu}}.
+    \end{equation}
+    Again, we distinguish between the Riemann tensor, Ricci tensor, and Ricci scalar by the number of indices.
+    In a given coordinate system the Ricci scalar can be computed as
+    \begin{align}
+        R &= g^{\alpha\beta} (\partial_\gamma \christoffel{\gamma}{\alpha}{\beta} - \partial_\beta\christoffel{\gamma}{\alpha}{\gamma} + \christoffel{\delta}{\alpha}{\beta}\christoffel{\gamma}{\gamma}{\delta} - \christoffel{\delta}{\alpha}{\gamma}\christoffel{\gamma}{\beta}{\delta})\\
+        &= g^{\alpha\beta} (\christoffel{\gamma}{\alpha}{\beta,\gamma} - \christoffel{\gamma}{\alpha}{\gamma,\beta} + \christoffel{\delta}{\alpha}{\beta} \christoffel{\gamma}{\gamma}{\delta} - \christoffel{\delta}{\alpha}{\gamma}\christoffel{\gamma}{\beta}{\delta})\\
+        &= 2 g^{\alpha\beta}(\christoffel{\gamma}{\alpha}{[\beta,\gamma]} + \christoffel{\delta}{\alpha}{[b} \christoffel{\gamma}{\gamma]}{d})
+    \end{align}
+    where \([ij]\) represents the antisymmetrisation of indices \(i\) and \(j\), defined by
+    \begin{equation}
+        T^{[i_1\dotso i_n]} \coloneqq \frac{1}{n!} \sum_{\sigma \in S_n} \sgn(\sigma) T^{\sigma(i_1) \dotso \sigma(i_n)}.
+    \end{equation}
+    Here \(S_n = \{\sigma\colon \{1, \dotsc, n\} \to \{1, \dotsc, n\} \mid \sigma \text{ is a bijection}\}\) is the permutation group\footnote{see the notes from symmetries of quantum mechanics.} and \(\sgn(n)\) is \(+1\) for an even permutation or \(-1\) for an odd permutation.
+    For example, 
+    \begin{equation}
+        T^{[ij]} = \frac{1}{2}(T^{ij} - T^{ji}).
+    \end{equation}
+    
+    
+    %   Appdendix
+    \appendixpage
+    \begin{appendices}
+        \include{parts/graphical-notation-appendix}
+    \end{appendices}
     
     \backmatter
     \renewcommand{\glossaryname}{Acronyms}
