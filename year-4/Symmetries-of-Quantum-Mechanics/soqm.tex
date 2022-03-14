@@ -11,6 +11,7 @@
 \usepackage{siunitx}
 \usepackage[version=4]{mhchem}
 \usepackage{chemfig}
+\usepackage{tensor}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -22,6 +23,12 @@
 % other libraries
 \usetikzlibrary{calc}
 \usetikzlibrary{3d}
+\usetikzlibrary{hobby}
+\usetikzlibrary{decorations.markings}
+
+% Young Tableau
+\usepackage{ytableau}
+\ytableausetup{smalltableaux}
 
 % References, should be last things loaded
 \usepackage{hyperref}  % Should be loaded second last (cleveref last)
@@ -40,7 +47,7 @@ noabbrev
 % Title page info
 \title{Symmetries of Quantum Mechanics}
 \author{Willoughby Seago}
-\date{}
+\date{February 17, 2022}
 % \subtitle{}
 % \subsubtitle{}
 
@@ -82,7 +89,7 @@ noabbrev
 \newcommand*{\hermit}{\dagger}
 \newcommand*{\positiveintegers}{\integers_{>0}}
 \newcommand*{\hilbert}{\mathcal{H}}
-\newcommand*{\ident}{\mathbf{1}}
+\newcommand*{\ident}{\mathbb{1}}
 \DeclareMathOperator{\tr}{tr}
 \newcommand*{\directsum}{\oplus}
 \newcommand*{\directproduct}{\otimes}
@@ -90,7 +97,8 @@ noabbrev
 \newcommand*{\e}{\mathrm{e}}
 \ExplSyntaxOn
 % Create LaTeX interface command
-\NewDocumentCommand{\cycle}{ O{\,} m }{  % optional arg is separator, mandatory arg is comma separated list
+\NewDocumentCommand{\cycle}{ O{\,} m }{  % optional arg is separator, mandatory
+    %arg is comma separated list
     (
     \willoughby_cycle:nn { #1 } { #2 }
     )
@@ -98,7 +106,8 @@ noabbrev
 
 \clist_new:N \l_willougbhy_cycle_clist  % Create new clist variable
 \cs_new_protected:Npn \willoughby_cycle:nn #1 #2 {  % create LaTeX3 function
-    \clist_set:Nn \l_willougbhy_cycle_clist { #2 }  % set clist variable with clist #2 passed by user
+    \clist_set:Nn \l_willougbhy_cycle_clist { #2 }  % set clist variable with
+    %clist #2 passed by user
     \clist_use:Nn \l_willougbhy_cycle_clist { #1 }  % print list separated by #1
 }
 \ExplSyntaxOff
@@ -116,14 +125,16 @@ noabbrev
 \DeclareMathOperator{\ISO}{ISO}
 \newcommand*{\triangleDthree}[3]{%
     \begin{tikzpicture}[baseline=(current bounding box), scale=0.5, font=\tiny]
-        \draw[highlight, very thick, rounded corners=0.1, fill=highlight!20] (-30:1) -- (90:1) -- (210:1) -- cycle;
+        \draw[highlight, very thick, rounded corners=0.1, fill=highlight!20]
+        (-30:1) -- (90:1) -- (210:1) -- cycle;
         \node at (210:1.3) {#1};
         \node at (90:1.3) {#2};
         \node at (-30:1.3) {#3};
     \end{tikzpicture}%
 }
 \newcommand*{\tetrahedron}[4]{%
-    \begin{tikzpicture}[highlight, ultra thick, rounded corners=0.01, baseline=(current bounding box)]
+    \begin{tikzpicture}[highlight, ultra thick, rounded corners=0.01,
+        baseline=(current bounding box)]
         \pgfmathsetmacro{\r}{1}
         \coordinate (A) at (0, 0, \r);
         \coordinate (B) at ({\r*sqrt(2)/2}, 0, 0);
@@ -140,7 +151,8 @@ noabbrev
     \end{tikzpicture}
 }
 \newcommand*{\invertedtetrahedron}[4]{%
-    \begin{tikzpicture}[highlight, ultra thick, rounded corners=0.01, baseline=(current bounding box)]
+    \begin{tikzpicture}[highlight, ultra thick, rounded corners=0.01,
+        baseline=(current bounding box)]
         \pgfmathsetmacro{\r}{1}
         \coordinate (A) at (0, 0, \r);
         \coordinate (B) at ({\r*sqrt(2)/2}, 0, 0);
@@ -158,817 +170,429 @@ noabbrev
 }
 \makeatletter
 \newcommand{\Spin}{\@lineargroup{Spin}}
+\newcommand*{\USp}{\@lineargroup{USp}}
+\newcommand*{\Sp}{\@lineargroup{Sp}}
 \makeatother
 \DeclarePairedDelimiterX{\commutator}[2]{[}{]}{#1, #2}
+\newcommand*{\rep}[1]{\mathbf{#1}}
+\DeclarePairedDelimiterX{\liebracket}[2]{[}{]}{#1, #2}
 
 % Include
-\includeonly{parts/group-theory, parts/math-prelim-appendix, parts/groups-appendix}
+\includeonly{parts/group-theory, parts/representation-theory, parts/math-prelim-appendix,
+    parts/groups-appendix, parts/manifolds-appendix, parts/algebras-appendix}
 
 \begin{document}
     \frontmatter
     \titlepage
     \innertitlepage{tikz-external/cube-octahedron-dual} 
     \tableofcontents
+    \listoffigures
     \mainmatter
     \include{parts/group-theory}
+    \include{parts/representation-theory}
     
-    \part{Representation Theory}
-    \chapter{Basics of Representation Theory}
-    \begin{rmk}
-        Material in this section applies both to finite groups and compact groups.
-        We won't worry too much about what it means for a group to be compact, we just note that the Lie groups \(\unitary(1) \isomorphic \specialOrthogonal(2)\) and \(\specialOrthogonal(3) \isomorphic \specialUnitary(2) / \integers_2\) are compact.
-        More generally \(\orthogonal(n)\), \(\specialOrthogonal(n)\), \(\Spin(n)\), \(\unitary(n)\), and \(\specialUnitary(n)\) are compact.
-    \end{rmk}
+    \part{Continuous Groups}
+    \chapter{Lie Groups}
+    \section{Background}
+    Finite groups were first utilised by mathematicians, particularly Galois, who wanted to classify the solutions to polynomials.
+    Groups were used to show that, in general, polynomials of degree 5 or greater don't admit an exact solution in terms of elementary functions.
+    That is, there is no \enquote{quintic formula} equivalent to the quadratic formula.
+    There are linear, cubic, and quartic versions of the quadratic formula, but the linear formula is trivial and the cubic and quartic formulae contain too many terms to be useful for human computations.
+    The main focus was on the symmetric groups, since permuting variables in equations played a big part in classifying the solutions, and it was soon noticed that the basic symmetry operations of a group applied to a far more general class of algebraic objects.
     
-    \section{Representation Definition}
-    There are two essentially equivalent definitions of a representation:
-    \begin{dfn}{Representation}{}
-        A \defineindex{representation} of a group, \(G\), is a group action of \(G\) on a linear space, \(V\).
-        That is \(\varphi \colon G \times V \to V\) is a representation if it is a group action.
-        
-        A \defineindex{representation} of a group, \(G\), is a homomorphism with the automorphism group of a linear space.
-        That is \(\rho \colon G \to \generalLinear(V)\) is a representation if it is a homomorphism.
+    Sophus Lie introduced Lie groups, to be defined shortly, for similar reasons, he was attempting to classify solutions to differential equations.
+    These have continuous solutions and so unsurprisingly Lie groups are continuous.
+    
+    All simple finite groups have been classified.
+    Likewise all simple and compact Lie groups have been classified, we will see the classification later.
+    
+    \section{Basics}
+    \begin{dfn}{Continuous Group}{}
+        A \defineindex{continuous group} is a group, \(G\), with an uncountable number of elements which can be continuously parametrised by some set of parameters, \(\{\alpha\}\).
+        We call the number of parameters the \define{dimension}\index{dimension!of a group} of \(G\), \(\dim G\).
     \end{dfn}
-    The equivalence of these two definitions is simple, if \(\varphi(g, \vv{v}) = g \action \vv{v} = \rho(g)\vv{v}\) for all \(g \in G\) and \(\vv{v} \in V\) then \(\varphi\) and \(\rho\) are the same representation in the two slightly different definitions.
+    Notice that it doesn't make sense to discus the order of a continuous group since it is infinite.
     
-    When the homomorphism is clear it is common to refer to \(V\) as the representation, rather than \(\rho\).
+    \begin{dfn}{Lie Group}{}
+        A \define{Lie group}\index{Lie!group} is a continuous group which admits an analytic structure in the parameters \(\{a\}\).
+        
+        Alternatively, a \define{Lie group} is a manifold equipped with a binary operation satisfying the group axioms.
+    \end{dfn}
+    For our purposes a manifold is a space which can be parametrised locally by a fixed number Euclidean coordinates.
+    The number of coordinates is the dimension of the manifold.
+    A fuller definition of a manifold is given in \cref{app:manifold}.
 
-    Representation theory gives us a way to do concrete calculations in a group.
-    We have implicitly been using representation theory already, for example we have used \(\integers_n = \{\e^{2i\pi m/n} \mid m = 0, \dotsc, n - 1\}\) as \emph{the} cyclic group of order \(n\).
-    Strictly this is actually a representation of a more general cyclic group, defined by \(\presentation{g}{g^n = e}\).
-    The linear space in question is \(\complex\), and \(\generalLinear(\complex) = \complex\setminus\{0\}\).
-    The group action is rotation by \(2\pi m/n\).
+    All of the groups in the following definition are Lie groups.
+    Technically, we are only defining a representation of these groups here but this is fine.
     
-    Representation theory is particularly useful because we have developed a lot of tools for dealing with computations in linear spaces since they are common in other areas of maths and physics.
-    Representation theory allows us to use these to work with groups.
-    
-    \begin{app}{}{}
-        When we solve the quantum harmonic oscillator we can do so in different linear spaces, such position space, \(\ket{x}\), momentum space, \(\ket{p}\), or number-of-particles space, \(\ket{n}\).
-        Each one of these corresponds to studying the same underlying physics on a different linear space, which we can think of as being different representations.
-        
-        If a system has a certain symmetry described by a group, \(G\), then this is expressed in the mathematics by \(G\) acting on the Hilbert space of states, which is to say as a representation of \(G\) on the Hilbert space of states.
-    \end{app}
-    
-    If the relevant linear space is finite dimensional, say \(\dim V = n\) then we can associate \(\generalLinear(V)\) with \(\generalLinear(n, \field)\), the group of \(n \times n\) matrices with entries in \(\field\), and so we can associate \(\rho(g)\) with a matrix.
-    
-    \section{Pedestrian Approach}
-    \begin{rmk}
-        In this section we will get an idea of how representation can be used without being too worried about precise definitions.
-    \end{rmk}
-    
-    Consider \(S_3\).
-    By \cref{lma:transpositions 1 a generate Sn} \(\{\cycle{1, 2}, \cycle{1, 3}\}\) generates \(S_n\), so we can define a representation by how it maps these two elements to the linear space.
-    Inspired by \(S_3\) as a permutation group we look for a representation that conserves this permuting ability.
-    In particular the obvious choice of 3 things to act on in a linear space are the 3 basis vectors of a 3-dimensional space, such as \(\reals^3\).
-    We use the standard basis, \(\ve{1} = (1, 0, 0)^\trans\), \(\ve{2} = (0, 1, 0)^\trans\), and \(\ve{3} = (0, 0, 1)^\trans\).
-    We can easily construct matrices that permute these, for example we want \(\rho(\cycle{1, 2})\ve{1} = \ve{2}\), \(\rho(\cycle{1, 2})\ve{2} = \ve{2}\) and \(\rho(\cycle{1, 2})\ve{3} = \ve{3}\).
-    This fully determines the matrix \(\rho(\cycle{1, 2})\):
-    \begin{equation}
-        \rho(\cycle{1, 2}) = 
-        \begin{pmatrix}
-            0 & 1 & 0\\
-            1 & 0 & 0\\
-            0 & 0 & 1
-        \end{pmatrix}
-        .
-    \end{equation}
-    Similarly, we have
-    \begin{equation}
-        \rho(\cycle{1, 3}) = 
-        \begin{pmatrix}
-            0 & 0 & 1\\
-            0 & 1 & 0\\
-            1 & 0 & 0
-        \end{pmatrix}
-        .
-    \end{equation}
-    This is called the \defineindex{permutation representation} of \(S_3\), and can easily be generalised to \(S_n\).
-    
-    At this point there are a few questions we should consider.
-    First, are there any other representations?
-    The answer to this is yes, and we'll see some later.
-    The second is can we find a simpler representation, for some sense of simpler.
-    The answer is again yes.
-    In particular notice that \(\vv{v} = (1, 1, 1)^{\trans}\) is an common eigenvector for both of these matrices, and hence there is an invariant subspace, \(\spn\{\vv{v}\}\), which is unchanged by this representation.
-    It can be shown that this allows us to perform a basis change and write these matrices in block diagonal form.
-    We can then define a new representation, \(\rho'\), in this block diagonal basis such that
-    \begin{equation}
-        \rho'(\cycle{1, 2}) = 
-        \begin{pmatrix}
-            1 & 0 & 0\\
-            0 & a_{11} & a_{12}\\
-            0 & a_{21} & a_{22}
-        \end{pmatrix}
-        ,\qqand \rho'(\cycle{1, 3}) = 
-        \begin{pmatrix}
-            1 & 0 & 0\\
-            0 & b_{11} & b_{12}\\
-            0 & b_{21} & b_{22}
-        \end{pmatrix}
-        .
-    \end{equation}
-    This is simpler because it is fully determined by the \(2\times 2\) block matrices on the diagonal.
-    We say that the permutation representation is reducible.
-    
-    \section{Basic Definitions}
-    \begin{dfn}{Faithful}{}
-        If \(\rho \colon G \to \generalLinear(V)\) is a representation of \(G\) then we say \(\rho\) is \define{faithful}\index{faithful representation} if it is injective, that is \(\rho(g) = \rho(g')\) implies \(g = g'\).
-        If this is not the case then we say \(\rho\) is \define{unfaithful}\index{unfaithful representation}.
-    \end{dfn}
-    
-    The permutation representation of \(S_3\) is faithful.
-    
-    \begin{dfn}{Trivial Representation}{}
-        \emph{A} \defineindex{trivial representation} is \(\rho\colon G \to \generalLinear(V)\) defined by \(\rho(g) = \rho(e) = \ident_V\), where \(\ident_V\) is the identity in \(\generalLinear(V)\) and \(V\) is an \emph{arbitrary vector space}.
-        
-        \emph{The} \define{trivial representation} is \(\rho\colon G \to \generalLinear(V)\) defined by \(\rho(g) = \rho(e) = \ident_V\), where \(\ident_V\) is the identity in \(\generalLinear(V)\) and \(V\) is a \emph{one-dimensional vector space}.
-    \end{dfn}
-    
-    A trivial representation is maximally unfaithful since all elements map to the same operator.
-    
-    \begin{dfn}{Unitary Representation}{}
-        If \(\rho \colon G \to \unitary(V)\) is a homomorphism then we say that \(\rho\) is a \defineindex{unitary representation}.
-        That is a unitary representation is one in which \(\rho(g)\) is a unitary operator for all \(g \in G\).
-    \end{dfn}
-    
-    We have been working with a unitary representation of \(\integers_n\) as \(\{\e^{2i\pi m/n} \mid m = 0, \dotsc, n - 1\}\).
-    
-    \begin{dfn}{Equivalence of Representations}{}
-        If \(\rho\) and \(\rho'\) are representations of \(G\) on \(V\) the we say that \(\rho\) and \(\rho'\) are \define{equivalent}\index{equivalence of representations} if they are represented by a \defineindex{similarity transform}, that is \(\rho(g) = S\rho'(g)S^{-1}\) for some \(S \in \generalLinear(V)\).
-        Notice that \(S\) must be the same for all \(g \in G\).
-    \end{dfn}
-    
-    As the name suggests the equivalence of representations, \(\sim\), is an equivalence relation.
-    Clearly \(\rho \sim \rho\) since \(\rho(g) = \ident_V\rho(g)\ident_V^{-1}\).
-    Also, if \(\rho \sim \rho'\) then \(\rho(g) = S\rho'(g)S^{-1}\) for some \(S \in \generalLinear(V)\), and so \(\rho'(g) = S^{-1}\rho(g)S\), identifying \(S = (S^{-1})^{-1}\) and knowing that if \(S \in \generalLinear(V)\) we also have \(S^{-1} \in \generalLinear(V)\) we see that \(\rho' \sim \rho\).
-    Finally, if \(\rho \sim \rho'\) and \(\rho' \sim \rho''\) there exists \(S, T \in \generalLinear(V)\) such that \(\rho(g) = S\rho'(g)S^{-1}\) and \(\rho'(g) = T\rho''(g)T^{-1}\), and hence \(\rho(g) = ST\rho''(g)T^{-1}S^{-1} = (ST)\rho(g)(ST)^{-1}\) and since \(S, T \in \generalLinear(V)\) it follows that \(ST \in \generalLinear(V)\), and hence \(\rho \sim \rho''\).
-    
-    \begin{dfn}{Invariant Subspace}{}
-        Let \(\rho \colon G \to \generalLinear(V)\) be a representation of the group \(G\) on the linear space \(V\).
-        Let \(W\) be a subspace of \(V\).
-        Then we call \(W\) a \defineindex{invariant subspace} if \(\rho(g)\vv{w} \in W\) for all \(g \in G\) and \(\vv{w} \in W\).
-        
-        Using the group-action definition of a representation \(W\) is an invariant subspace if \(\Orb(\vv{w}) \subseteq W\) for all \(\vv{w} \in W\).
-    \end{dfn}
-    
-    A trivial representation, \(\rho(g) = \ident_V\), has \(V\) as an invariant subspace.
-    Our earlier example of \(S_3\) in the permutation representation has \(\spn\{(1, 1, 1)^\trans\}\) as an invariant subspace.
-    All representations leave the trivial subspace, \(\{\vv{0}\}\), invariant.
-    
-    \begin{dfn}{Irreducible}{}
-        We call a representation \define{irreducible}\index{irreducible representation} if it has no invariant subspaces, apart from the trivial zero-dimensional subspace, \(\{\vv{0}\}\).
-        If a representation can be written in block diagonal form then it is \define{reducible}\index{reducible representation}
-    \end{dfn}
-    
-    It is common to shorten \enquote{irreducible representation} to \define{irrep}\index{irrep|see{irreducible representation}}.
-    
-    For finite groups and continuous compact groups the reducible representations can be written as a direct sum of irreducible representations.
-    For this reason we often care only about irreducible representations.
-    
-    The permutation representation of \(S_3\) is reducible.
-    
-    \begin{lma}{}{}
-        If a representation has invariant subspaces then we can write it in block diagonal form.
-    \end{lma}
-    
-    \begin{dfn}{Real and Complex Representations}{}
-        A representation, \(\rho \colon G \to \generalLinear(V)\), is \define{real}\index{real representation} if either \(V\) is a real vector space or the representation is equivalent to a representation which can be thought of as acting on a real vector space by reducing the field of scalars to \(\reals\).
-        Alternatively \(\rho\) is equivalent to \(\rho^*\).
-        
-        A \defineindex{complex representation} is a representation, \(\rho \colon G \to \generalLinear(V)\), where \(\rho\) is not equivalent to \(\rho^*\).
-    \end{dfn}
-    
-    We will refine this notion later to include pseudo-real representations.
-    
-    The permutation representation of \(S_3\) is real, and hence so is \(\rho'\), even though it is possible that \(a_{ij}\) and/or \(b_{ij}\) are not real, since \(\rho\) and \(\rho'\) are equivalent.
-
-    \begin{app}{}{}
-        Unitary representations are important in quantum physics.
-        They are the natural language to describe symmetries on the Hilbert space of states since they preserve the inner product, and hence the probability of being in a given state.
-        
-        Further there is a certain view from which particles \emph{are} irreducible representations of the Poincar\'e group, \(\reals^{1, 3} \ltimes \orthogonal(1, 3)\).
-        We then associate complex representations with charged particles and real representations with neutral particles.
-    \end{app}
-    
-    \section{Some Theorems}
-    \begin{thm}{Maschke's Theorem}{thm:maschke's theorem}\index{Maschke's theorem}
-        Any representation of a finite group is equivalent to a unitary representation.
-        
-        \begin{proof}
-            Let \(G\) be a finite group, \(V\) a vector space, and \(\rho\colon G \to \generalLinear(V)\) a representation.
-            Let \(\innerprod{-}{-}\) be an inner product on \(G\).
-            The statement of the theorem is equivalent to stating that we can define a new inner product on \(V\) such that this inner product is invariant under the action of this representation.
-            This works since the two inner products will be related by a change of basis, and hence this new inner product can be viewed as the old inner product after a similarity transform.
-            
-            The inner product that we define is \(\innerprod{-}{-}_G\) and it is defined for \(x, y \in V\) as
+    \begin{dfn}{Specific Lie Groups}{}
+        \begin{itemize}
+            \item The \defineindex{general linear group}, \(\generalLinear(n, \field)\), is defined as the group of transformations of an \(n\)-dimensional vector space over \(\field\), which is usually \(\reals\) or \(\complex\).
+            It has the representation
             \begin{equation}
-                \innerprod{x}{y}_G \coloneqq \frac{1}{\abs{G}} \sum_{g \in G} \innerprod{\rho(g)x}{\rho(g)y}.
+                \generalLinear(n, \field) \coloneqq \{M \in \matrices{n}{\field} \mid \det M \ne 0\}.
             \end{equation}
-            We can think of this inner product being defined by acting on the old inner product with the representation and then averaging over \(G\).
+            The requirement of non-zero determinant is so that the matrices are invertible.
             
-            We need to show that \(\innerprod{-}{-}_G\) is an inner product and that it is invariant with respect to the representation.
-            By definition \(\rho(g)x, \rho(g)y \in V\) and so \(\innerprod{\rho(g)x}{\rho(g)y}\) is positive definite.
-            This carries through the sum and so \(\innerprod{x}{y}_G\) is positive definite.
-            Linearity and conjugate symmetry of \(\innerprod{-}{-}_G\) similarly follows from these same properties for \(\innerprod{-}{-}\) without any complications since \(G\) is finite.
-            
-            Now consider what happens when we first act on \(V\) with \(\rho(g')\) for some \(g' \in G\).
-            Using the fact that \(\rho\) is a homomorphism we then have
-            \begin{align}
-                \innerprod{\rho(g')x}{\rho(g')y}_G &= \frac{1}{\abs{G}} \sum_{g \in G} \innerprod{\rho(g)\rho(g')x}{\rho(g)\rho(g')y}\\
-                &= \sum_{g\in G} \innerprod{\rho(gg')x}{\rho(gg')y}\\
-                &= \sum_{g''\in G} \innerprod{\rho(g'')x}{\rho(g'')y}\\
-                &= \innerprod{x}{y}_G.
-            \end{align}
-            In the penultimate step we have used the fact that as \(g\) takes on all values in \(G\) \(gg'\) necessarily also takes on all values in \(G\).
-            This is due to the fact that in a Cayley table each column must contain every element of \(G\) exactly once.
-            Hence summing over \(g\) with factors of \(gg'\) is the same as summing over \(g'' = gg'\), only the order of the terms changes and since the inner product gives an element of the base field this sum is commutative.
-            
-            Finally we remark that 
+            \item The \defineindex{special linear group}, \(\specialLinear(n, \field)\), is defined as the group of transformations of an \(n\)-dimensional vector space over \(\field\) which preserve volumes.
+            It has the representation
             \begin{equation}
-                \innerprod{x}{y}_G = \innerprod{\rho(g')x}{\rho(g')y}_G = \innerprod{\rho(g')^\hermit \rho(g') x}{y}_G
+                \specialLinear(n, \field) \coloneqq \{M \in \matrices{n}{\field} \mid \det M \ne 1\} \subgroup \generalLinear(n, \field).
             \end{equation}
-            using the property of inner products that \(\innerprod{x}{Ay} = \innerprod{A^\hermit x}{y}\) for any inner product, \(\innerprod{-}{-}\), and operator \(A\).
-            Hence we can identify that \(\rho(g')^\hermit \rho(g') = \ident\), and so \(\rho\) is a unitary representation.
-        \end{proof}
-    \end{thm}
-    
-    It turns out that being irreducible is an incredibly strong requirement, so much so that it doesn't really leave much wiggle room, as the next theorem shows.
-    Schur's lemma states that there is no room for non-trivial homomorphisms between irreducible representations.
-    
-    \begin{thm}{Schur's Lemma}{thm:schurs lemma}\index{Schur's lemma}
-        Let \(\rho\colon G \to \generalLinear(V)\) and \(\rho\colon G \to \generalLinear(V')\) be irreducible representations of the group \(G\) on some finite dimensional vector spaces \(V\) and \(V'\).
-        Let \(T \colon V \to V'\) be a linear map satisfying \(\rho'(g) \circ T = T \circ \rho(g)\) for all \(g \in G\) where \(\circ\) is composition of functions.
-        Then
-        \begin{enumerate}
-            \item either \(T\) is an isomorphism or \(T\) is trivial.
-            \item If \(V = V'\) then \(T = \lambda\ident\) for \(\lambda \in \complex\) and \(\ident\) being the identity map on \(V\).
-        \end{enumerate}
-        \begin{proof}
-            The first step is to notice that \(\ker T\) and \(\image T\) are invariant subspaces.
-            Recall that \(\ker T \coloneqq \{v \in V \mid Tv = 0\}\).
-            To show that \(\ker T\) is an invariant subspace we need to show that \(\rho(g)v \in \ker T\) for all \(v \in \ker T\).
-            To do this we notice that for \(v\in\ker T\) we have
-            \begin{multline}
-                T\rho(g)v = (T \circ \rho(g))v = (\rho'(g) \circ T)v\\
-                = \rho'(g)Tv = \rho'(g)(Tv) = \rho'(g)0 = 0
-            \end{multline}
-            where the final equality follows since linear maps map 0 to 0.
-            We have therefore shown that \(T\rho(g)v = 0\) for all \(v \in \ker T\) and hence \(\rho(g)v \in \ker T\) so \(\ker T\) is an invariant subspace of \(V\) under \(\rho\).
             
-            Now recall that \(\image T = \{v' \in V' \mid v' = T(v) \text{ for some } v \in V\}\).
-            This is an invariant subspace if \(\rho'(g)v \in \image T\) for all \(v' \in \image T\).
-            To show this we notice that for \(v' \in \image T\) we have \(v\in V\) such that \(v' = Tv\) and so
+            \item The \defineindex{orthogonal group}, \(\orthogonal(n)\), is defined as the group of transformations of an \(n\)-dimensional vector space over \(\reals\) which preserves lengths.
+            It has the representation
             \begin{equation}
-                \rho'(g)v' = \rho'(g)Tv = (\rho'(g) \circ T)v = (T\circ \rho(g))v = T\rho(g)v
+                \orthogonal(n) \coloneqq \{O \in \matrices{n}{\reals} \mid O^\trans O = \ident_n\} \subgroup \generalLinear(n, \reals).
             \end{equation}
-            and so \(\rho'(g)v'\) is of the form \(T\rho(g)v\) and \(\rho(g)v \in V\) meaning \(\rho'(g) v' \in \image T\).
-            Hence \(\image T\) is an invariant subspace of \(V'\) under \(\rho'\).
             
-            By definition \(\rho\) and \(\rho'\) are irreducible representations and therefore have no nontrivial invariant subspaces.
-            This means that the invariant subspace \(\ker T\) must be \(\{0\}\) or \(V\), and similarly \(\image T\) must be \(\{0\}\) or \(V'\).
-            We now treat this by cases.
-            \begin{itemize}
-                \item Suppose \(\ker T = \{0\}\).
-                Then \(\image T \ne \{0\}\) since all \(v \in V\) with \(v \ne 0\) map to something other than \(0\), meaning that \(\image T\) must contain nonzero elements.
-                Hence \(\image T = V'\).
-                It follows that \(T\) is an isomorphism since a trivial kernel implies that \(T \colon V \to V'\) is injective since \(V' = \image T\) this map is also surjective.
-                \item Suppose \(\ker T = V\).
-                Then \(\image T = \{0\}\), since by definition all \(v \in V\) map to \(0\).
-                Hence \(T\) is the trivial zero function, \(T(v) = 0\) for all \(v \in V\).
-            \end{itemize}
-            This finishes the proof of the first statement.
+            \item The \defineindex{special orthogonal group}, \(\specialOrthogonal(n)\), is defined as the group of transformations of an \(n\)-dimensional vector space over \(\reals\) which preserves lengths and orientations.
+            It has the representation
+            \begin{equation}
+                \specialOrthogonal(n) \coloneqq \{O \in \matrices{n}{\reals} \mid O^\trans O = \ident_n \text{ and } \det O = 1\}.
+            \end{equation}
+            It is a subgroup of both \(\orthogonal(n)\) and \(\specialLinear(n, \reals)\).
             
-            For the second statement suppose \(T\) is nontrivial, that is \(T \ne 0\).
-            Then \(T\) has at least one nonzero eigenvalue, \(\lambda \in \complex\), since if all eigenvalues are zero then \(T\) is trivial.
-            Now define a second linear map \(U \coloneqq T - \lambda\ident\).
-            Then by construction at least one eigenvalue of \(U\) is 0 and so \(U\) is not an isomorphism, since all vectors parallel to the eigenvector with eigenvalue 0 are mapped to 0.
-            More formally this means that \(\dim(\ker U) \ge 1\), in fact the dimension is the multiplicity of the eigenvalue 0.
+            \item The \defineindex{unitary group}, \(\unitary(n)\), is defined as the group of transformations of an \(n\)-dimensional vector space over \(\complex\) which preserves inner products.
+            It has the representation
+            \begin{equation}
+                \unitary(n) = \{U\in\matrices{n}{\complex} \mid U^\hermit U = \ident_n\} \subgroup \generalLinear(n, \complex).
+            \end{equation}
             
-            Since \(U = T - \lambda \ident\) it is clear that \(\rho'(g) \circ U = U \circ \rho(g)\) and so by the first part of this theorem \(U = 0\), since \(U\) is not an isomorphism.
-            Hence \(U = 0 = T - \lambda \ident\) which we can rearrange to get \(T = \lambda \ident\).
-        \end{proof}
-    \end{thm}
-    
-    An equivalent statement to the first part of Schur's lemma is that the following diagram commuting for all \(g \in G\) only if \(T\) is trivial or an isomorphism:
-    \begin{equation}
-        \tikzexternaldisable
-        \begin{tikzcd}
-            V \ar[r, "T"]\ar[d, "\rho(g)"'] & V' \ar[d, "\rho'(g)"]\\
-            V \ar[r, "T"]& V'
-        \end{tikzcd}
-    \end{equation}
-    
-    An alternative statement of the second part of Schur's lemma, which is often state as the full version of Schur's lemma in the physics literature, is the following corollary.
-    \begin{crl}{}{}
-        Let \(\rho\) be an irreducible representation of a group \(G\) on some finite dimensional vector space, \(V\), and \(T\) be some linear map on this same vector space such that \(\commutator{T}{\rho(g)} = 0\) for all \(g \in G\).
-        Then \(T = \lambda\ident\).
-        
-        \begin{rmk}
-            Here \(\commutator{A}{B} \coloneqq AB - BA\) is the usual \defineindex{commutator}.
-        \end{rmk}
-    \end{crl}
-
-    The final theorem for this section relates writing representations as direct sums of irreducible representations.
-    See \cref{dfn:direct sum} for the definition of direct sums.
-    
-    \begin{thm}{Decomposability Theorem}{}\index{decomposability theorem}
-        Let \(\rho \colon G \to \generalLinear(V)\) be a reducible representation for some compact group \(G\).
-        Then we can write
-        \begin{equation}
-            \rho(g) = m_1 \rho_1(g) \directsum m_2 \rho_2(g) \directsum \dotsb \directsum m_k\rho_k(g) = \bigoplus_{i=1}^{k} m_i\rho_i(g).
-        \end{equation}
-        where \(\rho_i \colon G \to \generalLinear(V)\) are irreducible representations and \(m_i \in \positiveintegers\).
-        By \(m_i \rho_i(g)\) we mean
-        \begin{equation}
-            m_i \rho_i(g) \coloneqq \underbrace{\rho_i(g) \directsum \dotsb \directsum \rho_i(g)}_{m_i \text{ times}} = \bigoplus_{j = 1}^{m_i} \rho_i(g).
-        \end{equation}
-        
-        \begin{proof}
-            % TODO: prove this, wikipedia recommends
-%            [1] Serre, Jean-Pierre (1977), Linear Representations of Finite Groups, New York: Springer Verlag, ISBN 0-387-90190-6
-%            [2] Fulton, William; Harris, Joe: Representation Theory A First Course. Springer-Verlag, New York 1991, ISBN 0-387-97527-6.
-        \end{proof}
-    \end{thm}
-    
-    \chapter{Character Theory of Finite Groups}
-    \section{Basics of Character Theory}
-    \begin{dfn}{Character}{}
-        Let \(G\) be a finite group and \(\rho\) a representation of \(G\).
-        Then we define the \defineindex{character}, \(\chi(g)\), of some \(g \in G\) as
-        \begin{equation}
-            \chi(g) \coloneqq \tr[\rho(g)].
-        \end{equation}
+            \item The \defineindex{special unitary group}, \(\specialUnitary(n)\), is defined as the group of transformations of an \(n\)-dimensional vector space over \(\complex\) which preserves inner products and orientations.
+            It has the representation
+            \begin{equation}
+                \specialUnitary(n) \coloneqq \{U \in \matrices{n}{\complex} \mid U^\hermit U = \ident_n \text{ and } \det U = 1\}.
+            \end{equation}
+            It is a subgroup of both \(\unitary(n)\) and \(\specialLinear(n, \complex)\).
+            
+            \item The \defineindex{symplectic group}\index{USp(2n)@\(\USp(2n)\), symplectic group of rank \(n\)}\index{SP(n)@\(\Sp(n)\), symplectic group of rank \(n\)}, \(\USp(2n) = \Sp(n)\), is defined as the group of transformations of an \(2n\)-dimensional vector space over \(\field\) which preserves symplectic bilinear forms\footnote{A \defineindex{symplectic bilinear form} is a map \(\omega\colon V\times V \to \field\) which is linear in both arguments, alternating, so \(\omega(x, y) = -\omega(y, x)\),  and non-degenerate, so \(\omega(u, v) = 0\) for all \(v \in V\) only if \(u = 0\). We can view \(\reals^{2n}\) as a symplectic space by endowing it with the map \(J\) defined above such that \(\omega(x, y) = x^{\hermit}Jy\).}.
+            It has the representation
+            \begin{equation}
+                \USp(2n) = \Sp(n) \coloneqq \{S \in \matrices{2n}{\field} \mid S^{\hermit} J S = J\}
+            \end{equation}
+            where
+            \begin{equation}
+                J \coloneqq
+                \begin{pmatrix}
+                    0 & -\ident_n\\
+                    -\ident_n & 0
+                \end{pmatrix}
+                .
+            \end{equation}
+            Note that \(J^2 = -\ident_{2n}\), so we can think of \(J\) as a generalisation of \(i\) which has \(i^2 = -1\).
+        \end{itemize}
     \end{dfn}
-    \begin{ntn}{}{}
-        When discussing multiple representations of \(G\) we will denote the representation being considered by a subscript, so \(\chi_\rho(g) = \tr[\rho(g)]\) and \(\chi_{\rho'}(g) = \tr[\rho'(g)]\).
-    \end{ntn}
     
-    \begin{lma}{}{lma:characters of equivalent representations are equal}
-        The characters of two equivalent representations are equal.
-        \begin{proof}
-            Recall that the representations \(\rho\) and \(\rho'\) of \(G\) on \(V\) are equivalent if there exists \(S \in \generalLinear(V)\) such that \(\rho'(g) = S\rho(g) S^{-1}\) for all \(g \in G\).
-            Therefore
-            \begin{align}
-                \chi_{\rho'}(g) &\coloneqq \tr[\rho'(g)]\\
-                &\hphantom{:}= \tr[S\rho(g)S^{-1}]\\
-                &\hphantom{:}= \tr[S^{-1}S\rho(g)]\\
-                &\hphantom{:}= \tr[\rho(g)]\\
-                &\hphantom{:}\eqqcolon \chi_{\rho}(g).
-            \end{align}
-            Here we have used the cyclic property of the trace, that \(\tr(ABC) = \tr(CAB)\).
-        \end{proof}
-    \end{lma}
+    \begin{exm}{}{}
+        The following are group actions of some Lie group on \(\reals^3\).
+        \begin{itemize}
+            \item \(\reals^3\) with vector addition as the group operation is an \(3\)-dimensional continuous group.
+            The parameters can be seen as the components of the vectors.
+            
+            \item \(\specialOrthogonal(3)\) with matrix multiplication as the group operation is a \(3\)-dimensional continuous group.
+            The parameters can be seen as the three Euler angles defining a rotation.
+        \end{itemize}
+    \end{exm}
     
-    Recall that an equivalence relation is a relation which is symmetric, reflexive, and transitive.
-    The equivalence class of \(a \in A\) under some equivalence relation, \(\sim\), is the set \([a] \coloneqq \{b \in A \mid a \sim b\}\).
-    The set of all equivalence classes is denoted \(A/\sim\).
+    It should be noted that the dimension of \(\specialOrthogonal(n)\) is not, in general, \(n\).
+    For example, \(\specialOrthogonal(2)\) has dimension 1, since there is only one parameter defining rotations in the plane, the angle of the rotation.
+    \(\specialOrthogonal(4)\) has dimension 6, since there are initially \(4^2 = 16\) degrees of freedom for the individual components of the matrix.
+    It then turns out that orthogonality fixes one component in each row and column, since these must form unit vectors, and the requirement that the determinant is 1 fixes another three degrees of freedom.
+    
+    \section{Properties of Lie Groups}
+    There are various properties which manifolds, and hence Lie groups, may or may not posses.
+    In this section we cover some of these properties.
+    
+    \subsection{Basic Properties}
+    \begin{dfn}{Finite or Infinite}{}
+        A manifold is finite dimensional if it is parametrised by a finite number of coordinates.
+        If this is not the case then the manifold is infinite dimensional.
+        A Lie group is \define{finite}\index{finite dimensional Lie group} or \define{infinite dimensional}\index{infinite dimensional Lie group} if it is a finite or infinite dimensional manifold respectively.
+    \end{dfn}
+    \begin{exm}{}{}
+        The Lie groups \(\unitary(1)\), \(\specialOrthogonal(2)\), \(\specialUnitary(2)\), and \(\specialOrthogonal(3)\) are all finite dimensional.
+        
+        The Lie group \(\unitary(\hilbert)\) for an infinite dimensional Hilbert space is an infinite dimensional Lie group under the topology induced by the operator norm,
+        \begin{equation}
+            \norm{A}_{\mathrm{op}} \coloneqq \inf \{c \ge 0 \mid \norm{Av} \le c\norm{v} \text{ for all } v \in \hilbert\}
+        \end{equation}
+        where \(\norm{-}\) is the norm on \(\hilbert\).
+        This norm can be thought of as the smallest number, \(c\), such that \(A\) doesn't scale the \enquote{length} of a vector by more than a factor of \(c\).
+        For example, this Lie group might represent all unitary transformations on the state of a particle with a continuous parameter.
+    \end{exm}
+    
+    \begin{dfn}{Real or Complex}{}
+        A manifold is real if it is parametrised by real numbers with smooth maps, and complex if it is parametrised by complex numbers with holomorphic maps.
+        A Lie group is \define{real}\index{real Lie group} or \define{complex}\index{complex Lie group} if it is a real or complex manifold, respectively.
+    \end{dfn}
     
     \begin{dfn}{}{}
-        A \defineindex{class function} is a function, \(f \colon A \to B\), which takes on the same value for all \(b \in [a]\), where \([a]\) is an equivalence class of \(A\) under some equivalence relation.
+        The Lie groups \(\unitary(1)\), \(\specialOrthogonal(2)\), \(\specialUnitary(2)\), and \(\specialOrthogonal(3)\) are real Lie groups, although we will later see that \(\specialUnitary(2)\) is pseudo-real.
+    \end{dfn}
+
+    \subsection{Compactness}    
+    The following definition assumes the existence of a metric on the manifold.
+    \begin{dfn}{Compact}{}
+        A manifold, \(M\), is compact if it is closed and bounded.
+        \define{Bounded}\index{bounded} means that \(d(x, y) < r\) for all \(x, y\) in the manifold and \(r \in \reals\) being some finite number with \(d\) being a metric.
+        \define{Closed}\index{closed} means that when viewing \(M\) as a submanifold of some larger manifold \(M\) contains its boundary.
+        A Lie group is \define{compact}\index{compact Lie group} if it is compact as a manifold and \define{non-compact}\index{non-compact Lie group} otherwise.
     \end{dfn}
     
-    Recall that \(x \sim y\) if \(x = gyg^{-1}\) is an equivalence relation, in particular it is called conjugacy and the equivalence classes of this equivalence relation are called conjugation classes.
+    As an example consider \(\reals\) with the standard metric \(d(x, y) = \abs{x - y}\).
+    Then \([0, 1] \coloneqq \{x \in \reals \mid 0 \le x \le 1\}\) is closed and bounded, and hence compact.
+    The intervals
+    \begin{align}
+        [0, 1) &\coloneqq \{x \in \reals \mid 0 \le x < 1\},\\
+        (0, 1] &\coloneqq \{x \in \reals \mid 0 < x \le 1\}, \qand\\
+        (0, 1) &\coloneqq \{x \in \reals \mid 0 < x < 1\}
+    \end{align}
+    are not closed, but are bounded.
+    The interval \([0, \infty) \coloneqq \{x \in \reals \mid x > 0\}\) is not bounded since the distance between points can become arbitrarily large.
     
-    \begin{lma}{}{}
-        The character is a class function on the conjugacy classes.
-        
-        \begin{proof}
-            Let \(x, y \in G\) be in the same conjugacy class.
-            Then \(x = gyg^{-1}\) for some \(g \in G\).
-            Let \(\rho\) be a representation of \(G\).
-            Then
-            \begin{align}
-                \chi_{\rho}(x) &\coloneqq \tr[\rho(x)]\\
-                &\hphantom{:}= \tr[\rho(gxg^{-1})]\\
-                &\hphantom{:}= \tr[\rho(g)\rho(y)\rho(g^{-1})]\\
-                &\hphantom{:}= \tr[\rho(g)\rho(y)\rho(g)^{-1}]\\
-                &\hphantom{:}= \tr[\rho(g)^{-1}\rho(g)\rho(y)]\\
-                &\hphantom{:}= \tr[\rho(y)]\\
-                &\hphantom{:}\eqqcolon \chi_\rho(y).
-            \end{align}
-            Here we have used the fact that \(\rho\) is a homomorphism so \(\rho(ab) = \rho(a)\rho(b)\) and \(\rho(a^{-1}) = \rho(a)^{-1}\).
-            We have also used the cyclic property of the trace, \(\tr(ABC) = \tr(CAB)\).
-            Hence \(\chi_\rho(x) = \chi_\rho(y)\) for all \(x, y \in [x] \in G/\sim\) where \(\sim\) is conjugacy.
-        \end{proof}
-    \end{lma}
+    The circle, \(S^1\), is compact but \(\reals\) isn't.
     
-    \begin{lma}{}{lma:character of direct prod/sum is prod/sum of characters}
-        Let \(\rho\) and \(\rho'\) be representations of \(G\).
-        Then \(\chi_{\rho\directsum\rho'}(g) = \chi_\rho(g) + \chi_{\rho'}(g)\) for all \(g \in G\) and \(\chi_{\rho\directproduct\rho'}(g) = \chi_\rho(g)\chi_{\rho'}(g)\).
-        \begin{proof}
-            In this proof we use braket notation.
-            Let \(\{\ket{i}\}\) be an orthonormal basis.
-            Then in braket notation with the Einstein summation convention
-            \begin{equation}
-                \tr(A) \coloneqq \bra{i}A\ket{i}.
-            \end{equation}
-            Therefore
-            \begin{align}
-                \chi_{\rho\directsum\rho'}(g) &\coloneqq \tr([\rho\directsum\rho')(g)]\\
-                &\hphantom{:}= \tr[\rho(g)\directsum\rho'(g)]\\
-                &\hphantom{:}= \bra{i}(\rho(g)\directsum\rho'(g))\ket{i}\\
-                &\hphantom{:}= \bra{i}\rho(g)\ket{i} + \bra{i}\rho'(g)\ket{i}\\
-                &\hphantom{:}= \tr[\rho(g)] + \tr[\rho'(g)]\\
-                &\hphantom{:}\eqqcolon \chi_\rho(g) + \chi_{\rho'}(g).
-            \end{align}
-            Here we have used the fact that
-            \begin{equation}
-                (A \directsum B)(\ket{v} \directsum \ket{w}) = A\ket{v} \directsum B\ket{w}
-            \end{equation}
-            and so
-            \begin{equation}
-                (\bra{v'} \directsum \bra{w'}) (A \directsum B) (\ket{v} \directsum \ket{w}) = (\bra{v'} \directsum \bra{w'}) (A\ket{v} \directsum B\ket{w}) = \bra{v'}A\ket{v} + \bra{w'}B\ket{w}.
-            \end{equation}
-        
-            Similarly
-            \begin{align}
-                \chi_{\rho\directproduct\rho'}(g) &\coloneqq \tr[(\rho\directproduct\rho')(g)]\\
-                &\hphantom{:}= \tr[\rho(g) \directproduct \rho'(g)]\\
-                &\hphantom{:}= \bra{i}(\rho(g)\directproduct\rho'(g))\ket{i}\\
-                &\hphantom{:}= \bra{i}\rho(g)\ket{i}\bra{i}\rho'(g)\ket{i}\\
-                &\hphantom{:}= \tr[\rho(g)]\tr[\rho'(g)]\\
-                &\hphantom{:}\eqqcolon \chi_\rho(g) \chi_{\rho'}(g).
-            \end{align}
-            Here we have used the fact that
-            \begin{equation}
-                (A\directproduct B) (\ket{v} \directproduct \ket{w}) = A\ket{v} \directproduct B\ket{w}.
-            \end{equation}
-        \end{proof}
-    \end{lma}
+    \begin{exm}{}{}
+        The Lie groups \(\unitary(1)\), \(\specialOrthogonal(2)\), \(\specialUnitary(2)\), and \(\specialOrthogonal(3)\) are compact Lie groups.
+    \end{exm}
     
-    \begin{lma}{}{}
-        Let \(G\) be a finite group and \(\rho\) a representation of \(G\).
-        Then \(\chi_\rho(g^{-1}) = \chi_\rho(g)^*\) for all \(g \in G\).
-        \begin{proof}
-            By \cref{thm:maschke's theorem} \(\rho\) is equivalent to a unitary representation, \(\rho'\).
-            By \cref{lma:characters of equivalent representations are equal} \(\chi_{\rho}(g) = \chi_{\rho'}(g)\) for all \(g \in G\).
-            Since \(\rho'\) is a homomorphism \(\rho'(g^{-1}) = \rho'(g)^{-1}\) by \cref{lma:homomorphism maps inverse to inverse}.
-            Since \(\rho'\) is unitary \(\rho'(g)^{-1} = \rho'(g)^{\hermit}\).
-            Since \(\tr(A) = \tr(A^\trans)\) it follows that \(\tr(A^\hermit) = \tr(A^*) = \tr(A)^*\).
-            Hence
-            \begin{multline}
-                \chi_{\rho}(g^{-1}) = \chi_{\rho'}(g^{-1}) = \tr[\rho'(g^{-1})] = \tr[\rho'(g)^{-1}]\\
-                = \tr[\rho'(g)^{\hermit}] = \tr[\rho'(g)]^* \eqqcolon \chi_{\rho'}(g)^* = \chi_{\rho}(g)^*.
-            \end{multline}
-        \end{proof}
-    \end{lma}
+    For a compact group all of the theorems of \cref{chap:basics of representation theory}, such as Maschke's theorem (\cref{thm:maschke's theorem}), Schur's lemma (\cref{thm:schurs lemma}), and the decomposability theorem (\cref{thm:decomposability}), can be modified to hold for compact continuous groups.
+    To do so we replace the sum over group elements, \(\sum_{g\in G}\), with the \defineindex{Haar measure}, \(\int \dl{\{\alpha\}}\), we won't go into detail here on this though.
+    For this reason we will restrict ourselves to compact groups, although here we give a few examples of non-compact groups.
     
-    \begin{lma}{}{}
-        Let \(G\) be a finite group and \(\rho\) a one-dimensional representation of \(G\).
-        Then \(\chi_\rho(g) = \rho(g)\), where we make the natural identification of \(\rho(g)\) as a \(1\times 1\) matrix with the matrix element \(\rho(g)_{11}\).
-        \begin{proof}
-            This is trivially true since the trace of \((z)\) is \(\tr[(z)] = z\), so \(\rho(g) = (z)\) for some \(z \in \complex\) and \(\chi_\rho(g) = \tr[\rho(g)] = \tr[(z)] = z\).
-        \end{proof}
-    \end{lma}
-    
-    \section{Space of Characters}
-    We can view the characters of a given representation as forming vectors.
-    Given a finite group, \(G\), and a representation \(\rho\) we define a vector
-    \begin{equation}
-        \chi(\rho) = (\chi_{\rho}(e), \chi_{\rho}(g_1), \dotsc, \chi_{\rho}(g_{N_\mathrm{c}})) \in \complex^{N_{\mathrm{c}}}
-    \end{equation}
-    where \(g_i\) is in the \(k\)th conjugacy class of \(G\) and \(N_{\mathrm{c}}\) is the total number of conjugacy classes.
-    It is simply a matter of convention to assign the first conjugacy class to be the one containing the identity.
-    
-    \begin{dfn}{Inner product on the space of characters}{}
-        We can define an inner product on the space of characters as follows:
+    \begin{exm}{Non-Compact Lie Group}{}
+        Consider the translation group on \(\reals\).
+        That is \(\reals\) acting on \(\reals\) by \(a \action x = x + a\).
+        This has a representation, \(\rho \coloneqq \reals \to \generalLinear(V)\), given by the following:
         \begin{equation}
-            \innerprod{\chi(\rho_a)}{\chi(\rho_b)} \coloneqq \frac{1}{\abs{G}} \sum_{g\in G} \chi_{\rho_a}(g)^{*} \chi_{\rho_b}(g) = \frac{1}{\abs{G}} \sum_{k = 1}^{N_{\mathrm{c}}} c_k \chi^*_{ak}\chi^{\phantom{*}}_{bk}
+            \rho(a) =
+            \begin{pmatrix}
+                1 & a\\ 0 & 1
+            \end{pmatrix}
+            .
         \end{equation}
-        where \(c_k\) is the number of elements in the \(k\)th conjugacy class and \(\chi_{ak} \coloneqq \chi_{\rho_a}(g_k)\) with \(g_k\) being a representative member of the \(k\)th conjugacy class.
+        However, this doesn't decompose since the subspace defined by the span \(\ve{x} = (1, 0)\) is an invariant subspace but its orthogonal complement, defined by the span of \(\ve{y} = (0, 1)\), is not invariant, since \(\rho(a)\ve{y} = (a, 1) \notin \spn \{\ve{y}\}\).
+        Hence we cannot write \(\rho = \rho_1 \directsum \rho_2\) with \(\rho_1 \colon \reals \to \generalLinear(W)\) and \(\rho_2 \colon \reals \to \generalLinear(W^{\bot})\) with \(W \directsum W^{\bot} = V\), despite the fact that \(\rho\) is not irreducible.
+        This is a failure of the decomposability theorem (\cref{thm:decomposability}) which holds only for compact groups.
+    \end{exm}
+    
+    \begin{exm}{}{}
+        The Lorentz group, \(\orthogonal(1, 3)\), is not compact.
+        This is because it is parametrised in part by the relative velocity of the frames and this is restricted to the non-compact interval \([0, c)\).
+        
+        Maschke's theorem (\cref{thm:maschke's theorem}) doesn't hold for the Lorentz group as it has no finite dimensional unitary representations.
+        This is why we need to define an invariant of the form \(\bar{\psi}\psi\) for spinors \(\psi\) with \(\bar{\psi} \coloneqq \psi^\hermit \gamma_0\) and \(\gamma_0 \coloneqq \ident_2 \directsum (-\ident_2) = \sigma_3 \directproduct \ident_2\).
+        If \(\psi\) instead transformed under a finite dimensional unitary representation, which is guaranteed to exist for a compact group by Maschke's theorem (\cref{thm:maschke's theorem}) then this would not be necessary as \(\psi^\hermit \psi\) would be invariant without the need for \(\gamma_0\).
+    \end{exm}
+    
+    \subsection{Connectedness}
+    \begin{dfn}{}{}
+        A manifold is connected if there exists a continuous path between any two points in the manifold.
+        A manifold is simply connected if any loop can be contracted continuously to a point.
+        A manifold is disconnected if it is not connected.
+        A Lie group is \define{disconnected}\index{disconnected Lie group}, \define{connected}\index{connected Lie group}, or \define{simply connected}\defineindex{simply connected Lie group} if it is disconnected, connected, or simply connected as a manifold respectively.
     \end{dfn}
     
-    The following theorem gives us a useful way to test if a representation is irreducible.
+    Intuitively a space is simply connected if there are no holes.
     
-    \begin{thm}{Orthogonality Theorem}{}
-        The irreducible representations form an orthonormal set in the space of characters.
+    \begin{figure}
+        \tikzsetnextfilename{connected}
+        \begin{tikzpicture}
+            \node at (0.45, -0.5) {Simply Connected};
+            \draw[use Hobby shortcut, closed, highlight, fill=highlight!10] (0, 0) .. (0.5, 0.25) .. (1, 1) .. (1.5, 2) .. (1, 2.5) .. (0.5, 2) .. (-0.5, 1.5) .. (-0.5, 0.75);
+            \begin{scope}[xshift=3cm]
+                \draw[use Hobby shortcut, closed, highlight, fill=highlight!10] (0, 0) .. (0.5, 0.25) .. (1, 1) .. (1.5, 2) .. (1, 2.5) .. (0.5, 2) .. (-0.5, 1.5) .. (-0.5, 0.75);
+                \draw[use Hobby shortcut, closed, highlight, fill=white] (0.2, 0.4) .. (0.4, 0.8) .. (0.5, 1) .. (0.5, 1.5) .. (0.3, 1) .. (0, 0.5);
+                \draw[dashed, my blue, rotate around={70:(0.315, 0.9)}] (0.315, 0.9) circle [x radius = 0.7, y radius = 0.28];
+                \node at (0.45, -0.5) {Connected};
+            \end{scope}
+            \begin{scope}[xshift=6cm]
+                \draw[use Hobby shortcut, closed, highlight, fill=highlight!10] (1.3, 1.3) .. (1.5, 2) .. (1, 2.5) .. (0.6, 2);
+                \draw[use Hobby shortcut, closed, highlight, fill=highlight!10] (0, 0) .. (0.5, 0.25) .. (0.7, 0.7) .. (0.5, 1.5) .. (-0.5, 1.5) .. (-0.5, 0.75);
+                \fill[my blue] (0, 0.5) circle [radius = 0.05];
+                \fill[my blue] (1, 1.5) circle [radius = 0.05];
+                \begin{scope}
+                    \clip[use Hobby shortcut, closed] (1.3, 1.3) .. (1.5, 2) .. (1, 2.5) .. (0.6, 2);
+                    \draw[my blue] (0, 0.5) to[bend left] (1, 1.5);
+                \end{scope}
+                \begin{scope}
+                    \clip[use Hobby shortcut, closed] (0, 0) .. (0.5, 0.25) .. (0.7, 0.7) .. (0.5, 1.5) .. (-0.5, 1.5) .. (-0.5, 0.75);
+                    \draw[my blue] (0, 0.5) to[bend left] (1, 1.5);
+                \end{scope}
+                \node at (0.45, -0.5) {Disconnected};
+            \end{scope}
+        \end{tikzpicture}
+        \caption[Connectedness]{Examples of simply connected, connected, and disconnected spaces. The loop (\tikz[baseline=-2.5pt]{\draw[dashed, my blue] (0, 0) -- ++ (0.5, 0);}) in the connected example cannot be continuously contracted to a point without leaving the space. Similarly the two points (\tikz[baseline=-2.5pt]{\fill[my blue] (0, 0) circle [radius = 0.05];}) in the disconnected example cannot be connected by a continuous path. The path connecting them (\tikz[baseline=-2.5pt]{\draw[my blue] (0, 0) -- ++ (0.5, 0);}) has a jump.}
+    \end{figure}
+    
+    \begin{exm}{}{}
+        The Lie groups \(\unitary(1)\), \(\specialOrthogonal(2)\), and \(\specialOrthogonal(3)\) are connected.
+        The Lie group \(\specialUnitary(2)\) is simply connected.
+        The Lie group \(\orthogonal(2)\) is disconnected since there is no continuous path from \(O \in \orthogonal(2)\) with \(\det O = -1\) to \(O' \in \orthogonal\) with \(\det O' = +1\) since \(\det\) is a continuous function and must jump from \(-1\) to \(+1\) along this path somewhere since all orthogonal matrices have \(\abs{\det O} = 1\).
+    \end{exm}
+    
+    \subsection{Simplicity}
+    Recall that a finite group is simple if it has no non-trivial proper normal subgroups, and that a normal subgroup is one which is invariant under conjugation.
+    That is, \(N \normalsubgroup G\) if \(gng^{-1} \in N\) for all \(n \in n\) and \(g \in G\).
+    We define simple Lie groups in a similar way but we explicitly disallow a few cases.
+    
+    \begin{dfn}{Simple Lie Group}{}
+        A Lie group is \define{simple}\index{simple group} if it is connected, non-Abelian, and has no non-trivial connected normal subgroups.
         
-        \begin{proof}
-            \begin{rmk}
-                This proof is beyond the scope of this course.
-            \end{rmk}
-            \vspace{1ex}
-            Suppose \(V_a\) and \(V_b\) are irreducible representations\footnote{of course we're being a bit sloppy with the language here, but this is standard, what we really mean is there exist irreducible representations, \(G \to \generalLinear(V_a)\) and \(G \to \generalLinear(V_b)\).} of some finite group, \(G\).
-            Denote these representations by \(\rho_{V_a}\) and \(\rho_{V_b}\) respectively.
-            The space of all homomorphisms \(V_a \to V_b\) is denoted \(\Hom_(V_a, V_b)\), and is equal to \(V_a^* \directproduct V_b\) where \(V_a^*\) is the dual vector space of \(V_a\), we can think of this informally as going from kets to bras, or more formally as the space of linear functions, \(V_a \to \field\), where \(\field\) is the base field of \(V_a\).
-            
-            Let \(V_0\) denote the vector space of trivial representations, that is the vector space with the associated representation \(\rho_{V_0}(g) = \ident_{V_0}\) for all \(g \in G\).
-            
-            Schur's lemma (\cref{thm:schurs lemma}) states that the only nontrivial homomorphisms compatible with the group structure are isomorphisms.
-            Hence we there are only nontrivial homomorphisms if \(V_a \isomorphic V_b\), in which case \(\dim(\Hom(V_a, V_b)_0) = 1\), where the subscript 0 denotes projection onto the trivial representation subspace.
-            On the other hand if \(V_a \not\isomorphic V_b\) then \(\dim(\Hom(V_a, V_b)) = 0\).
-            We can sum this up as \(\dim(\Hom(V_a, V_b)_0) = \delta_{ab}\).
-            
-            The character of the representation \(V_a^* \directproduct V_b\) is given by
-            \begin{equation}
-                \chi(\rho_{V_a^* \directproduct V_b}) = \chi(\rho_{V_a}) \chi(\rho_{V_b}),
-            \end{equation}
-            which follows from \cref{lma:character of direct prod/sum is prod/sum of characters} applied to each component of the vectors \(\chi(\rho)\).
-            Further
-            \begin{equation}
-                \chi(\rho_{V_a^*}) = \chi(\rho_{V_a})^*
-            \end{equation}
-            since
-            \begin{equation}
-                \chi_{\rho_{V_a^*}}(g) = \tr[\rho_{V_a^*}(g)] = \tr[\rho_{V_a}(g)^\hermit] = \tr[\rho_{V_a}(g)]^* = \chi_{\rho_{V_a}}(g)^*,
-            \end{equation}
-            which follows from the fact that the adjoint (Hermitian conjugate) of a vector is an element of the dual space and vice versa.
-            We therefore have
-            \begin{equation}
-                \chi(\rho_{V_a^* \directproduct V_b}) = \chi(\rho_{V_a})^*\chi(\rho_{V_b}).
-            \end{equation}
-            
-            Now define the operator \(\varphi\) according to
-            \begin{equation}
-                \varphi = \frac{1}{\abs{G}} \sum_{g \in G} \rho_V(g).
-            \end{equation}
-            This is a projection operator, meaning \(\varphi^2 = \varphi\), in particular it projects onto \(V_0\).
-            This means \(\varphi v_0 = v_0\) for all \(v_0 \in V_0\) and \(\varphi v_0^\perp = 0\) where \(v_0^\perp\) is an element of the orthogonal space to \(V_0\), which we denote \(V_0^\perp\) and is the space such that \(V_0^\perp \directsum V_0 = V\), note that all vectors in \(V_0^\perp\) are by construction orthogonal to all vectors in \(V_0\).
-            
-            To see that \(\varphi\) has these properties notice that applying \(\varphi\) to a vector gives an invariant vector and the only invariant vectors correspond to vectors in the trivial representation subspace.
-            Further, applying \(\varphi\) a second time just rearranges the order of the vectors in the sum, which has no effect since we are averaging over the whole group.
-            The dimension of the space projected onto by a projector is simply the trace of said projector, since we can write a projector in a diagonal form with 1 on the diagonal for basis vectors spanning the subspace and 0 for the other diagonal components.
-            Using the linearity of the trace we then have
-            \begin{equation}
-                \dim(V_0) = \tr \varphi = \frac{1}{\abs{G}} \tr[\rho_V(g)] = \frac{1}{\abs{G}} \sum_{g \in G} \chi_{\rho_V}(g).
-            \end{equation}
-            
-            Combining all of the above we have
-            \begin{align}
-                \delta_{ab} &= \dim(\Hom(V_a, V_b))\\
-                &= \dim((V_a^* \directproduct V_b)_0)\\
-                &= \frac{1}{\abs{G}} \sum_{g\in G} \chi_{\rho_{V_a^* \directproduct V_b}}(g)\\
-                &= \frac{1}{\abs{G}} \sum_{g\in G} \chi_{\rho_{V_a}}(g)^*\chi_{\rho_{V_b}}(g)\\
-                &\eqqcolon \innerprod{\chi(\rho_{V_a})}{\chi(\rho_{V_b})}.
-            \end{align}
-            This completes the proof.
-        \end{proof}
-    \end{thm}
-    
-    The important thing about the orthogonality theorem is all of the corollaries we can prove from it.
-    In the following let \(\rho\) be a representation of some finite group \(G\).
-    We can write \(\rho\) as
-    \begin{equation}
-        \rho = \bigoplus_{i = 1}^{k} m_i \rho_i = \bigoplus_{i = 1}^{k} \rho_i^{\directsum m_i} = m_1 \rho_i \directsum \dotsb \directsum m_k\rho_k
-    \end{equation}
-    where \(\rho_i\) are irreducible representations and \(m_i \in \positiveintegers\).
-    
-    \begin{crl}{}{}
-        A representation is fully characterised by its character since the distinct \(\rho_i\) correspond to linearly independent, in fact orthonormal, vectors in the character space.
-        We have
-        \begin{equation}
-            \chi_\rho(g) = \sum_{i = 1}^{k} m_i \chi_{\rho_i}(g).
-        \end{equation}
-    \end{crl}
-    
-    \begin{crl}{}{}
-        The multiplicity of some particular irreducible representation, \(\rho_a\), in the decomposition of \(\rho\) is
-        \begin{equation}
-            m_a = \innerprod{\chi(\rho_a)}{\chi(\rho)}
-        \end{equation}
-        \begin{proof}
-            By the linearity of the character
-            \begin{align}
-                \chi(\rho) = \sum_{i = 1}^{k} m_i\chi(\rho_i)
-            \end{align}
-            Then by the linearity of the inner product we have
-            \begin{align}
-                \innerprod{\chi(\rho_a)}{\chi(\rho)} &= \innerprod*{\chi(\rho_a)}{\sum_{i=1}^{k}m_i\chi(\rho_i)}\\
-                &= \sum_{i = 1}^{k} m_i \innerprod{\chi(\rho_a)}{\chi(\rho_i)}\\
-                &= \sum_{i = 1}^{k} m_i \delta_{ai}\\
-                &= m_a
-            \end{align}
-            which completes the proof.
-        \end{proof}
-    \end{crl}
-    
-    Compare this to the standard way of finding the components of a vector:
-    \begin{equation}
-        v^i = \ve{i} \cdot \vv{v}.
-    \end{equation}
-    
-    \begin{crl}{}{}
-        We can define a norm on the space of characters by
-        \begin{equation}
-            \norm{\chi(\rho)}^{2} \coloneqq \innerprod{\chi(\rho)}{\chi(\rho)} = \sum_{i} m_i^2
-        \end{equation}
-        and \(\rho\) is irreducible if and only if \(\norm{\chi(\rho)} = 1\).
-        \begin{proof}
-            Suppose \(\rho\) is irreducible.
-            Then we can think of \(\rho\) as being decomposed as \(\rho = 1\rho\), that is \(k = 1\) and \(m_1 = 1\).
-            Hence we trivially have \(\norm{\chi(\rho)} = 1\).
-            Suppose instead that \(\norm{\chi(\rho)} = 1\).
-            Then it follows that \(m_1^2 + \dotsb + m_k^2 = 1\).
-            Since \(m_i \in \positiveintegers\) it follows that \(m_i = 0\) for all but one value of \(i\) and for that value of \(i\) \(m_i = 1\), which means \(\rho = 1\rho_i = \rho_i\), so \(\rho\) is irreducible.
-        \end{proof}
-    \end{crl}
-    
-    % TODO: Calculate norm of permutation representation of S_3
-    
-    \begin{lma}{}{lma:dim irrep = char e}
-        The  character of the identity element corresponds to the dimension of the representation.
-        That is
-        \begin{equation}
-            \chi_{\rho_i}(e) = \dim V_i.
-        \end{equation}
-        \begin{proof}
-            For any representation, \(\rho \colon G \to V\) we have \(\rho(e) = \ident_{V}\) by \cref{lma:homomorphism maps identity to identity} and for any vector space, \(V\), we have \(\tr\ident_{V} = \dim V\), since \(\ident_V\) is just a matrix with ones on the diagonal.
-        \end{proof}
-    \end{lma}
-    
-    \begin{lma}{}{}
-        Let \(\rho_0\) be the trivial representation of some finite group, \(G\).
-        Then \(\chi(\rho_0) = (1, \dotsc, 1) \in \complex^{N_{\mathrm{c}}}\).
-        \begin{proof}
-            This follows since the characters of the trivial representation are all one since \(\chi_{\rho_0}(g) = \tr[\rho_0(g)] = \tr\ident_{V_0}\) and the vector space of \emph{the} trivial representation is one dimensional so \(\tr \ident_{V_0} = 1\).
-        \end{proof}
-    \end{lma}
-    
-    \subsection{Dimensionality Theorem}
-    \begin{dfn}{Regular Representation}{}
-        Let \(V\) be a vector space of dimension \(\abs{G}\).
-        Let \(\{\ve{g}\}\) be a set of \(\abs{G}\) linearly independent vectors in \(V\) which we label with group elements, \(g \in G\).
-        This set is guaranteed to exist since \(V\) is \(\abs{G}\)-dimensional.
-        We can think of \(V\) as the space spanned by these vectors.
+        A \defineindex{semi-simple Lie group} is a Lie group which can be written as a direct product of simple Lie groups.
         
-        Define a left action of \(G\) on \(\{\ve{g}\}\) in the obvious way by
-        \begin{equation}
-            g \action \ve{g'} \coloneqq \ve{gg'}.
-        \end{equation}
-        
-        The \defineindex{regular representation}, \(\rho_{\mathrm{R}} \colon G \to \generalLinear(V)\) is defined as the representation associated with this action, that is
-        \begin{equation}
-            \rho_{\mathrm{R}}(g) \ve{g'} = \ve{gg'}.
-        \end{equation}
+        A \defineindex{composite Lie group} is a Lie group which can be written as a semi-direct product of simple Lie groups.
     \end{dfn}
     
-    The regular representation is, in general, reducible, however it does have the following useful property:
+    The reason we exclude more cases than for the definition for any group is motivated by the fact that it is not possible to define a quotient group from a simple group, apart from the trivial group and the simple group itself.
+    We want this to hold replacing all groups with Lie groups.
+    Importantly this means that we want a simple Lie group to be one where it is not possible to define a non-trivial quotient \emph{Lie} group.
+    If we expand upon what this requires we get the definition above.
+    
+    We will only concern ourselves with simple Lie groups in this course.
+    
+    \begin{exm}{}{}
+        The Lie groups \(\specialLinear(n)\), \(\specialUnitary(n)\), and \(\USp(2n) = \Sp(n)\) are simple.
+    \end{exm}
+    
+    \subsubsection{Classification of Simple Compact Lie Groups}
+    All simple compact Lie groups have been classified.
+    It turns out there are four families of simple compact Lie groups, \(A_n\), \(B_n\), \(C_n\), and \(D_n\), and five exceptional groups, \(E_6\), \(E_7\), \(E_8\), \(F_4\), and \(G_2\) which don't fall into any of these categories.
+    We won't define the exceptional groups here, we just note that they exist.
+    The families consist of familiar groups, \(A_n = \specialUnitary(n + 1)\), \(B_n = \specialOrthogonal(2n + 1)\), \(C_n = \USp(2n)\), and \(D_n = \specialOrthogonal(2n)\).
+    These are sorted by their rank, which is given by the subscript.
+    Rank is a concept related to the Lie algebras of these groups, which we shall meet later.
+    
+    \begin{table}
+        \begin{tabular}{lcc}\toprule
+            Group & Dimension & Rank \\ \midrule
+            \(A_n\) & \((n + 1)^2 - 1\) & \(n\)\\
+            \(B_n\) & \(n(2n + 1)\) & \(n\)\\
+            \(C_n\) & \(n(2n + 1)\) & \(n\)\\
+            \(D_n\) & \(n(2n - 1)\) & \(n\)\\ \midrule
+            \(E_6\) & 78 & 6\\
+            \(E_7\) & 133 & 7\\
+            \(E_8\) & 248 & 8\\
+            \(F_4\) & 52 & 4\\
+            \(G_2\) & 14 & 2\\ \bottomrule
+        \end{tabular}
+        \caption{Classification of simple compact Lie groups}
+    \end{table}
+    
+    \tikzset{dynkin node/.style = {fill = white}}
+    \tikzset{->-/.style = {decoration={markings, mark=at position #1 with {\arrow{>}}}, postaction={decorate}}}
+    \tikzset{-<-/.style = {decoration={markings, mark=at position #1 with {\arrow{<}}}, postaction={decorate}}}
+    The Lie groups can be depicted by \define{Dynkin diagrams}\index{Dynkin diagram}, which are graphs with as many nodes as the rank of the group.
+    For example, \(A_1\) corresponds to
+    \tikzsetnextfilename{dynkin-A1}
+    \tikz[baseline=-2.5pt]{ \draw[dynkin node] (0, 0) circle [radius = 0.075]; }
+    , \(A_2\) corresponds to
+    \tikzsetnextfilename{dynkin-A2}
+    \tikz[baseline=-2.5pt]{ \draw (0, 0) -- (1, 0); \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius =0.075]; }
+    , and \(A_3\) corresponds to
+    \tikzsetnextfilename{dynkin-A3}
+    \tikz[baseline=-2.5pt]{ \draw (0, 0) -- (2, 0); \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius =0.075]; \draw[dynkin node] (2, 0) circle [radius =0.075]; }
+    .
+    In general \(A_n\) corresponds to
+    \tikzsetnextfilename{dynkin-An}
+    \tikz[baseline=-2.5pt]{ \draw (0, 0) -- (1.3, 0); \draw (1.7, 0) -- (3, 0); \draw[dotted] (1.3, 0) -- (1.7, 0); \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius =0.075]; \draw[dynkin node] (2, 0) circle [radius =0.075]; \draw[dynkin node] (3, 0) circle [radius =0.075]; }
+    with \(n\) nodes.
+    
+    The Dynkin  diagram for \(B_n\) is similar but the final connection is doubled and directed, so \(B_2\) corresponds to
+    \tikzsetnextfilename{dynkin-B2}
+    \tikz[baseline=-2.5pt]{ \draw[double, ->-=0.65, >=To] (0, 0) -- (1, 0); \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius =0.075]; }
+    , and \(B_3\) corresponds to
+    \tikzsetnextfilename{dynkin-B3}
+    \tikz[baseline=-2.5pt]{ \draw (-1, 0) -- (0, 0); \draw[double, ->-=0.65, >=To] (0, 0) -- (1, 0); \draw[dynkin node] (-1, 0) circle [radius = 0.075]; \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius =0.075]; }
+    .
+    In general \(B_n\) corresponds to
+    \tikzsetnextfilename{dynkin-Bn}
+    \tikz[baseline=-2.5pt]{ \draw (-2, 0) -- (-0.7, 0); \draw (-0.3, 0) -- (0, 0); \draw[dotted] (-0.7, 0) -- (-0.3, 0); \draw[double, ->-=0.65, >=To] (0, 0) -- (1, 0); \draw[dynkin node] (-2, 0) circle [radius = 0.075]; \draw[dynkin node] (-1, 0) circle [radius = 0.075]; \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius =0.075]; }
+    with \(n\) nodes.
+    
+    The Dynkin diagrams for \(C_n\) are almost identical to those of \(B_n\) but with the direction reversed, so \(C_2\) corresponds to
+    \tikzsetnextfilename{dynkin-C2}
+    \tikz[baseline=-2.5pt]{ \draw[double, -<-=0.65, >=To] (0, 0) -- (1, 0); \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius =0.075]; }
+    , and \(C_3\) corresponds to
+    \tikzsetnextfilename{dynkin-C3}
+    \tikz[baseline=-2.5pt]{ \draw (-1, 0) -- (0, 0); \draw[double, -<-=0.65, >=To] (0, 0) -- (1, 0); \draw[dynkin node] (-1, 0) circle [radius = 0.075]; \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius =0.075]; }
+    .
+    In general \(C_n\) corresponds to
+    \tikzsetnextfilename{dynkin-Cn}
+    \tikz[baseline=-2.5pt]{ \draw (-2, 0) -- (-0.7, 0); \draw (-0.3, 0) -- (0, 0); \draw[dotted] (-0.7, 0) -- (-0.3, 0); \draw[double, -<-=0.65, >=To] (0, 0) -- (1, 0); \draw[dynkin node] (-2, 0) circle [radius = 0.075]; \draw[dynkin node] (-1, 0) circle [radius = 0.075]; \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius =0.075]; }
+    with \(n\) nodes.
+    
+    The Dynkin diagrams for \(D_n\) branch at the end into two.
+    So \(D_4\) corresponds to 
     \begin{equation}
-        \chi_{\rho_{\mathrm{R}}}(g) = 
-        \begin{cases}
-            0 & \text{if } g \ne e,\\
-            \abs{G} & \text{if } g = e.
-        \end{cases}
+        \tikzsetnextfilename{dynkin-D4}
+        \tikz[baseline=(current bounding box.east)]{ \draw (0, 0) -- (1, 0); \draw (1, 0) -- ++ (30:1); \draw (1, 0) -- ++ (-30:1); \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius = 0.075]; \draw[dynkin node] ($(1, 0) + (30:1)$) circle [radius = 0.075]; \draw[dynkin node] ($(1, 0) + (-30:1)$) circle [radius = 0.075]; }
     \end{equation}
-    This follows since for \(g \ne e\) the diagonal of \(\rho_{\mathrm{R}}(g)\) must be zero, since if they weren't it would mean that \(\ve{gg} = \ve{g}\), which means that \(g^2 = g\), which can only happen for \(g = e\).
-    Additionally \(\rho_{\mathrm{R}}(e) = \ident_{V}\) and so \(\chi_{\mathrm{R}}(e) = \tr\ident_V = \dim V = \abs{G}\).
-    
-    The regular representation can also be viewed as the induced representation of the trivial representation.
-    Induced representations will be defined in . % TODO: add link to where induced representations are defined
-    
-    The main use of the regular representation for us is to prove the following theorem which aids in classifying the irreducible representations.
-    
-    \begin{thm}{Dimensionality Theorem}{thm:dimensionality thm}
-        Let \(G\) be a group and \(\{V_i\}\) be the irreducible representations of \(G\), then
-        \begin{equation}
-            \abs{G} = \sum_{i = 1}^{N_{\mathrm{c}}} \dim(V_i)^2.
-        \end{equation}
-        \begin{proof}
-            Let \(\rho_{\mathrm{R}}\) be the regular representation.
-            This can be written as
-            \begin{equation}
-                \rho_R = \bigoplus_{i = 1}^{k} \rho_i^{\directsum m_i}.
-            \end{equation}
-            Notice that we then have
-            \begin{align}
-                m_i &= \innerprod{\chi(\rho_i)}{\chi(\rho_{R})}\\
-                &\eqqcolon \frac{1}{\abs{G}} \sum_{g \in G} \chi_{\rho_i}(g)^* \chi_{\rho_{\mathrm{R}}}(g)\\
-                &= \chi_{\rho_i}(e)^*\\
-                &= \dim V_i.
-            \end{align}
-            Here we have used the fact that \(\chi_{\rho_{\mathrm{R}}}(g) = 0\) for \(g \ne e\) and so all terms in the sum vanish apart from the \(g = e\) term.
-            The regular representation contributes a factor of \(\abs{G}\) to this term, which cancels with the existing normalisation factor to leave just \(\chi_{\rho_i}(e)^*\), since \(g = e\) in this term.
-            We then apply \cref{lma:dim irrep = char e} to get \(\chi_{\rho_i}(e) = \dim V_i\), and since this is real the complex conjugate does nothing.
-            
-            Using \(m_i = \dim V_i\) we then have
-            \begin{equation}
-                \chi_{\rho_{\mathrm{R}}}(g) = \sum_{i = 1}^{k} m_i \chi_{\rho_i}(g) = \sum_{i = 1}^{k} \dim(V_i) \chi_{\rho_i}(g).
-            \end{equation}
-            Considering the specific case of \(g = e\) this then becomes
-            \begin{equation}
-                \abs{G} = \chi_{\rho_{\mathrm{R}}}(e) = \sum_{i = 1}^{k} \dim(V_i) \chi_{\rho_i}(e) = \sum_{i = 1}^{k} \dim(V_i)^2
-            \end{equation}
-            where we have used \cref{lma:dim irrep = char e} again in the last equality.
-        \end{proof}
-    \end{thm}
-    
-    The dimensionality theorem quickly allows us to limit the possible irreducible representations.
-    For example, \(S_3\) (\(\abs{S_3} = 3! = 6\)) could have either 6 one-dimensional irreducible representations (\(6 \cdot 1^2 = 6\)) or 2 one-dimensional irreducible representations and 1 two-dimensional irreducible representation (\(2 \cdot 1^2 + 1\cdot 2^2 = 6\)).
-    It turns out that the latter is correct.
-    
-    \section{Character Tables}
-    The common way to give the information on the characters of the irreducible representations is as a \defineindex{character table}.
-    Since the character is a class function, that is it is the same for all group elements sharing a conjugacy class, we only write out the conjugacy classes for the character table, rather than the full group.
-    We then have an optional line for the order of the classes.
-    The rows below then list the characters of the irreducible representations on the conjugacy classes.
-    Typically we list the conjugacy class containing the identity first and the trivial representation (one dimensional representation given by the trivial action) first which means that the first row contains all ones.
-    
-    As an example we now give the character table of \(S_3\) but there are some details here we have yet to discuss.
+    and \(D_5\) corresponds to
     \begin{equation}
-        \begin{array}{r|ccc}
-            S_3\text{ classes} & [()] & [\cycle{1,2}] & [\cycle{1,2,3}] \\
-            \text{Order} & 1 & 3 & 2 \\ \hline 
-            & & & \\[-2ex]
-            \text{Trivial} & 1 & 1 & 1 \\
-            \text{Alternating} & 1 & -1 & 1 \\
-            \text{Standard} & 2 & 0 & -1 \\
-        \end{array}
+        \tikzsetnextfilename{dynkin-D5}
+        \tikz[baseline=(current bounding box.east)]{ \draw (-1, 0) -- (1, 0); \draw (1, 0) -- ++ (30:1); \draw (1, 0) -- ++ (-30:1); \draw[dynkin node] (-1, 0) circle [radius = 0.075]; \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius = 0.075]; \draw[dynkin node] ($(1, 0) + (30:1)$) circle [radius = 0.075]; \draw[dynkin node] ($(1, 0) + (-30:1)$) circle [radius = 0.075]; }
     \end{equation}
-    The labels down the side label the irreducible representations, we haven't yet defined the alternating or standard representations so don't worry too much about them.
+    In general, \(D_n\) corresponds to
+    \begin{equation}
+        \tikzsetnextfilename{dynkin-Dn}
+        \tikz[baseline=-2.5pt]{ \draw (-1, 0) -- (0.3, 0); \draw (0.7, 0) -- (1, 0); \draw[dotted] (0.3, 0) -- (0.7, 0); \draw (1, 0) -- ++ (30:1); \draw (1, 0) -- ++ (-30:1); \draw[dynkin node] (-1, 0) circle [radius = 0.075]; \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius = 0.075]; \draw[dynkin node] ($(1, 0) + (30:1)$) circle [radius = 0.075]; \draw[dynkin node] ($(1, 0) + (-30:1)$) circle [radius = 0.075]; }
+    \end{equation}
     
-    In this section we will write statements like \enquote{the character table is square}.
-    What we mean by the character table here is the numbers that we fill in for each conjugacy class and representation ignoring the labels that we give along the edges.
+    The exceptional groups also have Dynkin diagrams.
+    For \(E_n\) (\(n = 6, 7, 8\)) the Dynkin diagram consists of a chain of \(n - 1\) nodes with an extra node branching off three from the end, so \(E_6\) corresponds to
+    \begin{equation}
+        \tikzsetnextfilename{dynkin-E6}
+        \begin{tikzpicture}[baseline=(current bounding box.east)]
+            \draw (0, 0) -- (4, 0);
+            \draw (2, 0) -- (2, 1);
+            \foreach \x in {0, ..., 4} {
+                \draw[dynkin node] (\x, 0) circle [radius = 0.075];
+            }
+            \draw[dynkin node] (2, 1) circle [radius = 0.075];
+        \end{tikzpicture}
+    \end{equation}
+    \(E_7\) corresponds to
+    \begin{equation}
+        \tikzsetnextfilename{dynkin-E7}
+        \begin{tikzpicture}[baseline=(current bounding box.east)]
+            \draw (0, 0) -- (5, 0);
+            \draw (3, 0) -- (3, 1);
+            \foreach \x in {0, ..., 5} {
+                \draw[dynkin node] (\x, 0) circle [radius = 0.075];
+            }
+            \draw[dynkin node] (3, 1) circle [radius = 0.075];
+        \end{tikzpicture}
+    \end{equation}
+    and \(E_8\) to
+    \begin{equation}
+        \tikzsetnextfilename{dynkin-E8}
+        \begin{tikzpicture}[baseline=(current bounding box.east)]
+            \draw (0, 0) -- (6, 0);
+            \draw (4, 0) -- (4, 1);
+            \foreach \x in {0, ..., 6} {
+                \draw[dynkin node] (\x, 0) circle [radius = 0.075];
+            }
+            \draw[dynkin node] (4, 1) circle [radius = 0.075];
+        \end{tikzpicture}
+    \end{equation}
     
-    \begin{thm}{}{}
-        The character table is square.
-        
-        \begin{proof}
-            \begin{rmk}
-                This proof is beyond the scope of this course.
-            \end{rmk}
-            \vspace{1ex}
-            The total number of irreducible representations must be at most the number of conjugacy classes since the irreducible representations form a basis in the space of class functions, which is a space of dimension  \(N_\mathrm{c}\).
-            
-            Suppose there is a class function, \(f \colon G \to \complex\), such that \(f\) is orthogonal to all of the characters of the irreducible representations, that is
-            \begin{equation}
-                \innerprod{f}{\chi(\rho_i)} = 0
-            \end{equation}
-            for all irreducible representations, \(\rho_i\).
-            If we can show that this necessarily means \(f = (0, \dotsc, 0) \in \complex^{N_{\mathrm{c}}}\) then this shows that the characters form a complete set of vectors on the class function space, and hence the number of characters is equal to the dimension of the space.
-            
-            Consider the map
-            \begin{equation}
-                \varphi \colon V_i \to V_i \qqwhere \varphi \coloneqq \sum_{g \in G} f(g)^* \rho_i(\gamma).
-            \end{equation}
-            Here \(V_i\) is the vector space associated with the irreducible representation \(\rho_i\).
-            It can easily be seen that
-            \begin{align}
-                \varphi \rho_i(g') &= \sum_{g\in G} f(g)^* \rho_i(g)\rho_i(g')\\
-                &= \sum_{g\in G} f(g)^* \rho_i(gg')\\
-                &= \sum_{g''\in G} f(g'')^* \rho_i(g'')\\
-                &= \sum_{g'''\in G} \rho_i(g')f(g''')^*\rho_i(g''')\\
-                &= \rho_i(g') \sum_{g'''\in G} f(g''')^*
-            \end{align}
-            where we use the fact that we are averaging over the group so averaging \(gg'\) over \(g\) is the same as averaging over \(g'' = gg'\).
-            We then have by Schur's lemma (\cref{thm:schurs lemma}) that \(\varphi = \lambda\ident\).
-            Hence,
-            \begin{equation}
-                \tr\varphi = \lambda\dim V_i
-            \end{equation}
-            and
-            \begin{equation}
-                \tr\varphi = \sum_{g \in G} f(g)^* \chi_{\rho_i}(g) = \abs{G} \innerprod{f}{\chi(\rho_i)} = 0.
-            \end{equation}
-            The last equality being by our assumption that \(f\) is orthogonal to all of the characters.
-            We therefore must have that either \(\lambda = 0\), in which case \(f(g) = 0\) for all \(g \in G\), or
-            \begin{equation}
-                \sum_{g\in G} f^*(g)\rho_i(g)
-            \end{equation}
-            holds for all irreducible representations, and hence for all representations since they can be written as a sum of irreducible representations.
-            
-            In particular this must hold for the regular representation, \(\rho_{\mathrm{R}}\).
-            However, since \(\rho_{R}(g)\) are all linearly independent by definition this means \(f(g) = 0\) for all \(g \in G\).
-            Either way the result is that \(f = (0, \dotsc, 0)\) and so the characters form a complete basis and hence the number of irreducible representations is equal to the number of conjugacy classes.
-        \end{proof}
-    \end{thm}
+    The Dynkin diagram for \(F_4\) is
+    \tikzsetnextfilename{dynkin-F4}
+    \tikz[baseline=-2.5pt]{ \draw (0, 0) -- (1, 0); \draw[double, ->-=0.65, >=To] (1, 0) -- (2, 0); \draw (2, 0) -- (3, 0); \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius = 0.075]; \draw[dynkin node] (2, 0) circle [radius = 0.075]; \draw[dynkin node] (3, 0) circle [radius = 0.075];}
+    .
     
-    The following theorem is useful but the proof requires somewhat complicated linear algebra so we omit it.
-    \begin{thm}{}{thm:dim irrep divides |G|}
-        This dimension of any irreducible representation divides the order of the group.
-        That is \(\abs{G} / \dim V_i \in \positiveintegers\) where \(\rho_i \colon G \to \generalLinear(V_i)\) is an irreducible representation.
-        
-        Further \(\dim V_i\) divides \(G / Z(G)\), where \(Z(G)\) is the centre of the group, which is the normal subgroup of all commuting elements.
-    \end{thm}
+    The Dynkin diagram for \(G_2\) is
+    \tikzsetnextfilename{dynkin-G2}
+    \tikz[baseline=-2.5pt]{ \draw[->-=0.65, >={To[width=0.3cm, length=0.14cm]}] (0, 0) -- (1, 0); \draw[yshift=0.035cm] (0, 0) -- (1, 0); \draw[yshift=-0.035cm] (0, 0) -- (1, 0); \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius = 0.075]; }
+    .
     
-    \begin{crl}{}{}
-        All irreducible representations of an Abelian group are one dimensional.
-        
-        \begin{proof}
-            Let \(G\) be an Abelian group.
-            Since the group is Abelian \(gg'g^{-1} = g'gg^{-1} = g'\) for all \(g, g' \in G\), and so every conjugacy class contains exactly one element.
-            Hence \(N_{\mathrm{c}} = \abs{G}\).
-            By the dimensionality theorem (\cref{thm:dimensionality thm})
-            \begin{equation}
-                \abs{G} = \sum_{i = 1}^{N_{\mathrm{c}}} \dim(V_i)^2 = \sum_{i = 1}^{\abs{G}} \dim(V_i)^2.
-            \end{equation}
-            Since \(\dim V_i\) divides \(\abs{G}\) by \cref{thm:dim irrep divides |G|} it follows that \(\dim V_i \ne 0\) and so \(\dim V_i = 1\) is the only way to have this equation hold.
-        \end{proof}
-    \end{crl}
-    
-    The past few theorems combined shows that we know quite a lot about the dimensions of the irreducible representations before we even start to work out what the representations are.
-    This mostly stems from Schur's lemma.
-    We can sum it up in a set of diophantine equations (equations with integer solutions) which must be satisfied.
-    \begin{important}
-        \begin{itemize}
-            \item \(\abs{G} = 1 + \dim(V_2)^2 + \dotsb + \dim(V_k)^2\),
-            \item \(k = N_{\mathrm{c}}\), and
-            \item \(\abs{G} / \dim V_i \in \positiveintegers\).
-        \end{itemize}
-    \end{important}
-    The \(1\) in the first equation corresponds to the dimension of the trivial representation, which is always present.
-    These equations are often enough to allow us to work out the dimensions of the irreducible representations without having to explicitly compute them.
-    
-    
+    Notice that for some low-rank cases the Dynkin diagrams are degenerate, for example \(A_1\) and \(B_1\) both correspond to
+    \tikzsetnextfilename{dynkin-B1}
+    \tikz[baseline=-2.5pt]{ \draw[dynkin node] (0, 0) circle [radius = 0.075]; }
+    which reflects the fact that \(A_1 \cong B_1\), which is to say \(SU(2) \cong SO(3)\), a fact that will be important later.
+    It also explains why the \(E_n\) exceptional groups start at \(E_6\), sinice the Dynkin diagram for \(E_5\) is the same as for \(D_5\), and the Dynkin diagram for \(E_4\) is the same as for \(A_4\).
     
     
     %   Appdendix
@@ -976,6 +600,8 @@ noabbrev
     \begin{appendices}
         \include{parts/math-prelim-appendix}
         \include{parts/groups-appendix}
+        \include{parts/manifolds-appendix}
+        \include{parts/algebras-appendix}
     \end{appendices}
     
     \backmatter
