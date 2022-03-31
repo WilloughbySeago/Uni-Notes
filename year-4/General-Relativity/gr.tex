@@ -105,6 +105,9 @@ noabbrev
     \prop_set_from_keyval:Nn \l_willoughby_color_prop { #1 }
 }
 \ExplSyntaxOff
+\newcommand*{\cisonepic}{\tikzexternaldisable\tikz[baseline=(a.base)]{\node[draw=highlight, fill=highlight!20, thick, text=highlight!90!black] (a) {\(c = 1\)}}\tikzexternalenable}
+\newcommand*{\cisone}{\tag*{\cisonepic\hspace{1em}(\refstepcounter{equation}\theequation)}}
+\DeclareMathOperator{\arsinh}{arshin}
 
 % Include
 \includeonly{parts/graphical-notation-appendix}
@@ -3559,7 +3562,7 @@ noabbrev
         \tensor{R}{^\alpha_{\sigma\rho\beta}} \approx \frac{1}{2}\eta^{\alpha\nu} [\partial_\sigma\partial_\rho h_{\beta\nu} - \partial_\nu\partial_\rho h_{\beta\sigma} - \partial_\sigma\partial_\beta h_{\rho\nu} + \partial_\beta\partial_\nu h_{\rho\sigma}].
     \end{equation}
     The Ricci tensor is then
-    \begin{equation}
+    \begin{equation}\label{eqn:ricci tensor weak field}
         R_{\sigma\beta} = \tensor{R}{^\alpha_{\sigma\beta\alpha}} \approx \frac{1}{2}\eta^{\alpha\nu} [\partial_\sigma \partial_\beta h_{\alpha\nu} - \partial_\nu\partial_\beta h_{\alpha\sigma} - \partial_\sigma\partial_\alpha h_{\beta\nu} + \partial_\alpha\partial_\nu h_{\beta\sigma}].
     \end{equation}
     We only need \(G_{00} = R_{00} - g_{00} R/2\) to calculate the constant of proportionality and so we only need to determine \(R_{00}\) and \(R\).
@@ -3788,6 +3791,685 @@ noabbrev
     When \(\chi = 2\pi\) the particles will have returned to their starting point, meaning that the metric describes a \defineindex{closed universe} if \(k = 1\).
     A closed universe has finite volume but is unbounded, if you go far enough you just end up repeating your self, but there is no \enquote{edge} of the universe, the same way that there is no \enquote{edge} of a sphere, you can go around and around but it has finite area.
     If \(k = -1\) then the transverse separation is strictly increasing and the particles never return to their starting point, so this describes an \defineindex{open universe}, which is infinite in volume.
+    
+    \subsection{Distances and Redshifts}
+    Consider a radial geodesic.
+    That is, the path taken by a photon reaching the origin from some distant galaxy.
+    For a photon the proper time is zero and the FRW metric gives \(R(t)\dd{\chi} = c\dd{t}\).
+    We therefore have
+    \begin{equation}
+        \chi = c \int\frac{1}{R(t)}\dd{t}.
+    \end{equation}
+    This is a comoving distance, meaning it is fixed even though time is changing.
+    Consider the time periods \([t, t']\) and \([t + \Delta t, t' + \Delta t]\).
+    In order for \(\chi\) to be the same we must have that the integrals over these are the same, hence the loss due to moving the start time \(\Delta t\) later must exactly cancel with the gain from moving the end time \(\Delta t\) later.
+    If we think of these time intervals as one period of a wave we see that we get a redshift effect:
+    \begin{equation}
+        \frac{\nu_{\mathrm{emit}}}{\nu_{\mathrm{observer}}} = 1 + z = \frac{R(t_{\mathrm{observe}})}{R(t_{\mathrm{emit}})}.
+    \end{equation}
+    We can therefore use the redshift to measure how much the universe has expanded since the radiation was emitted.
+    It is often convenient to include a factor, \(a(t) \coloneqq R(t)/R(t_0)\), where \(t_0\) is the time now so \(a(t_0) = 1\).
+    In this case
+    \begin{equation}
+        1 + z = \frac{1}{a(t_{\mathrm{emit}})}.
+    \end{equation}
+    
+    \section{Einstein Equations for the Universe}
+    Now that we have the FRW metric for a homogeneous, isotropic universe we put this into Einstein's field equations to obtain the dynamical equations for the universe.
+    We're particularly interested in the time dependence of \(R(t)\).
+    
+    We start with the metric in coordinates \((t, r, \vartheta, \varphi)\):
+    \begin{equation}
+        g_{\mu\nu} = \diag\left( c^2, -\frac{R^2}{\alpha}, -R^2r^2, -R^2r^2\sin^2\vartheta \right).
+    \end{equation}
+    Here \(\alpha = 1 - kr^2\).
+    Note that \(R\) here is \(R(t)\) with the time suppressed, it is \emph{not} the Ricci scalar, which we will denote \(\tensor{R}{^\alpha_\alpha}\) here.
+    We can easily compute the inverse metric:
+    \begin{equation}
+        g^{\mu\nu} = \diag\left( \frac{1}{c^2}, - \frac{\alpha}{R^2}, -\frac{1}{R^2r^2}, -\frac{1}{R^2r^2\sin^2\vartheta} \right).
+    \end{equation}
+    
+    Using these quantities we can compute the affine connections:
+    \begin{equation}
+        \christoffel{\mu}{\alpha}{\beta} = \frac{1}{2}g^{\mu\nu}(g_{\nu\beta,\alpha} + g_{\nu\alpha,\beta} - g_{\alpha\beta,\nu}).
+    \end{equation}
+    Since the metric is diagonal and relatively simple most of the affine connections vanish.
+    For example, consider \(\christoffel{0}{\alpha}{\beta}\).
+    The \(g^{\mu\nu}\) factor is only nonzero if \(\nu = \mu = 0\).
+    The \(g_{\nu\alpha}\) and \(g_{\nu\beta}\) terms are then only nonzero for \(\alpha = 0\) and \(\beta = 0\) respectively.
+    These then involve derivatives of \(g_{00}\), which vanish since \(c^2\) is a constant.
+    The final term, \(g_{\alpha\beta,\nu}\) involves a time derivative (since \(\nu = 0\)), and this is nonzero only when \((\alpha, \beta) = (1,1), (2,2), (3, 3)\).
+    Hence there are three nonzero affine connections \(\christoffel{0}{\alpha}{\beta}\).
+    Similar reasoning to this allows us to compute all nonzero elements:
+    \begin{alignat}{8}
+        \christoffel{0}{1}{1} &= \frac{R\dot{R}}{\alpha c^2}, \qquad && \christoffel{0}{2}{2} &= \frac{R\dot{R}r^2}{c^2}, \qquad && \christoffel{0}{3}{3} &= \frac{R\dot{R}r^2}{c^2}\sin^2\vartheta,\\
+        \christoffel{1}{0}{1} &= \frac{\dot{R}}{R}, \qquad && \christoffel{1}{1}{1} &= \frac{kr}{\alpha}, \qquad && \christoffel{1}{2}{2} &= -\alpha r,\\
+        \christoffel{1}{3}{3} &= - r\alpha \sin^2\vartheta, \qquad && \christoffel{2}{0}{2} &= \frac{\dot{R}}{R}, \qquad && \christoffel{2}{1}{2} &= \frac{1}{r},\\
+        \christoffel{2}{3}{3} &= -\sin\vartheta\cos\vartheta, \qquad && \christoffel{3}{0}{3} &= \frac{\dot{R}}{R}, \qquad && \christoffel{3}{1}{3} &= \frac{1}{r},\\
+        \christoffel{3}{2}{3} &= \frac{\cos\vartheta}{\sin\vartheta}.
+    \end{alignat}
+    Recall that \(\christoffel{\mu}{\alpha}{\beta} = \christoffel{\mu}{\beta}{\alpha}\), so as well as these \(\christoffel{1}{1}{0}\), \(\christoffel{2}{2}{0}\), \(\christoffel{2}{2}{1}\), \(\christoffel{3}{3}{0}\), \(\christoffel{3}{3}{1}\), and \(\christoffel{3}{3}{2}\) are nonzero.
+    This makes for 19 nonzero components, out of 64 components.
+    Note that dots here represent derivatives with respect to \(t\), so \(\dot{R} = \diff{R}/{t}\), not derivatives with respect to an affine parameter has they have done previously.
+    
+    The Ricci tensor is then given by
+    \begin{equation}
+        R_{\mu\nu} = \tensor{\Gamma}{^\alpha_{\mu\alpha,\nu}} - \tensor{\Gamma}{^\alpha_{\mu\nu,\alpha}} + \christoffel{\alpha}{\mu}{\beta} \christoffel{\beta}{\alpha}{\nu} + \christoffel{\alpha}{\alpha}{\beta} \christoffel{\beta}{\mu}{\nu}.
+    \end{equation}
+    Working out each component by hand would be a lot of work, fortunately we don't have to.
+    First, notice that the Ricci tensor must be diagonal, since \(G_{\mu\nu} + \Lambda g_{\mu\nu} = -\kappa T_{\mu\nu}\), with \(\kappa = 8\pi G/c^4\) and \(G_{\mu\nu} = R_{\mu\nu} - \tensor{R}{^\alpha_\alpha}g_{\mu\nu}/2\), so the diagonal nature of the Ricci tensor follows from the fact that the metric and the energy-momentum tensor are both diagonal in this case.
+    This reduces our work from 16 to 4 components, but it gets simpler still since we have isotropic space which means we don't need to compute all components.
+    Writing out the Einstein tensor the field equations are
+    \begin{equation}
+        R_{\mu\nu} - \frac{1}{2}\tensor{R}{^\alpha_\alpha} g_{\mu\nu} + \Lambda g_{\mu\nu} = -\kappa T_{\mu\nu}.
+    \end{equation}
+    Now consider what happens if we multiply this by \(g^{\mu\nu}\), this has the effect of raising the \(\mu\) and turning it into a \(\nu\), so we end up taking the trace in the process:
+    \begin{equation}
+        \tensor{R}{^\nu_\nu} - \frac{1}{2}\tensor{R}{^\alpha_\alpha} \tensor{g}{^\nu_\nu} + \Lambda \tensor{g}{^\nu_\nu} = -\kappa \tensor{T}{^\nu_\nu}.
+    \end{equation}
+    This further simplifies since \(\tensor{g}{^\nu_\nu} = 1\), which follows since \(g^{\mu\nu}\) is the inverse of \(g_{\mu\nu}\) so \(g^{\mu\nu}g_{\mu\nu} = \tensor{\delta}{^\mu_\mu} = 4\).
+    This is a general fact, that the trace of the metric is the dimension of the space.
+    Using this simplification, and relabelling dummy indices, we have
+    \begin{equation}
+        \tensor{R}{^\alpha_\alpha} - \frac{4}{2}\tensor{R}{^\alpha_\alpha} + 4\Lambda = -\kappa\tensor{T}{^\alpha_\alpha} \implies \tensor{R}{^\alpha_\alpha} = \kappa \tensor{T}{^\alpha_\alpha} - 4\Lambda.
+    \end{equation}
+    
+    The energy-momentum tensor is \(T^{\mu\nu} = (\rho + p/c^2)U^\mu U^\nu - pg^{\mu\nu}\), where \(U^\mu = (1, \vv{0})\) is the four velocity in comoving coordinates.
+    We then have \(U_\mu = (c^2, \vv{0})\), and so \(\tensor{T}{^\mu_\nu} = \diag(\rho c^2, =p, -p, -p)\).
+    The trace of the energy-momentum tensor is then \(T = \rho c^2  - 3p\).
+    
+    The field equations, \(R_{\mu\nu} - \tensor{R}{^\alpha_\alpha}g_{\mu\nu}/2 + \Lambda g_{\mu\nu} = -\kappa T_{\mu\nu}\), can be written in a mixed form by raising the \(\mu\) index, \(\tensor{R}{^\mu_\nu} - \tensor{R}{^\alpha_\alpha}\tensor{g}{^\mu_\nu}/2 + \Lambda\tensor{g}{^\mu_\nu} = -\kappa\tensor{T}{^\mu_\nu}\).
+    Substituting \(\tensor{R}{^\alpha_\alpha} = \kappa \tensor{T}{^\alpha_\alpha} - 4\Lambda\) we get
+    \begin{equation}
+        \tensor{R}{^\mu_\nu} - \frac{1}{2}(\kappa \tensor{T}{^\alpha_\alpha} - 4\Lambda)\tensor{g}{^\mu_\nu} + \Lambda\tensor{g}{^\mu_\nu} = -\kappa\tensor{T}{^\mu_\nu}.
+    \end{equation}
+    Rearranging this we have
+    \begin{equation}
+        \tensor{R}{^\mu_\nu} = -\kappa\left( \tensor{T}{^\mu_\nu} - \frac{1}{2}\tensor{T}{^\alpha_\alpha}\tensor{g}{^\mu_\nu} \right) + \Lambda\tensor{g}{^\mu_\nu}.
+    \end{equation}
+    Since the Ricci tensor is diagonal we have \(\tensor{R}{^0_0} = g^{00}R_{00} = R_{00}/c^2\), and \(\tensor{R}{^1_1} = g^{11}R_{11} = -\alpha R_{11}/R^2\).
+    The field equations then reduce to a pair of equations:
+    \begin{align}
+        \frac{1}{c^2}R_{00} = -\kappa\left( \frac{\rho c^2}{2} + \frac{3p}{2} \right) + \Lambda,\\
+        -\frac{\alpha}{R^2}R_{11} = -\kappa\left( -\frac{\rho c^2}{2} + \frac{p}{2} \right) + \Lambda.
+    \end{align}
+    
+    So the only components of the Ricci tensor that we need are \(R_{00}\) and \(R_{11}\).
+    We can compute these using
+    \begin{equation}
+        R_{\mu\nu} = \partial_\nu \christoffel{\alpha}{\mu}{\alpha} - \partial_\alpha\christoffel{\alpha}{\mu}{\nu} + \christoffel{\alpha}{\mu}{\beta} \christoffel{\beta}{\alpha}{\nu} + \christoffel{\alpha}{\alpha}{\beta} \christoffel{\beta}{\mu}{\nu}.
+    \end{equation}
+    We first note that when \(\mu = \nu = 0\) the second and fourth terms vanish since they have \(\christoffel{\alpha}{0}{0}\) and \(\christoffel{\beta}{0}{0}\), which are zero for all \(\alpha\) and \(\beta\).
+    The first term is nonzero only if \(\alpha = 1, 2, 3\), and the second term is nonzero only if \(\alpha = \beta\) and \(\alpha = 1, 2, 3\).
+    We therefore have
+    \begin{align}
+        R_{00} &= \partial_0\christoffel{\alpha}{0}{\alpha} + \christoffel{\alpha}{0}{\beta}\christoffel{\beta}{\alpha}{0}\\
+        &= \partial_0\christoffel{1}{0}{1} + \partial_0\christoffel{2}{0}{2} + \partial_0\christoffel{3}{0}{3} + \christoffel{\alpha}{0}{\beta}\christoffel{\beta}{\alpha}{0}\\
+        &= 3\partial_0 \frac{\dot{R}}{R} + \christoffel{\alpha}{0}{\beta}\christoffel{\beta}{\alpha}{0}\\
+        &= \frac{3\ddot{R}}{R} - \frac{3\dot{R}^2}{R^2} + \christoffel{\alpha}{0}{\beta}\christoffel{\beta}{\alpha}{0}\\
+        &= \frac{3\ddot{R}}{R} - \frac{3\dot{R}^2}{R^2} + \christoffel{1}{0}{1}\christoffel{1}{1}{0} + \christoffel{2}{0}{2}\christoffel{2}{2}{0} + \christoffel{3}{0}{3}\christoffel{3}{3}{0}\\
+        &= \frac{3\ddot{R}}{R} - \frac{3\dot{R}^2}{R^2} + \frac{3\dot{R}^2}{R^2}\\
+        &= \frac{3\ddot{R}}{R}.
+    \end{align}
+    
+    Similarly, one can show that
+    \begin{equation}
+        R_{11} = -\frac{1}{\alpha c^2}(R\ddot{R} + 2\dot{R}^2 + 2kc^2).
+    \end{equation}
+    We therefore have two equations mixing first and second time derivatives of \(R(t)\).
+    It is possible to separate out first and second time derivatives giving the \defineindex{Friedmann Equations}:
+    \begin{gather}
+        \dot{R}^2 - \frac{8\pi G\rho}{3}R^2 - \frac{\Lambda}{3}c^2R^2 = -kc^2\\
+        \ddot{R} = -\frac{4\pi G}{3}\left( \rho + \frac{3p}{c^2} \right) R + \frac{\Lambda}{3}c^2R.
+    \end{gather}
+    
+    We can simplify these by defining an effective density,
+    \begin{equation}
+        \rho_{\Lambda} = \frac{\Lambda c^2}{8\pi G},
+    \end{equation}
+    and an accompanying effective pressure,
+    \begin{equation}
+        p_\Lambda = -\rho_\Lambda c^2.
+    \end{equation}
+    We then change \(\rho \to \rho + \rho_\Lambda\) and \(p \to p + p_\Lambda\), and we get
+    \begin{gather}
+        \dot{R}^2 - \frac{8\pi G\rho}{3}R^2 = -kc^2,\\
+        \ddot{R} = -\frac{4\pi G\rho}{3}\left( \rho + \frac{3p}{c^2} \right)R.
+    \end{gather}
+    
+    We can interpret the first of these equations as an energy equation.
+    The \(\dot{R}\) term represents the kinetic energy and the \(R^2\) term is the Newtonian potential in a sphere of radius \(R\), since such a sphere has volume \(4\pi R^3/3\), and so mass \(M = 4\rho\pi R^3/3\), so we can rewrite the first equation as
+    \begin{equation}
+        \frac{1}{2}\dot{R}^2 - \frac{GM}{R} = -\frac{kc^2}{2}
+    \end{equation}
+    We then interpret the constant \(-kc^2/2\) as the total energy of the system.
+    The second equation is an acceleration equation.
+    
+    We can actually derive the second equation from the first by differentiating and imposing energy conservation.
+    In order to do this we need to know \(\dot{\rho}\).
+    We can find this by requiring the covariant divergence of the energy-momentum tensor to vanish, but a thermodynamics argument is more enlightening.
+    For an adiabatic process we know that at \(\dl{E} = -p\dd{V}\).
+    Setting \(E = \rho c^2V\), since \(\rho\) is the the mass density, so \(\rho c^2\) is the energy density, we know that \(V \propto R^3\), and so we have \(\dl{(\rho c^2V)} = c^2V\dl{\rho} + c^2\rho\dl{V} = -p\dd{V}\) and \(\dl{V} \propto 3R^2\dd{R}\).
+    Putting this together we have
+    \begin{equation}
+        c^2R^3\dl{\rho} = -3R^2(c^2\rho + p)\dd{R} \implies \dot{\rho} c^2 = -3(c^2\rho + p)\frac{\dot{R}}{R}
+    \end{equation}
+    Note that since \(\Lambda\) is independent of time \(\rho_{\Lambda}\) is independent of time.
+    
+    \subsection{Alternative Derivation}
+    \begin{wrn}
+        In this section we use units where \(c = 1\).
+    \end{wrn}
+    Another way to derive the Friedmann equations is using the matrix method.
+    To start we write out the matrices \(\Gamma_\mu\), which have components \(\tensor{(\Gamma_\mu)}{^\alpha_\beta} = \christoffel{\alpha}{\mu}{\beta}\).
+    The nonzero components of these matrices are given below:
+    \begin{alignat*}{5}
+        \Gamma_t &= 
+        \begin{pmatrix}
+            \cdot & \cdot & \cdot & \cdot\\
+            \cdot & \dot{R}/R & \cdot & \cdot\\
+            \cdot & \cdot & \dot{R}/R & \cdot\\
+            \cdot & \cdot & \cdot & \dot{R}/R
+        \end{pmatrix}
+        , \qquad & \Gamma_r &=
+        \begin{pmatrix}
+            \cdot & R\dot{R}/\alpha & \cdot & \cdot\\
+            \dot{R}/R & kr/\alpha & \cdot & \cdot\\
+            \cdot & \cdot & 1/r & \cdot\\
+            \cdot & \cdot & \cdot & 1/r
+        \end{pmatrix}
+        ,\\
+        \Gamma_{\vartheta} &= 
+        \begin{pmatrix}
+            \cdot & \cdot & \dot{R}Rr^2 & \cdot\\
+            \cdot & \cdot & -\alpha r & \cdot\\
+            \dot{R}/R & 1/r & \cdot & \cdot\\
+            \cdot & \cdot & \cdot & \cot\vartheta
+        \end{pmatrix}
+        , \qquad & \Gamma_\varphi &=
+        \begin{pmatrix}
+            \cdot & \cdot & \cdot & R\dot{R}r^2\sin^2\vartheta\\
+            \cdot & \cdot & \cdot & -\alpha r\sin^2\vartheta\\
+            \cdot & \cdot & \cdot & -\sin\vartheta\cos\vartheta\\
+            \dot{R}/R & 1/r & \cot\vartheta & \cdot
+        \end{pmatrix}
+        .
+    \end{alignat*}
+    
+    We can then compute the 6 independent \(B_{\rho\sigma}\) matrices, which have components \(\tensor{(B_{\rho\sigma})}{^\alpha_\beta} = \tensor{R}{^\alpha_{\beta\rho\sigma}}\).
+    These can be computed using
+    \begin{equation}
+        B_{\rho\sigma} = \partial_\rho\Gamma_\sigma - \partial_\sigma\Gamma_\rho + \Gamma_\rho\Gamma_\sigma - \Gamma_\sigma\Gamma_\rho.
+    \end{equation}
+    We then find
+    \begingroup
+    \scriptsize
+    \begin{alignat*}{5}
+        B_{tr} &= 
+        \begin{pmatrix}
+            \cdot & \ddot{R}R/\alpha & \cdot & \cdot\\
+            \ddot{R}/R & \cdot & \cdot & \cdot\\
+            \cdot & \cdot & \cdot & \cdot\\
+            \cdot & \cdot & \cdot & \cdot\\
+        \end{pmatrix}
+        , \quad & B_{t\vartheta} &= 
+        \begin{pmatrix}
+            \cdot & \cdot & \ddot{R}Rr^2 & \cdot\\
+            \cdot & \cdot & \cdot & \cdot\\
+            \ddot{R}/R & \cdot & \cdot & \cdot\\
+            \cdot & \cdot & \cdot & \cdot\\
+        \end{pmatrix}
+        ,\\
+        B_{t\varphi} &= 
+        \begin{pmatrix}
+            \cdot & \cdot & \cdot & \ddot{R}Rr^2\sin^2\vartheta\\
+            \cdot & \cdot & \cdot & \cdot\\
+            \cdot & \cdot & \cdot & \cdot\\
+            \ddot{R}/R & \cdot & \cdot & \cdot\\
+        \end{pmatrix}
+        , \quad & B_{r\vartheta} &=
+        \begin{pmatrix}
+            \cdot & \cdot & \cdot & \cdot\\
+            \cdot & \cdot & r^2(\dot{R}^2 + k) & \cdot\\
+            \cdot & -(\dot{R}^2 + k)/\alpha & \cdot & \cdot\\
+            \cdot & \cdot & \cdot & \cdot\\
+        \end{pmatrix}
+        ,\\
+        B_{r\varphi} &= 
+        \begin{pmatrix}
+            \cdot & \cdot & \cdot & \cdot\\
+            \cdot & \cdot & (\dot{R}^2 + k)\sin^2\vartheta & \cdot\\
+            \cdot & \cdot & \cdot & \cdot\\
+            \cdot & -(\dot{R}^2 + k)/\alpha & \cdot & \cdot\\
+        \end{pmatrix}
+        , \quad & B_{\vartheta\varphi} &= 
+        \begin{pmatrix}
+            \cdot & \cdot & \cdot & \cdot\\
+            \cdot & \cdot & \cdot & \cdot\\
+            \cdot & \cdot & (\dot{R}^2 + k)r^2\sin^2\vartheta & \cdot\\
+            \cdot & -(\dot{R}^2 + k)r^2 & \cdot & \cdot\\
+        \end{pmatrix}
+        .
+    \end{alignat*}
+    \endgroup
+    To find the Ricci tensor we first find the nonzero elements of the Riemann tensor, reacall that \(\tensor{R}{^\alpha_{\beta\rho\sigma}}\) is given by row \(\alpha\) and column \(\beta\) of \(B_{\rho\sigma}\).
+    The nonzero elements are then
+    \begingroup
+    \small
+    \begin{alignat*}{5}
+        \tensor{R}{^t_{rtr}} &= \ddot{R}R/\alpha, \qquad & \tensor{R}{^r_{ttr}} &= \ddot{R}/R, \qquad & \tensor{R}{^t_{\vartheta t \vartheta}} &= \ddot{R}Rr^2,\\
+        \tensor{R}{^\vartheta_{tt\vartheta}} &= \ddot{R}, \qquad & \tensor{R}{^t_{\varphi t\varphi}} &= \ddot{R}Rr^2\sin^2\vartheta, \qquad & \tensor{R}{^\varphi_{tt\varphi}} &= \ddot{R}/R,\\
+        \tensor{R}{^r_{\vartheta r\vartheta}} &= (\dot{R}^2 + k)r^2, \qquad & \tensor{R}{^\vartheta_{rr\vartheta}} &= -(\dot{R} + k)/\alpha, \qquad & \tensor{R}{^r_{\varphi r \varphi}} &= (\dot{R}^2 + k)r^2\sin^2\vartheta,\\
+        \tensor{R}{^\varphi_{rr\varphi}} &= -(\dot{R}^2 + k)/\alpha, \qquad & \tensor{R}{^\vartheta_{\varphi\vartheta\varphi}} &= (\dot{R}^2 + k)r^2\sin^2\vartheta, \qquad & \tensor{R}{^\varphi_{\vartheta\vartheta}} &= -(\dot{R}^2 + k)r^2.
+    \end{alignat*}
+    \endgroup
+    
+    From this we find that the Ricci tensor is
+    \begin{equation}
+        R_{\mu\nu} = 
+        \begin{pmatrix}
+            3\ddot{R}/R & \cdot & \cdot & \cdot\\
+            \cdot & -A/\alpha & \cdot & \cdot\\
+            \cdot & \cdot & -Ar^2 & \cdot\\
+            \cdot & \cdot & \cdot & -Ar^2\sin^2\vartheta\\
+        \end{pmatrix}
+        \cisone
+    \end{equation}
+    where \(A = R\ddot{R} + 2(\dot{R}^2 + k)\).
+    The Ricci scalar is then given by
+    \begin{equation}
+        \tensor{R}{^\alpha_\alpha} = 6\left( \frac{\ddot{R}}{R} + \frac{\dot{R} + k}{R^2} \right).\cisone
+    \end{equation}
+    Using this we can compute selected elements of the Einstein tensor:
+    \begin{align}
+        G^{00} &= -\frac{3}{R}(\dot{R}^2 + k),\cisone\\
+        G^{11} &= \frac{\alpha}{R^2}\left[ \frac{2\ddot{R}}{R} + \frac{1}{R^2}(\dot{R}^2 + k) \right].\cisone
+    \end{align}
+    The energy-momentum tensor is \(T^{\mu\nu} = (\rho + p)U^\mu U^\nu - pg^{\mu\nu}\) and the four velocity of the fluid, in comoving coordinates, is \(U^\mu = (c^2, \vv{0})\), giving
+    \begin{equation}
+        T^{\mu\nu} = 
+        \begin{pmatrix}
+            \rho & \cdot & \cdot & \cdot\\
+            \cdot & \alpha p/R^2 & \cdot & \cdot\\
+            \cdot & \cdot & p/(R^2r^2) & \cdot\\
+            \cdot & \cdot & \cdot & p/(R^2r^2\sin^2\vartheta)\\
+        \end{pmatrix}
+        .\cisone
+    \end{equation}
+    
+    Using all of this the Einstein field equations, \(G^{\mu\nu} + \Lambda g^{\mu\nu} = -8\pi GT^{\mu\nu}\), give
+    \begin{gather}
+        \dot{R}^2 + k - \frac{\Lambda}{3}R^2 = \frac{8\pi G\rho}{3}R^2,\cisone\\
+        2\frac{\ddot{R}}{R} + \frac{\dot{R}^2 + k}{R^2} - \Lambda = -8\pi Gp.\cisone
+    \end{gather}
+    
+    \section{Cosmological Dynamics}
+    Consider the first Friedmann equation,
+    \begin{equation}
+        \frac{\dot{R}^2}{2} - \frac{GM}{R} = -\frac{1}{2}kc^2,
+    \end{equation}
+    where \(M = 4\pi G\rho R^3/3\) and \(\rho\) includes \(\rho_{\Lambda}\).
+    This is a surprisingly Newtonian equation, it can be viewed as the equation of motion of a particle thrown vertically upwards on Earth, with \(-kc^2/2\) being the total energy of the particle per unit mass.
+    The only weird thing is that the total energy somehow depends on the curvature of the universe, through the parameter \(k\).
+    
+    For a given rate of expansion we can define a \defineindex{critical density}, \(\rho_{\mathrm{c}}\), which is such that \(k = 0\), which means the comoving part of the metric looks Euclidean.
+    This happens when
+    \begin{equation}
+        \rho_{\mathrm{c}} \coloneqq \frac{3H^2}{8\pi G},
+    \end{equation}
+    where \(H = R'/R\) is the \defineindex{Hubble parameter}.
+    It is common to define a dimensionless \defineindex{density parameter}, \(\Omega\), acording to
+    \begin{equation}
+        \Omega \coloneqq \frac{\rho}{\rho_{\mathrm{c}}} = \frac{8\pi G\rho}{3H^2}.
+    \end{equation}
+    We also attach a subscript zero to these parameters to denote their value now, since they are in general functions of time, so \(H_0\) is the Hubble parameter at the present time, and \(\Omega_0\) is the density parameter at this instant, and so on.
+    We can then write the Friedmann equation as
+    \begin{equation}
+        [H(t)]^2 + \Omega_0H_0^2 \frac{\rho(t)}{\rho_0} = -\frac{kc^2}{[R(t)]^2}.
+    \end{equation}
+    Taking this equation at time \(t = t_0\) we get
+    \begin{equation}
+        H_0^2(1 + \Omega_0) = -\frac{kc^2}{R_0} \implies R_0 = \frac{c}{H_0}\sqrt{-\frac{k}{1 + \Omega_0}},
+    \end{equation}
+    which is the current radius of curvature of the universe.
+    
+    Notice that as \(\Omega_0 \to 1\) the radius of curvature diverges, which corresponds to a flat universe.
+    In this limit the \(0kc^2/R^2\) term becomes negligible and so we can introduce a third solution when \(k = 0\), which is for a flat universe, giving
+    \begin{equation}
+        a(t) \coloneqq \frac{R(t)}{R_0} = \frac{1}{1 + z},
+    \end{equation}
+    where \(a\) is a dimensionless scale factor and \(z\) is the redshift.
+    
+    We can split the density, \(\rho\), into three parts, \(\rho_{\Lambda}\), which we refer to as the \defineindex{vacuum density} in this context, as well as \(\rho_{\mathrm{matter}}\), which is the density of matter, and can be shown to be proportional to \(R^{-3}\), and \(\rho_{\mathrm{radiation}}\), which is the density of energy, and can be shown to be proportional to \(R^{-4}\).
+    Note that \(\rho_{\Lambda}\) is proportional to \(R^0\), which is to say constant.
+    For each of these we can define an \(\Omega_i = \rho_i/\rho_{\mathrm{c}}\).
+    We then find that the Friedmann equation can be written as
+    \begin{equation}
+        H^2(z) = H_0^2\left[ \sum_{i} \Omega_i(1 + z)^{\gamma_i} + (1 - \Omega_0)(1 + z)^2 \right],
+    \end{equation}
+    where \(\gamma_{\mathrm{matter}} = 3\), \(\gamma_{\mathrm{radiation}} = 4\), and \(\gamma_{\Lambda} = 0\).
+    This form is useful since we can write distances as an integral of \(c/R(t)\) over coordinate time, but a change of variables allows us to write distances as
+    \begin{equation}
+        R_0\chi = \int \frac{c}{H(z)}\dd{z}
+    \end{equation}
+    instead.
+    
+    \subsubsection{Solutions to the Friedmann Equations}
+    There is no analytical solution to the Friedmann equations if we include all three sources of density.
+    For simplicity we deal with the \(k = 0\), flat universe, case.
+    This is a reasonable approximation at early times.
+    While normalising to now, so working with \(H_0\), \(R_0\), \(\Omega_0\), etc.\@ is useful for making measurements it doesn't matter when we normalise to for theory.
+    For this reason we choose to normalise to a time when \(a = 1\).
+    We mark parameters at this time with a subscript \(*\), so \(H_*\) is the Hubble parameter at a time when \(a = 1\).
+    Since the Hubble parameter had units of inverse time we can define a dimensionless time, \(\tau = tH_*\).
+    Note that \(\tau\) is \emph{not} the proper time here.
+    
+    Consider a universe which is dominated by matter and radiation, that is the \(\rho_{\Lambda}\) term is negligible.
+    We then have \(a'^2 = (a^{-2} + a^{-2})/2\), where \(a' = \diff{a}/{(t/\tau)}\).
+    This then integrates to give
+    \begin{equation}
+        \tau = \frac{2\sqrt{2}}{3}(2 + (a - 2)\sqrt{1 + a}).
+    \end{equation}
+    Considering the limiting behaviour of this equation we have
+    \begin{equation}
+        a =
+        \begin{cases}
+            2^{1/4}\sqrt{\tau} & \tau \ll 1,\\
+            \left( \dfrac{3\tau}{2\sqrt{2}} \right)^{2/3} & \tau \gg 1.
+        \end{cases}
+    \end{equation}
+    The interpretation of this is that initially the universe is radiation dominated, and expands as \(t^{1/2}\).
+    At later times matter dominates and the universe expands as \(t^{2/3}\).
+    This leads to the prediction that there was a big bang, when the universe was infinitely dense, at some finite time of order \(1/H_0\) ago, which is to say on the order of 10 billion years ago.
+    
+    Suppose instead that we have a universe dominated by matter and the vacuum density.
+    Again taking \(k = 0\) we have \(a'^2 = (a^{-1} + a^2)/2\), which can be solved with the substitution \(u = a^{3/2}\), giving the result
+    \begin{equation}
+        a = \left[ \sinh\left( \frac{3\tau}{2\sqrt{2}} \right) \right]^{2/3}.
+    \end{equation}
+    We then find that in a universe dominated by the vacuum density, as seems to be the case for us, we have \(a \propto \e^{3\tau/(2\sqrt{2})}\).
+    
+    Finally, suppose that \(k \ne 0\) and only the matter term contributes.
+    We then have \(a'^2 = a^{-1} - k\).
+    For \(k = -1\) we get
+    \begin{equation}
+        \tau = \sqrt{a + a^2} - \arsinh(\sqrt{a}).
+    \end{equation}
+    This tends to linear acceleration, \(a \propto \tau\), at large times.
+    For \(k = 1\) we instead have
+    \begin{equation}
+        \tau = \arcsin(\sqrt{a}) - \sqrt{a - a^2}.
+    \end{equation}
+    In this case we must have \(\abs{a} < 1\), which means that the universe will keep expanding until this is achieved and then collapse back again.
+    Without including the vacuum density the process of expanding and collapsing for \(k = 1\), and infinite expansion for \(k = -1\), will continue forever.
+    
+    \chapter{Gravitational Waves}
+    Gravitational waves are distortions of spacetime propagating as waves.
+    They were first predicted by Einstein in 1915 as a weak field solution to his field equations.
+    Interesting Einstein later dismissed the idea of gravitational waves, thinking them to be an artifact of a particular choice of coordinate system.
+    In 2015 gravitational waves were first observed by LIGO.
+    
+    \section{Wave Equation}
+    As with previous weak field solutions we start with the assumption that the metric is that of special relativity, plus a small correction,
+    \begin{equation}
+        g_{\mu\nu} = \eta_{\mu\nu} + h_{\mu\nu},
+    \end{equation}
+    where \(\abs{h_{\mu\nu}} \ll 1\).
+    Unlike previous weak field solutions we don't assume a static field, since this would not allow for wave solutions.
+    Starting from the expression for the Ricci tensor in \cref{eqn:ricci tensor weak field}, we get
+    \begin{equation}
+        R_{\alpha\beta} = \frac{1}{2}[\partial^\mu\partial_\mu h_{\alpha\beta} - \partial_\beta\partial^\mu h_{\alpha\mu} + \partial_\beta\partial_\alpha\tensor{h}{^\mu_\mu} - \partial_\alpha\partial_\mu \tensor{h}{^\mu_\beta}],
+    \end{equation}
+    where we have simply used the Minkowski metric to raise some indices from the initial expression.
+    Notice that \(\partial_\nu\partial^\rho h_{\beta\rho} = \eta^{\rho\sigma}\partial_\nu\partial_\sigma h_{\beta\rho} = \partial_\nu\partial_\sigma\tensor{h}{^\sigma_\beta}\) and \(\partial^\mu\partial_\mu = \dalembertian\) we can write this equation as
+    \begin{align}
+        R_{\beta\nu} &= \frac{1}{2}[\dalembertian h_{\beta\nu} - \partial_\nu\partial_\rho \tensor{h}{^\rho_\beta} + \partial_\beta\partial_\nu \tensor{h}{^\rho_\rho} - \partial_\beta \partial_\rho \tensor{h}{^\rho_\nu}]\\
+        &= \frac{1}{2}[\dalembertian h_{\beta\nu} - \partial_\nu \omega_\beta - \partial_\beta \omega_\nu],
+    \end{align}
+    where
+    \begin{equation}
+        \omega_\nu \coloneqq \partial_\rho \tensor{h}{^\rho_\nu} - \frac{1}{2}\partial_\nu\tensor{h}{^\rho_\rho} = \partial_\rho\left[ \tensor{h}{^\rho_\nu} - \frac{1}{2}\tensor{\eta}{^\rho_\nu}h \right]
+    \end{equation}
+    where \(h \coloneqq \tensor{h}{^\rho_\rho}\) is the trace.
+    
+    Recall that in free space the field equations are simply \(R_{\alpha\beta} = 0\), in which case we have
+    \begin{equation}
+        \dalembertian h_{\beta\nu} = \partial_\nu \omega_\beta + \partial_\beta \omega_\nu.
+    \end{equation}
+    Since we are looking for wave solutions we would like to find an equation like \(\dalembertian h_{\beta\nu} = 0\), which is simply a rearrangement of the wave equation for a wave propagating at speed \(c\):
+    \begin{equation}
+        \dalembertian h_{\beta\nu} = \frac{1}{c^2}\diffp[2]{h_{\beta\nu}}{t} - \laplacian h_{\beta\nu} = 0 \implies \laplacian h_{\beta\nu} = \frac{1}{c^2}\diffp[2]{h_{\beta\nu}}{t}
+    \end{equation}
+    In view of this we define a new field, 
+    \begin{equation}
+        \bar{h}^{\mu\nu} \coloneqq h^{\mu\nu} - \frac{1}{2}\eta^{\mu\nu}h.
+    \end{equation}
+    Then if
+    \begin{equation}
+        \partial_\mu \bar{h^{\mu\nu}} = 0
+    \end{equation}
+    we get the equation
+    \begin{equation}
+        \dalembertian \bar{h}_{\beta\nu} = 0.
+    \end{equation}
+    
+    In general this condition will not hold.
+    However, we can make a suitable coordinate transformation such that it does hold.
+    This is because we only have to satisfy four equations.
+    This comes from the fact that the Einstein and energy-momentum tensors are both symmetric, four-dimensional, rank 2 tensors, so have 10 independent components.
+    Of these six are fixed by requiring that the four four divergence of these tensors vanishes, which means \(\covariantDerivative{\nu}G^{\mu\nu} = 0\), so for each value of \(\mu\) we can fix \(G^{\mu 0}\) by setting it equal to \(-\covariantDerivative{i}G^{\mu i}\).
+    Doing so we are left with only four independent equations.
+    The extra 6 degrees of freedom can then be viewed as a gauge freedom and the choice of \(\partial_\nu\bar{h}^{\mu\nu} = 0\) is simply a gauge choice.
+    
+    This is analogous to the gauge freedom we have in electromagnetism, where the equivalent equation is \(\dalembertian A^\mu = \mu_0 J^\mu\), which is initially four equations.
+    We then insist that the \defineindex{Lorenz condition}, \(\partial_\mu A^\mu = 0\), is satisfied, which fixes one equation through \(c^2\div\vv{A} = -\diffp{\varphi}/{t}\).
+    The solution for \(A^\mu\) is then
+    \begin{equation}
+        A^\mu = \frac{\mu_0}{4\pi} \int \frac{[J^\mu]}{\abs{\vv{r} - \vv{r}'}} \dd{^3r'}
+    \end{equation}
+    where \([J^\mu]\) denotes the retarded current, that is at position \(\vv{r}'\) and time \(t\) the retarded current is the current at the origin at time \(t - r'/c\).
+    
+    The solution in general relativity is nearly identical, the only difference is the constant, since we have
+    \begin{equation}
+        \dalembertian \bar{h}^{\mu\nu} = -\frac{16 \pi G}{c^4}T^{\mu\nu},
+    \end{equation}
+    and so the solution is
+    \begin{equation}
+        \bar{h}^{\mu\nu} = -\frac{4G}{c^4} \int \frac{[T^{\mu\nu}]}{\abs{\vv{r} - \vv{r}'}} \dd{^3r'}.
+    \end{equation}
+    
+    The Lorenz condition does not completely fix the gauge freedom in electromagnetism.
+    The transformation \(A^\mu \to A^\mu + \partial^\mu\psi\) will not change the electric or magnetic fields provided \(\dalembertian\psi = 0\).
+    That is, we can always add a homogeneous solution to the wave equation without changing the physics.
+    The fix in electromagnetism is to introduce the Coulomb gauge, that \(\div\vv{A} = 0\), or more succinctly \(\varphi = 0\).
+    We have the same thing in general relativity.
+    We therefore introduce a further condition, known as the \defineindex{transverse traceless gauge}, requiring the following:
+    \begin{equation}
+        h_{\mu0} = 0, \qqand \tensor{h}{^\mu_\mu} = 0.
+    \end{equation}
+    The first of these fixes the first row and column of \(h\) to be zero, the second fixes the remaining \(3\times 3\) matrix to be traceless, since \(h^{00} = 0\) means \(\tensor{h}{^\mu_\mu} = \tensor{h}{^i_i} = 0\).
+    Notice that we have dropped the bar since in this gauge \(h_{\mu\nu} = \bar{h}_{\mu\nu}\), since these two fields differ only by a trace term, which is zero in this gauge.
+    \begin{equation}
+        h_{\mu\nu} = 
+        \left(
+        \begin{array}{cccc}
+            0 & 0 & 0 & 0\\\cline{2-4}
+            0 & \multicolumn{1}{|c}{} && \multicolumn{1}{c|}{}\\
+            0 & \multicolumn{1}{|c}{} & \mathclap{3\times 3} & \multicolumn{1}{c|}{}\\
+            0 & \multicolumn{1}{|c}{} && \multicolumn{1}{c|}{}\\\cline{2-4}
+        \end{array}
+        \right).
+    \end{equation}
+    
+    Its obvious why this is called the traceless gauge, but why is it transverse?
+    The answer is the condition that we get for plane wave solutions:
+    \begin{equation}
+        h^{\mu\nu} = A^{\mu\nu}\e^{ik^\alpha x_\alpha},
+    \end{equation}
+    is a generic plane wave solution with amplitude \(A^{\mu\nu}\).
+    The Lorenz condition, \(\partial_\mu h^{\mu\nu} = 0\), along with the fact that \(h^{0\mu} = 0\), applied to this plane wave solution gives
+    \begin{equation}
+        \partial_i h^{ij} = ik^i A^{ij}\e^{ik^\alpha x_\alpha} = ik^ih^{ij} = 0.
+    \end{equation}
+    This then implies that the wave vector, \(k^i\), is in some sense orthogonal to the field, \(h^{ij}\).
+    Which is why we call this the transverse gauge.
+    
+    Consider the degrees of freedom present.
+    Initially there are 10, from \(h^{\mu\nu}\) being a symmetric, 4-dimensional, rank 4 tensor.
+    This is then cut to 5 by applying the transverse traceless gauge condition.
+    The condition \(h^{0\mu} = 0\) fixes four degrees of freedom and the condition that \(\tensor{h}{^i_i} = 0\) fixes one more.
+    The Lorenz condition, \(\partial_{i}h^{ij} = 0\) fixes three more degrees of freedom, one for each value of \(j\) as we set \(\partial_1h^{1j} = -\partial_2h^{2j} - \partial_3h^{3j}\).
+    We are then left with two degrees of freedom.
+    We interpret these as two polarisations of the resulting gravitational waves.
+    We will study these in the next section.
+    
+    \section{Polarisations}
+    We now make the standard choice when studying waves of defining the \(z\)-axis as the axis along which the waves propagate, so \(\vv{k} = k\vh{z} = (0, 0, k)\).
+    As before we have \(k_iA^{ij} = 0\), which gives \(A^{3j} = 0\), since \(k_3 = k \ne 0\).
+    This fixes the last row and column to be all zero also.
+    \begin{equation}
+        \left(
+        \begin{array}{cccc}
+            0 & 0 & 0 & 0\\\cline{2-3}
+            0 & \multicolumn{1}{|c}{} & \multicolumn{1}{c|}{} & 0\\
+            0 & \multicolumn{1}{|c}{} &  \multicolumn{1}{c|}{\hspace{-1.5em}\smash{{\raisebox{1.3ex}{\(2\times 2\)}}}} & 0\\\cline{2-3}
+            0 & 0 & 0 & 0\\
+        \end{array}
+        \right)
+    \end{equation}
+    Let the \(2\times 2\) matrix be
+    \begin{equation}
+        \begin{pmatrix}
+            a & b\\
+            c & d
+        \end{pmatrix}
+        .
+    \end{equation}
+    Requiring that this is traceless sets \(d = -a\), and requiring symmetry sets \(c = b\).
+    So we get
+    \begin{equation}
+        \begin{pmatrix}
+            a & b\\
+            b & \mathllap{-}a
+        \end{pmatrix}
+        .
+    \end{equation}
+    
+    In order to see the effects of gravitational waves it is not enough to consider a single particle, since any single particle is at rest in its own frame of reference and therefore cannot detect changes in spacetime.
+    Instead we consider a pair of particles, initially at rest with respect to each other, and we look at the geodesic deviation as a gravitational wave passes.
+    Recall that the geodesic equation for particle separation, \(\Delta x^\mu\), is given by
+    \begin{equation}
+        \diffcov[2]{\Delta x^\mu}{\tau} = \mathcal{T}^{\mu\nu}\Delta x_\nu.
+    \end{equation}
+    The tidal tensor is given by
+    \begin{equation}
+        \mathcal{T}_{\mu\nu} = R_{\mu\alpha\beta\nu}\dot{x}^\alpha\dot{x}^\beta,
+    \end{equation}
+    where \(\dot{x}^\alpha\) is the four-velocity of the observer.
+    We previously showed that in the weak field limit the Riemann tensor is given by
+    \begin{equation}
+        R_{\alpha\mu\nu\beta} = \frac{1}{2}[\partial_\mu\partial_\nu h_{\alpha\beta} - \partial_\alpha\partial_\nu h_{\mu\beta} - \partial_\mu\partial_\beta h_{\alpha\nu} + \partial_\alpha\partial_\beta h_{\mu\nu}].
+    \end{equation}
+    We consider a stationary observer, so \(\dot{x}^\alpha = (c, \vv{0})\), in which case we have \(\mathcal{T}_{\alpha\beta} = c^2R_{\alpha00\beta}\).
+    Putting this into our expression for \(R_{\alpha\mu\nu\beta}\) all terms but the first vanish, since they contain either \(h_{\sigma0}\) or \(h_{0\sigma}\), which are zero.
+    We are left with
+    \begin{equation}
+        \mathcal{T}_{\alpha\beta} = c^2R_{\alpha00\beta} = \frac{1}{2}\partial_0\partial_0 h_{\alpha\beta} = \frac{1}{2}\ddot{h}_{\alpha\beta},
+    \end{equation}
+    where dots represent coordinate time derivatives, not derivatives with respect to an affine parameter.
+    
+    To lowest order the covariant derivative, \(\diffcov[2]{}{\tau}\), becomes a coordinate time derivative, \(\diff[2]{}{t}\).
+    The geodesic deviation equation then becomes
+    \begin{equation}
+        \Delta\ddot{x}_i = \frac{1}{2}\ddot{h}_{ij}\Delta x_j.
+    \end{equation}
+    We expect from the form of this equation that the spatial separation of the particles will oscillate with the gravitational wave.
+    
+    Going back to the form of \(h_{\mu\nu}\) as a \(2\times 2\) matrix surrounded by zeros we have
+    \begin{equation}
+        \mathcal{T}_{\mu\nu} = 
+        \begin{pmatrix}
+            \cdot & \cdot & \cdot & \cdot\\
+            \cdot & a & b & \cdot & \cdot\\
+            \cdot & b & \mathllap{-}a & \cdot\\
+            \cdot & \cdot & \cdot & \cdot
+        \end{pmatrix}
+        \exp\left[ i\frac{\omega}{c}(ct - z) \right].
+    \end{equation}
+    where we redefine \(a\) and \(b\) to absorb the factor of \(1/2\).
+    We consider the two polarisation states \(a = 0\) and \(b = 0\).
+    
+    First considering \(b = 0\) we have
+    \begin{equation}
+        \diff[2]{}{t}
+        \begin{pmatrix}
+            x\\ y
+        \end{pmatrix}
+        = 
+        \begin{pmatrix}
+            a & 0\\
+            0 & \mathllap{-}a
+        \end{pmatrix}
+        \begin{pmatrix}
+            x\\ y
+        \end{pmatrix}
+        \cos(\omega t) = a
+        \begin{pmatrix}
+            x\\ -y
+        \end{pmatrix}
+        \cos(\omega t),
+    \end{equation}
+    where we take the real part of the wave as the physical solution.
+    To interpret this consider a circle of particles.
+    These start by getting closer together along the \(x\) direction and further apart along the \(y\) direction, this continues to some maximum distortion before returning to a circle and the oscillating in the opposite way.
+    This is shown in \cref{fig:GW + polarised}.
+    Due to the fact that oscillations in this polarisation occur up-down/left-right we call this \(h_+\) polarisation.
+    
+    \begin{figure}
+        \tikzsetnextfilename{GW-plus-polarised}
+        \begin{tikzpicture}
+            \draw[very thick] (0, 0) circle [radius = 1];
+            \draw[very thick] (2, 0) circle [x radius = 0.5, y radius = 1.5];
+            \draw[very thick] (4, 0) circle [radius = 1];
+            \draw[very thick] (7, 0) circle [x radius = 1.5, y radius = 0.5];
+            \draw[->] (-1, -2) -- (8.5, -2) node[below] {\(t\)};
+        \end{tikzpicture}
+        \caption[Gravitational wave with \(h_+\) polarisation.]{A gravitational wave travelling into/out of the page will have this effect on a circle if \(b = 0\), known as \(h_+\) polarisation.}
+        \label{fig:GW + polarised}
+    \end{figure}
+    
+    Similarly if \(a = 0\) we have
+    \begin{equation}
+        \diff[2]{}{t}
+        \begin{pmatrix}
+            x\\ y
+        \end{pmatrix}
+        = 
+        \begin{pmatrix}
+            0 & b\\
+            b & 0
+        \end{pmatrix}
+        \cos(\omega t) = b
+        \begin{pmatrix}
+            y\\ x
+        \end{pmatrix}
+        .
+    \end{equation}
+    This means \(\ddot{x} \propto y\) and \(\ddot{y} \propto x\).
+    We therefore get diagonal oscillations, as shown in \cref{fig:GW x polarised}, and so we call this the \(h_{\times}\) polarisation.
+    
+    \begin{figure}
+        \tikzsetnextfilename{GW-times-polarised}
+        \begin{tikzpicture}
+            \draw[very thick] (0, 0) circle [radius = 1];
+            \draw[very thick, rotate around={-45:(2.5, 0)}] (2.5, 0) circle [x radius = 0.5, y radius = 1.5];
+            \draw[very thick] (5, 0) circle [radius = 1];
+            \draw[very thick, rotate around={-45:(7.5, 0)}] (7.5, 0) circle [x radius = 1.5, y radius = 0.5];
+            \draw[->] (-1, -2) -- (8.5, -2) node[below] {\(t\)};
+        \end{tikzpicture}
+        \caption[Gravitational wave with \(h_{\times}\) polarisation.]{A gravitational wave travelling into/out of the page will have this effect on a circle if \(a = 0\), known as \(h_\times\) polarisation.}
+    \end{figure}
+    
     
     
     %   Appdendix
