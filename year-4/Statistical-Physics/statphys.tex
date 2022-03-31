@@ -4,6 +4,7 @@
 
 \usepackage{siunitx}
 \usepackage{csquotes}
+\usepackage{blkarray}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -15,6 +16,10 @@
 % other libraries
 \usetikzlibrary{hobby}
 \usetikzlibrary{calc}
+
+% PGF plots
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
 
 % References, should be last things loaded
 \usepackage{hyperref}  % Should be loaded second last (cleveref last)
@@ -60,6 +65,11 @@ noabbrev
 \undef\Re
 \DeclareMathOperator{\Re}{Re}
 \DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\sech}{sech}
+\DeclareMathOperator{\artanh}{artanh}
+\newcommand*{\hamiltonian}{\mathcal{H}}
+\DeclarePairedDelimiterX{\poissonbracket}[2]{\lbrace}{\rbrace}{#1, #2}
+\DeclarePairedDelimiterX{\commutator}[2]{[}{]}{#1, #2}
 
 % Include
 \includeonly{}
@@ -1115,7 +1125,7 @@ noabbrev
         \frac{\Delta N_{\mathrm{rms}}}{\mean{N}} = \sqrt{\frac{\boltzmann T \rho \kappa_T}{\mean{N}}} \sim \frac{1}{\sqrt{\mean{N}}}.
     \end{equation}
     
-    \section{General Theory}
+    \section{General Theory}\label{sec:fluctuations general theory}
     We can now formulate our observations above into a general procedure for some observable, \(A\), with conjugate field \(f\), which play the roles of the magnetisation and magnetic field respectively.
     If in microstate \(i\) the observable takes the value \(A_i\) then the energy can be written as
     \begin{equation}
@@ -2050,7 +2060,7 @@ noabbrev
     Correlations between particles typically imply a gain in information, that is if two particles are (anti)correlated and we know a property of one particle then we are more likely to be able to correctly predict something about the second particle.
     This means that interactions generally generate correlations which reduce the missing information, and hence entropy.
     
-    \section{Classical Statistical Mechanics}
+    \section{Classical Statistical Mechanics}\label{sec:classical stat mech}
     In the coming section we will consider a classical fluid and try to improve on the ideal gas model.
     A classical fluid of \(N\) particles of mass \(m\) in a volume \(V\) has an average (number) density \(\rho = N/V\).
     An ideal gas has no interactions, which is of course not realistic.
@@ -2814,6 +2824,1324 @@ noabbrev
         \caption[Phase diagram showing the density]{A \((\rho, P)\) phase diagram showing three isotherms, one higher than the critical temperature, one lower, and one at the critical temperature. Notice the flat region for isotherms lower than the critical temperature where changing the density doesn't change the pressure, just the amount of the system in the solid and liquid phases which coexist in this region. For low densities we can approximate the isotherms as linear, which is the case for an ideal gas.}
         \label{fig:phase diagram density}
     \end{figure}
+    
+    \begin{figure}
+        \tikzsetnextfilename{phase-diagram-density-temperature}
+        \begin{tikzpicture}
+            \draw[very thick, <->] (0, 5) node[left] {\(\rho\)} -- (0, 0) -- (5, 0) node[below] {\(T\)};
+            \draw[ultra thick, highlight] (1.97, 2) -- (5, 2);
+            \draw[ultra thick, highlight, dashed, domain=-2:0, xshift=2cm, yshift=2cm] plot (\x, {sqrt{-\x}});
+            \draw[ultra thick, highlight, dashed, domain=-2:0, xshift=2cm, yshift=2cm] plot (\x, {-sqrt{-\x}});
+            \draw[dashed, thick] (2, 2) -- (2, 0) node[below] {\(T_{\mathrm{c}}\)};
+            \node at (1, 0.75) {\(\rho_{\mathrm{g}}\)};
+            \node at (1, 3.25) {\(\rho_{\mathrm{l}}\)};
+        \end{tikzpicture}
+    \end{figure}
+    
+    \section{Magnet}
+    Consider a magnetic solid made up of a collection of atoms with dipole moments.
+    At high temperatures with no external field the dipole moments will be randomly aligned and the net magnetisation will be negligible.
+    If an external field is applied then the dipole moments will align and the magnet will become magnetised.
+    This is called the \defineindex{paramagnetic phase}.
+    At low temperatures interactions between dipoles tend to align the dipoles.
+    Below some critical temperature, \(T_{\mathrm{c}}\), the magnet will have a significant magnetisation, even if there is no external field applied.
+    This is called the \defineindex{ferromagnetic phase}.
+    
+    In general if the external field, \(H\), is such that the magnetisation, \(M\), aligns with the external field then there will be a discontinuity for \(T < T_{\mathrm{c}}\) as the external field changes direction, the magnetisation will swap from positive to negative as the magnetisation goes from positive to negative.
+    At the critical temperature we have \(M_{\mathrm{c}} = 0\) due to symmetry between the two ferromagnetic phases with positive and negative net magnetisations.
+    The critical isotherm giving the magnets field, \(H\), as a function of the magnetisation, \(M\), will have zero slope at \(M = 0\), which corresponds to the response function diverging:
+    \begin{equation}
+        \chi = \diffp{M}{H}[H = 0] \to \infty.
+    \end{equation}
+    This means there will be large scale fluctuations in the magnetisation.
+    
+    \section{Binary Alloy}
+    Consider an alloy of two types of atoms, \(A\) and \(B\), which occur in equal concentration arranged in a regular lattice.
+    Again there will be some critical temperature, \(T_{\mathrm{c}}\), such that for \(T > T_{\mathrm{c}}\) we will have a disordered phase, where the atoms are arranged randomly on the sites, and for \(T < T_{\mathrm{c}}\) we will have an ordered state, where we get phase separation with atoms of type \(A\) and type \(B\) separating into two different regions.
+    
+    \section{Common Features}
+    There are some features common to all phase transitions.
+    The first is the coexistence curve, a line separating two phases which differ by macroscopic properties.
+    Second is the critical point marking the end of the coexistence curve.
+    Given a system we can define an order parameter, \(O\), which characterises the difference between the phases.
+    For the example of the solid-liquid-gas system we can define \(O = \rho_{\mathrm{l}} - \rho_{\mathrm{g}}\).
+    For the magnetic example we can define \(O = M\) to be the total magnetisation.
+    
+    At a phase transition we get a qualitative change in macroscopic properties as some parameter, usually the temperature, is varied.
+    There are two broad classes of phase transition.
+    A \defineindex{discontinuous phase transition}, or \define{first order phase transition}\index{first order phase transition|see{discontinuous phase transition}}, has a discontinuous jump in the order parameter upon crossing the coexistence curve.
+    A \defineindex{continuous phase transition} has \(O\) change continuously across the coexistence curve.
+    For a \defineindex{second order phase transition} the response function diverges, which is to say that the derivatives of \(O\) are discontinuous across the coexistence curve.
+    For a third order phase transition the response function is continuous, but its derivative isn't and so on.
+    We will focus on first and second order phase transitions.
+    
+    \chapter{Ising Model}
+    We are interested in studying phase transitions.
+    To do so we will use several techniques, including exact methods and approximations, such as mean field theories.
+    In order to unify these approaches we shall apply them all to the same model, the Ising model, which is one of the most studied models in physics.
+    On the surface this model appears to be about magnetisation, we can think of it as a basic version of the magnet described in the previous section, in which the dipoles can only align in one  of two directions.
+    However, with slight modifications the Ising model can describe a lot of systems.
+    We'll see some examples of other uses as we go.
+    
+    \section{The Model}
+    The \defineindex{Ising model} consists of a lattice of \(N\) spins, which can be either up or down.
+    That's it.
+    We denote the spin at the \(i\)th site by \(S_i\), such that \(S_i = 1\) for spin up and \(S_i = -1\) for spin down.
+    We also allow for some external field, \(h\), to be applied such that if the spins align with the field then the energy is reduced.
+    We suppose that the spins couple with their nearest neighbours such that if they align the net energy is reduced.
+    The total energy is then
+    \begin{equation}
+        E(\{S_i\}) = -h\sum_{i}S_i - J\sum_{\langle i, j \rangle} S_i S_j
+    \end{equation}
+    where \(\sum_{\langle i, j \rangle}\) is a sum over nearest neighbours.
+    That means we sum over \(i\) from 1 to \(N\) and then \(j\) takes on whatever values are needed such that \(S_j\) is the spin of a spin which is nearest neighbours to \(S_i\).
+    The \defineindex{coupling constant}, \(J\), is just a constant with dimensions of energy that tells us how much aligning two spins decreases the energy by, similarly \(h\) is just how much a single spin aligning with the external field decreases the energy.
+    
+    We define the \defineindex{coordination number}, \(z\), to be the number of nearest neighbours a given spin has.
+    For example, a two-dimensional square lattice has \(z = 4\), a three-dimensional simple cubic lattice has \(z = 6\), and a face centred cubic lattice has \(z = 12\).
+    For a system of \(N\) spins with coordination number \(z\) there are \(N z / 2\) nearest neighbour pairs, the factor of \(1/2\) stops us double counting since if we counted \(S_iS_j\) we don't want to also include \(S_jS_i\).
+    
+    The partition function for the Ising model is
+    \begin{equation}
+        \cpartition = \sum_{S_1 = \pm 1}\sum_{S_2 = \pm 1} \dotsb \sum_{S_N = \pm 1} \exp[-\beta E(\{S_i\})].
+    \end{equation}
+    
+    The free energy of the system is
+    \begin{equation}
+        F = E - TS. 
+    \end{equation}
+    The equilibrium state is given by minimising \(F\).
+    At low temperatures the \(TS\) term is negligible and \(F\) is minimised when \(E\) is.
+    At higher temperatures the \(TS\) term dominates and \(F\) is minimised when \(TS\) is maximised.
+    We therefore expect two different phases, one at low temperatures where the equilibrium state minimises energy, that is all spins align with each other and the external field, and one at high temperatures where the entropy dominates and the state is therefore disordered with essentially randomly aligned spins.
+    
+    The one-dimensional Ising model can be solved exactly and we will do so later.
+    The two-dimensional Ising model can also be solved exactly but we won't do this.
+    In three or more dimensions there is no exact solution to the Ising model.
+    Instead we need to come up with approximations.
+    We shall do this in the next section.
+    
+    \section{Mean Field Theory of the Ising Model}
+    The mean field approximation starts from the configurational energy
+    \begin{equation}
+        E(\{S_i\}) = -h\sum_iS_i - J\sum_{\langle i, j \rangle} S_i S_j.
+    \end{equation}
+    Consider the contribution to the energy due to some particular spin, \(S_j\):
+    \begin{equation}
+        \varepsilon(S_j) = -hS_j - JS_j\sum_{k\text{ nn}} S_k
+    \end{equation}
+    where the sum is over the nearest neighbours (nn) of \(S_j\).
+    The mean-field approximation, called the \defineindex{Weiss approximation}, is that the effect of the \(z\) individual nearest neighbours can be replaced by their average effect,
+    \begin{equation}
+        \varepsilon_{\mathrm{mf}}(S_j) = -hS_j - JS_j \sum_{k\text{ nn}} \expected{S_k} = -h_{\mathrm{mf}}S_j,
+    \end{equation}
+    where \(mf\) stands for mean field and 
+    \begin{equation}
+        h_{\mathrm{mf}} = h + Jzm.
+    \end{equation}
+    Essentially we can modify the external field to account for the effect of the neighbours through the mean magnetisation \(m = \expected{S_i} = \expected{M}/N\).
+    
+    Using this approximation the probability distribution for a single spin is
+    \begin{align}
+        P(S_j) &= \frac{\exp[-\beta\varepsilon_{\mathrm{mf}}(S_j)]}{Z(1)}\\
+        &= \frac{\exp[-\beta\varepsilon_{\mathrm{mf}}(S_j)]}{\sum_{S_i=\pm 1} \exp[-\beta\varepsilon_{\mathrm{mf}}(S_i)]}\\
+        &= \frac{\exp[\beta h_{\mathrm{mf}}S_]}{\exp[\beta h_{\mathrm{mf}}] + \exp[-\beta h_{\mathrm{mf}}]}.
+    \end{align}
+    
+    There is still a \defineindex{consistence condition} to fulfil.
+    The probability density depends on \(h_{\mathrm{mf}}\), which depends on the mean magnetisation per spin, \(m\), which depends on the probability distribution.
+    We therefore need to find \(m\) in such a way that this all remains consistent.
+    The value of \(m\) is
+    \begin{align}
+        m &= \sum_{S_j = \pm 1} S_jP(S_j)\\
+        &= \frac{\exp[\beta h_{\mathrm{mf}}] - \exp[-\beta h_{\mathrm{mf}}]}{\exp[\beta h_{\mathrm{mf}}] + \exp[\beta h_{\mathrm{mf}}]} = \tanh(\beta h_{\mathrm{mf}}).
+    \end{align}
+    Therefore we need the mean magnetisation per spin to satisfy
+    \begin{equation}
+        m = \tanh(\beta h + \beta Jzm).
+    \end{equation}
+    
+    It is possible to derive an alternate form of this relationship using
+    \begin{align}
+        m &= \frac{1}{\beta} \diffp{}{h_{\mathrm{mf}}} \ln Z(1)\\
+        &= \frac{1}{\beta} \diffp{}{h_{\mathrm{mf}}} \ln\left[ \sum_{S_j = \pm 1} \exp[-\beta h_{\mathrm{mf}}S_j] \right]\\
+        &= \frac{1}{\beta} \diffp{}{h_{\mathrm{mf}}} \ln( \exp[-\beta h_{\mathrm{mf}}] + \exp[\beta h_{\mathrm{mf}}] )\\
+        &= \frac{1}{\beta} \diffp{}{h_{\mathrm{mf}}} \ln[2\cosh(\beta h_{\mathrm{mf}})].
+    \end{align}
+    Taking the derivative will get the same result we have, however, in some cases it may be easier to manipulate the function in this form before taking the derivative to get some desired result.
+    
+    \subsection{Solving the Consistency Condition}
+    For simplicity we consider the case of zero applied field, so \(h = 0\).
+    The consistency condition is then
+    \begin{equation}
+        m = \tanh(\beta Jzm).
+    \end{equation}
+    This is a transcendental equation, meaning that it has no elementary solution.
+    Instead we consider the graphs \(y = \tanh(\beta Jzm)\) and \(y = m\).
+    This is done in \cref{fig:ising model consistency solution} for two values of \(\beta Jz\).
+    What we see is that there is either a single solution or three solutions depending on the value of \(\beta Jz\).
+    
+    \begin{figure}
+        \tikzsetnextfilename{ising-model-consistency-solution}
+        \begin{tikzpicture}[samples=100]
+            \draw[very thick, ->] (-4, 0) -- (4, 0) node[below] {\(m\)};
+            \draw[very thick, ->] (0, -2.5) -- (0, 2.5) node[left] {\(y\)};
+            \draw[ultra thick, highlight, domain=-4:4] plot (\x, {2*tanh(\x)});
+            \draw[ultra thick, my red, domain=-4:4] plot (\x, {2*tanh(\x/3)});
+            \draw[ultra thick, my blue] (-2.5, -2.5) -- (2.5, 2.5);
+            \draw[ultra thick, highlight] (0.5, -0.5) -- ++ (0.5, 0) node[right, black] {\(y = \tanh(\beta Jzm)\), \(\beta Jz = 1\)};
+            \draw[ultra thick, my red] (0.5, -1) -- ++ (0.5, 0) node[right, black] {\(y = \tanh(\beta Jzm)\), \(\beta Jz = 1/3\)};
+            \draw[ultra thick, my blue] (0.5, -1.5) -- ++ (0.5, 0) node[right, black] {\(y = m\)};
+        \end{tikzpicture}
+        \caption[Solving the consistency equation for the Ising model.]{Plot of the functions \(y = m\) and \(y = \tanh(\beta Jzm)\) for two values of \(\beta Jz = 1, 1/3\) showing that \(m = \tanh(\beta Jzm)\) has either one or three solutions depending on the value of \(\beta Jz\). The solutions are where the lines \(y = m\) and \(y = \tanh(\beta Jzm)\) cross.}
+        \label{fig:ising model consistency solution}
+    \end{figure}
+    
+    In the case where there is a single solution that solution is \(m = 0\).
+    This means that the spins are essentially arranged randomly.
+    This case corresponds to \(\beta J z\) being small, which is to say to high temperatures.
+    The three solutions case also has \(m = 0\) as a solution, but it also has two solutions \(m = \pm m_0\) for some constant \(m_0\), which correspond to all of the spins being aligned either up or down depending on the sign.
+    
+    We are interested in phase transitions so we want to know when the Ising model goes from one to three solutions.
+    We get three solutions when \(y = \tanh(\beta Jzm)\) is steeper than \(y = m\) at \(m = 0\), so when
+    \begin{equation}
+        \diff*{\tanh(\beta Jzm)}{m}[m = 0] > 1.
+    \end{equation}
+    There are two approaches we can take to solve this.
+    
+    Since this consistency equation is fairly simple we can just perform the derivative, let \(x = \beta Jzm\) and then
+    \begin{equation}
+        \diff*{\tanh(x)}{m} = \diff{x}{m}\diff*{\tanh x}{x} = \beta Jz \sech^2(\beta Jzm)
+    \end{equation}
+    evaluating at zero since \(\sech 0 = 1\) we see that the transition occurs when \(\beta Jzm = 1\).
+    
+    For a more complicated consistency equation it may be easier to first expand and then take the derivative.
+    The Taylor expansion of \(\tanh\) starts
+    \begin{equation}
+        \tanh x = x - \frac{x^3}{3} + \dotsb.
+    \end{equation}
+    Since we will be evaluating at \(m = 0\), and hence \(x = 0\), we can neglect any constant terms, which vanish in the derivative, and any terms of order \(x^2\) or higher, which vanish when we evaluate at \(x = 0\), leaving us only with the linear term.
+    Therefore we have
+    \begin{equation}
+        \diff*{\tanh x}{m} = \diff{x}{m}\diff*{\tanh x}{x} = \beta Jz \diff{x}{x} = \beta Jz,
+    \end{equation}
+    and so again we see the transition occurs when \(\beta Jz = 1\).
+    
+    We can now define a \defineindex{critical temperature},
+    \begin{equation}
+        T_{\mathrm{c}} \coloneqq \frac{Jz}{\boltzmann},
+    \end{equation}
+    which is the temperature at which \(\beta Jz = 1\) and the phase transition occurs.
+    Note that \(\beta Jz = T_{\mathrm{c}} / T\).
+    
+    \subsection{Critical Behaviour}
+    \subsubsection{Order Parameter}
+    We will now consider the behaviour of the system near the critical temperature, \(T_{\mathrm{c}}\).
+    The consistency condition can be expressed as
+    \begin{equation}
+        m = \tanh\left( m\frac{T_{\mathrm{c}}}{T} \right).
+    \end{equation}
+    Near the critical temperature \(T \approx T_{\mathrm{c}}\) and \(\abs{m} \ll 1\), since spins are likely to be fairly randomly arranged.
+    Therefore we can expand the consistency condition to
+    \begin{equation}
+        m \approx m\frac{T_{\mathrm{c}}}{T} - \frac{m^3}{3} \left( \frac{T_{\mathrm{c}}}{T} \right)^3 + \order(m^5).
+    \end{equation}
+    This is a cubic equation in \(m\).
+    The solutions are either that \(m = 0\) or we can divide by \(m\) and we get the quadratic
+    \begin{equation}
+        1 = \frac{T_{\mathrm{c}}}{T} - \frac{m^2}{3}\left( \frac{T_{\mathrm{c}}}{T} \right)^3 \implies m^2 = 3\left( \frac{T_{\mathrm{c}}}{T} \right)^3 \left( \frac{T_{\mathrm{c}}}{T} - 1 \right).
+    \end{equation}
+    Now define the \defineindex{reduced temperature}
+    \begin{equation}
+        t \coloneqq \frac{T - T_{\mathrm{c}}}{T_{\mathrm{c}}} = \frac{T}{T_{\mathrm{c}}} - 1,
+    \end{equation}
+    which we can think of as a measure of how far we are from the critical temperature.
+    Importantly \(t = 0\) when \(T = T_{\mathrm{c}}\).
+    Rearranging this definition we have
+    \begin{equation}
+        \frac{T}{T_{\mathrm{c}}} = 1 + t, \qqand \frac{T_{\mathrm{c}}}{T} = \frac{1}{1 + t}.
+    \end{equation}
+    We can then recast our equation for \(m^2\) above in terms of the reduced temperature:
+    \begin{equation}
+        m^2 = 3(1 + t)^3\left( \frac{1}{1 + t} - 1 \right) = -3t + \order(t^2).
+    \end{equation}
+    Notice that this means \(m\) is only real if \(t < 0\), and clearly \(m\) must be real for physical solutions.
+    This corresponds to the fact that for \(t < 0\) we have \(T < T_{\mathrm{c}}\), which is the region where there are three (real) solutions to the consistency condition.
+    
+    We can therefore characterise the behaviour near the critical temperature.
+    For \(T > T_{\mathrm{c}}\) we have \(m = 0\), corresponding to randomly aligned spins.
+    For \(T < T_{\mathrm{c}}\) we have \(m \approx \pm 3\sqrt{\abs{t}}\).
+    
+    \subsubsection{Response Function}
+    Now that we have the leading order behaviour in \(t\) for the order parameter, the magnetisation in this system, we move on to the behaviour response function, which for this system is the susceptibility:
+    \begin{equation}
+        \chi = \diffp{m}{h}\bigg\vert_{h = 0}.
+    \end{equation}
+    In order to find this we again expand the consistency condition now for nonzero external field, \(m = \tanh(\beta(h + Jzm))\).
+    This gives
+    \begin{equation}
+        m = \beta h + m\frac{T_{\mathrm{c}}}{T} - \frac{m^3}{3}\left( \frac{T_{\mathrm{c}}}{T} \right)^3.
+    \end{equation}
+    We have neglected here terms of higher order than \(m^3\), but also a term proportional to \(hm^2\), since near the critical point \(m = 0\) or \(m \propto \sqrt{t}\), both of which are small, and since we take the derivative for \(h = 0\) we can also treat \(h\) as small.
+    
+    Taking the derivative we get
+    \begin{equation}
+        \chi = \beta + \chi \frac{T_{\mathrm{c}}}{T} - \chi m^2 \left( \frac{T_{\mathrm{c}}}{T} \right)^3,
+    \end{equation}
+    where we have used \(\diffp{m}/{h}|_{h = 0} = \chi\) to implicitly differentiate \(m\).
+    Rearranging this we get
+    \begin{equation}
+        \chi = \beta\left[ 1 - \frac{T_{\mathrm{c}}}{T} + m^2\left( \frac{T_{\mathrm{c}}}{T} \right)^3 \right]^{-1}.
+    \end{equation}
+    For small \(t\) and using the appropriate value of \(m\), namely \(m = 0\) for \(T > T_{\mathrm{c}}\) and \(m = \pm 3\sqrt{\abs{t}}\) for \(T < T_{\mathrm{c}}\), for \(T > T_{\mathrm{c}}\) we get
+    \begin{equation}
+        \chi = \frac{\beta}{1 - T_{\mathrm{c}}/T} \sim \frac{\beta_{\mathrm{c}}}{t}
+    \end{equation}
+    where \(\beta_{\mathrm{c}} = 1/(\boltzmann T_{\mathrm{c}})\).
+    For \(T < T_{\mathrm{c}}\) we get
+    \begin{equation}
+        \chi = \frac{\beta}{1 - T_{\mathrm{c}}/T + 3(T_{\mathrm{c}}/T - 1)} \sim \frac{\beta_{\mathrm{c}}}{2\abs{t}}.
+    \end{equation}
+    
+    Notice that for \(t \to 0\) the response function diverges, indicating large fluctuations and a phase change.
+    This corresponds to the graph of \(m\) being vertical at the critical temperature.
+    
+    Note that when we say \(a \sim t^{\gamma}\) what we mean is that
+    \begin{equation}
+        \lim_{t \to 0} \frac{\ln a}{\ln \abs{t}} = \gamma.
+    \end{equation}
+    We call \(\gamma\) a \defineindex{critical exponent} in this context.
+    
+    \subsubsection{Limitations}
+    The mean field assumption is that we can neglect the correlations between spins.
+    Mathematically this means that
+    \begin{equation}
+        \expected{S_iS_j} \approx \expected{S_i}\expected{S_j}
+    \end{equation}
+    for \(i \ne j\).
+    We can write the energy of the Ising model as
+    \begin{equation}
+        E(\{S_i\}) = E_0 - h\sum_j S_j
+    \end{equation}
+    where \(E_0 = -J \sum_{\langle i, j \rangle} S_iS_j\).
+    This makes the energy the same form as when we discussed fluctuations in \cref{sec:fluctuations general theory}.
+    Hence we can identify the observable \(A = \sum_j S_j\) and conjugate field \(f = h\).
+    We then know that the response function is
+    \begin{equation}
+        \chi_{AA} \coloneqq \diffp{\expected{A}}{f} = \beta[\expected{A^2} - \expected{A}^2].
+    \end{equation}
+    In the case of the Ising model we can identify \(\chi\) as the susceptibility per site given by
+    \begin{equation}
+        \chi = \diffp{m}{f} = \frac{1}{N}\chi_{AA} = \frac{\beta}{N} \sum_{j} \sum_{k} [\expected{S_jS_k} - \expected{S_j}\expected{S_k}].
+    \end{equation}
+    This equation is exact, but in the mean field equation all terms with \(j \ne k\) vanish and we are left with
+    \begin{equation}
+        \chi = \beta[1 - m^2].
+    \end{equation}
+    This doesn't diverge at \(T_{\mathrm{c}}\) and so we see that the mean field theory is inconsistent with regard to the susceptibility, \(\chi\).
+    The problem is that the correlations become important as we approach the critical point.
+    
+    \subsection{Correlation Length}
+    Define the \defineindex{connected correlation function} to be
+    \begin{equation}
+        G_{ij} \coloneqq \expected{S_iS_j} - \expected{S_i}\expected{S_j} = \expected{(S_i - \expected{S_i})(S_j - \expected{S_j})}.
+    \end{equation}
+    This measures the correlations between fluctuations, \(\Delta S_i = S_i - \expected{S_i}\).
+    If \(G_{ij}\) is positive then this implies that the fluctuations of the spins are correlated.
+    
+    Defining \(R_{ij}\) as the distance between spins \(i\) and \(j\) for sufficiently large \(R_{ij}\) we expect that 
+    \begin{equation}
+        G_{ij} \approx C(R_{ij}) \exp[-R_{ij}/\xi],
+    \end{equation}
+    where \(C\) is some function which changes more slowly than the exponential and \(\xi\) is the \defineindex{correlation length}, which essentially cuts off the correlation function at distances greater than \(\xi\).
+    
+    When \(T > T_{\mathrm{c}}\) we have \(\expected{S_i} = 0\) and so a typical microstate consists of clusters of up and down spins, while the net magnetisation is zero.
+    Intuitively we can think of \(\xi\) as being a measurement of the size of the largest cluster off correlated spins.
+    As the temperature decreases to the critical temperature we expect \(\xi\) to diverge, as we start to get long range correlations.
+    
+    A refined mean field theory can be used to compute \(G_{ij}\), the two-point correlation function.
+    Doing so we would find that
+    \begin{equation}
+        \xi \sim \abs{t}^{-1/2},
+    \end{equation}
+    which clearly diverges at \(t = 0\), which corresponds to \(T = T_{\mathrm{c}}\).
+    
+    \subsection{Summary of Mean Field Theory}
+    In the absence of an external field the mean field theory predicts a critical temperature, \(T_{\mathrm{c}} = zJ/\beta\), at which there is a phase change.
+    
+    Near the critical temperature the behaviour is described by a few parameters which scale as \(\abs{t}\) to some critical exponent, where \(t = (T - T_{\mathrm{c}})/T_{\mathrm{c}}\).
+    In particular for \(T > T_{\mathrm{c}}\) we have \(m = 0\), whereas for \(T < T_{\mathrm{c}}\) we have
+    \begin{equation}
+        T \sim m_{-}\abs{t}^{\tilde{\beta}} = 3\abs{t}^{1/2}.
+    \end{equation}
+    Note that traditionally this critical exponent is called \(\beta\), but we add a tilde to avoid confusion with \(\beta = 1/(\boltzmann T)\).
+    The susceptibility near the critical temperature is given by
+    \begin{equation}
+        \chi \sim \chi_{\pm} \abs{t}^{-\gamma} = 
+        \begin{cases}
+            \beta_{\mathrm{c}}\abs{t}^{-1} & T > T_{\mathrm{c}},\\
+            \frac{\beta_{\mathrm{c}}}{2}\abs{t}^{-1} & T < T_{\mathrm{c}}.
+        \end{cases}
+    \end{equation}
+    The correlation length is given by
+    \begin{equation}
+        \chi \sim \xi_{\pm}\abs{t}^{-\nu} = \abs{t}^{-1/2}.
+    \end{equation}
+    
+    As before when we say that, for example, \(m \sim \abs{t}^{\tilde{\beta}}\) what we mean is that
+    \begin{equation}
+        \lim_{\abs{t} \to 0} \frac{\ln m}{\ln \abs{t}} = \tilde{\beta}.
+    \end{equation}
+    
+    We can define more critical exponents, for example the zero-field heat capacity is
+    \begin{equation}
+        C_{h} = \diffp{\mean{E}}{T}\bigg\vert_{h = 0} \sim \abs{t}^{-\alpha}.
+    \end{equation}
+    Just below \(T_{\mathrm{c}}\) we can characterise the discontinuity in the order parameter, \(m\), across the coexistence line by
+    \begin{equation}
+        h \sim \abs{m}^{\delta} \sgn(m).
+    \end{equation}
+    Using mean field theory we find that the values are \(\alpha = 0\) and \(\delta = 3\).
+    
+    The critical exponents, \(\alpha\), \(\tilde{\beta}\), \(\gamma\), \(\delta\), and \(\nu\) characterise the critical point.
+    However, not all of these components are independent, it turns out only three are, which we can take to be \(\tilde{\beta}\), \(\gamma\), and \(\nu\).
+    
+    Experiments give slightly different values of the critical exponents, and these values depend on the number of dimensions.
+    However, the Ising model can be modified to describe many different systems and, to the level of accuracy of the mean field theory, they mostly share the same values of the critical exponents, in three dimensions, \(\tilde{\beta} = 0.31\), \(\gamma = 1.25\), and \(\nu = 0.64\).
+    This is called \defineindex{universality}.
+    
+    \section{Exact Results in One Dimension}
+    It turns out that in one or two dimensions we can exactly solve the Ising model.
+    We will do so here for one dimension, which is significantly easier than solving exactly in two dimensions.
+    We will also assume no external field.
+    
+    In one dimension the Ising model is a row of spins, all of which can be up or down.
+    We can give the state of the system in multiple ways.
+    First, we can list the spins, which is what we've been doing so far.
+    A more useful description for our current purposes is to define some new variable, \(n_i\), which is 1 if there is a domain wall after spin \(i\), and zero otherwise.
+    That is it is 1 if \(S_i \ne S_{i + 1}\).
+    This is related to the spin values by
+    \begin{equation}
+        n_i = \frac{1}{2}(1 - S_i S_{i + 1}) = 
+        \begin{cases}
+            1 & \text{if there is a domain wall after spin }i,\\
+            0 & \text{if there isn't a domain wall after spin }i.
+        \end{cases}
+    \end{equation}
+    Inverting this we have
+    \begin{equation}
+        S_i S_{i + 1} = 1 - 2n_i,
+    \end{equation}
+    and so we can write the energy of the system as
+    \begin{equation}
+        E = -J\sum_{\langle i, j \rangle}S_{i}S_{i + 1} = -J\sum_{i = 1}^{N}(1 - 2n_i) = -NJ + 2J\sum_{i = 1}^{N}n_i.
+    \end{equation}
+    The first term is just a constant, and as usual we can ignore constant terms added to the energy.
+    We can then treat the system as a non-interacting assembly of domain walls with two states, \(n_i = 1\), which has energy \(\varepsilon = 2J\), and \(n_i = 0\), which has energy \(\varepsilon = 0\).
+    Since the system is non-interacting we can write down the Boltzmann distribution for a particular value of \(i\):
+    \begin{equation}
+        P(n_i) = \frac{\e^{-\beta \varepsilon(n_i)}}{\e^{-\beta \varepsilon(0)} + \e^{-\beta \varepsilon(1)}} = \frac{\e^{-2\beta Jn_i}}{1 + \e^{-2\beta J}}.
+    \end{equation}
+    Now define \(p = P(1)\) as the probability that a domain wall is present at any given location.
+    This has the high and low temperature behaviour
+    \begin{equation}
+        p \approx
+        \begin{cases}
+            \e^{-2\beta J} \to 0 & T \to 0,\\
+            \displaystyle\frac{1}{2} - \frac{1}{2}\beta J \to \frac{1}{2} & T \to \infty.
+        \end{cases}
+    \end{equation}
+    
+    We see that this has the expected behaviour of no domain walls at \(T = 0\), since all of the spins align, and a disordered state with essentially randomly aligned spins at high temperatures, meaning that there is a fifty-fifty chance of two neighbouring spins being aligned, so the probability of a domain wall is \(1/2\).
+    However, \(p\) goes smoothly between these two values, there is no phase transition.
+    There is only one phase for \(T > 0\), and it is a paramagnetic phase.
+    
+    To better understand this we examine the two point correlation function and correlation length.
+    Consider two particular sites, \(j\) and \(k\), separated by a distance of \(l\) units, that is \(l = \abs{j - k}\).
+    Let \(m\) be the number of domain walls between \(j\) and \(k\).
+    If \(m\) is even then there are an even number of alignment changes between \(j\) and \(k\) and so \(S_i = S_j\), similarly if \(m\) is odd \(j \ne k\).
+    We then have that
+    \begin{equation}
+        S_j S_k = 
+        \begin{cases}
+            +1 & \text{if } m \text{ is even},\\
+            -1 & \text{if } m \text{ is odd}.
+        \end{cases}
+    \end{equation}
+    We can write this as \(S_jS_k = (-1)^m\).
+    We then average to obtain
+    \begin{equation}
+        \expected{S_jS_k} = \sum_{m=0}^{l} p_m(-1)^m
+    \end{equation}
+    where \(p_m\) is the probability of having \(m\) domain walls between the two sites.
+    The value of \(p_m\) is given by the binomial distribution for having \(m\) domain walls in the \(l\) possible locations between the two sites, so
+    \begin{equation}
+        p_m = \binom{l}{m}p^m(1 - p)^{l - m} \implies \sum_{m = 0}^{l} (p + 1 - p)^l = 1,
+    \end{equation}
+    where we recognise \(p_m\) as the terms appearing in the binomial expansion of \((p + 1 - p)^l\).
+    We therefore have
+    \begin{equation}
+        \expected{S_jS_k} = \sum_{m = 0}^{l} \binom{l}{m} p^m (1 - p)^{l - m} (-1)^m = (-p + 1 - p)^l = (1 - 2p)^l.
+    \end{equation}
+    Rearranging this gives
+    \begin{equation}
+        \expected{S_jS_k} = (1 - 2p)^l = \exp[l\ln(1 - 2p)] = \e^{-l/\xi}.
+    \end{equation}
+    So we can identify the correlation length as
+    \begin{equation}
+        \xi = \frac{1}{\abs{\ln(1 - 2p)}} = 
+        \begin{cases}
+            \dfrac{1}{2}\e^{2\beta J} \to \infty & T \to 0,\\
+            \dfrac{1}{\abs{\ln(\beta J)}} \to 0 & T \to \infty.
+        \end{cases}
+    \end{equation}
+    From this we see that the correlation length decreases as temperature decreases, but it only diverges as \(T \to \infty\).
+    This means the only \enquote{phase transition} is at \(T = 0\), which isn't really a phase transition since we can't get to the \enquote{phase} below \(T = 0\).
+    We conclude that
+    \begin{equation}
+        \lim_{l \to \infty} \expected{S_j S_k} = 0
+    \end{equation}
+    for all positive temperatures.
+    For a ferromagnetic phase, which doesn't exist in one dimension, there would be long range order, and so this quantity would be nonzero.
+    
+    \subsection{Absence of Long Range Order in One Dimension}
+    Consider a one-dimensional system of particles with fixed position where each particle can be in one of two states, \(A\) or \(B\).
+    This is a generalisation of the Ising model, which is the case where \(A = 1\) and \(B = -1\).
+    We want to see if domain walls are favoured thermodynamically.
+    
+    Let \(\Delta E\) be the energy cost of introducing a single domain wall.
+    In order for this to be finite the system must be limited to short range interactions.
+    For example, in the Ising model we consider only nearest neighbour interactions and \(\Delta E = 2J\).
+    We could introduce next nearest neighbour interactions if we desired.
+    Importantly, \(\Delta E\) doesn't depend on \(N\), the size of the system.
+    The entropy gain due to creating a domain wall can be computed using the Boltzmann entropy, \(\Delta S = \boltzmann \ln \Omega\).
+    For the first domain wall \(\Omega = N\), since there are \(N\) possible locations for a domain wall, for the next there are \(N - 1\) choices and so on.
+    For a system with \(m\) domain walls \(\Omega = \binom{N}{m}\).
+    
+    For sufficiently large \(N\) the free energy change by introducing a \(m\) domain walls,
+    \begin{equation}
+        \Delta F = \Delta E - T\Delta S = \Delta E - \boltzmann T\ln \binom{N}{m},
+    \end{equation}
+    will be dominated by entropy term for all \(T > 0\), and hence long range order cannot be maintained.
+    
+    \subsection{General Solution in One Dimension}
+    We can solve the Ising model with an external field in one dimension.
+    To do so we wish to calculate the partition function,
+    \begin{equation}
+        \cpartition = \sum_{\{S_i = \pm 1\}} \e^{-\beta E(\{S_i\})} = \sum_{S_i = \pm 1} \sum_{S_2 = \pm 1} \dotso \sum_{S_N = \pm 1} \e^{-\beta E(\{S_i\})}.
+    \end{equation}
+    We can write the energy as
+    \begin{equation}
+        E(\{S_i\}) = -\frac{h}{2} \sum_{i = 1}^{N}S_i - \frac{h}{2}\sum_{i = 1}^{N}S_{i + 1} - J\sum_{i} S_iS_{i + 1}.
+    \end{equation}
+    Here we are using periodic boundary conditions, so \(S_{N + 1} = S_1\).
+    We then have
+    \begin{equation}
+        \e^{-\beta E} = \prod_{i = 1}^{N} \exp\left[ \frac{\beta h}{2}(S_i + S_{i + 1}) + \beta J_{S_iS_{i + 1}} \right].
+    \end{equation}
+    We then have
+    \begin{equation}
+        \cpartition = \sum_{\{S_i = \pm 1\}} \prod_{i = 1}^{N} T(S_i, S_{i + 1}),
+    \end{equation}
+    where
+    \begin{equation}
+        T(S_i, S_{i + 1}) \coloneqq \exp\left[ \frac{\beta h}{2} (S_i + S_{i + 1}) + \beta JS_iS_{i + 1} \right].
+    \end{equation}
+    We can write the values \(T(S_i, S_{i + 1})\) as a \(2 \times 2\) symmetric matrix, called the \defineindex{transfer matrix}, \(T\), where the rows correspond to \(S_i = \pm 1\) and the columns to \(S_{i + 1} = \pm 1\):
+    \begin{equation}
+        T = 
+        \begin{blockarray}{lll}
+            \text{\scriptsize\(S_{i+1} = +1\)} & \text{\scriptsize\(S_{i+1} = -1\)} & \\
+            \begin{block}{(ll)l}
+                \e^{\beta(J + h)} & \e^{-\beta J} & \text{\scriptsize\(S_i = +1\)}\\
+                \e^{-\beta J} & \e^{\beta(J - h)} & \text{\scriptsize\(S_i = -1\)}\\
+            \end{block}
+        \end{blockarray}
+        .
+    \end{equation}
+    We can then write the transition function with periodic boundary conditions as
+    \begin{align}
+        Z &= \sum_{\{S_i = \pm 1\}} T(S_1, S_2) T(S_2, S_3), \dotsm T(S_{N - 1}, S_N)T(S_N, S_1)\\
+        &= \tr(T^N)\\
+        &= \lambda_+^N + \lambda_-^N,
+    \end{align}
+    where \(\lambda_{\pm}\) are the eigenvalues of \(T\).
+    We can calculate these to be
+    \begin{equation}
+        \lambda_{\pm} = \e^{\beta J} \cosh(\beta h) \pm \sqrt{\e^{2\beta J} \sinh^2(\beta h) + \e^{-2\beta J}}.
+    \end{equation}
+    The free energy per spin is
+    \begin{equation}
+        f = \frac{F}{N} = -\frac{\boltzmann T}{N}\ln \cpartition.
+    \end{equation}
+    For large \(N\) we find that
+    \begin{equation}
+        f \to -\boltzmann T \ln \lambda_+,
+    \end{equation}
+    since \(\lambda_{+} - \lambda_{-} > 0\) and so \(\lambda_-/\lambda_+ < 1\).
+    We can then find various thermodynamic properties as derivatives of the free energy.
+    
+    \subsection{Phase Transitions in Two Dimensions}
+    We now consider the case of a two-dimensional Ising model on a square lattice.
+    This can also be solved exactly, although we won't do this.
+    A domain wall is now an extended object, made of a chain of links separating two neighbouring sites.
+    Take the length of the chain to be \(\tilde{N}\).
+    The energy cost of the whole chain is then
+    \begin{equation}
+        \Delta E = 2J\tilde{N}.
+    \end{equation}
+    
+    To evaluate the entropy gain due to this domain wall we have to estimate \(\Omega\), the number of possible paths that a domain wall of length \(\tilde{N}\) can take.
+    Consider a lattice of \(N\) sites with side length \(L\), so \(N = L^2\).
+    We are free to rotate the lattice without changing anything so there is noting special about which edge of the lattice the chain starts at.
+    There are therefore \(L\) choices for where the chain can start.
+    Not allowing the chain to double back on itself at any time there are three directions we could place the next link.
+    We therefore approximate
+    \begin{equation}
+        \Omega \approx 3^{\tilde{N}}L.
+    \end{equation}
+    This is only an upper bound but its good enough.
+    The entropy cost of this domain wall is then
+    \begin{equation}
+        \Delta S = \boltzmann \tilde{N} \ln 3 + \boltzmann \ln N \approx \boltzmann \tilde{N} \ln 3.
+    \end{equation}
+    The free energy cost of this domain wall is given by
+    \begin{equation}
+        \Delta F \approx \tilde{N}(2J - \boltzmann T \ln 3).
+    \end{equation}
+    For sufficiently low \(T\), in particular if
+    \begin{equation}
+        T < \frac{2J}{\ln 3},
+    \end{equation}
+    we have \(\Delta F > 0\) and a domain wall is not thermodynamically favourable.
+    We therefore have, for sufficiently low \(T\), an ordered phase with long range order.
+    
+    We know that at large \(T\) the domain wall is favoured and we will have a disordered phase.
+    This occurs at some critical temperature, \(T_{\mathrm{c}}\).
+    Which it can be shown has our estimate of \(2J/\ln 3\) as a lower bound.
+    
+    The exact solution to the two-dimensional Ising model, called the \defineindex{Onsager solution}, gives
+    \begin{equation}
+        T_{\mathrm{c}} = \frac{2J}{\ln (\sqrt{2} + 1)},
+    \end{equation}
+    since \(\sqrt{2} + 1 \approx 2.41\) our lower bound is not too far off.
+    
+    \section{Lattice Gas}
+    The Ising model can be modified to describe many systems.
+    As an example we consider a \defineindex{lattice gas}, which is a lattice where each site is either occupied by a single particle, or empty.
+    We can then assign to the \(i\)th lattice site a value
+    \begin{equation}
+        c_i = 
+        \begin{cases}
+            1 & \text{if site \(i\) is occupied},\\
+            0 & \text{if site \(i\) is unoccupied}.
+        \end{cases}
+    \end{equation}
+    The overall number concentration of the gas is
+    \begin{equation}
+        c = \frac{1}{N} \sum_{i = 1}^{N} c_i,
+    \end{equation}
+    which is simply the fraction of lattice sites with \(c_i = 1\).
+    
+    Notice that this model has built in hard core repulsion, since the lattice sites can have at most one occupant.
+    We can introduce a short range potential as an energy \(-\varepsilon < 0\) associated with a pair of neighbouring particles, in which case
+    \begin{equation}
+        E = -\varepsilon \sum_{\langle i, j \rangle} c_ic_j.
+    \end{equation}
+    
+    Allowing the total number of gas particles to change we work in the grand canonical ensemble.
+    We then get the partition function
+    \begin{equation}
+        \gcpartition = \sum_{\{c_i = 0, 1\}} \exp\left[ -\beta(E = \mu \sum_{i = 1}^{N} c_i) \right] = \sum_{\{c_i = 0, 1\}} \exp\left[ \beta \varepsilon \sum_{\langle i, j \rangle} c_ic_j \beta\mu \sum_{i = 1}^{N} c_i \right].
+    \end{equation}
+    
+    We can define the effective energy to be
+    \begin{equation}
+        E - \mu\sum_{i = 1}^{N} c_i,
+    \end{equation}
+    which we can map onto the Ising energy, up to a constant, by identifying
+    \begin{equation}
+        S_i = 2c_i -1 = \pm 1, \qquad J = \frac{\varepsilon}{4}, \qqand h = \frac{1}{4}(\varepsilon z + 2\mu).
+    \end{equation}
+    Recall that \(z\) is the coordination number.
+    We therefore have
+    \begin{equation}
+        \gcpartition^{\mathrm{LG}} = \mathrm{const} \times \cpartition^{\mathrm{Ising}}.
+    \end{equation}
+    Taking logs of this equation we find that the grand potential of the lattice gas and the free energy of the Ising model are the same, up to an unimportant constant:
+    \begin{equation}
+        \Phi_{\mathrm{LG}}(T, \mu) = F_{\mathrm{Ising}}(T, h) + \mathrm{const}.
+    \end{equation}
+    
+    Using the results from the Ising model we expect a discontinuous transition as \(\mu\) is decreased past \(\mu_{\mathrm{c}} = -\varepsilon z/2\) for \(T < T_{\mathrm{c}} = \varepsilon z/(4\boltzmann)\) we will have a \enquote{liquid} phase and a \enquote{gas} phase with concentrations
+    \begin{equation}
+        c_{\mathrm{l}} = \frac{1}{2}(1 + \abs{m}), \qqand c_{\mathrm{g}} = \frac{1}{2}(1 - \abs{m}),
+    \end{equation}
+    respectively.
+    Here \(\abs{m}\) is the magnetisation of the Ising model.
+    
+    \chapter{Landau Theory}
+    In this section we discuss \defineindex{Landau theory}.
+    This is a very general method which we will explore by once again considering the Ising model.
+    
+    \section{Mean Field Theory of the Ising Model (Again)}
+    The average energy of the Ising model is
+    \begin{equation}
+        \mean{E} = -h\sum_{i = 1}^{N}\expected{S_i} - J\sum_{\langle i, j \rangle} \expected{S_iS_j}.
+    \end{equation}
+    Making the approximation of uncorrelated spins this becomes
+    \begin{equation}
+        \mean{E} \approx -h\sum_{i = 1}^{N} \expected{S_i} = J\sum_{\langle i, j \rangle} \expected{S_i}\expected{S_j}.
+    \end{equation}
+    We now use \(\expected{S_i} = m\) and this becomes
+    \begin{equation}
+        \mean{E} \approx -hNm - \frac{1}{2}JzNm^2,
+    \end{equation}
+    where \(z\) is the coordination number of the lattice, that is the number of nearest neighbours that any lattice point has.
+    Notice that the second sum in the mean energy is a sum over pairs of nearest neighbours, all contributing \(-Jm^2\) to the energy.
+    There are \(Nz/2\) nearest neighbour pairs since there are \(N\) particles with \(z\) nearest neighbours but don't want to overcount by considering \(AB\) and \(BA\), so we divide by 2.
+    
+    Now consider the mean magnetisation per spin, \(m\), this is given by
+    \begin{align}
+        m &= \expected{S_i}\\
+        &= \sum_{S_i = \pm 1}^{N} S_iP(S_i)\\
+        &= P(1) - P(-1)\\
+        &= c - (1 - c),
+    \end{align}
+    where \(c\) is the mean field probability of a spin being up.
+    Rearranging this formula we see that
+    \begin{equation}
+        c = \frac{1}{2}(1 + m).
+    \end{equation}
+    The Gibbs entropy of the Ising model is then
+    \begin{equation}
+        S = -\boltzmann\sum_{\{S_i = \pm 1\}}P(S_i)\ln[P(S_i)] = -N\boltzmann[c\ln c + (1 - c)\ln(1 - c)].
+    \end{equation}
+    The Helmholtz free energy is defined as
+    \begin{equation}
+        F(m) = E(m) - TS(m).
+    \end{equation}
+    The Helmholtz free energy per spin is
+    \begin{equation}
+        f(m) \coloneqq \frac{F(m)}{N} = -hm - \frac{1}{2}Jzm^2 + \boltzmann T[c\ln c + (1 - c)\ln(1 - c)].
+    \end{equation}
+    
+    In order to find the equilibrium state we should minimise \(f\) with respect to \(m\) at constant \(h\).
+    Doing so we have
+    \begin{align}
+        \diffp{f}{m} &= -h - Jzm + \boltzmann T \diffp{c}{m}\diffp{}{c}[c\ln c + (1 - c)\ln(1 - c)]\\
+        &= -h - Jzm + \frac{1}{2}\boltzmann T[\ln c + 1 - \ln(1 - c) - 1]\\
+        &= -h - Jzm + \frac{1}{2}\boltzmann T[\ln c - \ln(1 - c)]\\
+        &= -h - Jzm + \frac{1}{2}\boltzmann T\ln\left( \frac{c}{1 - c} \right)\\
+        &= 0.
+    \end{align}
+    Rearranging this we get
+    \begin{equation}
+        \beta(h + Jzm) = \frac{1}{2}\ln\left( \frac{c}{1 - c} \right) = \frac{1}{2}\ln\left( \frac{1 + m}{1 - m} \right) = \artanh(m)
+    \end{equation}
+    from which we get
+    \begin{equation}
+        m = \tanh(\beta(h + Jzm)),
+    \end{equation}
+    which is the same result as we got previously.
+    
+    \subsection{Spontaneous Symmetry Breaking}
+    Consider the free energy per spin, \(f(m)\), at different temperatures.
+    For simplicity we first take \(h = 0\).
+    We then have
+    \begin{equation}
+        \beta f(m) = -\frac{T_{\mathrm{c}}}{T}\frac{m^2}{2} + \left[ \frac{1 + m}{2} \ln\left( \frac{1 + m}{2} \right) + \frac{1 - m}{2} \ln\left( \frac{1 - m}{2} \right) \right] + \ln 2.
+    \end{equation}
+    Here we have chosen to define the free energy such that \(f(0) = 0\), hence the added constant \(\ln 2\), which is fine as the energy is only defined up to a constant.
+    We now expand this for small \(m\) giving
+    \begin{equation}
+        \beta f(m) = -\frac{hm}{\boltzmann T} + \frac{T - T_{\mathrm{c}}}{T} \frac{m^2}{2} + \frac{m^4}{12} + \order(m^6).
+    \end{equation}
+    Here we include the factor of \(h\), for later use.
+    Plotting this we get \cref{fig:landau free energy}.
+    Notice that for \(T \ge T_{\mathrm{c}}\) there is a single minimum at \(m = 0\), corresponding to the single root to \(m = \tanh(\beta Jzm)\) at this temperature.
+    For \(T < T_{\mathrm{c}}\) there are two minima, corresponding to the two equivalent phases of all spins up or all spins down.
+    
+    \begin{figure}
+        \tikzsetnextfilename{landau-free-energy}
+        \begin{tikzpicture}[samples=100]
+            \draw[very thick, ->] (-5, 0) -- (5, 0) node[below] {\(m\)};
+            \draw[very thick, ->] (0, -2) -- (0, 5) node[left] {\(f\)};
+            \begin{scope}
+                \clip (-5, -2) rectangle (5, 5);
+                \draw[ultra thick, highlight, domain=-2:2] plot (2.5*\x, \x*\x*\x*\x);
+                \draw[ultra thick, my blue, domain=-2:2] plot (2.5*\x, \x*\x*\x*\x + 2*\x*\x);
+                \draw[ultra thick, my red, domain=-2:2] plot (2.5*\x, \x*\x*\x*\x - 2*\x*\x);
+            \end{scope}
+            \draw[ultra thick, my blue] (-3, -2.5) -- ++ (1, 0) node[right, black] {\(T > T_{\mathrm{c}}\)};
+            \draw[ultra thick, highlight] (-0.5, -2.5) -- ++ (1, 0) node[right, black] {\(T = T_{\mathrm{c}}\)};
+            \draw[ultra thick, my red] (2, -2.5) -- ++ (1, 0) node[right, black] {\(T < T_{\mathrm{c}}\)};
+        \end{tikzpicture}
+        \caption[Free energy of the Ising model.]{The free energy of the Ising model plotted for \(T < T_{\mathrm{c}}\), \(T = T_{\mathrm{c}}\), and \(T > T_{\mathrm{c}}\). In all cases \(h = 0\).}
+        \label{fig:landau free energy}
+    \end{figure}
+    
+    There are a few things to notice.
+    First, \(f\) is symmetric, that is \(f(-m) = f(m)\).
+    Second, at \(T = T_{\mathrm{c}}\) we have
+    \begin{equation}
+        \diffp[2]{f}{m}[m = 0] = 0.
+    \end{equation}
+    For \(T < T_{\mathrm{c}}\) we say that the symmetry \(m \to -m\) is spontaneously broken since the system must select one of the minima as its equilibrium state.
+    
+    If we now allow \(h\) to take a positive value then for \(T < T_{\mathrm{c}}\) we instead get \cref{fig:landau free energy positive external field}.
+    There are still two minima with the value of \(h\) chosen.
+    For larger values of \(h\) the minimum for negative \(m\) vanishes.
+    The fact that there is only one global minimum reflects the fact that when there is an external field it is energetically favourable for the spins to align with it.
+    For a negative external field the result would be the same but the negative minima would be the one that is selected for.
+    
+    \begin{figure}
+        \tikzsetnextfilename{landau-free-energy-nonzer-external-field}
+        \begin{tikzpicture}[samples=100]
+            \draw[very thick, ->] (-5, 0) -- (5, 0) node[below] {\(m\)};
+            \draw[very thick, ->] (0, -2) -- (0, 5) node[left] {\(f\)};
+            \begin{scope}
+                \clip (-5, -2) rectangle (5, 5);
+                \draw[ultra thick, highlight, domain=-2:2] plot (2.5*\x, \x*\x*\x*\x - 2*\x*\x - 0.5*\x);
+            \end{scope}
+        \end{tikzpicture}
+        \caption[Free energy of the Ising model with positive external field.]{The free energy of the Ising model with positive external field. Note that there are still too minima, but only one is a global minimum now, corresponding to the fact that the external field lowers the energy if the spins align with it.}
+        \label{fig:landau free energy positive external field}
+    \end{figure}
+    
+    \section{Landau Free Energy}
+    The process of Landau theory is motivated by the previous example of the Ising model.
+    We look for a way to write down an approximation of the free energy, called the \defineindex{Landau free energy}, without having to do detailed calculations.
+    The idea is that we can often do this without considering microscopic details, instead we just consider the symmetries of the system.
+    The general process is as follows:
+    \begin{itemize}
+        \item Identify the order parameter, for the Ising model it is \(m\).
+        \item Analyse the behaviour of the system near the critical point, where the order parameter is small.
+        \item Define the free energy density as a power series.
+        \item Eliminate terms which don't respect the symmetry of the system.
+        \item Truncate the power series at some suitable point once the physics is capture, for the Ising model this is after the \(m^4\) term.
+    \end{itemize}
+    
+    For the order parameter the desirable properties is that it is zero in the high temperature disordered phase and nonzero in the ordered phase.
+    For the case of the Ising model the important symmetry, in the absence of external fields, is that the system is invariant under \(m \to -m\).
+    This means that the free energy contains only even terms:
+    \begin{equation}
+        f(m) = \mathrm{const} + am^2 + bm^4 + \order(m^6).
+    \end{equation}
+    The constant value isn't important and so we are free to take it as \(0\) so \(f(0) = 0\).
+    We truncate at fourth order only because we know ahead of time that this is all that is needed to capture the physics.
+    We expect \(a\) and \(b\) to be smooth functions of the temperature.
+    
+    Minimising the free eneergy we get
+    \begin{equation}
+        f'(m) = 2am + 4bm^3 = 0 \implies m^2 = -\frac{a}{2b}.
+    \end{equation}
+    Assuming that \(b\) is finite the transition must occur when \(a = 0\), so we identify \(a\) as being of the form
+    \begin{equation}
+        a(T) = (T - T_{\mathrm{c}})\times\mathrm{const} = ta_0
+    \end{equation}
+    where \(t = (T - T_{\mathrm{c}})/T_{\mathrm{c}}\).
+    
+    For a small applied field, \(h\), the symmetry is broken and we include a linear term:
+    \begin{equation}
+        f(m) = -hm + am^2 + bm^4,
+    \end{equation}
+    where we know from our previous work that the linear term should be \(-hm\).
+    Notice that when \(h\) goes from positive to negative there is a discontinuous change of the global minima from positive to negative \(m\).
+    
+    \subsubsection{Critical Exponents}
+    Once we have the Landau free energy we can analyse it to find the critical exponents.
+    By minimising \(f(m)\) in the low temperature ordered phase we have
+    \begin{equation}
+        f'(m) = 2ta_{0} + 4bm^3 = 0 \implies m = \sqrt{\frac{a_0\abs{t}}{2b}}.
+    \end{equation}
+    Defining the critical exponent \(\tilde{\beta}\) by \(m \sim \pm \abs{t}^{\tilde{b}}\) we identify \(\tilde{\beta} = 1/2\).
+    
+    At \(T = T_{\mathrm{c}}\) we have \(t = 0\) and then
+    \begin{equation}
+        f(m) = -hm + bm^4.
+    \end{equation}
+    Minimising this we get
+    \begin{equation}
+        f'(m) = -h + 4bm^4 = 0 \implies h = 4bm^3.
+    \end{equation}
+    Defining the critical exponent \(\delta\) by \(h \sim \abs{m}^{\delta}\sgn(m)\) at \(t = 0\) we see that \(\delta = 3\).
+    
+    To find the behaviour of the susceptibility we minimise \(f(m)\) with respect to \(m\), which gives
+    \begin{equation}
+        f'(m) = -h + 2am + 4bm^3 = 0.
+    \end{equation}
+    Taking the derivative with respect to \(h\), and remembering that \(\diffp{m}{h}|_{h = 0} = \chi\) we have
+    \begin{equation}
+        -1 + 2a\chi + 12bm^2\chi = 0.
+    \end{equation}
+    From this we see that at \(h = 0\)
+    \begin{equation}
+        \chi \sim 
+        \begin{cases}
+            \dfrac{1}{2a_0t} & t < 0,\\
+            \dfrac{1}{4a_0\abs{t}} & t > 0.
+        \end{cases}
+    \end{equation}
+    Defining the critical exponent \(\gamma\) by \(\chi \sim \abs{t}^{-\gamma}\) we have \(\gamma = 1\).
+    
+    With some further work we can show that the heat capacity goes as \(c_h \sim \abs{t}^{-\alpha}\) at \(h = 0\) and \(\alpha = 0\).
+    The correlation length goes as \(\xi \sim \abs{t}^{-\nu}\), with \(\nu = 1/2\).
+    
+    \subsection{Universality}
+    The critical exponents at a continuous second order phase transition depend only on the symmetry of the order parameter, the range of interactions, and the dimension of space.
+    Systems equivalent in this sense are said to be in the same \defineindex{universality class}.
+    This sounds great, we can consider one model and then we will know the critical behaviour of all other models in the same class.
+    
+    The problem is that most of the critical exponents that we predict from Landau theory are wrong.
+    For example, the following compares the values predicted by Landau theory, the exact values known in two dimensions, and the simulated values in three dimensions:
+    \begin{equation}
+        \begin{array}{r|cccc}
+            & \tilde{\beta} & \delta & \alpha & \gamma\\\hline
+            \text{Landau}\rule{0pt}{10pt} & 1/2 & 3 & 0 & 1\\
+            \text{Ising 2D} & 1/8 & 15 & 0 & 7/4\\
+            \text{Ising 3D} & 0.31 & 5.2 & 0.12 & 1.24
+        \end{array}
+    \end{equation}
+    The reason that Landau theory fails is it is a mean field theory, and therefore neglects correlations near the critical point, which is when they become important as we have large fluctuations near the critical point, which correspond to high correlation.
+    
+    Landau theory can be modified to include the effect of spatial dimension, in which case we call it \defineindex{Landau--Ginzburg theory}.
+    If we were to do this we would find that at a certain dimension, known as the \defineindex{upper critical dimension}, the fluctuations aren't important and the Landau exponents become exact.
+    For the Ising model this happens for dimensions \(d \ge 4\).
+    The explanation for why this is is that as the dimension increases the number off nearest neighbours increases and the approximation of replacing the neighbours with the mean field becomes better and better.
+    
+    \section{Other Landau Free Energies}
+    There is no reason that the order parameter has to be a scalar.
+    Consider for example the vector magnetic moment, \(\vv{m}\).
+    Since the free energy is a scalar it must be constructed from scalar invariants of \(\vv{m}\), that is \(\abs{\vv{m}}\).
+    A similar set up to the Ising model would then lead to a potential of the form
+    \begin{equation}
+        f = a_0t\abs{\vv{m}}^2 + b\abs{\vv{m}}^4.
+    \end{equation}
+    For the case where \(\vv{m}\) is constrained to a plane this gives the famous \defineindex{Sombrero potential} shown in \cref{fig:sombrero potential}.
+    We see that the ground state has infinite degeneracy.
+    If \(\vv{m} = m\vh{m}\) is in the minima then so is \(m\vh{n}\) for any unit vector \(\vh{n}\).
+    These minima are also all connected and so the system can move between minima without any energetic cost.
+    
+    \begin{figure}
+        \tikzsetnextfilename{sombrero-potential}
+        \begin{tikzpicture}
+            \begin{axis}[
+                data cs=polar,
+                samples=30,
+                domain=-180:180,
+                y domain=0:10,
+                declare function={
+                    higgspotential(\r)={-125*\r^2+\r^4};
+                },
+                xtick=\empty,
+                ytick=\empty,
+                ztick=\empty,
+                xlabel = \(m_1\),
+                ylabel = \(m_2\),
+                zlabel = \rotatebox{-90}{\(f\)},
+                colormap={CM}{color=(my green), color=(my blue), color=(highlight), color=(my red)}
+                ]
+                \addplot3 [surf, shader=flat, draw=black, z buffer=sort] {higgspotential(y)};
+            \end{axis}
+        \end{tikzpicture}
+        \caption[Sombrero potential.]{The sombrero potential is the generalisation of the Landau free energy for the Ising model to a model with two-dimensional magnetic moment vectors.}
+        \label{fig:sombrero potential}
+    \end{figure}
+    
+    Why stop at vectors.
+    There are also systems where we can define tensor order parameters.
+    One example is in the study of liquid crystals, which are rod like molecules.
+    The orientation is described by a vector, \(\vh{n}\), and since there is no preferred end of the rod we treat \(\vh{n}\) and \(-\vh{n}\) the same.
+    One choice of order parameter is
+    \begin{equation}
+        Q_{ij} = \expected{n_in_j} - \frac{1}{3}\delta_{ij},
+    \end{equation}
+    where the \(-\delta_{ij}/3\) term simply normalises the system so that \(Q_{ij} = 0\) when the system is in the disordered phase, since \(n_in_i = 1\).
+    At low temperatures there will be phases where the molecules line up, in this case \(Q_{ij}\) will be greater than zero.
+    
+    To construct the free energy we need to use scalar invariants of the tensor order parameter, one particular example that arises is the cubic term \(\tr(Q^3)\).
+    This appears as it is a scalar invariant and there is no symmetry excluding it.
+    
+    As well as different types of order parameters Landau theory can also be used to model different types of phase transitions.
+    For example the Landau free energy
+    \begin{equation}
+        f(m) = am^2 + cm^3 + bm^4
+    \end{equation}
+    displays a discontinuous phase transition, and such a phase transition occurs in liquid crystals.
+    The Landau free energy
+    \begin{equation}
+        f(m) = am^2 + bm^4 + cm^6
+    \end{equation}
+    also displays a discontinuous phase transition if \(b < 0\).
+    
+    \chapter{Non Equilibrium Processes}
+    \section{The Reversibility Paradox}
+    Consider a box separated in two with a gas in one half of the box and vacuum in the other half.
+    If we remove the separating barrier then the gas will expand to fill the box.
+    If we filmed this and played the film in reverse it would be obvious that this had been done.
+    We don't, in real life, see a gas spontaneously take up a smaller volume than it currently occupies.
+    
+    Macroscopically we can understand this system by considering the Boltzmann entropy and the second law of thermodynamics.
+    The Boltzmann entropy is \(S = \boltzmann\ln\Omega\), where \(\Omega\) is the number of ways a system can be in a given macrostate.
+    Correspondingly the Boltzmann energy increases with volume, since there are more ways to arrange the gas molecules in a larger volume.
+    The second law says that entropy always increases (or stays the same), and hence a system containing a gas will always evolve to have that gas's volume maximised.
+    This clearly gives a direction of time.
+    
+    The paradox occurs when we try to consider this system microscopically.
+    There is nothing in the laws of motion of the individual gas molecules that isn't the same under time reversal.
+    For example, if we model the gas as classical and apply Newton's equations we get
+    \begin{equation}
+        m\ddot{\vv{r}}_i = -\grad[i]U(\{\vv{r}\})
+    \end{equation}
+    for some potential, \(U\).
+    This is second order in time derivatives and so when we reverse time, that is send \(t \to -t\), we have
+    \begin{equation}
+        \diff[2]{}{t} \to \diff[2]{}{(-t)} = \diff[2]{}{t}.
+    \end{equation}
+    So nothing changes in the equations of motion, except that all velocities reverse, which would send the system back to its original state, of all the gas in one half of the box.
+    
+    One may look for a solution to this in quantum mechanics, maybe there is something with all the probabilities and a loss of information that we neglect with this classical picture?
+    The Schrödinger equation is first order in time,
+    \begin{equation}
+        \operator{H}\psi = i\hbar\diffp{\psi}{t}.
+    \end{equation}
+    So under the transformation \(t \to -t\) we get
+    \begin{equation}
+        \operator{H}\psi = -i\hbar\diffp{\psi}{t}.
+    \end{equation}
+    However, by also transforming \(\psi \to \psi^*\) at the same time we just get
+    \begin{equation}
+        \operator{H}\psi^* = i\hbar\diffp{\psi^*}{t},
+    \end{equation}
+    and since \(\psi\) and \(\psi^*\) have the same magnitude the physics described by this equation is exactly the same.
+    More formally time evolution in quantum mechanics is unitary, and hence we can reverse it.
+    
+    So, how does time reversibility fail between the microscopic and macroscopic descriptions?
+    The resolution to the paradox is that we are considering only a single microstate in the microscopic case.
+    The second law is simply a statistical statement, that systems tend to evolve to increase entropy, states which don't evolve in this way are just incredibly rare.
+    So rare that in the lifetime of the universe they've probably never occurred.
+    
+    Slight complications to this resolution occur when we consider the Gibbs entropy.
+    In order to study these the best tool for the job is Hamiltonian dynamics, which we will give a short synopsis of here.
+    
+    \section{Hamiltonian Dynamics}
+    \begin{rmk}
+        For more details on Hamiltonian dynamics see the Lagrangian dynamics course.
+    \end{rmk}
+    \vspace{5pt}
+    Hamiltonian dynamics starts with the \defineindex{Hamiltonian}, which for all cases we care about can be written as
+    \begin{equation}
+        \hamiltonian = \sum_{i = 1}^{3N} \frac{p_i^2}{2m} + U(\{q_i\}),
+    \end{equation}
+    where \(q_i\) are generalised coordinates and \(p_i\) are the conjugate momenta.
+    Notice that this is of the form kinetic energy plus potential energy, and so is numerically equal to the total energy of the system.
+    The dynamics of the system are then dictated by \defineindex{Hamilton's equations}:
+    \begin{equation}
+        \dot{q}_i = \diffp{\hamiltonian}{p_i}, \qqand \dot{p}_i = -\diffp{\hamiltonian}{q_i}.
+    \end{equation}
+    Inserting the form of the Hamiltonian above we find that
+    \begin{equation}
+        \dot{q}_i = \frac{p_i}{m}, \qqand \dot{p}_i = -\diffp{U}{q_i}.
+    \end{equation}
+    We can interpret the first equation as simply the normal definition of momentum, \(p_i = m\dot{q_i}\) corresponds to \(\vv{p} = m\vv{v}\) if we take \(q_i\) as Cartesian coordinates.
+    The second is Newton's second law with force due to a potential, \(U\).
+    
+    An important concept is that of \defineindex{phase space}, \(\Gamma\).
+    This is a \(6N\) dimensional space spanned by \(\{q_i, p_i\}\).
+    A point in phase space corresponds to a microstate of the system.
+    We can denote a \defineindex{phase-space point} by
+    \begin{equation}
+        \vv{X} = (q_1, \dotsc, q_{3N}, p_1, \dotsc, p_{3N}).
+    \end{equation}
+    We will be interested in a probability distribution, \(\rho(\vv{X}, t)\), which is defined such that \(\rho(\vv{X}, t) \dd{\Gamma}\) is the probability that the system is in a state corresponding to a point in phase space in the small region \(\dl{\Gamma}\) centred on \(\vv{X}\) at time \(t\).
+    The region is given by
+    \begin{equation}
+        \dl{\Gamma} \coloneqq \prod_{i = 1}^{3N} \dl{q_i}\dd{p_i} = \dl{^{3N}q}\dl{^{3N}p}.
+    \end{equation}
+    
+    Recall that we think of an ensemble as a large fixed number, \(M\), of non-interacting systems all obeying the same equations of motion.
+    Each system in the ensemble can be represented by a point in phase space.
+    We can then view the ensemble as this collection of phase-space points.
+    These points move around and \(\rho\) is the density of these \defineindex{representative points}.
+    Since the total number of representative points, \(M\), is fixed we have
+    \begin{equation}
+        M = \int \rho(\vv{X}, t) \dd{\Gamma} = \mathrm{const}.
+    \end{equation}
+    We can therefore think of the collection of representative points, which is to say the ensemble, as evolving like an fluid in phase space, with constant \enquote{mass}, \(M\), and \enquote{mass} density \(\rho(\vv{X}, t)\).
+    
+    \subsection{Liouville's Theorem}
+    Liouville's theorem states that if we think of an ensemble as a phase space fluid that fluid is incompressible.
+    To prove this consider some fixed region of phase space, \(R\), and its boundary, \(\partial R\).
+    We define the \defineindex{phase-space velocity} of the point \(\vv{X}\) to be
+    \begin{equation}
+        \vv{V} \coloneqq \dot{\vv{X}} = (\dot{q}_1, \dotsc, \dot{q}_{3N}, \dot{p}_1, \dotsc, \dot{p}_{3N}).
+    \end{equation}
+    The rate at which the number of phase-space points in the region \(R\) decreases is given by the flux of these points crossing \(\partial R\):
+    \begin{equation}
+        -\diff{}{t} \int_R \rho \dd{\Gamma} = \int_{\partial R} \rho \vv{V} \cdot \dl{\vv{S}},
+    \end{equation}
+    where \(\dl{\vv{S}} = \vh{n}\dd{S}\) is an area element normal to \(\partial S\) and pointing outwards.
+    Note that we are assuming representative points aren't created or destroyed.
+    We can then interpret this as a continuity equation for the fluid.
+    Using the divergence theorem the right hand side can be written as
+    \begin{equation}
+        \int_{\partial R} \rho \vv{V}\cdot\dl{\vv{S}} = \int_{R} \div (\rho\vv{V}) \dd{\Gamma}
+    \end{equation}
+    where
+    \begin{equation}
+        \div \vv{A} = \sum_{i = 1}^{3N} \left( \diffp{A}{q_i} + \diffp{A}{p_i} \right).
+    \end{equation}
+    For a constant region, \(R\), we then have
+    \begin{equation}
+        \int_{R} \left[ \diffp{\rho}{t} + \div(\rho\vv{V}) \right] \dd{\Gamma} = 0.
+    \end{equation}
+    Since this must hold for an arbitrary region we have
+    \begin{equation}
+        \diffp{\rho}{t} + \div(\rho\vv{V}) = 0.
+    \end{equation}
+    
+    Inserting the definitions of \(\vv{V}\) and the divergence we have
+    \begin{equation}
+        \diffp{\rho}{t} = - \sum_{i = 1}^{3N}\left[ \diffp{}{q_i}(\dot{q}_i\rho) + \diffp{}{p_i}(\dot{p}_i\rho) \right],
+    \end{equation}
+    where we have used the fact that any two generalised coordinates or momenta are independent.
+    We can also use the identity \(\div(\varphi\vv{A}) = \vv{A}\cdot\grad\varphi + \varphi\div\vv{A}\) to write this as
+    \begin{align}
+        \diffp{\rho}{t} &= -\vv{V}\cdot\grad\rho - \rho\div\vv{V}\\
+        &= -\sum_{i = 1}^{3N} \left[ \dot{q}_i\diffp{\rho}{q_i} + \dot{p}+i\diffp{\rho}{p_i} \right] - \rho\sum_{i = 1}^{3N} \left[ \diffp{\dot{q}_i}{q_i} + \diffp{\dot{p}_i}{p_i} \right].
+    \end{align}
+    
+    Using Hamilton's equations we have
+    \begin{equation}
+        \div\vv{V} = \sum_{i = 1}^{3N} \left[ \diffp{}{q_i}\left( \diffp{\hamiltonian}{p_i} \right) + \diffp{}{p_i} \left( -\diffp{\hamiltonian}{q_i} \right) \right] = 0.
+    \end{equation}
+    Hence we have
+    \begin{equation}
+        \diffp{\rho}{t} = -\vv{V} \cdot \grad \rho = \sum_{i = 1}^{3N} \left[ \dot{q}_i\diffp{\rho}{q_i} + \dot{p}_i\diffp{\rho}{p_i} \right].
+    \end{equation}
+    
+    The total time derivative of \(\rho\) is given by the chain rule:
+    \begin{equation}
+        \diff{\rho}{t} \coloneqq \diffp{\rho}{t} + \sum_{i = 1}^{3N}\left[ \diffp{\rho}{q_i}\dot{q}_i + \diffp{\rho}{p_i}\dot{p}_i \right] = \diffp{\rho}{t} + \vv{V} \cdot \grad \rho.
+    \end{equation}
+    Note that since \(q_i\) and \(p_i\) are themselves, in general, functions of time this is the time derivative which moves with the fluid, this is called the material or Lagrangian description of the fluid\footnote{See the notes from the continuum mechanics part of the vectors, tensors, and continuum mechanics part of the methods of theoretical physics course for more details.}.
+    We therefore have
+    \begin{equation}
+        \diff{\rho}{t} = \diffp{\rho}{t} + \vv{V}\cdot\grad\rho = 0.
+    \end{equation}
+    This is \defineindex{Liouville's equation}, and it states that along any trajectory in phase space the density of representative points is constant.
+    This means that the representative points evolve as an incompressible fluid.
+    
+    Any (differentiable) function of the canonical variables satisfies
+    \begin{align}
+        \diff{u}{t} &= \diffp{u}{t} + \sum_{i}\left[ \diffp{u}{q_i}\diffp{q_i}{t} + \diffp{u}{p_i}\diffp{p_i}{t} \right]\\
+        &= \diffp{u}{t} + \sum_{i}\left[ \diffp{u}{q_i}\diffp{\hamiltonian}{p_i} - \diffp{u}{p_i}\diffp{\hamiltonian}{q_i} \right]\\
+        &= \diffp{u}{t} + \poissonbracket{u}{\hamiltonian},
+    \end{align}
+    where we define the \defineindex{Poisson bracket}, \(\poissonbracket{-}{-}\) to be
+    \begin{equation}
+        \poissonbracket{u}{v} \coloneqq \sum_i\left[ \diffp{u}{q_i}\diffp{v}{p_i} - \diffp{u}{p_i}\diffp{v}{q_i} \right].
+    \end{equation}
+    
+    We can then write Liouville's equation as
+    \begin{equation}
+        \diff{\rho}{t} = \diffp{\rho}{t} + \poissonbracket{\rho}{\hamiltonian} = 0.
+    \end{equation}
+    For an equilibrium solution we expect the distribution of representative points to be stationary, meaning that \(\diffp{\rho}/{t} = 0\).
+    This then implies that \(\poissonbracket{\rho}{\hamiltonian} = 0\).
+    If we consider the case of \(\rho\) being constant then this clearly holds and we will recover the microcanonical ensemble.
+    If instead \(\rho\) is a function of only the Hamiltonian then this holds again and we recover the canonical ensemble.
+    
+    \section{Entropy}
+    We now go back to the case where \(\rho\) is the probability density for a single system.
+    It still obeys Liouville's equation, and evolves as an incompressible fluid.
+    The Gibbs entropy for a discrete system is defined as
+    \begin{equation}
+        S_{\mathrm{G}} \coloneqq -\boltzmann\sum_{i} p_i \ln p_i.
+    \end{equation}
+    In the classical continuum limit this becomes
+    \begin{equation}
+        S_{\mathrm{G}} \coloneqq -\boltzmann\int \rho\ln\rho \dd{\Gamma} + \mathrm{const}.
+    \end{equation}
+    The constant is, as usual, unimportant and we are free to choose it to be zero.
+    In general it will contain terms like \(-3N\ln h\), which come from taking the classical limit, recall from \cref{sec:classical stat mech} that \(h^{3}\) is the volume occupied by a single state in phase space.
+    
+    The problem with this definition is that
+    \begin{equation}
+        \diff{S_{\mathrm{G}}}{t} = -\boltzmann\diff{}{t} \int \rho\ln\rho \dd{\Gamma} = 0,
+    \end{equation}
+    suggesting entropy is constant.
+    We would expect entropy to be increasing in most circumstances.
+    
+    Consider a classical system with localised probability density in phase space.
+    Intuitively we would expect the probability density to spread out over time, which would cause an increase in entropy.
+    However, Liouville's theorem forbids this from happening, which is why we seemingly get entropy as a constant.
+    What actually happens is that the probability density spreads into some complicated shape according to the dynamics of the system.
+    
+    As an analogy suppose we create an emulsion of oil in water.
+    Any sufficiently small region will contain only oil or only water, since one will form droplets in the other, so we see that the density of oil is constant.
+    However, if we take larger volumes they will start to contain water as well as oil, making it seem like the density of oil is lower.
+    
+    The same process can be thought of as occurring in phase space.
+    We can replace the probability density with the \define{coarse grained}\index{coarse graining} density, \(\mean{\rho}\), and redefine the entropy as
+    \begin{equation}
+        \mean{S} = -\boltzmann\int \mean{\rho} \ln \mean{\rho} \dd{\Gamma}.
+    \end{equation}
+    We do so by locally averaging \(\rho\) over some fixed local scale, \(\Lambda\), in order to obtain \(\mean{\rho}\).
+    This tends to smooth out the spread out probability density, seemingly increasing its volume, and so \(\mean{\rho}\) will generally be less than \(\rho\).
+    The result is that entropy increases in this process.
+    This is because
+    \begin{equation}
+        s(\rho) = -\boltzmann \rho\ln \rho
+    \end{equation}
+    defines a concave function and for a concave function we have the general fact that the average of the function at two points is less than the function at the average of those two points.
+    This means that
+    \begin{equation}
+        \frac{1}{2}[s(\rho_1) + s(\rho_2)] \le s\left( \frac{\rho_1 + \rho_2}{2} \right).
+    \end{equation}
+    This generalises to
+    \begin{equation}
+        \lambda s(\rho_1) + (1 - \lambda)s(\rho_2) \le s(\lambda \rho_1 + (1 - \lambda)\rho_2)
+    \end{equation}
+    for \(\lambda \in [1, 0]\).
+    If we then consider two adjacent regions of phase space, both with volume \(V\), and local densities \(\rho_1\) and \(\rho_2\), we can merge them into a single region with volume \(2V\), and density \((\rho_1 + \rho_2)/2\).
+    The entropy after this merging will be
+    \begin{equation}
+        \mean{s} = 2Vs\left( \frac{\rho_1 + \rho_2}{2} \right) \ge 2V\frac{1}{2}[s(\rho_1) + s(\rho_2)].
+    \end{equation}
+    The result of this is we recover the second law
+    \begin{equation}
+        \diff{\mean{S}}{t} \ge 0.
+    \end{equation}
+    
+    This coarse graining process may seem to be just made up to fix this problem, and it is, but remember that the second law is just a statistical law, and therefore we should expect that it arises in averaging processes.
+    This necessarily causes a loss of information, which corresponds to an increase in entropy.
+    This gets to a fundamental point.
+    Entropy is based on \emph{our} knowledge of the system, not on the information available in a perfect world.
+    After all in a perfect world we could solve every system exactly and do away with statistical mechanics.
+    
+    Another example of coarse graining leading to irreversibility is friction.
+    Newton's second law with a viscous term can be written as
+    \begin{equation}
+        m\ddot{\vv{r}}_i + \kappa\dot{\vv{r}}_i = - \grad[i] U(\{\vv{r}_i\}).
+    \end{equation}
+    This is not time reversible, due to the presence of the \(\dot{\vv{r}}_i\) first derivative term.
+    However, in a perfect world we could get rid of the viscous term by including the interactions causing the friction in the potential, restoring time reversibility.
+    The viscous term simply approximates the effect of these interactions, and hence gives rise to an arrow of time, much like increasing entropy.
+    
+    \chapter{The Master Equation}
+    \section{Entropy}
+    Consider a system evolving under the Hamiltonian \(\operator{H}\).
+    We can choose the microstates to simply be the eigenstates, \(\{\ket{i}\}\), of the Hamiltonian.
+    These evolve according to the Schrödinger equation, meaning if the state of the system is
+    \begin{equation}
+        \ket{\Psi} = \sum_{i} c_i\ket{i}
+    \end{equation}
+    then the evolution of the system obeys
+    \begin{equation}
+        i\hbar\diffp{}{t}\ket{\Psi} = \operator{H}\ket{\Psi} = \sum_i c_iE_i\ket{i}.
+    \end{equation}
+    Here \(E_i\) is the eigenvalue associated with the eigenstate \(\ket{i}\).
+    The solution to this is for the system to evolve according to
+    \begin{equation}
+        \ket{\Psi, t} = \sum_i c_i\exp[-iE_it/\hbar]\ket{i}.
+    \end{equation}
+    This means that \(c_i\) is constant and the state evolves by changing phase.
+    The result is that evolving according to Schrödinger's equation cannot change the classical weights, \(p_i\), associated with the system starting in a given microstate.
+    This means that the entropy is
+    \begin{equation}
+        S_{\mathrm{G}} = -\boltzmann\sum_i \abs{c_i}^2 \ln\abs{c_i}^2,
+    \end{equation}
+    which is a constant, meaning
+    \begin{equation}
+        \diff{S_{\mathrm{G}}}{t} = 0,
+    \end{equation}
+    just as we had in classical mechanics.
+    
+    Suppose instead that we start with mixed states,
+    \begin{equation}
+        \rho = \sum_i p_i\ket{\Psi_i}\bra{\Psi_i},
+    \end{equation}
+    where \(\ket{\Psi_i}\) are states, which aren't necessarily eigenstates of \(\operator{H}\).
+    The Gibbs entropy is then
+    \begin{equation}
+        S_{\mathrm{G}} = -\boltzmann\tr(\rho\ln\rho).
+    \end{equation}
+    Considering the Schrödinger equation and its adjoint,
+    \begin{equation}
+        -i\hbar\diffp{}{t}\bra{\Psi} = \bra{\Psi}\operator{H},
+    \end{equation}
+    it can be shown that \(\rho\) satisfies
+    \begin{equation}
+        \diffp{\rho}{t} = -\frac{i}{\hbar}\commutator{\operator{H}}{\rho}.
+    \end{equation}
+    This is the \defineindex{von Neumann equation}.
+    Under this we can show that the time evolution of \(\ket{\Psi_i}\) and \(\rho\) satisfies
+    \begin{equation}
+        \ket{\Psi_i, t} = \exp[-i\operator{H}t/\hbar]\ket{\Psi_i, 0}
+    \end{equation}
+    where \(\ket{\psi_i, 0} = \ket{\Psi_i}\), and
+    \begin{equation}
+        \rho(t) = \exp[-i\operator{H}t/\hbar]\rho(0)\exp[-i\operator{H}t/\hbar].
+    \end{equation}
+    We again find that
+    \begin{equation}
+        \diff{S_{\mathrm{G}}}{t} = 0.
+    \end{equation}
+    
+    So, how do we get increasing entropy from quantum mechanics?
+    
+    \subsection{Fermi's Master Equation}
+    In reality for most systems, certainly those of interest in statistical mechanics, we cannot write down the Hamiltonian exactly containing all microscopic detail.
+    Instead we can use an approximate Hamiltonian, \(\operator{H}_0\), and describe the system using eigenstates of \(\operator{H}_0\).
+    The true Hamiltonian is then
+    \begin{equation}
+        \operator{H} = \operator{H}_0 + \operator{h},
+    \end{equation}
+    where \(\operator{h}\) can be thought of as some small perturbation.
+    The states \(\ket{i}\) are then approximate energy eigenstates of \(\operator{H}\).
+    The matrix elements of \(\operator{h}\) in the eigenbasis of \(\operator{H}_0\) are
+    \begin{equation}
+        h_{ij} = \bra{i}\operator{h}\ket{j} = h_{ji}^*.
+    \end{equation}
+    This perturbation causes the system to move between the approximate states.
+    We treat the states in a non-unitary way.
+    To each state we assign a changing classical probability, \(p_i\), rather than keeping track of the amplitudes associated with the different states.
+    We can view this as a form of coarse graining where quantum coherence between states is wiped out.
+    
+    Using time dependent perturbation theory it can be shown\footnote{See either the principles of quantum mechanics notes or quantum theory notes.} that if the system can jump from an initial state, \(\ket{i}\), with energy \(E_i\), into a narrow band of final states, \(\ket{f}\), with energy within \(\delta E\) of \(E_i\), then the probability of this jump is
+    \begin{equation}
+        \lambda_{if} = \frac{2\pi}{\hbar} \abs{h_{if}}^2\rho_f,
+    \end{equation}
+    where \(\rho_f\) is the density of final states.
+    This is called \defineindex{Fermi's golden rule} for the one-to-many state transition rate.
+    We can convert this to a one-to-one transition rate of going from some initial state, \(\ket{i}\), to a single final state, \(\ket{j}\), by dividing by the number of final states in the range \([E_{i} - \delta E, E_i + \delta E]\), which is just \(\rho_f\delta E\), giving the transition rate
+    \begin{equation}
+        \nu_{ij} = \frac{2\pi}{\hbar \delta E} \abs{h_{ij}}^2.
+    \end{equation}
+    
+    Notice that \(\nu_{ij} \ge 0\) in this case and since \(h_{ij} = h_{ji}^*\) the jump rates are symmetric, so \(\nu_{ij} = \nu_{ji}\), this is often the case but not always.
+    
+    The interpretation of \(\nu_{ij}\) is that in the time \(t\) to \(t + \dl{t}\) the probability of transition from state \(\ket{i}\) to state \(\ket{j}\) is \(\nu_{ij}\dd{t}\).
+    Note that here we assume \(\dl{t}\) is small enough that multiple transitions are negligible.
+    Now consider some specific state \(i\).
+    The flux of states transitioning into this state in time \(\dl{t}\) is
+    \begin{equation}
+        \dl{p}_i = -p_i\sum_{j\ne i} \nu_{ij}\dl{t} + \sum_{j\ne i} p_j\nu_{ji}\dl{t}.
+    \end{equation}
+    The first term accounts for the flux of states out of state \(i\) and the second for the flux of states into \(i\).
+    We then have
+    \begin{equation}
+        \diff{p_i}{t} = -p_i\sum_{j \ne i} \nu_{ij} + \sum_{j\ne i} p_j\nu_{ji}.
+    \end{equation}
+    This is called the \defineindex{master equation}.
+    Notice that it is first order in time and doesn't posses time reversal symmetry.
+    
+    If \(\nu_{ij} = \nu_{ji}\) then we have
+    \begin{equation}
+        \diff{p_i}{t} = \sum_{j\ne i} \nu_{ij}(p_j - p_i).
+    \end{equation}
     
     
 %    %   Appdendix
