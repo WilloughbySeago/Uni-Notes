@@ -1,0 +1,1425 @@
+\part{Continuous Groups}
+\chapter{Lie Groups}
+\section{Background}
+Finite groups were first utilised by mathematicians, particularly Galois, who wanted to classify the solutions to polynomials.
+Groups were used to show that, in general, polynomials of degree 5 or greater don't admit an exact solution in terms of elementary functions.
+That is, there is no \enquote{quintic formula} equivalent to the quadratic formula.
+There are linear, cubic, and quartic versions of the quadratic formula, but the linear formula is trivial and the cubic and quartic formulae contain too many terms to be useful for human computations.
+The main focus was on the symmetric groups, since permuting variables in equations played a big part in classifying the solutions, and it was soon noticed that the basic symmetry operations of a group applied to a far more general class of algebraic objects.
+
+Sophus Lie introduced Lie groups, to be defined shortly, for similar reasons, he was attempting to classify solutions to differential equations.
+These have continuous solutions and so unsurprisingly Lie groups are continuous.
+
+All simple finite groups have been classified.
+Likewise all simple and compact Lie groups have been classified, we will see the classification later.
+
+\section{Basics}
+\begin{dfn}{Continuous Group}{}
+    A \defineindex{continuous group} is a group, \(G\), with an uncountable number of elements which can be continuously parametrised by some set of parameters, \(\{\alpha\}\).
+    We call the number of parameters the \define{dimension}\index{dimension!of a group} of \(G\), \(\dim G\).
+\end{dfn}
+Notice that it doesn't make sense to discus the order of a continuous group since it is infinite.
+
+\begin{dfn}{Lie Group}{}
+    A \define{Lie group}\index{Lie!group} is a continuous group which admits an analytic structure in the parameters \(\{a\}\).
+    
+    Alternatively, a \define{Lie group} is a manifold equipped with a binary operation satisfying the group axioms.
+\end{dfn}
+For our purposes a manifold is a space which can be parametrised locally by a fixed number Euclidean coordinates.
+The number of coordinates is the dimension of the manifold.
+A fuller definition of a manifold is given in \cref{app:manifold}.
+
+All of the groups in the following definition are Lie groups.
+Technically, we are only defining a representation of these groups here but this is fine.
+
+\begin{dfn}{Specific Lie Groups}{}
+    \begin{itemize}
+        \item The \defineindex{general linear group}, \(\generalLinear(n, \field)\), is defined as the group of transformations of an \(n\)-dimensional vector space over \(\field\), which is usually \(\reals\) or \(\complex\).
+        It has the representation
+        \begin{equation}
+            \generalLinear(n, \field) \coloneqq \{M \in \matrices{n}{\field} \mid \det M \ne 0\}.
+        \end{equation}
+        The requirement of non-zero determinant is so that the matrices are invertible.
+        
+        \item The \defineindex{special linear group}, \(\specialLinear(n, \field)\), is defined as the group of transformations of an \(n\)-dimensional vector space over \(\field\) which preserve volumes.
+        It has the representation
+        \begin{equation}
+            \specialLinear(n, \field) \coloneqq \{M \in \matrices{n}{\field} \mid \det M \ne 1\} \subgroup \generalLinear(n, \field).
+        \end{equation}
+        
+        \item The \defineindex{orthogonal group}, \(\orthogonal(n)\), is defined as the group of transformations of an \(n\)-dimensional vector space over \(\reals\) which preserves lengths.
+        It has the representation
+        \begin{equation}
+            \orthogonal(n) \coloneqq \{O \in \matrices{n}{\reals} \mid O^\trans O = \ident_n\} \subgroup \generalLinear(n, \reals).
+        \end{equation}
+        
+        \item The \defineindex{special orthogonal group}, \(\specialOrthogonal(n)\), is defined as the group of transformations of an \(n\)-dimensional vector space over \(\reals\) which preserves lengths and orientations.
+        It has the representation
+        \begin{equation}
+            \specialOrthogonal(n) \coloneqq \{O \in \matrices{n}{\reals} \mid O^\trans O = \ident_n \text{ and } \det O = 1\}.
+        \end{equation}
+        It is a subgroup of both \(\orthogonal(n)\) and \(\specialLinear(n, \reals)\).
+        
+        \item The \defineindex{unitary group}, \(\unitary(n)\), is defined as the group of transformations of an \(n\)-dimensional vector space over \(\complex\) which preserves inner products.
+        It has the representation
+        \begin{equation}
+            \unitary(n) = \{U\in\matrices{n}{\complex} \mid U^\hermit U = \ident_n\} \subgroup \generalLinear(n, \complex).
+        \end{equation}
+        
+        \item The \defineindex{special unitary group}, \(\specialUnitary(n)\), is defined as the group of transformations of an \(n\)-dimensional vector space over \(\complex\) which preserves inner products and orientations.
+        It has the representation
+        \begin{equation}
+            \specialUnitary(n) \coloneqq \{U \in \matrices{n}{\complex} \mid U^\hermit U = \ident_n \text{ and } \det U = 1\}.
+        \end{equation}
+        It is a subgroup of both \(\unitary(n)\) and \(\specialLinear(n, \complex)\).
+        
+        \item The \defineindex{symplectic group}\index{USp(2n)@\(\USp(2n)\), symplectic group of rank \(n\)}\index{SP(n)@\(\Sp(n)\), symplectic group of rank \(n\)}, \(\USp(2n) = \Sp(n)\), is defined as the group of transformations of an \(2n\)-dimensional vector space over \(\field\) which preserves symplectic bilinear forms\footnote{A \defineindex{symplectic bilinear form} is a map \(\omega\colon V\times V \to \field\) which is linear in both arguments, alternating, so \(\omega(x, y) = -\omega(y, x)\),  and non-degenerate, so \(\omega(u, v) = 0\) for all \(v \in V\) only if \(u = 0\). We can view \(\reals^{2n}\) as a symplectic space by endowing it with the map \(J\) defined above such that \(\omega(x, y) = x^{\hermit}Jy\).}.
+        It has the representation
+        \begin{equation}
+            \USp(2n) = \Sp(n) \coloneqq \{S \in \matrices{2n}{\field} \mid S^{\hermit} J S = J\}
+        \end{equation}
+        where
+        \begin{equation}
+            J \coloneqq
+            \begin{pmatrix}
+                0 & -\ident_n\\
+                -\ident_n & 0
+            \end{pmatrix}
+            .
+        \end{equation}
+        Note that \(J^2 = -\ident_{2n}\), so we can think of \(J\) as a generalisation of \(i\) which has \(i^2 = -1\).
+    \end{itemize}
+\end{dfn}
+
+\begin{exm}{}{}
+    The following are group actions of some Lie group on \(\reals^3\).
+    \begin{itemize}
+        \item \(\reals^3\) with vector addition as the group operation is an \(3\)-dimensional continuous group.
+        The parameters can be seen as the components of the vectors.
+        
+        \item \(\specialOrthogonal(3)\) with matrix multiplication as the group operation is a \(3\)-dimensional continuous group.
+        The parameters can be seen as the three Euler angles defining a rotation.
+    \end{itemize}
+\end{exm}
+
+It should be noted that the dimension of \(\specialOrthogonal(n)\) is not, in general, \(n\).
+For example, \(\specialOrthogonal(2)\) has dimension 1, since there is only one parameter defining rotations in the plane, the angle of the rotation.
+\(\specialOrthogonal(4)\) has dimension 6, since there are initially \(4^2 = 16\) degrees of freedom for the individual components of the matrix.
+It then turns out that orthogonality fixes one component in each row and column, since these must form unit vectors, and the requirement that the determinant is 1 fixes another three degrees of freedom.
+
+\section{Properties of Lie Groups}
+There are various properties which manifolds, and hence Lie groups, may or may not posses.
+In this section we cover some of these properties.
+
+\subsection{Basic Properties}
+\begin{dfn}{Finite or Infinite}{}
+    A manifold is finite dimensional if it is parametrised by a finite number of coordinates.
+    If this is not the case then the manifold is infinite dimensional.
+    A Lie group is \define{finite}\index{finite dimensional Lie group} or \define{infinite dimensional}\index{infinite dimensional Lie group} if it is a finite or infinite dimensional manifold respectively.
+\end{dfn}
+\begin{exm}{}{}
+    The Lie groups \(\unitary(1)\), \(\specialOrthogonal(2)\), \(\specialUnitary(2)\), and \(\specialOrthogonal(3)\) are all finite dimensional.
+    
+    The Lie group \(\unitary(\hilbert)\) for an infinite dimensional Hilbert space is an infinite dimensional Lie group under the topology induced by the operator norm,
+    \begin{equation}
+        \norm{A}_{\mathrm{op}} \coloneqq \inf \{c \ge 0 \mid \norm{Av} \le c\norm{v} \text{ for all } v \in \hilbert\}
+    \end{equation}
+    where \(\norm{-}\) is the norm on \(\hilbert\).
+    This norm can be thought of as the smallest number, \(c\), such that \(A\) doesn't scale the \enquote{length} of a vector by more than a factor of \(c\).
+    For example, this Lie group might represent all unitary transformations on the state of a particle with a continuous parameter.
+\end{exm}
+
+\begin{dfn}{Real or Complex}{}
+    A manifold is real if it is parametrised by real numbers with smooth maps, and complex if it is parametrised by complex numbers with holomorphic maps.
+    A Lie group is \define{real}\index{real Lie group} or \define{complex}\index{complex Lie group} if it is a real or complex manifold, respectively.
+\end{dfn}
+
+\begin{dfn}{}{}
+    The Lie groups \(\unitary(1)\), \(\specialOrthogonal(2)\), \(\specialUnitary(2)\), and \(\specialOrthogonal(3)\) are real Lie groups, although we will later see that \(\specialUnitary(2)\) is pseudo-real.
+\end{dfn}
+
+\subsection{Compactness}    
+The following definition assumes the existence of a metric on the manifold.
+\begin{dfn}{Compact}{}
+    A manifold, \(M\), is compact if it is closed and bounded.
+    \define{Bounded}\index{bounded} means that \(d(x, y) < r\) for all \(x, y\) in the manifold and \(r \in \reals\) being some finite number with \(d\) being a metric.
+    \define{Closed}\index{closed} means that when viewing \(M\) as a submanifold of some larger manifold \(M\) contains its boundary.
+    A Lie group is \define{compact}\index{compact Lie group} if it is compact as a manifold and \define{non-compact}\index{non-compact Lie group} otherwise.
+\end{dfn}
+
+As an example consider \(\reals\) with the standard metric \(d(x, y) = \abs{x - y}\).
+Then \([0, 1] \coloneqq \{x \in \reals \mid 0 \le x \le 1\}\) is closed and bounded, and hence compact.
+The intervals
+\begin{align}
+    [0, 1) &\coloneqq \{x \in \reals \mid 0 \le x < 1\},\\
+    (0, 1] &\coloneqq \{x \in \reals \mid 0 < x \le 1\}, \qand\\
+    (0, 1) &\coloneqq \{x \in \reals \mid 0 < x < 1\}
+\end{align}
+are not closed, but are bounded.
+The interval \([0, \infty) \coloneqq \{x \in \reals \mid x > 0\}\) is not bounded since the distance between points can become arbitrarily large.
+
+The circle, \(S^1\), is compact but \(\reals\) isn't.
+
+\begin{exm}{}{}
+    The Lie groups \(\unitary(1)\), \(\specialOrthogonal(2)\), \(\specialUnitary(2)\), and \(\specialOrthogonal(3)\) are compact Lie groups.
+\end{exm}
+
+For a compact group all of the theorems of \cref{chap:basics of representation theory}, such as Maschke's theorem (\cref{thm:maschke's theorem}), Schur's lemma (\cref{thm:schurs lemma}), and the decomposability theorem (\cref{thm:decomposability}), can be modified to hold for compact continuous groups.
+To do so we replace the sum over group elements, \(\sum_{g\in G}\), with the \defineindex{Haar measure}, \(\int \dl{\{\alpha\}}\), we won't go into detail here on this though.
+For this reason we will restrict ourselves to compact groups, although here we give a few examples of non-compact groups.
+
+\begin{exm}{Non-Compact Lie Group}{}
+    Consider the translation group on \(\reals\).
+    That is \(\reals\) acting on \(\reals\) by \(a \action x = x + a\).
+    This has a representation, \(\rho \coloneqq \reals \to \generalLinear(V)\), given by the following:
+    \begin{equation}
+        \rho(a) =
+        \begin{pmatrix}
+            1 & a\\ 0 & 1
+        \end{pmatrix}
+        .
+    \end{equation}
+    However, this doesn't decompose since the subspace defined by the span \(\ve{x} = (1, 0)\) is an invariant subspace but its orthogonal complement, defined by the span of \(\ve{y} = (0, 1)\), is not invariant, since \(\rho(a)\ve{y} = (a, 1) \notin \spn \{\ve{y}\}\).
+    Hence we cannot write \(\rho = \rho_1 \directsum \rho_2\) with \(\rho_1 \colon \reals \to \generalLinear(W)\) and \(\rho_2 \colon \reals \to \generalLinear(W^{\bot})\) with \(W \directsum W^{\bot} = V\), despite the fact that \(\rho\) is not irreducible.
+    This is a failure of the decomposability theorem (\cref{thm:decomposability}) which holds only for compact groups.
+\end{exm}
+
+\begin{exm}{}{}
+    The Lorentz group, \(\orthogonal(1, 3)\), is not compact.
+    This is because it is parametrised in part by the relative velocity of the frames and this is restricted to the non-compact interval \([0, c)\).
+    
+    Maschke's theorem (\cref{thm:maschke's theorem}) doesn't hold for the Lorentz group as it has no finite dimensional unitary representations.
+    This is why we need to define an invariant of the form \(\bar{\psi}\psi\) for spinors \(\psi\) with \(\bar{\psi} \coloneqq \psi^\hermit \gamma_0\) and \(\gamma_0 \coloneqq \ident_2 \directsum (-\ident_2) = \sigma_3 \directproduct \ident_2\).
+    If \(\psi\) instead transformed under a finite dimensional unitary representation, which is guaranteed to exist for a compact group by Maschke's theorem (\cref{thm:maschke's theorem}) then this would not be necessary as \(\psi^\hermit \psi\) would be invariant without the need for \(\gamma_0\).
+\end{exm}
+
+\subsection{Connectedness}
+\begin{dfn}{}{}
+    A manifold is connected if there exists a continuous path between any two points in the manifold.
+    A manifold is simply connected if any loop can be contracted continuously to a point.
+    A manifold is disconnected if it is not connected.
+    A Lie group is \define{disconnected}\index{disconnected Lie group}, \define{connected}\index{connected Lie group}, or \define{simply connected}\defineindex{simply connected Lie group} if it is disconnected, connected, or simply connected as a manifold respectively.
+\end{dfn}
+
+Intuitively a space is simply connected if there are no holes.
+
+\begin{figure}
+    \tikzsetnextfilename{connected}
+    \begin{tikzpicture}
+        \node at (0.45, -0.5) {Simply Connected};
+        \draw[use Hobby shortcut, closed, highlight, fill=highlight!10] (0, 0) .. (0.5, 0.25) .. (1, 1) .. (1.5, 2) .. (1, 2.5) .. (0.5, 2) .. (-0.5, 1.5) .. (-0.5, 0.75);
+        \begin{scope}[xshift=3cm]
+            \draw[use Hobby shortcut, closed, highlight, fill=highlight!10] (0, 0) .. (0.5, 0.25) .. (1, 1) .. (1.5, 2) .. (1, 2.5) .. (0.5, 2) .. (-0.5, 1.5) .. (-0.5, 0.75);
+            \draw[use Hobby shortcut, closed, highlight, fill=white] (0.2, 0.4) .. (0.4, 0.8) .. (0.5, 1) .. (0.5, 1.5) .. (0.3, 1) .. (0, 0.5);
+            \draw[dashed, my blue, rotate around={70:(0.315, 0.9)}] (0.315, 0.9) circle [x radius = 0.7, y radius = 0.28];
+            \node at (0.45, -0.5) {Connected};
+        \end{scope}
+        \begin{scope}[xshift=6cm]
+            \draw[use Hobby shortcut, closed, highlight, fill=highlight!10] (1.3, 1.3) .. (1.5, 2) .. (1, 2.5) .. (0.6, 2);
+            \draw[use Hobby shortcut, closed, highlight, fill=highlight!10] (0, 0) .. (0.5, 0.25) .. (0.7, 0.7) .. (0.5, 1.5) .. (-0.5, 1.5) .. (-0.5, 0.75);
+            \fill[my blue] (0, 0.5) circle [radius = 0.05];
+            \fill[my blue] (1, 1.5) circle [radius = 0.05];
+            \begin{scope}
+                \clip[use Hobby shortcut, closed] (1.3, 1.3) .. (1.5, 2) .. (1, 2.5) .. (0.6, 2);
+                \draw[my blue] (0, 0.5) to[bend left] (1, 1.5);
+            \end{scope}
+            \begin{scope}
+                \clip[use Hobby shortcut, closed] (0, 0) .. (0.5, 0.25) .. (0.7, 0.7) .. (0.5, 1.5) .. (-0.5, 1.5) .. (-0.5, 0.75);
+                \draw[my blue] (0, 0.5) to[bend left] (1, 1.5);
+            \end{scope}
+            \node at (0.45, -0.5) {Disconnected};
+        \end{scope}
+    \end{tikzpicture}
+    \caption[Connectedness]{Examples of simply connected, connected, and disconnected spaces. The loop (\tikz[baseline=-2.5pt]{\draw[dashed, my blue] (0, 0) -- ++ (0.5, 0);}) in the connected example cannot be continuously contracted to a point without leaving the space. Similarly the two points (\tikz[baseline=-2.5pt]{\fill[my blue] (0, 0) circle [radius = 0.05];}) in the disconnected example cannot be connected by a continuous path. The path connecting them (\tikz[baseline=-2.5pt]{\draw[my blue] (0, 0) -- ++ (0.5, 0);}) has a jump.}
+\end{figure}
+
+\begin{exm}{}{}
+    The Lie groups \(\unitary(1)\), \(\specialOrthogonal(2)\), and \(\specialOrthogonal(3)\) are connected.
+    The Lie group \(\specialUnitary(2)\) is simply connected.
+    The Lie group \(\orthogonal(2)\) is disconnected since there is no continuous path from \(O \in \orthogonal(2)\) with \(\det O = -1\) to \(O' \in \orthogonal\) with \(\det O' = +1\) since \(\det\) is a continuous function and must jump from \(-1\) to \(+1\) along this path somewhere since all orthogonal matrices have \(\abs{\det O} = 1\).
+\end{exm}
+
+\subsection{Simplicity}
+Recall that a finite group is simple if it has no non-trivial proper normal subgroups, and that a normal subgroup is one which is invariant under conjugation.
+That is, \(N \normalsubgroup G\) if \(gng^{-1} \in N\) for all \(n \in n\) and \(g \in G\).
+We define simple Lie groups in a similar way but we explicitly disallow a few cases.
+
+\begin{dfn}{Simple Lie Group}{}
+    A Lie group is \define{simple}\index{simple group} if it is connected, non-Abelian, and has no non-trivial connected normal subgroups.
+    
+    A \defineindex{semi-simple Lie group} is a Lie group which can be written as a direct product of simple Lie groups.
+    
+    A \defineindex{composite Lie group} is a Lie group which can be written as a semi-direct product of simple Lie groups.
+\end{dfn}
+
+The reason we exclude more cases than for the definition for any group is motivated by the fact that it is not possible to define a quotient group from a simple group, apart from the trivial group and the simple group itself.
+We want this to hold replacing all groups with Lie groups.
+Importantly this means that we want a simple Lie group to be one where it is not possible to define a non-trivial quotient \emph{Lie} group.
+If we expand upon what this requires we get the definition above.
+
+We will only concern ourselves with simple Lie groups in this course.
+
+\begin{exm}{}{}
+    The Lie groups \(\specialLinear(n)\), \(\specialUnitary(n)\), and \(\USp(2n) = \Sp(n)\) are simple.
+\end{exm}
+
+\subsubsection{Classification of Simple Compact Lie Groups}
+All simple compact Lie groups have been classified.
+It turns out there are four families of simple compact Lie groups, \(A_n\), \(B_n\), \(C_n\), and \(D_n\), and five exceptional groups, \(E_6\), \(E_7\), \(E_8\), \(F_4\), and \(G_2\) which don't fall into any of these categories.
+We won't define the exceptional groups here, we just note that they exist.
+The families consist of familiar groups, \(A_n = \specialUnitary(n + 1)\), \(B_n = \specialOrthogonal(2n + 1)\), \(C_n = \USp(2n)\), and \(D_n = \specialOrthogonal(2n)\).
+These are sorted by their rank, which is given by the subscript.
+Rank is a concept related to the Lie algebras of these groups, which we shall meet later.
+
+\begin{table}
+    \begin{tabular}{lcc}\toprule
+        Group & Dimension & Rank \\ \midrule
+        \(A_n\) & \((n + 1)^2 - 1\) & \(n\)\\
+        \(B_n\) & \(n(2n + 1)\) & \(n\)\\
+        \(C_n\) & \(n(2n + 1)\) & \(n\)\\
+        \(D_n\) & \(n(2n - 1)\) & \(n\)\\ \midrule
+        \(E_6\) & 78 & 6\\
+        \(E_7\) & 133 & 7\\
+        \(E_8\) & 248 & 8\\
+        \(F_4\) & 52 & 4\\
+        \(G_2\) & 14 & 2\\ \bottomrule
+    \end{tabular}
+    \caption{Classification of simple compact Lie groups}
+\end{table}
+
+\tikzset{dynkin node/.style = {fill = white}}
+\tikzset{->-/.style = {decoration={markings, mark=at position #1 with {\arrow{>}}}, postaction={decorate}}}
+\tikzset{-<-/.style = {decoration={markings, mark=at position #1 with {\arrow{<}}}, postaction={decorate}}}
+The Lie groups can be depicted by \define{Dynkin diagrams}\index{Dynkin diagram}, which are graphs with as many nodes as the rank\footnote{to be defined in \cref{sec:lie algebra generalities}} of the group.
+For example, \(A_1\) corresponds to
+\tikzsetnextfilename{dynkin-A1}
+\tikz[baseline=-2.5pt]{ \draw[dynkin node] (0, 0) circle [radius = 0.075]; }
+, \(A_2\) corresponds to
+\tikzsetnextfilename{dynkin-A2}
+\tikz[baseline=-2.5pt]{ \draw (0, 0) -- (1, 0); \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius =0.075]; }
+, and \(A_3\) corresponds to
+\tikzsetnextfilename{dynkin-A3}
+\tikz[baseline=-2.5pt]{ \draw (0, 0) -- (2, 0); \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius =0.075]; \draw[dynkin node] (2, 0) circle [radius =0.075]; }
+.
+In general \(A_n\) corresponds to
+\tikzsetnextfilename{dynkin-An}
+\tikz[baseline=-2.5pt]{ \draw (0, 0) -- (1.3, 0); \draw (1.7, 0) -- (3, 0); \draw[dotted] (1.3, 0) -- (1.7, 0); \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius =0.075]; \draw[dynkin node] (2, 0) circle [radius =0.075]; \draw[dynkin node] (3, 0) circle [radius =0.075]; }
+with \(n\) nodes.
+
+The Dynkin  diagram for \(B_n\) is similar but the final connection is doubled and directed, so \(B_2\) corresponds to
+\tikzsetnextfilename{dynkin-B2}
+\tikz[baseline=-2.5pt]{ \draw[double, ->-=0.65, >=To] (0, 0) -- (1, 0); \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius =0.075]; }
+, and \(B_3\) corresponds to
+\tikzsetnextfilename{dynkin-B3}
+\tikz[baseline=-2.5pt]{ \draw (-1, 0) -- (0, 0); \draw[double, ->-=0.65, >=To] (0, 0) -- (1, 0); \draw[dynkin node] (-1, 0) circle [radius = 0.075]; \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius =0.075]; }
+.
+In general \(B_n\) corresponds to
+\tikzsetnextfilename{dynkin-Bn}
+\tikz[baseline=-2.5pt]{ \draw (-2, 0) -- (-0.7, 0); \draw (-0.3, 0) -- (0, 0); \draw[dotted] (-0.7, 0) -- (-0.3, 0); \draw[double, ->-=0.65, >=To] (0, 0) -- (1, 0); \draw[dynkin node] (-2, 0) circle [radius = 0.075]; \draw[dynkin node] (-1, 0) circle [radius = 0.075]; \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius =0.075]; }
+with \(n\) nodes.
+
+The Dynkin diagrams for \(C_n\) are almost identical to those of \(B_n\) but with the direction reversed, so \(C_2\) corresponds to
+\tikzsetnextfilename{dynkin-C2}
+\tikz[baseline=-2.5pt]{ \draw[double, -<-=0.65, >=To] (0, 0) -- (1, 0); \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius =0.075]; }
+, and \(C_3\) corresponds to
+\tikzsetnextfilename{dynkin-C3}
+\tikz[baseline=-2.5pt]{ \draw (-1, 0) -- (0, 0); \draw[double, -<-=0.65, >=To] (0, 0) -- (1, 0); \draw[dynkin node] (-1, 0) circle [radius = 0.075]; \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius =0.075]; }
+.
+In general \(C_n\) corresponds to
+\tikzsetnextfilename{dynkin-Cn}
+\tikz[baseline=-2.5pt]{ \draw (-2, 0) -- (-0.7, 0); \draw (-0.3, 0) -- (0, 0); \draw[dotted] (-0.7, 0) -- (-0.3, 0); \draw[double, -<-=0.65, >=To] (0, 0) -- (1, 0); \draw[dynkin node] (-2, 0) circle [radius = 0.075]; \draw[dynkin node] (-1, 0) circle [radius = 0.075]; \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius =0.075]; }
+with \(n\) nodes.
+
+The Dynkin diagrams for \(D_n\) branch at the end into two.
+So \(D_4\) corresponds to 
+\begin{equation}
+    \tikzsetnextfilename{dynkin-D4}
+    \tikz[baseline=(current bounding box.east)]{ \draw (0, 0) -- (1, 0); \draw (1, 0) -- ++ (30:1); \draw (1, 0) -- ++ (-30:1); \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius = 0.075]; \draw[dynkin node] ($(1, 0) + (30:1)$) circle [radius = 0.075]; \draw[dynkin node] ($(1, 0) + (-30:1)$) circle [radius = 0.075]; }
+\end{equation}
+and \(D_5\) corresponds to
+\begin{equation}
+    \tikzsetnextfilename{dynkin-D5}
+    \tikz[baseline=(current bounding box.east)]{ \draw (-1, 0) -- (1, 0); \draw (1, 0) -- ++ (30:1); \draw (1, 0) -- ++ (-30:1); \draw[dynkin node] (-1, 0) circle [radius = 0.075]; \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius = 0.075]; \draw[dynkin node] ($(1, 0) + (30:1)$) circle [radius = 0.075]; \draw[dynkin node] ($(1, 0) + (-30:1)$) circle [radius = 0.075]; }
+\end{equation}
+In general, \(D_n\) corresponds to
+\begin{equation}
+    \tikzsetnextfilename{dynkin-Dn}
+    \tikz[baseline=-2.5pt]{ \draw (-1, 0) -- (0.3, 0); \draw (0.7, 0) -- (1, 0); \draw[dotted] (0.3, 0) -- (0.7, 0); \draw (1, 0) -- ++ (30:1); \draw (1, 0) -- ++ (-30:1); \draw[dynkin node] (-1, 0) circle [radius = 0.075]; \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius = 0.075]; \draw[dynkin node] ($(1, 0) + (30:1)$) circle [radius = 0.075]; \draw[dynkin node] ($(1, 0) + (-30:1)$) circle [radius = 0.075]; }
+\end{equation}
+
+The exceptional groups also have Dynkin diagrams.
+For \(E_n\) (\(n = 6, 7, 8\)) the Dynkin diagram consists of a chain of \(n - 1\) nodes with an extra node branching off three from the end, so \(E_6\) corresponds to
+\begin{equation}
+    \tikzsetnextfilename{dynkin-E6}
+    \begin{tikzpicture}[baseline=(current bounding box.east)]
+        \draw (0, 0) -- (4, 0);
+        \draw (2, 0) -- (2, 1);
+        \foreach \x in {0, ..., 4} {
+            \draw[dynkin node] (\x, 0) circle [radius = 0.075];
+        }
+        \draw[dynkin node] (2, 1) circle [radius = 0.075];
+    \end{tikzpicture}
+\end{equation}
+\(E_7\) corresponds to
+\begin{equation}
+    \tikzsetnextfilename{dynkin-E7}
+    \begin{tikzpicture}[baseline=(current bounding box.east)]
+        \draw (0, 0) -- (5, 0);
+        \draw (3, 0) -- (3, 1);
+        \foreach \x in {0, ..., 5} {
+            \draw[dynkin node] (\x, 0) circle [radius = 0.075];
+        }
+        \draw[dynkin node] (3, 1) circle [radius = 0.075];
+    \end{tikzpicture}
+\end{equation}
+and \(E_8\) to
+\begin{equation}
+    \tikzsetnextfilename{dynkin-E8}
+    \begin{tikzpicture}[baseline=(current bounding box.east)]
+        \draw (0, 0) -- (6, 0);
+        \draw (4, 0) -- (4, 1);
+        \foreach \x in {0, ..., 6} {
+            \draw[dynkin node] (\x, 0) circle [radius = 0.075];
+        }
+        \draw[dynkin node] (4, 1) circle [radius = 0.075];
+    \end{tikzpicture}
+\end{equation}
+
+The Dynkin diagram for \(F_4\) is
+\tikzsetnextfilename{dynkin-F4}
+\tikz[baseline=-2.5pt]{ \draw (0, 0) -- (1, 0); \draw[double, ->-=0.65, >=To] (1, 0) -- (2, 0); \draw (2, 0) -- (3, 0); \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius = 0.075]; \draw[dynkin node] (2, 0) circle [radius = 0.075]; \draw[dynkin node] (3, 0) circle [radius = 0.075];}
+.
+
+The Dynkin diagram for \(G_2\) is
+\tikzsetnextfilename{dynkin-G2}
+\tikz[baseline=-2.5pt]{ \draw[->-=0.65, >={To[width=0.3cm, length=0.14cm]}] (0, 0) -- (1, 0); \draw[yshift=0.035cm] (0, 0) -- (1, 0); \draw[yshift=-0.035cm] (0, 0) -- (1, 0); \draw[dynkin node] (0, 0) circle [radius = 0.075]; \draw[dynkin node] (1, 0) circle [radius = 0.075]; }
+.
+
+Notice that for some low-rank cases the Dynkin diagrams are degenerate, for example \(A_1\) and \(B_1\) both correspond to
+\tikzsetnextfilename{dynkin-B1}
+\tikz[baseline=-2.5pt]{ \draw[dynkin node] (0, 0) circle [radius = 0.075]; }
+which reflects the fact that \(A_1 \cong B_1\), which is to say \(SU(2) \cong SO(3)\), a fact that will be important later.
+It also explains why the \(E_n\) exceptional groups start at \(E_6\), since the Dynkin diagram for \(E_5\) is the same as for \(D_5\), and the Dynkin diagram for \(E_4\) is the same as for \(A_4\).
+
+\chapter{Lie Algebras}
+A lot of the uses of Lie groups make use of the underlying analytic structure to expand the group elements in the parameters, \(\{\alpha\}\), and then keep only the first order terms, linearising the group.
+Mathematically this is what we do if we move to the tangent space of the manifold and we call the resulting linear space the \defineindex{Lie algebra} associated with the Lie group.
+We will start with a simple example which we will then generalise.
+
+\section{The Abelian Group \texorpdfstring{\(\unitary(1) \isomorphic \specialOrthogonal(2)\)}{U(1) isomorphic to SO(2)}}
+We can define the unitary group \(\unitary(1)\) as
+\begin{equation}
+    \unitary(1) \coloneqq \{ U \in \matrices{1}{\complex} \mid U^\hermit U = \ident \}.
+\end{equation}
+This is obviously the same as the circle group
+\begin{equation}
+    \mathbb{T} \coloneqq \{ z \in \complex \mid \abs{z} = 1 \}
+\end{equation}
+under the obvious isomorphism associating \((z) \in \unitary(1)\) with \(z \in \mathbb{T}\).
+We therefore don't distinguish between \(\unitary(1)\) and \(\mathbb{T}\) and will say things like \(z \in \unitary(1)\), when it may be more proper to say \((z) \in \unitary(1)\).
+As the name suggests \(\mathbb{T}\) is a Lie group with the circle, \(S^1\), as its underlying manifold.
+This is a one-dimensional real manifold parametrised by \(\alpha \in [0, 2\pi)\).
+
+We can define the two dimensional rotation group, \(\specialOrthogonal(2)\), as
+\begin{equation}
+    \specialOrthogonal(2) \coloneqq \{ R \in \matrices{2}{\reals} \mid R^\trans R = \ident \text{ and } \det R = 1 \}.
+\end{equation}
+This acts on the plane, \(\reals^2\), through rotations, which are given by normal matrix multiplication, \(R \action \vv{x} = R\vv{x}\).
+This is a one dimensional real manifold parametrised by the rotation angle, \(\alpha \in [0, 2\pi)\).
+
+The unitary group \(\unitary(1)\) has an infinite family of representations labelled by \(n \in \integers\) given by
+\begin{equation}
+    \rho_n^{\unitary(1)}(\alpha) = \e^{in\alpha}.
+\end{equation}
+Here we are implicitly associating complex numbers with \(1\times 1\) complex matrices.
+The two-dimensional rotation group, \(\specialOrthogonal(2)\), has an infinite family of representations labelled by \(n \in \integers\) given by
+\begin{equation}
+    \rho_n^{\specialOrthogonal(2)}(\alpha) =
+    \begin{pmatrix}
+        \cos(n\alpha) & \sin(n\alpha)\\
+        -\sin(n\alpha) & \cos(n\alpha)
+    \end{pmatrix}
+    .
+\end{equation}
+It should be clear that \(\unitary(1)\) and \(\specialOrthogonal(2)\) are isomorphic.
+One isomorphism between them being \(\e^{i\alpha} \mapsto \rho_{1}^{\specialOrthogonal(2)}(\alpha)\).
+Since this is the case we will move between them as needed choosing which ever is most appropriate for the task at hand.
+
+The Kronecker product of representation is particularly simple for this case with
+\begin{equation}
+    \rho_{n} \directproduct \rho_{m} = \rho_{n + m}.
+\end{equation}
+
+In order to linearise \(\specialOrthogonal(2)\) we make use of the fact that elements of \(\unitary(1)\) can be expressed as \(\e^{i\alpha}\) and we suggest that \(O \in \specialOrthogonal(2)\) can be expressed as\footnote{the factor of \(i\) appearing in the exponent is a matter of convention, typically physicists include it and mathematicians absorb it in the definition of \(T\), which results in slightly different requirements on \(T\), in particular \(T\) will be anti-Hermitian (or skew-Hermitian), so \(T^\hermit = -T\)/}
+\begin{equation}
+    O = \exp[i\alpha T]
+\end{equation}
+for \(T \in \matrices{2}{\reals}\).
+As usual the exponential of a matrix is to be understood either  through its power series,
+\begin{equation}
+    \exp(A) = \sum_{n = 0}^{\infty} \frac{A^n}{n!},
+\end{equation}
+or a limit,
+\begin{equation}
+    \exp(A) = \lim_{n \to \infty} \left( 1 + \frac{A}{n} \right)^{n}.
+\end{equation}
+
+\begin{lma}{}{}
+    Let \(A \in \matrices{m}{\complex}\) be diagonalisable.
+    Then \(\det(\exp(A)) = \exp(\tr(A))\).
+    \begin{proof}
+        Let \(A \in \matrices{m}{\complex}\) be diagonalisable.
+        We work in the basis in which \(A\) is diagonal since both \(\det\) and \(\tr\) are basis independent.
+        In this basis the diagonal of \(A\) consists of its eigenvalues, \(\lambda_i\).
+        We then have
+        \begin{equation}
+            \det A = \prod_{i = 1}^{m} \lambda_i,
+        \end{equation}
+        and
+        \begin{equation}
+            \tr A = \sum_{i = 1}^{m} \lambda_i.
+        \end{equation}
+        Further in this basis \(\exp(A)\) is diagonal and its diagonal components are \(\exp(\lambda_i)\).
+        This follows since the \(n\)th power of a diagonal matrix just raises the elements on the diagonal to the \(n\)th power, that is
+        \begin{equation}
+            \begin{pmatrix}
+                \lambda_1 &&\\
+                &\ddots &\\
+                && \lambda_m
+            \end{pmatrix}
+            ^n = 
+            \begin{pmatrix}
+                \lambda_1^n &&\\
+                &\ddots &\\
+                && \lambda_m^n
+            \end{pmatrix}
+            .
+        \end{equation}
+        It follows that
+        \begingroup
+        \allowdisplaybreaks
+        \begin{align}
+            \exp(A) &= \sum_{n = 0}^{\infty} \frac{A^n}{n!}\\
+            &= \sum_{n = 0}^{\infty} \frac{1}{n!} 
+            \begin{pmatrix}
+                \lambda_1 && \\
+                & \ddots & \\
+                && \lambda_m
+            \end{pmatrix}
+            ^n\\
+            &= \sum_{n = 0}^{\infty} \frac{1}{n!}
+            \begin{pmatrix}
+                \lambda_1^n && \\
+                & \ddots & \\
+                && \lambda_m^n
+            \end{pmatrix}
+            \\
+            &= 
+            \begin{pmatrix}
+                \sum_{n = 0}^{\infty} \frac{\lambda_1^n}{n!} && \\
+                & \ddots & \\
+                && \sum_{n = 0}^{\infty} \frac{\lambda_m^n}{n!}
+            \end{pmatrix}
+            \\
+            &= 
+            \begin{pmatrix}
+                \exp(\lambda_1) && \\
+                & \ddots & \\
+                && \exp(\lambda_m)
+            \end{pmatrix}
+        \end{align}
+        \endgroup
+        Hence
+        \begin{align}
+            \exp(\tr(A)) &= \exp\left( \sum_{i} \lambda_i \right)\\
+            &= \prod_{i} \exp(\lambda_i)\\
+            &= \det(\exp(\lambda_i)).
+        \end{align}
+    \end{proof}
+\end{lma}
+
+The definition of \(O \in \specialOrthogonal(2)\) is that \(O^\trans O = \ident\), which can be expressed as
+\begin{align}
+    \ident &= O^\trans O\\
+    &= \exp(i\alpha T)^{\trans} \exp(i\alpha T)\\
+    &= \exp(i\alpha T^{\trans}) \exp(i\alpha T)\\
+    &= (\ident + i\alpha T^{\trans} + \order(\alpha^2))(\ident + i\alpha T + \order(\alpha^2))\\
+    &= \ident + i\alpha(T^\trans + T) + \order(\alpha^2).
+\end{align}
+Therefore if we take \(\alpha\) to be small we have that \(T^{\trans} = -T\), which is to say that \(T\) must be antisymmetric.
+This in fact generalises to \(\specialOrthogonal(n)\), we can write any element as \(\exp(i\alpha T)\) where \(T \in \matrices{n}{\reals}\) is antisymmetric.
+
+One particular solution is
+\begin{equation}
+    T = i
+    \begin{pmatrix}
+        0 & 1\\
+        -1 & 0
+    \end{pmatrix}
+    ,
+\end{equation}
+which leads to the previous representation since \(T^2 = \ident\) and so
+\begin{equation}
+    \exp(i\alpha T) = \ident \cos(\alpha) + iT\sin(\alpha) = \rho_1^{\specialOrthogonal(2)}(\alpha).
+\end{equation}
+This follows by expanding the exponential and collecting even and odd terms.
+
+We define the Lie algebra of \(\specialOrthogonal(2)\) to be all (real) scalar multiples of \(T\), \(\specialOrthogonalLie(2) \coloneqq \{\lambda T \mid \lambda \in \reals\}\).
+This is fairly boring since there is only one dimension, but it is useful to demonstrate the tangent space notion of the Lie algebra.
+
+As previously mentioned the underlying manifold for \(\unitary(1)\), and hence \(\specialOrthogonal(2)\), is the circle, \(S^1 = \{(x, y) \in \reals^2 \mid x^2 + y^2 = 1\}\), strictly this is an embedding of \(S^1\) in two-dimensions, on its own \(S^1\) is a one-dimensional manifold.
+We can cover \(S^1\) with two charts, two are needed to avoid a discontinuity at the join, we simply use whichever hasn't got the join at that point.
+For example, one chart could be \(f_1(\vartheta) = (\cos\vartheta, \sin\vartheta)\) and another \(f_2(\vartheta) = (\cos(\vartheta - \pi/1), \sin(\vartheta - \pi/2))\), which is just \(f_1\) rotated around by \(\pi/2\).
+Both of these maps have the codomain \([0, 2\pi)\).
+
+Now consider the point \((x, y)\) on \(S^1\).
+We have \(T(x, y) = (-y, x)\).
+For example, if \(T(-1, 0) = (0, -1)\).
+This vector will be tangent to \(S^1\) as embedded in \(\reals^2\).
+
+\begin{figure}
+    \begin{tikzpicture}
+        \draw[thick, ->] (-3, 0) -- (3, 0) node[below] {\(x\)};
+        \draw[thick, ->] (0, -3) -- (0, 3) node[left] {\(y\)};
+        \draw (0, 0) circle [radius = 2];
+        \draw[ultra thick, highlight] (1.95, 0) arc (0:355:1.95);
+        \draw[ultra thick, my blue, rotate=-90] (2.05, 0) arc (0:355:2.05);
+        \draw[ultra thick, highlight] (-3, 3) -- ++ (1, 0) coordinate (A);
+        \draw[->] (A) to[bend left] (100:1.95);
+        \node at (-0.6, 2.7) {\(f_1\)};
+        \draw[ultra thick, my blue] (-3, 2.5) -- ++ (1, 0) coordinate (B);
+        \draw[->] (B) to[bend left] (135:2.05);
+        \node at (-1.35, 2.15) {\(f_2\)};
+        \draw[my red, very thick, ->] (-2, 0) -- ++ (0, -2) node[left, black] {\(T(-1, 0) = (0, -1)\)};
+        \node at (-3, 2.75) {0};
+        \node at (-2, 2.75) {\(2\pi\)};
+    \end{tikzpicture}
+    \caption[The manifold \(S^1\)]{The manifold \(S^1\) covered by two charts, \(f_1\) and \(f_2\). \(T(x, y)\) gives a tangent vector as demonstrated by the case of \((x, y) = (-1, 0)\). The slight gaps in the two charts represent the discontinuity in \(\alpha\) going from 0 to \(2\pi\). Either chart is valid away from these discontinuities and at a discontinuity simply use the continuous chart.}
+\end{figure}
+
+The manifold \(\specialOrthogonal(2)\) is connected, since \(S^1\) is clearly connected.
+On the other hand the manifold \(\orthogonal(2)\) is \emph{not} connected.
+It is formed from two disconnected pieces, one, which has \(\det O = 1\), is essentially a copy of \(\specialOrthogonal(2)\), and one where \(\det O = -1\).
+These two pieces are disconnected since \(\det\) is a continuous function of the parameters yet makes a sudden jump from \(-1\) to \(+1\), which can only happen if there is a corresponding sudden jump in the parameters, meaning that \(\orthogonal(2)\) is not connected.
+
+Consider the parity operator
+\begin{equation}
+    P = 
+    \begin{pmatrix}
+        1 & 0\\
+        0 & -1
+    \end{pmatrix}
+    .
+\end{equation}
+This is an element of \(\orthogonal(2)\), but not \(\specialOrthogonal(2)\).
+Since \(P^2 = \ident\) we can view \(P\) as generating \(\integers_2 = \presentation{P}{P^2 = \ident}\) and we can then identify
+\begin{equation}
+    \specialOrthogonal(2) \isomorphic \orthogonal(2) / \integers_2.
+\end{equation}
+In fact, this generalises to
+\begin{equation}
+    \specialOrthogonal(n) \isomorphic \orthogonal(n) / \integers_2.
+\end{equation}
+Further we have
+\begin{equation}
+    \specialUnitary(n) \isomorphic \unitary(n) / \unitary(1)
+\end{equation}
+since we can think of \(\unitary(1)\) as the complex version of \(\integers_2\).
+
+For \(\specialOrthogonal(2)\) the Haar measure is
+\begin{equation}
+    \int_0^{2\pi} \frac{\dl{\alpha}}{2\pi}
+\end{equation}
+and so we can define an inner product on the character space as
+\begin{align}
+    \innerprod{\chi_{\rho_n}}{\chi_{\rho_m}}_{\unitary(1)} &= \frac{1}{2\pi}\int_{0}^{2\pi} \chi_{\rho_n}(\alpha)^* \chi_{\rho_m}(\alpha) \dd{\alpha}\\
+    &= \frac{1}{2\pi} \int_{0}^{2\pi} (\e^{in\alpha})^*\e^{im\alpha} \dd{\alpha}\\
+    &= \frac{1}{2\pi} \int_{0}^{2\pi} \e^{i(n - m)\alpha} \dd{\alpha}\\
+    &= \delta_{nm}.
+\end{align}
+We see that the character are orthonormal with respect to this inner product.
+The characters turn out to be less important for Lie groups than finite groups and we won't consider them much more.
+
+\section{Lie Algebra Generalities}\label{sec:lie algebra generalities}
+\begin{thm}{Exponential Map}{}
+    Every one-parameter subgroup of \(\generalLinear(n, \complex)\) is given by a matrix exponential, \(\rho_T(t) = \exp(tT)\) where \(T \in \matrices{n}{\complex}\) and \(T\) is not the zero matrix.
+    \begin{rmk}
+        We call \(T\) the \defineindex{generator} of the one-parameter subgroup.
+    \end{rmk}
+    \begin{proof}
+        Consider the single parameter homomorphism \(\rho_T \colon \reals \to \generalLinear(n, \complex)\) defined by
+        \begin{equation}
+            \diff*{\rho_T(t)}{t}[t = 0] = T
+        \end{equation}
+        with the boundary condition \(\rho_T(0) = \ident\).
+        Since \(\rho_T\) is a group homomorphism we require
+        \begin{equation}
+            \rho_T(s + t) = \rho_T(s)\rho_T(t).
+        \end{equation}
+        Differentiating this with respect to \(s\) and evaluating at \(s = 0\) gives
+        \begin{equation}
+            \diff*{\rho_T(s + t)}{s}[s = 0] = \diff*{\rho_T(s)}{s}[s = 0]\rho_T(t) = T\rho_T(t) = \diff*{\rho_T(t + s)}{s}[s = 0] = \diff*{\rho_T(t)}{t}
+        \end{equation}
+        where in the last step we set \(s + t = t\).
+        This gives us a differential equation
+        \begin{equation}
+            \diff*{\rho_T(t)}{t} = T\rho_T(t)
+        \end{equation}
+        which has the unique solution
+        \begin{equation}
+            \rho_T(t) = \exp(t T).
+        \end{equation}
+        This proves the theorem.
+    \end{proof}
+\end{thm}
+
+This theorem generalises to multi-parameter subgroups of \(\generalLinear(n, \complex)\), where we can write all elements in the form
+\begin{equation}
+    \exp(t^aT_a)
+\end{equation}
+with the Einstein summation convention implying \(t^aT_a = t^1T_1 + t^2T_2 + \dotsb + t^kT_k\).
+
+The possible generators depend on the group.
+We want to consider the product \(\rho_1\rho_2\rho_1^{-1}\rho_2^{-1}\), this will be \(\ident\) for an Abelian group and some \(\rho_3\) in the group by the closure of the group for a non-Abelian group.
+In order to avoid the \defineindex{Baker--Campbell--Hausdorff formula},
+\begin{equation}
+    \e^{A}\e^{B} = \exp\left( A + B + \frac{1}{2}\commutator{A}{B} + \frac{1}{2}\frac{1}{3!}\big(\commutator{A}{\commutator{A}{B}} + \commutator{\commutator{A}{B}}{B}\big) + \dotsb \right),
+\end{equation}
+we expand \(\rho_i\) as
+\begin{align}
+    \rho_1 &= \ident + i\alpha^a T_a + \frac{1}{2}(i\alpha^aT_a)^2 + \order(\alpha^3),\\
+    \rho_2 &= \ident + i\beta^a T_a + \frac{1}{2}(i\beta^aT_a)^2 + \order(\beta^3),\\
+    \rho_3 &= \ident + i\gamma^a T_a + \frac{1}{2}(i\gamma^aT_a)^2 + \order(\gamma^3).
+\end{align}
+We call the matrices \(T_a\) the Lie algebra generators.
+Substituting this into \(\rho_1\rho_2\rho_1^{-1}\rho_2^{-1}\) we get
+\begin{equation}
+    \commutator{\alpha^aT_a}{\beta^bT_b} = -i\gamma^cT_c + \order(\alpha^3, \beta^3, \gamma^3).
+\end{equation}
+All lower order terms cancel.
+We can therefore find \(\rho_3\) by finding \(\gamma^c = -\tensor{f}{_{ab}^c}\alpha^a\beta^b\) where we define the \defineindex{structure constants}, \(\tensor{f}{_{ab}^c}\), through the Lie algebra
+\begin{equation}
+    \liebracket{T_a}{T_b} = i\tensor{f}{_{ab}^c} T_c.
+\end{equation}
+This is the bare minimum amount of structure that the generators have to have in order to be compatible with the group structure.
+Notice that \(\tensor{f}{_{ab}^c} = -\tensor{f}{_{ba}^c}\), since \(\commutator{A}{B} = -\commutator{B}{A}\).
+Importantly the structure constants depend only on the commutator, and not on the anti-commutator.
+This is required since the commutator is independent of the representation but the anti-commutator is not.
+
+The number of generators is equal to the dimension of the Lie group.
+Not all generators commute.
+We define the \defineindex{rank} of the Lie group to be the size of the largest subset of generators such that all generators in the subset commute.
+Notice that the rank is at most equal to the dimension of the Lie group, with equality for an Abelian group where all generators, and hence all group elements, commute.
+Note that both \(\specialOrthogonal(3)\) and \(\specialUnitary(2)\) are rank one, which makes them about as simple as non-Abelian Lie groups can be.
+
+We now posit a theorem without proof, since the proof requires more details about manifolds which are beyond the scope of this course.
+\begin{thm}{}{}
+    To any Lie algebra there corresponds a unique Lie group which is simply connected.
+    This group is called the \defineindex{universal covering group}.
+\end{thm}
+In particular we find the universal covering group by exponentiating the Lie algebra.
+The important thing here is the simply connected part.
+This means that if we linearise a Lie group to get its Lie algebra the exponential map won't necessarily give back the same group, but it will give back a subgroup which is simply connected.
+As a subgroup this must contain the identity, and so we call this the component of the Lie group connected to the identity.
+
+It turns out that compactness puts some restrictions on what the generators can be.
+\begin{thm}{}{}
+    For a compact group the associated Lie algebra is generated by Hermitian generators.
+    \begin{proof}
+        Given some \(\rho \in G\) such that \(\rho\) is connected to the identity we can write \(\rho = \exp(i\alpha^aT_a)\).
+        Compact groups admit finite dimensional unitary representations, and so we have
+        \begin{align}
+            \ident &= \exp(i\alpha^aT_a)^\hermit \exp(i\alpha^aT_a)\\
+            &= \exp(-i\alpha^aT_a^\hermit)\exp(i\alpha^aT_a)\\
+            &= (\ident - i\alpha^aT_a^\hermit + \order(\alpha^2))(\ident + i\alpha^aT_a + \order(\alpha^2))\\
+            &= \ident + i\alpha^a(T_a - T_a^\hermit) + \order(\alpha^2).
+        \end{align}
+        Hence we must have \(T_a - T_a^\hermit = 0\), and since this must hold for all \(\rho\), and hence for all \(\alpha^a\) we have \(T_a = T_a^\hermit\) meaning \(T_a\) is Hermitian individually for each \(a\).
+    \end{proof}
+\end{thm}
+
+\begin{crl}{}{}
+    The Hilbert--Schmidt inner product on \(\matrices{n}{\complex}\) is defined by
+    \begin{equation}
+        \innerprod{T_a}{T_b} \coloneqq \tr(T_a^\hermit T_b),
+    \end{equation}
+    and if \(T_a\) are the generators of a Lie algebra associated with a compact group, that is \(T_a\) are Hermitian, we have
+    \begin{equation}
+        \innerprod{T_a}{T_b} \coloneqq \tr(T_a^\hermit T_b) = \tr(T_aT_b).
+    \end{equation}
+\end{crl}
+
+This leads to the following theorem,
+\begin{thm}{}{}
+    For a compact, semi-simple Lie algebra there is an orthogonal basis such that
+    \begin{equation}
+        \innerprod{T_a}{T_b} \coloneqq \tr(T_aT_b) = 2k_{R}\delta_{ab}.
+    \end{equation}
+\end{thm}
+We call \(k_R\) the \defineindex{Dynkin index} and it depends on the representation, which is what the subscript \(R\) is there to remind us of.
+In this basis the structure constants, \(\tensor{f}{_{ab}^c}\), are completely antisymmetric.
+
+We can make the above theorem slightly more precise, but this theorem is beyond the scope of the course:
+\begin{thm}{Killing Metric}{}
+    We can define a unique symmetric tensor called the \defineindex{Killing metric}:
+    \begin{equation}
+        k_{ab} \coloneqq \frac{1}{k_R} \tr(T_aT_b)
+    \end{equation}
+    where \(k_R\) is some constant depending on the choice of representation.
+    This tensor is invariant under the action of the Lie group, that is
+    \begin{equation}
+        0 = \delta_{T_c} \tr(T_aT_b) = \tr(\liebracket{T^c}{T_a}T_b) + \tr(T_a\liebracket{T^c}{T_b}) = ik_R(\tensor{f}{^c_{ab}} + \tensor{f}{^c_{ba}}).
+    \end{equation}
+    This implies that the structure constants are completely antisymmetric.
+    
+    For semi-simple Lie groups the Killing metric is non-singular.
+    For semi-simple, compact Lie groups there is a basis where
+    \begin{equation}
+        k_{ab} = 2\delta_{ab}.
+    \end{equation}
+\end{thm}
+
+We can use the metric, \(k_{ab}\), to raise and lower indices\footnote{see the notes for general relativity for lots on raising and lower indices}.
+Since \(k_{ab} \propto \delta_{ab}\) in this particular basis there is no numerical difference between \(\tensor{f}{_{ab}^c}\) and \(f_{abc}\) and so we won't differentiate between them.
+
+\begin{thm}{Jacobi Identity}{}
+    The structure constants satisfy the \defineindex{Jacobi identity}:
+    \begin{equation}
+        f_{aed}f_{bce} + f_{bed}f_{cae} + f_{ced}f_{abc} = 0.
+    \end{equation}
+    \begin{rmk}
+        Note that this is simply \(f_{aed}f_{bce}\) with a sum over cyclic permutations of \(a\), \(b\), and \(c\).
+    \end{rmk}
+    \begin{proof}
+        For any three matrices, \(A, B, C \in \matrices{n}{\complex}\) we have
+        \begin{equation}
+            \commutator{A}{\commutator{B}{C}} + \commutator{B}{\commutator{C}{A}} + \commutator{C}{\commutator{A}{B}}.
+        \end{equation}
+        This can be shown by expanding these commutators.
+        We can then interpret \(f_{abc}\) as the components of the matrix \((T_a^{\mathrm{adj}})_{bc} = -if_{abc}\) and the result follows.
+    \end{proof}
+\end{thm}
+
+\begin{dfn}{Adjoint Representation}{}
+    The \defineindex{adjoint representation} is given by defining the generator \(T_c^{\mathrm{adj}}\) to have components \((T_c^{\mathrm{adj}})_{bc} = -if_{abc}\).
+\end{dfn}
+
+\begin{crl}{}{}
+    The structure constants are real.
+    \begin{proof}
+        If \(T_a\) generates a representation of the Lie algebra then so does \(-T_a^*\), this is just the negative of the complex conjugate representation.
+        Taking the complex conjugate of the definition of the adjoint representation, dropping the \(\mathrm{adj}\) label, we have
+        \begin{equation}
+            \commutator{T_a}{T_b}^* = (if_{abc}T_c)^* \implies \commutator{T_a^*}{T_b^*} = -if_{abc}^*T_c^*
+        \end{equation}
+        noting that \(\commutator{-A}{-B} = \commutator{A}{B}\) since the negatives cancel when we expand the commutator we get
+        \begin{equation}
+            \commutator{-T_a^*}{-T_b^*} = if_{abc}^*(-T_a^*).
+        \end{equation}
+        Since \(f_{abc}\) are independent of the representation we must have \(f_{abc} = f_{abc}^*\), which means that \(f_{abc} \in \reals\).
+    \end{proof}
+\end{crl}
+The adjoint representation acts on the Lie algebra itself via the commutator.
+In particular if \(T_a^{\mathrm{adj}}\) are the generators in the adjoint representation and \(T_d\) are the generators in some other representation then \(T_a^{\mathrm{adj}} \circ T_d = \commutator{T_a}{T_d} = if_{ade}T_e\) and \(if_{ade} = (T_a^{\mathrm{adj}})_{de}\).
+
+So far we have viewed Lie algebras as the result of linearising a Lie group.
+We can extract the important algebraic details into a more abstract object.
+This is the way a mathematician would approach the subject.
+They would first make the following definition and then derive what we have taken as the defining properties as a result of this definition.
+\begin{dfn}{Lie Algebra}{}
+    A \defineindex{Lie algebra}, \(\lie{g}\), is a vector space over \(\field\) with a non-associative, alternating bilinear product satisfying the Jacobi identity.
+    This product is called the \defineindex{Lie bracket}.
+    Its properties are
+    \begin{itemize}
+        \item \define{Bilinearity}: For all \(x, y, z \in \lie{g}\) and \(a, b \in \field\)
+        \begin{align}
+            \liebracket{ax + by}{z} = a\liebracket{x}{z} + b\liebracket{y}{z}, \qand\\
+            \liebracket{z}{ax + by} = a\liebracket{z}{x} + b\liebracket{z}{y}.
+        \end{align}
+        \item \define{Alternativity}: For all \(x \in \lie{g}\)
+        \begin{equation}
+            \liebracket{x}{x} = 0.
+        \end{equation}
+        \item The \defineindex{Jacobi identity}: For all \(x, y, z \in \lie{g}\)
+        \begin{equation}
+            \liebracket{x}{\liebracket{y}{z}} + \liebracket{y}{\liebracket{z}{x}} + \liebracket{z}{\liebracket{x}{y}} = 0.
+        \end{equation}
+    \end{itemize}
+\end{dfn}
+Notice that the Jacobi identity just says that sums over symmetric permutations of \(x\), \(y\), and \(z\) in \(\liebracket{x}{\liebracket{y}{z}}\) must vanish.
+Another important fact is that alternativity combined with bilinearity implies anticommutativity, so \(\liebracket{x}{y} = -\liebracket{y}{x}\) for all \(x, y \in \lie{g}\).
+
+With this definition we can define the universal enveloping algebra:
+\begin{dfn}{Universal Enveloping Algebra}{}
+    Given a Lie algebra, \(\lie{g}\), we can embed it in an associative algebra, \(A\), in such a way that the abstract Lie bracket of \(\lie{g}\), corresponds to the commutator in \(A\), that is \(\liebracket{x}{y} = xy - yx\) in \(A\).
+    The \defineindex{universal enveloping algebra} is defined to be the associative algebra generated by \(t_i\) which are subject only to the conditions
+    \begin{equation}
+        t_it_j - t_jt_i = if_{ijk}t_k.
+    \end{equation}
+    We denote elements of the universal enveloping algebra here by lower case to distinguish from elements of the Lie algebra.
+\end{dfn}
+Since we mostly consider matrix Lie groups which have Lie algebras where the Lie bracket can be interpreted as the commutator we often won't distinguish between the Lie algebra and its universal enveloping algebra.
+
+The reason for defining the universal enveloping algebra is to make the following definition:
+\begin{dfn}{Casimir Element}{}
+    A \defineindex{Casimir element} is an element of the universal enveloping algebra of a Lie algebra which commutes with all generators of the Lie algebra.
+    That is it is in the centre of the universal enveloping algebra.
+\end{dfn}
+Every Lie algebra associated with a semi-simple Lie group has at least one Casimir element, called the \defineindex{quadratic Casimir}, which is defined by
+\begin{equation}
+    C = \delta^{ab}T_aT_b.
+\end{equation}
+For compact Lie groups Schur's lemma (\cref{thm:schurs lemma}) tells us that \(C\) is proportional to the identity, so \(C = C_2(R)\ident\), where the 2 stands for quadratic and the \(R\) tells us that the value of the number \(C_2(R)\) is representation dependent.
+
+It can be shown that the number of Casimir operators is equal to the number of invariant tensors, which is equal to the rank of the Lie algebra.
+
+\section{The Non--Abelian Groups \texorpdfstring{\(\specialUnitary(2)\)}{SU(2)} and \texorpdfstring{\(\specialOrthogonal(3)\)}{SO(3)}}
+\subsection{The Lie Algebras of \texorpdfstring{\(\specialUnitary(2)\)}{SU(2)} and \texorpdfstring{\(\specialOrthogonal(3)\)}{SO(3)}}
+Recall that
+\begin{equation}
+    \specialOrthogonal(3) \coloneqq \{ O \in \matrices{3}{\reals} \mid O^\trans O = \ident \},
+\end{equation}
+and
+\begin{equation}
+    \specialUnitary(2) \coloneqq \{ U \in \matrices{2}{\complex} \mid U^\hermit U = \ident \}.
+\end{equation}
+
+The Lie algebra of \(\specialOrthogonal(3)\), denoted \(\specialOrthogonalLie(3)\), is generated by any three linearly independent antisymmetric matrices.
+Ideally we would work in a basis where the structure constants are completely antisymmetric.
+Such a basis is guaranteed to exist since \(\specialOrthogonal(3)\) is compact and simple.
+One such basis is
+\begin{equation}
+    T_1 = -i
+    \begin{pmatrix}
+        0 & 0 & 0\\
+        0 & 0 & 1\\
+        0 & -1 & 0
+    \end{pmatrix}
+    , \quad T_2 = -i
+    \begin{pmatrix}
+        0 & 0 & -1\\
+        0 & 0 & 0\\
+        1 & 0 & 0
+    \end{pmatrix}
+    , \qand T_3 = -i
+    \begin{pmatrix}
+        0 & 1 & 0\\
+        -1 & 0 & 0\\
+        0 & 0 & 0
+    \end{pmatrix}
+    .
+\end{equation}
+Notice that the first \(2\times 2\) submatrix of \(T_3\) corresponds to a rotation by \(\pi/2\) in \(\specialOrthogonal(2)\), which corresponds to a three-dimensional rotation about the \(z\)-axis.
+The other two matrices are just permutations of this.
+It is easy to compute the Lie algebra for these three matrices:
+\begin{equation}
+    \liebracket{T_a}{T_b} = i\varepsilon_{abc}T_c
+\end{equation}
+where \(\varepsilon_{abc}\) is the Levi--Civita symbol.
+Hence the structure constants are \(f_{abc} = \varepsilon_{abc}\).
+This shouldn't be too surprising since in three dimensions any antisymmetric tensor of rank 3 must be proportional to \(\varepsilon_{abc}\).
+We can easily calculate the Dynkin index from
+\begin{equation}
+    \tr(T_aT_b) = 2k_R\delta_{ab},
+\end{equation}
+since putting in \(a = b = 1\) we get \(\tr(T_1T_1) = 2\) and so \(k_R = 1\) for this representation.
+
+We know that the Lie algebra of \(\specialUnitary(2)\), denoted \(\specialUnitaryLie(2)\), is generated by traceless Hermitian matrices.
+One choice is the Pauli matrices,
+\begin{equation}
+    \sigma_1 = 
+    \begin{pmatrix}
+        0 & 1\\
+        1 & 0
+    \end{pmatrix}
+    , \qquad \sigma_2 = 
+    \begin{pmatrix}
+        0 & -i\\
+        i & 0
+    \end{pmatrix}
+    , \qqand \sigma_3 = 
+    \begin{pmatrix}
+        1 & 0\\
+        0 & -1
+    \end{pmatrix}
+    .
+\end{equation}
+The generators of \(\specialUnitaryLie(2)\) are then given by
+\begin{equation}
+    T_a \coloneqq \frac{1}{2}\sigma_a.
+\end{equation}
+We can easily show that \(\tr(T_aT_b) = \delta_{ab} = 2k_R\delta_{ab}\) and so \(k_R = 1/4\) for this representation.
+The Lie algebra can be shown to satisfy
+\begin{equation}
+    \liebracket{T_a}{T_b} = i\varepsilon_{abc}T_c,
+\end{equation}
+which is the same as for \(\specialOrthogonalLie(3)\).
+
+What this means is that \(\specialOrthogonal(3)\) and \(\specialUnitary(2)\) are \defineindex{locally isomorphic}, meaning they have the same Lie algebra, but globally different, meaning they have different Dynkin indices.
+
+Given that \(\specialOrthogonalLie(3) \isomorphic \specialUnitaryLie(2)\) there must be a single simply connected Lie group which this Lie algebra exponentiates to.
+We can show that this is \(\specialUnitary(2)\).
+Consider the mapping \(\varphi \colon \reals^4 \to \specialUnitary(2)\) given by
+\begin{equation}
+    \varphi(x_0, x_1, x_2, x_3) = x_0\ident_2 + x_1 i\sigma_1 + x_2 i\sigma_2 + x_3 i\sigma_3 = 
+    \begin{pmatrix}
+        x_0 + ix_3 & ix_1 + x_2\\
+        ix_1 - x_2 & x_0 - ix_3
+    \end{pmatrix}
+    \coloneqq U.
+\end{equation}
+The defining conditions for \(\specialUnitary(2)\) lead to
+\begin{equation}
+    U^\hermit U = \ident_2 \text{ and } \det U = 1 \iff x_0^2 + x_1^2 + x_2^2 + x_3^2 = 1.
+\end{equation}
+What this means is that \(\specialUnitary(2)\) is topologically (homeomorphic to) a three-sphere, \(S^3\).
+Since three-spheres are simply connected this means \(\specialUnitary(2)\) is simply connected and so \(\specialOrthogonalLie(3) \isomorphic \specialUnitaryLie(2)\) exponentiates to \(\specialUnitary(2)\).
+
+It is worth briefly considering why \(\specialOrthogonal(3)\) is not simply connected.
+As a manifold \(\specialOrthogonal(3)\) is a three-dimensional ball of radius \(\pi\), that is \(\{(x, y, z) \in \reals^3 \mid x^2 + y^2 + z^2 \le \pi^2\}\) with opposite points associated.
+That is if two points are opposite on the 2-sphere \(\{(x, y, z) \in \reals^3 \mid x^2 + y^2 + z^2 = \pi^2\}\), we consider them to be the same point.
+The reason for this is that we can associate a line through the centre of this ball to be the axis of rotation and the distance we move along the line from the origin is the magnitude of the rotation, with the origin representing the angle 0 and one end of the line \(\pi\), and the other end \(-\pi\), however a rotation by \(\pi\) is the same as a rotation by \(-\pi\).
+This manifold is not simply connected.
+Consider a loop which goes along this line through the origin and then goes around the outside of the ball before joining up the other side of the loop.
+Moving along the line corresponds to rotating more or less and moving along the surface corresponds to changing the axis of rotation, essentially flipping the axis of rotation as we move from one side to the other.
+This is not contractible to a point and so \(\specialOrthogonal(3)\) is not simply connected.
+
+Since \(\specialOrthogonal(3)\) and \(\specialUnitary(2)\) have the same Lie algebra and \(\specialUnitary(2)\) is the simply connected universal covering group we expect there to be an \(n\)-to-1 map \(\specialUnitary(2) \to \specialOrthogonal(3)\).
+Indeed there is, for \(n = 2\), and we call \(\specialUnitary(2)\) a \defineindex{double cover} of \(\specialOrthogonal(3)\).
+One such map is given by the \defineindex{Weyl homomorphism} which defines the function \(h\) to be \(h(\vv{x}) = x_1\sigma_1 + x_2\sigma_2 + x_3\sigma_3\).
+This then satisfies
+\begin{equation}
+    Uh(\vv{x})U^\hermit = h(O\vv{x})
+\end{equation}
+where \(U\) is any unitary \(2\times 2\) matrix and this equation defines \(O\) as some orthogonal \(3\times 3\) matrix.
+We can use this to define a map \(U \mapsto O\), which is a map \(\specialUnitary(2) \to \specialOrthogonal(3)\).
+The kernel of this map is \(\{\pm \ident\} \isomorphic \integers_2\), and so
+\begin{equation}
+    \specialOrthogonal(3) \isomorphic \specialUnitary(2) / \integers_2
+\end{equation}
+by the first isomorphism theorem (\cref{thm:first isomorphism}).
+
+\subsection{Irreducible Representations of \texorpdfstring{\(\specialUnitaryLie(2)\)}{su(2)}}
+In this section we will construct the irreducible representations of \(\specialUnitaryLie(2)\), from which we can obtain the irreducible representations of \(\specialOrthogonalLie(3)\).
+We will use a method known as the \defineindex{highest weight representation}, which is a very general method which can be applied to any simple Lie algebra.
+For this process we will use a notation inspired by angular momentum in quantum mechanics\footnote{To brush up on angular momentum in quantum mechanics see the notes from the principles of quantum mechanics course.}, which it should quickly become clear is intimately linked to irreducible representations of \(\specialUnitaryLie(2)\).
+In particular, we will denote the generators of \(\specialUnitaryLie(2)\) by \(J_a\), for \(a = 1, 2, 3\), and we will denote vectors with bra-ket notation.
+
+The process uses Casimir operators, and there is one for each rank.
+Since \(\specialUnitaryLie(2)\) is rank 1 there is a single Casimir operator.
+All semi-simple Lie algebras have at least one Casimir operator given by
+\begin{equation}
+    C = k^{ab}T_aT_b
+\end{equation}
+where \(k^{ab}\) is the Killing metric.
+In the case of \(\specialUnitaryLie(2)\) we have the Casimir operator
+\begin{equation}
+    J^2 \coloneqq J_1^2 + J_2^2 + J_3^2
+\end{equation}
+since \(\specialUnitary(2)\) is simple and compact.
+By definition this Casimir operator commutes with all of the generators:
+\begin{equation}
+    \commutator{J^2}{J_a} = 0.
+\end{equation}
+By Schur's lemma (\cref{thm:schurs lemma}) the Casimir operator is of the form
+\begin{equation}
+    J^2 = C_2(R)\ident_{\dim V_R}
+\end{equation}
+where \(C_2(R)\) is some number depending on the representation and \(V_R\) is the vector space upon which the representation acts.
+
+We choose \(\{J^2, J_3\}\) as our set of maximally commuting operators, the choice of \(J_3\) instead of \(J_1\) or \(J_2\), or some linear combination of \(J_a\), is arbitrary but conventional.
+Let \(\ket{m}\) be an eigenvector of \(J_3\) with eigenvalue \(m\), that is
+\begin{equation}
+    J_3\ket{m} = m\ket{m}.
+\end{equation}
+Since \(J_a\) are Hermitian we know that \(m \in \reals\).
+We also know that \(\{\ket{m}\}\) forms a basis for \(V_R\).
+
+Now we define
+\begin{equation}
+    J_{\pm} \coloneqq J_1 \pm i J_2.
+\end{equation}
+Since \(J_i\) are Hermitian we immediately have that \(J_{\pm}^{\hermit} = J_{\mp}\).
+Using the properties of the Lie bracket and the Lie algebra relations of \(\specialUnitaryLie(2)\), namely \(\commutator{J_a}{J_b} = i\varepsilon_{abc}J_c\), we have
+\begin{align}
+    \commutator{J_3}{J_{\pm}} &= \commutator{J_3}{J_1 \pm iJ_2}\\
+    &= \commutator{J_3}{J_1} \pm i \commutator{J_3}{J_2}\\
+    &= i\varepsilon_{312}J_2 \mp \varepsilon_{321}J_1\\
+    &= iJ_2 \pm J_1\\
+    &= \pm(J_1 \pm iJ_2)\\
+    &= \pm J_{\pm}.
+\end{align}
+We also have
+\begin{align}
+    J_+J_- &= (J_1 + iJ_2)(J_1 - iJ_2)\\
+    &= J_1^2 + J_2^2 + iJ_2J_1 - iJ_1J_2\\
+    &= J_1^2 + J_2^2 + i\commutator{J_2}{J_1}\\
+    &= J_1^2 + J_2^2 - \varepsilon_{213}J_3\\
+    &= J_1^2 + J_2^2 + J_3
+\end{align}
+which we can rearrange to get \(J_1^2 + J_2^2 = J_+J_- - J_3\) which gives
+\begin{equation}\label{eqn:J^2 = J+J- - J3 + J3^2}
+    J^2 = J_1^2 + J_2^2 + J_3^2 = J_+J_- - J_3 + J_3^2.
+\end{equation}
+Similarly by considering \(J_-J_+\) we can show that
+\begin{equation}\label{eqn:J^2 = J-J+ + J3 + J3^2}
+    J^2 = J_-J_+ + J_3 + J_3^2.
+\end{equation}
+
+Now consider what happens when we act on some basis vector with \(J_3J_{\pm}\), we can use \(\commutator{J_3}{J_{\pm}}\) to rewrite this as \(J_3J_{\pm} = \commutator{J_3}{J_{\pm}} + J_{\pm}J_3 = \pm J_{\pm} \pm J_{\pm}J_3\).
+Hence
+\begin{align}
+    J_3J_{\pm}\ket{m} &= (\pm J_{\pm} \pm J_{\pm}J_3)\ket{m}\\
+    &= \pm J_{\pm}\ket{m} \pm J_{\pm} J_3\ket{m}\\
+    &= \pm J_{\pm}\ket{m} \pm mJ_{\pm}\ket{m}\\
+    &= \pm (1 \pm m)(J_{\pm}\ket{m})\\
+    &= (m \pm 1)(J_{\pm}\ket{m}).
+\end{align}
+What this shows is that \(J_{\pm}\ket{m}\) is an eigenvector of \(J_3\) with eigenvalue \(m\pm 1\).
+Since \(J_3\) is Hermitian its eigenvectors are orthogonal and so we know that \(\ket{m}\) is perpendicular to \(J_{\pm}\ket{m}\).
+Further, so long as \(J_{\pm}\ket{m} \ne 0\) we can identify \(J_{\pm}\ket{m} = \ket{m + 1}\).
+That is, we can use the operators \(J_{\pm}\) to produce states with eigenvalues either one higher or one lower.
+For this reason \(J_{\pm}\) are called \define{ladder operators}\index{ladder operator} collectively, with \(J_+\) being a \defineindex{raising operator} and \(J_-\) a \defineindex{lowering operator}.
+
+We now have the tools required to produce all finite dimensional representations.
+To do this we need only find the action of the generators, \(J_a\), on the basis, \(\{\ket{m}\}\).
+The assumption of a finite dimensional representation means that there are a finite number of basis vectors, \(\ket{m}\).
+This means that there exists some maximal eigenvalue, \(m^*\), at the \enquote{top of the ladder}, such that we can't go higher.
+This means that using the raising operator to generate a higher eigenvalue state must fail on \(\ket{m^*}\), which can only happen if
+\begin{equation}
+    J_+\ket{m^*} = 0.
+\end{equation}
+This state, \(\ket{m^*}\), is called the highest weight state.
+
+Now, consider what happens when we act with \(J^2\) on this state.
+Using \cref{eqn:J^2 = J-J+ + J3 + J3^2} we have \(J^2 = J_-J_+ + J_3 + J_3^2\) and so 
+\begin{align}
+    J^2\ket{m^*} &= (J_-J_+ + J_3 + J_3^2)\ket{m^*}\\
+    &= J_-J_+\ket{m^*} + J_3\ket{m^*} + J_3^2\ket{m^*}\\
+    &= 0 + m^*\ket{m^*} + {m^*}^2\ket{m^*}\\
+    &= m^*(m^* + 1)\ket{m^*}.
+\end{align}
+
+We can then use this relation for all states, \(\ket{m}\), not just \(\ket{m^*}\), since \(J^2\) is a Casimir operator, so commutes with \(J_- = J_1 - iJ_2\), which means if we consider the state \(\ket{m - n}\) for \(n \in \positiveintegers\) we have
+\begin{equation}
+    J^2\ket{m^* - n} = J^2J_-^n\ket{m^*} = J_-^nJ^2\ket{m^*} = m^*(m^* + 1)J_-^n\ket{m^*} = m^*(m^* - 1)\ket{m^* - n}.
+\end{equation}
+
+Since we assume a finite dimensional representation we must also have some \(n^* \in \positiveintegers\) such that \(\ket{m^* - n^*}\) is the lowest eigenvalue state.
+In this case we must have that
+\begin{equation}
+    J_-\ket{m^* - n^*} = 0.
+\end{equation}
+Using \cref{eqn:J^2 = J+J- - J3 + J3^2} we have \(J^2 = J_+J_- - J_3 + J_3^2\) and so
+\begin{align}
+    J^2\ket{m^* - n^*} &= (J_+J_- - J_3 + J_3^2)\ket{m^* - n^*}\\
+    &= [0 - (m^* - n^*) + (m^* - n^*)^2]\ket{m^* - n^*}\\
+    &= (m^* - n^*)[(m^* - n^*) - 1]\ket{m^* - n^*}.
+\end{align}
+However, since \(\ket{m^* - n^*}\) is also just another state we have
+\begin{equation}
+    J^2\ket{m^* - n^*} = m^*(m^* + 1)\ket{m^* - n^*}.
+\end{equation}
+Combining these we have
+\begin{equation}
+    (m^* - n^*)[(m^* - n^*) - 1] = m^*(m^* + 1) \implies 2m^* = n^* \in \positiveintegers.
+\end{equation}
+This implies that \(m^*\) can take on half-integer values.
+We can use the value of \(m^*\) to label the representation.
+
+At this point we move slightly closer to quantum mechanics notation by defining \(j = m^*\) and labelling the representation explicitly for each state: \(\ket{m} = \ket{j, m}\).
+The \(j\)th representation has dimension \(2j + 1\).
+Since \(j = 0, 1/2, 1, 3/2, 2, \dotsc\) this means that the dimension is \(1, 2, 3, 4, \dotsc\).
+The fundamental irreducible representation of \(\specialUnitaryLie(2)\) is the \(j = 1/2\) representation.
+The eigenstates can have values of \(m\) from \(j\) to \(j - n^* = j - 2j = -j\), so \(m = -j, -j + 1, \dotsc, j - 1, j\).
+
+Now that we have the finite dimensional irreducible representations of \(\specialUnitaryLie(2)\) we can find the finite dimensional irreducible representations of \(\specialOrthogonalLie(3)\).
+We find that the representations are just those we get if we restrict \(j\) to be an integer, \(j = 1, 2, 3, \dotsc\), which means they have dimension \(1, 3, 5, \dotsc\).
+The fundamental representation of \(\specialOrthogonalLie(3)\) is the \(j = 1\) representation.
+
+For a given representation we can compute the matrix elements of the operators \(J_3\) and \(J_{\pm}\).
+We add a label, \(j\), for the representation since the matrix form of an operator depends on the representation.
+Explicitly we have
+\begin{equation}
+    (J_3^{(j)})_{mm'} = \bra{j, m} J_3 \ket{j, m'} = m\braket{j, m}{j, m} = m \delta_{mm'},
+\end{equation}
+where we have chosen to have \(\ket{j, m}\) be normalised.
+For \(J_{\pm}\) we have
+\begin{equation}
+    (J_{\pm}^{(j)})_{mm'} = \bra{j, m}J_{\pm} \ket{j, m} = N_{\pm}(j, m) \braket{j, m}{j, m' \pm 1} = N_{\pm}(j, m)\delta_{m, m'\pm 1}
+\end{equation}
+where \(N_{\pm}(j, m)\) is given by
+\begin{equation}
+    N_{\pm}(j, m) = \sqrt{(j \mp m)(j \pm m + 1)} = \sqrt{j(j + 1) - m(m \pm 1)}.
+\end{equation}
+This normalisation factor is calculated by considering
+\begin{align}
+    \bra{j, m} J_{\pm}^{\hermit} J_{\pm} \ket{j, m} &= \bra{j, m} J_{\mp} J_{\pm} \ket{j, m}\\
+    &= \bra{j, m}(J^2 - J_3^2 \mp J_3^2)\ket{j, m}\\
+    &= j(j + 1) - m^2 \mp m\\
+    &= j(j + 1) - m(m \pm m)
+\end{align}
+which can be calculated in a different way by considering
+\begin{align}
+    \bra{j, m} J_{\pm}^\hermit J_{\pm} \ket{j, m} &= N_{\pm}(j, m)\bra{j, m} J_{\pm}^{\hermit} \ket{j, m \pm 1}\\
+    &= N_{\pm}(j, m)\bra{j, m\pm 1}J_{\pm}\ket{j, m}^*\\
+    &= N_{\pm}(j, m)N_{\pm}^*(j, m) \braket{j, m \pm 1}{j, m \pm 1}\\
+    &= \abs{N_{\pm}(j, m)}^2.
+\end{align}
+Choosing \(N_{\pm}(j, m)\) to be real and positive comparing these calculations we have
+\begin{equation}
+    N_{\pm}(j, m) = \sqrt{j(j + 1) - m(m \pm 1)}.
+\end{equation}
+
+On the level of the Lie group, \(\specialUnitary(2)\), we have that a representation of the group is given by
+\begin{equation}
+    \rho_j(\vv{\alpha})_{mm'} = \bra{j, m}\exp[i\alpha^aT_a]\ket{j, m'},
+\end{equation}
+which makes \(\rho_j(\vv{\alpha})\) a \((2j + 1) \times (2j + 1)\) matrix over \(\complex\).
+Note that \(j\) denotes the representation, \(\vv{\alpha}\) parametrises a group element, and \(mm'\) gives an entry into the \((2j + 1) \times (2j + 1)\) matrix.
+It is this representation that is called the highest weight representation for a given value of \(j\).
+
+For \(\specialUnitary(3)\) and \(\specialUnitary(2)\) it is common to define the \define{Wigner \(D\)-matrix}\index{Wigner D-matrix@Wigner \(D\)-matrix}, \(D^j(\alpha, \beta, \gamma)\) with components
+\begin{multline}
+    D^j(\alpha, \beta, \gamma)_{mm'} \coloneqq \bra{j, m} \exp[-i\alpha J_3] \exp[-i\beta J_2]\exp[-\gamma J_3]\ket{j, m'}\\
+    \eqqcolon \exp[-im\alpha + m'\gamma] d^j(\beta)_{mm'},
+\end{multline}
+where \(d^j(\beta)\) is called the \define{little Wigner \(d\)-matrix}\index{little Wigner d-matrix@little Wigner \(d\)-matrix}.
+In this case \(\alpha\), \(\beta\), and \(\gamma\) parametrise the group elements instead of the more general \(\vv{\alpha}\).
+Notice that \(J_1\) doesn't need to appear in the expression for \(D^j(\alpha, \beta, \gamma)\) since it is implicitly generated when we combine the exponentials into one using the Baker--Campbell--Hausdorff formula through commutators of \(J_2\) and \(J_3\).
+The Wigner \(D\)-matrices are widely used in physics literature since they are useful for calculating angular decay distribution amplitudes.
+
+Finally, for a given representation the quadratic Casimir is given by \(C_2(j)\ident\) with
+\begin{equation}
+    C_2(j) = j (j + 1),
+\end{equation}
+and the Dynkin index is given by
+\begin{equation}
+    k_j = \frac{1}{6}j(j + 1)(2j + 1).
+\end{equation}
+
+\subsection{Clebsch--Gordan Series of \texorpdfstring{\(\specialUnitary(2)\)}{SU(2)}}
+Recall that if two particles have angular momenta \(j_1\) and \(j_2\) then the combined system of both is given by the tensor product of the particles state spaces and the total angular momentum of this combined system, \(j\), can take on values from \(\abs{j_1 - j_2}\) to \(j_1 + j_2\) in integer steps.
+The reason for this is that combining the state spaces in this way corresponds to taking tensor products of the spin representations.
+The product in the group, \(\specialUnitary(2)\), becomes a sum on the level of the Lie algebra, \(\specialUnitaryLie(2)\), due to the exponential map.
+This is made rigorous with the next theorem.
+
+\begin{thm}{Clebsch--Gordan Series for \(\specialUnitary(2)\)}{}
+    The Clebsch--Gordan series for \(\specialUnitary(2)\), also called the Kronecker product or tensor product of representations, is given by
+    \begin{equation}
+        \rho_{j_1} \directproduct \rho_{j_2} = \rho_{\abs{j_1 - j_2}} \directsum \rho_{\abs{j_1 - j_2} + 1} \directsum \dotsb \directsum \rho_{j_1 + j_2} = \bigoplus_{j = \abs{j_1 - j_2}}^{j_1 + j_2} \rho_j
+    \end{equation}
+    where \(\rho_{j}\) are irreducible representations of \(\specialUnitaryLie(2)\) with Casimir elements \(j(j + 1)\ident_{2j + 1}\).
+    \begin{rmk}
+        Notice that the multiplicity (coefficient in the direct sum) of all irreducible representations involved is 1.
+        If this is always the case for the tensor product of two irreducible representations then we call the group \defineindex{simply reducible}.
+    \end{rmk}
+    \begin{proof}
+        Consider the Wigner \(D\)-matrix.
+        It is sufficient for this proof to consider rotations through a single angle since we only want to compute the character of the Wigner \(D\)-matrix and any other rotation by the same amount is equivalent by a similarity transform, and hence has the same character.
+        We therefore consider
+        \begin{equation}
+            D^j(\vartheta, 0, 0)_{mm'} = \e^{-im\vartheta}\delta_{mm'}.
+        \end{equation}
+        The fact that this is diagonal comes from the fact that \(\ket{j, m'}\) is an eigenstate of \(J_3\), which is the only operator appearing in
+        \begin{equation}
+            D^j(\vartheta, 0, 0)_{mm'} = \bra{j, m} \exp[-i\vartheta J_3]\ket{j, m'} \propto \braket{j, m}{j, m'} = \delta_{mm'}.
+        \end{equation}
+        
+        The character can then be computed as the trace of \(D^j\), recalling that the rows and columns of \(D^j\) are indexed by \(m\), which runs from \(-j\) to \(j\).
+        Hence,
+        \begin{align}
+            \chi_j(\vartheta) &\coloneqq \sum_{m = -j}^{j} D^j(\vartheta, 0, 0)_{mm}\\
+            &\hphantom{:}= \sum_{m = -j}^{j} \e^{im\vartheta}\\
+            &= \e^{-ij\vartheta} \sum_{m = 0}^{2j} (\e^{i\vartheta})^{m}.
+        \end{align}
+        We can now identify this as a geometric series and use the identity
+        \begin{equation}
+            \sum_{n = 0}^{N} r^n = \frac{1 - r^{N + 1}}{1 - r},
+        \end{equation}
+        which gives
+        \begin{align}
+            \chi_j(\vartheta) &= \e^{-ij\vartheta} \frac{1 - \e^{i(2j + 1)\vartheta}}{1 - \e^{i\vartheta}}\\
+            &= \frac{\e^{-ij\vartheta} - \e^{i(j + 1)\vartheta}}{1 - \e^{i\vartheta}}\\
+            &= \frac{\e^{-ij\vartheta} - \e^{i(j + 1)\vartheta}}{1 - \e^{i\vartheta}}\frac{\e^{-i\vartheta/2}}{\e^{-i\vartheta/2}}\\
+            &= \frac{\e^{-i(j + 1/2)\vartheta} - \e^{i(j + 1/2)\vartheta}}{\e^{-i\vartheta/2} - \e^{i\vartheta/2}}\\
+            &= \frac{\sin([j + 1/2]\vartheta)}{\sin(\vartheta/2)}.
+        \end{align}
+        
+        Two important cases are
+        \begin{equation}
+            \chi_{1/2}(\vartheta) = \frac{\sin(\vartheta)}{\sin(\vartheta/2)} = 2\cos\frac{\vartheta}{2},
+        \end{equation}
+        and
+        \begin{equation}
+            \chi_1(\vartheta) = \frac{\sin(3\vartheta/2)}{\sin(\vartheta/2)} = 1 + 2\cos\vartheta.
+        \end{equation}
+        
+        Now consider the product \(\chi_{j_1}(\vartheta)\chi_{j_2}(\vartheta) = \chi_{\rho_{j_1} \directproduct \rho_{j_2}}(\vartheta)\), applying trig identities it is possible to show that
+        \begin{equation}
+            \chi_{j_1}(\vartheta)\chi_{j_2}(\vartheta) = \chi_{j_1 + j_2}(\vartheta) + \chi_{j_1 - 1/2}(\vartheta) \chi_{j_2 - 1/2}(\vartheta).
+        \end{equation}
+        Assuming without loss of generality that \(j_1 \ge j_2\) we can iterate this equation \(2j_2 - 1\) times, using this product formula to first to compute \(\chi_{j_1 - 1/2}(\vartheta)\chi_{j_2 - 1/2}\), and then to compute the products \(\chi_{j_1 - 1}(\vartheta)\chi_{j_2 - 1}(\vartheta)\) which appear after this and so on we will find
+        \begin{equation}
+            \chi_{j_1}(\vartheta)\chi_{j_2}(\vartheta) = \chi_{j_1 + j_2} + \chi_{j_1 + j_2 - 1} + \dotsb + \chi_{j_1 - j_2}.
+        \end{equation}
+        This proves the theorem holds since we can identify the left hand side as the character of \(\rho_{j_1}\directproduct \rho_{j_2}\) and the right hand side as the character of \(\rho_{\abs{j_1} - j_2} \directsum \dotsb \directsum \rho_{j_1 + j_2}\).
+    \end{proof}
+\end{thm}
+
+While the above proof ensures that the theorem is correct we can also perform a non-trivial test of the theorem just by thinking about dimensions.
+Recall that the dimension of a tensor product is the product of the dimensions, whereas the dimension of a direct sum is the sum of the dimensions.
+Since the dimension of \(\rho_j\) is \(2j + 1\) in order for the theorem to hold we must have
+\begin{equation}
+    (2j_1 + 1)(2j_2 + 1) = [2\abs{j_1 - j_2} + 1] + [2(\abs{j_1 - j_2} + 1) + 1] + \dotsb + [2(j_1 + j_2) + 1].
+\end{equation}
+In order to check this we assume without loss of generality that \(j_1 \ge j_2\), and so the right hand side can be expressed as
+\begin{equation}
+    [2(j_1 - j_2) + 1] + [2(j_1 - j_2 + 1) + 1] + \dotsb + [2(j_1 - j_2 + 2j_2) + 1].
+\end{equation}
+This can then be written as
+\begin{equation}
+    2(j_1 - j_2) + 1 + 2(j_1 - j_2) + 3 + \dotsb + 2(j_1 - j_2) + 4j_1 + 1.
+\end{equation}
+There are \(2j_2 + 1\) copies of \(2(j_1 - j_2)\) in this sum and then a sum over odd integers from 1 to \(4j_2 + 1\).
+Hence we can write the sum as
+\begin{equation}
+    2(j_1 - j_2) (2j_2 + 1) + \sum_{n = 0}^{2j_2}(2n + 1).
+\end{equation}
+Using the identities
+\begin{equation}
+    \sum_{n = 0}^{N} 1 = N + 1, \qqand \sum_{n = 0}^{N} n = \frac{N}{2}(N + 1)
+\end{equation}
+we can write the sum as
+\begin{align}
+    2(j_1 - j_2)(2j_2 + 1) &+ 2j_2(2j_2 + 1) + 2j_2 + 1\\
+    &= 4j_1j_2 + 2j_1 - 4j_2^2 - 2j_2 + 4j_2^2 + 2j_2 +2j_2 + 1\\
+    &= 4j_1j_2 + 2j_1 + 2j_2 + 1\\
+    &= (2j_1 + 1)(2j_2 + 1).
+\end{align}
+Which shows that
+\begin{equation}
+    \dim(\rho_{j_1} \directproduct \rho_{j_2}) = \dim\left[ \bigoplus_{J = \abs{j_1 - j_2}}^{j_1 + j_2} \rho_J \right].
+\end{equation}
+
+Consider the result
+\begin{equation}
+    \chi_j(\vartheta) = \frac{\sin([j + 1/2]\vartheta)}{\sin(\vartheta/2)}.
+\end{equation}
+In the limit of \(\vartheta \to 0\) we first notice that \(D^j(0, 0, 0) = \ident_{2j + 1}\) and we have
+\begin{align}
+    \lim_{\vartheta \to 0} \chi_j(\vartheta) &= \lim_{\vartheta \to 0} \frac{\sin([j + 1]\vartheta)}{\sin(\vartheta/2)}\\
+    &= \lim_{\vartheta \to 0} \frac{(j + 1/2)\cos([j + 1/2]\vartheta)}{\cos(\vartheta/2)/2}\\
+    &= 2j + 1.
+\end{align}
+So we see that indeed the character of the identity is the dimension of the representation, which is what we expect.
+
+\begin{dfn}{Fundamental Representation}{}
+    A \defineindex{fundamental representation} is a representation from which all other finite dimensional irreducible representations can be constructed through tensor products.
+\end{dfn}
+
+\begin{crl}{Fundamental Representations of \(\specialUnitaryLie(2)\) and \(\specialOrthogonalLie(3)\)}{}
+    The fundamental representation of \(\specialUnitaryLie(2)\) is the \(j = 1/2\) representation.
+    The fundamental representation of \(\specialOrthogonalLie(3)\) is the \(j = 1\) representation.
+    \begin{proof}
+        For \(\specialUnitaryLie(2)\) we have \(\rho_{1/2} \directproduct \rho_{1/2} = \rho_{0} \directsum \rho_{1}\), so we can construct \(\rho_1\), since \(\rho_{0}\) is just the trivial representation.
+        We then have \(\rho_{1/2} \directproduct \rho_{1} = \rho_{1/2} \directproduct \rho_{1/2} \directproduct \rho_{1/2} = \rho_{1/2} \directsum \rho_{3/2}\), and so we can construct \(\rho_{3/2}\).
+        Carrying on like this we can construct \(\rho_{n/2}\) as \(\bigotimes_{i = 1}^{n/2} \rho_{1/2}\).
+        
+        The same can be done for \(\specialOrthogonalLie(3)\), but limiting to integer values of \(j\).
+    \end{proof}
+\end{crl}
+
+\begin{exm}{}{}
+    The previous theorem and its corollary are important for spin.
+    Given two particles with angular momenta \(j_1\) and \(j_2\) each is individually described by the \(\rho_{j_i}\) representation, and the combined system is described by the \(\rho_{j_1} \directproduct \rho_{j_2}\) representation.
+    The Clebsch--Gordan series then limits the possible angular momentum values the system can take to be \(\abs{j_1 - j_2}, \abs{j_1 - j_2} + 1, \dotsc, j_1 + j_2\).
+    This also allows us to combine the orbital angular momentum and spin of a particle into the total angular momentum.
+    
+    The corollary demonstrates that any system with angular momentum \(j\) can be modelled, at least in terms of angular momentum, as a system of \(j\) particles with spin \(1/2\) and no orbital angular momentum.
+\end{exm}
+
+The next theorem completes our study of \(\specialUnitaryLie(2)\).
+\begin{thm}{}{}
+    The representation of \(\specialUnitaryLie(2)\) as Pauli matrices is pseudo-real.
+    \begin{proof}
+        Consider the similarity transform\footnote{the minus sign is due to the physicist's convention that the exponential map is \(\exp(i\alpha T)\).}
+        \begin{equation}
+            -T_i^* = ST_iS^{-1}, \qqwhere S = \sigma_2 = 2T_2.
+        \end{equation}
+        We can show this by explicit computations.
+        First note that \(\sigma_2^2 = \ident\) so \(\sigma_2^{-1} = \sigma_{2}\).
+        We then have
+        \begin{align}
+            \frac{1}{2}\sigma_2\sigma_1\sigma_2^{-1} &= \frac{1}{2}
+            \begin{pmatrix}
+                0 & -i\\
+                i & 0
+            \end{pmatrix}
+            \begin{pmatrix}
+                0 & 1\\
+                1 & 0
+            \end{pmatrix}
+            \begin{pmatrix}
+                0 & -i\\
+                i & 0
+            \end{pmatrix}
+            \\
+            &= \frac{1}{2}
+            \begin{pmatrix}
+                -i & 0\\
+                0 & i
+            \end{pmatrix}
+            \begin{pmatrix}
+                0 & -i\\
+                i & 0
+            \end{pmatrix}
+            \\
+            &= \frac{1}{2}
+            \begin{pmatrix}
+                0 & -1\\
+                -1 & 0
+            \end{pmatrix}
+            \\
+            &= -T_1.
+        \end{align}
+        For \(i = 2\) we simply have \(\sigma_2^3 = \sigma_2 = -\sigma_2^*\).
+        For \(i = 3\) we have
+        \begin{align}
+            \frac{1}{2}\sigma_2\sigma_3\sigma_{2}^{-1} &= \frac{1}{2}
+            \begin{pmatrix}
+                0 & -i\\
+                i & 0
+            \end{pmatrix}
+            \begin{pmatrix}
+                1 & 0\\
+                0 & -1
+            \end{pmatrix}
+            \begin{pmatrix}
+                0 & -i\\
+                i & 0
+            \end{pmatrix}
+            \\
+            &= \frac{1}{2}
+            \begin{pmatrix}
+                0 & i\\
+                i & 0
+            \end{pmatrix}
+            \begin{pmatrix}
+                0 & -i\\
+                i & 0
+            \end{pmatrix}
+            \\
+            &= \frac{1}{2}
+            \begin{pmatrix}
+                -1 & 0\\
+                0 & 1
+            \end{pmatrix}
+            \\
+            &= -T_3.
+        \end{align}
+        
+        This shows that this representation is equivalent to its complex conjugate, which means that this representation is not complex.
+        However, there is no basis in which all three Pauli matrices are real and so this is a pseudo-real representation.
+    \end{proof}
+\end{thm}
