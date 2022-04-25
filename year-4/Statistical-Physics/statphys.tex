@@ -70,6 +70,7 @@ noabbrev
 \newcommand*{\hamiltonian}{\mathcal{H}}
 \DeclarePairedDelimiterX{\poissonbracket}[2]{\lbrace}{\rbrace}{#1, #2}
 \DeclarePairedDelimiterX{\commutator}[2]{[}{]}{#1, #2}
+\DeclareMathOperator{\Var}{Var}
 
 % Include
 \includeonly{}
@@ -4143,6 +4144,616 @@ noabbrev
         \diff{p_i}{t} = \sum_{j\ne i} \nu_{ij}(p_j - p_i).
     \end{equation}
     
+    Now consider only jumps from state 1 to state 2 and back.
+    We have
+    \begin{equation}
+        \diff{}{t}(p_1 + p_2) = 0 \implies \diff{p_1}{t} = -\diff{p_2}{t}.
+    \end{equation}
+    This is because we have restricted the system to only transitions between states 1 and 2 and hence \(p_1 + p_2 = 1\).
+    We also have
+    \begin{equation}
+        \diff{p_1}{t} = -p_1\nu_{12} + p_2\nu_{21} = -\diff{p_2}{t}.
+    \end{equation}
+    For the case of \(\nu_{12} = \nu_{21}\) we have
+    \begin{equation}
+        \diff{}{t}(p_1 - p_2) = -2\nu_{12}(p_1 - p_2).
+    \end{equation}
+    We can solve this to find that
+    \begin{equation}
+        p_1(t) - p_2(t) = [p_1(0) - p_2(0)]\exp[-2\nu_{12}t].
+    \end{equation}
+    The entropy is then
+    \begin{equation}
+        S = -\boltzmann p_1\ln p_1 = \boltzmann p_2\ln p_2,
+    \end{equation}
+    and it can be shown that this is increasing.
+    
+    \section{Random Walks}
+    Consider a one-dimensional random walk.
+    We can model this as a one-dimensional lattice of possible positions, labelled \(i = -L, \dotsc, L\), and take \(L \to \infty\) to avoid having to worry about boundary conditions.
+    We then think of state \(i\) as \enquote{the particle is at position \(i\)}.
+    If we assume that each step length is the same, and is the distance between nearest neighbours, then we find that \(\nu_{ij} = 0\) if \(j \ne i \pm 1\).
+    Assuming an isotropic random walk we have that \(\nu_{i,i+1} = \nu_{i,i-1}\).
+    Assuming a homogeneous random walk we have that \(\nu_{i,i\pm 1} = \nu\) for all \(i\).
+    
+    Now consider the master equation.
+    With the above information we can evaluate the sums and rearrange giving
+    \begin{align}
+        \dot{p}_i &= -2p_i\nu + \nu(p_{i + 1} + p_{i - 1})\\
+        &= \nu(p_{i - 1} - p_i) - \nu(p_i - p_{i + 1}).
+    \end{align}
+    We write it in this way since we can interpret the first term as the net probability flux from state \(i - 1\) to state \(i\), and the second term as the net probability flux from \(i\) to \(i + 1\).
+    
+    There is an exact solution to this recurrence relation, and its given by the modified Bessel functions of the first kind, \(I_n\), namely \(p_i(t) = \e^{-t}I_i(t)\).
+    However, it is more useful to consider the limit of the step size going to zero.
+    Let \(a\) be the step size.
+    We can define the probability density \(p(x, t) \dd{x}\) to be the probability that the particle is found in the region \([x, x + \dl{x}]\) where \(x = ia\).
+    We then replace \(p_i(t)\) with \(p(x, t)\) and \(p_{i\pm 1}(t)\) with \(p(x\pm a)\).
+    Taylor expanding we have
+    \begin{equation}
+        p(x \pm a, t) = p(x, t) \pm a\diffp{p}{x} + \frac{a^2}{2} \diffp[2]{p}{x} + \dotsb.
+    \end{equation}
+    Inserting this into our equations we have
+    \begin{align}
+        \diffp{p}{t} &= \nu\left[ p(x, t) - a\diffp{p}{x} + \frac{a^2}{2} \diffp[2]{p}{x} - p(x, t) \right] - \nu\left[ p(x, t) - p(x, t) - a\diffp{p}{x} - \frac{a^2}{2} \diffp[2]{p}{x} \right]\\
+        &= a^2\nu\diffp[2]{p}{x}.
+    \end{align}
+    We can then identify this as the diffusion equation,
+    \begin{equation}
+        \diffp{p}{t} = D\diffp[2]{p}{x},
+    \end{equation}
+    with \(D = a\nu^2\).
+    
+    For the initial condition where we know for certain the position of the particle is \(x = 0\), that is \(p(x, t = 0) = \delta(x)\), we can show that
+    \begin{equation}
+        p(x, t) = \frac{1}{\sqrt{4\pi Dt}}\exp\left[ -\frac{x^2}{4Dt} \right]
+    \end{equation}
+    is the solution.
+    What this shows is that the probability density spreads out, while remaining centred on the original position.
+    As time goes on it becomes increasingly likely to find the particle at larger distances, as one would expect.
+    
+    For an initial condition of the particle being at \(x_0\) we simply replace \(x\) with \(x - x_0\) in both the initial condition and solution.
+    We can identify
+    \begin{equation}
+        \mean{x - x_0} = \int (x - x_0) p(x, t) \dd{x} = \int (x - x_0)\delta(x - x_0) \dd{x} = 0,
+    \end{equation}
+    since we can choose to evaluate this at any time, so choose \(t = 0\).
+    We can also show that
+    \begin{equation}
+        \mean{(x - x_0)^2} = 2Dt = \Var(x),
+    \end{equation}
+    and so the standard deviation is \(\sigma = \sqrt{2Dt}\), meaning that the width of the distribution goes as \(t^{1/2}\).
+    
+    We can also consider a system of \(M\) non-interacting particles, in which case we simply replace \(p\) with \(\rho\) and everything is the same but instead of
+    \begin{equation}
+        \int p(x, t) \dd{x} = 1
+    \end{equation}
+    as normalisation we have
+    \begin{equation}
+        \int \rho(x, t) \dd{x} = M.
+    \end{equation}
+    
+    \section{Detailed Balance}
+    \subsection{Isolated System}
+    Consider an isolated system, that is a microcanonical ensemble.
+    In equilibrium the principle of equal \textit{a priori} probabilities holds and we have \(p_i^{\mathrm{eq}} = p^{\mathrm{eq}} = \mathrm{const}\).
+    We also have transition rate symmetry, meaning \(\nu_{ij} = \nu_{ji}\).
+    From this we have
+    \begin{equation}
+        p_i^{\mathrm{eq}}\nu_{ij} = p_j^{\mathrm{eq}}\nu_{ji}.
+    \end{equation}
+    This condition, called \defineindex{detailed balance}, is that the flux from \(i\) to \(j\) is equal to the flux from \(j\) to \(i\).
+    This is a stronger statement than the master equation, which only requires an overall balance for a stationary equilibrium state, that is an equilibrium state with \(\dot{p}_i = 0\).
+    
+    Suppose we are looking for a system to be in stationary equilibrium.
+    Then we have
+    \begin{equation}
+        \diffp{p_i}{t} = \sum_{j \ne i} (-p_i\nu_{ij} + p_j\nu_{ji}) = 0.
+    \end{equation}
+    If the detailed balance condition is met then clearly each term vanishes identically and we have a stationary equilibrium state, however, it is possible that rather than each term vanishing a system could just arrange the terms such that their sum vanishes, without meeting the detailed balance condition.
+    We see that by imposing a system follows the detailed balance condition we are guaranteed to find an equilibrium stationary state.
+    
+    We can also apply the detailed balance condition to a grouping of states.
+    Consider a system with two groups of states, \(A\) and \(B\).
+    Summing the detailed balance condition over the state \(i\) in \(A\) and the state \(j\) in \(B\) we get
+    \begin{equation}
+        \sum_{i \in A} \sum_{j \in B} p_i^{\mathrm{eq}} \nu_{ij} = \sum_{i \in A} \sum_{j \in B} p_j^{\mathrm{eq}} \nu_{ji}.
+    \end{equation}
+    Suppose we want to know the mean rate of transition from \(A\) to \(B\).
+    This is given by
+    \begin{equation}
+        p_A^{\mathrm{eq}}\nu_{AB} = \sum_{i \in A} p_i^{\mathrm{eq}} \sum_{j \in B} \nu_{ij}.
+    \end{equation}
+    We can identify the total probability of being in group \(A\) as
+    \begin{equation}
+        p_A^{\mathrm{eq}} = \sum_{i \in A} p_i^{\mathrm{eq}} = p^{\mathrm{eq}}\Omega_A,
+    \end{equation}
+    where \(\Omega_A\) is the number of microstates in \(A\).
+    The mean rate of transition from \(A\) to \(B\) \emph{given that the system is in group \(A\)} is
+    \begin{equation}
+        \nu_{AB} = \frac{\sum_{i\in A} p_i^{\mathrm{eq}} \sum_{j\in B}\nu_{ij}}{\sum_{i\in A}p_i^{\mathrm{eq}}} = \frac{1}{\Omega_A} \sum_{i \in A} \sum_{j \in B} \nu_{ij}.
+    \end{equation}
+    Doing the same for transitions from \(B\) to \(A\) we find that
+    \begin{equation}
+        p_A^{\mathrm{eq}}\nu_{AB} = p_B^{\mathrm{eq}}\nu_{BA}.
+    \end{equation}
+    This is the detailed balance condition for groups of states.
+    Importantly this holds even if the sizes of the two groups aren't equal, in which case we expect that \(p_A \ne p_B\) and \(\nu_{AB} \ne \nu_{BA}\).
+    
+    \subsection{Canonical Ensemble}
+    One view of a canonical ensemble is an otherwise isolated system submerged in a heat bath, which allows for the total energy of the system to change without the number of particles changing.
+    We then treat the combined system as an isolated system.
+    We can specify a microstate of the system, but in general this will correspond to many possible states of the heat bath.
+    This means that transitions between single states of the system correspond to transitions between groups of states of the composite system.
+    Therefore these obey the detailed balance condition for group transitions in an isolated system.
+    That is for states \(\alpha\) and \(\beta\) we have
+    \begin{equation}
+        p_\alpha^{\mathrm{eq}}\nu_{\alpha\beta} = p_\beta^{\mathrm{eq}} \nu_{\beta\alpha} \implies \frac{\nu_{\alpha\beta}}{\nu_{\beta\alpha}} = \frac{p_{\beta}^{\mathrm{eq}}}{p_{\alpha}^{\mathrm{eq}}}.
+    \end{equation}
+    
+    In a canonical ensemble we know that \(p_\alpha^{\mathrm{eq}} \propto \exp[-\beta E_\alpha]\), where \(E_\alpha\) is the energy of state \(\alpha\) and the constant of proportionality, \(1/\cpartition\), is constant for a given system.
+    We then find that
+    \begin{equation}
+        \frac{\nu_{\alpha\beta}}{\nu_{\beta\alpha}} = \frac{\exp[-\beta E_\beta]}{\exp[-\beta E_\alpha]} = \exp[\beta(E_\alpha - E_\beta)].
+    \end{equation}
+    This shows that, in general, the transition rates are asymmetric, and their ratio is a function of the energy difference.
+    
+    \subsubsection{Currents}
+    In a system obeying detailed balance there are no microscopic probability currents, and as a consequence there are no macroscopic currents.
+    As an example consider the continuity equation
+    \begin{equation}
+        \diffp{\rho}{t} + \diffp{J}{x} = 0.
+    \end{equation}
+    We can identify this as a diffusion equation with
+    \begin{equation}
+        J = -D\diffp{\rho}{x}
+    \end{equation}
+    as the diffusive particle current.
+    A stationary solution has \(\diffp{\rho}/{t} = 0\), which requires that \(J\) is constant in space.
+    An equilibrium solution is then the special case where \(J^{\mathrm{eq}} = 0\).
+    This means that \(\rho^{\mathrm{eq}}\) is spatially constant as well.
+    
+    For a non-equilibrium stationary solution we will have \(J \ne 0\), in which case we would have
+    \begin{equation}
+        \rho(x) = \mathrm{const} - \frac{J}{D}x.
+    \end{equation}
+    In order to maintain this linear density profile in a stationary state we would require an external reservoir for diffusive particles, in which case the composite system is not in an equilibrium state.
+    
+    \subsubsection{Computer Simulations}
+    One of the main uses of detailed balance is in computer simulations.
+    The general idea is that a computer simulation will give accurate results for measurements, if not accurate dynamics, if we can get the system to evolve to a steady state.
+    This can be done, at least most of the time, by requiring that the simulation obeys detailed balance.
+    We will then find in general that the probability of being in a given state will be given by
+    \begin{equation}
+        p_\alpha = \frac{1}{\cpartition} \exp[-\beta E_\alpha].
+    \end{equation}
+    
+    The most common way to do this is with a Monte-Carlo simulation using the Metropolis algorithm.
+    In this simulation we randomly select states, \(\alpha\) and \(\beta\), and simulate the system moving between these states by setting the jump rate to be
+    \begin{equation}
+        \nu_{\alpha\beta} = 
+        \begin{cases}
+            \nu_0 & E_\beta < E_\alpha,\\
+            \nu_0\exp[\beta(E_\alpha - E_\beta)] & E_\beta \ge E_\alpha,
+        \end{cases}
+        = \min \{ 1, \exp[\beta(E_\alpha - E_\beta)] \}.
+    \end{equation}
+    Here \(\nu_0\) is some constant, the value of which is not important.
+    
+    This will satisfy detailed balance, since
+    \begin{align}
+        p_\alpha^{\mathrm{eq}}\nu_{\alpha\beta} &= \frac{1}{\cpartition} \exp[-\beta E_\alpha]\nu_0\min\{1, \exp[\beta(E_\alpha - E_\beta)]\}\\
+        &= \frac{1}{\cpartition} \nu_0 \min\{ \exp[-\beta E_\alpha], \exp[-\beta E_\beta] \}\\
+        &= \frac{1}{\cpartition} \exp[-\beta E_\beta] \nu_0 \min\{ 1, \exp[\beta(E_\beta - E_\alpha)] \}\\
+        &= p_\beta^{\mathrm{eq}}\nu_{\beta\alpha}.
+   \end{align}
+    
+    We can then use this process to find various averages, such as \(\expected{O} = \sum_\alpha O_\alpha p_\alpha^{\mathrm{eq}}\), where \(O_\alpha\) is the value measured in state \(\alpha\).
+    Note here that we don't sum over all states, rather we sum over all states that the system reaches over some period of time.
+    
+    \begin{cde}{Monte Carlo and Metropolis}{}
+        The following pseudocode simulates the Monte Carlo method with the Metropolis algorithm running for \(N\) sweeps choosing units such that \(\boltzmann T = 1\).
+        \begin{lstlisting}[gobble=12]
+            measurements = []
+            repeat N times:
+                alpha = current state
+                beta = randomly chosen state
+                energy_change = energy(alpha) - energy(beta)
+                if energy_change <= 0 
+                or random_between_0_1() < exp(-energy_change):
+                    set state to beta
+                measurements.append(measurement of desired
+                                    quantity in current state)
+            expected_value = mean(measurements)
+        \end{lstlisting}
+    \end{cde}
+    
+    \chapter{Langevin Approach}
+    In this section we will lay out the Langevin approach to non-equilibrium processes.
+    We will start with the familiar case of a random walk, and then discuss Brownian motion, the original motivation for this approach.
+    
+    \section{Random Walk}
+    Consider a one-dimensional random walk.
+    We have seen that in the continuous limit the probability density follows a diffusion equation,
+    \begin{equation}
+        \diffp{p}{t} = D\diffp[2]{p}{x}.
+    \end{equation}
+    We saw that the diffusion coefficient is given by \(D = \nu a^2\), where \(\nu\) is the transition rate between two neighbouring sites and \(a\) is the distance between sites.
+    
+    Now consider a small time step, \(\Delta t\).
+    In time \(t\) the position changes by \(\Delta x(t)\) from its position at time \(t\), that is
+    \begin{equation}
+        x(t + \Delta t) = x(t) + \Delta x(t).
+    \end{equation}
+    We can treat \(\Delta x(t)\) as a random variable.
+    For sufficiently short periods of time, such that the probability of two transition occurring in the time period is negligible, we expect that
+    \begin{equation}
+        \Delta x(t) = 
+        \begin{cases}
+            \hphantom{-a}\mathllap{a} & \text{with probability } \nu \Delta t,\\
+            -a & \text{with probability } \nu \Delta t,\\
+            \hphantom{-a}\mathllap{a} & \text{with probability } 1 - 2\nu \Delta t.
+        \end{cases}
+    \end{equation}
+    That is, the particle moves in the positive direction with probability \(\nu \Delta t\), and in the negative direction with the same probability.
+    The particle then doesn't change position with probability \(1 - 2\nu\Delta t\).
+    
+    Since the particle is equally likely to move left or right we have that \(\expected{\Delta x(t)} = 0\).
+    The variance is \(\expected{\Delta x(t)^2} = 2a^2\nu \Delta t = 2D\Delta t\).
+    At different times \(\Delta x(t)\) are uncorrelated, and so we have \(\expected{\Delta x(t) \, \Delta x(t')} = \expected{\Delta x(t)}\expected{\Delta x(t')} = 0\) for \(t \ne t'\).
+    
+    We again want to take the continuum limit, so have \(\Delta t\) and \(\delta x\) go to zero.
+    In order to do so in a way that makes everything converge we should scale the lattice spacing as
+    \begin{equation}
+        a \propto \sqrt{\Delta t}
+    \end{equation}
+    in the limit of \(\Delta t\to 0\).
+    
+    Doing this we can define
+    \begin{equation}
+        \eta(t) \coloneqq \diff{x}{t}.
+    \end{equation}
+    Then \(\eta(t)\) is a random variable satisfying
+    \begin{equation}
+        \expected{\eta(t)} = 0, \qqand \expected{\eta(t)\eta(t')} = \Gamma \delta(t - t'),
+    \end{equation}
+    for some constant \(\Gamma\).
+    We call a random variable with statistics satisfying these requirements \defineindex{white noise}, since it averages out to zero and is uncorrelated at different times, so adding \(\eta(t)\) to a signal replicates a signal with background noise.
+    
+    This specification of \(\eta\) specifies a stochastic process, \(x(t)\), which is related to \(\eta\) by the \defineindex{Langevin equation}
+    \begin{equation}
+        \diff{x}{t} = \eta(t).
+    \end{equation}
+    We can integrate this equation giving
+    \begin{equation}
+        x(t) - x_0 = \int_0^t \eta(t') \dd{t'}
+    \end{equation}
+    where \(x_0 = x(0)\).
+    Notice that we need to introduce a dummy variable, \(t'\), in the integral.
+    
+    Since all we know about \(\eta\) are various averages we can take averages of this result to extract information.
+    Notice that these are thermodynamic averages, over whatever probability distribution \(\eta\) is drawn from, they aren't averages over time.
+    As such we have that the average of the integral is simply the integral of the average, and the average of a constant is just the constant.
+    Using this we have
+    \begin{equation}
+        \expected{x(t) - x_0} = \expected*{\int_0^t \eta(t) \dd{t'}} = \int_0^t \expected{\eta(t)} \dd{t'} = \int_0^t 0 \dd{t'} = 0.
+    \end{equation}
+    We can also compute the correlation.
+    Doing so we have to be careful and introduce different dummy variables when we square the integral:
+    \begin{align}
+        \expected{(x(t) - x_0)^2} &= \expected*{\int_0^t \eta(t') \dd{t'} \int_0^t \eta(t'') \dd{t''}}\\
+        &= \int_0^t \dl{t'} \int_0^t \dl{t''} \expected{\eta(t') \eta(t'')}\\
+        &= \Gamma \int_0^t \dl{t'} \int_0^t \dl{t''} \delta(t' - t'')\\
+        &= \Gamma \int_0^t \dl{t'}\\
+        &= \Gamma t.
+    \end{align}
+    Comparing this to the diffusion equation we can identify \(\Gamma = 2D\), since we expect \(\expected{\Delta x^2} = 2D\Delta t\).
+    
+    It can be shown that for an appropriate choice of \(\Gamma\) the Langevin approach is equivalent to the diffusion approach.
+    Proof of this is beyond the scope of this course, but as motivation consider the fact that a sum of random variables gives a Gaussian distribution, by the central limit theorem, and a Gaussian is indeed a solution to the diffusion equation.
+    
+    \section{Brownian Motion}
+    \defineindex{Brownian motion} is the seemingly random motion of a colloidal particle suspended in a fluid.
+    This was first discovered with pollen floating in water.
+    The motion is due to collisions with molecules of the liquid.
+    However, these molecules are too small and numerous to track individually.
+    Instead we can treat the fluid molecules as a source of a random force.
+    
+    For simplicity we consider Brownian motion in one dimension.
+    Consider a particle of mass \(m\) suspended in a fluid.
+    Newton's second law for this particle can be written as
+    \begin{equation}
+        m\diff[2]{x}{t} = -\gamma\diff{x}{t} + f(t)
+    \end{equation}
+    where \(f(t)\) is the random force produced as the net action of the fluid molecules, and the \(\gamma\) term represents viscous friction.
+    Note that viscous friction is itself a form of coarse graining, since on the molecular level it is just a result of more collisions and intermolecular forces.
+    It is common to talk of the \defineindex{mobility}, \(\mu \coloneqq 1/\gamma\), instead of \(\gamma\).
+    
+    The random force is equally likely to positive and negative and so we expect that
+    \begin{equation}
+        \expected{f(t)} = 0.
+    \end{equation}
+    In principle the random forces are correlated, since molecular collisions take a nonzero amount of time to occur.
+    However, we can assume that the the correlation is of the form
+    \begin{equation}
+        \expected{f(t)f(t')} = g(t - t'),
+    \end{equation}
+    for some decreasing function, \(g\).
+    We assume that the correlation falls of rapidly such that for times greater than some correlation time, \(t_{\mathrm{c}}\), we can approximate \(g(t) = \Gamma\delta(t)\), which is to say
+    \begin{equation}
+        \expected{f(t)f(t')} = \Gamma \delta(t - t').
+    \end{equation}
+    So \(f\) is a white noise random variable.
+    
+    For simplicity we now take \(m = 1\).
+    We also write \(v(t) = \diff{x}/{t}\), which allows us to write Newton's second law as
+    \begin{equation}
+        m\dot{v}(t) = -\gamma v(t) + f(t).
+    \end{equation}
+    We can solve this equation using an integrating factor.
+    Recall that the integrating factor is given by the exponential of the integral of the zeroth order derivative coefficient in a first order linear ordinary differential equation.
+    In this case the integrating factor is \(\exp[\gamma t]\).
+    We then have
+    \begin{equation}
+        \diff{}{t} [v(t)\e^{\gamma t}] = \dot{v}(t)\e^{\gamma t} + \gamma v(t)\e^{\gamma t} = \e^{\gamma t}f(t).
+    \end{equation}
+    We can then integrate this giving
+    \begin{equation}
+        \int_0^t \diff{}{t'} [v(t')\e^{\gamma t'}] \dd{t'} = [v(t')\e^{\gamma t'}]_{t'=0}^{t'=t} = v(t)\e^{\gamma t} - v_0 = \int_0^t \e^{\gamma t'}f(t') \dd{t'},
+    \end{equation}
+    where \(v_0 = v(0)\).
+    Notice we introduce a dummy variable, \(t'\), for the integration.
+    From this we get
+    \begin{equation}
+        v(t) = v_0\e^{-\gamma t} + \int_0^t \e^{-\gamma(t - t')}f(t') \dd{t'}.
+    \end{equation}
+
+    In order to extract information we take various averages.
+    First we have that the average velocity is
+    \begin{align}
+        \expected{v(t)} &= \expected*{v_0\e^{-\gamma t} + \int_0^t \e^{-\gamma(t - t')}f(t') \dd{t'}}\\
+        &= \expected{v_0\e^{-\gamma t}} + \expected*{\int_0^t \e^{-\gamma(t - t')} f(t') \dd{t'}}\\
+        &= v_0\e^{-\gamma t} + \int_0^t \e^{-\gamma(t - t')} \expected{f(t')} \dd{t'}\\
+        &= v_0\e^{-\gamma t},
+    \end{align}
+    where we have used \(\expected{f(t')} = 0\).
+    
+    Consider the short time limit, so \(\gamma t \ll 1\).
+    In this case we have \(\expected{v(t)} \approx v_0\), so friction has not yet had an effect.
+    In the long time limit, \(\gamma t \gg 1\), we have \(\expected{v} \to 0\).
+    So over long time scales the particle isn't really moving.
+    
+    We now consider the mean squared velocity:
+    \begin{align}
+        \expected{v(t)^2} &= \bigg\langle \left( v_0\e^{-\gamma t} + \int_0^t \e^{-\gamma(t - t')}f(t') \dd{t'} \right)\notag\\
+        &\qquad \times \left( v_0\e^{-\gamma t} + \int_0^t \e^{-\gamma(t - t'')}f(t'') \dd{t''} \right)\bigg\rangle\\
+        &= v_0^2\e^{-2\gamma t} + v_0\e^{-\gamma t}\int_0^t \e^{-\gamma(t - t')} \underbrace{\expected{f(t')}}_{=0} \dd{t'}\notag\\
+        &\qquad + v_0\e^{-\gamma t}\int_0^t \e^{-\gamma(t - t'')} \underbrace{\expected{f(t'')}}_{=0} \dd{t''}\notag\\
+        &\qquad + \int_0^t \dl{t'} \int_0^t \dl{t''} \, \e^{-\gamma(t - t')} \e^{\gamma(t - t'')} \expected{f(t')f(t'')}\\
+        &= v_0^2\e^{-2\gamma t} + \int_0^t \dl{t'} \int_0^t \dl{t''} \e^{-\gamma(t - t')}\e^{-\gamma(t - t'')} \Gamma\delta(t' - t'')\\
+        &= v_0^2\e^{-2\gamma t} + \Gamma \int_0^t \e^{-\gamma(t - t')}\e^{-\gamma(t - t')} \dl{t'}\\
+        &= v_0^2\e^{-2\gamma t} + \frac{\Gamma}{2\gamma} [\e^{-\gamma(t - t')}]_{t' = 0}^{t' = t}\\
+        &= v_0^2\e^{-2\gamma t} + \frac{\Gamma}{2\gamma} (1 - \e^{-2\gamma t}).
+    \end{align}
+    In the short time limit, \(\gamma t \ll 1\), we have \(\expected{v(t)^2} \approx v_0^2\).
+    In the long time limit, \(\gamma t \gg 1\), we have \(\expected{v(t)^2} \to \Gamma / (2\gamma)\).
+    What this means is that after a sufficiently long amount of time the particle \enquote{forgets} its initial velocity and comes into thermal equilibrium with the fluid.
+    By equipartition a particle in equilibrium, with mass \(m = 1\), has kinetic energy
+    \begin{equation}
+        \frac{1}{2} \expected{v(t)^2} = \frac{1}{2}\boltzmann T \implies \Gamma = 2\gamma \boltzmann T.
+    \end{equation}
+    This relates the magnitude of the noise fluctuations, \(\Gamma\), to the viscous dissipative term, \(\gamma\).
+    This shouldn't be a surprise since both are ultimately due to the same molecular dynamics.
+    
+    We can integrate our expression for \(v(t)\) again to get the position.
+    We have to be careful and change \(t\) to the dummy variable \(t'\), and we then have to change the \(t'\) dummy variable in the integral to \(t''\).
+    Note that this means changing the \(t\) in the limit of the integral to \(t'\).
+    Doing so we get
+    \begin{align}
+        \int_0^t v(t') \dd{t'} &= x(t) - x_0\\
+        &= \int_0^t v_0\e^{-\gamma t'} \dd{t'} + \int_0^t \dd{t'} \int_0^{t'} \dd{t''} \e^{-\gamma(t' - t'')} f(t'')\\
+        &= \frac{v_0}{\gamma}(1 - \e^{-\gamma t}) + \int_0^t \dd{t'} \int_0^{t'} \dd{t''} \e^{-\gamma(t' - t'')} f(t'').
+    \end{align}
+    
+    We can then find the average position:
+    \begin{align}
+        \expected{x(t)} = x_0 + \frac{v_0}{\gamma}(1 - \e^{-\gamma t}),
+    \end{align}
+    where we have used the fact that \(\expected{f(t'')} = 0\).
+    The short time limit is \(1 - \e^{-\gamma t} \approx \gamma t\), and so we have \(\expected{x(t)} \approx x_0 + v_0 t\).
+    This is ballistic motion.
+    The particle moves as if there were no drag effects, at constant velocity, \(v_0\).
+    The long time limit is \(\e^{-\gamma t} \approx 0\) giving \(\expected{x(t)} \approx x_0 + v_0/\gamma\).
+    This means that the particle essentially stops moving.
+    
+    We can also calculate the fluctuations in position:
+    \begin{equation*}
+        \expected{(x(t) - x_0)^2} = \frac{v_0}{\gamma^2} + \int_0^t \!\! \dd{t_1}\int_0^{t_1} \!\! \dd{t_2} \, \e^{-\gamma(t_1 - t_2)} \int_0^t \!\! \dd{t_3}\int_0^{t_3} \!\! \dd{t_4} \, \e^{-\gamma(t_3 - t_4)} \expected{f(t_2)f(t_4)}.
+    \end{equation*}
+    Here we have used the fact that the cross terms vanish since \(\expected{f(t)} = 0\).
+    We again have to be careful about introducing dummy variables for the integrals which don't clash.
+    Consider just the integral term here, call it \(I\).
+    We substitute in \(\expected{f(t_2)f(t_4)} = \Gamma \delta (t_2 - t_4)\).
+    This gives
+    \begin{equation}
+        I = \Gamma \int_0^t \!\! \dd{t_1}\int_0^{t_1} \!\! \dd{t_2} \, \e^{-\gamma(t_1 - t_2)} \int_0^t \!\! \dd{t_3}\int_0^{t_3} \!\! \dd{t_4} \, \e^{-\gamma(t_3 - t_4)} \delta(t_2 - t_4).
+    \end{equation}
+    Now we perform the integral over \(t_4\).
+    In order for the \(\delta(t_2 - t_4)\) term to not give zero we need to have \(t_2\) being between \(0\) and \(t_3\).
+    This means we change the limits on the \(t_3\) integral to go from \(t_2\) to \(t\), so \(t_3 \ge t_2\).
+    Doing so we get
+    \begin{equation}
+        I = \Gamma \int_0^t \!\! \dd{t_1} \int_0^{t_1} \!\! \dd{t_2} \, \e^{-\gamma(t_1 - t_2)} \int_{t_2}^{t} \!\! \dd{t_3} \, \e^{-\gamma(t_3 - t_2)}.
+    \end{equation}
+    Performing the \(t_3\) integral we get
+    \begin{equation}
+        I = \frac{\Gamma}{\gamma} \int_0^t \!\! \dd{t'} \int_0^{t_1} \!\! \dd{t_2} \e^{-\gamma(t_1 - t_2)}(1 - \e^{-\gamma(t - t_2)}).
+    \end{equation}
+    The \(t_2\) integral then gives
+    \begin{align}
+        I &= \frac{\Gamma}{\gamma^2} \int_0^t \!\! \dd{t_1} \left( 1 - \e^{-\gamma t_1} - \frac{1}{2}[\e^{-\gamma(t - t_1)} - \e^{-\gamma(t + t_1)}] \right)\\
+        &= \frac{\Gamma t}{\gamma^2} - \frac{\Gamma}{\gamma^3}(1 - \e^{-\gamma t}) - \frac{\Gamma}{2\gamma^3}(1 - \e^{-\gamma t})^2.
+    \end{align}
+    
+    The short time limit is \(\expected{(x(t) - x_0)^2} \approx v_0^2t^2\).
+    In the long time limit \(\gamma t \gg 1\) so \(t/\gamma^2 \gg 1/\gamma^3\), which means that we have \(\expected{(x(t) - x_0)^2} \approx \Gamma t/\gamma^2\).
+    Putting in \(\Gamma = 2\gamma \boltzmann T\) we get \(\expected{(x(t) - x_0)^2} \approx 2\boltzmann Tt/\gamma\).
+    Identifying \(\expected{(x(t) - x_0)^2} = 2Dt\) where \(D\) is the diffusion constant we get
+    \begin{equation}
+        D = \frac{\boltzmann T}{\gamma}.
+    \end{equation}
+    This is called the \defineindex{Einstein relation}.
+    It relates the diffusion constant, which is a measure of dissipation, to \(\Gamma\), which measures fluctuations.
+    
+    \section{General Theory}
+    Consider some variable, \(X\), with mean zero, which fluctuates in time.
+    We are interested in fluctuations in \(X\) about the mean, which we measure as correlations in equilibrium.
+    For example, if \(X\) is positive at time \(\tau\) then it is more likely to be positive at time \(\tau + t\), for some small \(t\), than it is to be negative, assuming that \(X\) varies relatively slowly over this time scale.
+    
+    In equilibrium we expect the correlation function to be independent of the initial time, and depends only on the difference in time, that is
+    \begin{equation}
+        \expected{X(\tau)X(\tau + t)} = M_{XX}(\tau)
+    \end{equation}
+    for some function \(M_{XX} \colon \reals \to \reals\).
+    For typical use cases we expect that there is some correlation time, \(t_{\mathrm{c}}\), such that \(M_{XX}\) rapidly falls of for \(t > t_{\mathrm{c}}\).
+    This typically appears in the form of an asymptotic decay:
+    \begin{equation}
+        M_{XX}(t) \sim \e^{-t/t_{\mathrm{c}}}.
+    \end{equation}
+    
+    It is possible to generalise this to compare two different fluctuating variables, for example, we may consider the magnetisation at two different, but nearby, places, which we expect to be correlated.
+    We then define
+    \begin{equation}
+        \expected{X(\tau)Y(\tau + t)} = M_{XY}(\tau).
+    \end{equation}
+    We call \(M_{XY}\) the \defineindex{dynamic correlation matrix}, and we can view the case of \(M_{XX}\) as a special case.
+    
+    The principle of detailed balance implies that there are no currents in equilibrium.
+    This means that once equilibrium is reached there is no direction of time, since there is no flowing current to distinguish forwards and backwards in time.
+    We therefore have that fluctuations arising in equilibrium are symmetric:
+    \begin{equation}
+        M_{XY}(t) = M_{XY}(-t).
+    \end{equation}
+    Further we have
+    \begin{alignat}{3}
+        M_{YX}(t) &= \expected{Y(\tau) X(\tau + t)}\\
+        &= \expected{X(\tau + t)Y(\tau)} \qquad & \tau \to \tau - t\\
+        &= \expected{X(\tau)Y(\tau - t)}\\
+        &= M_{XY}(-t)\\
+        &= M_{XY}(t),
+    \end{alignat}
+    so \(M_{XY}\) is also symmetric in \(X\) and \(Y\).
+    
+    \subsection{Linear Response Theory}
+    Now consider a small perturbation appliied to the system.
+    We can apply a small \enquote{thermodynamic force}, \(f_X\), such as an external field, \(h\), applied if \(X\) is the local magnetisation, \(m\).
+    
+    There are various ways to experimentally investigate these perturbations.
+    One way is to consider the perturbation over a long time, say starting at \(t = -\infty\) (or some large, negative approximation of \(-\infty\)), and then turning it off at \(t = 0\).
+    For \(t > 0\) the resulting average fluctuation, \(Y\), decays away.
+    
+    Another possibility is to consider the perturbation applied as a sharp kick at \(t = 0\), such a kick can be modelled as a delta distribution and the result is a Green's function.
+    
+    In either case we write
+    \begin{equation}
+        \expected{Y(t)}_{f_X} = R_{YX}(t) f_X,
+    \end{equation}
+    where \(Y\) is the fluctuation due to the thermal force, \(f_X\), and the average is over \(f_X\).
+    The \defineindex{response function matrix}, \(R_{YX}(t)\), generalises the susceptibility.
+    
+    For a sufficiently small perturbation the response will be so weak that it could have arisen as a natural, spontaneous fluctuation.
+    In that case the fluctuation, \(Y(t)\), will on average decay in time as if it were such a fluctuation which just happened to occur at \(t = 0\).
+    
+    The \defineindex{fluctuation-dissipation theorem} makes this idea, that a sufficiently small perturbation can be treated as a spontaneous fluctuation, more rigorous.
+    It states that
+    \begin{equation}
+        M_{YX}(t) = \boltzmann TR_{YX}(t).
+    \end{equation}
+    This says that the response function, \(R_{YX}\), which corresponds to the dissipation of the fluctuation, contains exactly the same information as the correlation function, \(M_{XY}\), which corresponds to the fluctuation.
+    
+    The factor of \(\boltzmann T\), can be motivated dimensionally, since \(f_XX\) has units of energy, and so does \(\boltzmann T\).
+    This means that \(X\) has units of \([R][f_X] = [R][\boltzmann][T]/[X]\), and \(M\) has units of \([X]^2 = [R][\boltzmann][T]\).
+    A full proof of the fluctuation-dissipation theorem is beyond the scope of the course as it either requires more classical mechanics, such as Poisson brackets, or more quantum mechanics through the formalism of the density matrix.
+    
+    Combining previous results we find that the fluctuation-dissipation theorem and symmetry of \(M_{XY}\) implies symmetry of the correlation matrix, that is
+    \begin{equation}
+        R_{XY}(t) = R_{YX}(t).
+    \end{equation}
+    This is \defineindex{Onsager's theorem}, which states that the mean response of \(X\) due to a thermodynamic force, \(f_Y\), is equivalent (in information content) to the mean response in \(Y\) due to \(f_X\).
+    Of course, to use this for computations we have to carefully define \(f_X\) for a given system such that this theorem holds.
+    
+    Onsager's theorem results in the time reversibility of microscopic physics constraining the time irreversible relaxation of a macroscopic system.
+    
+    \subsubsection{Thermoelectricity}
+    An application of the above theory is thermoelectricity.
+    Suppose we have two blocks of metal in contact.
+    If the left block is hotter than the right one then heat will flow from the left block to the right.
+    Since metal is conductive we also have to allow for electrons to flow between the blocks.
+    All of this will happen to achieve equilibrium, meaning that electrons are more likely to flow from the hot block to the cool block.
+    This is called the \defineindex{thermoelectric effect}.
+    
+    Now consider a different experiment where the temperatures are the same, but the chemical potentials of the electrons are not.
+    This is easiest to achieve by applying a voltage across the two blocks.
+    Onsager's theorem states that not only will electrons flow across the blocks but also heat energy will flow between them.
+    This is not easy to see from first principles but the symmetry of fluctuations and dissipations makes it so.
+    This is called the \defineindex{Peltier effect}.
+    
+    \subsection{Over Damped Brownian Motion}
+    Consider Brownian motion of a colloidal particle suspended in a fluid with an external force, \(F_{\mathrm{ext}}\).
+    We can also add a restoring force, \(-\kappa x\), which keeps the particle position bounded as \(t \to \infty\).
+    The Langevin equation for the system is then
+    \begin{equation}
+        m\diff[2]{x}{t} = -\gamma\diff{x}{t} + F_{\mathrm{ext}} - \kappa x + f(t).
+    \end{equation}
+    Here \(f\) is again a white noise random force, so \(\expected{f(t)} = 0\) and \(\expected{f(t)f(t')} = \Gamma \delta(t - t')\).
+    
+    Consider the case where the external force is switched on before \(t = 0\) and then turned off.
+    As a simplification we consider the case of an over damped system.
+    In this case accelerations are negligible, so the left hand side of the Langevin equation vanishes, and we get
+    \begin{equation}
+        \diff{x}{t} = \mu[F_{\mathrm{ext}} - \kappa x + f(t)]
+    \end{equation}
+    where \(\mu = 1/\gamma\).
+    This is a valid approximation for a viscous fluid, with \(\gamma\) large.
+    
+    Using an integrating factor we have
+    \begin{equation}
+        \diff{}{t} [x\e^{\mu\kappa t}] = \diff{x}{t}\e^{\mu\kappa t} + \mu\kappa x\e^{\mu\kappa t} = \mu\e^{\mu\kappa t}[F_{\mathrm{ext}} + f(t)].
+    \end{equation}
+    Integrating this we get
+    \begin{equation}
+        x(t) = \mu_{-\infty}^{0} \e^{-\mu\kappa(t - t')}[F_{\mathrm{ext}} + f(t)] \dd{t'} + \mu \int_0^t \e^{-\mu\kappa(t - t')}f(t').
+    \end{equation}
+    The average displacement is then
+    \begin{equation}
+        \expected{x(t)}_{F_{\mathrm{ext}}} = \frac{1}{\kappa} \e^{-\mu\kappa t}F_{\mathrm{ext}}.
+    \end{equation}
+    For \(\mu\kappa t \ll 1\) we have \(\expected{x(t)}_{F_{\mathrm{ext}}} = F_{\mathrm{ext}}/\kappa - F_{\mathrm{ext}}\mu t\).
+    This means the particle starts displaced by about \(F_{\mathrm{ext}}/\kappa\) and returns to zero displacement once the external force is removed.
+    
+    Comparing this with \(\expected{x}_f = Rf\) we have
+    \begin{equation}
+        R_{xx} = \frac{1}{\kappa}\e^{-\mu\kappa t}.
+    \end{equation}
+    Now considering the correlation function
+    \begin{equation}
+        M_xx(t) = \expected{x(\tau)x(\tau + t)}
+    \end{equation}
+    in the absence of external forces we have
+    \begin{equation}
+        x(t) = \mu \int_{-\infty}^t \e^{-\mu \kappa(t - t')} f(t') \dd{t'}.
+    \end{equation}
+    This allows us to compute the correlation function:
+    \begin{align}
+        M_{xx}(t) &= \mu^2\int_{-\infty}^{\tau} \dl{t'} \, \e^{-\mu\kappa(\tau - t')} \int_{-\infty}^{\tau + t} \dl{t''} \, \e^{-\mu\kappa(\tau + t - t'')} \expected{f(t')f(t'')}\\
+        &= \mu^2 \Gamma \int_{-\infty}^{\tau} \dl{t'} \, \e^{-\mu\kappa(t + 2\tau - 2t')}\\
+        &= \frac{\mu\Gamma}{2\kappa} \e^{-\mu\kappa t}.
+    \end{align}
+    The fluctuation dissipation theorem, \(\boltzmann T R_{xx} = M_{xx}\), then gives
+    \begin{equation}
+        \Gamma = \frac{2\boltzmann T}{\mu} = 2\gamma\boltzmann T,
+    \end{equation}
+    which is the same result we got previously.
     
 %    %   Appdendix
 %    \appendixpage
