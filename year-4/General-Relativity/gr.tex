@@ -37,6 +37,9 @@ noabbrev
 \usepackage{NotesBoxes}
 \usepackage{NotesMaths}
 
+\diffdef{}{long-var-wrap=dv}
+\diffdef{p}{long-var-wrap=dv}
+
 % Title page info
 \title{General Relativity}
 \author{Willoughby Seago}
@@ -2171,10 +2174,10 @@ noabbrev
     A tangent vector is a vector in the tangent space.
     The formal definition of a tangent space is a bit abstract:
     \begin{dfn}{Tangent Space}{}
-        Let \(M\) be a smooth manifold and \(f \colon M \to \reals\) a smooth function on \(M\).
-        The set of all smooth functions on \(M\), denoted \(C^{\infty}(M)\), is a real associative algebra under point wise addition and products, that is for \(f, g \in C^{\infty}(M)\) we define \((f + g)(p) = f(p) + g(p)\) and \(fg(p) = f(p)g(p)\).
+        Let \(M\) be a smooth manifold.
+        The set of all smooth functions \(M \to \reals\), denoted \(C^{\infty}(M)\), is a real associative algebra under point wise addition and products, that is for \(f, g \in C^{\infty}(M)\) we define \((f + g)(p) = f(p) + g(p)\) and \(fg(p) = f(p)g(p)\).
         
-        A \defineindex{derivation} at \(p \in M\) is a linear map, \(D \colon \End(M) \to \reals\) satisfying the Leibniz identity,
+        A \defineindex{derivation} at \(p \in M\) is a linear map, \(D \colon C^{\infty}(M) \to \reals\) satisfying the Leibniz identity,
         \begin{equation}
             D(fg) = D(f)g(p) + f(p)D(g)
         \end{equation}
@@ -4468,8 +4471,423 @@ noabbrev
             \draw[->] (-1, -2) -- (8.5, -2) node[below] {\(t\)};
         \end{tikzpicture}
         \caption[Gravitational wave with \(h_{\times}\) polarisation.]{A gravitational wave travelling into/out of the page will have this effect on a circle if \(a = 0\), known as \(h_\times\) polarisation.}
+        \label{fig:GW x polarised}
     \end{figure}
     
+    \section{Energy Transport}
+    Recall that we can write \(\bar{h}^{\mu\nu}\) as
+    \begin{equation}
+        \bar{h}^{\mu\nu} = -\frac{4G}{c^4} \int \frac{[T^{\mu\nu}]}{\abs{\vv{r} - \vv{r}'}} \dd{^3r'}.
+    \end{equation}
+    In the transverse traceless gauge we have \(\bar{h}^{00} = 0\), and so what we really need is
+    \begin{equation}
+        \bar{h}^{ij} = -\frac{4G}{c^4} \int \frac{[T^{ij}]}{\abs{\vv{r} - \vv{r}'}} \dd{^3r'}.
+    \end{equation}
+    A further simplification can be made by looking for a far-field solution, that is we assume that \(R \coloneqq \abs{\vv{r} - \vv{r}'}\) is large, and so as \(\vv{r}'\) varies of the range of integration \(R\) is approximately constant.
+    In this case what we really need to calculate is
+    \begin{equation}
+        h^{ij} \approx -\frac{4G}{c^4R} \int[T^{ij}] \dd{^3r'}.
+    \end{equation}
+    
+    In order to calculate this value we use the conservation law, \(\covariantDerivative{\nu}T^{\mu\nu} = \tensor{T}{^{\mu\nu}_{;\nu}} = 0\).
+    We are assuming weak, Newtonian fields and so we can replace the covariant derivative with a normal coordinate derivative.
+    We then have \(\partial_\nu T^{\mu\nu} = \tensor{T}{^{\mu\nu}_{,\nu}} = 0\).
+    Taking \(\mu = 0\) we get \(\tensor{T}{^{0\nu}_{,\nu}} = 0\), which can be rearranged to give \(\tensor{T}{^{00}_{,0}} = -\tensor{T}{^{0i}_{,i}}\).
+    Similarly we must have \(\covariantDerivative{\mu}\covariantDerivative{\nu}T^{\mu\nu} = 0\), which gives \(\tensor{T}{^{\mu\nu}_{;\mu\nu}} \approx \tensor{T}{^{\mu\nu}_{,\mu\nu}}\), which gives \(\tensor{T}{^{00}_{,00}} = \tensor{T}{^{ij}_{,ij}}\).
+    Note that since there are two derivatives the negatives cancel out.
+    
+    We want \(T^{ij}\), so we need to integrate \(\tensor{T}{^{ij}_{,ij}}\).
+    We can do this by parts twice, and doing so gives a factor of \(x^ix^j\) in the integrand.
+    We can choose the boundary to be such that all boundary terms vanish, usually by choosing a boundary at infinity and demanding that fields vanish at infinity.
+    We then end up with
+    \begin{equation}
+        h^{ij} = -\frac{4G}{c^4R} \int [T^{ij}] \dd{^3r'} = \frac{4G}{c^4R} \frac{1}{2}\frac{1}{c^2}\diff[2]{}{t} \int [T^{00}]x^ix^j \dd{^3r'}.
+    \end{equation}
+    Here the time derivatives come from swapping \(\tensor{T}{^{ij}_{,ij}}\) for \(\tensor{T}{^{00}_{,00}}\).
+    
+    In order to compute the energy transported by the gravitational waves we split the metric into two parts:
+    \begin{equation}
+        g_{\mu\nu} = g_{\mu\nu}^{\mathrm{(B)}} + h_{\mu\nu},
+    \end{equation}
+    where \(g_{\mu\nu}^{\mathrm{(B)}}\) corresponds to the background metric.
+    Notice that we no longer assume this is static, which would give \(g_{\mu\nu}^{\mathrm{(B)}} = \eta_{\mu\nu}\), but instead allow it to respond to the presence of the gravitational waves.
+    We can also write the Einstein tensor as \(G_{\mu\nu} = G_{\mu\nu}^{\mathrm{(B)}} + G_{\mu\nu}^{(h)}\).
+    If \(G^{\mu\nu} = 0\) we then have
+    \begin{equation}
+        G_{\mu\nu}^{\mathrm{(B)}} = -G_{\mu\nu}^{(h)}.
+    \end{equation}
+    The right hand side is the contribution of the waves to the background, and the left hand side is the response of the background.
+    Note that we must go to higher than linear order here since the linear Ricci tensor vanishes in a vacuum.
+    The Einstein tensor is then, to lowest order in \(h\), \(G_{\mu\nu} = G_{\mu\nu}^{\mathrm{(B)}} + G_{\mu\nu}^{(2)}\), where the last term represents terms of second order in \(h\).
+    We then get the effective source term for gravitational waves as
+    \begin{equation}
+        T_{\mu\nu}^{\mathrm{(GW)}} = \frac{c^4}{8\pi G}G_{\mu\nu}^{(2)} = \frac{c^4}{32\pi G}\tensor{h}{_{\alpha\beta,\mu}}\tensor{h}{^{\alpha\beta}_{,\nu}}.
+    \end{equation}
+    Which holds in the transverse traceless gauge.
+    In general we have
+    \begin{equation}
+        T_{\mu\nu}^{\mathrm{(GW)}} = \frac{c^4}{32\pi G}\expected*{\tensor{\bar{h}}{_{\alpha\beta,\mu}}\tensor{\bar{h}}{^{\alpha\beta}_{,\nu}} - \frac{1}{2}\tensor{\bar{h}}{_{,\mu}} \tensor{\bar{h}}{_{,\nu}}}.
+    \end{equation}
+    Here the average is over one period of the wave.
+    
+    Using the previous work we can show that in the transverse traceless gauge the energy dissipated by the wave is given by
+    \begin{equation}
+        -\dot{E} = \frac{G}{5c^5} \expected{\dddot{I}_{ij}\dddot{I}^{ij}}
+    \end{equation}
+    where \(I_{ij}\) is the three dimensional reduced quadrupole , given by
+    \begin{equation}
+        I_{ij} \coloneqq \int \rho\left( x_ix_j - \frac{1}{3}r^2\delta_{ij} \right) \dd{^3x}.
+    \end{equation}
+    Note that this is traceless by construction.
+    
+    \subsection{Binary System}
+    Consider a binary system of two masses, \(M_1\) and \(M_2\), which are separated by a distance \(a\) and are orbiting at orbital angular velocity \(\omega\).
+    It can be shown that the energy dissipated is given by
+    \begin{equation}
+        -\dot{E} = \frac{32}{5}\frac{G}{c^5} \mu^2 a^4 \omega^6
+    \end{equation}
+    where
+    \begin{equation}
+        \mu \coloneqq \frac{M_1M_2}{M_1 + M_2}
+    \end{equation}
+    is the reduced mass.
+    
+    Kepler's laws tell us that
+    \begin{equation}
+        \omega^2 = \frac{G(M_1 + M_2)}{a^3}.
+    \end{equation}
+    The binding energy of a two body system is always half the potential energy, so in this case \(-GM_1M_2/(2a)\).
+    The rate of change of this energy is equal to the power dissipated by the system creating gravitational waves.
+    Using this we set up a differential equation in energy which can be solved to give
+    \begin{equation}
+        a^4 = \frac{256}{5}\frac{G^3}{c^5} M_1M_2(M_1 + M_2)(-t).
+    \end{equation}
+    Here we choose to define \(t = 0\) as the time when the two object merge, so all times prior to this are negative.
+    What we see from this is that the binary system shrinks to zero size with \(a \propto (-t)^{1/4}\).
+    The orbital velocity then diverges as \(\omega \propto (-t)^{-3/8}\).
+    
+    The frequency of the gravitational waves will be twice the frequency of the orbiting masses since the quadrupole moment returns to its initial value after only half an orbit.
+    This is most obvious in the case of \(M_1 = M_2\), when clearly the system returns to its initial arrangement twice an orbit, albeit with a smaller separation, \(a\).
+    The frequency of the gravitational waves is then
+    \begin{equation}
+        \omega_{\mathrm{GW}} = \frac{5^{3/8}}{4} \left( \frac{G\mathcal{M}}{c^3} \right)^{5/8}(-t)^{-3/8}
+    \end{equation}
+    where
+    \begin{equation}
+        \mathcal{M} \coloneqq \left( \frac{(M_1M_2)^3}{M_1 + M_2} \right)^{1/5}
+    \end{equation}
+    is the \defineindex{chirp mass}.
+    This sets a characteristic timescale, \(t_{\mathrm{chirp}} \coloneqq G\mathcal{M}/c^3\), which corresponds to roughly the period of the gravitational waves through
+    \begin{equation}
+        \omega_{\mathrm{GW}} = \frac{5^{3/8}}{4} \frac{1}{t_{\mathrm{chirp}}} \left( -\frac{t}{t_{\mathrm{chirp}}} \right)^{-3/5}.
+    \end{equation}
+    
+    Consider the typical black hole merger case where \(\mathcal{M}\) is approximately 30 solar masses.
+    We then find that \(t_{\mathrm{chirp}} \approx \qty{0.15}{\milli\second}\).
+    This corresponds to a frequency on the order of a few kilo hertz.
+    This explains why we use the word chirp.
+    Since these frequencies occur on the order of hundreds to thousands of hertz we can directly translate the data to sound at the same frequency, and we hear a chirp sound as the frequency increases to above the human hearing range.
+    
+    Detections of gravitational waves, such as by LIGO, agree with these predictions, in particular we see that the frequency of the waves diverges as \((-t)^{-3/8}\).
+    For positive times, after the merger we get what is called ring down, where the oscillations rapidly decay.
+    This occurs due to the fact that in reality the two masses aren't point masses and upon merging the single mass produced oscillates slightly before settling into a roughly spherical shape.
+    
+    \chapter{Black Holes}
+    \section{Metrics}
+    We have seen that a stationary point mass, \(M\), at the origin can be described, away from the origin, by the Schwarzschild metric:
+    \begin{equation}
+        c^2\dd{\tau}^2 = \alpha c^2\dd{t}^2 - \frac{1}{\alpha}\dd{r}^2 + r^2\dd{\psi}^2,
+    \end{equation}
+    where
+    \begin{equation}
+        \alpha = 1 - \frac{r_{\mathrm{s}}}{r} = 1 0 \frac{2GM}{c^2},
+    \end{equation}
+    and \(\dl{\psi}^2 = \dd{\vartheta}^2 + \sin^2(\vartheta)\dd{\varphi}^2\).
+    Birkhoff's theorem then states that this same metric describes any spherically symmetric, stationary mass distribution when we are outside of the mass distribution.
+    It should be noted that by \enquote{outside} the mass distribution we mean that there is no matter between the observer and infinity, which is required as the derivation of the Schwarzschild metric assumes that the metric at infinity is given by the Minkowski metric.
+    
+    The \defineindex{no hair theorem} states that all (classical) black hole solutions to the the field equations are characterised by only three properties, their mass, \(M\), charge, \(Q\), and angular momentum, \(J\).
+    The Schwarzschild metric applies when \(Q\) and \(J\) are both zero.
+    If \(Q \ne 0\) then we get the \defineindex{Reissner--Nordstr{\o}m metric}.
+    This is the same as the Schwarzschild metric but with
+    \begin{equation}
+        \alpha = 1 - \frac{r_{\mathrm{s}}}{r} + \frac{r_Q^2}{r^2},
+    \end{equation}
+    where
+    \begin{equation}
+        r_Q^2 \coloneqq \frac{Q^2G}{4\pi\varepsilon_0c^4}.
+    \end{equation}
+
+    For the case when \(Q = 0\) but \(J \ne 0\) we get the \defineindex{Kerr metric}.
+    This is more complex as the rotation causes the black hole to bulge around the middle and so we lose spherical symmetry.
+    The metric is therefore usually given in modified coordinates, which are to an ellipsoid as spherical coordinates are to the sphere:
+    \begin{multline}
+        c^2\dd{\tau}^2 = \alpha c^2\dd{t}^2 + \frac{\Sigma}{\Delta}\dd{r}^2 + \Sigma\dd{\vartheta}^2 + \left( r^2 + a^2 + \frac{r_{\mathrm{s}}ra^2}{\Sigma}\sin^2(\vartheta) \right)\sin^2(\vartheta)\dd{\varphi}^2\\
+        - \frac{2r_{\mathrm{s}}ra\sin^2(\vartheta)}{\Sigma} c\dd{t}\dd{\varphi}.
+    \end{multline}
+    The ellipsoidal coordinates are related to Cartesian coordinates by
+    \begin{alignat}{3}
+        x &= \sqrt{r^2 + a^2}\sin(\vartheta)\cos(\varphi), \qquad & y &= \sqrt{r^2 + a^2}\sin(\vartheta)\sin(\varphi),\\
+        &\text{and} &  z &= r\cos(\vartheta).
+    \end{alignat}
+    Notice that these reduce to spherical coordinates when \(a = 0\).
+    The other parameters appearing in this metric are
+    \begin{equation}
+        a = \frac{J}{Mc}, \qquad \Sigma = r^2 + a^2\cos^2(\vartheta), \qqand \Delta = r^2 - r_{\mathrm{s}}r + a^2.
+    \end{equation}
+    Importantly notice the introduction of the cross term, \(\dd{t}\dd{\varphi}\), which implies a coupling between coordinate time and motion in the plane of rotation.
+    
+    Finally, for a rotating charged black hole the metric is the \defineindex{Kerr--Newman metric}, which is given in normal spherical coordinates by
+    \begin{multline}
+        c^2\dd{\tau}^2 = -\left( \frac{1}{\Delta} \dd{r}^2 + \dd{\vartheta}^2 \right)\rho^2 + (c\dd{t} - a\sin^2(\vartheta)\dd{\varphi})^2\frac{\Delta}{\rho^2}\\
+        - ((r^2 + a^2)\dd{\varphi} - ac\dd{t})^2\frac{\sin^2(\vartheta)}{\rho^2},
+    \end{multline}
+    where
+    \begin{equation}
+        a = \frac{J}{Mc}, \qquad \rho^2 = r^2 + a^2\cos^2\vartheta, \qqand \Delta = r^2 - r_{\mathrm{s}}r + a^2 + r_Q^2.
+    \end{equation}
+    
+    We will only consider stationary, neutral, black holes as described by the Schwarzschild metric.
+    
+    \section{Singularities}
+    The Schwarzschild metric is singular at 3 places.
+    First, when \(r = 0\) we have \(g_{tt} \to \infty\) and \(g_{rr} \to 0\), second when \(r = r_{\mathrm{s}}\) we have \(g_{tt} \to 0\) and \(g_{rr} \to \infty\), and finally when \(r \to \infty\) we have \(g_{\vartheta\vartheta}, g_{\varphi\varphi} \to \infty\).
+    To decide whether these singularities are important we need to see if they are real, or a coordinate artifact.
+    
+    Consider, for example, the Minkowski metric, \(c^2\dd{\tau}^2 = c^2\dd{t}^2 - \dd{r}^2 - r^2(\dd{\vartheta}^2 + \sin^2(\vartheta)\dd{\varphi}^2)\).
+    The two angular metric components, \(g_{\vartheta\vartheta} = -r^2\) and \(g_{\varphi\varphi} = -r^2\sin^2(\vartheta)\), both diverge as \(r \to \infty\).
+    However, if we write this same metric in Cartesian coordinates, \(c^2\dd{\tau}^2 = c^2\dd{t}^2 - \dd{x}^2 - \dd{y}^2 - \dd{z}^2\), then there is no \(r\) dependence and so nothing diverges as \(r \to \infty\).
+    From this we can see that this divergence is simply a coordinate artifact.
+    As another example consider what happens at \(r = 0\) when we make the coordinate transformation \(R = r^3/3\).
+    We find that
+    \begin{equation}
+        \diff{r}{R} = R \implies \dd{R}^2 = r^4\dd{r}^2 \implies \dd{r}^2 = (3R)^{-4/3}\dd{R}^2.
+    \end{equation}
+    We then see that the metric has a singularity at \(R = 0\), which is to say at \(r = 0\).
+    Clearly however, this is simply a coordinate artifact, introduced deliberately here for the sake of the example.
+    
+    The singularity in the Schwarzschild metric as \(r \to \infty\) is a \defineindex{coordinate singularity}, just like the two examples above.
+    For a \enquote{real} singularity there will be some invariant, such as the Ricci scalar, \(\tensor{R}{^\mu_\mu}\), which is singular.
+    Considering the Schwarzschild metric we can show that at \(r = r_{\mathrm{s}}\) the Ricci scalar vanishes.
+    However, for \(r = 0\) it can be shown that \(\tensor{R}{^\mu_\mu} \to \infty\), and so this is a \enquote{real} singularity.
+    The fact that \(r = 0\) has non-singular Ricci scalar doesn't guarantee it isn't a real singularity.
+    
+    \subsection{Radial Photon}
+    Consider a radial photon, by this we mean a massless particle, so \(\dl{\tau} = 0\), travelling along a geodesic with \(\dl{\vartheta} = \dl{\varphi} = 0\).
+    We then have the Lagrangian-squared
+    \begin{equation}
+        \lagrangian^2 = \alpha c^2\dot{t}^2 - \frac{1}{\alpha}\dot{r}^2.
+    \end{equation}
+    Applying the Euler--Lagrange equations to this we find that
+    \begin{equation}
+        \alpha\dot{t} = k, \qqand \dot{r}^2 = c^2k^2.
+    \end{equation}
+    The second of these, \(\dot{r} = \pm c\abs{k}\), gives us light cones for incoming and outgoing particles.
+    
+    A distant observer will measure the velocity of the photon to be
+    \begin{equation}
+        \diff{r}{t} = \frac{\dot{r}}{\dot{t}} = \pm c\alpha.
+    \end{equation}
+    This has two solutions,
+    \begin{equation}
+        ct = \pm(r + r_{\mathrm{s}} \ln\abs{r - r_{\mathrm{s}}} + \mathrm{const}).
+    \end{equation}
+    For \(r > r_{\mathrm{s}}\) we can identify the positive solution as the outgoing photon and the negative solution as an incoming photon.
+    For \(r \gg r_{\mathrm{s}}\) we recover \(ct = \pm r\), which is to say a photon moving in free space, which gives \ang{45} light cones.
+    
+    The incoming and outgoing geodesics for a massless particle form the light \enquote{cone} for this spacetime.
+    As the photon approaches \(r = r_{\mathrm{s}}\) from \(r > r_{\mathrm{s}}\) the edges of the light \enquote{cones} become parallel to the \(t\)-axis.
+    This means that it will take an infinite amount of coordinate time for the particle to reach \(r = r_{\mathrm{s}}\).
+    What this means for an external observer is that information about what has fallen into a black hole remains on the surface of the black hole.
+    On the other hand, for \(r < r_{\mathrm{s}}\) the light cones are tipped over and point toward \(r = 0\), meaning that once inside the black hole all photons head to the origin, meaning they can't escape.
+    This is shown in \cref{fig:geodesics-black-hole-massless}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{black-hole-geodesics-massless}
+        \begin{tikzpicture}[samples=100]
+            \draw[very thick, <->] (0, 5) node[right] {\(ct\)} -- (0, 0) -- (5, 0) node[below] {\(x\)};
+            \draw[dashed, my red] (2, 0) node[below, black] {\(r_{\mathrm{s}}\)} -- (2, 5);
+            \begin{scope}
+                \clip (0, 0) rectangle (5, 5);
+                \draw[highlight, domain=2.1:5, thick] plot (\x, {\x + ln(\x - 2)});
+                \draw[highlight, domain=2.0001:2.3, thick] plot (\x, {-\x - ln(\x - 2)});
+                \draw[highlight!50, thick] (2.3, 2.1) circle [x radius = 0.3, y radius = 0.12];
+                \draw[my blue, domain=0:1.99, thick] plot (\x, {\x + ln(2 - \x) + 1});
+                \draw[my blue, domain=0:1.999, thick] plot (\x, {-\x - ln(2 - \x) + 1});
+                \draw[my blue!50, thick] (1, 1) circle [x radius = 0.1, y radius = 1];
+            \end{scope}
+        \end{tikzpicture}
+        \caption[Geodesics of a massless particle near a black hole.]{Geodesics of a massless particle near a black hole. Notice that the geodesics approaching from \(r > r_{\mathrm{s}}\) never quite reach \(r_{\mathrm{s}}\). The light cone never overlaps the line \(r = r_{\mathrm{s}}\). On the other side of this line the light cone points towards \(r = 0\), indicating that particles cannot escape a black hole. The light cone tips over since the geodesic for an incoming, massless particle must form the left side of the light cone and the outgoing geodesic must form the right side. Left of \(r = r_{\mathrm{s}}\) the outgoing particle is the one which ends up asymptotically increasing, that is at larger \(r\) it is the higher line. For \(r > r_{\mathrm{s}}\) clearly the outgoing particle is the one moving away from the origin as \(t\) increases, note that this line is asymptotic to a \ang{45} line.}
+        \label{fig:geodesics-black-hole-massless}
+    \end{figure}
+    
+    We call \(r = r_{\mathrm{s}}\) the \defineindex{event horizon}.
+    It is the boundary between events which can and cannot be detected by an external observer in the future.
+    In a general spacetime, such as for a rotating charged black hole, the event horizon can be very difficult to calculate, since we have to consider all possible geodesics, but for this simple case it is simply a case of considering when \(g_{rr}\) diverges.
+    For finite time intervals, as measured by a local observer at rest, we have \(\dl{r} \to 0\), since
+    \begin{equation}
+        c^2\dd{\tau}^2 = g_{tt} c^2 \dd{t}^2 - g_{rr}\dd{r}^2 = 0
+    \end{equation}
+    for a photon, and we also know that \(g_{tt} \dd{t}^2 = \dd{t_{\mathrm{local}}}^2\).
+    Symmetry means that if a geodesic cannot cross \(r = 2Gm/c^2\) at one location then it cannot cross it anywhere, which means that any local condition we derive will apply to the whole surface.
+    
+    We now consider two solutions with \(r < r_{\mathrm{s}}\).
+    For an ingoing geodesic the diagram in \cref{fig:geodesics-black-hole-massless} we see that for \(r < r_{\mathrm{s}}\) as \(r\) decreases \(ct\) also decreases.
+    This seems paradoxical, however it is simply a result of our definition of the time coordinate.
+    Defining instead
+    \begin{equation}
+        ct' = ct + r_{\mathrm{s}} \ln\abs{r - r_{\mathrm{s}}}
+    \end{equation}
+    we see that the ingoing and outgoing null geodesics are
+    \begin{equation}
+        ct' = -r + \mathrm{const}, \qqand ct' = r + 2r_{\mathrm{s}} \ln\abs{r - r_{\mathrm{s}}} + \mathrm{const}.
+    \end{equation}
+    We call the resulting coordinates are called \defineindex{advanced Eddington--Finkelstein coordinates}.
+    In these coordinates the geodesics look slightly more sensible while maintaining the important features.
+    Instead of tipping over suddenly when \(r < r_{\mathrm{s}}\) they tip over slowly as \(r\) decreases, with \(r = r_{\mathrm{s}}\) instead being the point at which one side of the cone goes vertical, before pointing towards \(r = 0\) as \(r\) continues to decrease.
+    
+    \subsubsection{Infinite Redshift Surface}
+    At \(r = r_{\mathrm{s}}\) the time part of the metric vanishes, so \(g_{tt} = 0\).
+    For a stationary emitter at \(r\) the proper time interval, \(\dl{\tau}\), is related to the coordinate time interval, \(\dl{t}\), by
+    \begin{equation}
+        c^2\dd{\tau}^2 = g_{tt}c^2\dd{t}^2 = c^2\dd{t}^2\left( 1 - \frac{2GM}{rc^2} \right).
+    \end{equation}
+    As \(r \to r_{\mathrm{s}}\) we have \(g_{tt} \to 0\), and so \(\diff{\tau}/{t} \to 0\).
+    This means that
+    \begin{equation}
+        1 + z = \diff{t}{\tau} = \frac{\nu_{\mathrm{emitted}}}{\nu_{\mathrm{observed}}} \to \infty,
+    \end{equation}
+    which is to say the redshift is infinite at \(r = r_{\mathrm{s}}\).
+    It should be noted that the surface of infinite redshift and the event horizon coincide for the Schwarzschild metric, but not for more complicated spacetimes, such as the Kerr metric of the spinning black hole.
+    
+    \subsection{Massive Particles}
+    If we instead consider a massive particle then \(\lagrangian^2 = c^2\), giving
+    \begin{equation}
+        \lagrangian^2 = c^2 = \alpha c^2\dot{t}^2 - \frac{1}{\alpha}\dot{r}^2.
+    \end{equation}
+    Applying the Euler--Lagrange equations we then get \(\alpha\dot{t}^2 = k\), the same as before, but we get an extra term in the radial equation:
+    \begin{equation}
+        \dot{r}^2 = c^2k^2 - c^2\alpha.
+    \end{equation}
+    For simplicity we consider \(k = 1\) for a particle with zero speed at infinity.
+    We then have
+    \begin{equation}
+        \left( \diff{r}{\tau} \right)^2 = \dot{r}^2 = c^2\frac{r_{\mathrm{s}}}{r},
+    \end{equation}
+    where we have substituted \(\alpha = 1 - r_{\mathrm{s}}/r\).
+    The solution to this equation is
+    \begin{equation}
+        c\tau = \pm \frac{2}{3}r_{\mathrm{s}}\left( \frac{r}{r_{\mathrm{s}}} \right)^{3/2}.
+    \end{equation}
+    Here we have chosen the origin of proper time to be such that \(\tau = 0\) when \(r = 0\).
+    
+    Nothing strange happens when \(r = r_{\mathrm{s}}\), which confirms the fact that this is simply a consequence of coordinate choice.
+    An observer who has fallen into the black hole from infinity reaches the centre a proper time \(\tau = 2r_{\mathrm{s}}/(3c)\) after crossing the event horizon.
+    At this point the observer reaches a true singularity, and will be torn apart by tidal forces before they reach the origin.
+    However, for a sufficiently large black hole, say \(10^5\) solar masses, the tidal forces should be survivable at \(r = r_{\mathrm{s}}\).
+    
+    The negative sign in the solution above corresponds to ingoing trajectories.
+    We also have the positive sign, corresponding to outgoing trajectories.
+    This is to be expected, since the geodesic equation is time reversible:
+    \begin{equation}
+        \diff[2]{x^\mu}{\tau} + \christoffel{\mu}{\alpha}{\beta}\dot{x}^\alpha\dot{x}^\beta = 0 \xrightarrow{\tau \to -\tau} \diff[2]{x^\mu}{(-\tau)} + \christoffel{\mu}{\alpha}{\beta}(-\dot{x}^\alpha)(-\dot{x}^\beta) = 0.
+    \end{equation}
+    Note that the affine connections are unchanged under \(\tau \to -\tau\).
+    The fact that there are outgoing trajectories is a failure of coordinate time to properly describe what occurs inside the event horizon.
+    
+    In terms of coordinate time the apparent velocity of the falling observer is
+    \begin{equation}
+        v = \diff{r}{t} = \frac{\dot{r}}{\dot{t}} = \pm \sqrt{\frac{r_{\mathrm{s}}}{r}}\left( 1 - \frac{r_{\mathrm{s}}}{r} \right).
+    \end{equation}
+    This vanishes as \(r \to r_{\mathrm{s}}\).
+    Since \(t\) can also be interpreted as the proper time for a stationary observer at infinity we can interpret this as the particle \emph{never} crossing the event horizon from the view of this observer.
+    Instead the particle freezes at the event horizon.
+    
+    In theory this still allows for a particle generated at \(r = 0\) to escape the black hole, given the right initial conditions.
+    This is unlikely to happen though, and any particle falling in already has the wrong initial conditions, so cannot escape.
+    A singularity which emits particles is known as a \defineindex{white hole}.
+    
+    \section{Kruskal--Szekeres Coordinates}
+    The \(r = r_{\mathrm{s}}\) singularity is due to our choice of coordinates.
+    We can define a different set of coordinates, known as \defineindex{Kruskal--Szekeres coordinates}, in which light cones appear closer to those of Minkowski spacetime.
+    These coordinates for \(r > r_{\mathrm{s}}\) are defined as
+    \begin{align}
+        v &= \sqrt{\abs*{\frac{r}{r_{\mathrm{s}}} - 1}} \e^{r/(2r_{\mathrm{s}})} \sinh\left( \frac{ct}{2r_{\mathrm{s}}} \right),\\
+        u &= \sqrt{\abs*{\frac{r}{r_{\mathrm{s}}} - 1}} \e^{r/(2r_{\mathrm{s}})} \cosh\left( \frac{ct}{2r_{\mathrm{s}}} \right).
+    \end{align}
+    For \(r < r_{\mathrm{s}}\) they are defined as
+    \begin{align}
+        v &= \sqrt{\abs*{\frac{r}{r_{\mathrm{s}}} - 1}} \e^{r/(2r_{\mathrm{s}})} \cosh\left( \frac{ct}{2r_{\mathrm{s}}} \right),\\
+        u &= \sqrt{\abs*{\frac{r}{r_{\mathrm{s}}} - 1}} \e^{r/(2r_{\mathrm{s}})} \sinh\left( \frac{ct}{2r_{\mathrm{s}}} \right).
+    \end{align}
+    That is we just swap \(\sinh\) and \(\cosh\).
+    
+    In these coordinates the metric is
+    \begin{equation}
+        c^2\dd{\tau}^2 = 4r_{\mathrm{s}}^2 \frac{r_{\mathrm{s}}}{r} \e^{-r/r_{\mathrm{s}}} (\dl{v}^2 - \dl{u}^2) - r^2\dd{\psi}^2.
+    \end{equation}
+    Notice that \(u\) and \(v\) aren't clearly time or space like, and instead have properties of both, which makes sense given how they mix \(t\) and \(r\).
+    It can be shown that
+    \begin{equation}
+        u^2 - v^2 = \left( \frac{r}{r_{\mathrm{s}}} - 1 \right)\e^{r/r_{\mathrm{s}}}.
+    \end{equation}
+    This shows that lines of constant \(\tau\) lie on hyperbolae.
+    We also have
+    \begin{equation}
+        \frac{v}{u} = \tanh\left( \frac{ct}{2r_{\mathrm{s}}} \right).
+    \end{equation}
+    This shows that different time slices lie on straight lines in the \((u, v)\)-plane with different slopes.
+    
+    For a photon travelling along a radial null geodesic, that is \(\dl{\tau} = 0\) and \(\dl{\psi} = 0\), the metric reduces to \(\dl{v}^2 = \dl{u}^2\) and we have
+    \begin{equation}
+        u = \pm (v + \mathrm{const}).
+    \end{equation}
+    This shows that light cones in the \((u, v)\)-plane are at \ang{45}, much like in Minkowski spacetime.
+    
+    From the definitions of \(u\) and \(v\) we can see that all possible values of \(t\) and \(r\), that is \(-\infty < t < \infty\) and \(0 < r < \infty\), is covered by the region above the diagonal line \(v = -u\).
+    This is because for \(r > r_{\mathrm{s}}\) the coordinate \(u\) is positive and \(v\) ranges from \(-u\) to \(u\), whereas for \(r < r_{\mathrm{s}}\) \(v\) is positive and \(u\) ranges from \(-v\) to \(v\).
+    However, we can still consider the region below the line \(v = -u\).
+    The value of \(r\) depends on \(u^2 - v^2\) and the value of \(t\) depends on \(v/u\), so if the signs of both \(u\) and \(v\) change there will be no change in \(r\) and \(t\).
+    
+    \begin{figure}
+        \tikzsetnextfilename{black-hole-kruskal-szekeres-coords}
+        \begin{tikzpicture}[samples=100]
+            \draw[very thick, ->] (-3, 0) -- (3, 0) node[right] {\(u\)};
+            \draw[very thick, ->] (0, -3) -- (0, 3) node[above] {\(v\)};
+            \draw[dashed] (-3, -3) -- (3, 3);
+            \draw[dashed] (-3, 3) -- (3, -3);
+            \node[above] at (1.5, 0) {I};
+            \node[above] at (-1.5, 0) {III};
+            \node[right] at (0, 1) {II};
+            \node[right] at (0, -1) {IV};
+            \draw[domain=1.41422:3, ultra thick, highlight] plot ({sqrt(\x*\x - 2)}, \x);
+            \draw[domain=1.41422:3, ultra thick, highlight] plot ({-sqrt(\x*\x - 2)}, \x);
+            \draw[domain=1.41422:3, ultra thick, highlight] plot ({sqrt(\x*\x - 2)}, -\x);
+            \draw[domain=1.41422:3, ultra thick, highlight] plot ({-sqrt(\x*\x - 2)}, -\x);
+            \node[above] at ({sqrt(7)}, 3) {\(r = 0\)};
+            \node[below] at ({sqrt(7)}, -3) {\(r = 0\)};
+        \end{tikzpicture}
+        \caption[Kruskal--Szekeres coordinates.]{Four regions of spacetime in Kruskal--Szekeres coordinates.}
+        \label{fig:black hole kruskal szekeres coordinates}
+    \end{figure}
+    
+    We can extend the spacetime to the full \((u, v)\)-plane.
+    Doing so it splits into four parts, as shown in \cref{fig:black hole kruskal szekeres coordinates}.
+    In region I \(r > r_{\mathrm{s}}\) and \(-\infty < t < \infty\).
+    This region is asymptotically Minkowski space, meaning that for sufficiently large \(r\) we can write the metric as the Minkowski metric plus some small correction, vanishing in the limit \(r \to \infty\).
+    Region II differs since \(r < r_{\mathrm{s}}\) here.
+    An observer in region I would see the \(t = -\infty\) Schwarzschild surface.
+    If they fell into the black hole they would cross the \(t = \infty\) event horizon, but they would only see after passing through it.
+    Region IV is the interior of a white hole, which we can view as the mirror of a black hole.
+    It appears to occupy the same space as the black hole but with time reversed and bounded by \(t = -\infty\) instead.
+    Region III is again asymptotically Minkowski space, again with time reversal.
+    This can be seen only upon passing through the black hole event horizon, but cannot be entered from region II.
+    This is easy to see since in the \((u, v)\)-plane the light cones are again at \ang{45}, so one starting in region II will never pass into region III.
+    
+    Lines of constant \(v\) form an \defineindex{Einstein--Rosen bridge}, or \defineindex{wormhole}, between the two asymptotically Minkowski spacetimes.
+    It should be noted that these wormholes are not traversable.
+    However, more general spacetimes do allow for traversable wormholes, although they have never been observed.
+    There is no reason to think that the mirror universe of region III (and region IV) actually exists, its just a mathematical possibility.
     
     
     %   Appdendix
