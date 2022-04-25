@@ -12,6 +12,7 @@
 \usepackage[version=4]{mhchem}
 \usepackage{chemfig}
 \usepackage{tensor}
+\usepackage{ParticlesPackage}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -25,6 +26,8 @@
 \usetikzlibrary{3d}
 \usetikzlibrary{hobby}
 \usetikzlibrary{decorations.markings}
+\usetikzlibrary{angles}
+\usetikzlibrary{quotes}
 
 % Young Tableau
 \usepackage{ytableau}
@@ -179,9 +182,9 @@ noabbrev
 \newcommand*{\rep}[1]{\mathbf{#1}}
 \DeclarePairedDelimiterX{\liebracket}[2]{[}{]}{#1, #2}
 \newcommand*{\order}{\mathcal{O}}
-\DeclareMathOperator{\Csym}{C}
-\DeclareMathOperator{\Psym}{P}
-\DeclareMathOperator{\Tsym}{T}
+\newcommand*{\Csym}{\mathrm{C}}
+\newcommand*{\Psym}{\mathrm{P}}
+\newcommand*{\Tsym}{\mathrm{T}}
 \newcommand*{\clebschgordan}[6]{\mathcal{C}_{#1#2#3}^{#4#5#6}}
 
 % Include
@@ -461,7 +464,7 @@ noabbrev
     \section{Wigner--Eckart Theorem}
     \begin{dfn}{Tensor Operator}{}
         Let \(G\) be a Lie group, \(\rho\) a representation of \(G\), and \(\rho_c\) an irreducible representation of \(G\).
-        We say that \(T_{m_c}^c\) is a \defineindex{tensor operator} in the irreducible representation, \(c\), if it transforms as
+        We say that \(T_{m_c}^c\) is a \define{tensor operator}\index{tensor!operator} in the irreducible representation, \(c\), if it transforms as
         \begin{equation}
             \rho(g)T_{m_c}^{c}\rho(g)^\hermit = \rho_c(g)_{m_cm_c'}T_{m_c'}^{c},
         \end{equation}
@@ -498,7 +501,7 @@ noabbrev
     
     \begin{dfn}{Clebsch--Gordan Coefficient}{}
         Let \(a\) and \(b\) be irreducible representations of some Lie group and let \(c\) index the irreducible representations in the decomposition of \(a \directproduct b\).
-        Then we define the \defineindex{Clebsch--Gordan coefficients}, \(\clebschgordan{m_c}{m_a}{m_b}{c}{a}{b}\), are defined as the coefficients appearing in the decomposition of \(\ket{a, m_a} \directproduct \ket{b, m_b}\):
+        Then we define the \define{Clebsch--Gordan coefficients}\index{Clebsch--Gordan!coefficient}, \(\clebschgordan{m_c}{m_a}{m_b}{c}{a}{b}\), are defined as the coefficients appearing in the decomposition of \(\ket{a, m_a} \directproduct \ket{b, m_b}\):
         \begin{equation}
             \clebschgordan{m_c}{m_a}{m_b}{c}{a}{b} \coloneqq \bra{c, m_c} (\ket{a, m_a} \directproduct \ket{b, m_b}) = \braket{c, m_c}{a, m_a \directproduct b, m_b}.
         \end{equation}
@@ -506,7 +509,7 @@ noabbrev
     \begin{wrn}
         The Clebsch--Gordan coefficients are defined only up to a phase.
         Therefore there is a phase convention when we give their values.
-        The common phase convention is the \defineindex{Condon--Shortley phase convention}, which is such that the Clebsch--Gordan coefficients are real for \(\specialUnitary(2)\), this is what we will use.
+        The common phase convention is the \defineindex{Condon--Shortley phase convention}, which is such that the Clebsch--Gordan coefficients are real for \(\specialUnitaryLie(2)\), this is what we will use.
     \end{wrn}
     
     \begin{thm}{Wigner--Eckart Theorem}{}
@@ -521,7 +524,7 @@ noabbrev
             The state \(T^a_{m_a}\ket{b, m_b}\) transforms like a direct product of two states.
             We can see this by considering its transformation under some unitary representation, \(\rho\):
             \begin{align}
-                \rho(g) T^a_{m_a} \ket{b, m_b} = \rho(g) T^{a}_{m_a} \rho(g)^\hermit \rho(g) \ket{b, m_b}\\
+                \rho(g) T^a_{m_a} \ket{b, m_b} &= \rho(g) T^{a}_{m_a} \rho(g)^\hermit \rho(g) \ket{b, m_b}\\
                 &= \rho_a(g)_{m_am_a'}T^a_{m_a'} \rho_b(g)_{m_b'}\ket{b, m_b'}.
             \end{align}
             Here we have used \(\rho(g)^\hermit\rho(g) = \ident\) for a unitary representation, as well as the definition of the tensor operator's transformation law, and that the state \(\ket{j, m}\) transforms under the representation \(\rho_j\).
@@ -552,8 +555,740 @@ noabbrev
     This is useful to calculate, for example, relative decay times of particles when the particles are part of a representation of some internal symmetry group.
     This occurs for the \(\specialUnitary(2)\) isospin symmetry where we exchange up-type quarks and down-type quarks in pions.
     
+    Often the Clebsch--Gordan coefficients vanish.
+    This provides \define{selection rules}\index{selection rule}, which restrict the possible states.
+    In particular we must have \(\abs{j_1 + j_2} \le J \le \abs{j_1 - j_2}\) and \(M = m_1 + m_2\) for the Clebsch--Gordan coefficient to be non-zero.
+    
     To summarise this section, the matrix element \(\bra{c, m_c}T_{m_a}^{a}\ket{b, m_b}\) is non-zero only if the irreducible representation appears in the Clebsch--Gordan series decomposition of \(a \directproduct b\) with non-zero multiplicity.
-    The direction of the matirx element is determined completely by the Clebsch--Gordan coefficient.
+    The direction of the matrix element is determined completely by the Clebsch--Gordan coefficient.
+    This is useful since Clebsch--Gordan coefficients have already been computed for most representations of interest and can be readily looked up.
+    
+    \subsection{Using Clebsch--Gordan Coefficients}
+    Suppose we have an electron and a photon, that is a spin \(1/2\) particle and a spin \(1\) particle.
+    The electron spin is then described by the representation \(\rho_{1/2}\), and the photon's spin by \(\rho_{1}\).
+    The combined electron-photon system's is then described by the tensor product representation \(\rho_{1} \directproduct \rho_{1/2}\).
+    By the addition of angular momentum theorem (\cref{thm:clebsch-gordan seris su(2)}) we know that this representation can be decomposed as a sum of \(1 - 1/2 = 1/2\) and \(1 + 1/2 = 3/2\) representations: \(\rho_{1/2} \directproduct \rho_{1} = \rho_{3/2} \directsum \rho_{1/2}\).
+    Consider the state \(\ket{J, M}\) in this representation.
+    We can decompose this as a sum of tensor products of states in the individual particle representations, with the Clebsch--Gordan coefficients as the weights in the sum.
+    States in the \(j_1 = 11\) representation are \(\ket{j_1, m_1} = \ket{1, m_1}\) and states in the \(j_2 = 1/2\) representation are \(\ket{j_2, m_2} = \ket{1/2, m_2}\).
+    As always we have that \(m_1 = -j_1, -j_1 + 1, \dotsc, j_1 - 1, j_1\), which means \(m_1 = -1, 0, 1\) and similarly we have \(m_2 = -1/2, 1/2\).
+    The Clebsch--Gordan coefficients, \(\clebschgordan{M}{m_1}{m_2}{J}{j_1}{j_2}\), are non-zero only when \(m_1 + m_2 = M\).
+    
+    For example, consider the state \(\ket{J, M} = \ket{3/2, 1/2}\).
+    One way to have \(m_1 + m_2 = 1/2\) we is \(m_1 = 1\) and \(m_2 = -1/2\).
+    This corresponds to the states \(\ket{1, 1}\) and \(\ket{1/2, -1/2}\).
+    The other way to have \(m_1 + m_2 = 1/2\) is to have \(m_1 = 0\) and \(m_2 = 1/2\), which corresponds to \(\ket{1, 0}\) and \(\ket{1/2, 1/2}\).
+    We then find
+    \begin{equation}
+        \ket{\textcolor{highlight}{3/2}, \textcolor{highlight}{1/2}} = \textcolor{my yellow}{\clebschgordan{\textcolor{highlight}{\tfrac{1}{2}}}{\textcolor{my red}{0}}{\textcolor{my blue}{\tfrac{1}{2}}}{\textcolor{highlight}{\tfrac{3}{2}}}{\textcolor{my red}{1}}{\textcolor{my blue}{\tfrac{1}{2}}}} \ket{\textcolor{my red}{1}, \textcolor{my red}{0}} \directproduct \ket{\textcolor{my blue}{1/2}, \textcolor{my blue}{1/2}} + \textcolor{my green}{\clebschgordan{\textcolor{highlight}{\tfrac{1}{2}}}{\textcolor{my red}{1}}{\textcolor{my blue}{\bar{\tfrac{1}{2}}}}{\textcolor{highlight}{\tfrac{3}{2}}}{\textcolor{my red}{1}}{\textcolor{my blue}{\tfrac{1}{2}}}} \ket{\textcolor{my red}{1}, \textcolor{my red}{1}} \directproduct \ket{\textcolor{my blue}{1/2}, \textcolor{my blue}{-1/2}}.
+    \end{equation}
+    Note that we use a bar to denote a negative index, so \(\bar{\tfrac{1}{2}} = -1/2\).
+    
+    We can then look up the values of the Clebsch--Gordan coefficients.
+    To do so we need to understand the standard layout of a table of Clebsch--Gordan coefficients.
+    First we need to find the correct table, they are labelled by \(j_1\) and \(j_2\), usually as \(j_1 \times j_2\) or \(j_1 \directproduct j_2\).
+    The tables are then of the form
+    \begin{equation}
+        \begin{array}{cc|ccc}
+            && J & J & \cdots \\
+            && M & M & \cdots \\ \hline
+            m_1 & m_2 &&& \\
+            m_1 & m_2 &&& \\
+            \vdotswithin{m_1} & \vdotswithin{m_2} &&&
+        \end{array}
+    \end{equation}
+    The entries into the table are then almost the Clebsch--Gordan coefficients.
+    However, since most Clebsch--Gordan coefficients tend to be square roots there is an implicit square root.
+    Choosing the Condon--Shortly phase coefficient the Clebsch--Gordan coefficients are also real, and so the square root misses any negatives.
+    This means that, for example, the entry \(-1/2\) in the table is understood to mean \(-\sqrt{1/2}\).
+    
+    We are interested in the case of \(j_1 = 1/2\) and \(j_2 = 1\).
+    The Clebsch--Gordan table for \(1 \directproduct 1/2\) is as follows:
+    \begin{gather}
+        \begin{array}{cc|c}
+            && 3/2 \\
+            && 3/2 \\ \hline
+            1 & 1/2 & 1
+        \end{array}
+        \qquad
+        \begin{array}{cc|cc}
+            && \textcolor{highlight}{3/2} & 1/2 \\
+            && \textcolor{highlight}{1/2} & 1/2 \\ \hline
+            \textcolor{my red}{1} & \textcolor{my blue}{-1/2} & \textcolor{my green}{1/3} & 2/3\\
+            \textcolor{my red}{0} & \textcolor{my blue}{1/2} & \textcolor{my yellow}{2/3} & -1/3
+        \end{array}
+        \\
+        \begin{array}{cc|cc}
+            && 3/2 & 1/2 \\
+            && -1/2 & -1/2 \\ \hline
+            0 & -1/2 & 2/3 & 1/3\\
+            -1 & 1/2 & 1/3 & -2/3
+        \end{array}
+        \qquad
+        \begin{array}{cc|c}
+            && 3/2 \\
+            && -3/2 \\ \hline
+            -1 & -1/2 & 1
+        \end{array}
+    \end{gather}
+    From this we can read off the Clebsch--Gordan coefficients as
+    \begin{equation}
+        \textcolor{my yellow}{\clebschgordan{\textcolor{highlight}{\tfrac{1}{2}}}{\textcolor{my red}{0}}{\textcolor{my blue}{\tfrac{1}{2}}}{\textcolor{highlight}{\tfrac{3}{2}}}{\textcolor{my red}{1}}{\textcolor{my blue}{\tfrac{1}{2}}}} = \textcolor{my yellow}{\sqrt{2/3}} \qqand \textcolor{my green}{\clebschgordan{\textcolor{highlight}{\tfrac{1}{2}}}{\textcolor{my red}{1}}{\textcolor{my blue}{\bar{\tfrac{1}{2}}}}{\textcolor{highlight}{\tfrac{3}{2}}}{\textcolor{my red}{1}}{\textcolor{my blue}{\tfrac{1}{2}}}} = \textcolor{my green}{\sqrt{1/3}}.
+    \end{equation}
+    Hence the state \(\ket{3/2, 1/2}\) is given by
+    \begin{equation}
+        \ket{\textcolor{highlight}{3/2}, \textcolor{highlight}{1/2}} = \textcolor{my yellow}{\sqrt{\frac{2}{3}}} \ket{\textcolor{my red}{1}, \textcolor{my red}{0}} \directproduct \ket{\textcolor{my blue}{1/2}, \textcolor{my blue}{1/2}} + \textcolor{my green}{\sqrt{\frac{1}{3}}} \ket{\textcolor{my red}{1}, \textcolor{my red}{1}} \directproduct \ket{\textcolor{my blue}{1/2}, \textcolor{my blue}{-1/2}}.
+    \end{equation}
+    
+    As another example the state \(\ket{1/2, 1/2}\) is
+    \begin{align}
+        \ket{1/2, 1/2} & = \clebschgordan{\tfrac{1}{2}}{0}{\tfrac{1}{2}}{\tfrac{1}{2}}{1}{\tfrac{1}{2}} \ket{1, 0} \directproduct \ket{1/2, 1/2} + \clebschgordan{\tfrac{1}{2}}{1}{\bar{\tfrac{1}{2}}}{\tfrac{1}{2}}{1}{\tfrac{1}{2}} \ket{1, 1} \directproduct \ket{1/2, -1/2}\\
+        &= -\sqrt{\frac{1}{3}} \ket{1, 0} \directproduct \ket{1/2, 1/2} + \sqrt{\frac{2}{3}} \ket{1, 1} \directproduct \ket{1/2, -1/2}.
+    \end{align}
+    
+    Of course, now days the use of look up tables is quickly vanishing and many programs exist to compute/look up Clebsch--Gordan coefficients for you.
+    \begin{cde}{Clebsch--Gordan}{}
+        Looking up Clebsch--Gordan coefficients with \textit{Mathematica}.
+        \begin{lstlisting}[gobble=12, language=mathematica, mathescape]
+            (* ClebschGordan[{$\textcolor{codeCommentColor}{j_1}$, $\textcolor{codeCommentColor}{m_1}$}, {$\textcolor{codeCommentColor}{j_2}$, $\textcolor{codeCommentColor}{m_2}$}, {$\textcolor{codeCommentColor}{J}$, $\textcolor{codeCommentColor}{M}$}]
+            gives $\textcolor{codeCommentColor}{\clebschgordan{M}{m_1}{m_2}{J}{j_1}{j_2}}$*)
+            In[1]:= ClebschGordan[{1,0}, {1/2,1/2}, {3/2,1/2}]
+            Out[1]= $\sqrt{\frac{2}{3}}$
+            In[2]:= ClebschGordan[{1,1}, {1/2,-1/2}, {3/2,1/2}]
+            Out[2]= $\frac{1}{\sqrt{3}}$
+        \end{lstlisting}
+    \end{cde}
+    
+    \subsection{Geometric Interpretation of the \texorpdfstring{\(j = 1\)}{j = 1} Representation}
+    We now consider the geometric interpretation of the \(j = 1\) representation.
+    Consider the definition of a tensor operator in the \(j = 1\) representation as something which transforms according to
+    \begin{equation}
+        \rho(g) T_{k}^1 \rho(g)^\hermit = \rho_c(g)_{kl}T_l^1.
+    \end{equation}
+    In infinitesmial form this is
+    \begin{equation}
+        \commutator{J_a}{T_k^1} = i\varepsilon_{akl}T_l^1.
+    \end{equation}
+    For \(\specialUnitaryLie(2)\) we can write \(\rho(g)\) as \(\exp[i\alpha^aJ_a]\) and \(\rho(g)^\hermit\) as \(\exp[i\alpha^bJ_b]\), with implied sums over \(a\) and \(b\).
+    Expanding the transformation law to first order in \(\alpha\) we get
+    \begin{align}
+        (\ident + i\alpha^aJ_a + \order(\alpha^2))&T_k^1 (\ident - i\alpha^bJ_b + \order(\alpha^2))\\
+        &= (T_k^1 + i\alpha^aJ_aT_k^1 + \order(\alpha^2))(\ident - i\alpha^bJ_b)\\
+        &= T_k^1 + i\alpha^aJ_aT_k^1 - \alpha^bJ_bT_k^1J_b + \order(\alpha^2)\\
+        &= T_k^1 + i\alpha^a\commutator{J_a}{T_k^1} + \order(\alpha^2)\\
+        &= T_k^1 + i\alpha^a(i\varepsilon_{akl}T_l^1) + \order(\alpha^2)\\
+        &= T_k^1 - \alpha^a\varepsilon_{akl}T_l^1 + \order(\alpha^2)\\
+        &= T_k^1 + \alpha^a\varepsilon_{alk}T_l^1 + \order(\alpha^2).
+    \end{align}
+    Now, in a slight abuse of notation, we can define a \enquote{vector}, \(\vv{T} = (T_1^1, T_2^1, T_3^1)\), and a \enquote{vector} \(\vv{\alpha} = (\alpha^1, \alpha^2, \alpha^3)\).
+    We can then identify
+    \begin{equation}
+        \varepsilon_{alk}\alpha^aT_l^1 = (\vv{\alpha} \times \vv{T})_k = \abs{\vv{\alpha}}\abs{\vv{T}}\sin(\gamma),
+    \end{equation}
+    where \(\gamma\) is the \enquote{angle} between \(\vv{T}\) and \(\vv{\alpha}\).
+    We can then identify the first order term in the tensor transformation law as a small translation in the direction \enquote{perpendicular} to \(\vv{T}\) and \(\vv{\alpha}\), which is then added onto the original \(T_k^1\).
+    This is simply the infinitesimal version of a rotation of \(\vv{T}\) about \(\vv{\alpha}\).
+    This is shown in \cref{fig:infinitesimal rotation}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{infinitesimal-rotation}
+        \begin{tikzpicture}
+            \draw[very thick, <->, rounded corners=0.1]  (0, 3) coordinate (A) node[left] {\(\vv{\alpha}\)} -- (0, 0) coordinate (B) -- (140:2) coordinate (C) node[above right] {\(\vv{T}\)};
+            \path pic[draw, "\(\gamma\)", angle eccentricity = 0.7] {angle};
+            \node[left] at (C) {\(\vv{\alpha} \times \vv{T}\) \(\odot\)};
+            \draw[very thick, ->] (0, 0) -- (147:1.8) node[below left] {\(\vv{\alpha} + \delta\vartheta \, \vv{\alpha} \times \vv{T}\)};
+            \draw[dotted] (C) arc(180:189:2);
+        \end{tikzpicture}
+        \caption[Infinitesimal rotation.]{An infinitesimal rotation by \(\delta \vartheta\) of \(\vv{T}\) about \(\vv{\alpha}\) results in adding a term proportional to \(\vv{\alpha} \times \vv{T}\) to \(\vv{T}\).}
+        \label{fig:infinitesimal rotation}
+    \end{figure}
+    
+    \chapter{Further Applications}
+    \section{Polynomial Invariants}
+    \begin{rmk}
+        This section is nonexaminable.
+    \end{rmk}
+    In physics we are very interested in invariant quantities, such as energy, momentum, mass, etc.
+    These are all invariant under some particular symmetry and this fact can greatly simplify physics problems.
+    One question that we might ask is given a number of irreducible representations how many invariant quantities can we construct?
+    The simplest example of an invariant is the inner product.
+    This is an invariant of a vector representation and its complex conjugate.
+    
+    Suppose we have an irreducible representation, which we denote by its dimension, \(\rep{X}\).
+    Consider the representation \(\rep{X} \directproduct \overline{\rep{X}}\).
+    We know by \cref{crl:trivial irrep in clebsch--gordan decomposition if second term is complex conjugate} that the trivial representation appears exactly once in the Clebsch--Gordan series, that is:
+    \begin{equation}
+        \rep{X} \directproduct \overline{\rep{X}} = 1\cdot \rep{1} \directsum \dotsb.
+    \end{equation}
+    The inner product corresponds to the trivial representation, \(\rep{1}\), in this decomposition.
+    
+    For a given group, \(G\), we can define an invariant, \(\mathcal{I}\), as an \(n\)-multilinear operator from the space of irreducible representations to \(\complex\), such that for a given group element, \(g \in G\), \(\mathcal{I}\) is unchanged if we act on each representation with itself.
+    That is
+    \begin{equation}
+        \mathcal{I}_n = \mathcal{I}(\rep{X}_1, \dotsc, \rep{X}_n) = \mathcal{I}(\rho_1(g)\rep{X}_1, \dotsc, \rho_n(g)\rep{X}_n)
+    \end{equation}
+    for all \(g \in G\).
+    
+    The inner product then corresponds to \(\mathcal{I}_2\), it takes two values in and returns an invariant.
+    More explicitly as long as \(\dim \rep{X}_a = \dim \rep{X}_b\) we define the inner product as the invariant
+    \begin{equation}
+        \mathcal{I}_2(\rep{X}_a, \rep{X}_b) \coloneqq \sum_{i = 1}^{\dim \rep{X}_a} (\rep{X}_a)^*_i(\rep{X}_b)_i.
+    \end{equation}
+    If \(\dim\rep{X}_a \ne \dim\rep{X}_b\) then no degree two invariant can be formed.
+    Note that \((\rep{X}_a)_i\) here are the components of some element in the \(\rep{X}_a\) representation.
+    The basis we choose isn't important since by definition of being an invariant this quantity is the same no matter what basis we choose.
+    
+    One way to find higher order invariants is to take Kronecker products and count how many times \(\rep{1}\) appears.
+    Each occurrence leads to an invariant.
+    The specific representation giving rise to \(\rep{1}\) corresponds to the degree of the associated invariant.
+    
+    As an example we will consider the group \(G = S_4\), and limit ourselves to irreducible representations of dimension 3 or fewer.
+    The following Kronecker products can be computed:
+    \begin{align}
+        \rep{3}_1 \directproduct \rep{3}_1 &= \mathop{\mathrm{Sym}}(\rep{1} \directsum \rep{2} \directsum \rep{3}_1) \directsum \mathop{\mathrm{Asym}}(\rep{3}_2),\\
+        \rep{3}_1 \directproduct \rep{2} &= \rep{3}_1 \directsum \rep{3}_2,\\
+        \rep{3}_1 \directproduct \rep{3}_2 &= \rep{1}_1 \directsum \rep{2} \directsum \rep{3}_1 \directsum \rep{3}_2.
+    \end{align}
+    We restrict ourselves to considering invariants involving \(\rep{3}_1\).
+    We can take \((x, y, z)\) as a generic element of this vector space associated with this representation.
+    
+    The antisymmetric part vanishes since it corresponds to \(\varepsilon_{ijk}x_ix_j = 0\).
+    The invariants of degree at most three are
+    \begin{equation}
+        \mathcal{I}_2 = x^2 + y^2 + z^2, \qqand \mathcal{I}_3 = xyz.
+    \end{equation}
+    We have seen already that \(\mathcal{I}_2\) corresponds to the inner product.
+    That this also appears for \(S_4\) is simply due to the fact that \(S_4\) is a subgroup of \(\orthogonal(3)\).
+    The invariant of degree three comes from considering \(\rep{3}_1 \directproduct \rep{3}_1 \directproduct \rep{3}_1 = 1\cdot \rep{1} \directsum \dotsb\).
+    
+    Invariants are basis independent, as they must be to be useful.
+    This follows since a similarity transformation on the representation will always affect the invariants in a definite way and we can construct them such that there is no change.
+    
+    A more systematic way of obtaining the degrees and interdependencies of invariants in a given representation uses the \defineindex{Molien function}, which is beyond the scope of this course.
+    
+    For a given degree we can construct an invariant by making a generic ansatz and averaging over the group by the \defineindex{Reynolds operator}.
+    For example, consider the representation containing the vector \((x, y, z)\), again restricting ourselves to three dimensions.
+    Now consider any polynomial function, \(f\), of \(x\), \(y\), and \(z\), that is \(f \in \complex[x, y, z]\).
+    The following is then an invariant:
+    \begin{equation}
+        \mathcal{I}(x, y, z) = \frac{1}{\abs{G}} \sum_{g \in G} f(\rho(g) \circ x, \rho(g) \circ y, \rho(g) \circ z),
+    \end{equation}
+    where we understand \(\rho(g)\circ x\) as \(\rho(g)\ve{x}\), where \(\ve{x}\) is a unit vector in the \(x\)-direction.
+    
+    This operation corresponds to projection operators and will always give rise to an invariant.
+    However, most of the time it will lead to 0, which is trivially invariant, unless the degree of \(f\) matches one of the degrees predicted by either the Kronecker product method or the Molien function.
+    As an example consider \(f(x, y, z) = x^2\).
+    From this we derive the invariant \(\mathcal{I}(x, y, z) \propto x^2 + y^2 + z^2 = \mathcal{I}_2\), with some unimportant constant of proportionality.
+    
+    One can think of the Clebsch--Gordan coefficient appearing in
+    \begin{equation}
+        \bra{c, m_c} T_{m_a}^a \ket{b, m_b} = \clebschgordan{m_c}{m_a}{m_b}{c}{a}{b} \bra{c} |T^a| \ket{b}
+    \end{equation}
+    as an invariant of degree three of type \(\mathcal{I}(\overline{\rep{c}}, \rep{a}, \rep{b})\).
+    
+    \section{Land\'e \texorpdfstring{\(g\)}{g}-Factor}
+    \begin{wrn}
+        In this section we choose units such that \(\hbar = 1\).
+    \end{wrn}
+    Consider a Hydrogen atom with a Coulomb potential.
+    This system has the Hamiltonian \(H = H_0\), where \(H_0 = H_{\mathrm{Coulomb}} + H_{\text{spin-orbit}}\), where \(H_{\mathrm{Coulomb}}\) is the kinetic energy term and the Coulomb potential term, and \(H_{\text{spin-orbit}}\) is an extra term corresponding to spin-orbit coupling, the details of which are not important.
+    This system exhibits spherical symmetry.
+    We can break this symmetry by applying an external magnetic field.
+    In this case we get a modified Hamiltonian \(H = H_0 + H'\), where \(H' = -\vv{\mu} \cdot \vv{B}\) where \(\vv{B}\) is the external magnetic field and \(\vv{\mu}\) is the dipole moment given by
+    \begin{equation}
+        \vv{\mu} = \frac{e}{2\pi m_{\mathrm{e}} c} (\vv{J} + \vv{S}) = \frac{e}{2\pi m_{\mathrm{e}} c} (\vv{L} + 2\vv{S}).
+    \end{equation}
+    Defining \(x = -eB/(2m_{\mathrm{e}} c)\) we can write the perturbing Hamiltonian as \(H' = x(L_3 + 2S_3) = x(J_3 + S_3)\), choosing the \(3\)-axis to be along the direction of the magnetic field.
+    
+    We assume that the energy eigenstates, \(\ket{n, l, j, m}\), of \(H_0\) are known and treat \(H'\) as a perturbation.
+    The first order perturbation correction to the energy gives an extra term of the form
+    \begin{equation}
+        E' = \bra{n, l, j, m} H' \ket{n, l, j, m} = x(m + \expected{S_3}).
+    \end{equation}
+    Here we have used \(J_3\ket{n, l, j, m} = m\ket{n, l, j, m}\).
+    
+    Using the Wigner--Eckart theorem, and a condensed notation, \(\ket{m} = \ket{n, l, j, m}\), we have
+    \begin{equation}
+        \bra{m} S_i \ket{m'} = \clebschgordan{i}{m}{m'}{1}{j}{j'} \expected{\|S_1\|}, \qqand \bra{m} J_i \ket{m'} = \clebschgordan{i}{m}{m'}{1}{j}{j'} \expected{\|J_1\|}.
+    \end{equation}
+    Note that \(\expected{\|S_1\|}\) and \(\expected{\|J_1\|}\) are the reduced matrix elements in this condensed notation suppressing \(j\).
+    What these relations tell us is that \(\bra{m}S_i\ket{m'} = a\bra{m}J_i\ket{m'}\) with
+    \begin{equation}
+        a \coloneqq \frac{\expected{\|S_1\|}}{\expected{\|J_1\|}}.
+    \end{equation}
+    Importantly \(a\) is independent of the values of \(m\) and \(m'\).
+    
+    We have
+    \begin{equation}
+        \bra{m} \vv{J}^2 \ket{m} = \sum_{m', i} \bra{m} J_i \ket{m'} \bra{m'} J_i \ket{m},
+    \end{equation}
+    where we have used \(\vv{J}^2 = \sum_i J_iJ_i\) and inserted the completeness relation,
+    \begin{equation}
+        \ident = \sum_{m'} \ket{m'}\bra{m'}.
+    \end{equation}
+    We similarly have
+    \begin{align}
+        \bra{m} \vv{J} \cdot \vv{S} \ket{m} &= \sum_{m', i} \bra{m} J_i \ket{m'}\bra{m'} S_i \ket{m}\\
+        &= \sum_{m', i} \bra{m} J_i \ket{m'} a\ket{m'} J_i \ket{m}\\
+        &= a\bra{m}\vv{J}^2\ket{m}\\
+        &= a j(j + 1).
+    \end{align}
+    
+    Alternatively, using \(\vv{L} = \vv{J} - \vv{S}\) we have
+    \begin{equation}
+        \vv{L}^2 = (\vv{J} - \vv{S})^2 = \vv{J}^2 + \vv{S}^2 - 2\vv{J}\cdot\vv{S}.
+    \end{equation}
+    Note that here we have used the fact that \(\vv{J}\) and \(\vv{S}\) are both from two different copies of the \(\specialUnitary(2)\) Lie algebra, and hence commute with each other, we can view both as elements of the universal enveloping algebra.
+    Hence we find that
+    \begin{equation}
+        \bra{m} \vv{J} \cdot \vv{S} \ket{m} = -\frac{1}{2}[l(l + 1) - j(j + 1) - s(s + 1)].
+    \end{equation}
+    
+    We can compare these two results and solve for \(a\).
+    Doing so we find that
+    \begin{equation}
+        a = \frac{j(j + 1) + s(s + 1) - l(l + 1)}{2j(j + 1)},
+    \end{equation}
+    which is, as expected, independent of \(m\) and \(m'\).
+    We find that
+    \begin{equation}
+        E'_{jlsm} = -\frac{emB}{2m_{\mathrm{e}}c} g
+    \end{equation}
+    where
+    \begin{equation}
+        g = 1 + a
+    \end{equation}
+    is the \define{Land\'e \(g\)-factor}\index{Lande g-factor@Land\'e \(g\)-factor} to first order in perturbation theory.
+    This energy shift, \(E'\), can be added to the energy of the unperturbed Hamiltonian to lift the degeneracy.
+    
+    \section{Spherical Harmonics}
+    The trace is linear, meaning \(\tr(A + B) = \tr(A) + \tr(B)\).
+    For finite matrices we also have the cyclic property, which means in particular that \(\tr(AB) = \tr(BA)\).
+    This implies that for finite matrices \(\tr(\commutator{A}{B}) = 0\).
+    This cyclic property doesn't hold for operators on infinite dimensional spaces.
+    The canonical commutation relation, \(\commutator{\operator{x}_i}{\operator{p}_j} = i\hbar \delta_{ij}\), has trace \(3i\hbar \ne 0\) in three spatial dimensions.
+    This then implies that the position space representation is infinite dimensional.
+    This shouldn't come as a surprise since the position basis is continuously labelled by \(x\).
+    
+    The question then is how come the representations associated with the angular momentum are finite dimensional?
+    These representations are on vector spaces spanned by \(\ket{l, m}\) with \(l < n\) and \(m = -l, \dotsc, l\), making up a finite basis.
+    The answer is that we can decompose the Hilbert space on the sphere, \(S^2\), into an infinite sum of finite dimensional Hilbert spaces.
+    We will now investigate a basis for each of these finite dimensional Hilbert spaces.
+    
+    Consider \(S^2\) parametrised by the usual spherical coordinates \((\vartheta, \varphi)\).
+    Note that we keep \(r = 1\) fixed and so this is a two-dimensional manifold embedded in 3-dimensional space.
+    A state \(\ket{\vartheta, \varphi}\) obeys the completeness and orthogonality relations
+    \begin{align}
+        \ident_{S^2} &= \int \dl{\Omega} \, \ket{\vartheta, \varphi}\bra{\vartheta, \varphi},\\
+        \braket{\vartheta, \varphi}{\vartheta', \varphi'} &= \delta(\varphi - \varphi')\delta(\cos\vartheta - \cos\vartheta').
+    \end{align}
+    Note that \(\dl{\Omega} = \sin\vartheta \dd{\varphi}\dd{\vartheta}\) is a solid angle element, so
+    \begin{equation}
+        \int_{S^2}\dd{\Omega} = \int_0^{2\pi} \dd{\varphi} \int_{0}^{\vartheta} \dd{\vartheta} \, \sin\vartheta = \int_0^{2\pi} \dd{\varphi} \int_{-1}^{1} \dl{(\cos \vartheta)}.
+    \end{equation}
+
+    We can decompose the Hilbert space \(\hilbert_{S^2} = \spn\{\ket{\vartheta, \varphi}\}\), as a direct sum of the Hilbert spaces \(\hilbert_{l} = \spn\{\ket{l, m} \mid m = -l, \dotsc, l\}\).
+    Clearly
+    \begin{equation}
+        \dim\hilbert_l = \abs{\spn\{\ket{l, m} \mid m = -l, \dotsc, l\}} = \abs{\{-l, \dotsc, l\}} = 2l + 1.
+    \end{equation}
+    We then have
+    \begin{equation}
+        \hilbert_{S^2} = \bigoplus_{l = 0}^{\infty} \hilbert_l.
+    \end{equation}
+    We can rewrite the completeness and orthogonality relations for \(\hilbert_{S^2}\) in terms of its decomposition, giving
+    \begin{align}
+        \ident_{S^2} &= \sum_{l = 0}^{\infty}\sum_{m = -l}^{l} \ket{l, m}\bra{l, m},\\
+        \braket{l, m}{l', m'} &= \delta_{ll'}\delta_{mm'}.
+    \end{align}
+    
+    \begin{dfn}{Spherical Harmonic}{}
+        We define the \define{spherical harmonics}\index{spherical harmonic}, \(Y_{lm}\colon S^2 \to \complex\), as the projection of the state \(\ket{l, m}\) onto \(\ket{\vartheta, \varphi}\):
+        \begin{equation}
+            Y_{lm}(\vartheta, \varphi) \coloneqq \braket{\vartheta, \varphi}{l, m}.
+        \end{equation}
+    \end{dfn}
+    
+    \begin{lma}{}{}
+        The following orthogonality relations hold for the spherical harmonics:
+        \begin{align}
+            \int Y_{l'm'}^*(\vartheta, \varphi) Y_{lm}(\vartheta, \varphi) \dd{\Omega} &= \delta_{ll'}\delta_{mm'},\\
+            \sum_{l = 0}^{\infty} \sum_{m = -l}^{l} Y_{lm}(\vartheta, \varphi)Y_{lm}^*(\vartheta', \varphi') &= \delta(\varphi - \varphi')\delta(\cos\vartheta - \cos\vartheta').
+        \end{align}
+        \begin{proof}
+            We start with the orthogonality relation for \(\ket{l, m}\):
+            \begin{equation}
+                \braket{l, m}{l', m'} = \delta_{ll'}\delta_{mm'}.
+            \end{equation}
+            We then insert the completeness relation for \(\ket{\vartheta, \varphi}\):
+            \begin{equation}
+                \ident_{S^2} = \int \dl{\Omega} \, \ket{\vartheta, \varphi}\bra{\vartheta, \varphi}.
+            \end{equation}
+            This gives
+            \begin{equation}
+                \int\dl{\Omega} \braket{l, m}{\vartheta, \varphi}\braket{\vartheta, \varphi}{l', m'} = \delta_{ll'}\delta_{mm'}.
+            \end{equation}
+            Now we use \(\braket{l, m}{\vartheta, \varphi} = \braket{\vartheta, \varphi}{l, m}^*\) and the definition of the spherical harmonics as \(Y_{lm}(\vartheta, \varphi) \coloneqq \braket{\vartheta, \varphi}{l, m}\) to get
+            \begin{equation}
+                \int\dl{\Omega} Y_{lm}^*(\vartheta, \varphi)Y_{l'm'}(\vartheta, \varphi) = \delta_{ll'}\delta_{mm'}.
+            \end{equation}
+            Exchanging which symbols are primed we get the desired result.
+            
+            Next we start with the orthogonality relation for \(\ket{\vartheta, \varphi}\):
+            \begin{equation}
+                \braket{\vartheta, \varphi}{\vartheta', \varphi'} = \delta(\varphi - \varphi')\delta(\cos\vartheta - \cos\vartheta').
+            \end{equation}
+            We then insert the completeness relation for \(\ket{l, m}\):
+            \begin{equation}
+                \ident_{S_2} = \sum_{l = 0}^{\infty} \sum_{m = -l}^l \ket{l, m}\bra{l, m}.
+            \end{equation}
+            This gives
+            \begin{equation}
+                \sum_{l = 0}^{\infty} \sum_{m = -l}^{l} \braket{\vartheta, \varphi}{l, m}\braket{l, m}{\vartheta', \varphi'} = \delta(\varphi - \varphi')\delta(\cos\vartheta - \cos\vartheta').
+            \end{equation}
+            Again using \(\braket{l, m}{\vartheta', \varphi'} = \braket{\vartheta', \varphi'}{l, m}^*\) and the definition of the spherical harmonics as \(Y_{lm}(\vartheta, \varphi) \coloneqq \braket{\vartheta, \varphi}{l, m}\) we get
+            \begin{equation}
+                \sum_{l = 0}^{\infty} \sum_{m = -l}^{l} Y_{lm}(\vartheta, \varphi) Y_{lm}^*(\vartheta', \varphi') = \delta(\varphi - \varphi')\delta(\cos\vartheta - \cos\vartheta').
+            \end{equation}
+        \end{proof}
+    \end{lma}
+    
+    For \(l = 0, 1\), using the Condon--Shortley phase convention, the spherical harmonics are given by
+    \begin{alignat}{4}
+        Y_{00}(\vartheta, \varphi) &= \frac{1}{2}\sqrt{\frac{1}{\pi}},\\
+        Y_{10}(\vartheta, \varphi) &= \frac{1}{2}\sqrt{\frac{3}{\pi}} \cos\vartheta &&= \frac{1}{2}\sqrt{\frac{3}{\pi}} \frac{z}{r}, \label{eqn:Y10} \\
+        Y_{1,{-1}}(\vartheta, \varphi) &= \frac{1}{2}\sqrt{\frac{3}{2\pi}}\e^{-i\varphi}\sin\vartheta &&= \frac{1}{2}\sqrt{\frac{3}{2\pi}} \frac{x - iy}{r},\\
+        Y_{11}(\vartheta, \varphi) &= -\frac{1}{2}\sqrt{\frac{3}{2\pi}}\e^{i\varphi}\sin\vartheta &&= -\frac{1}{2}\sqrt{\frac{3}{2\pi}} \frac{x + iy}{r}.
+    \end{alignat}
+    In general the \(\varphi\) dependence of \(Y_{lm}\) only appears through a \(\e^{im\varphi}\) term and the \(\vartheta\) dependence appears through trigonometric terms \(\sin\vartheta\) and \(\cos\vartheta\), which occur with maximum power \(l\).
+    This follows from the fact that we can write the spherical harmonics as
+    \begin{equation}
+        Y_{lm}(\vartheta, \varphi) = \sqrt{\frac{(2l + 1)}{4\pi}\frac{(l - m)!}{(l + m)!}} P_{lm}(\cos\vartheta)\e^{im\varphi}.
+    \end{equation}
+    Here \(P_{lm}\) are the \define{associated Legendre polynomials}\index{associated Legendre polynomial}, which are polynomials of order \(l\).
+    A useful property of the spherical harmonics is that
+    \begin{equation}
+        Y_{l,{-m}} = (-1)^mY_{lm}^*.
+    \end{equation}
+    
+    The quadratic Casimir operator, \(L^2\), on \(S^2\) is given by
+    \begin{equation}
+        \int \dl{\Omega} \bra{\vartheta', \varphi'} \left( -\frac{L^2}{\hbar^2} \right) \ket{\vartheta, \varphi} = \frac{1}{\sin^2\vartheta}\diffp[2]{}{\varphi} + \frac{1}{\sin \vartheta} \diffp{}{\vartheta}\left( \sin\vartheta \diffp{}{\vartheta} \right).
+    \end{equation}
+    This corresponds to the Laplacian, \(\laplacian[S^2]\), on \(S^2\).
+    We therefore have that
+    \begin{equation}
+        \laplacian[S^2]Y_{lm} = -\frac{L^2}{\hbar^2}Y_{lm} = -l(l + 1)Y_{lm}.
+    \end{equation}
+    Which follows since we know that the action of the quadratic Casimir, \(L^2\), for \(\specialUnitary(2)\) is to multiply by a factor of \(l(l + 1)\).
+    It makes sense that this should be the Casimir.
+    First, the Laplacian is invariant under rotations, and it is of second order, as a quadratic Casimir must be.
+    Solutions to Laplace's equation are called harmonic functions, which explains the name \enquote{spherical harmonics}, they are harmonic functions on the sphere.
+    
+    \subsection{Application to \texorpdfstring{\(\reals^3 \isomorphic \reals^+ \directproduct S^2\)}{R3 isomorphic R+ x S2}}
+    We can decompose three-dimensional Euclidean space, \(\reals^3\), into a product of the non-negative real numbers, \(\reals^+ \coloneqq \{r \in \reals \mid r \ge 0\}\), and the sphere, \(S^2\):
+    \begin{equation}
+        \reals^3 \isomorphic \reals^+ \directproduct S^2.
+    \end{equation}
+    This is most obvious when working in spherical polar coordinates, where we associate the radial coordinate \(r\) with \(\reals^+\) and the angular components, \((\vartheta, \varphi)\), with \(S^2\).
+    Since the spherical harmonics are a complete set of functions on \(S^2\) we can express any\footnote{Well, any function of interest in physics.} function, \(f \colon \reals^3 \to \complex\) as
+    \begin{equation}
+        f(x, y, z) = \sum_{n = 1}^{\infty} \sum_{l = 0}^{n - 1} \sum_{m = -l}^{l}
+    \end{equation}
+    where \(u_{nlm} \colon \reals^+ \to \complex\) and \(Y_{lm}\colon S^2 \to \complex\) are the spherical harmonics.
+    
+    The Laplacian in spherical coordinates is
+    \begin{equation}
+        \laplacian[\reals^3] = \frac{1}{r^2} \diffp{}{r}\left( r^2 \diffp{}{r} \right) + \laplacian[S^2].
+    \end{equation}
+    This is used, for example, to express the Schrödinger equation in spherical coordinates.
+    
+    \begin{dfn}{Solid Harmonics}{}
+        The \define{solid harmonics}\index{solid harmonic} are the functions \(\mathcal{Y}_{lm} \colon \reals^3 \to \complex\) defined by
+        \begin{equation}
+            \mathcal{Y}_{lm}(r, \vartheta, \varphi) \coloneqq r^{l} Y_{lm}(\vartheta, \varphi).
+        \end{equation}
+    \end{dfn}
+    
+    The solid harmonics are solutions to Laplace's equation in \(\reals^3\), that is
+    \begin{equation}
+        \laplacian[\reals^3] \mathcal{Y}_{lm} = 0.
+    \end{equation}
+    These are particularly useful when we have a spherically symmetric potential, which we can write as \(V(r)\), that is as a function of only the distance from the origin, with no angular dependence.
+    In this case the solution doesn't depend on the magnetic quantum number, \(m\), since \(m\) singles out a direction in space, defining the \(L_3\) operator as the angular momentum along a particular axis.
+    We therefore reduce \(u_{nlm}\) to \(u_{nl}\) and the Schrödinger equation in three dimensions reduces to a Schrödinger equation in one dimension for the radial component:
+    \begin{equation}
+        \left( -\frac{\hbar^2}{2m}\frac{1}{r^2}\diffp{}{r}(r^2\diffp{}{r}) + V_l^{\mathrm{eff}}(r) \right) u_{nl}(r) = E_{nl}u_{nl}.
+    \end{equation}
+    Here \(V_l^{\mathrm{eff}}\) is the effective potential
+    \begin{equation}
+        V_l^{\mathrm{eff}}(r) \coloneqq V(r) + \frac{\hbar^2}{2m}\frac{l(l + 1)}{r^2}.
+    \end{equation}
+    Note that we are now restricting \(u_{nl}\) to be eigenfunctions of the Schrödinger equation, rather than an arbitrary complete set of functions on \(\reals^+\) as they originally were.
+    
+    \subsection{Why \texorpdfstring{\(S^2\)}{S2}?}
+    Why is it that \(S^2\) appears as the manifold of interest here.
+    We are considering \(\specialOrthogonal(3)\) symmetry, and the manifold of \(\specialOrthogonal(3)\) is \(\mathbb{RP}^3\), that is \(S^3\) with antipodal points associated.
+    So, why is this not the manifold that we are considering?
+    
+    Consider an arbitrary vector in \(\reals^3\).
+    We may as well define a coordinate system such that this arbitrary vector is \(v = (1, 0, 0)\).
+    We can act on this vector using \(\specialOrthogonal(2)\) to act on the \(y\) and \(z\) components, that is we act on it with \(\ident_1 \directproduct R\) with \(R \in \specialOrthogonal(2)\).
+    So
+    \begin{equation}
+        \ident_1 \directproduct R = 
+        \begin{pmatrix}
+            1 & 0 & 0\\
+            0 & \hphantom{-}\cos\vartheta & \sin\vartheta\\
+            0 & -\sin\vartheta & \sin\vartheta
+        \end{pmatrix}
+        .
+    \end{equation}
+    The interpretation of this is of course as a rotation about \(v = (1, 0, 0)\).
+    
+    The fact that our arbitrary vector is invariant under this operation means we have some redundancy, and to get rid of it we mod out by \(\specialOrthogonal(2)\).
+    Doing so the relevant manifold is
+    \begin{equation}
+        \specialOrthogonal(3) / \specialOrthogonal(2) \isomorphic S^2.
+    \end{equation}
+    Note that this is \emph{not} a group manifold since \(\specialOrthogonal(2)\) is \emph{not} normal in \(\specialOrthogonal(3)\).
+    
+    \chapter{Selection Rules}
+    \section{Parity Selection}
+    Recall that we defined \defineindex{parity symmetry} as
+    \begin{equation}
+        \Psym \circ (t, x, y, z) = (t, -x, -y, -z), \qquad \Psym \circ \vv{r} = -\vv{r}.
+    \end{equation}
+    Until 1956 it was believed that parity was strictly conserved in all interactions.
+    In 1956 theorists posited that parity conservation may be violated in weak interactions.
+    Experiments and further development of the theory found that parity is in fact maximally violated in weak interactions.
+    The weak force ignores so called \enquote{right handed particles} and acts only on \enquote{left handed particles}.
+    For this reason many attach an \(\mathrm{L}\) subscript to the symmetry group of the weak force, \(\specialUnitary(2)_{\mathrm{L}}\).
+    In practice the weak force is, well, weak, and can be neglected in many strong and electromagnetic interactions, so the parity is still usually a good quantum number.
+    
+    By allowing parity violation we effectively extend the symmetry group from \(\specialOrthogonal(3)\) to \(\orthogonal(3)\), since we can write elements of \(\orthogonal(3)\) as a reflection times an element of \(\specialOrthogonal(3)\), with the reflection corresponding to swapping the parity.
+    We implement the parity transformation as a unitary transformation, \(U(\Psym)\).
+    Further, reversing parity and then reversing back cannot change the physics, and hence we must have that \(U(\Psym)^2 = \e^{i\eta}\ident\), so that upon doubly reversing the parity the only effect is a phase change.
+    Often we are free to choose this phase factor, so in which case we usually choose \(\eta = 0\), corresponding to \(U(\Psym) = \pm\ident\).
+    
+    Given a state \(\ket{l, m}\) the parity transformation is
+    \begin{equation}
+        U(\Psym)\ket{l, m} = (-1)^l\ket{l, m}
+    \end{equation}
+    for \(l \in \naturals\).
+    This can be inferred from the parity transformation properties of the spherical harmonics:
+    \begin{equation}
+        \Psym \circ Y_{lm}(\vartheta, \varphi) = Y_{lm}(\pi - \vartheta, \varphi + \pi) = (-1)^lY_{lm}(\vartheta, \varphi).
+    \end{equation}
+    This can be seen by either thinking about the coordinates \((r, \vartheta, \varphi)\) being inverted through the origin, or algebraically by changing \(x \to -x\), \(y \to -y\), and \(z \to -z\) in the equations \(\vartheta = \arctan(\sqrt{x^2 + y^2}/z)\) and \(\varphi = \arctan(y/x)\).
+    
+    Suppose we have  a transition governed by the operator \(X\).
+    The parity of the operator is \(\eta_X\), which is given by \(U(\Psym) X U(\Psym)^\hermit = (-1)^{\eta_X}X\), or equivalently \(X = (-1)^{\eta_X}U(\Psym)^\hermit XU(\Psym)\).
+    We then have the selection rule that
+    \begin{equation}
+        \bra{l, m} X \ket{l', m'} \ne 0
+    \end{equation}
+    only if \(l + l' + \eta_X\) is even, since we have
+    \begin{align}
+        \bra{l, m} X \ket{l', m'} &= \bra{l, m} (-1)^{\eta_X} U(\Psym)^\hermit XU(\Psym) \ket{l', m'}\\
+        &= (-l)^{l + l' + \eta_X} \bra{l, m} X \ket{l', m'}.
+    \end{align}
+    Hence we have \((-1)^{l + l' + \eta_X} = 1\), which implies \(l + l' + \eta_X\) is even.
+    Note that if \(X\) is a tensor operator we also have the selection rules that \(\abs{j_1 - j_2} \le J \le j_1 + j_2\), and \(M = m_1 + m_2\).
+    
+    Common examples of operators with definite parity are the position, \(\vv{x}\), momentum, \(\vv{p}\), angular momentum, \(\vv{L}\), electric field, \(\vv{E}\), and magnetic field, \(\vv{B}\).
+    Of these \(\vv{x}\), \(\vv{p}\), \(\vv{E}\) are proper vectors, so have parity \(\eta_{\vv{x}} = \eta_{\vv{p}} = \eta_{\vv{E}} = 1\), whereas \(\vv{L}\) and \(\vv{B}\) are \define{pseudo-vectors}\index{pseudo-vector}, meaning they change by a sign under a parity transformation, and hence \(\eta_{\vv{L}} = \eta_{\vv{B}} = 0\).
+    
+    It is easy enough to show the pseudo-vector nature of \(\vv{L}\), since we know that \(\vv{L} = \vv{x} \times \vv{p}\), so
+    \begin{equation}
+        \Psym\circ \vv{L} = \Psym \circ (\vv{x} \times \vv{p}) = (\Psym\circ\vv{x})\times(\Psym\circ\vv{p}) = (-\vv{x}) \times (-\vv{p}) = \vv{x} \times \vv{p} = \vv{L}.
+    \end{equation}
+    In fact the cross product of two vectors is always a pseudo-vector.
+    Similarly the cross product of two pseudo-vectors is a pseudo-vector, and the cross product of a pseudo-vector and vector is a vector.
+    This is the logic that means \(\vv{B}\) is a pseudo vector since we have that \(\vv{F} = q\vv{E} + q\vv{v}\times\vv{B}\), and since \(\vv{F}\) is a proper vector and so is \(\vv{v}\) we must have that \(\vv{B}\) is a pseudo-vector.
+    
+    Each particle has an intrinsic parity.
+    Bosons have the same intrinsic parity as their antiparticles, whereas fermions have the opposite parity to their antiparticles.
+    This is a result of causality in QFT.
+    The angular momentum of a particle is a quantum number, \(J\).
+    It is also possible for the intrinsic parity to have this pseudo property.
+    If we are allowing for this then we label the particles with the quantum number \(J^\pm\), with \(-\) for when \(\eta\) is odd and \(+\) when \(\eta\) is even.
+    For example, the \(\uprho\)-meson (\(\mathrm{u}\bar{\mathrm{d}}\)) is a vector meson, meaning \(S = J = 1\), and the \(\mathrm{A}_1\)-meson (\(\bar{\mathrm{u}}\mathrm{d}\)) is also a vector meson.
+    However, the \(\uprho\)-meson has negative parity, so is \(1^{-}\), whereas the \(\mathrm{A}_1\)-meson has positive parity, so is \(1^{+}\).
+    We say that the \(\mathrm{A}_1\)-meson is a pseudo-vector particle.
+    
+    When we are only interested in computing transitions between like particles, for example, an electron going from one energy level to another, the parity cancels from both sides of the equation.
+    For this reason we often ignore parity when we are doing quantum mechanics.
+    When we are doing particle physics, such as QFT, however, we often consider cases where we generate new particles, potentially with different parities.
+    A general example would be the decay \(A \to B + C\).
+    In this case the parity of the final state is the sum of the intrinsic parities and the angular momentum, \(\eta_{\mathrm{tot}} = \eta_B + \eta_C + \eta_L\).
+    If \(A\) has definite parity and the interaction conserves parity (i.e. it is not a weak interaction) then we must have that \((-1)^{\eta_A} = (-1)^{\eta_{\mathrm{tot}}}\).
+    
+    \section{Superselection}
+    Superselection rules generalise selection rules.
+    Selection rules refer to a particular Hamiltonian which is such that only certain transitions between states occur with non-zero probability.
+    Superselection rules state that certain matrix elements vanish for \emph{all} observables.
+    That is given the states \(\ket{\psi}\) and \(\ket{\varphi}\) ew say these states are separated by a \defineindex{superselection rule} if
+    \begin{equation}
+        \bra{\psi} O \ket{\varphi} = 0
+    \end{equation}
+    for all observables \(O\).
+    
+    This means that a relative phase between \(\ket{\psi}\) and \(\ket{\varphi}\) is unobservable, and hence there is no coherent state of the form \(a\ket{\psi} + b\ket{\varphi}\).
+    
+    Notice that we can always define an Hermitian operator \(X \coloneqq \ket{\psi}\bra{\varphi} + \ket{\varphi}\bra{\psi}\), and clearly
+    \begin{equation}
+        \bra{\psi}X\ket{\varphi} = \braket{\psi}{\psi}\braket{\varphi}{\varphi} + \braket{\psi}{\varphi}\braket{\varphi}{\psi} = 1 \ne 0.
+    \end{equation}
+    What this means is that the presence of superselection rules really means that not all Hermitian operators are valid observables.
+    That is the space of observables is a strict subset of the space of Hermitian operators in the presence of superselection rules.
+    
+    An example of a superselection is the fermionic/bosonic nature of a particle.
+    Suppose that \(\ket{1/2}\) is a fermionic state, and \(\ket{1}\) is a bosonic state.
+    We could, at least mathematically in the Hilbert space, define a vector \(\ket{\psi} = a\ket{1/2} + b\ket{1}\), however, this doesn't correspond to a physically meaningful state.
+    This is because upon a \(2\pi\) rotation, due to some operator, \(U(2\pi)\), a fermionic state will pick up a negative sign, but a bosonic state won't, so
+    \begin{equation}
+        U(2\pi)\ket{\psi} = -a\ket{1/2} + b\ket{1}.
+    \end{equation}
+    Clearly this doesn't make any physical sense, since the relative phase between \(a\) and \(b\) changes by \(\pi\) upon rotation.
+    
+    Another example is conserved charge.
+    It doesn't make sense to write, for example, \(\ket{\psi} = \ket{\Pe} + \ket{\APe}\), since these transform under complex conjugates representations, and so pick up opposite phases when transforming.
+    The only time that this isn't a problem is if the representation is real, but this corresponds to the particle being neutral.
+    
+    \section{Electric Dipole}
+    Consider an extended charge distribution, \(\rho\).
+    To first order in the multipole expansion we can write the Hamiltonian in an external field, \(\vv{E}\), as
+    \begin{equation}
+        H = H_0 + H'
+    \end{equation}
+    where \(H_0\) is a Coulomb term and \(H' = -\vv{d} \cdot \vv{E}\), where \(\vv{d}\) is the electric dipole moment, given by
+    \begin{equation}
+        \vv{d} \coloneqq \int \rho(\vv{x}) \vv{x} \dd{^3x}.
+    \end{equation}
+    Importantly \(\vv{d}\) transforms the same as \(\vv{x}\), due to the factor of \(\vv{x}\) in the definition.
+    We know that \(\vv{x}\) is a \(j = 1\) tensor operator (that is, a vector) and hence the Wigner--Eckart theorem applies, as do the associated selection rules.
+    
+    For simplicity we consider the case of an external field aligned along the \(z\)-axis, so \(\vv{E} = E_z\ve{z}\).
+    It follows from this that \(H' \propto z\) since
+    \begin{equation}
+        H' = -\int \rho(\vv{x}) \vv{x} \dd{^3x} \cdot \ve{E} = -E_z \int \rho(\vv{x}) \vv{x} \cdot \ve{z} \dd{^3x} = -E_z \int \rho(\vv{x}) z \dd{^3x}.
+    \end{equation}
+    So \(H'\) transforms like \(z\).
+    Looking at the spherical harmonics in \cref{eqn:Y10} we see that
+    \begin{equation}
+        Y_{10} \propto \frac{z}{r}.
+    \end{equation}
+    Considering the definition of the solid harmonics as \(\mathcal{Y}_{lm} = r^lY_{lm}\) we see that
+    \begin{equation}
+        \mathcal{Y}_{10} \propto z.
+    \end{equation}
+    So \(H' \propto \mathcal{Y}_{10}\).
+    
+    Applying the Wigner--Eckart theorem we then have
+    \begin{equation}
+        \bra{l,m} H' \ket{l',m'} \propto \bra{l,m}\mathcal{Y}_{10}\ket{l',m'} = \clebschgordan{m}{0}{m'}{l}{1}{l'} \bra{l} |\mathcal{Y}_1 \ket{l'}.
+    \end{equation}
+    We know that the Clebsch--Gordan coefficient, \(\clebschgordan{M}{m_1}{m_2}{J}{j_1}{j_2}\), is non-zero only if \(M = m_1 + m_2\), so we must have \(m = m'\), and if \(\abs{j_1 - j_2} \le J \le j_1 + j_2\), which means that we must have \(\Delta l \coloneqq \abs{l - l'} \le 1\).
+    Further \(\clebschgordan{m}{0}{m'}{0}{1}{0} = 0\) for all allowed values of \(m\) and \(m'\), which is just \(m = m' = 0\).
+    This means we cannot have \(l = l' = 0\).
+    
+    Further considering parity selection rules since \(\eta_{\vv{x}} = 1\), and \(H'\) transforms like \(\vv{x}\), so has the same parity which means we must have \(l + l' + \eta_{\vv{x}} = l + l' + 1\) even.
+    Hence we cannot have \(l - l' = 0\), since if this is the case then \(l + l' + 1 = 2l + 1\), which is odd for all integer \(l\).
+    So \(\Delta l \ne 0\).
+    Hence we have the selection rules
+    \begin{equation}
+        m = m', \qqand \Delta l = \abs{l - l'} = 1.
+    \end{equation}
+    
+    \section{Pauli's Hydrogen Atom}
+    \begin{wrn}
+        In this section we use units such that \(c = \hbar = 1\).
+    \end{wrn}
+    Shortly after Schrödinger solved his equation for the hydrogen atom Pauli did so using group theory and a hidden \(\specialUnitary(2) \directproduct \specialUnitary(2)\) symmetry.
+    The energy levels of the hydrogen atom are given by
+    \begin{equation}
+        E_n = -\frac{m_{\mathrm{e}}e^4}{2} \frac{1}{n^2}.
+    \end{equation}
+    Importantly there is no \(l\) dependence.
+    This means that for each value of the principal quantum number, \(n\), we have \(l = 0, \dotsc, n - 1\), which means the total degeneracy is
+    \begin{equation}
+        \sum_{l = 0}^{n - 1} (2l + 1) = 2\sum_{l = 0}^{n - 1}l + \sum_{l = 0}^{n - 1} = 2\frac{n - 1}{2}n + n = n^2.
+    \end{equation}
+    Note that the \(2l + 1\) term is due to degeneracy in \(m\), which runs from \(-l\) to \(l\), so takes on \(2l + 1\) values for fixed \(l\).
+    
+    The degeneracy in \(m\) is expected, since we have a spherically symmetric potential, and \(m\) picks out a direction.
+    The fact that we have no \(l\) dependence suggests that there is some further symmetry which we are missing.
+    Pauli used the fact that there is a conserved vector, \(\vv{A}\), with components
+    \begin{equation}
+        A_i = \varepsilon_{ijk}p_jL_k - me^2\frac{x_i}{r},
+    \end{equation}
+    which is conserved in a spherically symmetric system in classical mechanics.
+    This is known as the \defineindex{Laplace--Runge--Lenz vector}.
+    In quantum mechanics there is a related quantity given by symmetrisation:
+    \begin{equation}
+        A_i = \varepsilon_{ijk}p_jL_k - me^2\frac{x_i}{r} - ip_i
+    \end{equation}
+    Note that this is an operator in quantum mechanics.
+    It can be shown that the following hold:
+    \begin{gather}
+        \vv{L} \cdot \vv{A} = \vv{A} \cdot \vv{L} = 0,\\
+        \commutator{L_i}{A_j} = i\varepsilon_{ijk}A_k,\\
+        \commutator{H}{A_i} = 0, \qwhere H = \sum_i\frac{p_i^2}{2m} - \frac{e^2}{r}.\\
+    \end{gather}
+    The second of these means that \(A_i\) is a \(j = 1\) vector operator.
+    The third means that \(\vv{A}\) is conserved.
+    
+    By Noether's theorem we can identify from this conservation law that there must be a hidden symmetry.
+    To find this symmetry we make some new definitions and extract a Lie algebra.
+    Start by defining
+    \begin{equation}
+        \tilde{A}_i \coloneqq \frac{A_i}{\sqrt{-2mH}}.
+    \end{equation}
+    Note that for a bound state the total energy is negative, so we take the minus sign in the root to keep \(\tilde{A}_i\) real.
+    It can then be shown that
+    \begin{equation}
+        \liebracket{\tilde{A}_i}{\tilde{A}_j} = i\varepsilon_{ijk}\tilde{A}_k.
+    \end{equation}
+    This shows that \(\tilde{A}_i\) are the generators of a \(\specialUnitaryLie(2)\) Lie algebra.
+    We then define \(X_i^{\pm} \coloneqq (L_i \pm \tilde{A}_i) / 2\).
+    From this the commutation relation
+    \begin{equation}
+        \liebracket{X_i^{\pm}}{X_j^{\pm}} = i\varepsilon_{ijk}X_k^{\pm}
+    \end{equation}
+    follows, since both \(L_i\) and \(A_i\) individually satisfy the requirements of a \(\specialUnitaryLie(2)\) Lie algebra, and since \(\vv{L} \cdot \vv{A} = \vv{A} \cdot \vv{L} = 0\) cross terms vanish.
+    
+    The result is that we identify an overall \(\specialUnitary(2) \directproduct \specialUnitary(2)\) symmetry, corresponding to the two copies of the \(\specialUnitaryLie(2)\) Lie algebra, spanned by \(X_i^+\) and \(X_i^-\) respectively.
+    We can think of one copy as resulting from rotational symmetry and the second from the symmetry associated with conservation of \(\vv{A}\).
+    
+    One question we may want to ask is what are the Casimir operators of these two Lie algebras are.
+    The fact that \(\vv{L} \cdot \vv{A} = \vv{A} \cdot \vv{L} = 0\) means that the two Casimir operators are actually the same, in particular the quadratic Casimir is
+    \begin{equation}
+        C_2^+ = (X^+)^2 = (X^-)^2 = C_2^- = C_2.
+    \end{equation}
+    We can parametrise this Casimir by \(C_2 = x(x + 1)\) with \(x = 0, 1/2, 1, 3/2, \dotsc\).
+    
+    From this it is possible to show that
+    \begin{equation}
+        A_iA_i = 2mH(L_iL_i + 1) + m^2e^4.
+    \end{equation}
+    Dividing through by \(-2mH\) and solving for \(H\) we get
+    \begin{equation}
+        H = -\frac{me^4/2}{L_iL_i + \tilde{A}_i\tilde{A}_i + 1} = -\frac{me^4/2}{4C_2 + 1} = -\frac{me^4/2}{(2x + 1)^2}
+    \end{equation}
+    for \(x = 0, 1/2, 1, 3/2, \dotsc\).
+    The second equality follows using \(L_i = X_i^+ + X_i^-\).
+    Counting the degeneracy of the states corresponds to counting the states in the direct product representation \(\rho_{j = x} \directproduct \rho_{j = x}\), which has \((2x + 1)^2\) states.
+    Comparing this with our initial work in this section we identify the principal quantum number \(n = 2x + 1\).
+    
+    Pauli's approach here was to write the Hamiltonian in terms of two Casimir operators (which just happen to be equal).
+    That this is possible is not an accident.
+    In the absence of spin we need three quantum numbers to describe a state, say \(\{x_1, x_2, x_3\}\), \(\{p_1, p_2, p_3\}\), or as is most common when talking about the hydrogen atom, \(\{n, l, m\}\).
+    Spherical symmetry guarantees that \(m\) doesn't appear in the final result, and hence we are reduced to two quantum numbers.
+    This means that a rank two symmetry, with two Casimirs, is sufficient to obtain solutions based solely on symmetry.
+    In order to include the effects of spin, as well as other relativistic corrections, we still need to solve Schrödinger's equation.
+    
+    
     
     
     %   Appdendix
