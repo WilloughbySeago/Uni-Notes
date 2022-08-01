@@ -35,6 +35,7 @@ Here are all the courses I took.
 * [General Relativity](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/General-Relativity) (s2)
 * [Statistical Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Statistical-Physics) (s2)
 * [Modelling and Visualisation in Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Modelling-and-Visualisation-in-Physics) (s2)
+* [Classical Electrodynamics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Classical-Electrodynamics) (s2) I took this class over the summer as course only
 
 ### Year 3
 * [Electromagnetism](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Electromagnetism) (y)
@@ -118,6 +119,7 @@ As the main source of this material I would like to thank the following people w
 * [Prof John Peacock](https://www.ph.ed.ac.uk/people/john-peacock)
 * [Prof Martin Evans](https://www.ph.ed.ac.uk/people/martin-evans)
 * [Prof Davide Marenduzzo](https://www.ph.ed.ac.uk/people/davide-marenduzzo)
+* [Prof Donal O'Connell](https://www.ph.ed.ac.uk/people/donal-oconnell)
 
 ### Bibliography
 Some of the books I have used to help write these notes:
