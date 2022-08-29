@@ -16,7 +16,7 @@ For later courses these notes became part of how I learned the course, I would w
 After the lecture I would then write up my notes compiling my own notes, the lecture notes, and any other relevant sources.
 For this reason the notes becomes more verbose for later courses.
 
-If you have spotted a mistake, have a suggestion or improvement in mind or think something is badly written/explained please contact me by creating an issue.
+If you have spotted a mistake, have a suggestion or improvement in mind, or think something is badly written/explained please contact me by creating an issue.
 
 ## Courses
 Here are all the courses I took.
@@ -35,7 +35,7 @@ Here are all the courses I took.
 * [General Relativity](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/General-Relativity) (s2)
 * [Statistical Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Statistical-Physics) (s2)
 * [Modelling and Visualisation in Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Modelling-and-Visualisation-in-Physics) (s2)
-* [Classical Electrodynamics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Classical-Electrodynamics) (s2) I took this class over the summer as course only
+* [Classical Electrodynamics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Classical-Electrodynamics) (s2) - I took this class over the summer as course only
 
 ### Year 3
 * [Electromagnetism](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Electromagnetism) (y)
