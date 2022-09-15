@@ -7,6 +7,7 @@
 \usepackage{siunitx}
 \usepackage{tensor}
 \usepackage{csquotes}
+\usepackage[thicklines]{cancel}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -69,8 +70,10 @@ noabbrev
 \newcommand*{\order}{\symcal{O}}
 \newcommand*{\classicalElectronRadius}{\ell_{\symrm{c}}}
 \newcommand*{\e}{\symrm{e}}
+\newcommand*{\ret}{{\text{ret}}}
+\newcommand*{\rad}{\text{rad}}
 
-\includeonly{parts/fundamentalsAndReview, parts/relativisticElectrodynamics}
+\includeonly{parts/fundamentalsAndReview, parts/relativisticElectrodynamics, parts/actions, parts/greensFunctions}
 
 \begin{document}
     \frontmatter
@@ -82,1467 +85,953 @@ noabbrev
     
     \include{parts/fundamentalsAndReview}
     \include{parts/relativisticElectrodynamics}
+    \include{parts/actions}
+    \include{parts/greensFunctions}
     
-    \part{Action Principles}
-    \chapter{Non-Relativistic Actions}
-    \epigraph{I got a career out of Taylor expanding.}{Donal O'Connell}
+    \part{Radiation}
+    \chapter{Radiation: The Potential}
+    \section{Setup}
+    We start by considering a point particle with charge \(e\) moving along some known trajectory, \(r^\mu(\tau)\).
+    We want to know what the resulting electromagnetic field is.
+    For the case of a stationary particle we expect to just get the Coulomb field.
     
-    This section will be mostly a review of content covered in other courses, in particular in the Lagrangian dynamics course and the quantum theory course.
-    For more on actions and the calculus of variations see the Lagrangian dynamics course and for more on the particular methods used here to find stationary actions see the quantum theory course.
-    
-    We will introduce the key ideas of action principles through some, hopefully familiar, non-relativistic examples, before we discus relativistic generalisations.
-    We start with a very simple example.
-    
-    \section[Non-Relativistic Point Particle in One Dimension in a Potential][First Example]{Non-Relativistic Point Particle in One Dimension in a Potential}
-    Consider a non-relativistic point particle in one dimension in a potential, \(V\), which depends on the position of the particle, \(x\), and nothing else.
-    The action for this particle along some path, \(x(t)\), between times \(a\) and \(b\) is defined to be the functional
+    If the particle has four velocity \(u^\mu(\tau) = \diff{r^\mu}/{\tau}\) then the current density at a position \(x\) is
     \begin{equation}
-        S[x(t)] = \int_a^b \left[ \frac{1}{2}m\dot{x} - V(x) \right] \dd{t}.
+        J^\mu(x) = ec \int \dl{\tau} \, u^\mu(x) \delta^4(x - r(\tau)).
     \end{equation}
-    We consider a small variation, \(x(t) \to x(t) + \delta x(t)\), where \(\delta x(t)\) is small.
-    The action on this varied path is
+    We choose to work in the Lorenz gauge, and will do so for the rest of the course.
+    In this gauge the Maxwell equations reduce to a wave equation for the potential:
+    \begin{equation}
+        \dalembertian A^\mu(x) = \frac{1}{c}J^\mu(x) = e\int \dl{\tau} \, u^\mu(\tau) \delta^4(x - r(\tau)).
+    \end{equation}
+    We have seen that this can be solved by a retarded Green's function,
+    \begin{equation}
+        G_{\symrm{R}}(x) = \frac{1}{2\pi} \theta(x^0) \delta(x\cdot x).
+    \end{equation}
+    The solution is then
     \begin{align}
-        S[x(t) + \delta x(t)] &= \int_a^b \left[ \frac{1}{2}m \left( \diff{}{t} [x(t) + \delta x(t)] \right)^2 - V(x(t) + \delta x(t)) \right] \dd{t} \notag\\
-        &= \int_a^b \left[ \frac{1}{2}m\left( \diff{x}{t} + \diff{}{t}\delta x(t) \right)^2 - V(x(t) + \delta x(t)) \right] \dd{t}.
+        A^\mu(x) &= \int \dl{^4x'} \, G_{\symrm{R}}(x - x') \frac{1}{c}J^\mu(x')\\
+        &= \int \dl{^4x'} \frac{1}{2\pi} \theta(x^0 - x'^0) \delta((x - x')^2) e \int \! \dl{\tau} \, u^\mu(\tau) \delta^4(x' - r(\tau)).
     \end{align}
-    Taylor expanding the potential to first order in \(\delta x(t)\), and expanding the brackets, again keeping only terms up to linear order in \(\delta x(t)\) we get
+    
+    \section{Doing the Integrals}
+    \epigraph{There are 5 integrals to do. This seems bad, integrals are hard.\\ I can do integrals with delta functions. Usually.\\ If there aren't delta functions I type it into Mathematica.}{Donal O'Connell}
+    \epigraph{It's good for you to see me screw up.}{Donal O'Connell}
+    
+    To evaluate the potential there are five integrals to do.
+    Fortunately, there are also five Dirac deltas.
+    We can swap the order of the integrals and evaluate the integrals over \(x'\) first, setting \(x' = r(\tau)\) everywhere:
     \begin{equation}
-        S[x(t) + \delta x(t)] = \int_a^b \left[ \frac{1}{2}m\dot{x}(t)^2 + m\dot{x} \diff{}{t}\delta x(t) - V(x(t)) - V'(x(t))\delta x(t) \right] \dd{t}.
+        A^\mu = \frac{e}{2\pi} \int \dl{\tau} \, \theta(x^0 - r^0(\tau)) \delta((x - r(\tau))^2) u^\mu(\tau).
     \end{equation}
-    Carrying around all of this explicit time dependence is getting a bit bothersome, so we'll drop the \((t)\) for \(x\) and \(\delta x\) most of the time:
+    
+    To do the next integral we have a Dirac delta evaluated at some function of \(\tau\), so we use \cref{eqn:delta(f(x))}.
+    In order to do this we need to find the zeros of \((x - r(\tau))^2\).
+    We don't know details about \(r(\tau)\) so the best we can do is to define \(\tau_*\) such that
+    \begin{itemize}
+        \item \((x - r(\tau_*))^2 = 0\),
+        \item \(x^0 - r^0(\tau_*) > 0\).
+    \end{itemize}
+    The first condition just says that \(\tau_*\) is a zero of \(f(\tau) = (x - r(\tau))^2\).
+    The second condition follows from the \(\theta(x^0 - r^0(\tau))\) term, which means the integrand vanishes when \(x^0 - r^0(\tau) < 0\), so we are free to only consider values making this quantity positive.
+    
+    Expanding the first condition we have
     \begin{equation}
-        S[x + \delta x] = \int_a^b \left[ \frac{1}{2}m \dot{x} + \dot{x} \diff{}{t}\delta x - V(x) - V'(x)\delta x \right] \dd{t}.
+        0 = (x - r(\tau_*))^2 = (x^0 - r^0(\tau_*))^2 - \abs{\vv{x} - \vv{r}(\tau_*)}.
     \end{equation}
-    Notice that we can write this in terms of the action on the unvaried path, plus some extra terms:
+    Taking the positive square root, since \(x^0 - r^0(\tau_*) > 0\) by definition, we have
     \begin{equation}
-        S[x + \delta x] = S[x] + \int_a^b \left[ m \dot{x} \diff{}{t}\delta x - V'(x)\delta x \right] \dd{t}.
+        x^0 - r^0(\tau_*) = \abs{\vv{x} - \vv{r}(\tau_*)}.
     \end{equation}
-    We therefore define the variation in \(S\) due to this variation in the path to be
+    That is, the temporal distance, \(x^0 - r^0(\tau_*)\), between an observer and the particle is equal to the spatial distance, \(\abs{\vv{x} - \vv{r}(\tau_*)}\), between the observer and the particle.
+    This means that the particle can send out a light signal at time \(\tau_*\) and have it reach the observer.
+    
+    Note that the value of \(\tau_*\) depends both on \(x\), the position of the observer, and \(r(\tau)\), the trajectory of the particle.
+    We usually leave the \(x\) dependence implicit, thinking of the observer as being fixed and the particle as moving.
+    
+    The last thing we need to use \cref{eqn:delta(f(x))} is \(\abs{f'(\tau_*)}\).
+    This is not too difficult to compute, applying the chain rule gives
     \begin{equation}
-        \delta S[x(t)] \coloneqq S[x(t) + \delta x(t)] - S[x(t)].
+        \diff{}{\tau} (x - r(\tau))^2 = 2(x - r(\tau)) \cdot (-r'(\tau)).
     \end{equation}
-    So,
-    \begin{equation}\label{eqn:variation in action}
-        \delta S[x(t)] = \int_a^b \left[ m \dot{x} \diff{}{t}\delta x - V'(x)\delta x \right] \dd{t}.
+    In order to find \(\abs{f'(\tau_*)}\) we need to know the sign of this quantity evaluated at \(\tau = \tau_*\).
+    First notice that \(r'(\tau) = u^\mu(\tau)\).
+    Now consider the components of the two four vectors above, we have
+    \begin{equation}
+        x^\mu - r^\mu(\tau_*) = (x^0 - r^0(\tau_*), \vv{x} - \vv{r}(\tau_*)), \qand u^\mu(\tau_*) = (\gamma(\tau_*)c, \gamma(\tau_*)\vv{v}(\tau_*)).
+    \end{equation}
+    Note that the speed of the particle depends on \(\tau_*\), and hence so does \(\gamma\).
+    
+    We can then compute the scalar product of the four vectors:
+    \begin{equation}
+        (x - r(\tau_*)) \cdot u^\mu(\tau_*) = (x^0 - r^0(\tau_*)) \gamma c - (\vv{x} - \vv{r}(\tau_*)) \cdot \vv{v} \gamma.
+    \end{equation}
+    We can rewrite \(x^0 - r^0(\tau_*) = \abs{\vv{x} - \vv{r}(\tau_*)}\), and we can write the dot product of three-vectors in terms of the angle between them, \(\vartheta\), giving
+    \begin{align}
+        (x - r(\tau_*)) \cdot u^\mu(\tau_*) &= \abs{\vv{x} - \vv{r}(\tau_*)}\gamma c = \gamma\abs{\vv{x} - \vv{r}(\tau_*)}\abs{\vv{v}} \cos\vartheta\\
+        &= \gamma \abs{\vv{x} - \vv{r}(\tau_*)} (c - \abs{\vv{v}} \cos\vartheta).
+    \end{align}
+    Noticing that \(\gamma \ge 1\) and \(\abs{\vv{x} - \vv{r}(\tau_*)} \ge 0\) we see that this scalar product is non-negative only if \(c - \abs{\vv{v}}\cos\vartheta\) is non-negative.
+    Since \(\abs{\vv{v}} \le c\) and \(\cos\vartheta \in [-1, 1]\) this is indeed non-negative and so
+    \begin{equation}
+        (x - r(\tau_*)) \cdot u^\mu(\tau_*) \ge 0 \implies \abs{f'(\tau_*)} = \abs{2(x - r(\tau_*)) \cdot (-u(\tau_*))} = 2(x - r(\tau_*))\cdot u(\tau_*).
     \end{equation}
     
-    In order to extract any physics from this variation we need the principle of least action.
+    We can then use \cref{eqn:delta(f(x))}, and we have
+    \begin{equation}
+        \delta((x - r(\tau))^2) = \frac{\delta(\tau - \tau_*)}{2(x - r(\tau_*)) \cdot u(\tau_*)}.
+    \end{equation}
+    Putting this into our expression for the potential we have
+    \begin{align}
+        A^\mu(x) &= \frac{e}{2\pi} \int \dl{\tau} \, \theta(x^0 - r^0(\tau)) \delta((x - r(\tau))^2) u^\mu(\tau)\\
+        &= \frac{e}{4\pi} \int \dl{\tau} \, \frac{\delta(\tau - \tau_*)}{(x - r(\tau_*)) \cdot u(\tau_*)} u^\mu(\tau)\\
+        &= \frac{e}{4\pi} \frac{u^\mu(\tau_*)}{(x - r(\tau_*)) \cdot u(\tau_*)}.
+    \end{align}
+    This is called the \defineindex{Li\'enard–Wiechert potential}.
+    Note that we can drop the \(\theta(x^0 - r^0(\tau_*))\) term after we make the change to the Dirac delta because we have selected zeros such that \(x^0 - r^0(\tau_*) > 0\).
     
-    \begin{clm}{Principle of Least Action}{}
-        The \defineindex{principle of least action}, or more accurately the principle of stationary action, states that the physical trajectory of a particle is such as to minimise the appropriate action.
-    \end{clm}
-    The phrase \enquote{appropriate action} is quite a lot here, since we usually define the action such that applying the principle of least action gives the correct results, so its a rather circular argument, but it works, and it generalises.
-    
-    One argument for why the principle of least action applies comes from the path integral formulation of quantum mechanics.
-    In this we have an integral of \(\exp(i S[x(t)]/\hbar)\).
-    This oscillates a lot, apart from near to where \(S[x(t)]\) is stationary, and so only the stationary path has a meaningful contribution to the integral, with the rapid oscillations cancelling out.
-    
-    Another thing we need to consider is what it means for a functional to be stationary.
-    For a normal function we would simply say that \(\diff{f}/{t} = 0\) if \(f\) is stationary at some value of \(t\).
-    Similarly for a functional we say that \(\delta f[x(t)] = 0\) if \(f\) is stationary on some path, \(x(t)\).
-    So, the principle of least action simply reduces to looking for \(x(t)\) such that \(\delta S[x(t)] = 0\).
-    
-    Before we can do this we will need a theorem about integrals.
-    
-    \begin{thm}{}{}
-        Let \(f\) be some sufficiently smooth function.
-        If
+    \begin{ntn}{}{}
+        We write
         \begin{equation}
-            \int_a^b f(t) \delta x(t) \dd{t} = 0
+            f|_{\ret} = f|_{\tau = \tau_*} = f(\tau_*),
         \end{equation}
-        for all distributions \(\delta x(t)\) then \(f(t) = 0\) for all \(t \in [a, b]\).
+        so, for example,
+        \begin{equation*}
+            A_\mu(x) = \frac{e}{4\pi} \frac{u^\mu}{(x - r) \cdot u} \bigg|_{\ret} = \frac{e}{4\pi} \frac{u^\mu}{(x - r)\cdot u} \bigg|_{\ret} = \frac{e}{4\pi} \frac{u^\mu(\tau_*)}{(x - r(t_*))\cdot u(\tau_*)}.
+        \end{equation*}
         
-        \begin{proof}[\enquote{proof}]
-            Let \(\delta x(t) = \delta(t - t_0)\) for some \(t_0 \in [a, b]\).
-            Then
-            \begin{equation}
-                0 = \int_a^b f(t) \delta x(t) \dd{t} = \int_a^b f(t) \delta(t - t_0) \dd{t} = f(t_0).
-            \end{equation}
-            Hence \(f(t) = 0\) for all \(t \in [a, b]\).
-        \end{proof}
-    \end{thm}
+        We write
+        \begin{equation}
+            R^\mu(\tau, x) = R^\mu(\tau) = x^\mu - r^\mu(\tau),
+        \end{equation}
+        so, for example,
+        \begin{equation}
+            A^\mu(x) = \frac{e}{4\pi} \frac{u^\mu}{R \cdot u} \bigg|_{\ret}.
+        \end{equation}
+        Note that by the definition of \(\tau_*\) we have \(R(\tau_*) \cdot R(\tau_*) = 0\) and \(R^0(\tau_*) > 0\).
+    \end{ntn}
     
-    This theorem can almost be applied to \cref{eqn:variation in action}.
-    The problem is that we have a derivative of \(\delta x\), which doesn't work with this theorem.
-    The solution is to either integrate by parts\footnote{as demonstrated multiple times in the quantum theory course}, or, equivalently, to massage our statement to allow us to integrate out this derivative.
-    To do this we write
+    \section{Components of the Potential}
+    We want to work out the temporal and spatial components of \(A^\mu(x)\).
+    In order to do this we need the components of \(u^\mu\), and the value of \(u \cdot R\), all at \(\tau = \tau_*\).
+    We know that the four velocity has components
     \begin{equation}
-        \diff{}{t} (\dot{x} \, \delta x) = \ddot{x} \, \delta x + \dot{x} \diff{}{t}\delta x.
+        u^\mu(\tau_*) = (\gamma(\tau_*) c, \gamma(\tau_*) c \vv{\beta}(\tau_*)) = \gamma c(1, \vv{\beta})|_{\ret}
     \end{equation}
-    Hence,
+    where \(\vv{\beta} = \vv{v}/c\).
+    Note that \(\gamma\) and \(\vv{\beta}\) both depend on \(\tau_*\).
+    We also have
     \begin{equation}
-        \int_a^b \dot{x}\diff{}{t}\delta x \dd{t} = \int_a^b \left[ \diff{}{t}(\dot{x} \, \delta x) - \ddot{x} \, \delta x \right] \dd{t} = \left[ \dot{x} \, \delta x \right]_a^b - \int_a^b \ddot{x} \, \delta x \dd{t}.
+        R^\mu(\tau_*) = (R^0(\tau_*), \vv{R}(\tau_*)) = (\abs{\vv{R}(\tau_*)}, \abs{\vv{R}(\tau_*)}\vh{n}) = \abs{\vv{R}}(1, \vh{n}) |_{\ret}.
     \end{equation}
-    Of course, this is exactly integration by parts, we've just done the middle steps that we usually miss out.
+    where \(\vh{n}\) is a unit vector pointing from the position of the particle to the position of the observer.
+    Note that we have used
+    \begin{equation}
+        R(\tau_*)^2 = R^0(\tau_*) - \vv{R}(\tau_*)^2 \implies R^0(\tau_*) = \vv{R}(\tau_*),
+    \end{equation}
+    where we take the positive square root since \(R^0(\tau_*) > 0\).
+    
+    We can then compute \(R \cdot u |_{\ret}\):
+    \begin{equation}
+        R \cdot u |_{\ret} = \gamma c \abs{\vv{R}}(1 - \vv{\beta} \cdot \vh{n}) |_{\ret}.
+    \end{equation}
+    The temporal component of the potential is then
+    \begin{equation}
+        A^0(x) = \frac{e}{4\pi} \frac{\gamma c}{\gamma c \abs{\vv{R}}(1 - \vv{\beta}\cdot\vh{n})}\bigg|_{\ret} = \frac{e}{4\pi\abs{\vv{R}}} \frac{1}{1 - \vv{\beta}\cdot\vh{n}}\bigg|_{\ret}.
+    \end{equation}
+    Notice that for a stationary particle at the origin we have \(\vv{\beta} = \vv{0}\) and \(R = x\) so
+    \begin{equation}
+        A^0(x) = \varphi(x) = \frac{e}{4\pi x},
+    \end{equation}
+    which is just the Coulomb potential as expected.
+    
+    The spatial component of the potential is
+    \begin{equation}
+        \vv{A}(x) = \frac{e}{4\pi} \frac{\gamma c \vv{\beta}}{\gamma c \abs{\vv{R}}(1 - \vv{\beta}\cdot\vh{n})} \bigg|_{\ret} = \frac{e}{r\pi \abs{\vv{R}}} \frac{\vv{\beta}}{1 - \vv{\beta}\cdot\vh{n}} \bigg|_{\ret}.
+    \end{equation}
+    
+    We see that there are two relativistic phenomena at play:
+    \begin{itemize}
+        \item retarded time, due to the finite speed of propagating signals, and
+        \item powers of \(1 - \vv{\beta}\cdot\vh{n}\), here \((1 - \vv{\beta}\cdot \vh{n})^{-1}\), we'll see that these arise a lot in the rest of the course.
+    \end{itemize}
+    Note that for a massive particle \(\abs{\vv{\beta}} < 1\), since \(\abs{\vv{v}} < c\), and so \(\vv{\beta}\cdot\vh{n} < 1\), meaning that \(1 - \vv{\beta}\cdot\vh{n} \ne 0\), so we don't have issues with singularities.
+    
+    \chapter{Radiation: The Field}
+    \section{Goal}
+    In this chapter we will derive the field corresponding to the Li\'enard--Wiechert potential,
+    \begin{equation}
+        A_\mu(x) = \frac{e}{4\pi} \frac{u_\mu}{R \cdot u} \bigg|_{\ret}.
+    \end{equation}
+    The electromagnetic field tensor is given, as usual, by
+    \begin{equation}
+        F_{\mu\nu} = \partial_\mu A_\nu - \partial_\nu A_\mu.
+    \end{equation}
+    To compute this we will need to work out various derivatives, such as \(\partial_\mu u_\nu(\tau_*)\).
+    We have to be careful when doing this because these derivatives are with respect to (components of) \(x\) and \(\tau_*\) depends on \(x\).
+    Hence, we first want to compute \(\partial_\mu \tau_*\).
+    
+    \section{\texorpdfstring{\(\partial_\mu \tau_*\)}{Derivative of Proper Retarded Time}}
+    The only think we really know about \(\tau_*\) is its definition, its such that \((x - r(\tau_*))^2 = 0\).
+    Starting from this we take a derivative of this definition hoping to extract \(\partial_\mu \tau_*\):
+    \begin{equation}
+        \partial_\mu(x - r(\tau_*))^2 = 0.
+    \end{equation}
+    Writing the scalar product out we get
+    \begin{equation}
+        0 = \partial_\mu(x_\nu - r_\nu(\tau_*))(x^\nu - r^\nu(\tau_*)).
+    \end{equation}
+    
+    We now use the relation \(\partial_\mu a^2 = 2a_\nu \partial_\mu a^\nu\) which holds for any four-vector, \(a\), in special relativity since the metric is constant:
+    \begin{multline}
+        \partial_\mu a^2 = \partial_\mu a_\nu a^\nu = (\partial_\mu a_\nu)a^\nu + a_\nu (\partial_\mu a^\nu) = (\partial_\mu a^\rho \eta_{\nu\rho}) a^\nu + a_\nu (\partial_\mu a^\nu)\\
+        = (\partial_\mu a^\rho)\eta_{\nu\rho}a^\nu + a_\nu (\partial_\mu a^\nu) = (\partial_\mu a^\rho)a_\rho + a_\nu (\partial_\mu a^\nu) = 2a_\nu \partial_\mu a^\nu.
+    \end{multline}
+    In the last equality we rename \(\rho\) to \(\nu\) in the first term.
     
     Using this we have
-    \begin{align}
-        \delta S[x(t)] &= \int_a^b \left[ m\dot{x} \diff{}{t}\delta x - V'(x)\delta x \right]\dd{t}\\
-        &= [m\dot{x} \, \delta x(t)]_a^b - \int_a^b [m\ddot{x} + V'(x)]\delta x \dd{t}.
-    \end{align}
-    Now restrict the variation to be zero on the boundary, so \(\delta x(a) = \delta x(b) = 0\).
-    This means that the first term vanishes and we have
     \begin{equation}
-        \delta S[x(t)] = -\int_a^b [m \ddot{x} + V'(x)] \delta x \dd{t}.
+        0 = 2(x_\nu - \rho_\nu(\tau_*)) \partial_\mu(x^\nu - r^\nu(\tau_*)).
     \end{equation}
-    Imposing the principle of least action and requiring that this holds for any variation with \(\delta x(a) = \delta x(b) = 0\) we have
+    The first bracket is simply \(R_\nu(\tau_*)\).
+    The derivative distributes over the second bracket giving
     \begin{equation}
-        0 = \int_a^b [m\ddot{x} + V'(x)] \delta x \dd{t} \implies m\ddot{x} + V'(x) = 0 \implies m\ddot{x} = -V'(x).
+        \partial_\mu(x^\nu - r^\nu(\tau_*)) = \partial_\mu x^\nu - \partial_\mu r^\nu(\tau_*) = \delta^\nu_\mu - \diff{r^\nu}{\tau} \partial_\mu \tau_*
     \end{equation}
-    Of course, this is just Newton's second law for a particle of mass \(m\) in a potential.
-    
-    \subsection{The Basic Idea}
-    We have seen here all of the basic ideas behind using action principles.
-    All that remains is to apply these ideas to more and more complex systems.
-    The basic procedure is always the same:
-    \begin{enumerate}
-        \item Write out the action.
-        \item Write out the action on the varied path.
-        \item Taylor expand to first order in the variation.
-        \item Compute the variation in the action.
-        \item Set the variation in the action to zero.
-        \item Integrate by parts to get rid of derivatives.
-        \item We will be left with something of the form
-        \begin{equation}
-            \int f(t) \delta x(t) \dd{t} = 0
-        \end{equation}
-        and requiring that this holds for any variation vanishing on the boundaries means that we must have \(f(t) = 0\) as our equation of motion.
-    \end{enumerate}
-    
-    \subsection{Calculus of Variations}
-    We define the variation in something, say \(f(x(t))\), depending on the path \(x(t)\) to be
+    where the second equality follows by applying the chain rule in the last term.
+    Putting this back with the rest we get
     \begin{equation}
-        \delta f(x(t)) \coloneqq f(x(t) + \delta x(t)) - f(x(t)).
+        0 = R_\nu(\tau_*) \left( \delta_\mu^\nu - \diff{r^\nu}{\tau}[\tau = \tau_*] \partial_\mu \tau_* \right).
     \end{equation}
-    One important example of this is the variation in \(\diff{x}/{t}\):
-    \begin{multline}
-        \delta \diff{x}{t} = \delta \diff{}{t}(x(t)) = \diff{}{t}(x(t) + \delta x(t)) - \diff{}{t}(x(t))\\
-        = \diff{}{t}x(t) + \diff{}{t}\delta x(t) - \diff{}{t} x(t) = \diff{}{t} \delta x(t).
-    \end{multline}
-    We think of this as meaning that \(\diff{}/{t}\) and \(\delta\) commute, so
+    Expanding the bracket and recognising \(\diff{r}/{\tau} = u\) we get
     \begin{equation}
-        \delta \diff{}{t} = \diff{}{t}\delta.
+        0 = R_\mu(\tau_*) - R(\tau_*) \cdot u(\tau_*) \partial_\mu \tau_*.
     \end{equation}
-    Similarly one can show that we can exchange the order of variations and integrals.
-    
-    A fortunate consequence of this is that we can interpret \(\delta \dot{x}\) in two ways, and both are equal.
-    Either,
+    Solving for \(\partial_\mu \tau_*\) we get
     \begin{equation}
-        \delta \dot{x} = \delta (\dot{x}) = \delta \diff{x}{t} = \diff{}{t}\delta x, \qqor \delta \dot{x} = \dot{\delta x} = \diff{}{t} \delta x = \delta \diff{x}{t}.
-    \end{equation}
-    Since these are equal there is no ambiguity in the notation.
-    
-    \section[Non-Relativistic General Particle in One Dimension in a Potential][Second Example]{Non-Relativistic General Particle in One Dimension in a Potential}
-    A slightly more generic action for a particle in one dimension in some potential is given by defining a \defineindex{Lagrangian}, \(\lagrangian(x(t), \dot{x}(t)) = T - V\), where \(T\) is the kinetic energy of the particle and \(V\) is the potential energy.
-    Note that we choose here for the Lagrangian to depend only on the position and velocity of the particle.
-    This is not always the case, but often is.
-    When this doesn't hold one has to take care with which of the following steps are still valid.
-    
-    The Lagrangian is defined such that the action is given by its integral:
-    \begin{equation}
-        S[x(t)] = \int_a^b \lagrangian(x(t), \dot{x}(t)) \dd{t}.
-    \end{equation}
-    So, we can identify the Lagrangian from the previous example as
-    \begin{equation}
-        \lagrangian = \frac{1}{2}m\dot{x}^2 - V(x),
-    \end{equation}
-    which is exactly \(T - V\).
-    
-    The variation in the action is
-    \begin{align}
-        \delta S[x(t)] &= \delta \int_a^b \lagrangian(x, \dot{x}) \dd{t}\\
-        &= \int_a^b \delta \lagrangian (x, \dot{x})\dd{t}\\
-        &= \int_a^b [\lagrangian(x + \delta x, \dot{x} + \delta\dot{x}) - \lagrangian(x, \dot{x})] \dd{t}.
-    \end{align}
-    To proceed we Taylor expand the Lagrangian to first order in \(\delta x\) and \(\delta \dot{x}\).
-    Note that we treat \(x\) and \(\dot{x}\) as independent variables before we find the equations of motion.
-    Therefore we simply have a Taylor expansion in two variables:
-    \begin{equation}
-        \lagrangian(x + \delta x, \dot{x} + \delta\dot{x}) = \lagrangian(x, \dot{x}) + \diffp{\lagrangian}{x}\delta x + \diffp{\lagrangian}{\dot{x}} \delta\dot{x}.
-    \end{equation}
-    Hence, the variation in the Lagrangian is
-    \begin{equation}
-        \delta \lagrangian(x, \dot{x}) = \diffp{\lagrangian}{x}\delta x + \diffp{\lagrangian}{\dot{x}}\delta \dot{x},
-    \end{equation}
-    and the variation in the action is
-    \begin{equation}
-        \delta S[x(t)] = \int_a^b \left[ \diffp{\lagrangian}{x}\delta x + \diffp{\lagrangian}{\dot{x}}\delta\dot{x} \right]\dd{t}.
-    \end{equation}
-    In order to deal with the derivative of \(\delta x\) we again integrate by parts, rewriting
-    \begin{equation}
-        \diff{}{t}\left( \diffp{\lagrangian}{\dot{x}} \delta x \right) = \diffp{\lagrangian}{\dot{x}}\delta\dot{x} + \diff{}{t}\left( \diffp{\lagrangian}{\dot{x}} \right)\delta x
-    \end{equation}
-    we have
-    \begin{align}
-        \delta S[x(t)] &= \int_a^b \left[ \diffp{\lagrangian}{x}\delta x + \diff{}{t}\left( \diffp{\lagrangian}{\dot{x}} \delta x \right) - \diff{}{t}\left( \diffp{\lagrangian}{t} \right) \delta x \right] \dd{t}\\
-        &= \left[ \diffp{\lagrangian}{\dot{x}} \delta x \right]_a^b + \int_a^b \left[ \diffp{\lagrangian}{x}\delta x - \diff{}{t}\left( \diffp{\lagrangian}{t} \right) \right] \delta x \dd{t}.
-    \end{align}
-    Again we impose that the variation vanishes at the boundary, so the first term vanishes.
-    The principle of least action then gives us
-    \begin{equation}
-        \diffp{\lagrangian}{x} = \diff{}{t}\diffp{\lagrangian}{\dot{x}}.
-    \end{equation}
-    This is the \defineindex{Euler--Lagrange equation}.
-    
-    \subsection{Basic Idea}
-    The Euler--Lagrange equation gives us another way to find the physical trajectory.
-    If we know the action in the form
-    \begin{equation}
-        S = \int \lagrangian \dd{t}
-    \end{equation}
-    then we can get the equations of motion by either
-    \begin{itemize}
-        \item varying \(S\) and setting the variation to zero, or
-        \item solving the Euler--Lagrange equations.
-    \end{itemize}
-    The first will always work.
-    The second requires that we have the right form of the Euler--Lagrange equations for the problem at hand, for example as derived here the standard Euler--Lagrange equation works if the Lagrangian depends on position and velocity, but not if it also depends on acceleration.
-    
-    \chapter{Relativistic Free Action}
-    \section{Motivation}
-    In this section we will derive the action and Lagrangian for a free relativistic particle.
-    We do so motivated by knowing the equations of motion for such a system are
-    \begin{equation}
-        m\diff{u^\mu}{\tau} = 0,
-    \end{equation}
-    where \(u\) is the four-velocity of the particle.
-    
-    For a free particle the motion, and hence action and Lagrangian, shouldn't depend on the location of the particle, \(x\), which we now take to be the four-position.
-    More formally put our system should have translation symmetry.
-    Recall that this implies momentum conservation, by Noether's theorem\footnote{See the notes from the Lagrangian dynamics course for details.}, which we would expect since the equation of motion
-    \begin{equation}
-        0 = m\diff{u^\mu}{\tau} = \diff{p^\mu}{\tau}
-    \end{equation}
-    can be seen as a statement of conservation of momentum.
-    Taking \(x\) to be the four-position if our Lagrangian is independent of \(x\) then it is also time independent, which implies energy conservation, this also follows from the time component of the equation of motion.
-    
-    Another requirement we impose is that the Lagrangian be Lorentz invariant.
-    Strictly all we need is for the action to be Lorentz invariant, but this is almost always achieved by having a Lorentz invariant Lagrangian.
-    This restriction is reasonable as the physics of the system should not depend on the frame and we want to derive Lorentz covariant equations of motion.
-    
-    Recall that in the non-relativistic case a free particle has the Lagrangian
-    \begin{equation}
-        \lagrangian = \frac{1}{2}m\dot{\vv{x}}\cdot\dot{\vv{x}}.
-    \end{equation}
-    The obvious choice then is to replace the three-velocity, \(\dot{\vv{x}}\) with the four-velocity, \(u\).
-    However, recall that \(u \cdot u = c^2\), so this alone cannot give us the particle dynamics.
-    The requirement that the Lagrangian is both Lorentz invariant and position independent is actually quite limiting.
-    There are only really three Lorentz scalars from which we can build the Lagrangian.
-    They are the mass, \(m\), the speed of light, \(c^2 = u \cdot u\), and the proper time experienced by the particle, \(\tau\).
-    Motivated by the non-relativistic case we look for an action of the form
-    \begin{equation}
-        S[x(t)] = \int_a^b \lagrangian(x(t), x'(t)) \dd{\tau}
-    \end{equation}
-    where \(x\) is the four-position, \(x'\) the four velocity, and we replace coordinate time, \(t\), with proper time \(\tau\).
-    
-    The action must have units of energy times time, and the Lagrangian units of energy.
-    This restricts the possible ways we can combine these three Lorentz scalars.
-    After some thinking one comes to the conclusion that the correct form for the action of a free relativistic particle is
-    \begin{equation}
-        S[x(t)] = -mc^2 \int_a^b \dl{\tau} \iff \lagrangian = -mc^2.
-    \end{equation}
-    This is motivated by the fact that it correctly reduces to the non-relativistic result in the non-relativistic limit, and also gives the expected equations of motion in the full relativistic case.
-    We will demonstrate this now.
-    
-    \section{Non-Relativistic Limit}
-    The proper time is given by \(\dl{\tau} = \dl{t}/\gamma\).
-    In the non-relativistic limit \(v \ll c\), and so we can Taylor expand \(1/\gamma\), giving
-    \begin{equation}
-        \frac{1}{\gamma} = \sqrt{1 - \frac{v^2}{c^2}} = \left( 1 - \frac{v^2}{c^2} \right)^{1/2} \approx 1 - \frac{1}{2}\frac{v^2}{c^2}.
-    \end{equation}
-    Hence,
-    \begin{align}
-        S[x(t)] &= -mc^2\int_a^b \dl{\tau}\\
-        &\approx -mc^2 \int_a^b \left( 1 - \frac{1}{2}\frac{v^2}{c^2} \right) \dd{t}\\
-        &=\int_a^b \frac{1}{2}mv^2 \dd{t} + \text{constant}.
-    \end{align}
-    The constant is unimportant for the dynamics of the system and can be neglected\footnote{For a proof of this see the Lagrangian dynamics course. Essentially the Lagrangian is always differentiated when we use it so any constants vanish, this is similar to how we can add a constant to the potential energy by choosing a different place to define as zero.}.
-    We see therefore that this choice of relativistic Lagrangian is equivalent to the non-relativistic choice of Lagrangian for a free particle.
-    
-    \section{Relativistic Equation of Motion}
-    We will now derive the relativistic equation of motion by varying \(S\).
-    Doing so we have
-    \begin{equation}
-        \delta S = -mc^2 \delta\int \dl{\tau}.
-    \end{equation}
-    The interpretation of \(\int \dl{\tau}\) is as the total proper time along the path of the particle through spacetime (i.e., its world line).
-    In order to have \(\delta S = 0\), as required by the principle of stationary action we need to extremise the total proper time along the path.
-    One way to do this is to take a straight line in spacetime\footnote{This is a geodesic, for more details on geodesics and this approach see the notes from the general relativity course.}.
-    This is a global property of the path.
-    Equations of motion are typically differential equations, which are local, so we need another way to think about this.
-    
-    Consider two paths, \(x_1\) and \(x_2\), both starting and ending at the same points.
-    We can parametrise each path using the proper time along that path, \(\tau_i\).
-    So \(x_i = x_i(\tau_i)\) for \(i = 1, 2\).
-    The variation in the action between these two paths is
-    \begin{equation}
-        \delta S = -mc^2 \left[ \int_{\text{path 1}} \dl{\tau_1} - \int_{\text{path 2}} \dl{\tau_2} \right].
-    \end{equation}
-    In order to derive the equations of motion we first consider path 2 as a deviation from path 1.
-    We then choose to use \(\tau_1\) as a common parameter for both paths, which we can do since we can find consider \(\tau_2\) as a function of \(\tau_1\), \(\tau_2(\tau_1)\).
-    We then have\footnote{Don't tell the mathematicians we're treating derivatives as fractions.}
-    \begin{equation}
-        \diff{\tau_2}{\tau_1} = \diff{\tau_2}{\tau_1} \implies \dl{\tau_2} = \diff{\tau_2}{\tau_1}\dd{\tau_1}.
-    \end{equation}
-    This allows us to combine the two integrals over the paths into one, giving
-    \begin{equation}
-        \delta S = -mc^2\int \left[ 1 - \diff{\tau_2}{\tau_1} \right]\dd{\tau_1}.
+        \partial_\mu \tau_* = \frac{R_\mu(\tau_*)}{R(\tau_*) \cdot \diff{r}{\tau}} = \frac{R_\mu}{R \cdot u} \bigg|_{\ret}.
     \end{equation}
     
-    The problem with this approach is that it promotes path 1 above path 2.
-    In order to avoid this we introduce some third parameter, \(\lambda\), which parametrise both paths\footnote{Small technicality: the paths must both be monotonic functions of \(\lambda\), so that they don't double back on themselves. Here \(\lambda\) is an affine parameter, for more details see the general relativity course.}, so we consider \(\tau_i\) as a function of \(\lambda\), \(\tau_i(\lambda)\).
-    We then have two paths, \(x_1(\lambda)\) and \(x_2(\lambda)\).
-    
-    Next we need to find a way of writing \(\dl{\tau_i}\) in terms of \(\lambda\).
-    To do so we consider the spacetime interval:
+    This vector is quite important and appears a lot, so we give it a name.
+    Define
     \begin{equation}
-        c^2\dd{\tau^2} = \dl{x} \cdot \dl{x} \implies \dl{\tau} = \frac{1}{c}\sqrt{\dl{x}\cdot\dl{x}}.
+        k_\mu \coloneqq c\partial_\mu \tau_* = \frac{cR_\mu}{R \cdot u} \bigg|_{\ret}.
     \end{equation}
-    We can then write \(\dl{x}\) in terms of \(\lambda\) using
+    The factor of \(c\) makes this dimensionless.
+    In order to decrease factors of \(c\) we also define a dimensionless velocity,
     \begin{equation}
-        \diff{x}{\lambda} = \diff{x}{\lambda} \implies \dl{x} = \diff{x}{\lambda}\dl{\lambda}.
+        w_\mu \coloneq \frac{u_\mu}{c}.
     \end{equation}
-    Factoring the factor of \(\dl{\lambda}\) out of the square root we have
+    This definition is not conventional, usually people just set \(c = 1\) and work with \(u_\mu\).
+    We can then write \(k_\mu\) as
     \begin{equation}
-        \dl{\tau} = \frac{1}{c}\sqrt{\diff{x}{\lambda} \cdot \diff{x}{\lambda}} \dd{\lambda}.
-    \end{equation}
-    Hence, the action can be written in terms of the parameter \(\lambda\) as
-    \begin{equation}\label{eqn:relativistic action in terms of lambda}
-        S[x(t)] = -mc \int_{\lambda_a}^{\lambda_b} \sqrt{\diff{x}{\lambda} \cdot \diff{x}{\lambda}} \dd{\lambda}.
-    \end{equation}
-    Here \(\lambda_a\) and \(\lambda_b\) are such that \(\tau_i(\lambda_a) = a\) and \(\tau_i(\lambda_b) = b\) fix the end points of the two paths.
-    The Lagrangian parametrised by \(\lambda\) is then
-    \begin{equation}
-        \lagrangian(x'(\lambda)) = -mc\sqrt{\diff{x}{\lambda}\cdot\diff{x}{\lambda}}.
-    \end{equation}
-
-    \subsection{Euler--Lagrange Equations}
-    We can now consider a slightly more general Lagrangian with position dependence, which will be useful later, in order to derive the Euler--Lagrange equations for a relativistic particle:
-    \begin{equation}
-        S[x(t)] = \int_{\lambda_a}^{\lambda_b} \lagrangian(x(\lambda), x'(\lambda)) \dd{\lambda}.
-    \end{equation}
-    The variation in \(S\) is given by varying the Lagrangian, which is done by Taylor expanding, and then integrating by parts until we can identify the integrand as zero if \(\delta S\) is to vanish.
-    Some care must be taken over this since \(x\) is a four-vector, but its pretty much identical to the one-dimensional non-relativistic case:
-    \begin{align}
-        \delta S[x(t)] &= \int_{\lambda_a}^{\lambda_b} \delta \lagrangian(x(\lambda), x'(\lambda)) \dd{\lambda}\\
-        &= \int_{\lambda_a}^{\lambda_b} \left[ \diffp{\lagrangian}{x^\mu}\delta x^\mu + \diffp{\lagrangian}{x'^\mu} \delta x'^\mu \right] \dd{\lambda}\\
-        &= \int_{\lambda_a}^{\lambda_b} \left[ \diffp{\lagrangian}{x^\mu} \delta x^\mu + \diff{}{\lambda}\left( \diffp{\lagrangian}{x'^\mu} \delta x^\mu \right) - \diff{}{\lambda}\left( \diffp{\lagrangian}{x'^\mu} \right) \delta x^\mu \right]\dd{\lambda}\\
-        &= \left[ \diffp{\lagrangian}{x'^\mu} \delta x^\mu \right]_{\lambda_a}^{\lambda_b} + \int_{\lambda_a}^{\lambda_b} \left[ \diffp{\lagrangian}{x^\mu} - \diff{}{\lambda}\left( \diffp{\lagrangian}{x'^\mu} \right) \right] \delta x^\mu \dd{\lambda}.
-    \end{align}
-    We require that \(\delta x^\mu\) vanishes on the boundary, so the first term vanishes.
-    We further require that this holds for arbitrary \(\delta x^\mu\), and so we have that each component of the square bracket in the integral must vanish independent of the other components giving the Euler Lagrange equations for a relativistic particle:
-    \begin{equation}
-        \diff{}{\lambda}\diffp{\lagrangian}{x'^\mu} = \diffp{\lagrangian}{x^\mu}.
+        k_\mu = \frac{R_\mu}{R \cdot w} \bigg|_{\ret}.
     \end{equation}
     
-    \subsection{Recovering Equations of Motion}
-    Finally we are ready to derive the equations of motion for the relativistic particle.
-    We go back to the position-independent Lagrangian, \(\lagrangian = -mc\sqrt{x'\cdot x'}\).
+    These vectors are nice to work with as they are dimensionless, and also have some nice properties.
+    First, note that \(k \cdot k \propto R \cdot R|_{\ret} = 0\) by the definition of \(\tau_*\), so \(k\cdot k = 0\).
+    Next, we have
+    \begin{equation}
+        k \cdot w = \frac{R_\mu}{R \cdot w} w^\mu \bigg|_{\ret} = \frac{R\cdot w}{R \cdot w} = 1.
+    \end{equation}
+    We also know that \(u \cdot u = c^2\), and hence \(w \cdot w = 1\).
+    
+    Consider the static situation, where the three-velocity of the particle vanishes.
+    We then have \(w^\mu = (1, \vv{0})\).
+    We've also seen that we have \(R^\mu(\tau_*) = \abs{\vv{R}}(1, \vh{n})\).
     We then have
     \begin{equation}
-        \diff{\lagrangian}{x^\mu} = 0 \implies \diff{}{\lambda} \diffp{\lagrangian}{x'^\mu} = 0.
+        R \cdot w|_{\ret} = \abs{\vv{R}}.
     \end{equation}
-    So we need to compute \(\diffp{\lagrangian}/{x'^\mu}\).
-    An application of the chain rule gives
+    We also have
     \begin{equation}
-        \diffp{\lagrangian}{x'^\mu} = -mc \diffp{}{x'^\mu} \sqrt{x'^\nu x'_\nu} = -\frac{1}{2}\frac{mc}{\sqrt{x'\cdot x'}} \diffp{}{x'^\mu}(x'^\nu x'_\nu).
+        k_\mu = \frac{R_\mu}{R \cdot w} \bigg|_{\ret} = \frac{\abs{\vv{R}}(1, \vh{n})}{\abs{\vv{R}}} = (1, \vh{n}).
+    \end{equation}
+    This shows that we can think of \(k_\mu\) as generalising the unit vector \(\vh{r}\) pointing from the source to the observation point in non-relativistic electromagnetism.
+    
+    \section{\texorpdfstring{\(\partial_\mu u_\nu(\tau_*)\)}{Derivative of Four-Velocity}}\label{sec:derivative of four-vel}
+    In order to compute \(\partial_\mu A_\nu\) we need to compute \(\partial_\mu u_\nu(\tau_*)\), since this term appears in the potential.
+    This is fairly simple to do through an application of the chain rule:
+    \begin{equation}
+        \partial_\mu u_\nu(\tau_*) = \diff{u_\nu}{\tau}[\tau = \tau_*] \partial_\mu \tau_* = \diff{w_\mu}{\tau}[\tau = \tau_*] k_\mu = \dot{w}_\nu(\tau_*) k_\mu.
+    \end{equation}
+    Note that the factor of \(c\) from \(u_\nu = cw_\nu\) cancels with the factor of \(c\) from \(\partial_\mu \tau_* = k_\mu/c\).
+    We also introduce here the notation
+    \begin{equation}
+        \dot{f} = \diff{f}{\tau},
+    \end{equation}
+    which we will use for the rest of the course.
+    Note that a dot denotes a derivative with respect to proper time, \emph{not} with respect to coordinate time.
+    
+    \section{\texorpdfstring{\(\partial_\mu(R(\tau_*) \cdot u(\tau_*))\)}{Derivative of R dot u}}
+    In order to compute \(\partial_\mu A_\nu\) we need to compute \(\partial_\mu (R(\tau_*) \cdot u(\tau_*))\), since this term appears in the potential.
+    First, write out the scalar product in terms of indices:
+    \begin{equation}
+        \partial_\mu(R(\tau_*) \cdot u(\tau_*)) = \partial_\mu(R_\nu(\tau_*) u^\nu(\tau_*)).
+    \end{equation}
+    Then insert the definition of \(R_\nu(\tau_*)\):
+    \begin{equation}
+        \partial_\mu(R(\tau_*) \cdot u(\tau_*)) = \partial_\mu(x_\nu - r_\nu(\tau_*)) u^\nu(\tau_*).
+    \end{equation}
+    We can then proceed to apply the product rule, giving
+    \begin{equation}
+        \partial_\mu(R(\tau_*) \cdot u(\tau_*)) = [\partial_\mu(x_\nu - r_\nu(\tau_*))]u^\nu(\tau_*) + (x_\nu - r_\nu(\tau_*))\partial_\mu u^\nu(\tau_*).
+    \end{equation}
+    
+    Consider the term in square brackets.
+    Distributing the derivative we have
+    \begin{equation}
+        \partial_\mu(x_\nu - r_\nu(\tau_*)) = (\partial_\mu x_\nu - r_\nu(\tau_*)) = \eta_{\mu\nu} - u_\nu(\tau_*)\partial_\mu \tau_*.
+    \end{equation}
+    The first term follows from
+    \begin{equation}
+        \partial_\mu x_\nu = \partial_\mu x^\rho \eta_{\nu\rho} = \delta_\mu^\rho \eta_{\nu\rho} = \eta_{\nu\mu} = \eta_{\mu\nu}.
+    \end{equation}
+    The second term follows from an application of the chain rule and identifying \(\diff{r}/{\tau} = u\).
+    
+    Now consider the second term, the derivative here is just the result in \cref{sec:derivative of four-vel} with an indexed raised, so
+    \begin{equation}
+        \partial_\mu u^\nu(\tau_*) = \dot{w}^\nu(\tau_*) k_\mu.
+    \end{equation}
+    
+    Putting this together we have
+    \begin{equation}
+        \partial_\mu(R(\tau_*) \cdot u(\tau_*)) = (\eta_{\mu\nu} - u_\nu(\tau_*)\partial_\mu \tau_*)u^\nu(\tau_*) + R_\nu(\tau_*) \dot{w}^\nu(\tau_*) k_\mu.
+    \end{equation}
+    We can improve on this by writing it in terms of the dimensionless \(k_\mu\) and \(w_\mu\):
+    \begin{equation}
+        \partial_\mu(R(\tau_*) \cdot u(\tau_*)) = (\eta_{\mu\nu} - w_\nu(\tau_*)k_\mu)cw^\nu(\tau_*) + R_\nu(\tau_*) \dot{w}^\nu(\tau_*) k_\mu.
+    \end{equation}
+    Expanding the bracket we get
+    \begin{equation}
+        \partial_\mu(R(\tau_*) \cdot u(\tau_*)) = cw_\mu(\tau_*) - cw_\nu(\tau_*)k_\mu w^\nu(\tau_*) + R_\nu(\tau_*) \dot w^\nu(\tau_*) k_\mu.
+    \end{equation}
+    Notice that in the second term we have \(w \cdot w = 1\), so
+    \begin{equation}
+        \partial_\mu(R(\tau_*) \cdot u(\tau_*)) = cw_\mu(\tau_*) - ck_\mu + R_\nu(\tau_*) \dot{w}^\nu(\tau_*) k_\mu.
+    \end{equation}
+    Writing the last term as a scalar product and factoring out a factor of \(c\) we get
+    \begin{align}
+        \partial_\mu(R(\tau_*) \cdot u(\tau_*)) &= c\left[ w_\mu(\tau_*) - k_\mu + \frac{1}{c} R \cdot \dot{w}(\tau_*) k_\mu  \right]\\
+        &= c\left[ w_\mu - k_\mu + \frac{1}{c}R \cdot \dot{w}k_\mu \right]\bigg|_{\ret}.
+    \end{align}
+    
+    \section{\texorpdfstring{\(\partial_\mu A_\nu\)}{Derivative of Potential}}
+    \epigraph{When you're doing a calculation, did you get it right? In my experience probably not.}{Donal O'Connell}
+    We can now work out \(\partial_\mu A_\nu\), which gets us most of the way to calculating the field tensor.
+    We start with
+    \begin{equation}
+        \partial_\mu A_\nu(x) = \partial_\mu \left[ \frac{e}{4\pi} \frac{u_\nu}{R \cdot u} \right] \bigg|_{\ret}.
+    \end{equation}
+    An application of the product rule gives
+    \begin{equation}
+        \partial_\mu A_\nu(x) = \frac{e}{4\pi}\left[ \frac{1}{R \cdot u} \partial_\mu u_\nu + u_\nu \partial_\mu \frac{1}{R \cdot u} \right] \bigg|_{\ret}.
+    \end{equation}
+    The first term is simple, we've already worked out \(\partial_\mu u_\nu(\tau_*) = \dot{w}_\nu(\tau_*)k_\mu\).
+    The second term requires a little more work since we know \(\partial_\mu(R(\tau_*) \cdot u(\tau_*))\), but this term appears in the denominator.
+    We therefore use the chain rule,
+    \begin{equation}
+        \partial_\mu \frac{1}{f(x)} = -\frac{\partial_\mu f(x)}{(f(x))^2},
+    \end{equation}
+    which gives
+    \begin{equation}
+        \partial_\mu \frac{1}{R(\tau_*) \cdot u(\tau_*)} = - \frac{c}{(R \cdot u)^2}\left[ w_\mu - k_\mu + \frac{1}{c} R \cdot \dot{w} k_\mu \right] \bigg|_{\ret}.
+    \end{equation}
+    
+    Putting this together we have
+    \begin{equation}
+        \partial_\mu A_\nu(x) = \frac{e}{4\pi} \left[ \frac{\dot{w}_\nu k_\mu}{R \cdot u} - \frac{cu_\nu}{(R \cdot u)^2} \left( w_\mu - k_\mu + \frac{1}{c} R \cdot \dot{w} k_\mu \right) \right] \bigg|_{\ret}.
+    \end{equation}
+    Here we have \(cu_\nu/(R\cdot u)^2 = w_\nu/(R\cdot w)^2\).
+    Hence, in terms of the dimensionless vectors \(k_\mu\) and \(w_\mu\) we have
+    \begin{equation}
+        \partial_\mu A_\nu(x) = \frac{e}{4\pi} \left[ \frac{k_\mu \dot{w}_\nu}{cR \cdot w} - \frac{w_\nu}{(R \cdot w)^2}\left( w_\mu - k_\mu + \frac{1}{c}R \cdot \dot{w}k_\mu\right) \right] \bigg|_{\ret}.
+    \end{equation}
+    Now expand the inner brackets to get
+    \begin{equation}
+        \partial_\mu A_\nu(x) = \frac{e}{4\pi} \left[ \frac{k_\mu \dot{w}_\nu}{cR\cdot w} - \frac{w_\mu w_\nu}{(R\cdot w)^2} + \frac{k_\mu w_\nu}{(R\cdot w)^2} - \frac{k_\mu w_\nu}{c(R\cdot w)^2} R\cdot \dot{w} \right] \bigg|_{\ret}.
+    \end{equation}
+    
+    Notice that in the last term we have \(R_\rho/(R \cdot w)|_{\ret} = k_\rho\), with the \(R_\rho\) appearing through the scalar product \(R \cdot \dot{w}\), so we have
+    \begin{equation}
+        \partial_\mu A_\nu(x) = \frac{e}{4\pi} \left[ \frac{k_\mu \dot{w}_\nu}{cR\cdot w} - \frac{w_\mu w_\nu}{(R\cdot w)^2} + \frac{k_\mu w_\nu}{(R\cdot w)^2} - \frac{k_\mu w_\nu}{cR\cdot w} k\cdot \dot{w} \right] \bigg|_{\ret}.
+    \end{equation}
+    
+    \subsection{Gauge Check}
+    We're working in the Lorenz gauge.
+    A good check to perform at this point is that we are indeed in the Lorenz gauge, that is that \(\partial^\mu A_\mu = 0\).
+    Since we've calculated \(\partial_\mu A_\nu\) this is as simple as raising an index and contracting with the other index:
+    \begin{equation}
+        \partial^\mu A_\mu(x) = \frac{e}{4\pi} \left[ \frac{k \cdot \dot{w}}{cR\cdot w} - \frac{w \cdot w}{(R \cdot w)^2} + \frac{k \cdot w}{(R \cdot w)^2} + \frac{k\cdot w}{cR\cdot w} k \cdot \dot{w} \right].
+    \end{equation}
+    We can then use the fact that \(w \cdot w = k \cdot w = 1\) and we see have
+    \begin{equation}
+        \renewcommand{\CancelColor}{\color{highlight}}
+        \partial^\mu A_\mu(x) = \frac{e}{4\pi} \left[ \cancel{\frac{k \cdot \dot{w}}{cR\cdot w}} \renewcommand{\CancelColor}{\color{my orange}} - \cancel{\frac{1}{(R \cdot w)^2}} + \cancel{\frac{1}{(R \cdot w)^2}} - \renewcommand{\CancelColor}{\color{highlight}} \cancel{\frac{1}{cR\cdot w} k \cdot \dot{w}} \mkern3mu \right] = 0.
+    \end{equation}
+    So the Lorenz gauge condition holds, which is a good sign we haven't gone too far astray.
+    
+    \section{\texorpdfstring{\(F_{\mu\nu}\) or }{}Finally the Field}
+    The field tensor is
+    \begin{equation}
+        F_{\mu\nu}(x) = \partial_\mu A_\nu(x) - \partial_\nu A_\mu(x).
+    \end{equation}
+    We've already worked out \(\partial_\mu A_\nu(x)\), so we're most of the way there.
+    
+    To make computing the field slightly simpler we use antisymmetrisation.
+    We define the \defineindex{antisymmetrisation} of the two index tensor \(T_{\mu\nu}\) to be
+    \begin{equation}
+        T_{(\mu\nu)} \coloneqq \frac{1}{2}(T_{\mu\nu} - T_{\nu\mu}).
+    \end{equation}
+    We can also apply this when \(T_{\mu\nu}\) is defined as a product of two four-vectors, such as \(T_{\mu\nu} = a_\mu b_\nu\), then we have
+    \begin{equation}
+        T_{(\mu\nu)} = a_{(\mu}b_{\nu)} \coloneqq \frac{1}{2}(a_\mu b_\nu - a_\nu b_\mu).
+    \end{equation}
+    Using this we can write the field tensor as
+    \begin{equation}
+        F_{\mu\nu} = 2\partial_{(\mu} A_{\nu)}.
+    \end{equation}
+    
+    Hence, we have
+    \begin{equation}
+        F_{\mu\nu} = \frac{2e}{4\pi} \left[ \frac{k_{(\mu}\dot{w}_{\nu)}}{c R\cdot w} - \frac{w_{(\mu}w_{\nu)}}{(R \cdot w)^2} + \frac{k_{(\mu}w_{\nu)}}{(R \cdot w)^2} - \frac{k_{(\mu}w_{\nu)}}{cR \cdot w} k \cdot \dot{w} \right] \bigg|_{\ret}.
+    \end{equation}
+    The second term vanishes, since
+    \begin{equation}
+        w_{(\mu}w_{\nu)} = \frac{1}{2}(w_\mu w_\nu - w_\nu w_\mu) = 0.
+    \end{equation}
+    We can think of this term as being there just to fix the gauge, and not having an effect on the field.
+    The other terms are fairly simple to, and expanding the antisymmetrisation we get
+    \begin{equation}
+        F_{\mu\nu} = \frac{e}{4\pi} \left[ \frac{k_\mu\dot{w}_\nu - k_\nu\dot{w}_\mu}{c R \cdot w} + \frac{k_\mu w_\nu - k_\nu w_\mu}{(R \cdot w)^2} + \frac{k_\mu w_\nu - k_\nu w_\mu}{cR\cdot w} k\cdot \dot{w} \right] \bigg|_{\ret}.
+    \end{equation}
+    
+    We can break this into two terms as follows:
+    \begin{equation}
+        F_{\mu\nu} = \frac{e}{4\pi} \frac{k_\mu w_\nu - k_\nu w_\mu}{(R \cdot w)^2} + \frac{e}{4\pi c} \frac{1}{R \cdot w}[k_\mu \alpha_\nu - k_\nu \alpha_\mu] \bigg|_{\ret}.
+    \end{equation}
+    Here we define a new four-vector,
+    \begin{equation}
+        \alpha^\mu \coloneqq \dot{w}^\mu - k \cdot \dot{w} w^\mu
+    \end{equation}
+    
+    \subsection{Interpretation}
+    The first term falls of as \(1 / \abs{\vv{R}}^2\).
+    It is also independent of acceleration.
+    We can identify this term as the Coulomb field.
+    
+    The second term is new.
+    It falls off as \(1/\abs{\vv{R}}\).
+    It's linear in the acceleration, since its linear in \(\alpha\) and \(\alpha\) is linear in \(\dot{w}\).
+    Note that \(\alpha\) was chosen to evoke \(a\) and acceleration for this purpose.
+    This term is called the \defineindex{radiation field}, and its the reason that accelerating particles radiate.
+    
+    \section{Constant Velocity Case}
+    \label{sec:constant velocity case}
+    Consider the case where the particle has a constant velocity, that is \(\dot{w}^\mu = 0\).
+    Then \(\alpha^\mu = 0\) for all \(\mu\), and so we have only the Coulomb field.
+    
+    We've seen that \(R^\mu(\tau_*) = \abs{\vv{R}}(1, \vh{n})\).
+    We also have \(w^\mu(\tau_*) = \gamma(1, \vv{\beta})\) where \(\vv{\beta} = \vv{v}/c\).
+    Note that \(\gamma\) does \emph{not} depend on \(\tau_*\), since the particle has a constant velocity.
+    
+    We then have \(R \cdot w = \gamma\abs{\vv{R}}(1 - \vh{n} \cdot \vv{\beta})\), and
+    \begin{equation}
+        k^\mu = \frac{R^\mu}{R \cdot w} \bigg|_{\ret} = \frac{(1, \vh{n})}{\gamma(1 - \vh{n}\cdot\vv{\beta})}.
     \end{equation}
 
-    We can compute this derivative in a fairly straight forward way, we just have to be careful about applying the product rule and matching indices:
-    \begin{align}
-        \diffp{}{x'^\mu}(x'^\nu x'_\nu) &= \diffp{}{x'^\mu} (x'^\nu \eta_{\nu\rho} x'^\rho)\\
-        &= \diffp{x'^\nu}{x'^\mu} \eta_{\nu\rho} x'^\rho + x'^\nu \eta_{\nu\rho} \diffp{x'^\rho}{x'^\mu}\\
-        &= \tensor{\delta}{^\nu_\mu} \eta_{\nu\rho} x'^\rho + x'^\nu \eta_{\nu\rho} \tensor{\delta}{^\rho_\mu}\\
-        &= \eta_{\mu\rho} x'^\rho + x'^\nu \eta_{\nu\mu}\\
-        &= 2\eta_{\mu\nu} x'^\nu\\
-        &= 2\eta x'_\mu.
-    \end{align}
-    Here we renamed \(\rho \to \mu\) and used the symmetry of the metric to combine the two terms into one.
-    We therefore have
+    We can work out the electric field using \(E^i = F^{i0}\):
     \begin{equation}
-        \diffp{\lagrangian}{x'^\mu} (x'\cdot x') = 2x'_\mu.
+        E^i(x) = F^{i0}(x) = \frac{e}{4\pi} \frac{k^i w^0 - k^0 w^i}{\gamma^2 \abs{\vv{R}}^2(1 - \vh{n} \cdot \vv{\beta})^2}.
     \end{equation}
-    We could probably have guessed this by considering \(\diffp{x^2}/{x} = 2x\) and matching indices, and indeed this is how people usually perform this calculation after some practice.
-    
-    The result is that
+    We know that
     \begin{equation}
-        \diffp{\lagrangian}{x'^\mu} = -\frac{mc x'_\mu}{\sqrt{x'\cdot x'}}.
+        k^i = \frac{n^i}{\gamma(1 - \vh{n} \cdot \vv{\beta})}, \quad w^0 = \gamma, \quad k^0 = \frac{1}{\gamma(1 - \vh{n} \cdot \vv{\beta})}, \qand w^i = \gamma \beta^i.
     \end{equation}
-    Hence, the equation of motion is
+    Using this
     \begin{equation}
-        \diff{}{\lambda}\left[ \frac{mc}{\sqrt{\diff{x}{\lambda} \cdot \diff{x}{\lambda}}} \diff{x^\mu}{\lambda} \right] = 0
+        E^i(x) = \frac{e}{4\pi \abs{\vv{R}}^2} \frac{n^i - \beta^i}{\gamma^2(1 - \vh{n} \cdot \vv{\beta})^3},
     \end{equation}
-    where we have written the derivatives out in full, instead of using primes.
-    We have also dropped the negative and raised the index on \(x'_\mu\), since the left hand side is equal to zero, and so the overall sign is not important.
-    
-    While this looks quite complicated it turns out that it is just a straight line in spacetime.
-    The complexity arises because \(\lambda\) may be a fairly complex parametrisation.
-    The equation of motion gets significantly more simple if we choose a sensible, simple, parametrisation, such as a proper time.
-    
-    Now consider a single path and choose to use the proper time along this path as the parameter, so \(\lambda = \tau\).
-    For a single path there is no reason not to use the proper time, it was only when comparing paths that this caused problems, since its different for each path.
-    We then have that
+    or in terms of three-vectors,
     \begin{equation}
-        \diff{x}{\lambda} = \diff{x}{\tau} = u \implies \diff{x}{\lambda}\cdot\diff{x}{\lambda} = u \cdot u = c^2.
-    \end{equation}
-    Hence, the equation of motion simplifies to
-    \begin{equation}
-        \diff{}{\tau}\left[ m\diff{x^\mu}{\tau} \right] = 0 \implies m\diff{u^\mu}{\tau} = 0,
-    \end{equation}
-    which is exactly the equation of motion that we were looking to find, justifying our choice of action.
-    
-    \subsection{Reparametrisation Invariance}
-    This use of parametrisations can be a bit worrying, after all parametrisation is an arbitrary choice, like a coordinate choice or a choice of units, and so it shouldn't effect the overall result.
-    We can quite quickly show that this action is independent of how we parametrise the path.
-    
-    Suppose we have two parameters, \(\lambda\) and \(\kappa\), we want to show that choosing to parametrise our path with \(\kappa\) leaves the form of the action unchanged.
-    To do so we consider \(\kappa\) as a function of \(\lambda\), which must be possible since both parametrise the same path and we can therefore draw a correspondence between them.
-    Now that we have \(\kappa = \kappa(\lambda)\) we have
-    \begin{equation}
-        \diff{\kappa}{\lambda} = \kappa' \implies \dl{\kappa} = \kappa'\dd{\lambda}.
-    \end{equation}
-    By the chain rule we also have
-    \begin{equation}
-        \diff{x}{\lambda} = \diff{x}{\kappa}\diff{\kappa}{\lambda}.
-    \end{equation}
-    Hence, the action is
-    \begin{align}
-        S &= \int \left[ -mc \sqrt{\diff{x}{\lambda} \cdot \diff{x}{\lambda}} \right] \dd{\lambda}\\
-        &= \int \left[ -mc \sqrt{\diff{x}{\kappa} \cdot \diff{x}{\kappa} \left( \diff{\kappa}{\lambda} \right)^2} \right] \frac{1}{\kappa'} \dd{\kappa}\\
-        &= \int \left[ -mc \sqrt{\diff{x}{\kappa} \cdot \diff{x}{\kappa}} \right] \dd{\kappa}.
-    \end{align}
-    So, the form of the action is independent of the choice of parametrisation.
-    This is called \defineindex{reparametrisation invariance}.
-    
-    In particular this invariance means we may as well choose a simple parametrisation, such as proper time, leaving us with a particularly simple form of the action
-    \begin{equation}
-        S = -mc^2 \int \dd{\tau}.
+        \vv{E}(x) = \frac{e}{4\pi\abs{\vv{R}}^2} \frac{\vh{n} - \vv{\beta}}{\gamma^2(1 - \vh{n}\cdot \vv{\beta})^3}.
     \end{equation}
     
-    \chapter{Alternative Actions}
-    The choice of action is not unique.
-    We say that two actions are equivalent if they give the same equations of motion.
-    Similarly two Lagrangians are equivalent if they give equivalent actions.
-    
-    There are some obvious things we can do to Lagrangians to give trivially equivalent actions, first, we can add a constant.
-    This has no effect on the equations of motion since we always differentiate the Lagrangian and so this term will vanish in the Euler--Lagrange equations.
-    Second, we can add a total derivative term, this will not change the Euler--Lagrange equations either\footnote{For proof see the notes from the Lagrangian dynamics course.}.
-    There are also non-trivial changes we can make to the action which still give the same results, including using completely different Lagrangians.
-    
-    \section{Alternative Relativistic Action}
-    For a relativistic particle we ruled out using \(m\dot{x}^2/2\), since \(\dot{x}^2 = c^2\) if we interpret this as a \((3 + 1)\)-dimensional equation.
-    However, it turns out that if we take this as the action for a free particle we do actually get the same equations of motion as with the action defined in the previous chapter.
-    That is the action in \cref{eqn:relativistic action in terms of lambda} is equivalent to the action
+    To find the magnetic field we use \(F^{ij} = -\varepsilon^{ijk}B^k\).
+    In particular, to find \(B^l\) we multiply by another Levi-Civita symbol:
     \begin{equation}
-        S_2[x(\tau)] \coloneqq -\int \frac{m}{2}\diff{x^\mu}{\tau} \diff{x_\mu}{\tau} \dd{t},
+        \varepsilon^{ijl} F^{ij} = -\varepsilon^{ijl}\varepsilon^{ijk}B^k = -2\delta^{lk}B^k,
     \end{equation}
-    we simply forget that \(\dot{x}^2 = c^2\) until after we have done the variation.
-    We will demonstrate this with an even more general choice of action.
-    
-    Consider the action
+    so,
     \begin{equation}
-        \tilde{S}[x(\lambda)] \coloneqq \int \left[ -g(\lambda)^{-1} \diff{x^\mu}{\lambda} \diff{x_\mu}{\lambda} - \left( \frac{mc}{2} \right)^2 g(\lambda) \right] \dd{\lambda}.
+        B^l = -\frac{1}{2} \varepsilon^{lij} F^{ij}.
     \end{equation}
-    This has the undetermined quantity \(g(\lambda)\).
-    We can place restrictions on this quantity by requiring that this action has reparametrisation invariance.
-    That is if we consider some new parameter, \(\tilde{\lambda}\).
-    We then have
+    We have
     \begin{equation}
-        \diff{x^\mu}{\lambda} \diff{x_\mu}{\lambda} = \diff{x^\mu}{\tilde{\lambda}} \diff{x_\mu}{\tilde{\lambda}} \left( \diff{\tilde{\lambda}}{\lambda} \right)^2,
+        F^{ij}(x) = \frac{e}{4\pi} \frac{k^iw^j - k^jw^i}{\gamma^2 \abs{\vv{R}}^2(1 - \vh{n}\cdot\vv{\beta})^2} = \frac{e}{4\pi\abs{\vv{R}}^2} \frac{n^j\beta^k - n^k \beta^j}{\gamma^2(1 - \vh{n}\cdot\vv{\beta})^3}.
     \end{equation}
-    and
+    We can identify \(n^j \beta^k - n^k \beta^j = \varepsilon^{ijk}n^i\), and so when we multiply by \(\varepsilon^{lij}\) we get a factor of \(\varepsilon^{lij}\varepsilon^{ijk} = 2\delta^{lk}\).
+    The factor of 2 cancels with the \(1/2\) in \(B^l = -\varepsilon^{lij}F^{ij}/2\).
+    We're then left with
     \begin{equation}
-        \dl{\lambda} = \diff{\lambda}{\tilde{\lambda}}\dd{\tilde{\lambda}}.
-    \end{equation}
-    Hence, the action can be written as
-    \begin{equation}
-        \tilde{S}[x(\tilde{\lambda})] = \int \left[ -g(\lambda(\tilde{\lambda}))^{-1} \diff{x^\mu}{\tilde{\lambda}} \diff{x_\mu}{\tilde{\lambda}} \diff{\tilde{\lambda}}{\lambda} - \left( \frac{mc}{2} \right)^2 g(\lambda(\tilde{\lambda})) \diff{\lambda}{\tilde{\lambda}} \right] \dd{\tilde{\lambda}}.
-    \end{equation}
-    Notice that one factor of \(\diff{\tilde{\lambda}}/{\lambda}\) from the chain rule applied to the derivatives cancels with a factor of \(\diff{\lambda}/{\tilde{\lambda}}\) from the change in the measure.
-    Enforcing reparametrisation invariance is then equivalent to requiring that
-    \begin{equation}
-        \tilde{S}[x(\tilde{\lambda})] = \int\left[ -g(\tilde{\lambda})^{-1} \diff{x^\mu}{\tilde{\lambda}} \diff{x_\mu}{\tilde{\lambda}} - \left( \frac{mc}{2} \right)^2 g(\tilde{\lambda}) \right] \dd{\tilde{\lambda}}.
-    \end{equation}
-    We can see that this is true so long as
-    \begin{equation}
-        g(\tilde{\lambda}) = \diff{\lambda}{\tilde{\lambda}} g(\lambda(\tilde{\lambda})).
-    \end{equation}
-    Note that this means that \(g\) does not transform like a normal scalar function, which would be unchanged under reparametrisation, \(f(\lambda) = f(\tilde{\lambda})\).
-    It is perhaps clearer if we write this requirement as
-    \begin{equation}
-        g(\tilde{\lambda})\dd{\tilde{\lambda}} = g(\lambda) \dd{\lambda}.
-    \end{equation}
-    This requirement is equivalent to saying that \(g(\lambda)\dd{\lambda}\) is a one-form\footnote{A common abuse of terminology is to call \(g(\lambda)\) alone a one-form.}\footnote{For more on one-forms see the notes from the general relativity course.}.
-    
-    \subsection{Equations of Motion}
-    We can get equations of motion from \(\tilde{S}\) by applying the Euler--Lagrange equations, and treating \(g\) as a degree of freedom, that is we take as the Lagrangian
-    \begin{equation}
-        \lagrangian\left( x^\mu(\lambda), \diff{x^\mu}{\lambda}, g(\lambda), \diff{g}{\lambda} \right) = -g(\lambda)^{-1} \diff{x^\mu}{\lambda}\diff{x_\mu}{\lambda} - \left( \frac{mc}{2} \right)^2 g(\lambda).
-    \end{equation}
-    Doing so with \(g\) as our degree of freedom we have
-    \begin{equation}
-        \diffp{\lagrangian}{\left( \diff{g}{\lambda} \right)} = 0
-    \end{equation}
-    and so one equation of motion is
-    \begin{equation}
-        0 = \diffp{\lagrangian}{g} = \frac{1}{g(\lambda)^2} \left( \diff{x}{\lambda} \right)^2 - \left( \frac{mc}{2} \right)^2.
-    \end{equation}
-    Now taking \(x\) as our degree of freedom we have
-    \begin{equation}
-        \diff{\lagrangian}{x} = 0
+        \delta^{lk}(n^j \beta^k - n^k \beta^j) = n^j \beta^l - n^l \beta^j,
     \end{equation}
     and so
     \begin{equation}
-        \diff{}{\lambda}\diffp{\lagrangian}{\left( \diff{x}{\lambda} \right)} = \diff{}{\lambda} \left[ -\frac{1}{g(\lambda)} \diff{x^\mu}{\lambda} \right] = 0
+        B^l = - \frac{e}{4\pi\abs{\vv{R}}^2} \frac{n^j \beta^l - n^l \beta^j}{\gamma^2(1 - \vh{n}\cdot \vv{\beta})^3}.
     \end{equation}
-    is the other equation of motion.
-    
-    Consider what happens if we choose \(g(\lambda) = 2/m\).
-    We then have that
+    Which gives us
     \begin{equation}
-        \left( \diff{x}{\lambda} \right)^2  = c^2
+        \vv{B}(x) = -\frac{e}{4\pi\abs{\vv{R}}^2} \frac{1}{\gamma^2(1 - \vh{n}\cdot\vv{\beta})^3} \vh{n} \times \vv{\beta}.
     \end{equation}
-    and our second equation of motion becomes
+    Since \(\vh{n} \times \vh{n} = \vv{0}\) we can write this as
     \begin{equation}
-        \diff{}{\lambda}\left[ -\frac{m}{2} \diff{x^\mu}{\lambda} \right] = 0.
-    \end{equation}
-    These are exactly the same equations of motion as we got by choosing to take \(\lambda = \tau\) in our original action, hence \(\tilde{S}\) and \(S\) are equivalent actions.
-    
-    Setting \(g(\lambda) = 2/m\) in \(\tilde{S}\) we get
-    \begin{equation}
-        \tilde{S} = \int \left[ -\frac{m}{2}\diff{x^\mu}{\lambda}\diff{x_\mu}{\lambda} + \text{constant} \right]\dd{\lambda}
-    \end{equation}
-    and since the constant can be ignored without changing the equations of motion we see that \(S_2\) is an equivalent action to \(S\) also.
-    
-    \subsection{Which Action To Choose?}
-    So, there are three actions, \(S\), \(S_2\), and \(\tilde{S}\), which all produce the same equations of motion.
-    Which should we use?
-    The answer depends on what we are trying to do.
-    The \enquote{correct} action, with an easy physical interpretation, is \(S\), we simply extremise the length of the world line.
-    However, it is often easier to work with \(S_2\), after all it doesn't have a square root in it, we simply have to fix \(u^2 = c^2\) after we've done all of the variation.
-    The slightly more general action \(\tilde{S}\) has the advantage that we can use it for massless particles also by taking the limit \(m \to 0\), although we can't then take \(g(\lambda) = 2/m\) (which is equivalent to \(\lambda = \tau\)) but instead pick \(g(\lambda) = \text{constant}\) (which is equivalent to picking some alternative affine parameter instead of \(\tau\)).
-    
-    \chapter{Action for Electromagnetic Fields}
-    In this chapter we will motivate the action for the electromagnetic field.
-    First, we motivate the use of a Lagrangian density, then we will study which terms could possible occur in the action if it is to have the desired symmetry, and finally we will demonstrate that we recover the correct equations of motion, namely Maxwell's equations.
-    We will start by doing so for a free field with no charges or currents
-    
-    \section{Lagrangian Density}
-    When we considered a particle we found that its action was of the form
-    \begin{equation}
-        S = \int \lagrangian \dd{\lambda}.
-    \end{equation}
-    That is an integral of the Lagrangian.
-    The Lagrangian in turn depends on \(x^\mu(\lambda)\), the position of the particle, and \(\dot{x}^\mu(\lambda)\), the velocity of the particle, which depend on the single parameter \(\lambda\).
-    Hence, there is a single integral.
-    
-    Now consider a string, it was shown in a tutorial question that the position of the string is described by \(\varphi(x, t)\), which gives the deviation from the equilibrium position of the string at position \(x\) along the string and time \(t\).
-    This is equivalent to \(x^\mu(\lambda)\) above, with \(\varphi\) being \(x^\mu\) and both \(x\) and \(t\) being parameters like \(\lambda\).
-    This value, \(\varphi\), then evolves under the action
-    \begin{equation}
-        S[\varphi(x, t)] = \int \left[ \frac{1}{2}\left( \diffp{\varphi}{t} \right)^2 - \frac{Y}{2}\left( \diffp{\varphi}{x} \right)^2 \right] \dd{t} \dd{x}
-    \end{equation}
-    where \(\mu\) is the mass per unit length and \(Y\) is the spring constant per unit length.
-    The important thing here is that the \enquote{path}, \(\varphi\), depends on two parameters and we integrate some Lagrangian-like quantity over both of them to get the action.
-    
-    Now, consider electromagnetism.
-    It will be our general goal to see how \(A^\mu\), the four-potential, transforms.
-    In general we will consider cases where \(A^\mu\) depends on the position in spacetime, so we consider it to be a function \(A^\mu(x^0, x^1, x^2, x^3)\).
-    We treat \(x^\mu\) as parameters here, so we expect a four-dimensional integral.
-    We therefore look for an action of the form
-    \begin{equation}
-        S[A^\mu(x)] = \int \lagrangianDensity \dd{^4x}.
-    \end{equation}
-    We call \(\lagrangianDensity\) the \defineindex{Lagrangian density}\footnote{It's very common to just refer to the Lagrangian density as the Lagrangian as well.} since we integrate over space (hence density) to get something (the Lagrangian) which we integrate over time to give the action, that is
-    \begin{equation}
-        S = \int \lagrangianDensity \dd{^4x} = \int \lagrangianDensity \dd{^3 x} \dd{x^0} = c \int \lagrangian \dd{t}
-    \end{equation}
-    where we define
-    \begin{equation}
-        \lagrangian = \int \lagrangianDensity \dd{^3x}.
+        \vv{B} = \vh{n} \times \vv{E}.
     \end{equation}
     
-    \section{Possible Terms}
-    In order to narrow down possibilities for \(\lagrangianDensity\) we need to decide what symmetries it should satisfy.
-    First, we would like for \(\lagrangianDensity\) to be \emph{Lorentz invariant}, since this guarantees that the equations of motion will be Lorentz invariant.
-    Second, we would like for \(\lagrangianDensity\) to be \emph{gauge invariant}, since this guarantees that the equations of motion will be gauge invariant.
-    Third, for a free electromagnetic field we would like for \(\lagrangianDensity\) to be \emph{translation invariant}.
+    \chapter{Radiation: Analysing the Field}
+    \epigraph{Part of my goal in lecturing this course is to make you think I know what I'm talking about.}{Donal O'Connell}
     
-    Imposing these symmetries we can narrow down the possible terms in the Lagrangian density.
-    First, we expect to have the volume element, \(\dl{^4x}\).
-    This Lorentz invariant and is trivially gauge invariant since it doesn't depend on the potential.
-    It is also translation invariant, since it doesn't depend on position in flat spacetime.
-    Second, we expect the electromagnetic tensor to appear in some way.
-    In order for this to happen in a Lorentz invariant way we must some how get a scalar, the most obvious way to do this is \(F_{\mu\nu}F^{\mu\nu}\).
-    Since the electromagnetic tensor is gauge invariant this product will also be gauge invariant, and for a free field there is no position dependence so it will be translation invariant.
-    Note that \(F^{*}_{\mu\nu}F^{*\mu\nu}\) is simply proportional to \(F_{\mu\nu}F^{\mu\nu}\), so doesn't give us anything new.
-    
-    There are other possible terms too, for example, \(F^*_{\mu\nu}F^{\mu\nu}\) satisfies these required symmetries.
-    However, it doesn't have parity invariance, which it turns out is a required symmetry in electromagnetism.
-    Other terms with the required symmetry properties include powers of \(F_{\mu\nu}F^{\mu\nu}\), such as \((F_{\mu\nu}F^{\mu\nu})^2\), and derivatives of the electromagnetic field tensor, such as \(\partial_\rho F_{\mu\nu} \partial^\rho F^{\mu\nu}\).
-    However, these terms turn out to be less important in classical electrodynamics and instead appear as higher order corrections in quantum electrodynamics.
-    
-    \section{Action}
-    We need the action to have units of energy times time, or more generally units of \(\hbar\).
-    This is fundamentally since the action appears in the path integral
+    \section{Comparison with Previous Result}
+    In \cref{sec:constant velocity case} we computed the electric field from a point charge travelling at a constant velocity, \(u^\mu = cw^\mu\), to be
     \begin{equation}
-        \int \exp\left[ \frac{i}{\hbar}S \right] \, \symcal{D}x
+        \vv{E}(x) = \frac{e}{4\pi \abs{\vv{R}}^2 \gamma^2} \frac{\vh{n} - \vv{\beta}}{(1 - \vh{n} \cdot \vv{\beta})^3} \bigg|_{\ret}.
     \end{equation}
-    To which we can apply the stationary phase approximation giving the principle of least action in the first place\footnote{See the notes from the quantum theory course.}.
-    
-    Recall that \(F_{\mu\nu}F^{\mu\nu} = -2\vv{E}^2 + 2\vv{B}^2\), and that \(u = (\vv{E}^2 + \vv{B}^2)/2\) is the energy density.
-    We know therefore that \(F_{\mu\nu}F^{\mu\nu}\) has dimensions of energy per volume, or
+    In \cref{sec:point charge} we computed the electric field from a point charge travelling at a constant velocity to be
     \begin{equation}
-        [F_{\mu\nu}F^{\mu\nu}] = [\text{energy density}] = \frac{[\text{energy}]}{[\text{length}]^3}.
-    \end{equation}
-    Now, integrating over the three spatial dimensions gets rid of the per volume part of these dimensions, leaving us with dimensions of energy, which we then integrate over \(x^0\), to get dimensions of length times density:
-    \begin{equation*}
-        \left[ \int F_{\mu\nu}F^{\mu\nu} \dd{^4x} \right] = \left[ \int \dl{^4x} \right] \frac{[\text{energy}]}{[\text{length}]^3} = \int [\text{energy}] \dd{x^0} = [\text{energy}][\text{length}].
-    \end{equation*}
-    So, if we include a factor of \(1/c\) then we will get the desired units:
-    \begin{equation*}
-        \left[ \frac{1}{c} \int F_{\mu\nu}F^{\mu\nu} \dd{^4x} \right] = \frac{[\text{time}]}{[\text{length}]} [\text{energy}][\text{length}] = [\text{energy}][\text{time}] = [\hbar].
-    \end{equation*}
-    
-    This isn't quite the form of the action, there is a conventional factor of \(-1/4\), so the action is defined as
-    \begin{equation}
-        S[A^\mu(x)] \coloneqq \frac{1}{c}\int_V \left[ -\frac{1}{4}F_{\mu\nu}F^{\mu\nu} \right] \dd{^4x}
-    \end{equation}
-    where \(V\) is some four-dimensional volume.
-    We then define
-    \begin{equation}
-        \lagrangianDensity(\partial^\mu A^\nu) = -\frac{1}{4c} F_{\mu\nu}F^{\mu\nu}
-    \end{equation}
-    for the Lagrangian density.
-    
-    We can also consider a more general action
-    \begin{equation}
-        S = \frac{1}{c} \int_V \lagrangianDensity(A^\mu, \partial^\mu A^\nu) \dd{^4x}.
-    \end{equation}
-    It should be noted that the indices appearing in the argument to \(\lagrangianDensity\) are not meant to represent a particular value, they are simply a reminder that \(A^\mu\) is a four-vector and \(\partial^\mu A^\nu\) is a rank 2 tensor.
-    This is known as abstract index notation, as opposed to Ricci calculus which we have mostly been using so far, where each index is simply a place holder for a particular coordinate.
-    
-    \section{Equations of Motion}
-    \epigraph{I'm just some guy, you have to wonder why you want to believe me.}{Donal O'Connell}
-    Consider the more general action defined above.
-    We will vary the potential in order to find the equations of motion:
-    \begin{equation}
-        A_\mu(x) \to A_\mu(x) + \delta A_\mu(x).
-    \end{equation}
-    We choose the variation so that, as usual, it vanishes on the boundary of \(V\), denoted \(\partial V\).
-    The variation in the action is then
-    \begin{align}
-        \delta S &= \frac{1}{c} \int_V \delta \lagrangianDensity(A^\mu, \partial^\mu A^\nu) \dd{^4x}\\
-        &= \frac{1}{c} \int_V \left[ \diffp{\lagrangianDensity}{A^\mu} \delta A^\mu + \diffp{\lagrangianDensity}{(\partial^\mu A^\nu)} \delta \partial^\mu A^\nu \right] \dd{^4x}.
-    \end{align}
-    We get this result by simply Taylor expanding in the two variables, \(A^\mu\) and \(\partial^\mu A^\nu\), it just looks a bit weird since one is written as a derivative, and we're actually packaging 20 terms into two with sums over repeated indices.
-    
-    We apply the usual manipulation of writing the second term, with the variation of a derivative, as the derivative of a product minus the extra term this produces:
-    \begin{equation}
-        S = \frac{1}{c} \int_V \left[ \diffp{\lagrangianDensity}{A^\mu} \delta A^\mu + \partial^\mu\left( \diffp{\lagrangianDensity}{(\partial^\mu A^\nu)} \delta A^\nu \right) - \partial^\mu\diffp{\lagrangianDensity}{(\partial^\mu A^\nu)} \delta A^\nu \right] \dd{^4x}.
-    \end{equation}
-    Now consider the term with derivative of the product:
-    \begin{equation}
-        \int_V \partial^\mu \left( \diffp{\lagrangianDensity}{(\partial^\mu A^\nu)} \delta A^\nu \right) \dd{^4x}.
-    \end{equation}
-    This is simply the divergence theorem in four dimensions:
-    \begin{equation}
-        \int_V \div \vv{v} \dd{^d x} = \int_{\partial V} \vv{v} \cdot \dd{\vv{S}} \iff \int_V \partial^\mu v_\mu \dd{^dx} = \int_{\partial V} v_\mu \dd{S}^\mu.
-    \end{equation}
-    Hence, applying the divergence theorem we have
-    \begin{equation}
-        \int_V \partial^\mu\left( \diffp{\lagrangianDensity}{(\partial^\mu A^\nu)} \delta A^\nu \right) \dd{^4x} = \int_{\partial V} \diffp{\lagrangianDensity}{(\partial^\mu A^\nu)} \delta A^\nu \dd{S^\mu}.
-    \end{equation}
-    However, since \(\delta A^\nu\) vanishes on \(\partial V\) this integral is identically zero and so this term does not contribute to the action.
-    
-    The variation in the action is therefore
-    \begin{equation}
-        \delta S = \frac{1}{c} \int_V \left[ \diffp{\lagrangianDensity}{A^\mu} \delta A^\mu - \partial^\mu \diffp{\lagrangianDensity}{(\partial^\mu A^\nu)} \delta A^\nu \right] \dd{^4x}.
-    \end{equation}
-    We can reindex the first term, replacing \(\mu\) with \(\nu\), to get a factor of \(\delta A^\nu\) in both terms which we then factor out:
-    \begin{equation}
-        \delta S = \frac{1}{c} \int_V \left[ \diffp{\lagrangianDensity}{A^\nu} - \partial^\mu \diffp{\lagrangianDensity}{(\partial^\mu A^\nu)} \right] \delta A^\nu \dd{^4x}.
-    \end{equation}
-    Hence, requiring that \(\delta S = 0\) according to the principle of least action and taking \(\delta A^\nu\) to be arbitrary, other than the requirement of vanishing on \(\partial V\), we must have that the square brackets vanish, giving the Euler--Lagrange equations for this form of Lagrangian:
-    \begin{equation}
-        \diffp{\lagrangianDensity}{A^\nu} = \partial^\mu \diffp{\lagrangianDensity}{(\partial^\mu A^\nu)}.
+        \vv{E}^{\text{old}}(x) = \frac{e}{4\pi \abs{\vv{x}}^{3} \gamma^2} \frac{\vv{x}}{(1 - \beta^2 \sin^2 \vartheta)^{3/2}}.
     \end{equation}
     
-    Finally, we return to the case of
-    \begin{equation}
-        \lagrangianDensity = -\frac{1}{4}F^{\mu\nu}F_{\mu\nu}.
-    \end{equation}
-    Recalling that \(F^{\mu\nu}\) is defined in terms of \(\partial^\mu A^\nu\), and doesn't depend on \(A^\mu\) alone we have
-    \begin{equation}
-        \diffp{\lagrangianDensity}{A^\nu} = 0.
-    \end{equation}
-    We can also calculate the other side of the Euler--Lagrange equations fairly easily, we just have to be careful to avoid index clash.
-    We start with
-    \begin{equation}
-        \diffp{\lagrangianDensity}{(\partial^\mu A^\nu)} = -\frac{1}{4}\diffp{}{(\partial^\mu A^\nu)} (F_{\alpha\beta}F^{\alpha\beta}) = -\frac{1}{2} F_{\alpha\beta} \diffp{}{(\partial^\mu A^\nu)} F^{\alpha\beta}
-    \end{equation}
-    where we have used the freedom in raising and lowering paired indices to notice that both terms in the product rule will give the same result.
-    We need only then compute the derivative once, which we do by plugging in the definition for \(F^{\alpha\beta}\):
-    \begin{equation}
-        \diffp{}{(\partial^\mu A^\nu)} F^{\alpha\beta} = \diffp{}{(\partial^\mu A^\nu)} [\partial^\alpha A^\beta - \partial^\beta A^\alpha].
-    \end{equation}
-    Now notice that the derivative will vanish on each term, apart from when the indices match up correctly across both the derivatives and the potentials, in which case we get unity.
-    Hence,
-    \begin{equation}
-        \diffp{}{(\partial^\mu A^\nu)} F^{\alpha\beta} = \tensor{\delta}{^\alpha_\mu} \tensor{\delta}{^\beta_\nu} - \tensor{\delta}{^\beta_\mu} \tensor{\delta}{^\alpha_\nu}.
-    \end{equation}
-    Going back to one side of the Euler--Lagrange equations we have
-    \begin{align}
-        \diffp{\lagrangianDensity}{(\partial^\mu A^\nu)} &= -\frac{1}{2}F_{\alpha\beta}[\tensor{\delta}{^\alpha_\mu}\tensor{\delta}{^\beta_\nu} - \tensor{\delta}{^\beta_\mu} \tensor{\delta}{^\alpha_\nu}]\\
-        &= -\frac{1}{2}[F_{\mu\nu} - F_{\nu\mu}]\\
-        &= -F_{\mu\nu},
-    \end{align}
-    where we have used the antisymmetry of the electromagnetic tensor in the last step.
+    Logically these two seemingly different fields must be the same.
+    Showing this is a case of making sure we properly understand what the different variables represent.
+    First, consider \cref{fig:spacetime radiation field quantities}.
+    This spacetime diagram shows how the position of the observer, \(x\), and retarded position of the particle, \(r(\tau_*)\), are related.
+    As well as this we see that there is some time when the particle and the observer share a time coordinate.
+    In the calculation of \(\vv{E}^{\text{old}}\) we chose to set up our coordinates such that the particle was at the origin at the time of measurement.
     
-    Hence, the full Euler--Lagrange equations give
-    \begin{equation}\label{eqn:free field eom}
-        0 = \partial^\mu \diffp{\lagrangianDensity}{(\partial^\mu A^\nu)} = -\partial^\mu F_{\mu\nu}.
-    \end{equation}
-    This is exactly the Maxwell equation for a free electromagnetic field: \(\partial^\mu F_{\mu\nu} = 0\).
-    This justifies our choice of the action, including neglecting higher order terms.
+    \begin{figure}
+        \tikzsetnextfilename{space-time-diagram-radiation}
+        \begin{tikzpicture}
+            \draw[my purple, very thick] (2, 1) -- (4, 3);
+            \draw[my purple, thick] (2, 1) -- (2, 0) node [below] {\(\vv{r}(\tau_*)\)};
+            \draw[my purple, thick] (2, 1) -- (0, 1) node [left] {\(r^0(\tau_*)\)};
+            \fill[my orange] (4, 3) circle [radius = 0.05cm] node [right, text=black] {\textcolor{my orange}{\(x\)}, observer};
+            \draw[my orange, thick] (4, 3) -- (4, 0) node[below] {\(\vv{x}\)};
+            \draw[my orange, thick] (4, 3) -- (0, 3) node[left] {\(x^0\)};
+            \draw[thick, <->] (0, 5) -- (0, 0) -- (5, 0);
+            \node[below] at (5, 0) {space};
+            \node[left] at (0, 5) {\(ct\)};
+            \draw[highlight, very thick, ->] (1.4, 0) -- (4.4, 5) node [above right, text=black, outer sep=-3pt] {\textcolor{highlight}{\(c\tau\)}, particle world line};
+            \fill[my purple] (2, 1) circle [radius = 0.05cm] node [below right, outer sep=-2pt] {\(c\tau_*\)};
+            \fill[my green] (3.2, 3) circle [radius = 0.05cm];
+        \end{tikzpicture}
+        \caption{Spacetime diagram detailing the relation between various quantities in the radiation field.}
+        \label{fig:spacetime radiation field quantities}
+    \end{figure}
     
-    \chapter{Interactions}
-    \section{Action for A Current}
-    Suppose we have a current density, \(J^\mu(x)\), we can modify our action for the free electromagnetic field by adding an extra interaction term.
-    The resulting action is
-    \begin{align}
-        S &= \frac{1}{c} \int \left[ -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} - \frac{1}{c}J^\mu A_\mu \right] \dd{^4x}\\
-        &= \frac{1}{c} \int \left[ -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} \right] \dd{^4x} + \frac{1}{c} \int \left[ -\frac{1}{c} J^\mu A_\mu \right] \dd{^4x}\\
-        &= S_{\text{free}} + S_{\text{int}}.
-    \end{align}
-    In terms of the Lagrangian density we have
-    \begin{align}
-        \lagrangianDensity &= -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} - \frac{1}{c}J^\mu A_\mu\\
-        &= \lagrangianDensity_{\text{free}} + \lagrangianDensity_{\text{int}}.
-    \end{align}
+    \begin{figure}
+        \tikzsetnextfilename{space-diagram-radiation}
+        \begin{tikzpicture}
+            \draw[thick, my light blue] (-2, 0) -- (2, 2) node [pos=0.6, above, text=black, font=\small] {\(\vv{R}\)};
+            \draw[ultra thick, my light blue, ->] (-2, 0) -- (-1, 0.5) node [pos=0.9, above, text=black, font=\small] {\(\vh{n}\)};
+            \fill[my orange] (2, 2) circle [radius=0.05cm] node [right] {\(\vv{x}\)};
+            \draw[my orange, thick] (0, 0) coordinate (B) -- (2, 2) coordinate (C);
+            \draw[thick, ->] (-3, 0) -- (3, 0) node [below] {\(x\)};
+            \draw[thick, ->] (0, 0) -- (0, 3) node [left] {\(y\)};
+            \coordinate (A) at (2, 0);
+            \path pic[draw, "\(\vartheta\)", angle eccentricity=0.75, font=\small] {angle};
+            \path (-2, 0) coordinate (B) pic[draw, font=\small, "\(\varphi\)", angle eccentricity=1.25] {angle};
+            \draw[->, highlight, very thick] (-2, 0) -- (-0.8, 0) node [below, font=\small] {\(c\vv{\beta}\)};
+            \draw[|-|, thick] (-2, -0.5) -- (0, -0.5) node [midway, below] {\(d\)};
+        \end{tikzpicture}
+        \caption{Space diagram detailing the relation between various quantities in the radiation field.}
+        \label{fig:space radiation field quantities}
+    \end{figure}
     
-    \section{Dimensions}
-    The first step in justifying this choice is to check it works dimensionally.
-    In order to do this it is sufficient to show that \(\lagrangianDensity_{\text{int}}\) has the same dimensions as \(\lagrangianDensity_{\text{free}}\).
-    We can also ignore any indices, since they don't change the dimensions.
-    That is, we want to show that \([FF] = [JA/c]\).
-    To do this we use the fact that \(F^{\mu\nu}\) is defined in terms of derivatives of \(A^\mu\), so \([F] = [\partial A] = \dimension{L}^{-1}[A]\).
-    Hence, \([FF] = \dimension{L}^{-1}[FA] = \dimension{L}^{-1}[A][F]\).
-    We also know that \(c\) is a speed, so \([JA/c] = \dimension{L}^{-1}\dimension{T}[JA] = \dimension{L}^{-1}[A]\dimension{T}[J]\).
-    So, things work out dimensionally as long as \(\dimension{T}[J] = [F]\).
-    Recall that Maxwell's equation gives us \(\partial^\mu F_{\mu\nu} = J_\nu/c\), and so we have \([\partial F] = \dimension{L}^{-1}[F] = [J/c] = \dimension{L}^{-1}\dimension{T}[J]\).
-    Thus, \([F] = \dimension{T}[J]\), and so the dimensions work.
-    
-    \section{Equations of Motion}
-    The next step in justifying this choice is to show that we get the correct equations of motion, both for the fields and for particles.
-    We'll start with the field.
-    
-    \subsection{Equations of Motion for the Field}
-    The Euler--Lagrange equations for a Lagrangian density of the form \(\lagrangianDensity(A^\mu, \partial^\mu A^\nu)\) are
+    Now, suppose that we choose spatial coordinates such that the motion of the particle is in the \((x, y)\)-plane and \(z = 0\).
+    Then the setup is as shown in \cref{fig:space radiation field quantities}.
+    The left point on the \(x\) axis shows the position of the particle at time of measurement, if we are to measure the particle at the origin.
+    The distance along the \(x\)-axis, \(d\), is given by the time taken to travel this distance, which is \((x^0 - r^0(\tau_*))/c\), times the speed of the particle, \(c\abs{\vv{\beta}}\):
     \begin{equation}
-        \partial^\mu \diffp{\lagrangianDensity}{(\partial^\mu A^\nu)} = \diffp{\lagrangianDensity}{A^\nu}.
+        d = \abs{\vv{\beta}}(x^0 - r^0(\tau_*)) = \abs{\vv{\beta}}\abs{\vv{R}}.
     \end{equation}
-    Since the interaction term doesn't introduce any derivatives of \(A^\mu\) we know from \cref{eqn:free field eom} that
-    \begin{equation}
-        \partial^\mu \diffp{\lagrangianDensity}{(\partial^\mu A^\nu)} = -\partial^\mu F_{\mu\nu}.
-    \end{equation}
-    However, the interaction term introduces a term with \(A^\mu\), so the other side of the Euler--Lagrange equations no longer vanishes.
-    Instead,
-    \begin{align}
-        \diffp{\lagrangianDensity}{A^\nu} &= \diffp{}{A^\nu} \left[ -\frac{1}{c}J^\mu A_\mu \right]\\
-        &= -\frac{1}{c}\diffp{}{A^\nu} J^\mu A_\mu\\
-        &= -\frac{1}{c}\diffp{}{A^\nu} J_\mu A^\mu\\
-        &= -\frac{1}{c}J_\mu \diffp{A^\mu}{A^\nu}\\
-        &= -\frac{1}{c}J_\mu \tensor{\delta}{^\mu_\nu}\\
-        &= -\frac{1}{c}J_\nu.
-    \end{align}
-    Hence, we have the equation of motion for the fields given by
-    \begin{equation}
-        \partial^\mu F_{\mu\nu} = \frac{1}{c}J_\nu,
-    \end{equation}
-    which is exactly the inhomogeneous Maxwell equation.
+    Here we have used the fact that \(\abs{\vv{R}(\tau)_*} = R^0(\tau_*)\).
     
-    At this point one might wonder how to derive the homogeneous Maxwell equation, \(\partial^\mu F^*_{\mu\nu} = 0\).
-    The answer is that we don't really need to do this because we have used \(F^{\mu\nu} = \partial^\mu A^\nu - \partial^\nu A^\mu\) as a definition and this makes the homogeneous Maxwell equation trivially true.
-    The two Maxwell equations aren't on quite the same footing in terms of importance, the inhomogeneous one contains most of the physics.
-    This is similar to how the divergence equations in the non-relativistic version are not strictly necessary, since they follow from the curl equations and the identity \(\div\curl\vv{V} = 0\).
-    On the physics side we can view this as being a consequence of the fact that it is \(A^\mu\), not \(F^{\mu\nu}\), which is the fundamental variable appearing, for example, in the path integrals of QFT.
-    
-    \subsection{Gauge Invariance}
-    \epigraph{It's actually very interesting, well, I say very interesting. I very quickly get interested in things like this. That's why I'm here.}{Donal O'Connel}
-    When justifying the choice of the free action we said that we were looking for something gauge invariant, and we found it by working with the gauge invariant electromagnetic field tensor.
-    The interaction term has an explicit \(A_\mu\), which is not manifestly gauge invariant.
-    Recall that a gauge transform takes the form of \(A_\mu(x) \to A'_\mu(x) = A_\mu(x) + \partial_\mu \chi(x)\), for some smooth scalar field \(\chi\).
-    Using this we can show that the action is gauge invariant:
-    \begin{align}
-        S_{\text{int}} &\to \frac{1}{c}\int \left[ -\frac{1}{c} J^\mu(A_\mu + \partial_\mu \chi) \right] \dd{^4x}\\
-        &= S_{\text{int}} - \frac{1}{c^2} \int \left[ J^\mu \partial_\mu \chi \right] \dd{^4x}\\
-        &= S_{\text{int}} - \frac{1}{c^2} \int \left[  \partial_\mu(J^\mu \chi) - (\partial_\mu J^\mu)\chi \right] \dd{^4x}.
-    \end{align}
-
-    Now, considering the first term we see that an application of the divergence theorem gives
+    Hence, we can write \(\vv{R}\) in terms of \(\vv{x}\), the position of the observer, and \(\vv{\beta}\), the velocity of the particle, as
     \begin{equation}
-        \int_{V} \partial_\mu(J^\mu \chi) \dd{^4x} = \int_{\partial V} J^\mu \chi \dd{S_\mu}
+        \vv{R} = \vv{x} + \vv{\beta} \abs{\vv{R}}.
     \end{equation}
-    where \(S_\mu\) is a normal vector to the boundary \(\partial V\).
-    Now, whenever we vary the action we always do so in such a way that variations on the boundary vanish, and hence this term doesn't contribute to the variation, and so doesn't effect the equations of motion.
-    
-    The second term has \(\partial_\mu J^\mu\), which vanishes by the continuity equation if \(J^\mu\) is a conserved current.
-    This hints at a link between the symmetry of gauge invariance and the conservation of current, which is a consequence of Noether's theorem.
-    
-    The result is that while the action is not strictly gauge invariant the variation in the action is gauge invariant, and that's all we care about.
-    More formally the action is gauge invariant up to a surface term if the current is conserved.
-    
-    At this point we note that often we use terminology inherited from Lagrangian dynamics.
-    In particular we might call \(A^\mu\) a generalised coordinate, and the quantity
+    The unit vector, \(\vh{n}\), pointing from the particles position at the time of measurement to the observer is given by
     \begin{equation}
-        \diffp{\lagrangianDensity}{(\partial^\mu A^\nu)}
+        \vh{n} = \frac{\vv{R}}{\abs{\vv{R}}} = \vv{\beta} + \frac{\vv{x}}{\abs{\vv{R}}}.
     \end{equation}
-    is the canonical momentum conjugate to \(A^\mu\).
+    Rearranging this we get
+    \begin{equation}
+        \vh{n} - \vv{\beta} = \frac{\vv{x}}{\abs{\vv{R}}}.
+    \end{equation}
+    Taking the dot product with \(\vh{n}\) and using the fact that \(\vh{n} \cdot \vh{n} = 1\) we get
+    \begin{equation}
+        1 - \vh{n} \cdot \vv{\beta} = \frac{1}{\abs{\vv{R}}} \vh{n} \cdot \vv{x}.
+    \end{equation}
+    Hence, we can write the radiation field as
+    \begin{equation}
+        \vv{E}(x) = \frac{e}{4\pi \gamma^2} \frac{\vv{x}/\abs{\vv{R}}}{\abs{\vv{R}}^3(1 - \vh{n} \cdot \vv{\beta})^3} \bigg|_{\ret}.
+    \end{equation}
+    This is now clearly parallel to \(\vv{x}\), which is the direction of \(\vv{E}^{\text{old}}\), so the two fields are in the same direction.
     
-    \subsection{Relativistic Interacting Point Particle}
-    We have seen that we get the inhomogeneous Maxwell equation as the equation of motion of the field.
-    Before we accept this form of the action we should show that it also recovers the correct particle dynamics, namely the Lorentz force law.
-    
-    Suppose we have some particle of mass \(m\) and charge \(q\).
-    The four current splits into a temporal part and spatial part according to \(J^\mu(x) = (\rho(x)c, \vv{J}(x))\).
-    For a point particle the charge density is simply a Dirac delta distribution,
+    We now need to check that they have the same magnitude.
+    Both have the same initial factor of \(e/(4\pi \gamma^2)\), so that's a good start.
+    To continue we want to write \(\abs{\vv{R}}(1 - \vh{n} \cdot \vv{\beta})\) in terms of \(\vv{x}\) and \(\vartheta\).
+    Consider the quantity \((\vh{n} - \vv{\beta})^2\), on the one hand this is equal to \(\abs{\vv{x}}^2 / \abs{\vv{R}}^2\), on the other hand expanding gives us
     \begin{equation}
-        \rho(x) = q \delta^3(\vv{x} - \vv{r}(t)).
+        (\vh{n} - \vv{\beta})^2 = 1 - 2 \vh{n} \cdot \vv{\beta} + \beta^2.
     \end{equation}
-    The superscript 3 is because this is a delta distribution in three dimensions.
-    The charge density depends on the four-position, \(x^\mu = (ct, \vv{x})\).
-    This is the four-position of the point at which we are measuring the charge density, not the position of the particle, which is \(r^\mu = (ct', \vv{r})\).
-    The spatial part of the current density for a moving charge distribution is \(\vv{J}(x) = \rho(x)\vv{v}(t)\).
-    Therefore we can write the four-current as
+    Now consider \((1 - \vh{n} \cdot \vv{\beta})^2\):
     \begin{equation}
-        J^\mu(x) = q\delta^3(\vv{x} - \vv{r}(t))(c, \vv{v}(t))^\mu.
+        (1 - \vh{} \cdot \vv{\beta})^2 = 1 - 2 \vh{n} \cdot \vv{\beta} + (\vh{n} \cdot \vv{\beta})^2 = (\vh{n} - \vv{\beta})^2 - [\beta^2 - (\vh{n} \cdot \vv{\beta})^2].
     \end{equation}
-    
-    This is not manifestly Lorentz covariant, but we know that \(J^\mu\) is a contravariant four-vector, and so we should be able to massage this into a form making it manifestly Lorentz covariant.
-    The first step is to get rid of the three-dimensional Dirac delta in favour for a four dimensional one.
-    We can do this by using the fact that if we integrate a four-dimensional delta distribution over time we are left with a three-dimensional spatial delta-distribution.
-    Let's introduce \(r^0(t') = ct'\) as the time component of the particle's four-position.
-    We therefore have
-    \begin{align}
-        J^\mu(x) &= q \delta^3(\vv{x} - \vv{r}(t))(c, \vv{v}(t))^\mu\\
-        &= q \int \dl{(ct')} \, \delta(ct - ct') \delta^3(\vv{x} - \vv{r}(t')) \diff{r^\mu(t')}{t'}\\
-        &= qc \int \dl{t'} \, \delta^4(x - r(t')) \diff{r^\mu}{t'}.
-    \end{align}
-    Here we have written the four-velocity of the particle as a derivative of its four-position.
-    We can choose to use the proper time of the particle as the time parameter, and we therefore get
+    The term in square brackets can be rewritten using the angle, \(\varphi\), between the velocity vector and \(\vh{n}\):
     \begin{equation}
-        J^\mu(x) = qc \int \dl{\tau} \diff{r^\mu}{\tau} \delta^4(x - r(\tau)).
+        \beta^2 - (\vh{n} \cdot \vv{\beta})^2 = \beta^2 - \beta^2 \cos^2\varphi = \beta^2 \sin^2 \varphi = \abs{\vv{\beta} \times \vh{n}}^2.
     \end{equation}
-    It should be noted that a change of variables (\enquote{cancelling} the \(\dl{\tau}\) in the derivative with the measure of the integral) gives us
+    We can rewrite this cross product by substituting in \(\vh{n} = \vv{x}/\abs{\vv{R}}\):
     \begin{equation}
-        J^\mu(x) = qc \int \dl{r^\mu} \, \delta^4(x - r).
+        \vv{\beta} \times \vh{n} = \frac{1}{\abs{\vv{R}}}\vv{\beta} \times \vv{x} \implies \beta^2 - (\vh{n} \cdot \vv{\beta})^2 = \frac{1}{\abs{\vv{R}}^2}\abs{\vv{\beta} \times \vv{x}}^2.
     \end{equation}
-    Either of these two forms is manifestly Lorentz covariant, which is what we wanted.
-    
-    Now consider the total action of the fields and the particle, this can be written as
-    \begin{equation*}
-        S_{\text{tot}} = \frac{1}{c}\int \left[ -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} \right] \dd{^4x} - mc \int \sqrt{\diff{r}{\lambda} \cdot \diff{r}{\lambda}} \dd{\lambda} + \frac{1}{c} \int \left[ -\frac{1}{c}J^\mu A_\mu \right] \dd{^4x}.
-    \end{equation*}
-    The first term is the action for a free electromagnetic field, the second term the action for a free particle, and the third accounts for the interactions between the field and the particle.
-    It is this interacting term that we are interested in.
-    In more detail we can write it as
-    \begin{align}
-        S_{\text{int}} &= \frac{1}{c}\int \dl{^4x} \, \left[ -\frac{1}{c}J^\mu A_\mu \right]\\
-        &= -\frac{1}{c} \int \dl{^4x} \, qc \int \dl{\tau} \, \diff{r^\mu}{\tau} \delta^4(x - r(t)) A_\mu(x)\\
-        &= -\frac{q}{c} \int \dl{\tau} \, \diff{r^\mu}{\tau} A_\mu(r(\tau)).
-    \end{align}
-    In the last step we swapped the integrals to perform the integral over \(\dl{^4x}\) first using the sifting property of the delta distribution.
-    This leaves us with a term which depends on the four-potential at the position of the particle, this means that there is no interaction at a distance, which is what we would expect.
-    
-    We can reparametrise the interaction action as
+    Finally, we have
     \begin{equation}
-        S_{\text{int}} = -\frac{q}{c} \int \dl{\lambda} \, \diff{r^\mu(\lambda)}{\lambda} A_\mu(r(\lambda)).
+        (1 - \vh{n} \cdot \vv{\beta})^2 = \frac{\abs{\vv{x}}^2}{\abs{\vv{R}}^2} - \frac{\abs{\vv{\beta} \times \vv{x}}^2}{\abs{\vv{R}}^2} = \frac{\abs{\vv{x}}^2}{\abs{\vv{R}}^2}(1 - \beta^2 \sin^2 \vartheta),
     \end{equation}
-    The total action is then
-    \begin{equation}
-        S_{\text{tot}} = \frac{1}{c}\int \dl{^4x}\, \left[ -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} \right] -mc \int \dl{\lambda} \, \sqrt{\diff{r}{\lambda} \cdot \diff{r}{\lambda}} - \frac{q}{c} \int \dl{\lambda} \, \diff{r^\mu}{\lambda} A_\mu(r(\lambda)).
-    \end{equation}
-    
-    We can then find the equations of motion for the particle using the appropriate Euler-Lagrange equations, namely
-    \begin{equation}
-        \diff{}{\lambda} \diff{\lagrangian}{\left( \diff{r^\mu}{\lambda} \right)} = \diff{\lagrangian}{r^\mu}
-    \end{equation}
-    where \(\lagrangian\) is the integrand of the total action after performing all spatial integrals.
-    There is no dependence on \(r^\mu\) or \(\diff{r^\mu}/{\lambda}\) in the first term, so it doesn't contribute to the particle's equations of motion, which makes sense as that term is only to do with the electromagnetic field.
-    
-    Performing the derivative of \(\lagrangian\) we have
-    \begin{equation}
-        \diff{}{\lambda} \left[ -mc \frac{1}{\sqrt{\diff{r}{\lambda} \cdot \diff{r}{\lambda}}} \diff{r^\mu}{\lambda} - \frac{q}{c}A^\mu(r(\lambda)) \right] = -\frac{q}{c} \diff{r_\nu}{\lambda} \partial^\mu A^\nu(r(\lambda)).
-    \end{equation}
-    Taking \(\lambda = \tau\) again we have that \((\diff{r}/{\tau})^2 = c^2\), and so computing the derivative with respect to \(\lambda\) we are left with
-    \begin{equation}
-        -m\diff[2]{r^\mu}{\tau} - \frac{q}{c}\partial^\nu A^\mu(r(\tau)) \diff{r_\nu}{\tau} = -\frac{q}{c}\partial^\mu A^\nu(r(\tau)) \diff{r_\nu}{\tau}.
-    \end{equation}
-    Collecting the derivatives of the potential together we see that we get the electromagnetic tensor and are left with the final equation of motion
-    \begin{equation}
-        m \diff[2]{r^\mu}{\tau} = \frac{q}{c}F^{\mu\nu}(r(\tau)) \diff{r_\nu}{\tau}.
-    \end{equation}
-    We can then identify the left hand side as the four-force and the whole equation is the Lorentz force law, in a covariant form.
-    
-    We have seen two forms of the total action here.
-    The second one, with the interaction in terms of \(\lambda\), is good for deriving the particle's equation of motion.
-    The first form, with the interaction in terms of the position, is better for the equations of motion of the field.
-    These are unaffected by the particle's presence since \(A^\mu\) and its derivative don't appear in the action for the free particle.
-    
-    \chapter{Remarks and Extensions}
-    \section{Recap}
-    The total action for the electromagnetic field with a charged particle is
-    \begin{equation}
-        S = \frac{1}{c} \int\dl{^4x} \left[ -\frac{1}{4} F^{\mu\nu}F_{\mu\nu} \right] - mc \int \dl{\lambda} \sqrt{\diff{r}{\lambda} \cdot \diff{r}{\lambda}} + S_{\symrm{int}}
-    \end{equation}
-    where
-    \begin{align}
-        S_{\symrm{int}} &= \frac{1}{c} \int \dl{^4x} \left[ -\frac{1}{c}J^\mu(x)A_\mu(x) \right]\\
-        &= -\frac{e}{c} \int \dl{\lambda} \, \diff{r^\mu}{\lambda} A_\mu(r(\lambda)).
-    \end{align}
-    
-    If we vary \(S\) with respect to \(A_\mu\) then we get the Maxwell equations, which tell us how the field evolves.
-    If we vary with respect to \(r^{\mu}\) then we get the Lorentz force law, which tells us how the particle's motion evolves.
-    In both cases we can instead use the appropriate Euler--Lagrange equations instead of varying the action explicitly.
-    They are
-    \begin{equation}
-        \partial^\mu \diffp{\lagrangianDensity}{(\partial^\mu A^\nu)} = \diffp{\lagrangianDensity}{A^\nu}, \qqand \diff{}{\lambda}\diffp{\lagrangian}{\left( \diffp{r^\mu}{\lambda} \right)} = \diffp{\lagrangian}{r^\mu}.
-    \end{equation}
-    After this we are free to set \(\lambda = \tau\) and use simplifications like \((\diff{r}/{\lambda})^2 = c^2\).
-    The two Lagrangian quantities, the Lagrangian, \(\lagrangian\), and Lagrangian density, \(\lagrangianDensity\), are related by
-    \begin{equation}
-        \lagrangian = \int \lagrangianDensity \dd{^3x}.
-    \end{equation}
-    
-    \section{Radiation Reaction}
-    The first form of the interaction, in terms of \(x\), is good for deriving the Maxwell equations with a charged particle.
-    The second form, with \(\lambda\), is good for deriving the Lorentz force law.
-    When we did this we got the Lorentz force law in the form
-    \begin{equation}
-        \diff{p^\mu}{\tau} = \frac{e}{c} F^{\mu\nu}(r(\tau)) \diff{r_\nu}{\tau}.
-    \end{equation}
-    This can be done either by varying the action or applying the Euler--Lagrange equations.
-    
-    The \(F^{\mu\nu}\) here is the total field tensor, including the contribution to the field from the particle.
-    This is different to how we usually think about the fields due to point particles, where we can ignore the Coulomb field of the particle in question.
-    The field diverges at the position of the particle, causing problems, much like those we have to fix by renormalisation in QFT.
-    
-    We cannot completely ignore the field from the particle though, if we do we miss something called the radiation reaction, which we will cover later in our discussion of radiation.
-    
-    \section{Alternative Terms}
-    The form of the action is determined using two constraints, symmetries of the system and dimensional analysis.
-    These are very powerful tools and allow us to specify actions which align well with the observed physics.
-    However, they can't rule out all possible terms, but with some simple assumptions dimensional analysis can suggest the most important terms.
-    
-    \subsection{Why No Second Order Term?}
-    \epigraph{Rigorous? This is physics. There is no rigour.}{Donal O'Connel}
-    We chose not to include a term involving \((F^{\mu\nu}F_{\mu\nu})^2\) in our action.
-    This is justified by the end results, but can also be argued for by dimensional analysis.
-    Suppose we did have such a term.
-    It would be of the form
-    \begin{equation}
-        \frac{1}{c} \int \dl{^4x} \, \kappa(F^{\mu\nu}F_{\mu\nu})^2
-    \end{equation}
-    where \(\kappa\) is a dimensionfull quantity such that the above has units of action.
-    Comparing to the first order term we see that we have
-    \begin{equation}
-        \left[ \frac{1}{c} \int \dl{^4x} \, \kappa(F^{\mu\nu}F_{\mu\nu})^2 \right] = \left[ \frac{1}{c} \int \dl{^4x} \left( -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} \right) \right]
-    \end{equation}
-    where square brackets denote \enquote{dimensions of}.
-    In particular
-    \begin{equation}
-        [\kappa F^{\mu\nu}F_{\mu\nu}] = 1.
-    \end{equation}
+    where \(\vartheta\) is the angle between the position of the observer and the velocity.
     Hence, we have
     \begin{equation}
-        [\kappa] = \frac{1}{[F^{\mu\nu}F_{\mu\nu}]}.
+        \abs{\vv{R}}(1 - \vh{n} \cdot \vv{\beta}) = \abs{\vv{x}}(1 - \beta^2 \sin^2\vartheta)^{1/2}.
     \end{equation}
-    Now, we know that
-    \begin{equation}
-        [S] = \left[ \frac{1}{c} \int \dl{^4x} \left( -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} \right) \right]
-    \end{equation}
-    so we have that
-    \begin{equation}
-        [F^{\mu\nu}F_{\mu\nu}] = \frac{[S][c]}{\left[ \int \dl{^4x} \right]} = \frac{\dimension{M}}{\dimension{L}\dimension{T}^2},
-    \end{equation}
-    where we've used the fact that \(S\) has dimensions of angular momentum, \([S] = \dimension{M}\dimension{L}^2\dimension{T}^{-1}\), \([c] = \dimension{L}\dimension{T}^{-1}\), and \([\int \dl{^4x}] = \dimension{L}^4\).
+    If we substitute this into \(\vv{E}(x)\) we will find it has the same form as \(\vv{E}^{\text{old}}(x)\), showing that the two fields are indeed the same.
     
-    Combing this we have
+    \section{Radiation Field}
+    Recall that the general Li\'enard–Wiechert fields are given by
     \begin{equation}
-        [\kappa] = \frac{\dimension{L}\dimension{T}^2}{\dimension{M}} = \left( \frac{\dimension{T}}{\dimension{L}} \right)^2 \frac{\dimension{L}^3}{\dimension{M}}.
+        F_{\mu\nu}(x) = \frac{e}{4\pi} \frac{1}{(R \cdot w)^2} (k_\mu w_\nu - k_\nu w\mu) + \frac{e}{4\pi c} \frac{1}{R \cdot w} (k_\mu \alpha_n - k_\nu \alpha_\mu) \bigg|_{\ret}.
     \end{equation}
-    At this point we make the assumption that \(\kappa\) is not a new constant, rather it is built from other physical constants.
-    In particular we assume that the dimensions of \((\dimension{T}/\dimension{L})^2\) come from a factor of \(c^2\), and the dimension of \(\dimension{M}\) comes from the mass of the particle, \(m\).
-    We are then just left with the dimensions of \(\dimension{L}^3\).
-    It turns out that there is a natural length scale in classical electrodynamics, called the \defineindex{classical radius of an electron}.
-    This is defined as the length, \(\classicalElectronRadius\), such that the rest energy of the electron is equal to the electric potential from a pair of electrons:
+    Here \(w_\mu = u_\mu/c\), where \(u\) is the four-velocity of the particle,
     \begin{equation}
-        \frac{e^2}{4\pi\classicalElectronRadius} = mc^2 \implies \classicalElectronRadius = \frac{e^2}{4\pi mc^2} \approx \qty{2.82e-15}{\metre}.
+        k_\mu = \frac{R_\mu}{R \cdot w} \bigg|_{\ret},
     \end{equation}
-    The idea is that, before the advent of quantum mechanics, one suggestion was that the mass of the electron was provided by the potential energy.
-    Note that this quantity is on the order of length of one nuclear diameter.
+    and
+    \begin{equation}
+        \alpha = \dot{w}^\mu - (k \cdot w) w^\mu
+    \end{equation}
+    where the dot represents a derivative with respect to the proper time.
     
-    We then posit that
+    Notice that the first term falls of as \(1/R^2\), corresponding to the Coulomb field.
+    The second term, which is the radiation field, falls of as \(1/R\).
+    Hence, at large distances if the particle has nonzero acceleration the radiation field\footnote{we'll call the radiation field \(F^{\rad}\) or \(F_{\rad}\), whichever allows for more compact writing of sub/superscripts.},
     \begin{equation}
-        \kappa = \frac{k\classicalElectronRadius^3}{mc^2}
+        F_{\mu\nu}^{\rad}(x) \coloneqq \frac{e}{4\pi c} \frac{1}{R \cdot w} (k_\mu \alpha_n - k_\nu \alpha_\mu) \bigg|_{\ret},
     \end{equation}
-    where \(k\) is some dimensionless number.
-    Further, we assume that \(k\) is approximately on the order of 1, and so the resulting value of \(\kappa\) is
+    and to first order the electromagnetic field is then
     \begin{equation}
-        \kappa \sim \frac{(10^{-15}\,\unit{\metre})^3}{(10^{-31}\,\unit{\kilogram})(10^{8} \,\unit{\metre\per\second})^2} = 10^{-31}\,\unit{\metre\second\squared\per\kilogram}.
+        F_{\mu\nu} \approx F_{\mu\nu}^{\rad} + \order(1/R^2).
     \end{equation}
-    The exact value isn't important, the point is that, unless \(k\) is very large, \(\kappa\) is very \emph{very} small.
-    Hence, if there is an \((F^{\mu\nu}F_{\mu\nu})^2\) term in the action then it is suppressed by a factor of \(10^{-31}\) compared to the \(F^{\mu\nu}F_{\mu\nu}\) term.
     
-    This analysis relies on two assumptions, first, that \(\kappa\) depends only on other constants which are already relevant to classical electrodynamics, and second that \(k\) is of order 1.
-    However, since we get reasonable results without need for an \((F^{\mu\nu}F_{\mu\nu})^2\) term this seems to be the case.
+    The radiation field is what we see as light.
+    It should be pretty obvious that this is the dominant effect at large distances.
+    We can detect light with our eyes, but not the Coulomb field.
     
-    In principle higher order terms, including but not limited to an \((F^{\mu\nu}F_{\mu\nu})^2\) term, are present in a full quantum mechanical description, such as QED.
-    This is in part because quantum mechanics brings in other dimensionfull quantities, such as \(\hbar\), from which we can construct \(\kappa\).
+    At this point we make a change which allows for simplification later.
+    We introduce a new value
+    \begin{equation}
+        \varepsilon_\mu \coloneqq \alpha_\mu - Xk_\mu,
+    \end{equation}
+    where \(X\) is some constant to be chosen later to simplify equations.
+    We have complete freedom in choosing \(X\) since
+    \begin{equation}
+        k_\mu \varepsilon_\nu - k_\nu \varepsilon_\mu = k_\mu \alpha_\nu - k_\mu X k_\nu - k_\nu \alpha_\mu + k_\nu X k_\mu = k_\mu \alpha_\nu - k_\nu \alpha_\mu,
+    \end{equation}
+    so the radiation field is invariant under this choice.
     
-    The Compton wavelength, \(\lambda_{\symrm{c}}\), of the electron is the appropriate length scale in quantum mechanics.
-    It is larger than the classical electron radius by a factor of \(\alpha\), the fine structure constant:
-    \begin{equation}
-        \classicalElectronRadius = \alpha \lambda_{\symrm{c}} = \frac{e^2}{4\pi \hbar c} \lambda_{\symrm{c}} \approx \frac{\lambda_{\symrm{c}}}{137} \approx \qty{2.43e-12}{\metre}.
-    \end{equation}
-    What this means is that quantum effects become important as distances decrease long before questions of the structure of the electron.
+    The physics here is that if \(\varepsilon_0 = 0\) then \(\vv{\varepsilon}\) is parallel to \(\vv{E}\), which has components \(E^i = F^{i0}\).
+    This makes \(\varepsilon\) useful when working with polarised light.
     
-    \subsection{Theta Term}
-    We left out one term with the correct dimensions to be included in the action.
-    This is called the \defineindex{theta term}:
+    Recall that at \(\tau = \tau_*\) we have \(k \cdot k = 0\), \(k \cdot w = 1\), and \(k \cdot \alpha = 0\), which implies \(k \cdot \varepsilon = 0\) also.
+    
+    Radiation fields transport energy and momentum, so we should study the energy-momentum tensor,
     \begin{equation}
-        S_{\vartheta} = \frac{1}{c} \vartheta \int\dl{^4x} \, F_{\mu\nu} F^{*\mu\nu}.
+        \tensor{T}{^{\mu\nu}} \coloneqq \tensor{F}{^{\mu\rho}}\tensor{F}{_\rho^\nu} + \frac{1}{4}\eta^{\mu\nu} \tensor{F}{^{\alpha\beta}} \tensor{F}{_{\alpha\beta}}.
     \end{equation}
-    Here \(\vartheta\) is a dimensionless constant.
-    We justified leaving this out through claims of \enquote{parity conservation}.
-    We can actually show that this term doesn't have any classical effect because it can be reduced to a boundary term.
-    Start by inserting the definition of \(F^{*\mu\nu}\):
-    \begin{equation}
-        S_{\vartheta} = \frac{1}{c}\vartheta \int \dl{^4x} \left[ -\frac{1}{2} \varepsilon^{\mu\nu\rho\sigma} F_{\mu\nu}F_{\rho\sigma} \right].
-    \end{equation}
-    Then insert the definition of \(F_{\mu\nu}\) and \(F_{\rho\sigma}\) in terms of the potential:
-    \begin{equation}
-        S_{\vartheta} = -\frac{\vartheta}{2c} \int \dl{^4x}  \, \varepsilon^{\mu\nu\rho\sigma}(\partial_\mu A_\nu - \partial_\nu A_\mu)(\partial_\rho A_\sigma - \partial_\sigma A_\rho).
-    \end{equation}
-    Now, notice that each term in brackets is antisymmetric in the two indices, and so is the Levi-Civita symbol.
-    So, swapping the indices in the second term in each bracket, expanding the brackets, relabelling swapping the indices again, and then swapping the indices on the Levi-Civita symbol cancels the minus sign giving the first term in the brackets again.
-    Each bracket therefore contributes a factor of 2.
-    That is,
+    Recall that \(T^{00} = u\) is the energy density and \(T^{i0} = S^i/c\) is parallel to the Poynting vector.
+    
+    We can compute the first term of the energy-momentum tensor fairly easily:
     \begin{align}
-        \varepsilon^{\mu\nu\rho\sigma} (\partial_\mu A_\nu - \partial_\nu A_\mu) &= \varepsilon^{\mu\nu\rho\sigma}\partial_\mu A_\nu - \underbrace{\varepsilon^{\mu\nu\rho\sigma} \partial_\nu A_\mu}_{\mu \leftrightarrow \nu}\\
-        &= \varepsilon^{\mu\nu\rho\sigma}\partial_\mu A_\nu - \varepsilon^{\nu\mu\rho\sigma}\partial_\mu A_\nu\\
-        &= \varepsilon^{\mu\nu\rho\sigma}\partial_\mu A_\nu + \varepsilon^{\mu\nu\rho\sigma}\partial_\mu A_\nu\\
-        &= 2\varepsilon^{\mu\nu\rho\sigma}\partial_\mu A_\nu.
+        \tensor*{F}{_{\rad}^{\mu\rho}}\tensor{{F_{\rad}}}{_\rho^\nu} &= \frac{e^2}{16\pi^2 c^2} \frac{1}{(R \cdot w)^2} (k^\mu \varepsilon^\rho - k^\rho \varepsilon^\mu)(k_\rho \varepsilon^\nu - k^\nu \varepsilon_\rho)\\
+        &= \frac{e^2}{16\pi^2 c^2} \frac{1}{(R \cdot w)^2}[k^\mu \varepsilon^\rho k_\rho \varepsilon^\mu - k^\rho \varepsilon_\mu k_\rho \varepsilon^\nu - k^\mu \varepsilon^\rho k^\nu \varepsilon_\rho + k^\rho \varepsilon^\mu k^\nu \varepsilon_\rho] \notag\\
+        &= -\frac{e^2}{16\pi^2 c^2} \frac{1}{(R \cdot w)^2} k^\mu k^\nu \varepsilon \cdot \varepsilon.
     \end{align}
-    Hence, doing this for both terms we get
-    \begin{equation}
-        S_{\vartheta} = -\frac{2\vartheta}{c} \int \dl{^4x} \, \varepsilon^{\mu\nu\rho\sigma} (\partial_\mu A_\nu)(\partial_\rho A_\sigma).
-    \end{equation}
-    Now, pull the \(\partial_\mu\) out the front of the term and apply it to all that remains.
-    Using the product rule this will give an extra term, which we subtract away:
-    \begin{equation}
-        S_{\vartheta} = -\frac{2\vartheta}{c} \int \dl{^4x} [\varepsilon^{\mu\nu\rho\sigma} \partial_\mu(A_\nu \partial_\rho A_\sigma) - \varepsilon^{\mu\nu\rho\sigma}A_\nu \partial_\mu\partial_\rho A_\sigma].
-    \end{equation}
-    Notice that \(\varepsilon^{\mu\nu\rho\sigma}\) is antisymmetric in \(\mu\) and \(\rho\), whereas \(\partial_\mu\partial_\rho\) is symmetric in \(\mu\) and \(\rho\).
-    Hence, their product, and thus the second term, vanishes, leaving
-    \begin{equation}
-        S_{\vartheta} = -\frac{2\vartheta}{c} \int \dl{^4x} \, \varepsilon^{\mu\nu\rho\sigma} \partial_\mu (A_\nu \partial_\rho A_\sigma).
-    \end{equation}
-    Finally, an application of the divergence theorem results in an integral over the boundary of the volume of integration above, and hence this doesn't contribute to the variation which vanishes on the boundary.
+    Here the first and fourth terms vanish as they contain \(k \cdot \varepsilon\), and the second term vanishes as it contains \(k \cdot k\), leaving only the third term.
     
-    The result of all of this is that \(S_{\vartheta}\) is irrelevant classically.
-    It turns out that \(S_{\vartheta}\) also doesn't have an effect in QED.
-    However, there is an analogous term in QCD which does have an effect, although a small one with \(\vartheta < 10^{-14}\).
-    This leads to the \enquote{strong CP problem}, in which the CP violation due to this theta term happens to cancel with CP violation due to other terms in the Lagrangian resulting in a theory that preserves CP symmetry overall.
-    One solution to this fine tuning problem is to introduce a new particle, called an \defineindex{axion}, which break the symmetry.
-    Axions are also considered to be a dark matter candidate.
+    The second term in the energy-momentum tensor then vanishes completely, since we achieve this term by contracting over the \(\mu\) and \(\nu\) indices above, giving \(k \cdot k = 0\).
+    Hence, the energy-momentum tensor for the radiation field is
+    \begin{equation}
+        T_{\rad}^{\mu\nu} = -\frac{e^2}{16\pi^2 c^2} \frac{1}{(R \cdot w)^2} k^\mu k^\nu \varepsilon \cdot \varepsilon \bigg|_{\ret}.
+    \end{equation}
+    Note that the total energy-momentum tensor is
+    \begin{equation}
+        T^{\mu\nu} = T_{\rad}^{\mu\nu} + \order(1/R^3),
+    \end{equation}
+    with the \(1/R^3\) term coming from the cross term between the radiation field and the Coulomb field.
     
-    \section{Actions are Flexible}
-    \epigraph{We like the Higgs here at Edinburgh}{Donal O'Connel}
-    We considered a vector force.
-    This is demonstrated by the fact that \(\partial^\mu F_{\mu\nu} = J_\nu/c\) has only a single free index.
-    In the Lorenz gauge we have the even simpler
-    \begin{equation}
-        \dalembertian A_\mu = \frac{1}{c}J_\mu.
-    \end{equation}
+    The fact that \(T_{\rad} \sim 1/R^2\) is important.
+    Suppose we are integrating over a large surface, large enough that the Coulomb field is negligible.
+    Then the surface area goes with \(R^2\), so the integral will be constant.
+    This means that the energy passing through the surface is independent of the size of the surface, and in particular we don't lose energy, it just spreads out as we get further away.
+    This is basically Gauss' law.
     
-    What happens if instead of a vector field we have a scalar field?
-    The free case can be modelled on the free EM case, we replace \(\dalembertian A_\mu = 0\) with \(\dalembertian \varphi = 0\), where \(\varphi\) is our scalar field.
-    Introducing this field creates a long range effect, which is not observed.
-    A slight alteration is
-    \begin{equation}
-        \dalembertian \varphi + \frac{1}{\ell^2} \varphi = 0
-    \end{equation}
-    where \(\ell\) is a constant with units of length.
-    This is, for example, applicable to the Higgs.
+    Note that in these equations we can think of \(k\) as the direction of propagation and \(\varepsilon\) has two interpretations.
+    First, its to do with the acceleration, \(\dot{w}\), of the particle.
+    Second, its to do with the polarisation of the light.
     
-    In further analogy with electromagnetism we can add an interation due to the motion of some particle at position \(r(\lambda)\):
-    \begin{equation}
-        \dalembertian \varphi + \frac{1}{\ell^2}\varphi = y\int \dl{\lambda} \, \delta^4(x - r(\lambda)).
-    \end{equation}
-    Here the interaction term is modelled after the interaction term in EM, in particular, the motion of a particle of charge \(y\) (up to some factor of \(c\)) moving along the path parametrised by \(\lambda\).
-    We call this \enquote{charge} \(y\) after Yukawa.
-    
-    In the static case, with the charge fixed at the origin we can set \(\lambda = \tau = t\) and this reduces to
-    \begin{equation}
-        -\laplacian\varphi + \frac{1}{\ell^2}\varphi = y\delta^3(\vv{x}).
-    \end{equation}
-    The solution to this is the \defineindex{Yukawa potential}
-    \begin{equation}
-        \varphi \propto \frac{1}{4\pi \abs{\vv{x}}} \e^{-\abs{\vv{x}}/\ell}.
-    \end{equation}
-    This is the usual Coulomb potential suppressed exponentially, justifying our claim that the extra \(\varphi/\ell^2\) term leads to a short range effect.
-    
-    The action for the free scalar field would be
-    \begin{equation}
-        S_{\text{free}} = \frac{1}{c} \int \dl{^4x} \left[ \frac{1}{2}(\partial \varphi)^2 - \frac{1}{2\ell^2}\varphi^2 \right].
-    \end{equation}
-    Note that \((\partial\varphi)^2 = (\partial_\mu \varphi)(\partial^\mu \varphi)\).
-    The interaction term with the particle is then
-    \begin{equation}
-        S_{\text{int}} = -y\int \dl{\lambda} ,\ \varphi(r(\lambda)).
-    \end{equation}
-    This is analogous to the EM interaction term
-    \begin{equation}
-        S_{\text{int}}^{\symrm{EM}} = -\frac{e}{c} \int \dl{\lambda} \, \diff{r^\mu}{\lambda} A_\mu (r(\lambda)).
-    \end{equation}
-    
-    \subsubsection{Action Lego}
-    \epigraph{Actions are like Lego, you just keep adding terms.}{Donal O'Connel}
-    Actions are very flexible.
-    Every new field we come up with can be added into the action, and all possible interactions between fields and particles can be accounted for.
-    As an example we'll create a rather complicated action as follows:
-    \begin{multline}
-        S_{\text{tot}} = S_{\text{free}}^{\text{EM}} + S_{\text{free}}^{\text{particle}} + S_{\text{int}}^{\text{EM}} + S_{\text{free}}^{\text{scalar}} + S_{\text{free}}^{\text{Higgs}}\\
-        + S_{\text{int}}^{\text{scalar/EM}} + S_{\text{free}}^{\text{dark}} + S_{\text{free}}^{\text{dark particle}} + S_{\text{int}}^{\text{dark}}.
-    \end{multline}
-    
-    Fundamentally there are two types of terms here, free terms describing fields, and interaction terms describing the interaction of either particles and fields, or two different fields.
-    The first term is the free electromagnetic field term:
-    \begin{equation}
-        S_{\text{free}}^{\text{EM}} = \frac{1}{c} \int \dl{^4x} \left[ -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} \right].
-    \end{equation}
-    The second term is the usual term for a free particle, although we can extend it to \(n\) particles interacting with the EM field, where each has mass \(m_i\) and position \(r_i\):
-    \begin{equation}
-        S_{\text{particle}}^{\text{EM}} = \sum_{i=1}^{n} \int \dl{\tau} \, \frac{1}{2}m_i \left( \diff{r_i}{\tau} \right)^2.
-    \end{equation}
-    Next, is the interaction between each of these particles and the EM field, with each particle contributing a current \(J_i\):
-    \begin{equation}
-        S_{\text{int}}^{\text{EM}} = \sum_{i=1}^{n} \frac{1}{c} \int \dl{^4x} \, J_i^\mu(x) A_\mu(x).
-    \end{equation}
-    Notice that the potential, \(A_\mu\), is the combined potential due to all particles.
-    Now we include our free scalar field:
-    \begin{equation}
-        S_{\text{free}}^{\text{scalar}} = \frac{1}{c} \int \dl{^4x} \left[ \frac{1}{2}(\partial\varphi)^2 - \frac{1}{2\ell^2}\varphi^2 \right].
-    \end{equation}
-    We can then have each of our particles also carry a Yukawa charge, \(y_i\), interacting with the scalar field and contributing a term
-    \begin{equation}
-        S_{\text{free}}^{\text{Higgs}} = -\sum_{i=1}^{n} y_i \int \dl{\tau} \, \varphi(r_i(\tau)).
-    \end{equation}
-    Now we have two fields, the EM field and the scalar field, and we can have these interact:
-    \begin{equation}
-        S_{\text{int}}^{\text{scalar/EM}} = \int \dl{^4x} \, \kappa \varphi F^{\mu\nu}F_{\mu\nu},
-    \end{equation}
-    where \(\kappa\) is a dimensionfull constant giving overall dimensions of action, so \([\kappa] = [\varphi]/[cS]\).
-    
-    Now suppose we want to include some dark matter, and that it behaves a lot like electromagnetism.
-    We can introduce a \enquote{dark EM field}, \(\symcal{B}_{\mu\nu}\), defined analogously to the EM field:
-    \begin{equation}
-        \symcal{B}_{\mu\nu} = \partial_\mu B_\nu - \partial_\nu B_\mu,
-    \end{equation}
-    where \(B_\mu\) is some sort of \enquote{dark potential}, analogous to \(A_\mu\).
-    This \enquote{dark EM field} will then contribute a free term
-    \begin{equation}
-        S_{\text{free}}^{\text{dark}} = \int \dl{^4x} \left[ -\frac{1}{4}\symcal{B}^{\mu\nu}\symcal{B}_{\mu\nu} + \frac{1}{2L^2} B_\mu B^\mu \right].
-    \end{equation}
-    Here \(L\) is another constant with dimensions of length and the second term makes this a short ranged field.
-    We can then include dark matter particles, which don't interact with the EM field or scalar field, but do interact with the \enquote{dark EM field}.
-    Suppose there are \(N\) of them, with mass \(M_i\) and position \(R_i\), then they will contribute the following term:
-    \begin{equation}
-        S_{\text{free}}^{\text{dark particle}} = \sum_{i = 1}^{N} \int \dl{\tau} \, \frac{1}{2}M_i \left( \diff{R_i}{\tau} \right)^2.
-    \end{equation}
-    As well as some interaction term, \(S_{\text{int}}^{\text{dark}}\) similar to \(S_{\text{int}}^{\text{EM}}\):
-    \begin{equation}
-        S_{\text{int}}^{\text{dark}} = \sum_{i=1}^{N} \frac{1}{c} \int \dl{^4x} \, K_i^\mu(x)B_\mu(x)
-    \end{equation}
-    where \(K_i^\mu\) is a \enquote{dark current} analogous to \(J_i^\mu\).
-    
-    We can keep going like this, adding in fields, particles, and interactions, until we've covered every required term.
-    
-    \part{Green's Functions}
-    \chapter{Green's Functions}
-    \section{Motivation}
-    We've now derived the Maxwell equations:
-    \begin{equation}
-        \partial^\mu F_{\mu\nu} (x) = \frac{1}{c}J_\nu(x).
-    \end{equation}
-    In the Lorenz gauge, \(\partial^\nu A_\nu = 0\), we've seen that these become
-    \begin{equation}
-        \dalembertian A_\mu = \frac{e}{c} \int u_\nu(x) \delta^4(x - r(\tau)) \dd{\tau}.
-    \end{equation}
-    Here \(u\) is the four velocity, and \(\delta^4\) is a four dimensional Dirac delta.
-    This is a wave equation with the right hand side being a driving force.
-    The wave equation can be solved in many ways, but one of the most common is to use Green's functions.
-    
-    \section{General Theory}
-    \begin{rmk}
-        For an introduction to Green's functions and Dirac deltas see the notes from the Fourier analysis part of the Statistics and Fourier Analysis course.
-        For more advanced use see the Methods of Mathematical Physics course notes.
-        For their applications to electromagentism see the Electromagentism course notes.
-    \end{rmk}
-    Let \(\symfrak{L}\) be a linear differential operator.
-    Consider the equation \(\symfrak{L} y(x) = f(x)\).
-    Here we want to solve for some function, \(y\), depending on \(x\).
-    We call \(f(x)\) the source term.
-    The \defineindex{Green's function} for this equation is the solution to the related equation
-    \begin{equation}
-        \symfrak{L} G(x) = \delta(x).
-    \end{equation}
-    That is, it gives the response of the system to a sharp impulse.
-    
-    The general solution, \(y\), is then given by integrating:
-    \begin{equation}
-        y(x) = \int G(x - x') f(x') \dd{x'}.
-    \end{equation}
-    This works by adding up the response to impulses at all possible positions, \(x'\).
-    Applying \(\symfrak{L}\) shows that \(y\) when defined like this is indeed a solution, under the assumption that everything is sufficiently smooth for the differential operator to commute with the integral:
-    \begin{equation}
-        \symfrak{L} y(x) = \int \symfrak{L} G(x - x') f(x') \dd{x'} = \int \delta(x - x') f(x') \dd{x'} = f(x).
-    \end{equation}
-    From which we see that we recover the equation \(\symfrak{L}y(x) = f(x)\).
-    
-    So, once we find the Green's function, often easier than solving the equation for a general source, we can find the general solution by integrating.
-    
-    Since this is physics we also have to be concerned with making our solutions physically reasonable.
-    In the context of Green's functions this means that we look for causal Green's functions, which vanish before the impulse, so when \(x < 0\) above.
-    We're also doing relativity, so we restrict all motion to be slower than the speed of light.
-    In particular this means that we look for \define{retarded Green's functions}\index{retarded Green's function}, which have the response at a distance \(x\) from the source occur at a time \(x/c\) after the source does whatever it is that the response is in response to.
-    
-    \section{Application to Wave Equation}
-    The wave equation with a source in three dimensional space is
-    \begin{equation}
-        \frac{1}{c^2} \diffp[2]{}{t} \varphi(t, \vv{x}) - \laplacian \varphi(t, \vv{x}) = \rho(t, \vv{x}).
-    \end{equation}
-    Here \(\varphi\) is the wave and \(\rho\) is the source.
-    This is for a scalar field, but the equation works the same for a vector field, or for a higher rank tensor field.
-    
-    The Green's function for this system, \(G\), is then defined as the solution to
-    \begin{equation}
-        \frac{1}{c^2} \diffp[2]{}{t} G(t, \vv{x}) - \laplacian \varphi(t, \vv{x}) = \frac{1}{c} \delta(t) \delta^3(\vv{x}).
-    \end{equation}
-    Here the factor of \(1/c\) on the right hand side is just convention, and is a choice of normalisation such that the area under the delta distribution is \(1/c\), instead of 1.
-    Leaving it out would just result in a factor of \(c\) appearing elsewhere.
-    It is also common to define the right hand side to be negative instead, again, this is just matter of convention.
-    
-    We want to make this equation look Lorentz covariant.
-    To start with we combine the time and space parts into the d'Alembertian:
-    \begin{equation}
-        \dalembertian \varphi(x) = \frac{1}{c} \delta(t) \delta^3(\vv{x}).
-    \end{equation}
-    To proceed we need a basic property of delta distributions:
-    \begin{lma}{}{lma:delta(ax)}
-        Let \(a > 0\), then \(\delta(ax) = \delta(x)/a\) as distributions.
-        That is, for a smooth test function, \(f\), we have
-        \begin{equation}
-            \int_{x_0}^{x_1} f(x) \delta(ax) \dd{x} = \frac{1}{a} \int_{x_0}^{x_1} f(x) \delta(x) \dd{x}
-        \end{equation}
-        when \(0\) is in the range of integration.
-        
-        \begin{proof}
-            Consider the left hand side of the integral equation above:
-            \begin{equation}
-                I = \int_{x_0}^{x_1} f(x) \delta(ax) \dd{x}.
-            \end{equation}
-            Complete a change of variables, defining \(u = ax\).
-            Then we have \(a\dl{x} = \dl{u}\), and so 
-            \begin{equation}
-                I = \frac{1}{a} \int_{x_0}^{x_1} f(u/a) \delta(u) \dd{u} = \frac{1}{a} f(0/a) = \frac{1}{a} f(0).
-            \end{equation}
-            The right hand side of the integral equation is
-            \begin{equation}
-                \frac{1}{a} \int_{x_0}^{x_1} f(x) \delta(x) \dd{x} = \frac{1}{a} f(0) = I,
-            \end{equation}
-            proving the lemma.
-        \end{proof}
-    \end{lma}
-    
-    Using this we have \(\delta(t)/c = \delta(ct) = \delta(x^0)\) as distributions.
-    Hence, we have
-    \begin{equation}
-        \dalembertian \varphi(x) = \frac{1}{c} \delta(t) \delta^3(\vv{x}) = \delta(x^0)\delta^3(\vv{x}) = \delta^4(x).
-    \end{equation}
-    
-    We will mainly be interested in the retarded Green's function, which for the wave equation is
-    \begin{equation}
-        G_{\symrm{R}}(t, \vv{x}) = \frac{1}{4\pi c \abs{\vv{x}}} \delta(t - \abs{\vv{x}}/c).
-    \end{equation}
-    Note that the factor of \(1/c\) out the front is due to the choice of including a factor of \(1/c\) in front of the Dirac deltas in the definition of the Green's function.
-    
-    The solution for \(\varphi\) is then
-    \begin{equation}
-        \varphi(x) = \int \dl{^4x} \, \frac{1}{4\pi c\abs{\vv{x} - \vv{x}'}} \delta^4(t - t' - \abs{\vv{x} - \vv{x}'}/c) \rho(t', \vv{x}').
-    \end{equation}
-    We can rewrite this in terms of \(t'\) as
-    \begin{equation}
-        \varphi(x) = \int \dl{^3x'} \dd{t'} \, \frac{1}{4\pi \abs{\vv{x} - \vv{x}'}} \delta^4(t - t' - \abs{\vv{x} - \vv{x}'}/c) \rho(t', \vv{x}').
-    \end{equation}
-    Here the factor of \(c\) from \({x'}^0 = ct'\) cancels with the factor of \(1/c\) already present.
-    We can then perform the integration over \(t\) using the sifting property of the delta distribution and we get
-    \begin{equation}
-        \varphi(x) = \int \dl{^3x'} \, \frac{1}{4\pi \abs{\vv{x} - \vv{x}'}} \rho(t  - \abs{\vv{x} - \vv{x}'}/c, \vv{x}').
-    \end{equation}
-    This is as far as we can go without knowing what the source term is.
-    
-    Note the one over distance dependence familiar from the static case, \(\laplacian 1/(4\pi\abs{\vv{x}}) = -\delta^3(\vv{x})\).
-    We can also see that at a time \(t\) and a distance \(\abs{\vv{x} - \vv{x}'}\) from the source the observer will see the effects of the source at time \(t - \abs{\vv{x} - \vv{x}'}/c\), since we choose the retarded Green's function.
-    
-    \subsection{Dirac Delta at a Function}
-    Consider \(\delta(f(x))\).
-    It can be shown that
-    \begin{equation}
-        \delta(f(x)) = \sum_{i} \frac{\delta(x - a_i)}{\abs{f'(a_i)}}
-    \end{equation}
-    as distributions where \(a_i\) are the zeros of \(f\), \(f'(a_i) \ne 0\), and \(f\) is smooth.
-    We also assume \(f\) has a finite number of zeros.
-    This is what we shall do in this section.
-    
-    To start with we suppose that \(f\) is a monotone increasing function.
-    This means it has at most one zero.
-    In the case with no zeros everything vanishes and its not interesting, so suppose \(f\) has one zero, call it \(a\).
-    Further, we suppose that \(a\) is in the region of interest, that is \(a \in (x_0, x_1)\) when we are interested in
-    \begin{equation}
-        I = \int_{x_0}^{x_1} \delta(f(x)) g(x) \dd{x}
-    \end{equation}
-    for some smooth test function, \(g\).
-    We want to show that
-    \begin{equation}
-        I = \frac{1}{\abs{f'(a)}} \int_{x_0}^{x_1} \delta(x - a) g(x) = \frac{1}{\abs{f'(a)}} g(a).
-    \end{equation}
-    
-    First, notice that for a monotone increasing function \(f'(x) \ge 0\) for all \(x\), so we can ignore the absolute values as we have \(\abs{f'(a)} = f'(a)\).
-    Now, let \(u = f(x)\), then we have \(u = 0\) at \(x = a\).
-    We also have \(u(x_0) = f(x_0)\) and \(u(x_1) = f(x_1)\), and importantly \(f(x_0) < f(x_1)\).
-    Further, \(\dl{u} = f'(x) \dd{x}\) and so a change of variables gives
-    \begin{equation}
-        I = \int_{f(x_0)}^{f(x_1)} \frac{1}{f'(x)} \delta(u) g(x(u)) \dd{u}.
-    \end{equation}
-    Performing the integration using the sifting property we get the integrand evaluated at the point at which \(u\) vanishes, which is at \(x = a\), and so \(x(u) = a\), hence
-    \begin{equation}
-        I = \frac{1}{f'(a)} g(a).
-    \end{equation}
-    This proves the statement for the special case where \(f\) is a monotone increasing function.
-    
-    Now, suppose that \(f\) is a monotone decreasing function.
-    Then let
-    \begin{equation}
-        I = \int_{x_0}^{x_1} \delta(f(x)) g(x) \dd{x}
-    \end{equation}
-    again.
-    The same change of variables gives
-    \begin{equation}
-        I = \int_{f(x_0)}^{f(x_1)} \frac{1}{f'(x)} \delta(u) g(x(u)) \dd{u}.
-    \end{equation}
-    However, now \(f(x_0) > f(x_1)\), and so we need to swap the limits picking up a negative sign:
-    \begin{equation}
-        I = -\int_{f(x_1)}^{f(x_0)} \frac{1}{f'(x)} \delta(u) g(x(u)) \dd{u}.
-    \end{equation}
-    Since \(f\) is monotone decreasing we have \(f'(x) \le 0\) for all \(x\) and so \(\abs{f'(x)} = -f'(x)\) giving
-    \begin{equation}
-        I = \int_{f(x_1)}^{f(x_0)} \frac{1}{\abs{f'}(x)} \delta(u) g(x(u)) \dd{u}.
-    \end{equation}
-    Completing the integration,
-    \begin{equation}
-        I = \frac{1}{\abs{f'}(a)} g(a).
-    \end{equation}
-    This proves the statement for the special case where \(f\) is a monotone decreasing function.
-    
-    Now, let \(f\) be any smooth function.
-    Let \(a_i\) be its zeros and by hypothesis we have \(f(a_i) \ne 0\).
-    For each zero we split our integral over \((x_0, x_1)\) into an integral over only a small neighbourhood of \(a_i\), say \((a_i - \varepsilon_i, a_i + \varepsilon_i)\) where we choose \(\varepsilon_i\) such that these intervals are non-intersecting.
-    Further, by choosing sufficiently small intervals \(f\) will be monotone increasing or monotone decreasing on each interval, allowing us to apply the special cases of the theorem above.
-    Outside of these intervals since \(f(x) \ne 0\) we have \(\delta(f(x)) = 0\) and so there is no contribution to the integral.
-    We then have
-    \begin{align}
-        I &= \int_{x_0}^{x_1} \delta(f(x)) g(x) \dd{x}\\
-        &= \sum_{i} \int_{a_i - \varepsilon_i}^{a_i + \varepsilon_i} \delta(f(x)) g(x) \dd{x}\\
-        &= \sum_{i} \frac{1}{\abs{f'(a_i)}} g(a_i)\\
-        &= \sum_{i} \int_{a_i - \varepsilon_i}^{a_i + \varepsilon_i} \frac{\delta(x - a_i)}{\abs{f'(a_i)}} g(x) \dd{x}\\
-        &= \int_{x_0}^{x_1} \sum_{i} \frac{\delta(x - a_i)}{\abs{f'(a_i)}} g(x) \dd{x}.
-    \end{align}
-    Therefore, as distributions, we have
-    \begin{equation}
-        \delta(f(x)) = \sum_i \frac{\delta(x - a_i)}{\abs{f'(a_i)}}.
-    \end{equation}
-
-    Note that if we have \(f(x) = ax\) for \(a \ne 0\) then the only zero is at \(x = 0\) and we have \(f'(x) = a\) so we have
-    \begin{equation}
-        \delta(ax) = \frac{1}{\abs{a}} \delta(x)
-    \end{equation}
-    as distributions.
-    This further simplifies to \(\delta(ax) = \delta(x)/a\) for \(a > 0\), which is \cref{lma:delta(ax)}.
-    
-    \subsection{Application to Green's Function}
-    Motivated by this property of Dirac deltas we look for some function, \(f\), such that
-    \begin{equation}
-        G_{\symrm{R}}(x) = \delta(f(t)).
-    \end{equation}
-    We start by considering \(g(t) = c^2t^2 - \abs{x}^2\), where we treat \(\vv{x}\) as fixed:
-    \begin{equation}
-        \delta(g(t)) = \delta(c^2 t^2 - \abs{\vv{x}}^2).
-    \end{equation}
-    This function has two zeros, \(t_{\pm} = \pm \abs{\vv{x}}/c\).
-    The derivative is \(g'(t) = 2c^2t\), so \(\abs{g'(t_{\pm})} = 2c\abs{\vv{x}}\).
+    \chapter{Radiation: The Poynting Vector}
+    \section{The Poynting Vector}
+    The Poynting vector is related to the energy-momentum tensor through \(S^i = cT^{i0}\).
     Hence,
     \begin{equation}
-        \delta(c^2t^2 - \abs{\vv{x}}^2) = \frac{1}{2c\abs{\vv{x}}} [\delta(t - \abs{x}/c) + \delta(t + \abs{x}/c)].
+        S^i = -\frac{e^2}{16\pi c} \frac{1}{(R \cdot w)} \varepsilon \cdot \varepsilon k^i k^0.
     \end{equation}
-    Comparing this to the retarded Green's function we see that the first term matches up to a factor of \(2\pi\).
-    We can also introduce the \defineindex{advanced Green's function}, which differs by the sign in the delta:
+    We drop the \(\ret\) label since otherwise we'd have to write it for every equation here.
+    
+    Recall that
     \begin{equation}
-        G_{\symrm{A}}(x) = \frac{1}{4\pi c\abs{\vv{x}}} \delta(t + \abs{\vv{x}}/c).
+        k^\mu = \frac{(1, \vh{n})}{\gamma(1 - \vh{n} \cdot \vv{\beta})}
     \end{equation}
+    where \(\vh{n}\) is a unit vector in the direction of the observer from the particle and \(\vv{\beta} = \vv{v}/c\) is the velocity of the particle, normalised by a factor of \(c\).
+    Hence,
+    \begin{equation*}
+        k^0 = \frac{1}{\gamma(1 - \vh{n} \cdot \vv{\beta})}, \qand k^i = \frac{n^i}{\gamma(1 - \vh{n} \cdot \vv{\beta})} \implies k^ik^0 = \frac{n^i}{[\gamma(1 - \vh{n} \cdot \vv{\beta})]^2}.
+    \end{equation*}
+    We then define \(w^\mu = \gamma(1, \vv{\beta})\) and we've shown that \(R^\mu = \abs{R}(1, \vh{n})\), so
+    \begin{equation}
+        R \cdot w = \gamma \abs{\vv{R}} (1 - \vh{n} \cdot \vv{\beta}) \implies (R \cdot w)^2 = \gamma^2 \abs{\vv{R}}^2 (1 - \vh{n} \cdot \vv{\beta})^2.
+    \end{equation}
+    
+    We can then write the Poynting vector as 
+    \begin{equation}
+        \vv{S} = -\frac{e^2}{15\pi^2 c} \frac{1}{\abs{\vv{R}}^2} \frac{1}{[\gamma(1 - \vh{n} \cdot \vv{\beta})]^4} \varepsilon \cdot \varepsilon \vh{n}.
+    \end{equation}
+    
+    We'll start by considering the non-relativistic case, then we'll move on to the general case.
+    
+    \section{Non-Relativistic Case}
+    In the non-relativisticc case \(\beta \ll 1\), and hence \(1 - \vh{n} \cdot \vv{\beta} \approx 1\), also \(\gamma \approx 1\).
+    Recall that \(\varepsilon^\mu\) is defined as
+    \begin{equation}
+        \varepsilon^\mu = \dot{w}^\mu - (k \cdot \dot{w}) w^\mu - Xk^\mu
+    \end{equation}
+    where \(w^\mu = u^\mu/c\) is the four-velocity normalised by a factor of \(c\), \(X\) is some scalar field that we are free to choose, and the dot represents a proper time derivative.
+    
+    We will choose \(X\) such that \(\varepsilon^0 = 0\).
+    This is a sensible choice because 
+    \begin{equation}
+        F^{\mu\nu} \propto k^\mu \varepsilon^\nu - k^\nu\varepsilon^\mu \implies E^i = F^{i0} \propto k^i\varepsilon^0 - k^0\varepsilon^i,
+    \end{equation}
+    so if \(\varepsilon^0 = 0\) then \(E^i \propto \varepsilon^i\), so we can interpret \(\vv{\varepsilon}\) as the polarisation of \(\vv{E}\).
+    
+    Fixing \(\varepsilon^0 = 0\) we then have \(k \cdot \varepsilon = k^0\varepsilon^0 - \vv{k} \cdot \vv{\varepsilon} = -\vv{k} \cdot \vv{\varepsilon}\).
+    We know that \(k \cdot \varepsilon = 0\) in general, so \(\vv{k} \cdot \vv{\varepsilon} = 0\).
+    
+    In order to compute \(\varepsilon\) we need to know what \(\dot{w}^\mu\) is:
+    \begin{equation}
+        \dot{w}^\mu = \diff{}{\tau} [\gamma(1, \vv{\beta})].
+    \end{equation}
+    In the non-relativistic limit we have
+    \begin{equation}
+        \gamma = (1 + v^2/c^2)^{-1/2} \approx 1 + \frac{v^2}{c^2} + \order(v^4/c^4).
+    \end{equation}
+    Dropping the second order and higher terms we have \(\gamma \approx 1\).
+    On the other hand \(\vv{\beta} = \vv{v}/c\), and we keep the first order term.
+    The proper time derivative becomes a coordinate time derivative in the non-relativistic limit, so we have
+    \begin{equation}
+        \dot{w}^\mu \approx \diff{}{t} \left( 1, \frac{\vv{v}}{c} \right) = \left( 0, \frac{1}{c}\diff{\vv{v}}{t} \right).
+    \end{equation}
+    
+    We can then compute \(k \cdot \dot{w}\), using \(k^\mu = (1, \vh{n})\):
+    \begin{equation}
+        k\cdot \dot{w} \approx (1, \vh{n}) \cdot \left( 0, \frac{1}{c} \diff{\vv{v}}{t} \right) = -\frac{1}{c} \vh{n} \cdot \diff{\vv{v}}{t}.
+    \end{equation}
+    Hence,
+    \begin{equation}
+        \vv{\varepsilon} = \frac{1}{c} \diff{\vv{v}}{t} + \frac{1}{c} \vh{n} \cdot \diff{\vv{v}}{t} \frac{\vv{v}}{c} - X\vh{n} \approx \frac{1}{c} \diff{\vv{v}}{t} - X\vh{n},
+    \end{equation}
+    where we've dropped second order terms.
+    
+    Since \(\vv{k} = \vh{n}\) in the non-relativistic limit we have \(\vh{n} \cdot \vv{\varepsilon} = 0\), and so
+    \begin{equation}
+        \vh{n} \cdot \vv{\varepsilon} = \frac{1}{c} \vh{n} \cdot \diff{\vv{v}}{t} - X = 0
+    \end{equation}
+    which we can rearrange for \(X\):
+    \begin{equation}
+        X = \frac{1}{c}\vh{n} \cdot \diff{\vv{v}}{t}.
+    \end{equation}
+    Hence,
+    \begin{equation}
+        \vv{\varepsilon} = \frac{1}{c} \diff{\vv{v}}{t} - \left( \frac{1}{c} \vh{n} \cdot \diff{\vv{v}}{t} \right) \vh{n}.
+    \end{equation}
+    We can introduce a factor of \(\vh{n} \cdot \vh{n} = 1\) to write this as
+    \begin{equation}
+        \vv{\varepsilon} = \frac{1}{c}\left[ \diff{\vv{v}}{t} (\vh{n} \cdot \vh{n}) - \vh{n} \left( \vh{n} \cdot \diff{\vv{v}}{t} \right) \right].
+    \end{equation}
+    We can then recognise the vector triple product:
+    \begin{equation}
+        \vv{\varepsilon} = \frac{1}{c} \vh{n} \times \left( \vh{n} \times \diff{\vv{v}}{t} \right).
+    \end{equation}
+    
+    Hence, the non-relativistic limit of the Poynting vector is
+    \begin{equation}
+        \vv{S} \approx \frac{e^2}{16\pi^2c^3} \frac{1}{\abs{\vv{R}}^3} \abs*{\vh{n} \times \left( \vh{n} \times \diff{\vv{v}}{t} \right)}^2 \vh{n}.
+    \end{equation}
+    If \(\vartheta\) is the angle between \(\vh{n}\) and \(\diff{\vv{v}}/{t}\) then \(\abs{\vh{n} \times \diff{\vv{v}}/{t}} = \sin \vartheta \abs{\diff{\vv{v}}/{t}}\).
+    By definition, the vector \(\vh{n} \times \diff{\vv{v}}/{t}\) is perpendicular to \(\vh{n}\), so taking the cross product with \(\vh{n}\) we get
+    \begin{equation}
+        \vh{n} \times \left( \vh{n} \times \diff{\vv{v}}{t} \right) = \abs{\sin\vartheta} \abs*{\diff{\vv{v}}{t}} \sin\frac{\pi}{2} = \abs{\sin\vartheta} \abs*{\diff{\vv{v}}{t}}.
+    \end{equation}
+    Hence,
+    \begin{equation}
+        \vv{S} \approx \frac{e^2}{16\pi^2 c^3} \frac{1}{\abs{\vv{R}}} \sin^2\vartheta \left( \diff{\vv{v}}{t} \right)^2 \vh{n}.
+    \end{equation}
+    
+    There is, therefore, no radiation directly ahead, when \(\vartheta = 0\), and the radiation is maximised at \(\vartheta = \pi/2\).
+    This is shown in \cref{fig:poynting non-relativistic radiation,fig:poynting non-relativistic radiation polar}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{poynting-non-relativistic-radiation}
+        \begin{tikzpicture}
+            \draw[thick, ->] (-pi, 0) -- (pi, 0) node [below] {\(\vartheta\)};
+            \draw[thick, ->] (0, 0) -- (0, 2) node [left] {\(\abs{\vv{S}}\)};
+            \draw[thick, my orange, domain=-pi:pi, samples=400] plot (\x, {1.8*sin(\x r)*sin(\x r)});
+            \node[below] at (pi/2, 0) {\(\tfrac{\pi}{2}\)};
+            \node[below] at (-pi/2, 0) {\(\mathllap{-}\tfrac{\pi}{2}\)};
+        \end{tikzpicture}
+        \caption{The magnitude of the Poynting vector is maximised at \(\pm \pi/2\) in the non-relativistic case.}
+        \label{fig:poynting non-relativistic radiation}
+    \end{figure}
+    
+    \begin{figure}
+        \tikzsetnextfilename{poynting-non-relativistic-radiation-polar}
+        \begin{tikzpicture}
+            \draw[thick, ->] (-2, 0) -- (2, 0) node [below] {\(\diff{\vv{v}}/{t}\)};
+            \draw[thick, my orange, domain=0:360, samples=500] plot (\x:{2*sin(\x)*sin(\x)});
+        \end{tikzpicture}
+        \caption[Polar plot of non-relativistic Poynting vector.]{This polar plot shows how the magnitude of the Poynting vector varies with the angle \(\vartheta\). Pick some position for the observer relative to the particle's acceleration, which is horizontal here. Draw a line to that point from the centre of the figure of 8. The distance from the centre that this line crosses the figure of 8 again gives the magnitude of the Poynting vector in that direction. If it doesn't cross again then the magnitude is zero.}
+        \label{fig:poynting non-relativistic radiation polar}
+    \end{figure}
+    
+    \section{General Case}
+    Now we consider the general relativistic case.
+    Again, we chose to have \(\varepsilon^0 = 0\).
     Then we have
     \begin{equation}
-        \delta(c^2 t^2 - \abs{\vv{x}}^2) = 2\pi (G_{\symrm{R}}(x) + G_{\symrm{A}}).
+        0 = k \cdot \varepsilon = - \frac{1}{\gamma(1 - \vh{n} \cdot \vv{\beta})} \vh{n} \cdot \vv{\varepsilon}.
     \end{equation}
+    Hence, \(\vh{n} \cdot \vv{\varepsilon} = 0\) again.
+    We again look for \(\vv{\varepsilon}\) to be of the form \(\vh{n}\) crossed with something.
     
-    We don't want the advanced Green's function to appear in our solution.
-    Notice that the support of the retarded Green's function, that is the set upon which the function doesn't vanish, is positive, whereas the support of the advanced Green's function is negative.
-    We can then multiply by a Heaviside step function,
+    \subsection{Step 1: Compute \texorpdfstring{\(k \cdot \dot{w}\)}{k . dw/dtau}}
+    Using the product rule we have
     \begin{equation}
-        \theta(x) = 
-        \begin{cases}
-            1 & x > 0,\\
-            0 & x < 0.
-        \end{cases}
+        \dot{w}^\mu = \diff{}{\tau} [\gamma(1, \vv{\beta})] = \dot{\gamma} (1, \vv{\beta}) + \gamma (0, \dot{\vv{\beta}}).
     \end{equation}
-    This gives
+    We can find \(\dot{\gamma}\) by considering \(1 = \gamma^2(1 - \vv{\beta}^2)\), and taking the derivative:
     \begin{equation}
-        G_{\symrm{R}}(x) = \frac{1}{2\pi} \delta(c^2t^2 - \vv{x}^2) \theta(x^0) = \frac{1}{2\pi} \delta(x^2) \theta(x^0).
+        0 = \diff{}{\tau} [\gamma^2(1 - \vv{\beta}^2)] = 2\gamma\dot{\gamma}(1 - \vv{\beta})^2 - 2\gamma^2\vv{\beta} \cdot \dot{\vv{\beta}}.
+    \end{equation}
+    Rearranging we have
+    \begin{equation}
+        \dot{\gamma} = \gamma^3 \vv{\beta} \cdot \dot{\vv{\beta}}.
+    \end{equation}
+    Hence,
+    \begin{equation}
+        \dot{w}^\mu = \gamma^3 \vv{\beta} \cdot \dot{\vv{\beta}}(1, \vv{\beta}) + \gamma(0, \vv{\dot{\beta}}).
     \end{equation}
     
-    This is (sufficiently) relativisticly invariant.
-    The delta term is clearly invariant, since it depends only on the length of a four-vector.
-    The theta term is not quite invariant, since if the direction of time changes then \(\theta(x^0)\) will change.
-    However, it is invariant under time dilation, since \(\gamma > 0\), so the sign of time doesn't change.
+    We can then compute \(k \cdot \dot{w}\):
+    \begin{equation}
+        k \cdot \dot{w} = \gamma^2 \vv{\beta} \cdot \dot{\vv{\beta}} - \frac{\vh{n} \cdot \dot{\vv{\beta}}}{1 - \vh{n} \cdot \vv{\beta}}.
+    \end{equation}
     
-    The Lorentz group, \(\orthogonal(1, 3)\), is the group of all Lorentz transformations.
-    The \(\theta(x^0)\) term is invariant under the subgroup \(\specialOrthogonal^+(1, 3)\), called the \defineindex{proper ortho\-chronous Lorentz group}.
-    Here the \(\symrm{S}\) stands for special, and as with the usual special orthogonal group it means that the transformation has a determinant of 1.
-    The \(+\) denotes that the orientation of time is preserved.
-    It is fine that \(\theta(x^0)\) is only invariant under \(\specialOrthogonal^+(1, 3)\) since this is the component of the Lorentz group which is connected to the identity and so is the group generated by the Lie algebra \(\specialOrthogonalLie(1, 3)\).\footnote{See the notes for the symmetries of quantum mechanics or symmetries of particles and fields courses for details.}
+    \subsection{Step 2: Compute \texorpdfstring{\(\vv{\varepsilon}\)}{epsilon vector}}
+    We can then compute \(\vv{\varepsilon}\):
+    \begin{align}
+        \vv{\varepsilon} &= \dot{\vv{w}} - (k \cdot \dot{w}) \vv{w} - X \vv{k}\\
+        &= \gamma^3 \vv{\beta} \cdot \dot{\vv{\beta}} + \gamma \dot{\vv{\beta}} - \gamma^3 \vv{\beta} \cdot \dot{\vv{\beta}} \vv{\beta} + \frac{\vh{n} \cdot \dot{\vv{\beta}}}{1 - \vh{n} \cdot \vv{\beta}} \gamma \vv{\beta} - X \frac{\vh{n}}{\gamma(1 - \vh{n} \cdot \vv{\beta})}\\
+        &= \frac{\gamma}{1 - \vh{n} \cdot \vv{\beta}} \left[ \dot{\vv{\beta}} (1 - \vh{n} \cdot \vv{\beta}) + \vh{n} \cdot \dot{\vv{\beta}} \vv{\beta} - \frac{X}{\gamma^2}\vh{n} \right].
+    \end{align}
     
-    Solutions to the wave equation aren't unique.
-    If \(\varphi\) is a solution to \(\dalembertian \varphi = \rho\) then so is \(\varphi + \varphi_{\symrm{H}}\) where \(\varphi_{\symrm{H}}\) is a solution to the homogeneous equation, \(\dalembertian \varphi_{\symrm{H}} = 0\).
-    This corresponds to the fact that the Green's function is not unique unless we impose boundary conditions.
-    We choose boundary conditions corresponding to outgoing radiation, such as a particle causing electromagnetic waves.
-    This gives the retarded Green's function.
-    We could also consider boundary conditions corresponding to incoming radiation, such as firing a laser at a particle, which corresponds to the advanced Green's function, which we get with \(\theta(-x^0)\).
-    If we had two particles interacting electromagnetically then we would need a mixture of these two boundary conditions as radiation leaves one particle and arrives at the other.
-    This leads to the Feynman Green's function, which has a \(\theta(x^0)\) term and a \(\theta(-x^0)\) term.
-    This is common in QFT\footnote{See the quantum theory notes}.
+    \subsection{Step 3: Impose \texorpdfstring{\(\vv{\varepsilon} \cdot \vh{n} = 0\)}{epsilon dot n-hat = 0}}
+    Imposing \(\vv{\varepsilon} \cdot \vh{n} = 0\), which is equivalent to \(\varepsilon^0 = 0\), we have
+    \begin{align}
+        0 &= \vv{\varepsilon} \cdot \vh{n}\\
+        &= \frac{\gamma}{1 - \vh{n} \cdot \vv{\beta}} \left[ \vh{n} \cdot \dot{\vv{\beta}} - (\vh{n} \cdot \dot{\vv{\beta}})(\vh{n} \cdot \vv{\beta}) + (\vh{n} \cdot \dot{\vv{\beta}})(\vh{n} \cdot \vv{\beta}) - \frac{X}{\gamma^2} \vh{n} \cdot \vh{n} \right]\\
+        &= \frac{\gamma}{1 - \vh{n} \cdot \vv{\beta}} \left[ \vh{n} \cdot \vv{\beta} - \frac{X}{\gamma^2} \right].
+    \end{align}
+    Since \(\gamma/(1 - \vh{n} \cdot \vv{\beta}) \ne 0\) we must have that
+    \begin{equation}
+        X = \gamma^2 \vh{n} \cdot \dot{\vv{\beta}}.
+    \end{equation}
     
+    \subsection{Step 4: Rearrange}
+    Starting from
+    \begin{equation}
+        \vv{\varepsilon} = \frac{\gamma}{1 - \vh{n} \cdot \vv{\beta}} \left[ \dot{\vv{\beta}} (1 - \vh{n} \cdot \vv{\beta}) + \vh{n} \cdot \dot{\vv{\beta}} \vv{\beta} - \frac{X}{\gamma^2}\vh{n} \right]
+    \end{equation}
+    we can rewrite this as
+    \begin{equation}
+        \vv{\varepsilon} = \frac{\gamma}{1 - \vh{n} \cdot \vv{\beta}} \left[ \dot{\vv{\beta}} \vh{n} \cdot (\vh{n} - \vv{\beta}) - (\vh{n} - \vv{\beta}) \vh{n} \cdot \dot{\vv{\beta}} \right].
+    \end{equation}
+    Recognising the vector triple product this gives
+    \begin{equation}
+        \vv{\varepsilon} = \frac{\gamma}{1 - \vh{n} \cdot \vv{\beta}} \vh{n} \times ((\vh{n} - \vv{\beta}) \times \dot{\vv{\beta}}).
+    \end{equation}
+    
+    The Poynting vector is they
+    \begin{equation}
+        \vv{S} = \frac{e^2}{16\pi^2 c} \frac{1}{\abs{\vv{R}}^2} \frac{1}{\gamma^2(1 - \vh{n} \cdot \vv{\beta})} \abs{\vh{n} \times ((\vh{n} - \vv{\beta}) \times \dot{\vv{\beta}})}^2 \vh{n} \bigg|_{\ret}.
+    \end{equation}
+    Note that this depends on the velocity, whereas the non-relativistic case only depended on the acceleration.
+    This case is too complex for further general analysis, instead we consider the specific case of linear acceleration.
+    
+    \section{Linear Acceleration Case}
+    For linear acceleration we have \(\vv{\beta}\) and \(\dot{\vv{\beta}}\) parallel, and hence \(\vv{\beta} \times \dot{\vv{\beta}} = \vv{0}\).
+    The Poynting vector is then given by
+    \begin{equation}
+        \vv{S} = \frac{e^2}{16\pi^2 c} \frac{1}{\abs{\vv{R}}^2} \frac{1}{\gamma(1 - \beta \cos \vartheta)^6} \abs{\dot{\vv{\beta}}}^2 \sin^2(\vartheta) \vh{n},
+    \end{equation}
+    where we've again introduced \(\vartheta\) as the angle between \(\vh{n}\) and \(\dot{\vv{\beta}}\), which in this specific case is also the angle between \(\vh{n}\) and \(\vv{\beta}\), allowing us to simplify \(\vh{n} \cdot \vv{\beta}\) as well.
+    
+    Suppose that \(\beta \approx 1\), then for \(\vartheta \approx 0\) the value \(1/(1 - \beta\cos\vartheta)\) will get very large.
+    This means we will have very intense radiation in the direction of \(\vv{\beta}\), which is called \defineindex{relativistic beaming}, although directly ahead of the particle there will still be a dark spot.
+    This also happens to a lesser extent for smaller values of \(\beta\), as demonstrated in \cref{fig:poynting relativistic radiation,fig:poynting relativistic radiation polar}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{poynting-relativistic-radiation}
+        \begin{tikzpicture}
+            \draw[thick, ->] (-pi, 0) -- (pi, 0) node [below] {\(\vartheta\)};
+            \draw[thick, ->] (0, 0) -- (0, 2.6) node [left] {\(\abs{\vv{S}}\)};
+            \draw[thick, my orange, domain=-pi:pi, samples=400] plot (\x, {0.3*sin(\x r)*sin(\x r)/((1-0.5*cos(\x r))^6)});
+            \node[below] at (pi/2, 0) {\(\tfrac{\pi}{2}\)};
+            \node[below] at (-pi/2, 0) {\(\mathllap{-}\tfrac{\pi}{2}\)};
+        \end{tikzpicture}
+        \caption{The magnitude of the Poynting vector for the relativistic case. There is a dark spot directly ahead, but slightly to the side of this there will be a high intensity of radiation. Note that the scale on the \(y\)-axis is different to that of \cref{fig:poynting non-relativistic radiation}, the maximum intensity of radiation is much higher here. A value of \(\beta = 0.5\) was used here.}
+        \label{fig:poynting relativistic radiation}
+    \end{figure}
+    \begin{figure}
+        \tikzsetnextfilename{poynting-relativistic-radiation-polar}
+        \begin{tikzpicture}
+            \draw[thick, ->] (-2, 0) -- (4, 0) node [below] {\(\diff{\vv{v}}/{t}\)};
+            \draw[thick, my orange, domain=0:360, samples=500] plot (\x:{0.6*sin(\x)*sin(\x)/((1-0.5*cos(\x))^6)});
+        \end{tikzpicture}
+        \caption[Polar plot of non-relativistic Poynting vector.]{This is the relativistic version of \cref{fig:poynting non-relativistic radiation polar}, see the caption of this figure for an explanation of how to read this plot. Note that the axis scales are not the same in these two figures, the maximum intensity of radiation is much higher here. A value of \(\beta = 0.5\) was used here.}
+        \label{fig:poynting relativistic radiation polar}
+    \end{figure}
     
     \backmatter
 %    \renewcommand{\glossaryname}{Acronyms}
