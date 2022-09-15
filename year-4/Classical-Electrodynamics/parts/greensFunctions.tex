@@ -1,0 +1,272 @@
+\part{Green's Functions}
+\chapter{Green's Functions}
+\section{Motivation}
+We've now derived the Maxwell equations:
+\begin{equation}
+    \partial^\mu F_{\mu\nu} (x) = \frac{1}{c}J_\nu(x).
+\end{equation}
+In the Lorenz gauge, \(\partial^\nu A_\nu = 0\), we've seen that these become
+\begin{equation}
+    \dalembertian A_\mu = \frac{e}{c} \int u_\nu(x) \delta^4(x - r(\tau)) \dd{\tau}.
+\end{equation}
+Here \(u\) is the four velocity, and \(\delta^4\) is a four dimensional Dirac delta.
+This is a wave equation with the right hand side being a driving force.
+The wave equation can be solved in many ways, but one of the most common is to use Green's functions.
+
+\section{General Theory}
+\begin{rmk}
+    For an introduction to Green's functions and Dirac deltas see the notes from the Fourier analysis part of the Statistics and Fourier Analysis course.
+    For more advanced use see the Methods of Mathematical Physics course notes.
+    For their applications to electromagentism see the Electromagentism course notes.
+\end{rmk}
+Let \(\symfrak{L}\) be a linear differential operator.
+Consider the equation \(\symfrak{L} y(x) = f(x)\).
+Here we want to solve for some function, \(y\), depending on \(x\).
+We call \(f(x)\) the source term.
+The \defineindex{Green's function} for this equation is the solution to the related equation
+\begin{equation}
+    \symfrak{L} G(x) = \delta(x).
+\end{equation}
+That is, it gives the response of the system to a sharp impulse.
+
+The general solution, \(y\), is then given by integrating:
+\begin{equation}
+    y(x) = \int G(x - x') f(x') \dd{x'}.
+\end{equation}
+This works by adding up the response to impulses at all possible positions, \(x'\).
+Applying \(\symfrak{L}\) shows that \(y\) when defined like this is indeed a solution, under the assumption that everything is sufficiently smooth for the differential operator to commute with the integral:
+\begin{equation}
+    \symfrak{L} y(x) = \int \symfrak{L} G(x - x') f(x') \dd{x'} = \int \delta(x - x') f(x') \dd{x'} = f(x).
+\end{equation}
+From which we see that we recover the equation \(\symfrak{L}y(x) = f(x)\).
+
+So, once we find the Green's function, often easier than solving the equation for a general source, we can find the general solution by integrating.
+
+Since this is physics we also have to be concerned with making our solutions physically reasonable.
+In the context of Green's functions this means that we look for causal Green's functions, which vanish before the impulse, so when \(x < 0\) above.
+We're also doing relativity, so we restrict all motion to be slower than the speed of light.
+In particular this means that we look for \define{retarded Green's functions}\index{retarded Green's function}, which have the response at a distance \(x\) from the source occur at a time \(x/c\) after the source does whatever it is that the response is in response to.
+
+\section{Application to Wave Equation}
+The wave equation with a source in three dimensional space is
+\begin{equation}
+    \frac{1}{c^2} \diffp[2]{}{t} \varphi(t, \vv{x}) - \laplacian \varphi(t, \vv{x}) = \rho(t, \vv{x}).
+\end{equation}
+Here \(\varphi\) is the wave and \(\rho\) is the source.
+This is for a scalar field, but the equation works the same for a vector field, or for a higher rank tensor field.
+
+The Green's function for this system, \(G\), is then defined as the solution to
+\begin{equation}
+    \frac{1}{c^2} \diffp[2]{}{t} G(t, \vv{x}) - \laplacian \varphi(t, \vv{x}) = \frac{1}{c} \delta(t) \delta^3(\vv{x}).
+\end{equation}
+Here the factor of \(1/c\) on the right hand side is just convention, and is a choice of normalisation such that the area under the delta distribution is \(1/c\), instead of 1.
+Leaving it out would just result in a factor of \(c\) appearing elsewhere.
+It is also common to define the right hand side to be negative instead, again, this is just matter of convention.
+
+We want to make this equation look Lorentz covariant.
+To start with we combine the time and space parts into the d'Alembertian:
+\begin{equation}
+    \dalembertian \varphi(x) = \frac{1}{c} \delta(t) \delta^3(\vv{x}).
+\end{equation}
+To proceed we need a basic property of delta distributions:
+\begin{lma}{}{lma:delta(ax)}
+    Let \(a > 0\), then \(\delta(ax) = \delta(x)/a\) as distributions.
+    That is, for a smooth test function, \(f\), we have
+    \begin{equation}
+        \int_{x_0}^{x_1} f(x) \delta(ax) \dd{x} = \frac{1}{a} \int_{x_0}^{x_1} f(x) \delta(x) \dd{x}
+    \end{equation}
+    when \(0\) is in the range of integration.
+    
+    \begin{proof}
+        Consider the left hand side of the integral equation above:
+        \begin{equation}
+            I = \int_{x_0}^{x_1} f(x) \delta(ax) \dd{x}.
+        \end{equation}
+        Complete a change of variables, defining \(u = ax\).
+        Then we have \(a\dl{x} = \dl{u}\), and so 
+        \begin{equation}
+            I = \frac{1}{a} \int_{x_0}^{x_1} f(u/a) \delta(u) \dd{u} = \frac{1}{a} f(0/a) = \frac{1}{a} f(0).
+        \end{equation}
+        The right hand side of the integral equation is
+        \begin{equation}
+            \frac{1}{a} \int_{x_0}^{x_1} f(x) \delta(x) \dd{x} = \frac{1}{a} f(0) = I,
+        \end{equation}
+        proving the lemma.
+    \end{proof}
+\end{lma}
+
+Using this we have \(\delta(t)/c = \delta(ct) = \delta(x^0)\) as distributions.
+Hence, we have
+\begin{equation}
+    \dalembertian \varphi(x) = \frac{1}{c} \delta(t) \delta^3(\vv{x}) = \delta(x^0)\delta^3(\vv{x}) = \delta^4(x).
+\end{equation}
+
+We will mainly be interested in the retarded Green's function, which for the wave equation is
+\begin{equation}
+    G_{\symrm{R}}(t, \vv{x}) = \frac{1}{4\pi c \abs{\vv{x}}} \delta(t - \abs{\vv{x}}/c).
+\end{equation}
+Note that the factor of \(1/c\) out the front is due to the choice of including a factor of \(1/c\) in front of the Dirac deltas in the definition of the Green's function.
+
+The solution for \(\varphi\) is then
+\begin{equation}
+    \varphi(x) = \int \dl{^4x} \, \frac{1}{4\pi c\abs{\vv{x} - \vv{x}'}} \delta^4(t - t' - \abs{\vv{x} - \vv{x}'}/c) \rho(t', \vv{x}').
+\end{equation}
+We can rewrite this in terms of \(t'\) as
+\begin{equation}
+    \varphi(x) = \int \dl{^3x'} \dd{t'} \, \frac{1}{4\pi \abs{\vv{x} - \vv{x}'}} \delta^4(t - t' - \abs{\vv{x} - \vv{x}'}/c) \rho(t', \vv{x}').
+\end{equation}
+Here the factor of \(c\) from \({x'}^0 = ct'\) cancels with the factor of \(1/c\) already present.
+We can then perform the integration over \(t\) using the sifting property of the delta distribution and we get
+\begin{equation}
+    \varphi(x) = \int \dl{^3x'} \, \frac{1}{4\pi \abs{\vv{x} - \vv{x}'}} \rho(t  - \abs{\vv{x} - \vv{x}'}/c, \vv{x}').
+\end{equation}
+This is as far as we can go without knowing what the source term is.
+
+Note the one over distance dependence familiar from the static case, \(\laplacian 1/(4\pi\abs{\vv{x}}) = -\delta^3(\vv{x})\).
+We can also see that at a time \(t\) and a distance \(\abs{\vv{x} - \vv{x}'}\) from the source the observer will see the effects of the source at time \(t - \abs{\vv{x} - \vv{x}'}/c\), since we choose the retarded Green's function.
+
+\subsection{Dirac Delta at a Function}
+Consider \(\delta(f(x))\).
+It can be shown that
+\begin{equation}\label{eqn:delta(f(x))}
+    \delta(f(x)) = \sum_{i} \frac{\delta(x - a_i)}{\abs{f'(a_i)}}
+\end{equation}
+as distributions where \(a_i\) are the zeros of \(f\), \(f'(a_i) \ne 0\), and \(f\) is smooth.
+We also assume \(f\) has a finite number of zeros.
+This is what we shall do in this section.
+
+To start with we suppose that \(f\) is a monotone increasing function.
+This means it has at most one zero.
+In the case with no zeros everything vanishes and its not interesting, so suppose \(f\) has one zero, call it \(a\).
+Further, we suppose that \(a\) is in the region of interest, that is \(a \in (x_0, x_1)\) when we are interested in
+\begin{equation}
+    I = \int_{x_0}^{x_1} \delta(f(x)) g(x) \dd{x}
+\end{equation}
+for some smooth test function, \(g\).
+We want to show that
+\begin{equation}
+    I = \frac{1}{\abs{f'(a)}} \int_{x_0}^{x_1} \delta(x - a) g(x) = \frac{1}{\abs{f'(a)}} g(a).
+\end{equation}
+
+First, notice that for a monotone increasing function \(f'(x) \ge 0\) for all \(x\), so we can ignore the absolute values as we have \(\abs{f'(a)} = f'(a)\).
+Now, let \(u = f(x)\), then we have \(u = 0\) at \(x = a\).
+We also have \(u(x_0) = f(x_0)\) and \(u(x_1) = f(x_1)\), and importantly \(f(x_0) < f(x_1)\).
+Further, \(\dl{u} = f'(x) \dd{x}\) and so a change of variables gives
+\begin{equation}
+    I = \int_{f(x_0)}^{f(x_1)} \frac{1}{f'(x)} \delta(u) g(x(u)) \dd{u}.
+\end{equation}
+Performing the integration using the sifting property we get the integrand evaluated at the point at which \(u\) vanishes, which is at \(x = a\), and so \(x(u) = a\), hence
+\begin{equation}
+    I = \frac{1}{f'(a)} g(a).
+\end{equation}
+This proves the statement for the special case where \(f\) is a monotone increasing function.
+
+Now, suppose that \(f\) is a monotone decreasing function.
+Then let
+\begin{equation}
+    I = \int_{x_0}^{x_1} \delta(f(x)) g(x) \dd{x}
+\end{equation}
+again.
+The same change of variables gives
+\begin{equation}
+    I = \int_{f(x_0)}^{f(x_1)} \frac{1}{f'(x)} \delta(u) g(x(u)) \dd{u}.
+\end{equation}
+However, now \(f(x_0) > f(x_1)\), and so we need to swap the limits picking up a negative sign:
+\begin{equation}
+    I = -\int_{f(x_1)}^{f(x_0)} \frac{1}{f'(x)} \delta(u) g(x(u)) \dd{u}.
+\end{equation}
+Since \(f\) is monotone decreasing we have \(f'(x) \le 0\) for all \(x\) and so \(\abs{f'(x)} = -f'(x)\) giving
+\begin{equation}
+    I = \int_{f(x_1)}^{f(x_0)} \frac{1}{\abs{f'}(x)} \delta(u) g(x(u)) \dd{u}.
+\end{equation}
+Completing the integration,
+\begin{equation}
+    I = \frac{1}{\abs{f'}(a)} g(a).
+\end{equation}
+This proves the statement for the special case where \(f\) is a monotone decreasing function.
+
+Now, let \(f\) be any smooth function.
+Let \(a_i\) be its zeros and by hypothesis we have \(f(a_i) \ne 0\).
+For each zero we split our integral over \((x_0, x_1)\) into an integral over only a small neighbourhood of \(a_i\), say \((a_i - \varepsilon_i, a_i + \varepsilon_i)\) where we choose \(\varepsilon_i\) such that these intervals are non-intersecting.
+Further, by choosing sufficiently small intervals \(f\) will be monotone increasing or monotone decreasing on each interval, allowing us to apply the special cases of the theorem above.
+Outside of these intervals since \(f(x) \ne 0\) we have \(\delta(f(x)) = 0\) and so there is no contribution to the integral.
+We then have
+\begin{align}
+    I &= \int_{x_0}^{x_1} \delta(f(x)) g(x) \dd{x}\\
+    &= \sum_{i} \int_{a_i - \varepsilon_i}^{a_i + \varepsilon_i} \delta(f(x)) g(x) \dd{x}\\
+    &= \sum_{i} \frac{1}{\abs{f'(a_i)}} g(a_i)\\
+    &= \sum_{i} \int_{a_i - \varepsilon_i}^{a_i + \varepsilon_i} \frac{\delta(x - a_i)}{\abs{f'(a_i)}} g(x) \dd{x}\\
+    &= \int_{x_0}^{x_1} \sum_{i} \frac{\delta(x - a_i)}{\abs{f'(a_i)}} g(x) \dd{x}.
+\end{align}
+Therefore, as distributions, we have
+\begin{equation}
+    \delta(f(x)) = \sum_i \frac{\delta(x - a_i)}{\abs{f'(a_i)}}.
+\end{equation}
+
+Note that if we have \(f(x) = ax\) for \(a \ne 0\) then the only zero is at \(x = 0\) and we have \(f'(x) = a\) so we have
+\begin{equation}
+    \delta(ax) = \frac{1}{\abs{a}} \delta(x)
+\end{equation}
+as distributions.
+This further simplifies to \(\delta(ax) = \delta(x)/a\) for \(a > 0\), which is \cref{lma:delta(ax)}.
+
+\subsection{Application to Green's Function}
+Motivated by this property of Dirac deltas we look for some function, \(f\), such that
+\begin{equation}
+    G_{\symrm{R}}(x) = \delta(f(t)).
+\end{equation}
+We start by considering \(g(t) = c^2t^2 - \abs{x}^2\), where we treat \(\vv{x}\) as fixed:
+\begin{equation}
+    \delta(g(t)) = \delta(c^2 t^2 - \abs{\vv{x}}^2).
+\end{equation}
+This function has two zeros, \(t_{\pm} = \pm \abs{\vv{x}}/c\).
+The derivative is \(g'(t) = 2c^2t\), so \(\abs{g'(t_{\pm})} = 2c\abs{\vv{x}}\).
+Hence,
+\begin{equation}
+    \delta(c^2t^2 - \abs{\vv{x}}^2) = \frac{1}{2c\abs{\vv{x}}} [\delta(t - \abs{x}/c) + \delta(t + \abs{x}/c)].
+\end{equation}
+Comparing this to the retarded Green's function we see that the first term matches up to a factor of \(2\pi\).
+We can also introduce the \defineindex{advanced Green's function}, which differs by the sign in the delta:
+\begin{equation}
+    G_{\symrm{A}}(x) = \frac{1}{4\pi c\abs{\vv{x}}} \delta(t + \abs{\vv{x}}/c).
+\end{equation}
+Then we have
+\begin{equation}
+    \delta(c^2 t^2 - \abs{\vv{x}}^2) = 2\pi (G_{\symrm{R}}(x) + G_{\symrm{A}}).
+\end{equation}
+
+We don't want the advanced Green's function to appear in our solution.
+Notice that the support of the retarded Green's function, that is the set upon which the function doesn't vanish, is positive, whereas the support of the advanced Green's function is negative.
+We can then multiply by a Heaviside step function,
+\begin{equation}
+    \theta(x) = 
+    \begin{cases}
+        1 & x > 0,\\
+        0 & x < 0.
+    \end{cases}
+\end{equation}
+This gives
+\begin{equation}
+    G_{\symrm{R}}(x) = \frac{1}{2\pi} \delta(c^2t^2 - \vv{x}^2) \theta(x^0) = \frac{1}{2\pi} \delta(x^2) \theta(x^0).
+\end{equation}
+
+This is (sufficiently) relativisticly invariant.
+The delta term is clearly invariant, since it depends only on the length of a four-vector.
+The theta term is not quite invariant, since if the direction of time changes then \(\theta(x^0)\) will change.
+However, it is invariant under time dilation, since \(\gamma > 0\), so the sign of time doesn't change.
+
+The Lorentz group, \(\orthogonal(1, 3)\), is the group of all Lorentz transformations.
+The \(\theta(x^0)\) term is invariant under the subgroup \(\specialOrthogonal^+(1, 3)\), called the \defineindex{proper ortho\-chronous Lorentz group}.
+Here the \(\symrm{S}\) stands for special, and as with the usual special orthogonal group it means that the transformation has a determinant of 1.
+The \(+\) denotes that the orientation of time is preserved.
+It is fine that \(\theta(x^0)\) is only invariant under \(\specialOrthogonal^+(1, 3)\) since this is the component of the Lorentz group which is connected to the identity and so is the group generated by the Lie algebra \(\specialOrthogonalLie(1, 3)\).\footnote{See the notes for the symmetries of quantum mechanics or symmetries of particles and fields courses for details.}
+
+Solutions to the wave equation aren't unique.
+If \(\varphi\) is a solution to \(\dalembertian \varphi = \rho\) then so is \(\varphi + \varphi_{\symrm{H}}\) where \(\varphi_{\symrm{H}}\) is a solution to the homogeneous equation, \(\dalembertian \varphi_{\symrm{H}} = 0\).
+This corresponds to the fact that the Green's function is not unique unless we impose boundary conditions.
+We choose boundary conditions corresponding to outgoing radiation, such as a particle causing electromagnetic waves.
+This gives the retarded Green's function.
+We could also consider boundary conditions corresponding to incoming radiation, such as firing a laser at a particle, which corresponds to the advanced Green's function, which we get with \(\theta(-x^0)\).
+If we had two particles interacting electromagnetically then we would need a mixture of these two boundary conditions as radiation leaves one particle and arrives at the other.
+This leads to the Feynman Green's function, which has a \(\theta(x^0)\) term and a \(\theta(-x^0)\) term.
+This is common in QFT\footnote{See the quantum theory notes}.
