@@ -1,0 +1,1019 @@
+% !TeX program = lualatex
+\documentclass[fleqn]{NotesClass}
+
+\strictpagecheck
+
+%% Packages
+\usepackage{tensor}
+\usepackage{csquotes}
+
+% Tikz stuff
+\usepackage{tikz}
+%\tikzset{>=latex}
+% External
+\usetikzlibrary{external}
+\tikzexternalize[prefix=tikz-external/]
+% Other libraries
+
+%\usepackage[compat=1.1.0]{tikz-feynman}
+
+% References, should be last things loaded
+\usepackage[pdfauthor={Willoughby Seago},pdftitle={Quantum Field Theory},pdfkeywords={quantum field theory, QFT, quantisation, perturbation theory, Feynman diagrams, QED, QCD, standard model, path integral, renormalisation},pdfsubject={Quantum Field Theory}]{hyperref}  % Should be loaded second last (cleveref last)
+\colorlet{hyperrefcolor}{blue!60!black}
+\hypersetup{colorlinks=true, linkcolor=hyperrefcolor, urlcolor=hyperrefcolor}
+\usepackage[
+capitalize,
+nameinlink,
+noabbrev
+]{cleveref} % Should be loaded last
+
+% My packages
+\usepackage{NotesBoxes}
+\usepackage{NotesMaths}
+
+\setmathfont[range={\int, \oint}]{Latin Modern Math}
+
+% Highlight colour
+\definecolor{Yellow}{HTML}{F9C80E}
+\definecolor{Orange}{HTML}{F86624}
+\definecolor{Red}{HTML}{EA3546}
+\definecolor{Purple}{HTML}{662E9B}
+\definecolor{Blue}{HTML}{43BCCD}
+
+\colorlet{highlight}{Red}
+
+% Title page info
+\title{Quantum Field Theory}
+\author{Willoughby Seago}
+\date{}
+% \subtitle{}
+% \subsubtitle{}
+
+% Commands
+
+% Maths
+\newcommand{\minkowskiMetric}{\eta}
+\newcommand{\trans}{{\top}}
+\newcommand{\dalembertian}{\partial^2}
+\newcommand{\EM}{\text{em}}
+\DeclarePairedDelimiterX{\anticommutator}[2]{\{}{\}}{#1 , #2}
+\DeclareMathOperator{\tr}{tr}
+\newcommand{\hermit}{{\dagger}}
+
+\includeonly{}
+
+\begin{document}
+    \frontmatter
+    \titlepage
+    \innertitlepage{}
+    \tableofcontents
+    \listoffigures
+    \mainmatter
+    
+    
+    %   Appdendix
+    \appendixpage
+    \begin{appendices}
+        \chapter{Pre-Course Revision}
+        The content of this appendix is based on the notes released before the course began to recap key ideas from previous courses.
+        In particular, it covers material from Quantum Theory and Classical Electrodynamics.
+        
+        \section{Special Relativity}
+        \subsection{Four Vectors}
+        Consider some event occurring at the spatial position \(\vv{x}\) and at time \(t\).
+        The coordinates of this event, in four-dimensional Minkowski space, form a \defineindex{contravariant} four-vector, which we write with upper indices:
+        \begin{equation}
+            x^\mu = (x^0, x^1, x^2, x^3) = (ct, \vv{x}).
+        \end{equation}
+        The \defineindex{covariant} four-vector has lower indices:
+        \begin{equation}
+            x_\mu = (x_0, x_1, x_2, x_3) = (ct, -\vv{x}).
+        \end{equation}
+        Similarly a general four-vector has a contravariant and covariant form:
+        \begin{equation}
+            a^\mu = (a^0, a^1, a^2, a^3) = (a^0, \vv{a}), \qand a_\mu = (a_0, a_1, a_2, a_3) = (a^0, -\vv{a}).
+        \end{equation}
+        In particular, \(a^0 = a_0\) and \(a^i = -a_i\), where we follow the convention that Greek indices run from 0 to 3 and Latin indices run from 1 to 3.
+        
+        We move between upper and lower indices using the \defineindex{metric tensor}, \(\minkowskiMetric\)\index{\(\eta\)|see{metric tensor}}, also denoted \(g\):
+        \begin{equation}
+            a^\mu = \minkowskiMetric^{\mu\nu}a_\nu, \qqand a_\mu = \minkowskiMetric_{\mu\nu}a^\nu,
+        \end{equation}
+        where we apply the summation convention, summing over repeated indices with one up and one down.
+        The covariant and contravariant components of the Minkowski metric are given by
+        \begin{equation}
+            \minkowskiMetric^{\mu\nu} = \minkowskiMetric_{\mu\nu} = 
+            \begin{pmatrix}
+                1 & 0 & 0 & 0\\
+                0 & -1 & 0 & 0\\
+                0 & 0 & -1 & 0\\
+                0 & 0 & 0 & -1
+            \end{pmatrix}
+            ,
+        \end{equation}
+        and the mixed components are given by
+        \begin{equation}
+            \tensor{\minkowskiMetric}{_\mu^\nu} = \tensor{\minkowskiMetric}{^\nu_\mu} = 
+            \begin{pmatrix}
+                1 & 0 & 0 & 0\\
+                0 & 1 & 0 & 0\\
+                0 & 0 & 1 & 0\\
+                0 & 0 & 0 & 1
+            \end{pmatrix}
+            = \tensor{\delta}{_\mu^\nu} = \tensor{\delta}{^\nu_\mu}.
+        \end{equation}
+        Here \(\tensor{\delta}{^\mu_\nu}\) is the Kronecker delta, defined to be 1 if \(\mu = \nu\) and 0 otherwise.
+        Note that we have made a choice of signs here.
+        \begin{wrn}
+            Sometimes the Minkowski metric is instead chosen to be
+            \begin{equation}
+                \minkowskiMetric^{\mu\nu} \stackrel{!}{=} 
+                \begin{pmatrix}
+                    -1 & 0 & 0 & 0\\
+                    0 & 1 & 0 & 0\\
+                    0 & 0 & 1 & 0\\
+                    0 & 0 & 0 & 1
+                \end{pmatrix}
+                .
+            \end{equation}
+            These two conventions are known as \(({+}{-}{-}{-})\) and \(({-}{+}{+}{+})\) for short, where the signs refer to the signs along the diagonal.
+        \end{wrn}
+        
+        The \defineindex{scalar product} of two four-vectors, \(a\) and \(b\), in Minkowski space is defined to be
+        \begin{equation}
+            a \cdot b \coloneqq a^\mu b_\mu = a_\mu b^\mu = a_\mu b_\nu \minkowskiMetric^{\mu\nu} = a^\mu b^\nu \minkowskiMetric_{\mu\nu} = a^0b^0 - \vv{a} \cdot \vv{b}
+        \end{equation}
+        where \(\vv{a} \cdot \vv{b} = a^1b^1 + a^2b^2 + a^3b^3\) is the normal three-dimensional scalar product.
+        
+        \subsection{Lorentz Transformations}
+        \define{Lorentz transformations}\index{Lorentz transformation} are linear transformations on four-vectors which leave the scalar product invariant.
+        If \(\Lambda\) is a Lorentz transformation then the four-vector \(a\) transforms as
+        \begin{equation}
+            a^\mu \to a'^\mu = \tensor{\Lambda}{^\mu_\nu} a^\nu.
+        \end{equation}
+        These are the \defineindex{homogeneous Lorentz transformations}, and they form a group called the \defineindex{homogeneous Lorentz group}, or just the Lorentz group, denoted \(\orthogonal(1, 3)\), where \((1,3)\) is the signature of the metric, one time component and three spatial components.
+        Including translations as well we get the Poincar\'e group, \(\reals^{1,3} \rtimes \orthogonal(1, 3)\), where \(\reals^{1,3}\) denotes translations in Minkowski space\footnote{for more details on groups see Symmetries of Quantum Mechanics or Symmetries of Particles and Fields}.
+        
+        The \enquote{standard} Lorentz transformation is a \defineindex{boost} along the \(x\)-axis, where the boosted frame moves at a constant speed, \(v\), along the \(x\)-axis:
+        \begin{equation}
+            \tensor{\Lambda}{^\mu_\nu} = 
+            \begin{pmatrix}
+                \cosh \omega & -\sinh \omega & 0 & 0\\
+                -\sinh \omega & \cosh \omega & 0 & 0\\
+                0 & 0 & 1 & 0\\
+                0 & 0 & 0 & 1
+            \end{pmatrix}
+        \end{equation}
+        where
+        \begin{align}
+            \tanh \omega &= \beta \coloneqq \frac{v}{c},\\
+            \cosh \omega &= \gamma \coloneqq \frac{1}{\sqrt{1 - \beta^2}} = \frac{1}{\sqrt{1 - v^2/c^2}},\\
+            \sinh \omega &= \gamma\beta.
+        \end{align}
+        In terms of coordinates we have
+        \begin{align}
+            ct' &= \gamma\left( ct -  \frac{v}{c}x \right),\\
+            x' &= \gamma(x - vt),\\
+            y' &= y,\\
+            z' &= z.
+        \end{align}
+        
+        Note that the Lorentz group contains ordinary three-dimensional rotations as a subgroup, \(\orthogonal(3)\), for example, the following Lorentz transformation is a clockwise rotation by \(\varphi\) about the \(z\)-axis, leaving time unaffected:
+        \begin{equation}
+            \tensor{\Lambda}{^\mu_\nu} = 
+            \begin{pmatrix}
+                1 & 0 & 0 & 0\\
+                0 & \cos\varphi & \sin\varphi & 0\\
+                0 & -\sin\varphi & \cos\varphi & 0\\
+                0 & 0 & 0 & 1
+            \end{pmatrix}
+            .
+        \end{equation}
+        
+        By definition the scalar product is invariant under the action of the Lorentz group.
+        This means that for some Lorentz transformation \(\Lambda\) and four-vectors \(a\) and \(b\) we have
+        \begin{equation}
+            b'^\mu b'^\nu \minkowskiMetric_{\mu\nu} = \tensor{\Lambda}{^\mu_\rho} a^\rho \tensor{\Lambda}{^\nu_\sigma} b^\sigma \minkowskiMetric_{\mu\nu} = a^\rho b^\sigma \minkowskiMetric_{\rho\sigma}.
+        \end{equation}
+        The last equality is given by computing the scalar product after the transformation.
+        Since \(a\) and \(b\) are arbitrary this means we must have
+        \begin{equation}\label{eqn:lorentz transformation of metric}
+            \tensor{\Lambda}{^\mu_\rho} \tensor{\Lambda}{^\nu_\sigma} \minkowskiMetric_{\mu\nu} = \minkowskiMetric_{\rho\sigma}.
+        \end{equation}
+        We can rewrite this as
+        \begin{equation}
+            \tensor{(\Lambda^\trans)}{_\rho^\mu} \minkowskiMetric_{\mu\nu} \tensor{\Lambda}{^\nu_\sigma} = \minkowskiMetric_{\rho\sigma}.
+        \end{equation}
+        In matrix notation we then have \(\Lambda^{\trans} \minkowskiMetric \Lambda = \minkowskiMetric\).
+        Taking the determinant we have
+        \begin{equation}
+            \det(\Lambda^\trans \minkowskiMetric \Lambda) = \det(\Lambda^\trans) \det(\minkowskiMetric) \det(\Lambda) = \det(\minkowskiMetric) \implies (\det\Lambda)^2 = 1,
+        \end{equation}
+        where we've used \(\det(AB) = \det(A)\det(B)\), and \(\det(A^\trans) = \det(A)\).
+        Hence, we have
+        \begin{equation}
+            \det \Lambda = \pm 1
+        \end{equation}
+        for all \(\Lambda \in \orthogonal(1, 3)\).
+        Transformations with \(\det \Lambda = +1\) are called \define{proper Lorentz transformations}\index{proper Lorentz transformation}, and form a subgroup, \(\specialOrthogonal(1, 3)\)\index{SO(1,3)|seealso{proper Lorentz transformation}}.
+        Lorentz transformations with \(\det \Lambda = -1\) are called \define{improper Lorentz transformations}\index{improper Lorentz transformation}.
+        
+        Now set the free indices, \(\rho\) and \(\sigma\), to 0 in \cref{eqn:lorentz transformation of metric} and we get
+        \begin{equation}
+            \tensor{\Lambda}{^\mu_0} \tensor{\Lambda}{^\nu_0} \minkowskiMetric_{\mu\nu} = \minkowskiMetric_{00} = 1.
+        \end{equation}
+        Writing out the components this becomes
+        \begin{equation}
+            \tensor{\Lambda}{^0_0} \tensor{\Lambda}{^0_0} - \tensor{\Lambda}{^1_0}\tensor{\Lambda}{^1_0} - \tensor{\Lambda}{^2_0}\tensor{\Lambda}{^2_0} - \tensor{\Lambda}{^3_0}\tensor{\Lambda}{^3_0} = 1
+        \end{equation}
+        which gives
+        \begin{equation}
+            (\tensor{\Lambda}{^0_0})^2 = 1 + \sum_{i = 1}^{3} (\tensor{\Lambda}{^i_0})^2 \ge 1,
+        \end{equation}
+        where the inequality follows from the fact that \(\tensor{\Lambda}{^i_0}\) is real, so its square is nonnegative.
+        We can conclude from this that either
+        \begin{equation}
+            \tensor{\Lambda}{^0_0} \ge 1 \qor \tensor{\Lambda}{^0_0} \le -1.
+        \end{equation}
+        We call transformations with \(\tensor{\Lambda}{^0_0} \ge 1\) \define{orthochronous Lorentz transformations}\index{orthochronous Lorentz transformation}, these form a subgroup, \(\orthogonal^+(1, 3)\)\index{orthochronous Lorentz group}\index{O+(1,3)@\(\orthogonal^+(1,3)\)|seealso{orthochronous Lorentz group}}.
+        There is also a subgroup of proper orthochronous Lorentz transformations, \(\specialOrthogonal^+(1, 3)\)\index{proper orthochronous Lorentz group}\index{SO+(1,3)@\(\specialOrthogonal^+(1,3)\)|seealso{proper orthochronous Lorentz group}}.
+        
+        We can divide homogeneous Lorentz transformations into four classes, or in more technical language, the Lie group \(\orthogonal(1, 3)\) has four connected components:
+        \begin{equation}
+            \begin{array}{ccc}
+                & \det \Lambda = + 1 & \det \Lambda = -1\\
+                \tensor{\Lambda}{^0_0} \ge +1 & \symrm{I} & \symrm{II}\\
+                \tensor{\Lambda}{^0_0} \le -1 & \symrm{III} & \symrm{IV}
+            \end{array}
+        \end{equation}
+        It is component I, the proper orthochronous Lorentz transformations, which contains the identity and so is the most important.
+        In particular, it is the Lie group generated by the Lie algebra \(\specialOrthogonalLie(1, 3)\).
+        
+        Any transformation of type II, III, or IV can be generated by combing a proper orthochronous transformation of type I with one of the following:
+        \begin{itemize}
+            \item \define{Spatial inversion}\index{spatial inversion}: The parity operation \(x^0 \to x^0\) and \(\vv{x} \to -\vv{x}\):
+            \begin{equation}
+                \tensor{\Lambda}{^\mu_\nu} = 
+                \begin{pmatrix}
+                    1 & 0 & 0 & 0\\
+                    0 & -1 & 0 & 0\\
+                    0 & 0 & -1 & 0\\
+                    0 & 0 & 0 & -1
+                \end{pmatrix}
+                .
+            \end{equation}
+            \item \define{Time reversal}\index{time reversal}: the operation \(x^0 \to -x^0\) and \(\vv{x} \to \vv{x}\):
+            \begin{equation}
+                \tensor{\Lambda}{^\mu_\nu} =
+                \begin{pmatrix}
+                    -1 & 0 & 0 & 0\\
+                    0 & 1 & 0 & 0\\
+                    0 & 0 & 1 & 0\\
+                    0 & 0 & 0 & 1
+                \end{pmatrix}
+                .
+            \end{equation}
+            \item \define{Spacetime inversion}\index{spacetime inversion}: The operation \(x^\mu \to -x^\mu\):
+            \begin{equation}
+                \tensor{\Lambda}{^\mu_\nu} =
+                \begin{pmatrix}
+                    -1 & 0 & 0 & 0\\
+                    0 & -1 & 0 & 0\\
+                    0 & 0 & -1 & 0\\
+                    0 & 0 & 0 & -1
+                \end{pmatrix}
+                .
+            \end{equation}
+        \end{itemize}
+        
+        If \(x\) and \(y\) are four vectors then the \defineindex{spacetime interval} \(s^2 \coloneqq (x - y)^\mu(x - y)_\mu\) is invariant under Lorentz transformations, since its just a scalar product of some four-vector \(x - y\).
+        
+        \subsection{Classification of Four-Vectors}
+        We classify four-vectors, \(a\), by whether their scalar product with themselves is positive, negative, or zero:
+        \begin{itemize}
+            \item if \(a^2 > 0\) we call \(a\) \defineindex{time-like},
+            \item if \(a^2 = 0\) we call \(a\) \defineindex{light-like},
+            \item if \(a^2 < 0\) we call \(a\) \defineindex{space-like}.
+        \end{itemize}
+        
+        \subsection{Differential Operators}
+        The gradient operator in normal \(\reals^n\) consists of spatial derivatives at each component.
+        The generalisation to Minkowski space includes a time derivative, and a factor of \(c\) for dimensional consistency:\index{\(\partial_\mu\)}
+        \begin{equation}
+            \partial_\mu = \diffp{}{x^\mu} = \left( \frac{1}{c}\diffp{}{t}, \grad \right) = \left( \frac{1}{c}\diffp{}{t}, \diffp{}{x}, \diffp{}{y}, \diffp{}{z} \right).
+        \end{equation}
+        Note that the derivative with respect to a contravariant vector gives a covariant operator.
+        As with normal four-vectors we can raise the index to get the operator
+        \begin{equation}
+            \partial^\mu = \diffp{}{x_\mu} = \left( \frac{1}{c}\diffp{}{t}, -\grad \right) = \left( \frac{1}{c}\diffp{}{t}, -\diffp{}{x}, -\diffp{}{y}, -\diffp{}{z} \right).
+        \end{equation}
+        
+        The Laplacian, \(\laplacian = \div \grad\), can also be generalised to Minkowski space as the scalar product of \(\partial\) with itself, we call the result the \defineindex{d'Alembertian}:
+        \begin{equation}
+            \dalembertian \coloneqq \partial_\mu \partial^\mu = \partial^\mu \partial_\mu = \frac{1}{c^2}\diffp[2]{}{t} - \laplacian = \frac{1}{c^2} \diffp[2]{}{t} - \diffp[2]{}{x} - \diffp[2]{}{y} - \diffp[2]{}{z}.
+        \end{equation}
+        This is also denoted \(\square^2\) or \(\square\).
+        Note that the wave equation for some field, \(\varphi\), can then be written as \(\dalembertian\varphi = 0\).
+        
+        \subsection{Momentum and Energy}
+        The four-momentum, \(p\), is a four-vector given by
+        \begin{equation}
+            p^\mu = \left( \frac{E}{c}, \vv{p} \right)
+        \end{equation}
+        where \(E\) is the energy of the particle and \(\vv{p}\) is the relativistic three-momentum of the particle.
+        
+        For a free particle of mass \(m\) we have that
+        \begin{equation}
+            p^2 = \frac{E^2}{c^2} - \vv{p} \cdot \vv{p} = m^2c^2.
+        \end{equation}
+        This can be rewritten as
+        \begin{equation}
+            E^2 = \abs{\vv{p}}^2c^2 + m^2c^4,
+        \end{equation}
+        which is known as the \defineindex{energy-momentum relation}, or the \defineindex{mass-shell condition}.
+        
+        Particles for which \(p^\mu p_\mu = m^2c^2\) are said to be on their \defineindex{mass-shell}.
+        
+        \section{Electromagnetic Theory}
+        \subsection{Maxwell's Equations}
+        We use \defineindex{Heaviside--Lorentz units}, where \(\varepsilon_0 = 1\).
+        In these units \defineindex{Maxwell's equations} are
+        \begin{align}
+            \div \vv{B} &= 0, \tag{ME1}\\
+            \curl \vv{E} &= -\frac{1}{c}\diffp{\vv{B}}{t}, \tag{ME2}\\
+            \curl \vv{B} &= \vv{j} + \frac{1}{c} \diffp{\vv{E}}{t}, \tag{ME3}\\
+            \div \vv{E} &= \rho. \tag{ME4}
+        \end{align}
+        Here \(\vv{E}\) is the electric field, \(\vv{B}\) is the magnetic field, \(\vv{j}\) is the current density, and \(\rho\) is the charge density.
+        
+        Any vector field with vanishing divergence, including \(\vv{B}\), can be written as the curl of another field, say \(\vv{A}\), then \(\div\vv{B} = 0\) follows from the identity that \(\div(\curl \vv{A}) = 0\) for any vector field \(\vv{A}\).
+        Hence, we can rewrite the first equation as
+        \begin{equation}
+            \vv{B} = \curl \vv{A}. \tag{ME1'}
+        \end{equation}
+        Similarly we can write \(\vv{E}\) as
+        \begin{equation}
+            \vv{E} = -\frac{1}{c}\diffp{\vv{A}}{t} - \grad \Phi \tag{ME2'}
+        \end{equation}
+        since \(\curl(\grad\Phi) = \vv{0}\) for all scalar fields \(\Phi\) and the curl of the first term just gets us back to \(\vv{B}\), so this equation can replace the second of Maxwell's equations.
+        
+        Combing the third and fourth equation it is possible to derive the continuity equation
+        \begin{equation}
+            \div\vv{j} + \frac{1}{c}\diffp{\rho}{t} = 0.
+        \end{equation}
+        Defining the electromagnetic \defineindex{four-current}, \(j_{\EM}^{\mu} \coloneqq (\rho, \vv{j})\) then we can write this as
+        \begin{equation}
+            \partial_\mu j_{\EM}^\mu = 0.
+        \end{equation}
+        This is a statement of charge conservation.
+        
+        \subsection{Four-Vector Potential}
+        We can define the \defineindex{four-potential} as
+        \begin{equation}
+            A^\mu \coloneqq (\Phi, \vv{A}).
+        \end{equation}
+        Recall the identity
+        \begin{equation}
+            \curl (\curl \vv{A}) = \grad(\div\vv{A}) - \laplacian\vv{A}.
+        \end{equation}
+        Substitute the modified Maxwell equations into the third Maxwell equation, giving
+        \begin{equation}
+            \curl(\curl \vv{A}) = \vv{j} - \frac{1}{c^2}\diffp[2]{\vv{A}}{t} - \frac{1}{c} \grad \diffp{\Phi}{t}.
+        \end{equation}
+        On the left we can use the identity to get
+        \begin{equation}
+            \grad(\div\vv{A}) - \laplacian\vv{A} = \vv{j} - \frac{1}{c^2}\diffp[2]{\vv{A}}{t} - \frac{1}{c} \grad \diffp{\Phi}{t}.
+        \end{equation}
+        Rearranging this gives
+        \begin{equation}
+            \frac{1}{c^2}\diffp[2]{\vv{A}}{t} - \laplacian\vv{A} + \grad\left[ \div\vv{A} + \frac{1}{c}\diffp{\Phi}{t} \right] = \dalembertian\vv{A} + \grad\left[ \div\vv{A} + \frac{1}{c}\diffp{\Phi}{t} \right] = \vv{j}.
+        \end{equation}
+        Doing something similar with the fourth Maxwell equation we get
+        \begin{equation}
+            -\frac{1}{c}\diffp{}{t}(\div\vv{A}) - \laplacian\Phi = \rho.
+        \end{equation}
+        We can combine these two equations into a covariant form:
+        \begin{equation}\label{eqn:dalembertian Amu - partial mu partial nu Anu = jmu}
+            \dalembertian A^\mu - \partial^\mu \partial_\nu A^\nu = j_{\EM}^\mu.
+        \end{equation}
+        
+        \subsection{Gauge Transformations}
+        We can define two new potentials, \(\tilde{\vv{A}}\) and \(\tilde{\Phi}\), via the \defineindex{gauge transformation}
+        \begin{equation}
+            \tilde{\vv{A}} = \vv{A} - \grad\chi \qand \tilde{\Phi} = \Phi + \frac{1}{c}\diffp{\chi}{t},
+        \end{equation}
+        or in covariant form,
+        \begin{equation}
+            \tilde{A}^\mu = A^\mu + \partial^\mu \chi.
+        \end{equation}
+        Here \(\chi\) is any scalar field (with second derivatives).
+        Importantly the fields \(\vv{E}\) and \(\vv{B}\) don't change if we make this transformation.
+        We can use this to choose potentials satisfying the \defineindex{Lorenz gauge condition}
+        \begin{equation}
+            \div \vv{A} + \frac{1}{c}\diffp{\Phi}{t} = 0,
+        \end{equation}
+        or in covariant form,
+        \begin{equation}
+            \partial_\nu A^\nu = 0.
+        \end{equation}
+        
+        In this case Maxwell's equations reduce to two decoupled equations,
+        \begin{equation}
+            \dalembertian \vv{A} = \vv{j}, \qand \dalembertian\Phi = \rho,
+        \end{equation}
+        or in covariant form,
+        \begin{equation}
+            \dalembertian A^\mu = j_{\EM}^{\mu}.
+        \end{equation}
+        
+        Note that the Lorenz gauge doesn't fix the potentials uniquely, since
+        \begin{equation}
+            \div\tilde{\vv{A}} + \frac{1}{c}\diffp{\tilde{\Phi}}{t} = \div\vv{A} + \frac{1}{c}\diffp{\Phi}{t} - \laplacian \chi + \frac{1}{c^2} \diffp[2]{\chi}{t}.
+        \end{equation}
+        So if the original potential, \(A^\mu\), satisfies \(\partial_\mu A^\mu = 0\) then we can choose to have \(\partial_\mu \tilde{A}^\mu = 0\) so long as \(\chi\) is such that \(\dalembertian\chi = 0\).
+        
+        \subsection{Covariant Form of Maxwell's Equations}
+        The \define{Maxwell tensor}\index{Maxwell tensor|see{electromagnetic field strength tensor}}, or \defineindex{electromagnetic field strength tensor} is defined to be
+        \begin{equation}
+            F^{\mu\nu} \coloneqq \partial^\mu A^\nu - \partial^\nu A^\mu.
+        \end{equation}
+        \begin{wrn}
+            Note that there is a different sign convention used, for example, by Mandl and Shaw, where
+            \begin{equation}
+                F^{\mu\nu} \stackrel{!}{\coloneqq} \partial^\nu A^\mu - \partial^\mu A^\nu.
+            \end{equation}
+        \end{wrn}
+    
+        We can think of the electromagnetic field strength tensor as the four-dimensional \enquote{curl} of the four-potential\footnote{this becomes precise in the language of geometric algebra, where we replace curl with the wedge product, and the wedge product of two vectors gives a bivector, which four our purposes is a two index tensor.}
+        
+        The electromagnetic field strength tensor is manifestly gauge invariant, since any gauge transformation cancels between the two terms.
+        
+        Considering the space-time and space-space components of \(F\) we can fairly simply show that they correspond to the normal electric and magnetic fields:
+        \begin{align}
+            F^{i0} &= \partial^iA^0 - \partial^0A^i = \diffp{\Phi}{x^i} - \frac{1}{c}\diffp{A^i}{t} = E^i,\\
+            F^{ij} &= \partial^iA^j - \partial^jA^i = -\diffp{A^i}{x^i} + \diffp{A^i}{x^j} = -\varepsilon^{ijk}B^k.
+        \end{align}
+        Here \(\varepsilon^{ijk}\) is the Levi-Civita symbol, which is defined to be 1 if \(ijk\) is an even permutation of \(123\), \(-1\) if it's an odd permutation, and 0 otherwise.
+        
+        We can write \(F\) as a \(4 \times 4\) matrix:
+        \begin{equation}
+            F^{\mu\nu} =
+            \begin{pmatrix}
+                0 & -E_x & -E_y & -E_z\\
+                E_x & 0 & -B_z & B_y\\
+                E_y & B_z & 0 & -B_z\\
+                E_z & -B_y & B_x & 0
+            \end{pmatrix} 
+            .
+        \end{equation}
+        We can then write \cref{eqn:dalembertian Amu - partial mu partial nu Anu = jmu} as
+        \begin{equation}
+            \partial_\mu F^{\mu\nu} = j_{\EM}^{\nu}.
+        \end{equation}
+        Conservation of the electromagnetic four-current is then very obvious, since
+        \begin{equation}
+            \partial_\nu j_{\EM}^\nu = \partial_\nu \partial_\mu F^{\mu\nu} = 0,
+        \end{equation}
+        since \(F^{\mu\nu}\) is antisymmetric in \(\mu\) and \(\nu\) and \(\partial_\nu\partial_\mu\) is symmetric in \(\mu\) and \(\nu\).
+        
+        \subsection{Interaction of Matter with EM Fields}
+        The classical Hamiltonian for a free, non-relativistic particle is
+        \begin{equation}
+            H = \frac{\abs{\vv{p}}^2}{2m}.
+        \end{equation}
+        For a particle with charge \(q\) in an electromagnetic field we modify the Hamiltonian through the \defineindex{minimal coupling prescription},
+        \begin{equation}
+            H \to H - q\Phi, \qand \vv{p} \to \vv{p} - \frac{q}{c}\vv{A},
+        \end{equation}
+        giving the classical Hamiltonian for a non-relativistic particle in an electromagnetic field:
+        \begin{equation}
+            H = \frac{\abs{\vv{p} - q\vv{A}/c}^2}{2m} + q\Phi.
+        \end{equation}
+        Note that this equation is in Heaviside--Lorentz units, in SI units there is no factor of \(c\).
+        
+        This Hamiltonian is chosen such that the force on a particle due to the electromagnetic field is
+        \begin{equation}
+            \vv{F} = q\left( \vv{E} + \frac{1}{c}\vv{v} \times \vv{B} \right),
+        \end{equation}
+        which is the Lorentz force in Heaviside--Lorentz units, again the factor of \(c\) is absent in SI units.
+        
+        \section{Relativistic Quantum Mechanics}
+        \subsection{Klein--Gordon Equation}
+        The \defineindex{Schrödinger equation} for a free particle of mass \(m\) is
+        \begin{equation}
+            -\frac{\hbar^2}{2m} \laplacian \Psi(\vv{r}, t) = i\hbar\diffp{}{t}\Psi(\vv{r}, t).
+        \end{equation}
+        One way to obtain this is from the non-relativistic energy-momentum relation,
+        \begin{equation}
+            E = \frac{\abs{\vv{p}}^2}{2m} = H,
+        \end{equation}
+        by substituting in the relevant operators:
+        \begin{equation}
+            E \to i\hbar\diffp{}{t}, \qand \vv{p} \to -i\hbar\grad.
+        \end{equation}
+        
+        To obtain a relativistic equation then we should use the relativistic energy-momentum relation,
+        \begin{equation}
+            E^2 = \abs{\vv{p}}^2 c^2 + m^2 c^4.
+        \end{equation}
+        Then after the operator substitution we have
+        \begin{equation}
+            -\hbar^2 \diffp[2]{}{t}\varphi(\vv{r}, t) = -\hbar^2c^2\laplacian \varphi(\vv{r}, t) + m^2c^2\varphi(\vv{r}, t).
+        \end{equation}
+        This is the \defineindex{Klein--Gordon equation}.
+        
+        We can write the Klein--Gordon equation in a manifestly covariant form as
+        \begin{equation}
+            \left( \dalembertian + \frac{m^2c^2}{\hbar^2} \right)\varphi(x) = 0 \qqor (\dalembertian + \mu^2)\varphi(x) = 0
+        \end{equation}
+        where \(\mu = mc/\hbar\).
+        We can jump straight to this covariant form by instead using the operator prescription
+        \begin{equation}
+            p^\mu \to i\hbar \diffp{}{x^\mu} = i\hbar\left( \frac{1}{c}\diffp{}{t}, -\grad \right).
+        \end{equation}
+        
+        Note that if \(m = 0\) then the Klein--Gordon equation reduces to a wave equation, \(\dalembertian \varphi(x) = 0\).
+        
+        The Klein--Gordon equation is valid for any spin 0 particle.
+        
+        \subsubsection{Free Particle Solutions}
+        The Klein--Gordon equation has plane-wave solutions,
+        \begin{equation}
+            \varphi(\vv{r}, t)  = \exp[i\vv{k} \cdot \vv{r} - i\omega t].
+        \end{equation}
+        Substituting this into the Klein--Gordon equation we see it is a solution as long as \(\omega\), \(\vv{k}\), and \(m\) are related by
+        \begin{equation}
+            \hbar^2\omega^2 = \hbar^2c^2\abs{\vv{k}}^2 + m^2c^4.
+        \end{equation}
+        Taking the square root we have
+        \begin{equation}
+            \hbar\omega = \pm \sqrt{\hbar^2c^2\abs{\vv{k}}^2 + m^2c^4}.
+        \end{equation}
+        
+        These solutions are eigenfunctions of the momentum operator and the energy operator, with eigenvalues \(\vv{p} = \hbar\vv{k}\) and \(E = \hbar\omega\) respectively.
+        Interpreting \(\hbar\omega\) as the allowed energy of the free particle there is ambiguity in the sign of the total energy.
+        We have both positive and negative energy solutions.
+        Initially this was viewed as a problem, but later people realised that both sorts of solutions were important, with negative energy solutions corresponding to antiparticles.
+        
+        Define the four-vector \(k^\mu = (\omega/c, \vv{k})\).
+        Then the solutions to the Klein--Gordon equation can be written in a covariant form as
+        \begin{equation}
+            \varphi(x) = \exp[-ik \cdot x] = \exp[-ik^\mu x_\mu] = \exp[-ip^\mu x_\mu/\hbar].
+        \end{equation}
+        This allows us to interpret the four-momentum as \(p^\mu = \hbar k^\mu\).
+        
+        If \(\varphi\) is a solution of the Klein--Gordon equation then so is its complex conjugate, \(\varphi^*\).
+        The general solution is a superposition of plane-wave solutions:
+        \begin{equation}
+            \varphi(x) = \int \frac{\dl{^3x}}{2E_p(2\pi)^3}[f(p)\exp[-ip\cdot x/\hbar] + g(p) \exp[ip\cdot x/\hbar]].
+        \end{equation}
+        Here the factors in the denominator of the measure are included for future convenience, and
+        \begin{equation}
+            E_p \coloneqq +\sqrt{\abs{\vv{p}}^2c^2 + m^2c^4}
+        \end{equation}
+        is defined to be positive.
+        
+        \subsection{Continuity Equation and Probability Interpretation}
+        Denote the Schrödinger equation by \((\symrm{SE})\) and its conjugate by \((\symrm{SE})^*\), that is
+        \begin{equation}
+            (\symrm{SE}) = -\frac{\hbar^2}{2m} \laplacian \Psi(\vv{r}, t) - i\hbar\diffp{}{t}\Psi(\vv{r}, t) = 0.
+        \end{equation}
+        Then by considering
+        \begin{equation}
+            \Psi^*(\symrm{SE}) - \Psi(\symrm{SE}) = 0
+        \end{equation}
+        we can derive a continuity equation
+        \begin{equation}
+            \div\vv{j} + \diffp{\rho}{t} = 0,
+        \end{equation}
+        where
+        \begin{equation}
+            \rho \coloneqq \Psi^*\Psi, \qand \vv{j} \coloneqq -\frac{i\hbar}{2m} (\Psi^*\grad \Psi - \Psi \grad \Psi^*).
+        \end{equation}
+        These are the \defineindex{probability density} and \defineindex{probability current} respectively.
+        
+        We can do the same for the Klein--Gordon equation and obtain the same continuity equation, but now with
+        \begin{equation}
+            \rho \coloneqq \frac{i\hbar}{2mc^2} \left( \varphi^* \diffp{\varphi}{t} - \varphi \diffp{\varphi^*}{t} \right), \qand \vv{j} \coloneqq -\frac{i\hbar}{2m}(\varphi^*\grad \varphi - \varphi\grad\varphi^*).
+        \end{equation}
+        Here we chose to make \(\vv{j}\) identical to the non-relativistic Schrödinger current.
+        We can show that in the non-relativistic limit \(\rho\) reduces to \(\varphi^*\varphi\).
+        There is a problem however, the candidate for the probability density, \(\rho(x)\), is no longer positive definite, the negative energy solutions will have \(\rho(x) < 0\).
+        This means that there is no simple probability density interpretation for \(\rho\) from the Klein--Gordon equation.
+        
+        \subsection{Dirac Equation}
+        Dirac, aiming to avoid the problems with negative energy/probability solutions, looked for a relativistic equation linear in \(\diffp{}/{t}\).
+        He then proceeded to argue that the equation must be linear in spatial derivatives, since in relativity we have to treat space and time on an equal footing.
+        We therefore start with an equation of the form
+        \begin{equation}
+            i\hbar\diffp{}{t}\psi(\vv{r}, t) = \operator{H}\psi(\vv{r}, t)
+        \end{equation}
+        where \(\operator{H}\) is linear in space and time derivatives.
+        These requirements mean that we can write out a candidate Hamiltonian with some unknown coefficients:
+        \begin{equation}
+            i\hbar\diffp{}{t}\psi(\vv{r}, t) = -i\hbar c\left( \alpha^1\diffp{}{x^1} + \alpha^2\diffp{}{x^2} + \alpha^3\diffp{}{x^3} \right) \psi(\vv{r}, t) + \beta mc^2 \psi(\vv{r}, t).
+        \end{equation}
+        We choose to have \(\alpha^i\) and \(\beta\) be dimensionless by including the required factors of \(c\), \(\hbar\), and \(m\), we also include a conventional factor of \(-i\).
+        Using the operator prescription \(\vecoperator{p} = -i\hbar\grad\) we can write this more compactly as
+        \begin{equation}
+            i\hbar\diffp{}{t}\psi(\vv{r}, t) = (c\vv{\alpha} \cdot \vecoperator{p} + \beta mc^2) \psi(\vv{r}, t).
+        \end{equation}
+        This is the \defineindex{Dirac equation} for a free particle.
+        We assume that the Hamiltonian is independent of position and time, which is what we would want for free particle solutions.
+        Hence \(\alpha^i\) and \(\beta\) must be independent of position and time, so commute with the derivatives, such as \(\vecoperator{p}\), but not necessarily each other.
+        
+        Next, we impose the relativistic energy-momentum equation:
+        \begin{equation}
+            \operator{H}^2\psi(\vv{r}, t) = (c^2\abs{\vecoperator{p}}^2 + m^2c^4)\psi(\vv{r}, t).
+        \end{equation}
+        We know that
+        \begin{equation}
+            \operator{H}^2\psi(\vv{r}, t) = (c\vv{\alpha} \cdot \vecoperator{p} + \beta mc^2)(c\vv{a} \cdot \vecoperator{p} + \beta mc^2)\psi(\vv{r}, t).
+        \end{equation}
+        Expanding the right hand side, while being careful about the ordering of terms, we get
+        \begin{align}
+            \operator{H}^2\psi(\vv{r}, t) &= \left\{ c^2[(\alpha^1)^2(\operator{p}^1)^2 + (\alpha^2)^2(\operator{p}^2)^2 + (\alpha^3)^2(\operator{p}^3)^2] + m^2c^4\beta^2 \right\} \psi(\vv{r}, t)\\
+            & \quad + \left\{ (\alpha^1\alpha^2 + \alpha^2\alpha^1)\operator{p}^1\operator{p}^2 + (\alpha^2\alpha^3 + \alpha^3\alpha^2)\operator{p}^2\operator{p}^3 \right\}\psi(\vv{r}, t)\\
+            & \quad + mc^3\left\{ (\alpha^1\beta + \beta\alpha^1)\operator{p}^1 + (\alpha^2\beta + \beta\alpha^2)\operator{p}^2 + (\alpha^3\beta + \beta\alpha^3)\operator{p}^3 \right\}\psi(\vv{r}, t).
+        \end{align}
+        The relativistic energy-momentum relation is satisfied if
+        \begin{align}
+            (\alpha^1)^2 = (\alpha^2)^2 = (\alpha^3)^2 = \beta^2 &= 1,\\
+            \alpha^i\alpha^j + \alpha^j\alpha^i &= 0,\\
+            \alpha^i\beta + \beta\alpha^i &= 0,
+        \end{align}
+        which can be written more compactly sa
+        \begin{equation}
+            \anticommutator{\alpha^i}{\alpha^j} = 2\delta^{ij}, \quad \anticommutator{\alpha^i}{\beta} = 0, \qand \beta^2 = 1,
+        \end{equation}
+        where \(\anticommutator{A}{B} = AB + BA\) is the \defineindex{anticommutator}.
+        
+        Clearly \(\alpha^i\) and \(\beta\) cannot just be numbers for these requirements to hold.
+        Instead, we assume they are matrices.
+        Since \(\operator{H}\) is Hermitian they must be Hermitian, and hence are square matrices.
+        This means they must have real eigenvalues.
+        Since these matrices square to the identity their squares have eigenvalues whose product is 1, since the determinant is the product of the eigenvalues and the determinant of the unit matrix is 1.
+        Since the eigenvalues are real the eigenvalues of \(\alpha^i\) and \(\beta\) must be \(\pm 1\).
+        \begin{lma}{}{}
+            We have that \(\tr \alpha^i = \tr \beta = 0\).
+            \begin{proof}
+                Consider \(\tr\alpha^i\).
+                Since \(\beta^2 = 1\) we can insert \(\beta^2\) into the argument of the trace and then use the cyclic property to get
+                \begin{equation}
+                    \tr \alpha^i = \tr(\beta^2\alpha^i) = \tr(\beta\alpha^i\beta).
+                \end{equation}
+                Now using the anticommutation relations we can replace \(\alpha^i\beta\) with \(-\beta\alpha^i\) and then take the negative outside the trace to get
+                \begin{equation}
+                    \tr \alpha^i = \tr(\beta\alpha^i\beta) = \tr(\beta(-\beta\alpha^i)) = -\tr(\beta^2\alpha^i) = -\tr(\alpha^i)
+                \end{equation}
+                since \(\beta^2 = 1\), and so \(\tr\alpha^i = -\tr\alpha^i\), which must mean \(\tr\alpha^i = 0\).
+                
+                Similarly, consider \(\tr\beta\), we have
+                \begin{equation}
+                    \tr\beta = \tr((\alpha^i)^2\beta) = \tr(\alpha^i\beta\alpha^i) = -\tr((\alpha^i)^2\beta) = -\tr \beta,
+                \end{equation}
+                and so \(\tr\beta = 0\).
+            \end{proof}
+        \end{lma}
+        
+        So, if \(\alpha^i\) and \(\beta\) are \(n \times n\) matrices with eigenvalues \(\pm 1\) since the trace is the sum of the eigenvalues and the trace vanishes \(n\) must be even so that the eigenvalues can cancel pairwise.
+        There is no \(2\times 2\) set of Hermitian traceless \(2\times 2\) matrices satisfying the anticommutation relations, although the Pauli matrices come close, satisfying
+        \begin{equation}
+            \anticommutator{\sigma^i}{\sigma^j} = 2\delta^{ij},
+        \end{equation}
+        but there is no viable candidate for \(\beta\).
+        
+        The simplest representation is \(4 \times 4\).
+        The \defineindex{standard representation} is
+        \begin{align}
+            \beta &= 
+            \begin{pmatrix}
+                1 & 0 & 0 & 0\\
+                0 & 1 & 0 & 0\\
+                0 & 0 & -1 & 0\\
+                0 & 0 & 0 & -1
+            \end{pmatrix}
+            , \qquad & \alpha^1 &=
+            \begin{pmatrix}
+                0 & 0 & 0 & 1\\
+                0 & 0 & 1 & 0\\
+                0 & 1 & 0 & 0\\
+                1 & 0 & 0 & 0
+            \end{pmatrix}
+            ,\\
+            \alpha^2 &= 
+            \begin{pmatrix}
+                0 & 0 & 0 & -i\\
+                0 & 0 & i & 0\\
+                0 & -i & 0 & 0\\
+                i & 0 & 0 & 0
+            \end{pmatrix}
+            , \qquad & \alpha^3 &= 
+            \begin{pmatrix}
+                0 & 0 & 1 & 0\\
+                0 & 0 & 0 &-1\\
+                1 & 0 & 0 & 0\\
+                0 & -1 & 0 & 0
+            \end{pmatrix}
+            .
+        \end{align}
+        These can be written in a \(2\times 2\) block form as
+        \begin{equation}
+            \beta = 
+            \begin{pmatrix}
+                1 & 0\\
+                0 & 1
+            \end{pmatrix}
+            , \qqand \vv{\alpha} = 
+            \begin{pmatrix}
+                0 & \vv{\sigma}\\
+                \vv{\sigma} & 0
+            \end{pmatrix}
+        \end{equation}
+        where \(\vv{\sigma} = (\sigma^1, \sigma^2, \sigma^3)\) are the Pauli matrices.
+        We can also write these as \(\alpha^i = \sigma^1 \otimes \sigma^i\).
+        It's not too difficult to check that these matrices have the desired properties.
+        
+        \begin{cde}{}{}
+            \begin{lstlisting}[gobble=16, language=mathematica, mathescape]
+                Unprotect[TensorProduct];
+                a_ $\otimes$ b_ := KroneckerProduct[a, b]
+                Protect[TensorProduct];
+                $\delta_{i\_, j\_}$ := KroneckerDelta[i, j]
+                $\alpha_{i\_}$ := PauliMatrix[1] $\otimes$ PauliMatrix[i]
+                anticommutator[a_, b_] := a.b + b.a
+                And@@
+                    Flatten@
+                        Table[anticommutator[$\alpha_{\symrm{i}}$, $\alpha_{\symrm{j}}$]
+                            == 2 $\delta_{\symrm{i,j}}$ IdentityMatrix[4],
+                            {i,1,3}, {j, 1, 3}]
+                True
+            \end{lstlisting}
+        \end{cde}
+        
+        Since the Hamiltonian is a \(4 \times 4\) matrix the wave function, \(\psi(\vv{r}, t)\), must be a four component column vector:
+        \begin{equation}
+            \psi(\vv{r}, t) = 
+            \begin{pmatrix}
+                \psi_1(\vv{r}, t)\\ \psi_2(\vv{r}, t)\\ \psi_3(\vv{r}, t)\\ \psi_4(\vv{r}, t)\\
+            \end{pmatrix}
+            .
+        \end{equation}
+        
+        \subsection{Probability Density}
+        The Dirac equation for a free particle is
+        \begin{equation}
+            i\hbar\diffp{}{t}\psi(\vv{r}, t) = (-i\hbar c\vv{\alpha} \cdot \overrightarrow{\grad} + \beta mc^2)\psi(\vv{r}, t).
+        \end{equation}
+        Here \(\overrightarrow{\grad}\) is the normal gradient operator acting to the right.
+        From this we can construct a probability density.
+        Take the Hermitian conjugate of this equation:
+        \begin{equation}
+            -i\hbar\diffp{}{t}\psi^\hermit (\vv{r}, t) = \psi^\hermit(\vv{r}, t) \left( i\hbar c\vv{\alpha} \cdot \overleftarrow{\grad} + \beta mc^2 \right).
+        \end{equation}
+        Here \(\overleftarrow{\grad}\) denotes a gradient operator acting to the left.
+        Note that \(\psi^\hermit\) is a row vector.
+        Multiplying the first equation by \(\psi^\hermit\) on the left, and the second by \(\psi\) on the right we obtain
+        \begin{align}
+            i\hbar\diffp{}{t}(\psi^\hermit \psi) &= -i\hbar c(\psi^\hermit \vv{\alpha} \cdot \overrightarrow{\grad} \psi + \psi^\hermit \vv{\alpha} \cdot \overleftarrow{\grad}\psi)\\
+            &= -i\hbar c(\psi^\hermit \vv{\alpha} \cdot \grad \psi + (\grad\psi^\hermit)\cdot \vv{\alpha}\psi)\\
+            &= -i\hbar c\div(\psi^\hermit \vv{\alpha} \psi).
+        \end{align}
+        We can write this as a continuity equation,
+        \begin{equation}
+            \div\vv{j} + \frac{1}{c}\diffp{\rho}{t} = 0,
+        \end{equation}
+        where
+        \begin{equation}
+            \rho \coloneqq \psi^\hermit \psi, \qqand \vv{j} = \psi^{\hermit} \vv{\alpha} \psi.
+        \end{equation}
+        We can write this in a covariant form:
+        \begin{equation}
+            \partial_\mu j^\mu = 0,
+        \end{equation}
+        where \(j = (\rho, \vv{j})\) is the \defineindex{four-probability current}.
+        
+        This tells us that \(\psi^\hermit \psi\) transforms as the time component of a four-vector, and \(\psi^\hermit \vv{\alpha} \psi\) transforms as the corresponding space part.
+        
+        Note that \(\rho = \abs{\psi}^2\) is positive definite, solving one of our earlier problems with the Klein--Gordon equation.
+        
+        \subsection{Free Particle Solutoins}
+        The Dirac equation has plane-wave solutions:
+        \begin{equation}
+            \psi(\vv{r}, t) = \psi(x) = \exp[-ik_\mu x^\mu]u(\vv{p}) = \exp\left[ -\frac{i}{\hbar}(cp_0t - \vv{p} \cdot r) \right]u(\vv{p}).
+        \end{equation}
+        Here \(u(\vv{p})\) is a four component column vector.
+        
+        Substituting this into the Dirac equation we get
+        \begin{equation}
+            p^0u = (\vv{\alpha} \cdot \vv{p} + \beta mc)u.
+        \end{equation}
+        We interpret this solution as representing a particle of energy \(cp^0\) and momentum \(\vv{p}\).
+        Putting in the matrices \(\alpha^i\) and \(\beta\) this becomes
+        \begin{equation}\label{eqn:dirac equation wave solution matrix form}
+            \begin{pmatrix}
+                -p^0 + mc & 0 & p^3 & p^1 - ip^2\\
+                0 & -p^0 + mc & p^1 + ip^2 & -p^3\\
+                p^3 & p^1 - ip^2 & -(p^0 + mc) & 0\\
+                p^1 + ip^2 & -p^3 & 0 & -(p^0 + mc)
+            \end{pmatrix}
+            \begin{pmatrix}
+                u_1\\ u_2\\ u_3\\ u_4
+            \end{pmatrix}
+            = 0.
+        \end{equation}
+        The condition for a nontrivial solution for \(u_i\) to exist is that the determinant of the matrix vanishes.
+        Computing the determinant we find that the determinant vanishes exactly when
+        \begin{equation}
+            [m^2 c^2 + \abs{\vv{p}}^2 - (p^0)^2]^2 = 0,
+        \end{equation}
+        which is exactly the energy-momentum relation.
+        Taking the square root we have
+        \begin{equation}
+            p^0 = \pm \sqrt{m^2c^2 + \abs{\vv{p}}^2},
+        \end{equation}
+        so we still have negative energy solutions.
+        
+        \subsubsection{Positive Energy Solutions}
+        First suppose \(p^0 > 0\), that is
+        \begin{equation}
+            p^0 = +\sqrt{m^2c^2 + \abs{\vv{p}}^2} \eqqcolon p^0_+ = \frac{E}{c},
+        \end{equation}
+        where we choose to take \(E > 0\) as the magnitude of the energy.
+        Substituting into the first two rows of \cref{eqn:dirac equation wave solution matrix form} we get
+        \begin{align}
+            0 &= (-p_+^0 + mc)u_1 + p_3u_3 + (p^1 - ip^2)u_4,\\
+            0 &= (-p_+^0 + mc)u_2 + (p^1 + ip^2)u_3 - p^3 u_4.
+        \end{align}
+        Only two of the four \(u_i\) are linearly independent, so we are free to fix two values.
+        The conventional choice is either \(u_1 = 1\) and \(u_2 = 0\), or \(u_1 = 0\) and \(u_2 = 1\).
+        The first choice gives
+        \begin{equation}
+            u_3 = \frac{p^3}{p_+^0 + mc}, \qand u_4 = \frac{p^1 + ip^2}{p_+^0 + mc},
+        \end{equation}
+        whereas the second gives
+        \begin{equation}
+            u_3 = \frac{p^1 - ip^2}{p_+^0 + mc}, \qand u_4 = \frac{-p^3}{p_+^0 + mc}.
+        \end{equation}
+        
+        \subsubsection{Negative Energy Solutions}
+        Now suppose \(p^0 < 0\), that is
+        \begin{equation}
+            p^0 = -\sqrt{m^2c^2 + \abs{\vv{p}}^2} \eqqcolon p^0_- = -\frac{E}{c},
+        \end{equation}
+        where again, we choose to have \(E > 0\).
+        We can follow a similar process to the positive energy solutions, but for the lower two rows of \cref{eqn:dirac equation wave solution matrix form}.
+        Again, we make an arbitrary choice for two components, the conventions being either \(u_3 = 1\) and \(u_4 = 0\), or \(u_3 = 0\) and \(u_4 = 1\).
+        The first choice leads to 
+        \begin{equation}
+            u_1 = \frac{p^3}{p^0_- - mc}, \qand u_2 = \frac{p^1 + ip^2}{p^0_- - mc},
+        \end{equation}
+        and the second gives
+        \begin{equation}
+            u_1 = \frac{p^1 - ip^2}{p^0_- - mc}, \qand u_2 = \frac{-p^3}{p^0_- - mc}.
+        \end{equation}
+        
+        \subsubsection{Summary}
+        The positive energy solutions with four-momentum \(p^\mu_+ = (p^0_+, \vv{p})\) are
+        \begin{equation}
+            \omega^1(\vv{p}) =
+            \begin{pmatrix}
+                1\\ 0\\
+                \frac{p^3}{p^0_+ + mc}\\
+                \frac{p^1 + ip^2}{p^0_+ + mc}
+            \end{pmatrix}
+            ,\qand \omega^2(\vv{p}) = 
+            \omega^1(\vv{p}) =
+            \begin{pmatrix}
+                0\\ 1\\
+                \frac{p^1 - ip^2}{p^0_+ + mc}\\
+                \frac{-p^3}{p^0_+ + mc}
+            \end{pmatrix}
+            .
+        \end{equation}
+        The negative energy solutions with four-momentum \(p^\mu_- = (p^0_-, -\vv{p})\) are
+        \begin{equation}
+            \omega^1(\vv{p}) =
+            \begin{pmatrix}
+                -\frac{p^1 - ip^2}{p^0_+ + mc}\\
+                \frac{p^3}{p^0_+ + mc}\\
+                0\\ 1
+            \end{pmatrix}
+            ,\qand \omega^2(\vv{p}) = 
+            \omega^1(\vv{p}) =
+            \begin{pmatrix}
+                -\frac{p^3}{p^0_+ + mc}\\
+                -\frac{p^1 + ip^2}{p^0_+ + mc}\\
+                1\\ 0
+            \end{pmatrix}
+            .
+        \end{equation}
+        Note that there are varying conventions on how the \(\omega^\mu\) are labelled.
+        
+        \subsubsection{Rest Frame Solutions}
+        When the particle is at rest, that is \(\vv{p} = \vv{0}\), we have
+        \begin{equation}
+            \omega^1(\vv{0}) = 
+            \begin{pmatrix}
+                1\\ 0\\ 0\\ 0
+            \end{pmatrix}
+            , \quad \omega^2(\vv{0}) = 
+            \begin{pmatrix}
+                0\\ 1\\ 0\\ 0
+            \end{pmatrix}
+            , \quad \omega^3(\vv{0}) = 
+            \begin{pmatrix}
+                0\\ 0\\ 0\\ 1
+            \end{pmatrix}
+            , \qand \omega^4(\vv{0}) = 
+            \begin{pmatrix}
+                0\\ 0\\ 1\\ 0
+            \end{pmatrix}
+            .
+        \end{equation}
+        These are such that the solutions
+        \begin{equation}
+            \psi^{(1)} = \exp\left[ -\frac{imc^2t}{\hbar} \right] 
+            \begin{pmatrix}
+                1\\ 0\\ 0\\ 0
+            \end{pmatrix}
+            \qand
+            \psi^{(2)} = \exp\left[ -\frac{imc^2t}{\hbar} \right]
+            \begin{pmatrix}
+                0\\ 1\\ 0\\ 0
+            \end{pmatrix}
+        \end{equation}
+        are degenerate in energy.
+        There should therefore be another operator which commutes with the Hamiltonian and whose eigenvalues label the states.
+        One such operator is
+        \begin{equation}
+            \Sigma^3 \coloneqq
+            \begin{pmatrix}
+                \sigma^3 & 0\\
+                0 & \sigma^3
+            \end{pmatrix}
+            = 
+            \begin{pmatrix}
+                1 & 0 & 0 & 0\\
+                0 & -1 & 0 & 0\\
+                0 & 0 & 1 & 0\\
+                0 & 0 & 0 & -1
+            \end{pmatrix}
+            .
+        \end{equation}
+        The rest frame four-component spinors, \(\omega^\mu(\vv{0})\), are eigenvectors of \(\Sigma^3\) with eigenvalues \(\pm 1\).
+        This suggests that we can interpret the Dirac equation as describing a spin \(1/2\) particle, and the eigenvalues of \(\Sigma^3\) are interpreted as the 3rd component of the spin in the rest frame.
+        
+        The notation \(\Sigma^3\) suggests we should define
+        \begin{equation}
+            \vv{\Sigma} \coloneqq 
+            \begin{pmatrix}
+                \vv{\sigma} & 0\\
+                0 & \vv{\sigma}
+            \end{pmatrix}
+            , \qor \Sigma^i \coloneqq
+            \begin{pmatrix}
+                \sigma^i & 0\\
+                0 & \sigma^i
+            \end{pmatrix}
+            .
+        \end{equation}
+        We then have
+        \begin{equation}
+            \left( \frac{1}{2}\hbar \vv{\Sigma} \right) \cdot \left( \frac{1}{2}\hbar \vv{\Sigma} \right) = \frac{3}{4}\hbar^2 \operator{1}
+        \end{equation}
+        and \(\hbar\Sigma^3/2\) has eigenvalues of \(\pm \hbar/2\) suggesting that the spin operator is
+        \begin{equation}
+            \vecoperator{s} = \frac{1}{2}\hbar \vv{\Sigma}.
+        \end{equation}
+        
+        Note that \(\vv{\Sigma}\) does not commute with the Hamiltonian in frames other than the rest frame, when \(\vv{p} = \vv{0}\).
+        The operator \(\vecoperator{L} = \vecoperator{r} \times \vecoperator{p}\) also doesn't commute with the Hamiltonian.
+        However, the operator
+        \begin{equation}
+            \vecoperator{J} = \vecoperator{L} + \vecoperator{s} = \vecoperator{r} \times \vecoperator{p} + \frac{1}{2}\hbar\vv{\Sigma}
+        \end{equation}
+        does commute with the Hamiltonian.
+        This suggests we can interpret \(\vecoperator{J}\) as the total angular momentum.
+        
+        When \(\vv{p} \ne \vv{0}\) there are two independent states for any fixed four-momentum.
+        Therefore there exists some operator which commutes with \(c\vv{\alpha} \cdot \vecoperator{p} + \beta mc^2\) and labels the states.
+        One option is the \defineindex{helicity operator}
+        \begin{equation}
+            \operator{h}(\vv{p}) = 
+            \begin{pmatrix}
+                \frac{\vv{\sigma} \cdot \vv{p}}{\abs{\vv{p}}} & 0\\
+                0 & \frac{\vv{\sigma}\cdot\vv{p}}{\abs{\vv{p}}}
+            \end{pmatrix}
+            .
+        \end{equation}
+        This commutes with \(c\vv{\alpha} \cdot\vecoperator{p} + \beta mc^2\) and has eigenvalues \(\pm 1\).
+        We can therefore chose general plane-wave states with \(\vv{p} \ne \vv{0}\) to be helicity states.
+        
+    \end{appendices}
+    
+    \backmatter
+    %    \renewcommand{\glossaryname}{Acronyms}
+    %    \printglossary[acronym]
+    \printindex
+\end{document}
