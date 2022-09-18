@@ -22,6 +22,11 @@ If you have spotted a mistake, have a suggestion or improvement in mind, or thin
 Here are all the courses I took.
 (y) denotes a year long course, (s1) a course that was only in semester 1 and (s2) a course that was only in semester 2.
 
+### Year 5
+* [Quantum Field Theory](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-5/Quantum-Field-Theory) (s1)
+* [Symmetries of Particles and Fields](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-5/Symmetries-of-Particles-and-Fields) (s1)
+* [Particle Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-5/Particle-Physics) (s1)
+
 ### Year 4
 * [Introduction to Condensed Matter Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Introduction-to-Condensed-Matter-Physics) (s1)
 * [Relativity, Nuclear, and Particle Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Relativity-Nuclear-and-Particle-Physics) (s1) - composed of three parts:
