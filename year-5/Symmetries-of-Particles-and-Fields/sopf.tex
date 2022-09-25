@@ -1,0 +1,1127 @@
+% !TeX program = lualatex
+\documentclass[fleqn]{NotesClass}
+
+\strictpagecheck
+
+%% Packages
+\usepackage{tensor}
+\usepackage{csquotes}
+
+% Tikz stuff
+\usepackage{tikz}
+%\tikzset{>=latex}
+% External
+\usetikzlibrary{external}
+\tikzexternalize[prefix=tikz-external/]
+% Other libraries
+
+% References, should be last things loaded
+\usepackage[pdfauthor={Willoughby Seago},pdftitle={Symmetries of Particles and Fields},pdfkeywords={symmetry, group theory, lie groups, lie algebras, representation theory, lorentz group, SU(2), quantum field theory},pdfsubject={Lie Groups, Representation Theory, and Quantum Field Theory}]{hyperref}  % Should be loaded second last (cleveref last)
+\colorlet{hyperrefcolor}{blue!60!black}
+\hypersetup{colorlinks=true, linkcolor=hyperrefcolor, urlcolor=hyperrefcolor}
+\usepackage[
+capitalize,
+nameinlink,
+noabbrev
+]{cleveref} % Should be loaded last
+
+% My packages
+\usepackage{NotesBoxes}
+\usepackage{NotesMaths}
+
+\setmathfont[range={\int, \oint, \otimes, \oplus, \bigotimes, \bigoplus}]{Latin Modern Math}
+
+% Highlight colour
+\definecolor{highlight}{HTML}{710D78}
+\definecolor{my blue}{HTML}{2A0D77}
+\definecolor{my red}{HTML}{770D38}
+\definecolor{my green}{HTML}{14770D}
+\definecolor{my yellow}{HTML}{E7BB41}
+
+% Title page info
+\title{Symmetries of Particles and Fields}
+\author{Willoughby Seago}
+\date{}
+% \subtitle{}
+% \subsubtitle{}
+
+% Commands
+% Text
+\newcommand{\course}[1]{\textit{#1}}
+
+% Maths
+\newcommand{\cyclicGroupZ}[1][n]{\integers_{#1}}
+\newcommand{\cyclicGroupC}[1][n]{C_{#1}}
+\newcommand{\symmetricGroup}[1][n]{S_{#1}}
+\newcommand{\subgroup}{\subseteq}
+\newcommand{\properSubgroup}{\subset}
+\DeclarePairedDelimiter{\cardinality}{\lvert}{\rvert}
+\newcommand{\action}{\mathbin{.}}
+\newcommand{\e}{\symrm{e}}
+\newcommand{\ident}{1}
+\newcommand{\sphere}[1][n]{S^{#1}}
+\newcommand{\minkowskiSpace}{\reals^{1,3}}
+\newcommand{\minkowskiMetric}{\eta}
+\renewcommand{\lie}[1]{\symfrak{#1}}
+\DeclarePairedDelimiterX{\commutator}[2]{[}{]}{#1 , #2}
+\DeclarePairedDelimiterX{\anticommutator}[2]{\{}{\}}{#1, #2}
+\DeclarePairedDelimiterX{\innerproduct}[2]{(}{)}{#1, #2}
+\newcommand{\isomorphic}{\cong}
+\newcommand{\hermit}{\dagger}
+\newcommand{\trans}{\top}
+\renewcommand{\field}{\symbb{k}}
+\DeclareMathOperator{\End}{End}
+\DeclareMathOperator{\Aut}{Aut}
+\DeclareMathOperator{\symplectic}{Sp}
+\ExplSyntaxOn
+% Create LaTeX interface command
+\NewDocumentCommand{\cycle}{ O{\,} m }{  % optional arg is separator, mandatory
+    %arg is comma separated list
+    (
+    \willoughby_cycle:nn { #1 } { #2 }
+    )
+}
+
+\clist_new:N \l_willougbhy_cycle_clist  % Create new clist variable
+\cs_new_protected:Npn \willoughby_cycle:nn #1 #2 {  % create LaTeX3 function
+    \clist_set:Nn \l_willougbhy_cycle_clist { #2 }  % set clist variable with
+    %clist #2 passed by user
+    \clist_use:Nn \l_willougbhy_cycle_clist { #1 }  % print list separated by #1
+}
+\ExplSyntaxOff
+
+\includeonly{}
+
+\begin{document}
+    \frontmatter
+    \titlepage
+    \innertitlepage{}
+    \tableofcontents
+    \listoffigures
+    \mainmatter
+    
+    \chapter{Introduction}
+    Symmetries are incredibly important in physics.
+    Both approximate and exact symmetries highly restrict the forms that our equations can take, to the point that often the correct equation can be written down from symmetries alone.
+    The mathematical language expressing symmetries is group theory.
+    In particular we are interested in continuous symmetries, which are modelled by Lie groups, and we can get a better understanding of Lie groups by studying the associated Lie algebras.
+    
+    The following is a selection of symmetries we'll discuss in this course, to demonstrate how broad a concept symmetry is:
+    \begin{itemize}
+        \item Spacetime translations and rotations, these give rise to conservation of energy, momentum, and angular momentum.
+        \item Internal symmetries, these give rise to conservation of electric charge, and particle number to give a couple of examples.
+        \item Charge conjugation, parity, and time reversal symmetries.
+        \item Homogeneity and isotropy of the universe on a large scale, these allow us to write down a metric tensor which then describes the curvature of spacetime across the universe.
+        \item Approximate internal symmetries, such as nuclear isospin and flavour \(\specialUnitary(3)\).
+        \item General coordinate invariance (or invariance under diffeomorphisms) leads to an interpretation of general relativity as a gauge theory.
+    \end{itemize}
+    
+    The course is structured as follows:
+    \begin{enumerate}
+        \item We introduce Lie groups and Lie algebras.
+        \item We study spacetime symmetries and look at the actions that we can form obeying these symmetries.
+        \item We study compact groups and their representations.
+        \item We look at applications in particle physics, including Noether's theorem, isospin, the quark model, spontaneous symmetry breaking, chiral symmetry, gauge theories, QCD, electroweak theory, and the Higgs mechanism.
+        \item We loo at applications in cosmology.
+    \end{enumerate}
+    
+    \part{Lie Groups}
+    \chapter{Groups and Lie Groups}
+    \epigraph{What's the difference between theoretical physics and maths? The distinction is that thoretical physicists rarely prove anything, we cheat by looking at nature.}{Neil Turok}
+    \section{Groups}
+    \begin{rmk}
+        For more details see the \course{Symmetries of Quantum Mechanics} course.
+    \end{rmk}
+    A group is the mathematical language used to describe symmetries.
+    Roughly speaking a symmetry is something that we can do to something else, such that the second thing is unchanged.
+    We should expect that chaining together symmetries should behave nicely.
+    In particular, it should be possible to do nothing, and it should be possible to undo anything we do.
+    Abstracting this gives us the definition of a group.
+    \begin{dfn}{Group}{}
+        A \defineindex{group}, \((G, \cdot)\), is a set, \(G\), along with an associative binary operation, \(\cdot \colon G\times G \to G\), such that there is an identity element and every element has an inverse.
+        
+        \define{Associativity}\index{associative} means that for all \(g, h, k \in G\) we have
+        \begin{equation}
+            g \cdot (h \cdot k) = (g \cdot h) \cdot k.
+        \end{equation}
+        The \defineindex{identity} element is the distinguished element \(1 \in G\) such that
+        \begin{equation}
+            1 \cdot g = g \cdot 1 = g
+        \end{equation}
+        for all \(g \in G\).
+        For each \(g \in G\) we have some \(g^{-1} \in G\), called the \defineindex{inverse} of \(g\), such that
+        \begin{equation}
+            g \cdot g^{-1} = g^{-1} \cdot g = 1.
+        \end{equation}
+    \end{dfn}
+    
+    \begin{dfn}{Abelian}{}
+        A group, \(G\), is \defineindex{Abelian} if \(gh = hg\) for all \(g, h \in G\).
+    \end{dfn}
+    
+    \begin{ntn}{}{}
+        We usually refer to a group, \(G\), rather than a group \((G, \cdot)\), with the operation either implicit or stated separately.
+        
+        We usually write the operation as juxtaposition, so \(gh\) instead of \(g \cdot h\).
+        We may use multiple symbols for different group operations, such as \(+\), \(*\), or \(\circ\).
+        We then write the inverse and identities with the appropriate notation, so \(-g\) for \(g\) inverse if we use \(+\), and 0 for the identity.
+    \end{ntn}
+    
+    \begin{exm}{Groups}{}
+        \begin{itemize}
+            \item The single element set, \(\{e\}\), is a group if we define \(e \cdot e = e\).
+            This is called the \defineindex{trivial group}.
+            \item The symmetries of a cube form a group, with the operation being concatenation of symmetries.
+            \item The sets \(\integers\), \(\rationals\), \(\reals\), and \(\complex\) all form groups under addition.
+            \item The sets \(\rationals^{\times}\), \(\reals^{\times}\), and \(\complex^{\times}\) all form groups under multiplication where \(S^{\times} = S\setminus \{0\}\) denotes the set \(S\) with \(0\) removed.
+            \item Invertible \(n \times n\) matrices over some ring, \(R\), form a group under matrix multiplication.
+            \item The set \(\cyclicGroupZ = \cyclicGroupC = \{0, 1, \dotsc, n - 1\}\)\index{Zn@\(\cyclicGroupZ\)|see{cyclic group}}\index{Cn@\(\cyclicGroupC\)|see{cyclic group}} forms a group under addition modulo \(n\).
+            This is called the \defineindex{cyclic group} of order \(n\).
+            \item The set of all permutations on \(n\) elements forms a group, denoted \(\symmetricGroup\)\index{Sn@\(S_n\)|see{symmetric group}}.
+            This is called the \defineindex{symmetric group} on \(n\) objects.
+            \item The set of invertible functions, \(A \to A\), forms a group under function composition.
+            \item The set of translations of space forms a group under repeated application of translations.
+            \item The set of rotations of space forms a group under repeated application of rotations.
+        \end{itemize}
+    \end{exm}
+    
+    \begin{dfn}{Subgroup}{}
+        Let \(G\) be a group, and let \(H\) be a subset of \(G\).
+        We say that \(H\) is a \defineindex{subgroup} of \(G\), and write \(H \subgroup G\) if \(H\) is a group under the operation of \(G\).
+        
+        If \(H \ne G\) we say that \(H\) is a \defineindex{proper subgroup}\index{subgroup!proper} of \(G\), and we write \(H \properSubgroup G\).
+        If \(H \ne \{e\}\) then we say that \(H\) is a \index{nontrivial subgroup}\index{subgroup!nontrivial} of \(G\).
+    \end{dfn}
+    
+    \begin{dfn}{Order}{}
+        The order of a finite group, that is a group with a finite number of elements, is the number of elements.
+        We write \(\cardinality{G}\) for the order of the group \(G\).
+    \end{dfn}
+    
+    \begin{exm}{}{}
+        \begin{itemize}
+            \item The order of the trivial group is \(\cardinality{\{e\}} = 1\).
+            \item The order of \(\cyclicGroupC\) is \(\cardinality{\cyclicGroupC} = n\).
+            \item The order of \(\symmetricGroup\) is \(\cardinality{\symmetricGroup} = n!\).
+        \end{itemize}
+    \end{exm}
+    
+    We usually think of symmetries, and therefore groups, as acting on something.
+    The group definition doesn't tell us how the group elements act on an object (mathematical or physical), this will come later.
+    We typically don't distinguish much between a group acting on something, and a stand alone group with nothing to act on, since the later is not that interesting.
+    
+    \begin{dfn}{Group Action}{}
+        Given a group, \(G\), and a set, \(S\), we define a \defineindex{left group action}\index{group action} as a function, \(\varphi \colon G \times S \to S\), such that
+        \begin{itemize}
+            \item \(\varphi(1, s) = s\) for all \(s \in S\); and
+            \item \(\varphi(g, \varphi(h, s)) = \varphi(gh)\).
+        \end{itemize}
+        Writing \(\varphi(g, s) = g \action s\) these requirements become \(1 \action s = s\) and \(g \action (h \action s) = (gh) \action s\).
+    \end{dfn}
+
+    \begin{exm}{Group Actions}{}
+        The group \(\reals^3\) of three-dimensional real vectors under vector addition acts on itself by translation:
+        \begin{equation}
+            \vv{a} \action \vv{x} = \vv{x} + \vv{a}.
+        \end{equation}
+        The group \(S_n\) acts on \((1, \dotsc, n)\) by permutation, say \(\sigma \in S_n\) swaps the first and second element, then
+        \begin{equation}
+            \sigma \action (1, 2, 3, \dotsc, n) = (2, 1, 3, \dotsc, n).
+        \end{equation}
+        The group \(\cyclicGroupZ[4] = \{0, 1, 2, 3\}\) acts on \(\reals^2\) by rotations by angles \(0\), \(\pi/2\), \(\pi\), and \(3\pi/2\), corresponding to \(0\), \(1\), \(2\), and \(3\) respectively.
+        
+        The group \(\cyclicGroupC[4] = \{1, i, -1, -i\}\), acts on \(\complex\) by complex multiplication:
+        \begin{equation}
+            z \action w = zw
+        \end{equation}
+        where \(z \in \cyclicGroupC[4]\) and \(w \in \complex\).
+        However, notice that we can interpret \(\complex\) as a plane and rotation by multiples of \(i\) as rotations by multiplies of \(\pi/2\), so really these two groups are the same.
+    \end{exm}
+
+    Often two groups may look different, as in the case of \(\cyclicGroupZ[4]\) and \(\cyclicGroupC[4]\) above, but really they are the same on the level of the group structure.
+    This is expressed through the notion of isomorphisms.
+    
+    \begin{dfn}{Morphisms}{}
+        Let \(G\) and \(H\) be groups.
+        A group \defineindex{homomorphism} is a function \(\varphi \colon G \to H\) such that \(\varphi(g_1 g_2) = \varphi(g_1)\varphi(g_2)\) for all \(g_1, g_2 \in G\).
+        If this function is invertible it is called a group \defineindex{isomorphism}.
+        
+        If there exists an isomorphism \(G \to H\) then we say \(G\) and \(H\) are \defineindex{isomorphic}, and write \(G \isomorphic H\).
+    \end{dfn}
+    
+    So, when we say that \(\cyclicGroupZ[4]\) and \(\cyclicGroupC[4]\) are the same, we really mean that the mapping defined by \(0 \mapsto 1\), \(1 \mapsto i\), \(2 \mapsto -1\), and \(3 \mapsto -i\) is a group isomorphism, and \(\cyclicGroupZ[4] \isomorphic \cyclicGroupC[4]\).
+    In fact, this is a slightly cheaty example as \(\cyclicGroupZ[n] \isomorphic \cyclicGroupC[n]\) where \(\cyclicGroupC[n] = \{\e^{2\pi i m/n} \mid m = 0, \dotsc, n - 1\}\).
+    Alternatively we can define \(\cyclicGroupC[n] = \cyclicGroupZ[n]\), and then say that the complex exponentials before are a representation of the group.
+    
+    When two groups are isomorphic, as far as group theory is concerned, they are equivalent and interchangeable.
+    
+    \begin{exm}{}{}
+        \begin{itemize}
+            \item The group \(\symmetricGroup[2]\) is isomorphic to the group \(\cyclicGroupC[2]\).
+            \item The group of symmetries of the triangle is isomorphic to \(\symmetricGroup[3]\).
+            \item All groups are isomorphic to some subgroup of \(\symmetricGroup[n]\) for some \(n\).
+            \item All groups of order 1 are isomorphic, since they have a single element and that element must be the identity.
+        \end{itemize}
+    \end{exm}
+    
+    \begin{dfn}{Direct Product}{}
+        Let \(G\) and \(H\) be groups.
+        Then there exists a group \(G \times H\) formed from pairs \((g, h)\) with \(g \in G\) and \(h \in H\) with the group operation just elementwise application of \(G\) and \(H\)'s operations:
+        \begin{equation}
+            (g, h)(g', h') = (gg', hh').
+        \end{equation}
+    \end{dfn}
+    
+    \begin{lma}{}{}
+        The direct product as defined above is a group.
+        \begin{proof}
+            Let \(G\) and \(H\) be groups and \(G \times H\) their direct product.
+            Then for all \(g, g', g'' \in G\) and \(h, h', h'' \in H\) we have
+            \begin{align}
+                (g, h)[(g', h')(g'', h'')] &= (g, h)(g'g'', h'h'')\\
+                &= (g(g'g''), h(h'h''))\\
+                &= ((gg')g'', (hh')h'')\\
+                &= (gg', hh')(g'', h''')\\
+                &= [(g, h)(g', h')](g'', h'').
+            \end{align}
+            So, the operation is associative.
+            Let \(1_G \in G\) and \(1_H \in H\) be the identities in their respective groups, then
+            \begin{equation}
+                (1_G, 1_H)(g, h) = (1_Gg, 1_Hh) = (g, h) = (g1_G, h1_H) = (g, h)(1_G, 1_H),
+            \end{equation}
+            so \(1_{G\times H} = (1_G, 1_H)\) is the identity in \(G \times H\).
+            Finally, take \(g \in G\) and \(h \in H\).
+            Then we have
+            \begin{equation}
+                (g, h)(g^{-1}, h^{-1}) = (gg^{-1}, hh^{-1}) = (1_G, 1_H) = 1_{G\times H},
+            \end{equation}
+            so \(G \times H\) has inverses.
+        \end{proof}
+    \end{lma}
+    
+    \begin{exm}{}{}
+        \begin{itemize}
+            \item Considering \(\reals\) as a group under addition we have \(\reals \times \reals = \{(x, y) \mid x, y \in \reals\}\) with addition defined as \((x, y) + (x', y') = (x + x', y + y')\), so we identify this with the plane, \(\reals^2\), under vector addition.
+            \item The product \(\cyclicGroupZ[3] \times \cyclicGroupZ[2]\) is the set \(\{(n, m) \mid n = 0, 1, 2 \text{ and } m = 0, 1\}\).
+            This group is generated\footnote{A group, \(G\), is \defineindex{generated} by some \(g \in G\) if all \(h \in G\) are of the form \(g^n\) for some \(n \in \naturals\), where \(g^n \coloneqq g g \dotsm g\) with \(n\) factors and \(g^0 \coloneqq 1\). We call the smallest such \(n\) the \defineindex{order} of \(h\).} by \((1, 1)\), and \((1, 1)\) has order 6, so this group is isomorphic to \(\cyclicGroupZ[6]\).
+            In fact, if \(p\) and \(q\) are relatively prime them \(\cyclicGroupZ[p] \times \cyclicGroupZ[q] \isomorphic \cyclicGroupZ[pq]\).
+            \item The first noncyclic group is the Klein four-group, \(V = \cyclicGroupZ[2] \times \cyclicGroupZ[2]\).
+            \item If \(G\) is a group and \(\{1\}\) is the trivial group then \(G \times \{1\} \isomorphic \{1\} \times G \isomorphic G\), so \(\{1\}\) acts as an identity for the direct product.
+        \end{itemize}
+    \end{exm}
+    
+    \section{Lie Groups}
+    Often the groups of interest in physics have an uncountable number of elements, in this case they are continuos groups.
+    We can define this more rigorously by parametrising the elements in a continuous way.
+    \begin{dfn}{Continuous Groups}{}
+        A \defineindex{continuous group}, \(G\), is a group with an infinite number of elements parametrised by a (possibly infinite) set of parameters, \(\{\alpha\} = \{\alpha_1, \alpha_2, \dotsc\}\), such that each element of \(G\) can be written as a function of these parameters, \(g(\alpha) = g(\alpha_1, \alpha_2, \dotsc)\).
+        
+        The \defineindex{dimension} of \(G\) is the number of independent parameters.
+    \end{dfn}
+    
+    \begin{exm}{}{}
+        Spatial translations of \(\reals^3\) form a three dimensional continuous group.
+        The translation \(\vv{x} \to \vv{x} + \vv{a}\) is parametrised by \(\{a_1, a_2, a_3\}\).
+        
+        Spatial rotations of \(\reals^3\) form a three dimensional continuous group.
+        Consider the rotation \(x^i \to \tensor{R}{^i_j}x^j\).
+        For a rotation we know that \(\tensor{R}{^i_j}\tensor{R}{^k_l} \delta_{ik} = \delta_{jl}\), or \(R^\trans R = \ident\).
+        A rotation in three dimensions can be parametrised by 3 parameters, two used to pick out a unit vector in \(\reals^3\), the third component being fixed by normalisation, and one parameter to give the angle of rotation about said unit vector.
+    \end{exm}
+    
+    As is usually the case in physics we assume that most things are analytic, they can be expanded in Taylor series.
+    This assumption defines Lie groups, one of the main subjects of our study in this course.
+    \begin{dfn}{Lie Group}{}
+        A \defineindex{Lie group}, \(G\), is a continuous group for which the group multiplication has an analytic structure.
+        That is, if \(g(\alpha) = g(\beta)g(\gamma)\) then \(\alpha_i = \varphi_i(\beta, \gamma)\) where \(\varphi_i\) are analytic functions of \(\beta\) and \(\gamma\).
+    \end{dfn}
+    
+    Formally we say that the parameter space for a Lie group is a smooth manifold and multiplication is given by a smooth function on this manifold.
+    
+    Continuous groups can be either compact or noncompact, depending on the structure of the parameter space.
+    For our purposes a \defineindex{compact space} is one which is closed and bounded, that is it contains its boundary and the parameters are restricted in their size.
+    For example, \(\reals\) is noncomapct, since it isn't bounded, the intervals \([0, 1)\), \((0, 1]\), and \((0, 1)\) are noncompact as they don't contain their boundaries, and \([0, 1]\) is compact.
+    The sphere, \(\sphere\), is compact.
+    
+    For example, the group of translations of \(\reals^3\) is noncompact, since we can have infinite translations.
+    The group of rotations of \(\reals^3\) on the other hand is compact, the parameters defining the axis are constrained to \([0, 1]\) and the parameters defining the angle are constrained to \([0, 2\pi)\), which looks like it isn't closed but actually we identify 0 and \(2\pi\) as the same rotation, so really this is drawing from the circle, \(\sphere[1]\), which is closed.
+    The parameter space is then \([0, 1]^2 \times \sphere[1]\), which is compact, since the product of compact spaces is compact.
+    
+    \section{Metric Spaces}
+    \begin{rmk}
+        This section is concerned with the notion of a metric on a real vector space.
+        There is a more general mathematical notion of a metric on a topological space which we shall not discuss here, but when restricted to \(\reals^n\) these notions coincide.
+    \end{rmk}
+
+    Consider some finite dimensional real vector space, \(V\), and fix some basis.
+    Take a vector with components \(x^\mu\) where \(\mu = 1, \dotsc, N\) where \(N = \dim V\).
+    Alternatively, particularly when doing relativity, we may take \(\mu = 0, \dotsc, N - 1\), in which case we interpret \(x^0\) as the time.
+    A \defineindex{metric}, \(g_{\mu\nu}\), is a real, symmetric, \(N \times N\) matrix.
+    We define the length of a vector according to
+    \begin{equation}
+        \norm{x}^2 = x^2 = g_{\mu\nu}x^\mu x^\nu,
+    \end{equation}
+    where summation over \(\mu\) and \(\nu\) is implied by the Einstein summation convention, which we follow in this course: repeated indices appearing once raised and once lowered are summed over unless otherwise specified.
+    
+    It is possible to choose a basis such that:
+    \begin{itemize}
+        \item \(g_{\mu\nu}\) is diagonal, that is \(g_{\mu\nu} = \diag(\lambda_1, \dotsc, \lambda_N)\) where \(\lambda_i \in \reals\) are the eigenvalues of \(g_{\mu\nu}\); and
+        \item the eigenvalues are either \(0\) or \(\pm 1\).
+        Reordering the basis as required allows us to put the metric in the canonical form
+        \begin{equation}
+            g_{\mu\nu} = \diag(1, \dotsc, 1, 0, \dotsc, 0, -1, \dotsc, -1).
+        \end{equation}
+        We call this the \defineindex{canonical basis}.
+    \end{itemize}
+
+    The first point, that \(g_{\mu\nu}\) is diagonalisable, is not that surprising.
+    The second point, that the eigenvalues are restricted to \(\{0, \pm 1\}\), is worth explaining.
+    Suppose that \(g_{\mu\nu} = \diag(\lambda, \dotsc)\) where \(\lambda \ne 0\).
+    We can rescale \(x^1 \mapsto sx^1\).
+    Then, \(g_{\mu\nu} \mapsto \diag(\lambda/s^2, \dotsc)\), in order for \(x^2\) to remain invariant, since using the diagonal nature of \(g_{\mu\nu}\) we have
+    \begin{multline}
+        x^2 = g_{\mu\nu}x^\mu x^\nu = \lambda x^1 x^1 + \sum_{i = 2}^{N} g_{ii}x^ix^i\\
+        \mapsto \frac{\lambda}{s^2}sx^1sx^1 + \sum_{i = 2}^{N} g_{ii}x^ix^i = \lambda x^1x^1 + \sum_{i = 2}^{N} g_{ii}x^ix^i = x^2.
+    \end{multline}
+    So, by choosing \(s = \sqrt{\abs{\lambda}}\) we can scale \(g_{\mu\nu}\) such that
+    \begin{equation}
+        g_{\mu\nu} = \diag(\sgn(\lambda), \dotsc)
+    \end{equation}
+    where
+    \begin{equation}
+        \sgn(\lambda) =
+        \begin{cases}
+            1 & \lambda > 0,\\
+            -1 & \lambda < 0.
+        \end{cases}
+    \end{equation}
+    Doing this same process for all nonzero eigenvalues of the original \(g_{\mu\nu}\) we can scale all diagonal elements to be \(0\) or \(\pm 1\).
+    Reordering the basis then gives us the canonical form.
+    
+    \begin{exm}{Metrics}{}
+        Euclidean space, \(\reals^n\), has the metric \(g_{ij} = \delta_{ij}\).
+        In particular, when \(n = 3\) we have
+        \begin{equation}
+            x^2 = (x^1)^2 + (x^2)^2 + (x^3)^2,
+        \end{equation}
+        which is just the usual length-squared of a vector, \(\vv{x} = (x^1, x^2, x^3)\).
+        
+        Minkowski space, \(\minkowskiSpace\), has the metric \(g_{\mu\nu} = \diag(1, -1, -1, -1)\), so
+        \begin{equation}
+            x^2 = (x^0)^2 - (x^1)^2 - (x^2)^2 - (x^3)^2,
+        \end{equation}
+        which is just the usual scalar product of two four-vectors.
+        \begin{wrn}
+            The choice of \(g_{\mu\nu} = \diag(-1, 1, 1, 1)\) is also common, leading to lots of annoying sign discrepancies.
+            In fact, given any metric, \(g\), the metric \(-g\) is equivalent.
+        \end{wrn}
+    \end{exm}
+    
+    Transformations preserving the metric in its canonical form are the symmetries that we are most interested in.
+    This makes sense when you think about what we use the metric for.
+    In Euclidean space the metric defines lengths, something that shouldn't change under symmetries.
+    In special relativity transformations preserving the metric don't preserve lengths, at least in the traditional sense, they instead preserve the speed of light.
+    In quantum mechanics the metric used to define the inner product between state vectors being preserved means that probability is preserved by metric preserving transformations.
+    
+    \begin{dfn}{Types of Metric}{}
+        If the metric has only positive eigenvalues then we say that it is a \defineindex{positive definite} metric.
+        If the metric has positive and negative eigenvalues then we say that it is \defineindex{indefinite}.
+    \end{dfn}
+    
+    An indefinite metric allows for \(x^2\) to be positive, negative or zero, contrary to our normal intuition about length squared.
+    
+    The \defineindex{metric signature} is either a pair or triple of natural numbers giving the number of 1s, \(-1\)s, and 0s in the metric.
+    For example, the the Euclidean metric on \(\reals^n\) is \((n, 0, 0)\) or \((n, 0)\), where no third number is taken to mean no zero eigenvalues.
+    So the Minkowski metric is \((1, 3)\), or \((1, 3, 0)\).
+    
+    If we have a nonsingular metric, that is \(\det g \ne 0\), then we can use the metric, and its inverse, to raise and lower indices.
+    Define the inverse metric \(g^{\mu\nu}\) to be such that
+    \begin{equation}
+        g^{\mu\rho}g_{\rho\nu} = \tensor{\delta}{^\mu_\nu}.
+    \end{equation}
+    Then we define
+    \begin{equation}
+        x_\mu = g_{\mu\nu}x^\nu, \quad T_{\mu\nu} = g_{\mu\rho}g_{\nu\sigma}T^{\rho\sigma},
+    \end{equation}
+    and so on for more indices.
+    
+    After lengths the next most important quantity we can define is volumes.
+    Recall that a parallelepiped with sides \(\vv{a}, \vv{b}, \vv{c} \in \reals^3\) has volume
+    \begin{equation}
+        \abs{\vv{a} \cdot (\vv{b} \times \vv{c})} = \abs{a^ib^jc^k\varepsilon^{ijk}}.
+    \end{equation}
+    This suggests that we can use the Levi-Civita symbol to generalise volumes.
+    Define the \defineindex{Levi-Civita symbol} on \(n\) indices to be
+    \begin{equation}
+        \varepsilon_{\mu_1 \mu_2 \dots \mu_n} \coloneqq
+        \begin{cases}
+            +1 & \text{if } \mu_1 \mu_2 \dots \mu_n \text{ is an even permutation of } 1 \dots n,\\
+            -1 & \text{if } \mu_1 \mu_2 \dots \mu_n \text{ is an odd permutation of } 1 \dots n,\\
+            0 & \text{otherwise}.
+        \end{cases}
+    \end{equation}
+    For a nonsingular metric we can then define the Levi-Civita symbol with raised indices:
+    \begin{equation}
+        \varepsilon^{\mu_1\mu_2 \dots \mu_n} \coloneqq ^{\mu_1\nu_1}g^{\mu_2\nu_2} \dotsm g^{\mu_n\nu_n} \varepsilon_{\nu_1\nu_2 \dots \nu_n}.
+    \end{equation}
+    
+    We can use this to define the determinant of a matrix, \(A\):
+    \begin{equation}
+        \det A \coloneqq \varepsilon_{\mu_1\mu_2 \dots \mu_n} \tensor{A}{^{\mu_1}_1} \tensor{A}{^{\mu_2}_2} \dotsm \tensor{A}{^{\mu_n}_n}
+    \end{equation}
+    
+    In a general metric the infinitesimal volume element, which is invariant under metric preserving transformations, is
+    \begin{equation}
+        \dl{V} \coloneqq \sqrt{\abs{\det g}} \varepsilon_{\mu_1\mu_2 \dots \mu_n} \dd{x^{\mu_1}} \dd{x^{\mu_2}} \dotsm \dd{x^{\mu_n}}.
+    \end{equation}	
+    If \(g\) is the Minkowski metric then its determinant is negative in any coordinate system and so this is often written \(\sqrt{-\det g}\) instead.
+    It's also common to use \(g\) as short for \(\det g\), and anywhere else the metric appears it has indices.
+    
+    \chapter{Matrix Groups}
+    \section{General Theory}
+    In this chapter we will study various metric preserving groups of linear transformations on some vector space, \(V\).
+    If \(V\) is finite dimensional then we can choose a basis and identify these linear transformations with matrices, which gives a group.
+    
+    A \defineindex{linear transformation} is a function, \(T \colon U \to V\), where \(U\) and \(V\) are vector spaces over the same base field, \(\field\), such that
+    \begin{equation}
+        T(\alpha u_1 + \beta u_2) = \alpha T(u_1) + \beta T(u_2)
+    \end{equation}
+    for all \(\alpha, \beta \in \field\) and \(u_1, u_2 \in U\).
+    Note that we often drop the brackets for linear transformations, and just write \(Tu = T(u)\), which reflects the notion of linear transformations as matrices in the finite dimensional case.
+    
+    The group operation in question is composition of linear transformation, which is matrix multiplication in the finite dimensional case.
+    This inherits associativity from the underlying operation of function composition.
+    Let \(f \colon A \to B\), \(g \colon B \to C\), and \(h \colon C \to D\) be functions.
+    Then,
+    \begin{multline}
+        [(h \circ g) \circ f](a) = (h \circ g)(f(a)) = h(g(f(a)))\\
+        = h((g \circ f)(a)) = [h \circ (g \circ f)](a).
+    \end{multline}
+    for all \(a \in A\), so \((h \circ g) \circ f = h \circ (g \circ f)\).
+    
+    The identity linear transformation, \(\ident \colon V \to V\), is given by \(\ident(v) = v\) for all \(v \in V\).
+    Note that \(T \circ \ident_U = T\) and \(\ident_V \circ T = T\) for all \(T \colon U \to V\) where \(\ident_V\) and \(\ident_U\) are the identities on their respective vector spaces.
+    
+    The inverse linear transformation of \(T \colon U \to V\), if it exists, is the linear transformation \(T^{-1}\colon V \to U\) such that \(T \circ T^{-1} = \ident_V\) and \(T^{-1} \circ T = \ident_U\).
+    We get around the \enquote{if it exists} problem by just defining our groups to be formed from invertible transformations.
+    This works since if \(T \colon U \to V\) and \(S \colon V \to W\) are invertible linear transformations then the inverse of \(S \circ T\) is \(T^{-1} \circ S^{-1}\):
+    \begin{equation}
+        (S \circ T) \circ (T^{-1} \circ S^{-1}) = S \circ (T \circ T^{-1}) \circ S^{-1} = S \circ \ident_V \circ S = S \circ S^{-1} = \ident_W,
+    \end{equation}
+    and similarly \((T^{-1} \circ S^{-1}) \circ (S \circ T) = \ident_U\), so \(S \circ T \colon U \to W\) has an inverse.
+    
+    In our examples we will consider linear transformations from a space to itself, known as \define{endomorphisms}\index{endomorphism}.
+    The set of all such functions is
+    \begin{equation}
+        \End(V) \coloneqq \{T \colon V \to V \mid T \text{is linear}\}.
+    \end{equation}
+    This same notion applies to other types of objects, such as groups, with linear transformations replaced with the appropriate type, so group homomorphisms for groups.
+    With function composition as multiplication \(\End(V)\) forms a monoid, which is a group the requirement for inverses.
+    Restricting ourselves to invertible linear transformations we consider all invertible linear transformations from a space to itself, known as \define{automorphisms}\index{automorphism}.
+    The set of all such functions is
+    \begin{equation}
+        \Aut(V) \coloneqq \{T \colon V \to V \mid T \text{is linear and invertible}\} \subseteq \End(V).
+    \end{equation}
+    With function composition as multiplication \(\Aut(V)\) forms a group.
+    
+    In the finite dimensional case we are interested in transformations which can be expressed as invertible matrices, \(\tensor{D}{^\mu_\nu}(\alpha)\), where \(\alpha = \alpha_1, \dotsc, \alpha_{\dim G}\) parametrises the group.
+    These act on vectors as
+    \begin{equation}
+        x^\mu \to x'^\mu = \tensor{D}{^\mu_\nu}(\alpha) x^\nu
+    \end{equation}
+    where \(\mu, \nu = 1, \dotsc, N\).
+    Note that \(N \ne \dim G\) in general.
+    
+    \section{Matrix Groups}
+    In this section we will define specific matrix groups of interest in physics.
+    In all of these suppose we have a vector space, \(V\), of potentially infinite dimension over either the real or complex numbers.
+    In all cases the elements of the groups are linear transformations and the group operation is composition of transformations.
+    The identity is the identity transformation.
+    Our first group is the broadest possible such group.
+    
+    \begin{dfn}{General Linear Group}{}
+        The \defineindex{general linear group}, \(\generalLinear(V)\)\index{GL(V)@\(\generalLinear(V)\)|see{general linear group}}, is the group of all invertible transformations of \(V\), that is
+        \begin{equation}
+            \generalLinear(V) \coloneqq \{T \colon V \to V \mid T \text{ is invertible}\} = \Aut(V).
+        \end{equation}
+        
+        If \(V\) is a vector space over the field \(\field\), and is of finite dimension \(N\), then by choosing a basis we can identify each linear transformation with a matrix, and we can identify \(\generalLinear(V)\) with the set of invertible \(N \times N\) matrices over \(\field\), denoted \(\generalLinear(N, \field)\).
+        In this case invertible is equivalent to nonzero determinant, and so
+        \begin{equation}
+            \generalLinear(N, \field) \coloneqq \{T \in \matrices{N}{\field} \mid \det T \ne 0\}
+        \end{equation}
+        where \(\matrices{N}{\field}\) is the set of \(N \times N\) matrices over \(\field\).
+    \end{dfn}
+    
+    There are a variety of notations for the general linear group, and the subsequent subgroups, such as \(\generalLinear_n(\field)\) or \(\generalLinear(n)\), leaving the precise field to context.
+    
+    All other groups to be defined are subgroups of \(\generalLinear(V)\), and so to show they are groups we need only show that they're closed under the induced operation and contain all inverses.
+    This will require various linear algebra facts which we state without proof.
+    We also won't worry too much about intricacies with definitions in the infinite dimensional case, we'll just work with matrices.
+    
+    \begin{dfn}{Special Linear Group}{}
+        The \defineindex{special linear group}, \(\specialLinear(V)\)\index{SL(V)@\(\specialLinear(V)\)|see{special linear group}}, for finite dimensional \(V\), is the group of all invertible linear transformations with unit determinant:
+        \begin{equation}
+            \specialLinear(V) \coloneqq \{T \colon V \to V \mid T \text{ is invertible and } \det T = 1\} \subgroup \generalLinear(V).
+        \end{equation}
+        Choosing a basis we can identify each linear transformation with an \(N \times N\) matrix over \(\field\) and we get
+        \begin{equation}
+            \specialLinear(V) \coloneqq \{T \in \matrices{N}{\field} \mid \det T = 1\} \subgroup \generalLinear(N, \field).
+        \end{equation}
+    \end{dfn}
+    
+    We know that \(\det(S \circ T) = \det(S) \det(T)\), so if \(\det T = \det S = 1\) then \(\det(S \circ T) = 1\), so \(\specialLinear(V)\) is closed under composition.
+    Since \(\det(T^{-1}) = 1/\det(T)\) if \(\det T = 1\) then \(\det(T^{-1}) = 1\), so \(\specialLinear(V)\) contains all inverses.
+    Hence, \(\specialLinear(V)\) is a group.
+    
+    \begin{dfn}{Orthogonal Group}{}
+        The \defineindex{orthogonal group}, \(\orthogonal(N)\)\index{O(n)@\(\orthogonal(n)\)|see{orthogonal group}}, is the group preserving the Euclidean metric.
+        It consists of all orthogonal \(N \times N\) matrices over \(\reals\):
+        \begin{equation}
+            \orthogonal(N) \coloneqq \{O \in \matrices{N}{\reals} \mid O^\trans O = OO^\trans = \ident\} \subgroup \generalLinear(N, \reals).
+        \end{equation}
+    \end{dfn}
+    
+    Note that \(O^\trans O = \ident\) can be written as \(O^\trans \ident O = \ident\), where the \(\ident\) on the left is understood as the matrix form of the Euclidean metric, so the Euclidean metric is invariant under the action of the Orthogonal group
+    \begin{equation}
+        \delta_{\mu\nu} \xrightarrow{D \in \orthogonal(N)} \delta_{\alpha\beta} \tensor{D}{^\alpha_\mu}\tensor{D}{^\beta_\nu} = \delta_{\mu\nu}.
+    \end{equation}
+    This allows us to interpret orthogonal transformations as rotations, since they preserve distances and angles.
+    
+    Suppose \(O_1, O_2 \in \orthogonal(N)\), then \(O^\trans O = \ident\).
+    Then \((O_1O_2)^{\trans}(O_1O_2) = O_2^\trans O_1^\trans O_1 O_2 = O_2^\trans \ident O_2 = \ident\), so \(\orthogonal(N)\) is closed under composition.
+    We claim that if \(O \in \orthogonal(N)\) then \(O^{-1} \in \orthogonal(N)\), first note that \(O^{-1} = O^{\trans}\), then we have \((O^{-1})^\trans O^{-1} = (O^{\trans})^{\trans}O^{\trans} = OO^{\trans} = \ident\), so \(O^{-1} \in \orthogonal(N)\).
+    Hence \(\orthogonal(N)\) contains all inverses.
+    
+    \begin{dfn}{Special Orthogonal Group}{}
+        The \defineindex{special orthogonal group}, \(\specialOrthogonal(N)\)\index{SO(n)@\(\specialOrthogonal(n)\)|see{special orthogonal group}}, is the subgroup of the orthogonal group given by restricting to \(O \in \orthogonal(N)\) with \(\det O = 1\):
+        \begin{equation}
+            \specialOrthogonal(N) \coloneqq \{O \in \orthogonal(N) \mid \det O = 1\}.
+        \end{equation}
+        Note that \(\specialOrthogonal(N) \subgroup \orthogonal(N)\) and \(\specialOrthogonal(N) \subgroup \specialLinear(N, \reals)\).
+    \end{dfn}
+    
+    The special orthogonal group is a group for exactly the same reasons that \(\orthogonal(N)\) and \(\specialLinear(N, \field)\) are.
+    
+    \begin{dfn}{Unitary Group}{}
+        The \defineindex{unitary group}, \(\unitary(N)\)\index{U(n)@\(U(n)\)|see{unitary group}}, is the group preserving the standard inner product on a complex vector space:
+        \begin{equation}
+            \innerproduct{x}{y} = \sum_i x_i^* y_i.
+        \end{equation}
+        \begin{wrn}
+            We follow the physics convention that an inner product is conjugate linear in its first argument, mathematicians often define it to be conjugate linear in the second instead.
+        \end{wrn}
+        The unitary group consists of all \(N \times N\) unitary matrices over \(\complex\):
+        \begin{equation}
+            \unitary(N) \coloneqq \{U \in \matrices{N}{\complex} \mid U^\hermit U = UU^\hermit = \ident\} \subgroup \generalLinear(N, \complex).
+        \end{equation}
+    \end{dfn}
+    
+    Note that \(U^\hermit U = \ident\) can be written as \(U^\hermit \ident U = \ident\), with the \(\ident\) on the left understood as the matrix form of the metric on this complex vector space, so the metric is invariant under the action of the unitary group
+    \begin{equation}
+        \delta_{\mu\nu} \xrightarrow{D \in \unitary(N)} \delta_{\alpha\beta} (\tensor{D}{^\alpha_\mu})^* \tensor{D}{^\beta_\nu} = \delta_{\mu\nu}.
+    \end{equation}
+    
+    The same logic used to show the orthogonal group is a group works for the unitary group if we just replace transposes with Hermitian conjugates.
+    
+    \begin{dfn}{Special Unitary Group}{}
+        The \defineindex{special unitary group}, \(\specialUnitary(N)\)\index{SU(n)@\(\specialUnitary(n)\)|see{special unitary group}}, is the subgroup of the unitary group given by restricting to \(U \in \unitary(N)\) with \(\det U = 1\):
+        \begin{equation}
+            \specialUnitary(N) \coloneqq \{U \in \unitary(N) \mid \det U = 1\}.
+        \end{equation}
+        Note that \(\specialUnitary(N) \subgroup \unitary(N)\) and \(\specialUnitary(N) \subgroup \specialLinear(N, \complex)\).
+    \end{dfn}
+    
+    The special unitary group is a group for exactly the same reasons that \(\unitary(N)\) and \(\specialLinear(N, \field)\) are.
+    
+    \begin{exm}{\(\specialUnitary(2)\)}{}
+        Consider \(\specialUnitary(2)\).
+        Start with some \(2\times 2\) matrix over \(\complex\),
+        \begin{align}
+            U = 
+            \begin{pmatrix}
+                a & b\\ c & d
+            \end{pmatrix}
+            .
+        \end{align}
+        The requirement that \(U^\hermit U = \ident\) tells us that
+        \begin{equation}
+            U^{-1} = U^{\hermit} \implies 
+            \begin{pmatrix}
+                d & -b\\
+                -c & a
+            \end{pmatrix}
+            =
+            \begin{pmatrix}
+                a^* & c^*\\
+                b^* & d^*
+            \end{pmatrix}
+        \end{equation}
+        so \(a = d^*\) and \(c^* = -b\).
+        Now add in the requirement that \(\det U = 1\) and we have
+        \begin{equation}
+            ad - bc = 1 \implies aa^* + bb^* = 1.
+        \end{equation}
+        Now write \(a = \alpha_1 + i \alpha_2\) and \(b = \alpha_3 + i\alpha_4\) for \(\alpha_i \in \reals\).
+        Then we have
+        \begin{equation}
+            \alpha_1^2 + \alpha_2^2 + \alpha_3^2 + \alpha_4^2 = 1.
+        \end{equation}
+        This defines the three sphere,
+        \begin{equation}
+            \sphere[3] \coloneqq \{\vv{x} \in \reals^4 \mid x_1^2 + x_2^2 + x_3^2 + x_4^2 = \norm{\vv{x}}^2 = 1\}.
+        \end{equation}
+        This is a three-dimensional real manifold which is the parameter space for \(\specialUnitary(2)\).
+        Note that \(\sphere[3]\) is simply connected, that is any loop can be contracted to a point.
+    \end{exm}
+    
+    \begin{dfn}{Pseudo-Orthogonal Group}{}
+        The \defineindex{pseudo-orthogonal group}, \(\orthogonal(n, m)\)\index{O(n, m)@\(\orthogonal(n, m)\)|see{pseudo-orthogonal group}}, is the group preserving the metric with signature \((n, m)\).
+    \end{dfn}
+    
+    \begin{exm}{Lorentz Group}{}
+        The \defineindex{proper Lorentz group}, \(\specialOrthogonal(3, 1)\), is the group of Lorentz transformations, \(\Lambda\), preserving the Minkowski metric:
+        \begin{equation}
+            \Lambda^\trans \minkowskiMetric \Lambda = \minkowskiMetric \iff \tensor{\Lambda}{_\mu^\rho} \minkowskiMetric_{\rho\sigma} \tensor{\Lambda}{^\sigma_\nu} = \minkowskiMetric_{\mu\nu},
+        \end{equation}
+        and with \(\det \Lambda = 1\).
+        
+        Note that we can also consider the general \defineindex{Lorentz group} \(\orthogonal(3, 1)\)\index{O(3,1)@\(\orthogonal(3, 1)\)|see{Lorentz group}}, which allows transformations inverting spacetime with \(\det \Lambda \ne 1\), and the \defineindex{proper orthochronous Lorentz group}, \(\specialOrthogonal^+(3, 1)\)\index{SO+(3,1)@\(\specialOrthogonal^+(3, 1)\)|see{proper orthochronous Lorentz group}}, which has \(\tensor{\Lambda}{^0_0} \ge 1\).
+    \end{exm}
+    
+    \begin{dfn}{Pseudo-Unitary Group}{}
+        The \defineindex{pseudo-unitary group} is the group preserving an indefinite metric on a complex vector space.
+    \end{dfn}
+    
+    \begin{dfn}{Symplectic Groups}{}
+        The \defineindex{symplectic group} \(\symplectic(2N, \field)\)\index{Sp(2n, k)@\(\symplectic(2n, \field)\)|see{symplectic group}}, preserves an antisymmetric metric given by the block diagonal matrix
+        \begin{equation}
+            g = 
+            \begin{pmatrix}
+                0 & \ident_N\\
+                -\ident_N & 0
+            \end{pmatrix}
+        \end{equation}
+        on a \(2N\)-dimensional vector space over \(\field\).
+        
+        The \defineindex{compact symplectic group}, \(\symplectic(2N)\)\index{Sp(2n)@\(\symplectic(2n)\)|see{compact symplectic group}}, is \(\symplectic(2N) = \symplectic(2N, \complex) \cap \unitary(2N)\).
+        We can think of it as being the result of taking matrices in \(\symplectic(2N), \complex\) and replacing complex numbers with \(2\times 2\) real matrices according to
+        \begin{equation}
+            x + iy \mapsto 
+            \begin{pmatrix}
+                x & y\\
+                -y & x
+            \end{pmatrix}
+            .
+        \end{equation}
+    \end{dfn}
+    
+    The symplectic group arises in physics when we consider phase space.
+    In classical mechanics in three spatial dimensions phase space is the six dimensional space spanned by the three components of position and three components of momentum, so a point in phase space is \((q_1, q_2, q_3, p_1, p_2, p_3)\).
+    Symplectic transformations, \(\symplectic(6, \reals)\), are the set of transformations preserving Hamilton's equations:
+    \begin{equation}
+        \dot{q}_i = \diff{H}{p_i}, \qquad \dot{p}_i = -\diff{H}{q_i}.
+    \end{equation}
+    
+    With some restrictions most Lie groups fit into one of the previously mentioned categories.
+    However, there are five Lie groups that don't, these are called the \define{exceptional groups}\index{exceptional group}.
+    There is no particularly simple definition of any of them, we just note here that they exist, and are called \(F_4\), \(G_2\), \(E_6\), \(E_7\), and \(E_8\).
+    These names come from the classification of semisimple Lie algebras (to be defined later), where we call the Lie algebras of \(\specialLinear(n + 1, \complex)\), \(\specialOrthogonal(2n + 1)\), \(\symplectic(2n)\), and \(\specialOrthogonal(2n)\) by the names \(A_n\), \(B_n\), \(C_n\), and \(D_n\) respectively.
+    Here \(n\) is the rank of the Lie algebra (to be defined later).
+    
+    \section{One Dimensional Groups}
+    In this section we will discuss one-dimensional groups, these are groups parametrised by a single value.
+    \begin{exm}{}{}
+        \begin{itemize}
+            \item Translations along \(\reals\) form a one-dimensional Lie group parametrised by the size of the translation, \(a \in \reals\), with the action \(x \mapsto x + a\).
+            This group is just \(\reals\).
+            This example is noncompact.
+            \item Rotations about some fixed axis form a one-dimensional Lie group parametrised by the size of the rotation, \(\vartheta \in [0, 2\pi)\), with the action
+            \begin{equation}
+                \begin{pmatrix}
+                    x\\ y
+                \end{pmatrix}
+                \mapsto
+                \begin{pmatrix}
+                    \cos\vartheta & \sin\vartheta\\
+                    -\sin\vartheta & \cos\vartheta
+                \end{pmatrix}
+                \begin{pmatrix}
+                    x\\ y
+                \end{pmatrix}
+                .
+            \end{equation}
+            This group is \(\specialOrthogonal(2)\).
+            This example is compact.
+            \item Multiplication by a phase factor forms a one-dimensional Lie group parametrised by the argument of the phase factor, \(\varphi \in [0, 2\pi)\), with the action \(z \mapsto \e^{i\varphi}z\).
+            This group is \(\unitary(1)\).
+            This example is compact.
+        \end{itemize}
+        These last two examples are actually isomorphic, using \(\e^{i\varphi} = \cos \varphi + i\sin \varphi\) we can map from \(\unitary(1)\) to \(\specialOrthogonal(2)\) with
+        \begin{equation}
+            \e^{i\varphi} \mapsto 
+            \begin{pmatrix}
+                \cos\varphi & \sin\varphi\\
+                -\sin\varphi & \cos\varphi
+            \end{pmatrix}
+            .
+        \end{equation}
+        So, \(\unitary(1) \isomorphic \specialOrthogonal(2)\).
+    \end{exm}
+    
+    One-dimensional Lie groups are, unsurprisingly, some of the simplest Lie groups.
+    In fact, they're so simple that they're not that interesting, a theory we'll develop rigorously through a collection of theorems.
+    
+    \begin{thm}{}{}
+        All one-dimensional Lie groups can be parametrised so that
+        \begin{equation}
+            g(a) g(b) = g(a + b)
+        \end{equation}
+        for all \(a\) and \(b\).
+        \begin{proof}
+            Consider a one-dimensional Lie group, \(G\), parametrised by some value in the interval \(I\).
+            Associativity tells us that
+            \begin{equation}
+                g(x) [g(y)g(z)] = [g(x)g(y)]g(z)
+            \end{equation}
+            for all \(x, y, z \in I\).
+            We can write \(g(y)g(z)\) and \(g(x)g(y)\) as single group elements \(g(\varphi(y, z))\) and \(g(\varphi(x, y))\) for some analytic function \(\varphi \colon I^2 \to I\), this is just the definition of a Lie group.
+            Doing so we have
+            \begin{equation}
+                g(x) g(\varphi(y, z)) = g(\varphi(x, y))g(z).
+            \end{equation}
+            Now we can use analyticity again to write \(g(x)g(\varphi(y, z)) = g(x)g(a) = g(\varphi(x, a)) = g(\varphi(x, \varphi(y, z)))\) and \(g(\varphi(x, y))g(z) = g(\varphi(\varphi(x, y), z))\):
+            \begin{equation}
+                g(\varphi(x, \varphi(y, z))) = g(\varphi(\varphi(x, y), z)).
+            \end{equation}
+            Hence, we must have
+            \begin{equation}
+                \varphi(x, \varphi(y, z)) = \varphi(\varphi(x, y), z).
+            \end{equation}
+            
+            Now, take the derivative of this expression with respect to \(z\), the right hand side gives
+            \begin{equation}
+                \diffp{}{z}\varphi(\varphi(x, y), z),
+            \end{equation}
+            and the chain rule applied to the left hand side gives
+            \begin{equation}
+                \diffp{}{z} \varphi(x, \varphi(y, z)) = \diffp{\varphi(x, \varphi(y, z))}{{\varphi(y, z)}} \diffp{\varphi(y, z)}{z}.
+            \end{equation}
+            
+            We are free to shift our parametrisation interval around, so imagine we choose it to contain zero and choose a parametrisation such that \(g(0) = 1\).
+            Consider the case where \(z = 0\).
+            Then \(g(y)g(z) = g(y)g(0) = g(y)1 = g(y)\), but we also have \(g(y)g(z) = g(\varphi(y, z)) = g(\varphi(y, 0))\), so we must have \(\varphi(y, 0) = y\).
+            Thus, evaluating are derivatives at \(z = 0\), we have
+            \begin{equation}
+                \diffp{\varphi(x, y)}{y} \psi(y) = \psi(\varphi(x, y))
+            \end{equation}
+            where
+            \begin{equation}
+                \psi(y) \coloneqq \diffp{\varphi(y, z)}{z} \bigg|_{z = 0}.
+            \end{equation}
+            This differential equation can be solved by writing it as
+            \begin{equation}
+                \frac{1}{\psi(\varphi(x, y))} \diffp{\varphi(x, y)}{y} = \frac{1}{\psi(y)}.
+            \end{equation}
+            We can then integrate with respect to \(y\) and we get
+            \begin{equation}
+                \rho(\varphi(x, y)) = \rho(y) + c(x)
+            \end{equation}
+            where \(c\) is an arbitrary function of \(x\), taking the role of our integration constant, but not constant as \(x\) is allowed to vary, and 
+            \begin{equation}
+                \rho(x) \coloneqq \int_0^x \frac{1}{\psi(t)} \dd{t}
+            \end{equation}
+            with \(\rho(0) = 0\).
+            
+            We can determine \(c(x)\) by choosing \(y = 0\), which gives \(\rho(\varphi(x, 0)) = \rho(x) = \rho(0) + c(x) = 0 + c(x)\), so \(c(x) = \rho(x)\).
+            Hence,
+            \begin{equation}
+                \rho(\varphi(x, y)) = \rho(x) + \rho(y).
+            \end{equation}
+            
+            Now we just reparametrise our group from \(g(x)\) to \(\overbar{g}(\rho(x))\), we then have
+            \begin{equation}
+                \overbar{g}(\rho(x))\overbar{g}(\rho(y)) = g(x)g(y) = g(\varphi(x, y)) = \overbar{g}(\rho(\varphi(x, y))) = \overbar{g}(\rho(x) + \rho(y)).
+            \end{equation}
+            Hence, our group operation becomes addition in parameter space and we are finished.
+        \end{proof}
+    \end{thm}
+    
+    \begin{crl}{}{}
+        All one dimensional Lie algebras are Abelian.
+        \begin{proof}
+            Let \(G\) be a one-dimensional Lie group parametrised such that \(g(a)g(b) = g(a + b)\) for all \(a\) and \(b\).
+            Then
+            \begin{equation}
+                g(a)g(b) = g(a + b) = g(b + a) = g(b)g(a),
+            \end{equation}
+            and so \(G\) is Abelian.
+        \end{proof}
+    \end{crl}
+    
+    The following theorem won't be proved here, but intuitively all it says is that every compact connected Abelian Lie group can be parametrised by phase factors.
+    \begin{thm}{}{}
+        All compact connected Abelian Lie groups are isomorphic to
+        \begin{equation}
+            \bigotimes_{i = 1}^{n} \unitary(1) = \underbrace{\unitary(1) \otimes \dotsb \otimes \unitary(1)}
+        \end{equation}
+        for some \(n \in \naturals\).
+    \end{thm}
+    Identifying each copy of \(\unitary(1)\) with a circle we see that every compact connected Abelian Lie group is a product of circles, which is a Torus.
+    
+    This means that in most of the course we'll be interested in non-Abelian Lie groups.
+    
+    \chapter{Representations}
+    \section{What is a Representation}
+    Intuitively a representation of a group, \(G\), is a set of \(N \times N\) matrices, \(D\), parametrised by group elements, \(g\), such that matrix multiplication is compatible with the group operation:
+    \begin{equation}
+        D(g) D(h) = D(gh) \iff \tensor{D}{^\mu_\nu}(g) \tensor{D}{^\nu_\rho}(h) = \tensor{D}{^\mu_\rho}(g h)
+    \end{equation}
+    for all \(g, h \in G\).
+    
+    \begin{exm}{\(\symmetricGroup[3]\)}{}
+        The symmetric group on 3 objects has a representation, called the \defineindex{permutation representation}, given by the matrices
+        \begin{alignat*}{3}
+            \cycle{} &\mapsto 
+            \begin{pmatrix}
+                1 & 0 & 0\\
+                0 & 1 & 0\\
+                0 & 0 & 1
+            \end{pmatrix}
+            , \quad & \cycle{1,2} &\mapsto
+            \begin{pmatrix}
+                0 & 1 & 0\\
+                1 & 0 & 0\\
+                0 & 0 & 1
+            \end{pmatrix}
+            , \quad & \cycle{1,3} &\mapsto
+            \begin{pmatrix}
+                0 & 0 & 1\\
+                0 & 1 & 0\\
+                1 & 0 & 0
+            \end{pmatrix}
+            \\
+            \cycle{2,3} &\mapsto 
+            \begin{pmatrix}
+                1 & 0 & 0\\
+                0 & 0 & 1\\
+                0 & 1 & 0
+            \end{pmatrix}
+            , \quad & \cycle{1,2,3} &\mapsto
+            \begin{pmatrix}
+                0 & 1 & 0\\
+                0 & 0 & 1\\
+                1 & 0 & 0
+            \end{pmatrix}
+            , \quad & \cycle{3,2,1} &\mapsto
+            \begin{pmatrix}
+                0 & 0 & 1\\
+                1 & 0 & 0\\
+                0 & 1 & 0
+            \end{pmatrix}
+            .
+        \end{alignat*}
+        To motivate this suppose that the three objects are the basis vectors
+        \begin{equation}
+            e_1 = 
+            \begin{pmatrix}
+                1\\0\\0
+            \end{pmatrix}
+            , \quad e_2 =
+            \begin{pmatrix}
+                0\\1\\0
+            \end{pmatrix}
+            , \qand e_3 = 
+            \begin{pmatrix}
+                0\\0\\1
+            \end{pmatrix}
+            .
+        \end{equation}
+        Then this representation acts by permuting the vectors in the obvious way.
+        For example, the matrix representing \(\cycle{1,2}\) sends \(e_1\) to \(e_2\), \(e_2\) to \(e_1\), and \(e_3\) to itself.
+        
+        Another representation of \(\symmetricGroup[3]\) is given by the \defineindex{trivial representation}, which represents all group elements with the \(1\times 1\) zero matrix, \((0)\), sending all vectors to the zero vector.
+        
+        A third representation of \(\symmetricGroup[3]\) is given by sending each element either to \((1)\) or \((-1)\), depending on the sign of the permutation.
+    \end{exm}
+    
+    There are two ways to formalise the notion of a representation, they are as follows.
+    \begin{dfn}{Representation}{}
+        Let \(G\) be a group.
+        Then a group \defineindex{representation}, \((D, V)\), is a vector space, \(V\), and a homomorphism, \(D \colon G \to \generalLinear(V)\).
+    \end{dfn}
+    
+    \begin{dfn}{Representation}{}
+        Let \(G\) be a group and \(V\) a vector space.
+        A group \define{representation}, \((D, V)\), is a vector space, \(V\), and a group action, \(G \times V \to V\) given by \(g \action v = D(g)v\) where \(D(g)\) is some linear transformation.
+    \end{dfn}
+    
+    \begin{ntn}{}{}
+        We're generally pretty loose with the exact language as to what objects make up a representation.
+        People will refer to \((D, V)\), \(D\), \(V\), and the set of matrices \(\{D(g) \mid g \in G\}\) as the representation interchangeably, with context telling us which we care about.
+    \end{ntn}
+    
+    \begin{dfn}{Representation Dimension}{}
+        The dimension of a representation is the dimension of the vector space, \(V\), which is also the number of rows in the matrix.
+    \end{dfn}
+    
+    \begin{wrn}
+        The dimension of the representation is, in general, \emph{not} the same as the dimension of a continuous group.
+    \end{wrn}
+    
+    \begin{exm}{\(\symmetricGroup[3]\)}{}
+        The permutation representation is of dimension 3, the trivial representation is of dimension 1, as is the sign representation.
+    \end{exm}
+    
+    \section{Properties of Representations}
+    \begin{exm}{Faithful Representation}{}
+        A representation is faithful if \(\rho\) is injective.
+    \end{exm}
+    
+    \begin{exm}{\(\symmetricGroup[3]\)}{}
+        The permutation representation is faithful, the trivial and sign permutations are not.
+    \end{exm}
+    
+    Representations give us another way to think about the matrix groups of the last chapter.
+    Instead of defining them as matrices we can define them by symmetries, so, for example, \(\orthogonal(N)\) is the group preserving the Euclidean metric.
+    Then the usual interpretation as \(N \times N\) orthogonal matrices is just a representation.
+    We call it the \defineindex{defining representation}, since it can be used to define the representation.
+    The defining representation must be an isomorphism in order for it to contain all group elements exactly once.
+    
+    The \defineindex{fundamental representation} is one from which all other all other representations can be built from tensor products.
+    
+    \begin{dfn}{Equivalence of Representations}{}
+        Two representations are \define{equivalent}\index{equivalent representations} if they are related by a similarity transformation.
+        That is, if \(G\) is a group with representations \(D\) and \(D'\) then there exists some \(S\), independent of \(g\), such that for all \(G\)
+        \begin{equation}
+            D'(g) = SD(g)S^{-1}.
+        \end{equation}
+    \end{dfn}
+    
+    \begin{dfn}{Reducible}{}
+        A representation, \((D, V)\), is \define{reducible}\index{reducible representation} if there exists some subspace \(U \subset V\) with \(U \ne V\) and \(U \ne \{0\}\) such that
+        \begin{equation}
+            D(g) u \in U \text{ for all } u \in U \text{ and } g \in G.
+        \end{equation}
+        If this is the case we call \(U\) an \defineindex{invariant subspace}.
+        A representation is \define{irreducible}\index{irreducible representation} if it is not reducible.
+    \end{dfn}
+    
+    \begin{ntn}{}{}
+        People often shorten \enquote{irreducible representation} to \define{irrep}\index{irrep|see{irreducible representation}}.
+    \end{ntn}
+    
+    Notice that if \(D\) is a representation of \(G\) then so is \(D^*\), since
+    \begin{equation}
+        D(g)^*D(h)^* = (D(g)D(h))^* = D(gh)^*
+    \end{equation}
+    for all \(g, h \in G\).
+    
+    \begin{dfn}{}{}
+        Let \(D\) be a representation of some group \(G\).
+        
+        If \(D(g)^* = D(g)\) for all \(g \in G\) then we say that \(D\) is a \defineindex{real representation}.
+        
+        If \(D\) is not equivalent to \(D^*\) then we say that \(D\) is a \defineindex{complex representation}.
+        
+        If \(D \ne D^*\) but \(D\) is equivalent to \(D^*\) then we say that \(D\) is a \defineindex{pseudo-real representation}.
+    \end{dfn}
+    
+    Suppose that we have some symmetry described by the group \(G\).
+    Then we classify different types of objects based on which representation they transform under.
+    If
+    \begin{equation}
+        s \mapsto s,
+    \end{equation}
+    that is there is no transformation, then \(s\) transforms under the trivial representation and we call \(s\) a \defineindex{scalar}.
+    If
+    \begin{equation}
+        v^\mu \mapsto \tensor{D}{^\mu_\nu}(g)v^\nu,
+    \end{equation}
+    where \(D\) is the fundamental representation we say that \(v\) is a \defineindex{vector}.
+    If
+    \begin{equation}
+        T^{\mu_1\mu_2\dots \mu_n} \mapsto \tensor{D}{^{\mu_1}_{\nu_1}}(g) \tensor{D}{^{\mu_2}_{\nu_2}}(g) \dotsm \tensor{D}{^{\mu_n}_{\nu_n}}(g) T^{\nu_1\nu_2 \dots \nu_n}
+    \end{equation}
+    then we say that \(T\) is a \defineindex{tensor}, note that both scalars and vectors are special cases of tensors.
+    
+    We can write this last line more succinctly as
+    \begin{equation}
+        T^\alpha = \tensor{D}{^\alpha_\beta}(g) T^\beta.
+    \end{equation}
+    We understand this as \(T\) transforming under the tensor product
+    \begin{equation}
+        \tensor{(D(g) \otimes D(g) \otimes \dotsb \otimes D(g))}{^{\mu_1\mu_2 \dots \mu_n}}_{\nu_1\nu_2\dots \nu_n} = \tensor{D}{^{\mu_1}_{\nu_1}}(g) \tensor{D}{^{\mu_2}_{\nu_2}}(g).
+    \end{equation}
+    
+    \section{Unitary Representations}
+    
+    \begin{dfn}{Unitary Representation}{}
+        Let \(G\) be a group and \((D, V)\) a representation of \(G\).
+        We say that \(D\) is a \defineindex{unitary representation} if it preserves the inner product on \(V\), that is if
+        \begin{equation}
+            \innerproduct{u}{v} = \innerproduct{D(g)u}{D(g)v}
+        \end{equation}
+        for all \(g, h \in G\).
+    \end{dfn}
+    
+    \begin{thm}{Maschke's Theorem}{}
+        Any representation of a finite group is equivalent to a unitary representation.
+        \begin{proof}
+            Let \(G\) be a finite group, \(V\) a vector space, and \((D, V)\) a representation.
+            Let \(\innerproduct{-}{-}\) be the inner product on \(V\).
+            Define a new inner product,
+            \begin{equation}
+                \braket{x}{y} \coloneqq \sum_{g \in G} \innerproduct{D(g)x}{D(g)y}.
+            \end{equation}
+            Then we claim that \((D, V)\) is a unitary representation with respect to this new inner product and since different inner products are related by similarity transformations \((D, V)\) is equivalent to a unitary representation.
+            
+            Take some fixed \(h \in G\).
+            The rearrangement theorem states that if the elements of the group are listed, \((g_1, \dotsc, g_n)\), then the action \((g_1, \dotsc, g_n) \mapsto (g_1h, \dotsc, g_nh)\) is just a permutation.
+            In particular, if \(f \colon G \to \complex\) then
+            \begin{equation}
+                \sum_{g \in G} f(g) = \sum_{g\in G} f(gh),
+            \end{equation}
+            since multiplying each argument by \(h\) just permutes the terms.
+            
+            Using this we can equivalently write the inner product, \(\braket{-}{-}\), as
+            \begin{align}
+                \braket{x}{y} &= \sum_{g\in G} \innerproduct{D(gh)x}{D(gh)y}\\
+                &= \sum_{g\in G} \innerproduct{D(g)D(h)x}{D(g)D(h)y}\\
+                &= \sum_{g\in G} \innerproduct{D(g)u}{D(g)v}\\
+                &= \braket{u}{v},
+            \end{align}
+            where \(u = D(h)x\) and \(v = D(h)y\).
+            Then we have
+            \begin{equation}
+                \braket{x}{y} = \braket{u}{v} = \braket{D(h)x}{D(h)y} = \bra{x}D^\hermit(h)D(h)\ket{y},
+            \end{equation}
+            so for this to hold true for all \(x, y \in V\) we must have \(D^\hermit(h)D(h) = \ident\).
+            Hence, \(D\) is unitary with respect to this new inner product.
+        \end{proof}
+    \end{thm}
+    
+    A very similar theorem holds for compact Lie groups.
+    The proof is almost identical but the sum is replaced with an integral.
+    We won't prove it here as it requires some measure theory to make everything work.
+    It comes down to the compactness requirement ensuring convergence of the integrals at every step.
+    Without this requirement the integrals may not converge, in which case there is no reason for an equivalent unitary representation to exist.
+    \begin{thm}{}{}
+        Every representation of a compact Lie group is equivalent to a unitary representation.
+    \end{thm}
+    
+    Why do we care about unitary representations?
+    Mostly for quantum mechanics.
+    If a group action on a Hilbert space of states is to preserve probability then it must be either unitary, so \(\innerproduct{Ux}{Uy} = \innerproduct{x}{y}\), or \defineindex{antiunitary}, that is \(\innerproduct{Ux}{Uy} = \innerproduct{x}{y}^*\).
+    An example of an antiunitary transformation is time reversal.
+    Consider a system evolving from state \(\ket{\psi}\) to \(\ket{\varphi}\).
+    The amplitude for this is \(\braket{\psi}{\varphi}\).
+    The time reversed system evolves from state \(\ket{\varphi}\) to state \(\ket{\psi}\).
+    The amplitude for this is \(\braket{\varphi}{\psi} = \braket{\psi}{\varphi}^*\).
+    
+    
+    \backmatter
+%    \renewcommand{\glossaryname}{Acronyms}
+%    \printglossary[acronym]
+    \printindex
+\end{document}
