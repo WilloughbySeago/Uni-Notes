@@ -6,6 +6,7 @@
 %% Packages
 \usepackage{tensor}
 \usepackage{csquotes}
+\usepackage{scalerel,stackengine}  % needed for d with slash
 
 % Tikz stuff
 \usepackage{tikz}
@@ -31,7 +32,7 @@ noabbrev
 \usepackage{NotesBoxes}
 \usepackage{NotesMaths}
 
-\setmathfont[range={\int, \oint}]{Latin Modern Math}
+\setmathfont[range={\int, \oint, \otimes, \oplus, \bigotimes, \bigoplus}]{Latin Modern Math}
 
 % Highlight colour
 \definecolor{Yellow}{HTML}{F9C80E}
@@ -50,17 +51,44 @@ noabbrev
 % \subsubtitle{}
 
 % Commands
-
+% Text
+\newcommand*{\course}[1]{\textit{#1}}
 % Maths
 \newcommand{\minkowskiMetric}{\eta}
-\newcommand{\trans}{{\top}}
 \newcommand{\dalembertian}{\partial^2}
-\newcommand{\EM}{\text{em}}
-\DeclarePairedDelimiterX{\anticommutator}[2]{\{}{\}}{#1 , #2}
-\DeclareMathOperator{\tr}{tr}
+\newcommand{\e}{\symrm{e}}
+\newcommand{\lagrangian}{L}
+\newcommand{\lagrangianDensity}{\symcal{L}}
+\newcommand{\hamiltonianDensity}{\symcal{H}}
+\DeclarePairedDelimiterX{\poissonBracket}[2]{\{}{\}}{#1, #2}
+\newcommand{\parity}{\symrm{P}}
+\newcommand{\chargeConjugation}{\symrm{C}}
+\newcommand{\timeReversal}{\symrm{T}}
 \newcommand{\hermit}{{\dagger}}
+\DeclarePairedDelimiterX{\commutator}[2]{[}{]}{#1, #2}
+\newcommand{\ident}{1}
+\newcommand\dbar{\ThisStyle{\ensurestackMath{%
+            \stackengine{-.3\LMpt}{\SavedStyle \symrm{d}}{\SavedStyle\overbar{}%
+                \mkern2.25mu}{O}{r}{F}{F}{L}}}}
+\newcommand{\invariantmeasure}[1]{\dbar #1}
+\newcommand\bardelta{\ThisStyle{\ensurestackMath{%
+            \stackengine{-.3\LMpt}{\SavedStyle \delta}{\SavedStyle\overbar{}%
+                \mkern4.5mu}{O}{r}{F}{F}{L}}}}
+\newcommand{\hilbertSpace}{\symbb{H}}
+\newcommand{\normalordering}[1]{{\vcentcolon}{#1}{\vcentcolon}}
+\AtBeginDocument{
+    \let\Re\relax
+    \let\Im\relax
+    \DeclareMathOperator{\Re}{Re}
+    \DeclareMathOperator{\Im}{Im}
+}
+\DeclareMathOperator{\Res}{Res}
+\newcommand{\trans}{{\top}}
+\newcommand{\EM}{\text{em}}
+\DeclarePairedDelimiterX{\anticommutator}[2]{\{}{\}}{#1, #2}
+\DeclareMathOperator{\tr}{tr}
 
-\includeonly{}
+\includeonly{parts/prelim}
 
 \begin{document}
     \frontmatter
@@ -70,950 +98,2086 @@ noabbrev
     \listoffigures
     \mainmatter
     
+    \chapter{Introduction}
+    \section{Course Overview}
+    \define{Quantum field theory (QFT)}\index{quantum field theory}\glossary[acronym]{QFT}{Quantum Field Theory} is combination of relativity and quantum mechanics.
+    It will be our topic of study in this course.
+    We will focus mostly on a single quantum field theory, namely \define{quantum electrodynamics (QED)}\index{quantum electrodynamics}\glossary[acronym]{QED}{Quantum Electrodynamics}, which is the result of combining electrodynamics, which is inherently relativistic, and quantum mechanics.
+    
+    There are various courses leading into this course, some of the important ones for which I have notes are
+    \begin{itemize}
+        \item \course{Principles of Quantum Mechanics};
+        \item \course{Quantum Theory};
+        \item \course{Classical Electrodynamics}; and
+        \item \course{Symmetries of Quantum Mechanics}.
+    \end{itemize}
+    This course has a companion course, \course{Symmetries of Particles and Fields}, which focuses on the mathematical abstraction of symmetry.
+    Ideas from this companion course, and the related course \course{Symmetries of Quantum Mechanics} will occur throughout this course.
+    Another related course, focused more on the experimental side of this field, is \course{Particle Physics}.
+    I have notes for both \course{Symmetries of Particles and Fields} and \course{Particle Physics}.
+    
+    This course, and its companion, lead naturally into the course \course{Gauge Theories in Particle Physics}, for which I also have notes.
+    Many ideas in this course will be expanded upon in the gauge theories course.
+    The gauge theories course will also treat other quantum field theories, such as \defineindex{electroweak} interactions (a combination of electromagnetism and the weak interactions), and \define{quantum chromodynamics (QCD)}\index{quantum chromodynamics}\glossary[acronym]{QCD}{Quantum Chromodynamics} (the quantum field theory of the strong force).
+    The course also briefly touches on lattice gauge theory, a particular way of doing calculations in nonperturbative QCD.
+    
+    This course is roughly divided into four sections:
+    \begin{itemize}
+        \item Canonical QFT: Here we deal with operators and quantisation, familiar from traditional quantum mechanics, such as in \course{Principles of Quantum Mechanics}.
+        \item QED: We will use this as an example, to allow us to work in a concrete setting rather than in the abstract.
+        This is in many ways the simplest of quantum field theories, we study mostly interactions of photons and electrons, and since photons aren't charged the interactions are about as simple as they get.
+        Mathematically this \enquote{simplicity} is due to the underlying \(\unitary(1)\) symmetry, which is an Abelian gauge group, and is significantly easier to work with than, say, the \(\specialUnitary(3)\) symmetry of QCD.
+        \item Path integral formalism: This is a more abstract, but often more powerful, yet equivalent formulation of quantum field theory.
+        This formalism leads itself to gauge theories, and so will be used heavily in \course{Gauge Theories in Particle Physics}.
+        Nonrelativistic path integrals were treated in \course{Quantum Theory}.
+        \item Renormalisation: When we do QFT calculations we often get infinite results.
+        Renormalisation is the process of removing these infinities and extracting meaningful results.
+        The renormalisation of QED will be treated in more detail in \course{Gauge Theories}.
+    \end{itemize}
+    There is some concurrent teaching of these topics, but in these notes I separate them out, so if something's not making sense maybe check to see if its been explained in more detail in a different section.
+    
+    \section{Conventions}
+    Quantum field theory is full of conventions.
+    One convention that almost everyone follows is that we work in natural units, where \(c = \hbar = 1\).
+    This makes the formulas look much simpler and less cluttered, and we can put \(c\) and \(\hbar\) back in by dimensional analysis.
+    
+    The second convention is unfortunately much more varied, its the choice of metric.
+    We will use the \(({+}{-}{-}{-})\) metric,
+    \begin{equation}
+        \minkowskiMetric_{\mu\nu} = 
+        \begin{pmatrix}
+            1 & 0 & 0 & 0\\
+            0 & -1 & 0 & 0\\
+            0 & 0 & -1 & 0\\
+            0 & 0 & 0 & -1
+        \end{pmatrix}
+        .
+    \end{equation}
+    The most common alternative to this is \(({-}{+}{+}{+})\), where the diagonal has a single negative 1 and the rest is made of positive 1s.
+    There are some even rarer choices to use an imaginary metric, \((i{+}{+}{+})\), which still gives the same relative minus sign when we square each element in the inner product.
+    
+    Throughout the course, unless specified otherwise, we will use the Einstein summation convention.
+    Specifically, if an index appears exactly twice in a term, once in a raised position and once in a lowered position, then we sum over all values of that index.
+    We also follow the convention where Greek indices, such as \(\mu\) and \(\nu\), run from \(0\) to the number of dimensions minus one, most commonly meaning \(\mu = 0, 1, 2, 3\).
+    On the other hand, Latin indices, such as \(i\) and \(j\), run from \(1\) to the number of dimensions minus one, most commonly, \(i = 1, 2, 3\).
+    This means that Greek indices are summed over all components, whereas Latin indices are summed only over spatial components.
+    
+    We follow the convention that the electromagnetic field strength tensor is
+    \begin{equation}
+        F^{\mu\nu} = \partial^\mu A^\nu - \partial^\nu A^\mu.
+    \end{equation}
+    An alternative convention is
+    \begin{equation}
+        F^{\mu\nu} = \partial^\nu A^\mu - \partial^\mu A^\nu,
+    \end{equation}
+    which differs from our choice by an overall minus sign.
+    For example, this results in Maxwell's equations being written as \(\partial_\mu F^{\mu\nu} = -j^\nu\), instead of \(\partial_\mu F^{\mu\nu} = j^\nu\), which is what we'll be using.
+    
+    \part{Canonical Quantisation}
+    \chapter{Classical Fields}
+    \section{Relativity Basics}
+    In order to understand quantum field theory we will need to quantise fields.
+    In order to quantise fields we should be sure that we understand classical fields, so this is where we start the course.
+    We will briefly recap ideas mostly from the \course{Classical Electrodynamics} and \course{Quantum Theory} courses, so check the notes for this course for more details.
+    
+    \subsection{Four-Vectors}
+    We can consider a generic four-vector,
+    \begin{equation}
+        a^\mu = (a^0, \vv{a}) = (a^0, a^1, a^2, a^3).
+    \end{equation}
+    Using the metric, \(\minkowskiMetric_{\mu\nu} \coloneqq \diag(1,-1,-1,-1)\), we can lower the indices to get a covariant four-vector:
+    \begin{equation}
+        a_\nu \coloneqq \minkowskiMetric_{\mu\nu}a^\mu = (a^0, -\vv{a}) = (a^0, -a^1, -a^2, -a^3) = (a_0, a_1, a_2, a_3).
+    \end{equation}
+
+    Given two four vectors, \(a^\mu = (a^0, \vv{a})\) and \(b = (b^0, \vv{b})\), we can take the inner product,
+    \begin{equation}
+        a \cdot b \coloneqq a^\mu b_\mu = a_\mu b^\mu = \minkowskiMetric_{\mu\nu} a^\mu b^\nu = a^0b^0 - \vv{a} \cdot \vv{b}.
+    \end{equation}
+    Here \(\vv{a} \cdot \vv{b} = a^ib^i = a^1b^1 + a^2b^2 + a^3b^3\) is the standard dot product for three-vectors.
+    
+    For the specific case of the inner product of a four-vector with itself we use the shorthand
+    \begin{equation}
+        a^2 = a \cdot a = a^0 a^0 - \vv{a} \cdot \vv{a} = (a^0)^2 - \vv{a}^2 .
+    \end{equation}
+    
+    \subsection{Specific-Four Vectors}
+    The position is a four-vector, \(x^\mu = (t, \vv{x})\), where \(t\) is the time coordinate and \(\vv{x}\) is the spatial position.
+    Note that in SI units this would be \(x^\mu = (ct, \vv{x})\), since the components of a four-vector must have the same dimensions.
+    We can also construct a covariant position four-vector, \(x_\mu = (t, -\vv{x})\).
+    
+    The momentum is a four-vector, \(p^\mu = (E, \vv{p})\), where \(E\) is the energy, and \(\vv{p}\) is the relativistic three-momentum.
+    Note that in SI units this would be \(p^\mu = (E/c, \vv{p})\).
+    We can also construct a covariant momentum four-vector, \(p_\mu = (E, -\vv{p})\).
+    
+    For a (real\footnote{as in, not a virtual particle}) particle of mass \(m\) the four-momentum squares to the mass squared, that is
+    \begin{equation}
+        m^2 = p^2 = E^2 - \vv{p}^2.
+    \end{equation}
+    Rearranging this gives us
+    \begin{equation}
+        E^2 = \vv{p}^2 + m^2.
+    \end{equation}
+    This is the relativistic \defineindex{energy-momentum relation}, it's perhaps more familiar if we reinstate the factors of \(c\):
+    \begin{equation}
+        E^2 = \vv{p}^2c^2 + m^2c^4,
+    \end{equation}
+    and is most famous in the case where \(\vv{p} = \vv{0}\):
+    \begin{equation}
+        E = mc^2.
+    \end{equation}
+    
+    We can construct a four-vector derivative by defining the derivative with respect to \(x^\mu\):
+    \begin{equation}
+        \partial_\mu \coloneqq \diffp{}{x^\mu} = \left( \diffp{}{t}, \grad \right).
+    \end{equation}
+    Note that this is a covariant vector, since the contravariant quantity, \(x^\mu\), appears in the denominator, so the derivative transforms in the opposite way to how it would if \(x^\mu\) were in the numerator.
+    We can similarly define a contravariant operator,
+    \begin{equation}
+        \partial^\mu = \diffp{}{x_\mu} = \left( \diffp{}{t}, -\grad \right).
+    \end{equation}
+    The square of these operators is common enough to be given it's own name, it's called the \defineindex{d'Alembert operator},
+    \begin{equation}
+        \dalembertian = \partial^\mu \partial_\mu = \diffp[2]{}{t} - \laplacian.
+    \end{equation}
+    This same quantity is also denoted \(\square^2\), as a sort of four-dimensional (note four sides) Lorentzian-manifold analogue of the Laplacian, \(\laplacian\), and also confusingly sometimes denoted \(\square\), without the superscript 2.
+    We also call this the wave operator, since if \(f\) is a field satisfying \(\dalembertian f = 0\) then expanding and rearranging this we have
+    \begin{equation}
+        \diffp[2]{f}{t} = \diffp[2]{f}{x},
+    \end{equation}
+    which is the equation of a wave travelling at the speed of light.
+    
+    \section{Nonrelativistic Particle and Wave}
+    A nonrelativistic particle of mass \(m\) has the energy-momentum relation
+    \begin{equation}
+        E = \frac{\vv{p}^2}{2m} = \frac{1}{2}m\vv{v}^2.
+    \end{equation}
+    To get an equation for this particle we substitute in the usual operators,
+    \begin{equation}
+        E \to i\diffp{}{t}, \qand \vv{p} \to -i\grad.
+    \end{equation}
+    Acting on an arbitrary state, \(\psi\), we then get
+    \begin{equation}
+        i\diffp{\psi}{t} = \frac{(-i\grad)^2}{2m} \psi = -\frac{1}{2m}\laplacian\psi.
+    \end{equation}
+    This is exactly the \define{Schrödinger equation}\index{Schrödinger!equation} for a free particle.
+    
+    One solution to this is a plane wave,
+    \begin{equation}
+        \psi(x) = \e^{-iEt + i\vv{p} + \vv{x}} = \e^{-ip\cdot x}.
+    \end{equation}
+    This is only a solution if \(E^2 = \vv{p}^2/2m\).
+    Notice that while we can write the exponent with the relativistic four-vectors this is still nonrelativistic since the energy-momentum is not relativistic.
+    In particular, we have a single energy value for each possible momentum, as seen in \cref{fig:energy-momentum relation nonrelativistic}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{energy-momentum-nonrelativistic}
+        \begin{tikzpicture}
+            \draw[thick, ->] (-3, 0) -- (3, 0) node [below] {\(\vv{p}\)};
+            \draw[thick, ->] (0, 0) -- (0, 3) node [left] {\(E\)};
+            \draw[very thick, highlight, domain=-3:3, samples=500] plot (\x, \x*\x/3);
+        \end{tikzpicture}
+        \caption{The nonrelativistic energy-momentum relation assigns a single energy to each three-momentum. Note that this is really just a slice through a four-dimensional plot, but all that really matters is the magnitude of the three-momentum.}
+        \label{fig:energy-momentum relation nonrelativistic}
+    \end{figure}
+    
+    We know that solutions to the Schrödinger equation can be interpreted as amplitudes, which we then take the modulus square of, \(\abs{\psi}^2\), to get a probability density function.
+    We call a function with this property a \defineindex{wave function}.
+    
+    \section{Relativistic Particle and Wave}
+    A relativistic particle of mass \(m\) has the energy-momentum relation
+    \begin{equation}
+        E^2 = \vv{p}^2 + m^2.
+    \end{equation}
+    Making the operator substitutions and acting on an arbitrary state, \(\varphi\), we get
+    \begin{equation}
+        \left( i\diffp{}{t} \right)^2\varphi = (-i\grad)^2\varphi + m^2\varphi.
+    \end{equation}
+    Rearranging this we get
+    \begin{equation}
+        (\dalembertian + m^2)\varphi = 0.
+    \end{equation}
+    This is the \defineindex{Klein--Gordon equation}.
+    
+    One solution to this is a plane wave,
+    \begin{equation}
+        \varphi(x) = \e^{-ip \cdot x}.
+    \end{equation}
+    This is a solution provided that \(p^2 = m^2\).
+    If \(p^2 = m^2\) then we say that \(p^\mu\) is \defineindex{on-shell}.
+    
+    If \(e^{-ip\cdot x}\) is a solution then so is
+    \begin{equation}
+        \varphi^* = \e^{ip\cdot x}.
+    \end{equation}
+    We see that we get pairs of solutions.
+    These correspond to the pairs of possible energy values, \(E = \pm \sqrt{\vv{p}^2 + m^2}\), as shown in \cref{fig:energy-momentum relation relativistic}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{energy-momentum-relation}
+        \begin{tikzpicture}
+            \draw[thick, ->] (-3, 0) -- (3, 0) node [below] {\(\vv{p}\)};
+            \draw[thick, ->] (0, -3) -- (0, 3) node [left] {\(E\)};
+            \clip (-3, -3) rectangle (3, 3);
+            \draw[very thick, highlight, domain=-3:3, samples=500] plot ({sinh(\x)}, {cosh(\x)});
+            \draw[very thick, highlight, domain=-3:3, samples=500] plot ({sinh(\x)}, {-cosh(\x)});
+            \draw[dashed, thick, black!50] (-3, -3) -- (3, 3);
+            \draw[dashed, thick, black!50] (-3, 3) -- (3, -3);
+            \node[above left] at (0, 1) {\(m\)};
+        \end{tikzpicture}
+        \caption{The relativistic energy momentum assigns two energies to a each three-momentum. The curve is a hyperbola. Notice that at zero three-momentum there we don't have zero energy, instead we have energy \(\pm m\), since we are counting the mass towards the energy in the relativistic formulation. The hyperbola here are the \enquote{shell} referred to in \enquote{on-shell}.}
+        \label{fig:energy-momentum relation relativistic}
+    \end{figure}
+    
+    The negative energy solutions to the Klein--Gordon equation pose a problem, in particular, it is possible for \(\varphi^* \varphi\) to be negative, which means there is no probabilistic interpretation of \(\varphi\), and so \(\varphi\) is \emph{not} a wave function.
+    Instead, we just call \(\varphi\) a field.
+    
+    States of a system obeying the Klein--Gordon equation correspond to relativistic free particles (plural).
+    
+    \section{Maxwell Fields}
+    The most familiar fields are electromagnetic fields.
+    In this section we will briefly recap a relativistic treatment of these fields.
+    For more details see the \course{Classical Electrodynamics} course.
+    
+    The electromagnetic \enquote{potential} is
+    \begin{equation}
+        A^\mu(x) = (\varphi(x), \vv{A}(x)),
+    \end{equation}
+    where \(\varphi\) is the electric potential and \(\vv{A}\) is the electromagnetic vector potential.
+    The electric \enquote{field} is then
+    \begin{equation}
+        F^{\mu\nu} = \partial^\mu A^\nu - \partial^\nu A^\mu.
+    \end{equation}
+    \begin{wrn}
+        An alternative convention,
+        \begin{equation}
+            F^{\mu\nu} = \partial^\nu A^\mu - \partial^\mu A^\nu,
+        \end{equation}
+        differs by a sign.
+    \end{wrn}
+    The electromagnetic current density is
+    \begin{equation}
+        j^\mu = (\rho, \vv{j}).
+    \end{equation}
+    This current is conserved, mathematically this is expressed as its four-divergence vanishing,
+    \begin{equation}
+        \partial_\mu j^\mu = \diffp{\rho}{t} + \div\vv{j} = 0.
+    \end{equation}
+    This is a continuity equation.
+    
+    Maxwell's equation is
+    \begin{equation}
+        \partial_\mu F^{\mu\nu} = j^\nu.
+    \end{equation}
+    Writing \(F^{\mu\nu}\) in terms of \(A^\mu\) we get
+    \begin{equation}
+        \partial_\mu F^{\mu\nu} = \partial_\mu \partial^\mu A^\nu - \partial_\mu \partial^\nu A^\mu = \dalembertian A^\nu - \partial^\nu \partial_\mu A^\mu.
+    \end{equation}
+    The \defineindex{Lorenz gauge} condition is to choose \(A^\mu\) such that its four-divergence vanishes, \(\partial_\mu A^\mu\).
+    Then we have \(\partial_\mu F^{\mu\nu} = \dalembertian A^\nu\), so we can write Maxwell's equation as
+    \begin{equation}
+        \dalembertian A^\nu = j^\nu.
+    \end{equation}
+    
+    In QFT we call \(A^\mu\) the \defineindex{electromagnetic field} and we call \(F^{\mu\nu}\) the \defineindex{electromagnetic field strength}.
+    This is partly an annoying historical artefact and partly because \(A^\mu\) is the field appearing in our equations in an analogous way to \(\varphi\) in the Klein--Gordon equation.
+    
+    In free space, that is when \(j^\mu = 0\), Maxwell's equation is
+    \begin{equation}
+        \dalembertian A^\mu = 0.
+    \end{equation}
+    Notice that this is similar to the Klein--Gordon equation with massless particles, \(m = 0\).
+    This is good, because we would like electromagnetism to work with photons, which are massless.
+    The one difference from the Klein--Gordon equation is that \(A^\mu\) is a four-vector, whereas \(\varphi\) is a scalar.
+    The only change in the solutions is that we, in theory, get a different solution for each component of \(A^\mu\).
+    The way that this manifests in the solutions is we get an extra vector out front called the \defineindex{polarisation vector}, \(\varepsilon^\mu\):
+    \begin{equation}
+        A^\mu = \varepsilon^\mu \e^{-ip\cdot x}.
+    \end{equation}
+    Assuming the momentum is on-shell, that is \(p^2 = 0\) in this massless case.
+    This means the momentum is light-like, more good news for electromagnetism explaining photons.
+    
+    It can be shown that\footnote{See the \course{Classical Electrodynamics} course, note that there we work with \(k^\mu = \hbar p^\mu\).} \(\varepsilon_\mu p^\mu = 0\).
+    We are also free to choose \(\varepsilon^\mu\) such that \(\varepsilon^0 = 0\), then the condition \(\varepsilon_\mu p^\mu = 0\) becomes \(\vv{\varepsilon} \cdot \vv{p} = 0\).
+    This means that electromagnetic waves are \defineindex{transverse}, since their polarisation vector, \(\vv{\varepsilon}\), is perpendicular to their direction of travel, \(\vv{p}\).
+    
+    Since the mathematics of the vector field \(A^\mu\) is so similar to the mathematics of the scalar field \(\varphi\) we will mostly deal with scalar fields in this course to develop our theory, then work with other fields once we have a good understanding off the maths.
+    Each type of field corresponds to a different spin.
+    Scalar fields describe spin zero particles, like the Higgs boson, and vector fields describe spin one particles, like the photon.
+    Spin \(1/2\) particles are described by spinors.
+    
+    \chapter{Lagrangians and Hamiltonians}
+    \section{Lagrangian Dynamics of a Particle}
+    \epigraph{That's all there is to a Lagrangian dynamics course, the rest is just examples.}{Richard Ball}
+    \begin{rmk}
+        See the \course{Lagrangian Dynamics} course for more details.
+    \end{rmk}
+    Consider a particle of mass \(m\) moving in one dimension in a conservative force field.
+    We can define its position with a \defineindex{generalised coordinate}, \(q\), which gives us a \defineindex{generalised velocity}, \(\dot{q} \coloneqq \diff{q}/{t}\).
+    We can then define the \defineindex{Lagrangian}:
+    \begin{equation}
+        \lagrangian(q, \dot{q}) = T(\dot{q}) - V(q).
+    \end{equation}
+    Here \(T(\dot{q})\) is the kinetic energy of the particle, which we assume depends only on the velocity for simplicity, and \(V(q)\) is the potential energy of the particle, which must depend only on the position.
+    The Lagrangian is a function of the generalised position and velocity.
+    
+    The \defineindex{action} of the particle between the times \(t_1\) and \(t_2\) is defined to be
+    \begin{equation}
+        S[q(t)] \coloneqq \int_{t_1}^{t_2} \dl{t} \, \lagrangian(q, \dot{q}).
+    \end{equation}
+    \defineindex{Hamilton's principle} states that the path the particle takes, \(q(t)\), is such that the action is extremised, that is the variation, \(\delta S\), given by varying \(q \to q + \delta q\) vanishes.
+    We can compute the variation in a general action, \(S\), by computing the variation in the Lagrangian:
+    \begin{equation}
+        \delta \lagrangian = \diffp{\lagrangian}{q} \delta q + \diffp{\lagrangian}{\dot{q}} \delta \dot{q}.
+    \end{equation}
+    For a smooth variation, \(\delta q\), we have
+    \begin{equation}
+        \delta \dot{q} = \diffp{}{t}(\delta q),
+    \end{equation}
+    and so
+    \begin{equation}
+        \delta \lagrangian = \diffp{\lagrangian}{q} \delta q + \diffp{\lagrangian}{\dot{q}} \diff{}{t} (\delta q)
+    \end{equation}
+    Integrating this the variation in the action is
+    \begin{equation}
+        \delta S = \int_{t_1}^{t_2} \dl{t} \left[ \diffp{\lagrangian}{q} \delta q + \diffp{\lagrangian}{\dot{q}} \diff{}{t} (\delta q) \right].
+    \end{equation}
+    The product rule tells us that
+    \begin{equation}
+        \diff{}{t}\left( \diffp{\lagrangian}{\dot{q}} \delta q \right) = \diffp{\lagrangian}{\dot{q}} \diff{}{t} (\delta \dot{q}) + \diff{}{t} \left( \diffp{\lagrangian}{\dot{q}} \right) \delta q.
+    \end{equation}
+    Rearranging this we can rewrite the second term in \(\delta S\) as a total derivative minus a term:
+    \begin{align}
+        \delta S &= \int_{t_1}^{t_2} \dl{t} \left[ \diffp{\lagrangian}{q} \delta q + \diff{}{t}\left( \diffp{\lagrangian}{\dot{q}} \delta q \right) - \diff{}{t}\left( \diffp{\lagrangian}{\dot{q}} \right) \delta q \right]\\
+        &= \int_{t_1}^{t_2} \dl{t} \left[ \diffp{\lagrangian}{q} - \diff{}{t}\left( \diffp{\lagrangian}{\dot{q}} \right) \right] \delta q + \int_{t_1}^{t_2} \dl{t} \, \diff{}{t}\left( \diffp{\lagrangian}{\dot{q}} \delta q \right)\\
+        &= \int_{t_1}^{t_2} \dl{t} \left[ \diffp{\lagrangian}{q} - \diff{}{t}\left( \diffp{\lagrangian}{\dot{q}} \right) \right] \delta q + \left[ \diffp{\lagrangian}{\dot{q}} \delta q \right]_{t_1}^{t_2}.
+    \end{align}
+    Now suppose that \(\delta q\) vanishes at \(t_1\) and \(t_2\), so \(\delta q(t_1) = \delta q(t_2) = 0\), then the last term above vanishes and we have
+    \begin{equation}
+        \delta S = \int_{t_1}^{t_2} \dl{t} \left[ \diffp{\lagrangian}{q} - \diff{}{t}\left( \diffp{\lagrangian}{\dot{q}} \right) \right]\delta q.
+    \end{equation}
+    If \(\delta S\) is to vanish for all variations \(\delta q\) then we must have
+    \begin{equation}
+        \diffp{\lagrangian}{q} - \diff{}{t}\left( \diffp{\lagrangian}{\dot{q}} \right) = 0.
+    \end{equation}
+    This is the \defineindex{Euler--Lagrange equation} for a single particle in one dimension.
+    
+    This generalises to \(n\)-dimensional space by replacing \(q\) with \(n\) coordinates \(q_i\) and \(\dot{q}\) with \(\dot{q}_i\).
+    The Lagrangian is then
+    \begin{equation}
+        \lagrangian(q_i, \dot{q}_i) = T(\dot{q}_i) - V(q_i),
+    \end{equation}
+    and the action is
+    \begin{equation}
+        S[q_i(t)] = \int_{t_1}^{t_2} \dl{t} \, \lagrangian(q_i, \dot{q}_i).
+    \end{equation}
+    We then get \(n\) Euler--Lagrange equations:
+    \begin{equation}
+        \diffp{\lagrangian}{q_i} - \diff{}{t} \left( \diffp{\lagrangian}{\dot{q}_i} \right) = 0.
+    \end{equation}
+    
+    \begin{exm}{}{}
+        The Lagrangian for a simple harmonic oscillator is
+        \begin{equation}
+            \lagrangian = \frac{1}{2} m \dot{x}^2 - \frac{1}{2} m\omega^2 x^2.
+        \end{equation}
+        We have
+        \begin{equation}
+            \diffp{\lagrangian}{x} = -m\omega^2 x, \qand \diffp{\lagrangian}{\dot{x}} = m\dot{x} \implies \diff{}{t}\left( \diffp{\lagrangian}{\dot{x}} \right) = m\ddot{x}.
+        \end{equation}
+        Hence,
+        \begin{equation}
+            m\ddot{x} = -m\omega^2 x \implies \ddot{x} = -\omega^2 x
+        \end{equation}
+        is the equation of motion for the simple harmonic oscillator, which is exactly what we would expect.
+    \end{exm}
+    
+    \section{Hamiltonian Dynamics of a Particle}
+    Let's go back to the one-dimensional case.
+    We can define the \defineindex{canonical momentum} of the particle as
+    \begin{equation}
+        p \coloneqq \diffp{\lagrangian}{\dot{q}}.
+    \end{equation}
+    Note that, in general, this is \emph{not} the normal momentum.
+    
+    We then define the \defineindex{Hamiltonian}, \(H\), as a function of the generalised position and canonical momentum:
+    \begin{equation}
+        H(q, p) \coloneqq p\dot{q} - \lagrangian(q, \dot{q}).
+    \end{equation}
+    Note that we must eliminate any \(\dot{q}\) remaining in the expression for the Hamiltonian, this can be done by solving the defining relation \(p = \diff{\lagrangian}/{\dot{q}}\) for \(\dot{q}\) and then substituting in the result.
+    
+    Now consider what happens when we vary \(H\).
+    Varying the left hand side we get
+    \begin{equation}
+        \dl{H} = \diffp{H}{q} \dd{q} + \diffp{H}{p} \dd{p}.
+    \end{equation}
+    Varying the right hand side we have
+    \begin{equation}
+        \dl{H} = p \dd{q} + q \dd{p} - \diffp{\lagrangian}{q} \dd{q} - \diffp{\lagrangian}{\dot{q}} \dd{\dot{q}}.
+    \end{equation}
+    We can rewrite the last term in terms of the canonical momentum:
+    \begin{equation}
+        \dl{H} = p \dd{q} + q \dd{p} - \diffp{\lagrangian}{q} \dd{q} - p \dd{\dot{q}} =  q \dd{p} - \diffp{\lagrangian}{q} \dd{q}.
+    \end{equation}
+    Using the Euler--Lagrange equations the second term can be rewritten to give
+    \begin{equation}
+        \dl{H} =  q \dd{p} - \diff{}{t}\left( \diffp{\lagrangian}{\dot{q}} \right) \dd{q} = q \dd{p} - \dot{p} \dd{q}.
+    \end{equation}
+    Comparing this with the result for the left hand side variation we can read off
+    \begin{equation}
+        \dot{q} = \diffp{H}{p}, \qand \dot{p} = - \diffp{H}{q}.
+    \end{equation}
+    These are \defineindex{Hamilton's equations}.
+    
+    This all generalises to \(n\) dimensions.
+    First replace \(q\) with \(q_i\), and \(p\) with \(p_i \coloneqq \diffp{\lagrangian}/{q_i}\).
+    Then the Hamiltonian is
+    \begin{equation}
+        H(q_i, p_i) = \sum_i p_i \dot{q}_i - \lagrangian(q_i, \dot{q}_i).
+    \end{equation}
+    Hamilton's equations are
+    \begin{equation}
+        \dot{q}_i = \diffp{H}{p_i}, \qand \dot{p}_i = -\diffp{H}{q_i}.
+    \end{equation}
+    
+    It can be useful when doing Hamiltonian mechanics to define the \defineindex{Poisson bracket} of two functions, \(A\) and \(B\), depending on position, \(q_i\), and momentum, \(p_i\):
+    \begin{equation}
+        \poissonBracket{A, B} \coloneqq \sum_i \left( \diffp{A}{p_i}\diffp{B}{q_i} - \diffp{A}{q_i}\diffp{B}{p_i} \right).
+    \end{equation}
+    This has the advantage of allowing us to express Hamilton's equations in the more symmetric form
+    \begin{equation}\label{eqn:hamilton's equations with poisson brackets}
+        \dot{q}_i = \poissonBracket{H}{q_i}, \qand \dot{p}_i = \poissonBracket{H}{p_i}.
+    \end{equation}
+    
+    Note the similarity to Heisenberg's operator equation of motion for a time independent operator, \(A\):
+    \begin{equation}
+        \dot{A}(t) = i [H, A].
+    \end{equation}
+    Replacing Poisson brackets with \(i\) times the commutator can get us quite a long way in quantum mechanics.
+    
+    The Hamiltonian is conserved.
+    To show this consider the time derivative:
+    \begin{equation}
+        \diff{H}{t} = \diffp{H}{p} \dot{p} + \diffp{H}{q} \dot{q} = \dot{q}\dot{p} - \dot{p}\dot{q} = 0.
+    \end{equation}
+    We can often identify the Hamiltonian with the total energy when this is also conserved.
+    
+    \begin{exm}{}{}
+        The canonical momentum for a simple harmonic oscillator is
+        \begin{equation}
+            p = \diffp{\lagrangian}{\dot{x}} = m\dot{x},
+        \end{equation}
+        which is just the normal momentum in this case.
+        The Hamiltonian is then
+        \begin{equation}
+            H = p\dot{q} - \lagrangian = m\dot{x}^2 - \frac{1}{2}m\dot{x}^2 + \frac{1}{2}m\omega^2x^2 = \frac{1}{2}m\dot{x}^2 + \frac{1}{2}m\omega^2x^2,
+        \end{equation}
+        which is exactly the energy of a simple harmonic oscillator.
+    \end{exm}
+    
+    \section{Lagrangian Dynamics of a Field}
+    Lagrangian dynamics doesn't change that much when we work with fields.
+    We start by replacing the generalised coordinate \(q(t)\) with the field, \(\varphi(x)\), which now depends on a position in spacetime, rather than just a time.
+    Instead of a Lagrangian we work with a \defineindex{Lagrangian density}, \(\lagrangianDensity(\varphi, \partial_\mu \varphi)\), replacing the time derivative of the coordinate with a four-vector derivative.
+    We then have to integrate over a region of spacetime to get the action:
+    \begin{equation}
+        S[\varphi(x)] \coloneqq \int \dl{^4x} \, \lagrangianDensity(\varphi, \partial_\mu \varphi).
+    \end{equation}
+    The integral should be taken over some arbitrary region of spacetime.
+    Note that we can write this as
+    \begin{equation}
+        S[\varphi(x)] = \int \dl{t} \int \dl{^3\vv{x}} \, \lagrangianDensity(\varphi, \partial_\mu \varphi) = \int \dl{t} \, \lagrangian(\varphi, \partial_\mu \varphi)
+    \end{equation}
+    where
+    \begin{equation}
+        \lagrangian(\varphi, \partial_\mu \varphi) \coloneqq \int \dl{^3\vv{x}} \, \lagrangianDensity(\varphi, \partial_\mu \varphi).
+    \end{equation}
+    So, integrating \(\lagrangianDensity\) over space gives \(\lagrangian\), which we call the Lagrangian, which explains the interpretation of \(\lagrangianDensity\) as a Lagrangian \emph{density}.
+    While this distinction is important the Lagrangian doesn't actually appear that much in QFT, so people often just call \(\lagrangianDensity\) the Lagrangian, leaving the density part implicit.
+    
+    The Euler--Lagrange equations for the Lagrangian density don't change much, and can be derived in a very similar way.
+    We start by varying the field, \(\varphi \to \varphi + \delta \varphi\), and looking at the resulting variation in the Lagrangian density:
+    \begin{equation}
+        \delta\lagrangianDensity = \diffp{\lagrangianDensity}{\varphi} \delta \varphi + \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \delta (\partial_\mu \varphi).
+    \end{equation}
+    For a smooth variation we have
+    \begin{equation}
+        \delta (\partial_\mu \varphi) = \partial_\mu (\delta \varphi)
+    \end{equation}
+    and so
+    \begin{equation}
+        \delta\lagrangianDensity = \diffp{\lagrangianDensity}{\varphi} \delta \varphi + \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \partial_\mu (\delta \varphi).
+    \end{equation}
+    We can use the product rule,
+    \begin{equation}
+        \partial_\mu \left( \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \delta \varphi \right) = \partial_\mu \left( \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \right) \delta \varphi + \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \partial_\mu (\delta \varphi),
+    \end{equation}
+    to write the last term as a total derivative minus a term:
+    \begin{equation}
+        \delta\lagrangianDensity = \diffp{\lagrangianDensity}{\varphi} \delta \varphi + \partial_\mu \left( \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \delta \varphi \right) - \partial_\mu \left( \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \right) \delta \varphi.
+    \end{equation}
+    Integrating over some spacetime region, \(\Omega\), to get the variation in the action we have
+    \begin{align}
+        \delta S &= \int_\Omega \dl{^4x} \left[ \diffp{\lagrangianDensity}{\varphi} \delta \varphi + \partial_\mu \left( \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \delta \varphi \right) - \partial_\mu\left( \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \right) \delta \varphi \right]\\
+        &= \int_\Omega \dl{^4x} \left[ \diffp{\lagrangianDensity}{\varphi} \delta \varphi - \partial_\mu\left( \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \right) \delta \varphi \right] + \int_\Omega \dl{^4x} \, \partial_\mu \left( \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \delta \varphi \right).
+    \end{align}
+    Applying the divergence theorem to the second integral we can replace it with an integral of \((\diffp{\lagrangianDensity}/{(\partial_\mu \varphi)}) \delta \varphi\) over the boundary, \(\partial \Omega\).
+    Choosing a variation, \(\delta \varphi\), which vanishes on the boundary this term will vanish, and we will be left with
+    \begin{equation}
+        \delta S = \int_\Omega \dl{^4x} \left[ \diffp{\lagrangianDensity}{\varphi} \delta \varphi - \partial_\mu\left( \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \right) \delta \varphi \right].
+    \end{equation}
+    For this to vanish for all variations of the field we require that
+    \begin{equation}
+        \diffp{\lagrangianDensity}{\varphi} - \partial_\mu \left( \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \right) = 0.
+    \end{equation}
+    These are the \define{Euler--Lagrange equations}\index{Euler--Lagrange equation} for a scalar field.
+    
+    \section{Hamiltonian Dynamics of a Field}
+    Following the same logic as for a single particle we can define the \defineindex{canonical momentum},
+    \begin{equation}
+        \pi(x) \coloneqq \diffp{\lagrangianDensity}{\dot{\varphi}}.
+    \end{equation}
+    This is \emph{not} the same as the actual momentum.
+    Notice that this definition treats time differently to position, this will result in the Hamiltonian formulation not being Lorentz invariant, although the results we get still are, the steps between are just frame dependent.
+    This corresponds to the non-Lorentz invariance of the energy, the energy of a particle of mass \(m\) is \(\gamma m\).
+    
+    We then define the Hamiltonian, \(H\), to be
+    \begin{equation}
+        H \coloneqq \int \pi \dot{\varphi} \dd{^4x} - L = \int \dd{^4x} \, (\pi \dot{\varphi} - \lagrangianDensity) = \int \dl{^3\vv{x}} \, \hamiltonianDensity
+    \end{equation}
+    where
+    \begin{equation}
+        \hamiltonianDensity \coloneqq \pi \dot{\varphi} - \lagrangianDensity
+    \end{equation}
+    is the \defineindex{Hamiltonian density}.
+    Both the Hamiltonian and Hamiltonian density must be functions of the field, \(\varphi\), and the canonical momentum, \(\pi\), which is just another field.
+    
+    The same derivation as before works without modification, so we won't repeat it here, the result is \defineindex{Hamilton's equations} for a field:
+    \begin{equation}
+        \dot{\varphi} = \diffp{\hamiltonianDensity}{\pi}, \qand \dot{\pi} = - \diffp{\hamiltonianDensity}{\varphi}.
+    \end{equation}
+    
+    As before, the Hamiltonian density is conserved:
+    \begin{align}
+        \diff{\hamiltonianDensity}{t} &= \int \dl{^3\vv{x}} \left( \diffp{\hamiltonianDensity}{\varphi} \dot{\varphi} + \diffp{\hamiltonianDensity}{\pi} \dot{\pi} \right)\\
+        &= \int \dl{^3\vv{x}} (-\dot{\pi} \dot{\varphi} + \dot{\varphi} \dot{\pi})\\
+        &= 0.
+    \end{align}
+    Again, when energy is conserved we can often identify it with the Hamiltonian.
+    
+    \section{Klein--Gordon Equation}
+    \epigraph{We have to learn to run before we walk.}{Richard Ball}
+    The Lagrangian for a scalar field, \(\varphi\), is
+    \begin{equation}
+        \lagrangianDensity = \frac{1}{2}(\partial_\mu \varphi)(\partial^\mu \varphi) - \frac{1}{2}m^2\varphi^2.
+    \end{equation}
+    Clearly we have
+    \begin{equation}
+        \diffp{\lagrangianDensity}{\varphi} = -m^2\varphi.
+    \end{equation}
+    We can also compute the derivative with respect to \(\partial_\mu \varphi\), note that \((\partial_\mu \varphi)(\partial^\mu \varphi)\) is just \((\partial \varphi)^2\), so we can treat this just like the derivative of a quantity squared, giving
+    \begin{equation}
+        \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} = \partial^\mu \varphi.
+    \end{equation}
+    We end with an upper index, since the left hand side has a lower index in the denominator, which is an upper index in the numerator.
+    We then have
+    \begin{equation}
+        \partial_\mu \left( \diffp{\lagrangianDensity}{\varphi} \right) = \partial_\mu \partial^\mu \varphi = \dalembertian \varphi.
+    \end{equation}
+    Using the Euler--Lagrange equations we then have
+    \begin{equation}
+        \dalembertian \varphi + m^2 \varphi = 0,
+    \end{equation}
+    which is just the Klein--Gordon equation.
+    
+    The canonical momentum associated with this Lagrangian is
+    \begin{equation}
+        \pi = \diffp{\lagrangianDensity}{\dot{\varphi}} = \diffp{\lagrangianDensity}{(\partial_0 \varphi)}  = \partial^0 \varphi = \dot{\varphi}.
+    \end{equation}
+    The Hamiltonian is then
+    \begin{equation}
+        \hamiltonianDensity = \pi \dot{\varphi} - \lagrangianDensity = \frac{1}{2}(\pi^2 + (\grad \varphi)^2 + m^2\varphi^2).
+    \end{equation}
+    The \(\grad\varphi\) term comes from
+    \begin{align}
+        \pi^2 - \frac{1}{2} (\partial_\mu\varphi)(\partial^\mu\varphi) &= \pi^2 - \frac{1}{2} [(\partial_0 \varphi)(\partial^0 \varphi) - (\partial_i \varphi)(\partial^i \varphi)]\\
+        &= \pi^2 - \frac{1}{2}[\dot{\varphi}^2 - (\grad\varphi)^2] = \frac{1}{2}[\pi^2 - (\grad\varphi)^2]
+    \end{align}
+    where we've used \(\dot{\varphi} = \pi\).
+    
+    Compare the Hamiltonian density for the Klein--Gordon equation with the Hamiltonian for the harmonic oscillator:
+    \begin{equation}
+        H = \frac{1}{2m} (p^2 + m^2\omega^2 x^2).
+    \end{equation}
+    Up to a factor of \(\omega^2\) and \(1/m\) this is pretty much the same as the Klein--Gordon Hamiltonian density, minus the \((\grad \varphi)^2\) term.
+    Similarly the Klein--Gordon Lagrangian density is very similar to the harmonic oscillator Lagrangian.
+    This suggests that we should study the harmonic oscillator, and indeed we shall soon.
+    
+    \begin{exm}{Electromagnetism}{}
+        The Lagrangian density for the electromagnetic field, \(A^\mu\), is
+        \begin{equation}
+            \lagrangianDensity = -\frac{1}{4}F^{\mu\nu}F_{\mu\nu}.
+        \end{equation}
+        We can insert the definition of \(F^{\mu\nu}\) and expand this out to get
+        \begin{align}
+            \lagrangianDensity &= -\frac{1}{4}(\partial^\mu A^\nu - \partial^\nu A^\mu)(\partial_\mu A_\nu - \partial_\nu A_\mu)\\
+            &= -\frac{1}{4}[(\partial^\mu A^\nu)(\partial_\mu A_\nu) - (\partial^\nu A^\mu)(\partial_\mu A_\nu)\\
+            &\qquad- (\partial^\mu A^\nu)(\partial_\nu A_\mu) + (\partial^\nu A^\mu)(\partial_\nu A_\mu)]\\
+            &= -\frac{1}{2}(\partial^\mu A^\nu)(\partial_\mu A_\nu) + \frac{1}{2}(\partial^\mu A^\nu)(\partial_\nu A_\mu).
+        \end{align}
+        
+        We treat each component of \(A_\nu\) as an independent field.
+        We then have
+        \begin{equation}
+            \diffp{\lagrangianDensity}{A_\nu} = 0, \qand \diffp{\lagrangianDensity}{(\partial_\mu A_\nu)} = -\partial^\mu A^\nu + \partial^\nu A^\mu = -F^{\mu\nu}.
+        \end{equation}
+        Hence, the Euler--Lagrange equations give
+        \begin{equation}
+            \partial_\mu\left( \diffp{\lagrangianDensity}{(\partial_\mu A_\nu)} \right) = -\partial_\mu \partial^\mu A^\nu + \partial^\nu \partial_\mu A^\mu = 0.
+        \end{equation}
+        That is,
+        \begin{equation}
+            \dalembertian A^\nu - \partial^\nu \partial_\mu A^\mu = 0 \iff -\partial_\mu F^{\mu\nu} = 0
+        \end{equation}
+        This is Maxwell's equation in a vacuum in an arbitrary gauge.
+        
+        The canonical momentum is
+        \begin{equation}
+            \pi^\mu(x) = \diffp{\lagrangianDensity}{\dot{A}_\mu} = \diffp{\lagrangianDensity}{(\partial_0 A_\mu)} = -\partial^\mu A^0 + \partial^0 A^\mu = -F^{0\mu}.
+        \end{equation}
+        Antisymmetry of \(F^{\mu\nu}\) implies that \(\pi^\mu(x) = 0\), and so \(\pi^\mu(x) = (0, -\vv{E}(x))\), where \(\vv{E}(x)\) is the electric field.
+        
+        The fact that \(\pi^0(x) = 0\) will cause problems later when we try to quantise the electromagnetic field.
+        
+        In the presence of sources the Lagrangian density is instead
+        \begin{equation}
+            \lagrangianDensity = -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} - J^\mu A_\mu.
+        \end{equation}
+        This doesn't change the term given by differentiating with respect to \(\partial_\mu A_\nu\), all that changes is we now have
+        \begin{equation}
+            \diffp{\lagrangianDensity}{A_\mu} = -J^\mu,
+        \end{equation}
+        and so the result of applying the Euler--Lagrange equations is now
+        \begin{equation}
+            \dalembertian A^\nu - \partial^\nu \partial_\mu A^\mu = J^\nu,
+        \end{equation}
+        which is Maxwell's equation in the presence of a source.
+    \end{exm}
+    
+    \section{Symmetries}
+    \subsection{Discrete Symmetries}
+    There are three discrete symmetries of particular interest in quantum field theory, they are
+    \begin{itemize}
+        \item \defineindex{parity}: \(\parity \colon \vv{x} \mapsto -\vv{x}\), \(\parity \colon x^\mu = (x^0, x^i) \mapsto (x^0, -x^i) = (x_0, x_i) = x_\mu\), so parity acts to swap raised and lowered indices of positions;
+        \item \defineindex{time reversal}: \(\timeReversal \colon t \mapsto t\), \(\timeReversal \colon x^\mu = (x^0, x^i) \mapsto (-x^0, x^i) = -(x^0, -x^i) = -(x_0, x_i) = -x_\mu\), so time reversal acts to swap raised and lowered indices and negate positions;
+        \item \defineindex{charge conjugation}: \(\chargeConjugation \colon e \mapsto -e\), where \(e\) is the charge of the particle.
+    \end{itemize}
+    
+    Consider, for example, the Lagrangian of the Klein--Gordon equation:
+    \begin{equation}
+        \lagrangianDensity = \frac{1}{2}(\partial^\mu \varphi)(\partial_\mu\varphi) - \frac{1}{2}m^2 \varphi^2.
+    \end{equation}
+    Under parity the scalar field is unchanged, and \(\partial^\mu \leftrightarrow \partial^\mu\), so the Lagrangian is unchanged under parity.
+    Under time reversal the scalar field is unchanged, and \(\partial^\mu \leftrightarrow -\partial_\mu\), so the Lagrangian is unchanged under time reversal.
+    Since this Lagrangian has no charges involved it is trivially invariant under charge conjugation.
+    
+    Now consider the Electromagnetic Lagrangian,
+    \begin{equation}
+        \lagrangianDensity = -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} - J^\mu A_\mu.
+    \end{equation}
+    Under parity transformations \(F^{\mu\nu} \leftrightarrow F_{\mu\nu}\), \(J^\mu \to J_\mu\), and \(A_\mu \to A^\mu\), so
+    \begin{equation}
+        \parity\lagrangianDensity = -\frac{1}{4}F_{\mu\nu}F^{\mu\nu} - J_\mu A^\mu = \lagrangianDensity,
+    \end{equation}
+    so the Lagrangian is unchanged by parity.
+    Under time reversal transformations \(F^{\mu\nu} \leftrightarrow -F_{\mu\nu}\) since the derivatives in the definition of \(F^{\mu\nu}\) transform as \(\partial^\mu \to -\partial_\mu\) under time reversal.
+    On the other hand, \(J^\mu \to J^\mu\), and \(A_\mu \to A_\mu\), since time reversal doesn't effect the current or potential.
+    Hence,
+    \begin{equation}
+        \timeReversal\lagrangianDensity = -\frac{1}{4}(-F_{\mu\nu})(-F^{\mu\nu}) - J^\mu A_\mu = \lagrangianDensity,
+    \end{equation}
+    so the Lagrangian is unchanged under time reversal.
+    Under charge conjugation \(F^{\mu\nu} \leftrightarrow -F_{\mu\nu}\), \(J^\mu \to -J_\mu\), and \(A^\mu \to -J_\mu\), so
+    \begin{equation}
+        \chargeConjugation\lagrangianDensity = -\frac{1}{4}(-F_{\mu\nu})(-F^{\mu\nu}) - (-J_\mu)(-A^\mu) = \lagrangianDensity,
+    \end{equation}
+    so the Lagrangian is invariant under charge conjugation.
+    
+    Invariance under each of these symmetries means that both of these Lagrangians are invariant under the combined \(\chargeConjugation\parity\timeReversal\) symmetry, given by \(x^\mu \mapsto -x^\mu\) and \(e \mapsto -e\).
+    
+    \subsection{Continuous Symmetries}
+    \begin{rmk}
+        For more details see the \course{Symmetries of Particles and Fields} course.
+    \end{rmk}
+    If the action is invariant under a group of continuous symmetries then we have a conserved quantity.
+    This is the essence of \defineindex{Noether's theorem}.
+    The most common examples being
+    \begin{itemize}
+        \item invariance under translations in time leading to energy conservation;
+        \item invariance under spatial translations leading to momentum conservation;
+        \item invariance under rotation leading to angular momentum conservation.
+    \end{itemize}
+    
+    The simplest case is, perhaps, when the Lagrangian is invariant under translations, then the action is also necessarily translation invariant.
+    Suppose we have a translation
+    \begin{equation}
+        \varphi(x) \to \varphi'(x) = \varphi(x) + \delta \varphi(x).
+    \end{equation}
+    Note that the translation is allowed to depend on \(x\).
+    The variation in \(\lagrangianDensity\) is
+    \begin{align}
+        \delta \lagrangianDensity &= \diffp{\lagrangianDensity}{\varphi} \delta\varphi + \diffp{\lagrangianDensity}{(\partial_\mu)} \delta(\partial_\mu \varphi)\\
+        &= \partial_\mu \left( \diffp{\lagrangianDensity}{(\partial_\mu\varphi)} \right) \delta \varphi + \diffp{\lagrangianDensity}{(\partial_\mu\varphi)} \delta(\partial_\mu\varphi)\\
+        &= \partial_\mu\left( \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \delta \varphi \right).
+    \end{align}
+    The second equality is simply an application of the Euler--Lagrange equations to rewrite the first term.
+    The last equality is just recognising the product rule.
+    
+    Imposing that \(\lagrangianDensity\) is invariant under translations like this we have \(\delta \lagrangianDensity = 0\), which gives us the continuity equation
+    \begin{equation}
+        \partial_\mu J^\mu(x) = 0,
+    \end{equation}
+    where
+    \begin{equation}
+        J^\mu(x) \coloneqq \diffp{\lagrangianDensity}{(\partial_\mu)} \delta \varphi
+    \end{equation}
+    is the conserved current, a generalisation of the normal current in electrodynamics.
+    There is also a corresponding conserved \enquote{charge}:
+    \begin{equation}
+        Q = \int\dl{^3\vv{x}} \, J^0(x).
+    \end{equation}
+    To see that this quantity is conserved consider
+    \begin{equation}
+        \dot{Q} = \int \dl{^3\vv{x}} \, \partial_0 J^0(x) = -\int \dl{^3\vv{x}} \, \partial_i J^i(x) = 0
+    \end{equation}
+    where in the last step we've used the divergence theorem to rewrite the last term as a surface integral, then take this surface to be at infinity, and made the usual assumption that fields vanish sufficiently quickly at infinity.
+    
+    It can be shown that the Euler--Lagrange equations are invariant under the addition of a four-divergence, 
+    \begin{equation}
+        \lagrangianDensity \to \lagrangianDensity + \partial_\mu \Lambda^\mu
+    \end{equation}
+    for some four-vector field \(\Lambda^\mu\) with a sufficiently smooth derivative.
+    The same derivation as before, but setting \(\delta\lagrangianDensity = \partial_\mu \Lambda^\mu\) instead of zero, then gives a conserved current
+    \begin{equation}
+        j^\mu = \diffp{\lagrangianDensity}{(\partial_\mu\varphi)} \delta\varphi - \Lambda^\mu.
+    \end{equation}
+    
+    As well as changing the Lagrangian directly we can instead act on spacetime, for example, by translation:
+    \begin{equation}
+        x^\mu \to x'^\mu = x^\mu + a^\mu
+    \end{equation}
+    for some infinitesimal four-vector \(a^\mu\).
+    This induces a change in the scalar field, given by Taylor expanding:
+    \begin{equation}
+        \varphi(x) \to \varphi(x + a) = \varphi(x) + a^\mu \partial_\mu \varphi(x).
+    \end{equation}
+    Since the Lagrangian density is also a scalar it must transform the same way:
+    \begin{equation}
+        \lagrangianDensity \to \lagrangianDensity + a^\mu \partial_\mu \lagrangianDensity = \lagrangianDensity + a^\nu \partial_\mu (\tensor{\delta}{^\mu_\nu} \lagrangianDensity).
+    \end{equation}
+    Comparing this to the transformation \(\lagrangianDensity \to \lagrangianDensity + \partial_\mu \Lambda^\mu\) we can identify
+    \begin{equation}
+        \partial_\mu \Lambda^\mu = a^\nu \partial_\mu (\partial^\mu_\nu \lagrangianDensity).
+    \end{equation}
+    We then have four conserved currents, one for each value of \(\nu\), such as
+    \begin{equation}
+        J^\mu(x) = \diffp{\lagrangianDensity}{(\partial_\mu \varphi)}a^0\partial_0\varphi - a^0 \tensor{\delta}{^\mu_0}\lagrangianDensity,
+    \end{equation}
+    which comes from setting \(\nu = 0\).
+    We can combine these four currents into a single rank 2 tensor, scaling out the \(a^\nu\) parameter, to get
+    \begin{equation}
+        \tensor{T}{^\mu_\nu} = \diffp{\lagrangianDensity}{(\partial_\mu \lagrangianDensity)}\partial_\nu \varphi - \lagrangianDensity \tensor{\delta}{^\mu_\nu}.
+    \end{equation}
+    Raising the index we get
+    \begin{equation}
+        T^{\mu\nu} = \diffp{\lagrangianDensity}{(\partial_\mu \varphi)}\partial^\nu \varphi - \lagrangianDensity \minkowskiMetric^{\mu\nu}.
+    \end{equation}
+    This is the \defineindex{energy-momentum tensor}, also called the \define{stress-energy tensor}\index{stress-energy tensor|see{energy-momentum tensor}}\footnote{Strictly this is the energy-momentum density tensor, but very rarely does anyone bother to make that distinction.}.
+    
+    The conserved \enquote{charge} associated with the \(\nu = 0\) component is
+    \begin{equation}
+        \int \dl{^3\vv{x}} \, T^{00} = \int \left( \diffp{\lagrangianDensity}{(\partial_0\varphi)} \partial^0\varphi - \lagrangianDensity \right) = \int \dl{^3\vv{x}} \, \hamiltonianDensity = H,
+    \end{equation}
+    so this is an expression of energy conservation.
+    This shouldn't be surprising as translations by \(a^0\) correspond to time translations.
+    
+    Similarly the conserved charges associated with the \(\nu = i\) components are
+    \begin{equation}
+        P^i = \int \dl{^3\vv{x}} \, T^{0i} = \int \dl{^3\vv{x}} \, \pi \partial^i \varphi.
+    \end{equation}
+    Since we expect these three components to form a four-vector with time component given by \(H\) we interpret them as the actual momentum of the particle, as opposed to the conjugate momentum, \(\pi\).
+    We can then interpret \(\pi\partial_i\varphi\) as the momentum density.
+    
+    \chapter{Quantised Fields}
+    Quantum field theory is a quantum theory of fields.
+    We've seen classical fields, now we need some quantum mechanics before we can start quantising fields.
+    So, in this section we'll give a quick recap of quantum mechanics.
+    For more details see the \course{Principles of Quantum Mechanics} and \course{Quantum Theory} courses.
+    
+    \section{Quantum Mechanics}
+    \epigraph{It's slightly disturbing that people believe it.}{Richard Ball, on quantum mechanics}
+    \subsection{The Basics}
+    In quantum mechanics we start with coordinates \(q_i\), and a Lagrangian, \(\lagrangian(q_i, \dot{q}_i)\).
+    We then define canonical momenta,
+    \begin{equation}
+        p_i \coloneqq \diffp{\lagrangian}{q_i}.
+    \end{equation}
+    From this we can find a Hamiltonian,
+    \begin{equation}
+        H = \sum_i p+i\dot{q}_i - \lagrangian.
+    \end{equation}
+
+    So far this could all be classical.
+    The quantum mechanics begins when we interpret \(q_i\), \(p_i\), and \(H\) as \define{Hermitian operators}\index{Hermitian!operator}\footnote{An operator, \(A\), is Hermitian if \(A^\hermit = A\), where \(A^\hermit\) is the \define{Hermitian conjugate}\index{Hermitian!conjugate}, defined such that \(\bra{\psi}A\ket{\varphi} = \bra{\varphi}A^\hermit\ket{\psi}^*\).} acting on a Hilbert space of states.
+    The Hermitian requirement is so that these operators have real eigenvalues, which we can then interpret as the results of measurements.
+    For example, the average energy is given by
+    \begin{equation}
+        E = \bra{\psi, t} H \ket{\psi, t},
+    \end{equation}
+    where \(\ket{\psi, t}\) is the state of the particle, that is a vector in the Hilbert space, and \(\bra{\psi, t} = \ket{\psi, t}^\hermit\) is the corresponding vector in the dual space.
+    
+    The next step is to realise that operators don't necessarily commute, and so we impose the \define{canonical commutation relation (CCR)}\index{canonical commutation relation}\glossary[acronym]{CCR}{Canonical Commutation Relation}:
+    \begin{equation}
+        \commutator{q_i}{p_i} \coloneqq i\delta_{ij},
+    \end{equation}
+    where \(\commutator{A}{B} \coloneqq AB - BA\) is the \defineindex{commutator}.
+    As well as this we impose that the positions commute, and the momenta commute, so
+    \begin{equation}
+        \commutator{q_i}{q_j} = \commutator{p_i}{p_j} = 0.
+    \end{equation}
+    
+    \subsection{Time Dependence}
+    The time evolution of a state, \(\ket{\psi, t}\), under a system with Hamiltonian \(H\) is given by the \define{Schrödinger equation}\index{Schrödinger!equation}\index{time dependent Schrödinger equation}
+    \begin{equation}
+        i \diff{}{t} \ket{\psi, t} = H\ket{\psi, t}.
+    \end{equation}
+    This is a fairly simple differential equation, if we ignore the fact that \(H\) is an operator and \(\ket{\psi, t}\) is a vector, the solution is just
+    \begin{equation}\label{eqn:time evolution of Schrödinger equation}
+        \ket{\psi, t} = \e^{-iHt}\ket{\psi}
+    \end{equation}
+    where \(\ket{\psi} = \ket{\psi, 0}\) is the initial state of the system.
+    Fortunately this is perfectly valid, even though \(H\) \emph{is} an operator and \(\ket{\psi, t}\) \emph{is} vector, we just have to interpret the exponential through its power series:
+    \begin{equation}
+        \e^{-iHt} \coloneqq \sum_{n = 0}^{\infty} \frac{1}{n!}(-iHt)^n.
+    \end{equation}
+    
+    This scheme with which we have worked so far, where operators are time independent and states are time dependent, is called the \define{Schrödinger picture}\index{Schrödinger!picture}.
+    It turns out that its actually easier to do QFT by interpreting operators to be time dependent and states to be time independent, called the \define{Heisenberg picture}\index{Heisenberg!picture}.
+    We distinguish between these two pictures by either including \(t\) or not, as appropriate in our operators and states.
+    A state, \(\ket{\psi}\), in the Heisenberg picture is related to the state \(\ket{\psi, t}\) in the Schrödinger picture by
+    \begin{equation}
+        \ket{\psi} = \e^{iHt}\ket{\psi, t},
+    \end{equation}
+    which is just what we get rearranging \cref{eqn:time evolution of Schrödinger equation}.
+    An operator, \(A(t)\), in the Heisenberg picture is related to the operator \(A\) in the Schrödinger picture by
+    \begin{equation}
+        A(t) = \e^{iHt} A \e^{-iHt}.
+    \end{equation}
+    
+    Importantly, expectation values are the same in both pictures, and so both pictures describe the same physics:
+    \begin{align}
+        \expected{A}_{\symrm{S}} &= \bra{\psi, t} A \ket{\psi, t}\\
+        &= \bra{\psi} \e^{iHt} A \e^{-iHt}\\
+        &= \bra{\psi} A(t) \ket{\psi}\\
+        &= \expected{A}_{\symrm{H}},
+    \end{align}
+    where the subscripts refer to the picture in which we interpret the expectation value.
+    
+    This picture changing is the same for all operators, so in particular, the position and momentum in the Heisenberg picture are given by
+    \begin{equation}
+        q_i(t) = \e^{iHt}q_i\e^{-iHt}, \qqand p_i(t) = \e^{iHt}p_i\e^{-iHt}.
+    \end{equation}
+    We also have
+    \begin{equation}
+        H(t) = \e^{iHt} H \e^{-iHt} = \e^{iHt}\e^{-iHt} H = H,
+    \end{equation}
+    which works since \(H\) commutes with itself, and the exponentials are just power series in \(H\), so also commute with \(H\).
+    This shows that the Hamiltonian is time independent in both pictures, which is a statement of energy conservation.
+    
+    Consider two operators, \(A(t)\) and \(B(t)\), in the Heisenberg picture.
+    If we know their commutator, \(\commutator{A}{B}\), in the Schrödinger picture then we can also compute it in the Heisenberg picture:
+    \begin{align}
+        \commutator{A(t)}{B(t)} &= \braket{\e^{iHt}A\e^{-iHt}}{\e^{iHt}B\e^{-Ht}}\\
+        &= \e^{iHt}A\e^{-iHt}\e^{iHt}B\e^{-iHt} - \e^{iHt}B\e^{-iHt}\e^{iHt}A\e^{iHt}\\
+        &= \e^{iHt}AB\e^{-iHt} - \e^{iHt}BA\e^{-iHt}\\
+        &= \e^{iHt}(AB - BA)\e^{-iHt}\\
+        &= \e^{iHt}\commutator{A}{B}\e^{iHt}.
+    \end{align}
+    In particular,
+    \begin{equation}
+        \commutator{q_i(t)}{p_j(t)} = \e^{iHt}\commutator{q_i}{p_j}\e^{-iHt} = \e^{iHt}i\delta_{ij}\e^{-iHt} = i\delta_{ij}\e^{iHt}\e^{-iHt} = i\delta_{ij},
+    \end{equation}
+    so the canonical commutation relations hold if both operators are evaluated at the same time.
+    Similarly,
+    \begin{equation}
+        \commutator{q_i(t)}{q_j(t)} = \commutator{p_i(t)}{p_j(t)} = 0.
+    \end{equation}
+    
+    In the Heisenberg picture instead of the Schrödinger equation we have the \define{Heisenberg equation}\index{Heisenberg!equation}, which we can derive by considering the time derivative of a generic operator, \(A(t)\):
+    \begin{align}
+        \diff{}{t}A(t) &= \diff{}{t}(\e^{iHt}A\e^{-iHt})\\
+        &= iH\e^{iHt}A\e^{-iHt} + \e^{iHt}A(-iH)\e^{-iHt}\\
+        &= i\e^{iHt}HA\e^{-iHt} - i\e^{iHt}AH\e^{-iHt}\\
+        &= i\e^{iHt}\commutator{H}{A}\e^{-iHt}\\
+        &= i\commutator{H}{A(t)}.
+    \end{align}
+    That is,
+    \begin{equation}
+        \diff{}{t}A(t) = i\commutator{H}{A(t)}.
+    \end{equation}
+    
+    The Heisenberg equation applied to the position and momentum gives
+    \begin{equation}
+        \diff{}{t}q(t) = i\commutator{H}{q(t)}, \qand \diff{}{t}p(t) = i\commutator{H}{p(t)}.
+    \end{equation}
+    Note the similarity to \cref{eqn:hamilton's equations with poisson brackets}.
+    In general when we work in the Heisenberg picture things can look pretty similar to classical mechanics, but with \(i\) times the commutator in place of Poisson brackets.
+    
+    \begin{exm}{}{}
+        Consider the Lagrangian for a particle of mass \(m\) in a position dependent potential, \(V\), in one dimension:
+        \begin{equation}
+            L = \frac{1}{2}m\dot{q}^2 - V(q).
+        \end{equation}
+        The Hamiltonian for this system is
+        \begin{equation}
+            H = \frac{p^2}{2m} + V(q).
+        \end{equation}
+        We then have
+        \begin{equation}
+            \dot{q} = i\commutator{H}{q(t)} = \frac{i}{2m}\commutator{p^2}{q}.
+        \end{equation}
+        Now, consider three operators, \(A\), \(B\), and \(C\).
+        We have
+        \begin{align}
+            \commutator{AB}{C} &= ABC - CBA\\
+            &= ABC - ACB + ACB - CBA\\
+            &= A\commutator{B}{C} + \commutator{A}{C}B.
+        \end{align}
+        Using this with \(A = B = p\) and \(C = q\) gives
+        \begin{equation}
+            \commutator{p^2}{q} = p\commutator{p}{q} + \commutator{p}{q}p = -2ip,
+        \end{equation}
+        where the negative comes from the antisymmetry of the commutator, \(\commutator{p}{q} = -\commutator{q}{p} = -i\).
+        Hence,
+        \begin{equation}
+            \dot{q} = \frac{p}{2m}.
+        \end{equation}
+        Classically we would have \(p = mv = m\dot{q}\), and this is just the quantum analogue of the classical nonrelativistic momentum.
+        
+        We also have
+        \begin{equation}
+            \dot{p} = i\commutator{H}{p(t)} = i\commutator{V(q)}{p}.
+        \end{equation}
+        We can expand \(V(q)\) as a power series in \(q\), we also have the identity
+        \begin{equation}
+            \commutator{q^n}{p} = inq^{n-1}.
+        \end{equation}
+        This can be proven with induction on \(n\).
+        First, take \(n = 0\), then
+        \begin{equation}
+            \commutator{q^0}{p} = \commutator{\ident}{p} = 0.
+        \end{equation}
+        Now suppose that
+        \begin{equation}
+            \commutator{q^k}{p} = ikq^{k-1}
+        \end{equation}
+        for some nonnegative integer \(k\).
+        Then
+        \begin{multline}
+            \commutator{q^{k+1}}{p} = \commutator{qq^k}{p} = q\commutator{q^k}{p} + \commutator{q}{p}q^k\\
+            = q ikq^{k-1} + iq^k = i(k + 1)q^k,
+        \end{multline}
+        and so by induction the identity holds for all natural numbers, \(n\).
+        
+        Expanding \(V\) as a Taylor series we have
+        \begin{equation}
+            V(q) = \sum_{n = 0}^{\infty} \frac{q^n}{n!} \diffp[n]{V}{q}\bigg|_{q = 0}.
+        \end{equation}
+        Then we have
+        \begin{align}
+            \commutator{V(q)}{p} &= \sum_{n = 0}^{\infty} \frac{1}{n!} \diffp[n]{V}{q}\bigg|_{q = 0} \commutator{q^n}{p}\\
+            &= \sum_{n = 0}^{\infty} \frac{1}{n!} \diffp[n]{V}{q}\bigg|_{q = 0} in q^{n - 1}\\
+            &= \sum_{n = 1}^{\infty} \frac{iq^{n - 1}}{(n - 1)!} \diffp[n]{V}{q}\bigg|_{q = 0}.
+        \end{align}
+        To first order we then have
+        \begin{equation}
+            \commutator{V(q)}{p} = i \diffp[n]{V}{q}\bigg|_{q = 0}
+        \end{equation}
+        and so
+        \begin{equation}
+            \dot{p} = i\commutator{V(q)}{p} = -\diffp{V}{q}.
+        \end{equation}
+        Compare this to the classical nonrelativistic equation
+        \begin{equation}
+            F = -\diffp{V}{x},
+        \end{equation}
+        expressing the force due to a potential.
+        
+        Both of these two analogies, known as \defineindex{Ehrenfest's theorem}, between classical mechanics and quantum mechanics are really due to the similarity between the classical and quantum equations of motion in the Heisenberg picture.
+    \end{exm}
+    
+    \section{Quantum Fields}
+    \epigraph{Fundamentally silly}{Richard Ball}
+    The procedure for quantising fields is almost identical to the procedure for quantising position and momentum.
+    Instead of the position and momentum we have the fields \(\varphi\) and \(\pi\).
+    We interpret these as operators in the Heisenberg picture.
+    Since in field theory we deal with densities instead to be integrated over, such as \(\lagrangianDensity\) instead of \(\lagrangian\), we replace \(\delta_{ij}\) in the canonical commutation relations with \(\delta^3(\vv{x} - \vv{x}')\), note that this treats time differently to space.
+    We postulate that the at some time, \(t\), we have
+    \begin{equation}
+        \commutator{\varphi(t, \vv{x})}{\pi(t, \vv{x}')} = i\delta^3(\vv{x} - \vv{x}')
+    \end{equation}
+    and the fields commute with themselves at all positions:
+    \begin{equation}
+        \commutator{\varphi(t, \vv{x})}{\varphi(t, \vv{x}')} = \commutator{\pi(t, \vv{x})}{\pi(t, \vv{x}')} = 0.
+    \end{equation}
+    This is called the \define{equal time commutation relation (ETCR)}\index{equal time commutation relation}\glossary[acronym]{ETCR}{Equal Time Commutation Relation}.
+    
+    In quantum mechanics as done in the previous section we treat \(t\) as a parameter and \(\vv{x}\) as an operator.
+    This is clearly not Lorentz covariant.
+    There are also other problems, such as having only a single \(\vv{x}\) operator which only allows us to talk of a single particle.
+    In quantum field theory we interpret both \(t\) and \(\vv{x}\) as parameters and \(\varphi\) as an operator.
+    We can then make this Lorentz covariant and treat systems with multiple particles.
+    
+    \subsection{Equations of Motion}
+    The Heisenberg equation,
+    \begin{equation}
+        \dot{A}(t, \vv{x}) = i \commutator{H}{A(t, \vv{x})},
+    \end{equation}
+    applies to any operator, \(A\), and hence applies to \(\varphi\).
+    We then have
+    \begin{equation}
+        \dot{\varphi}(t, \vv{x}) = i \commutator{H}{\varphi(t, \vv{x})} = i \int \dl{^3\vv{x}'} \, \commutator{\hamiltonianDensity(t, \vv{x}')}{\varphi(t, \vv{x})}
+    \end{equation}
+    We've replaced the Hamiltonian with an integral over the Hamiltonian density.
+    We'll now introduce a shorthand notation where primes denote quantities evaluated at \((t, \vv{x}')\) and an absence of a prime is a quantity evaluated at \((t, \vv{x})\), so \(\varphi' = \varphi(t, \vv{x}')\) and \(\varphi = \varphi(t, \vv{x})\).
+    The Hamiltonian density is
+    \begin{equation}
+        \hamiltonianDensity' = \frac{1}{2}(\pi'^2 + (\grad'\varphi')^2 + m^2\varphi'^).
+    \end{equation}
+    The commutator then becomes
+    \begin{equation}
+        \commutator{\hamiltonianDensity'}{\varphi} = \frac{1}{2}\left( \commutator{\pi'^2}{\varphi} + \commutator{(\grad'\varphi')^2}{\varphi} + m^2\commutator{\varphi'^2}{\varphi} \right).
+    \end{equation}
+    The last two terms vanish, since the fields commute with themselves at all positions.
+    The first term isn't too bad if we use
+    \begin{equation}
+        \commutator{AB}{C} = A \commutator{B}{C} + \commutator{A}{C}B,
+    \end{equation}
+    we have
+    \begin{align}
+        \frac{1}{2}\commutator{\pi'^2}{\varphi} &= \frac{1}{2}\pi'\commutator{\pi'}{\varphi} + \frac{1}{2}\commutator{\pi'}{\varphi}\pi'\\
+        &= -\frac{1}{2}\pi'\commutator{\varphi}{\pi'} - \frac{1}{2}\commutator{\varphi}{\pi'}\pi'\\
+        &= -\frac{1}{2} \pi' i\delta^3(\vv{x} - \vv{x}') - \frac{1}{2} i\delta^3(\vv{x} - \vv{x}') \pi'\\
+        &= -i\pi' \delta^3(\vv{x} - \vv{x}').
+    \end{align}
+    Hence, we have the equation of motion
+    \begin{align}
+        \dot{\varphi}(t, \vv{x}) &= i \int \dl{^3\vv{x}'} \commutator{\hamiltonianDensity(t, \vv{x}')}{\varphi(t, \vv{x})}\\
+        &= i \int \dl{^3\vv{x}'} (-i\pi(t, \vv{x}') \delta^3(\vv{x} - \vv{x}'))\\
+        &= \pi(t, \vv{x}).
+    \end{align}
+    So, \(\dot{\varphi} = \pi\).
+    This should be no surprise since we found this same relationship for \(\varphi\) satisfying the Klein--Gordon equation before we started quantising.
+    
+    Similarly we can find the equation of motion for \(\pi\):
+    \begin{equation}
+        \dot{\pi}(t, \vv{x}) = i\commutator{H}{\pi(t, \vv{x})} = i\int \dl{^3\vv{x}'} \commutator{\hamiltonianDensity(t, \vv{x}')}{\pi(t, \vv{x})}.
+    \end{equation}
+    The commutator in this case is
+    \begin{equation}
+        \commutator{\hamiltonianDensity'}{\pi} = \frac{1}{2}(\commutator{\pi'^2}{\pi} + \commutator{(\grad'\varphi')^2}{\pi} + m^2\commutator{\varphi'^2}{\pi}).
+    \end{equation}
+    The first term vanishes this time.
+    The last term can be computed easily:
+    \begin{align}
+        \frac{1}{2}m^2\commutator{\varphi'^2}{\pi} &= \frac{1}{2}m^2 \varphi'^2\commutator{\varphi'}{\pi} + \frac{1}{2}m^2\commutator{\varphi'}{\pi}\varphi'\\
+        &= \frac{1}{2}m^2 i\delta^3(\vv{x} - \vv{x}') + \frac{1}{2}m^2 \varphi' i\delta^3(\vv{x} - \vv{x}')\\
+        &= im^2 \delta^3(\vv{x} - \vv{x}').
+    \end{align}
+    The second term isn't too bad, we just have to notice that \(\grad'\) acts on \(\vv{x}'\) and not on \(\vv{x}\), allowing us to pull it outside of commutators like \(\commutator{\grad'\varphi'}{\pi} = \grad'\commutator{\varphi'}{\pi}\).
+    Proceeding as before we then have
+    \begin{align}
+        \frac{1}{2}\commutator{(\grad'\varphi')^2}{\pi} &= \frac{1}{2} (\grad'\varphi') \cdot \commutator{\grad'\varphi'}{\pi} + \frac{1}{2} \commutator{\grad'\varphi'}{\pi} \cdot (\grad'\varphi')\\
+        &= \frac{1}{2}(\grad'\varphi') \cdot (\grad'\commutator{\varphi'}{\pi}) + \frac{1}{2}(\grad'\commutator{\varphi'}{\pi}) \cdot (\grad'\varphi')\\
+        &= \frac{1}{2}(\grad'\varphi') \cdot (\grad'i\delta^3(\vv{x} - \vv{x}')) + \frac{1}{2}(\grad'i\delta^3(\vv{x} - \vv{x}')) \cdot (\grad'\varphi')\notag\\
+        &= i(\grad'\varphi') \cdot (\grad'\delta^3(\vv{x} - \vv{x}')).
+    \end{align}
+    We can deal with the gradient of the delta distribution by integrating by parts, and assuming that fields vanish sufficiently quickly at infinity:
+    \begin{align}
+        \int \dl{^3\vv{x}'} (\grad'\varphi) \cdot (\grad'\delta^3(\vv{x} - \vv{x}')) &= \int \dl{^3\vv{x}'} \, \grad' \cdot [\delta^3(\vv{x} - \vv{x}') (\grad'\varphi')]\\
+        &\qquad- \int \dl{^3\vv{x}'} \, (\grad'^2\varphi') \delta^3(\vv{x} - \vv{x}')\\
+        &= \int_{\partial V} [\delta^3(\vv{x} - \vv{x}') \grad'\varphi']\\
+        &\qquad- \int \dl{^3\vv{x}'} \, (\grad'^2\varphi') \delta^3(\vv{x} - \vv{x}')\\
+        &= - \int \dl{^3\vv{x}'} \, (\grad'^2\varphi') \delta^3(\vv{x} - \vv{x}')
+    \end{align}
+    where as usual the boundary term vanishes.
+    This means that, as distributions,
+    \begin{equation}
+        i(\grad'\varphi') \cdot (\grad'\delta^3(\vv{x} - \vv{x}')) = -i(\grad'^2\varphi')\delta^3(\vv{x} - \vv{x}').
+    \end{equation}
+    Hence, we have
+    \begin{align}
+        \dot{\pi}(t, \vv{x}) &= i \int \dl{^3\vv{x}'} \commutator{\hamiltonianDensity(t, \vv{x}')}{\varphi(t, \vv{x})}\\
+        &= i \int \dl{^3\vv{x}'} \left[ -i(\grad'^2\varphi') \delta^3(\vv{x} - \vv{x}') + im^2 \delta^3(\vv{x} - \vv{x}')\right]\\
+        &= \laplacian\varphi - m^2\varphi.
+    \end{align}
+    
+    Now, we have \(\pi = \dot{\varphi}\), so \(\dot{\pi} = \ddot{\varphi} = \partial_0\partial^0 \varphi\).
+    Hence,
+    \begin{equation}
+        \partial_0\partial^0 \varphi = \laplacian\varphi - m^2\varphi = \partial_i\partial^i \varphi - m^2\varphi.
+    \end{equation}
+    Rearranging this we get
+    \begin{equation}
+        0 = (\partial_0\partial^0 - \partial_i\partial^i)\varphi + m^2\varphi = (\dalembertian + m^2)\varphi,
+    \end{equation}
+    so the quantised fields satisfy the Klein--Gordon equation.
+    This means that the Heisenberg equations for field operators look a lost like classical field equations with operators replacing the fields and \(i\) times the commutator replacing Poisson brackets.
+    
+    Even though the Hamiltonian formulation and the equal time commutation relations aren't Lorentz covariant the final result is, and that's all that we care about.
+    The steps in the derivation, however, are frame dependent.
+    This is an inescapable problem with canonical quantisation.
+    
+    \chapter{Quantum Harmonic Oscillator}
+    \epigraph{By understanding the harmonic oscillator you understand everything! Well, accept from all the things we can't solve.}{Richard ball}
+    \epigraph{Surely the hydrogen atom isn't a harmonic oscillator? Well it is!}{Richard Ball}
+    The quantum harmonic oscillator is one of the most important systems in quantum mechanics.
+    It's everywhere, we use it to model atoms and phonons, molecules, and pretty much anything else.
+    Even other systems we study in quantum mechanics, such as the hydrogen atom or pairs of particles, can be interpreted as a harmonic oscillator by a change of coordinates.
+    After all, any potential in physics can always be Taylor expanded to second order at a minimum to get a harmonic potential.
+    Part of the reason why we study the harmonic oscillator is that its very nice.
+    We can solve it exactly.
+    The results are also nice, evenly spaced energy levels, bounded below.
+    
+    The harmonic oscillator is the system with the Hamiltonian
+    \begin{equation}
+        H = \frac{p^2}{2m} + \frac{1}{2}m\omega^2 q^2.
+    \end{equation}
+    We have previously remarked on the similarity of this and the Klein--Gordon Hamiltonian density, and suggested that study of the harmonic oscillator could be enlightening for the Klein--Gordon equation.
+    In this section we'll study the harmonic oscillator, computing the spectrum of the Hamiltonian, and discussing various interpretations.
+    In the next chapter we'll go back through the same steps but for fields obeying the Klein--Gordon and the Hamiltonian density.
+    
+    \section{Solution}
+    There are two ways to solve the harmonic oscillator: the analytic way, involving Hermite polynomials, which is frankly, horrible, and the algebraic way, which is maybe more mysterious but is much more inline with the quantum field theory interpretation, so this is the way we'll proceed.
+    
+    Start by defining a new operators from the position and momentum operators:
+    \begin{align}
+        a \coloneqq \sqrt{\frac{m\omega}{2}} q + \frac{i}{\sqrt{2m\omega}} p.
+    \end{align}
+    The factors are chosen so that our final statements have a simple form, note that \(a\) is dimensionless.
+    The Hermitian conjugate of this is
+    \begin{equation}
+        a^\hermit = \sqrt{\frac{m\omega}{2}} q - \frac{i}{\sqrt{2m\omega}} p.
+    \end{equation}
+    Note that \(a\) is not Hermitian, it's not an observable, for now we can just think of it as a mathematical trick.
+    We'll see later that combinations of \(a\) and \(a^\hermit\) can be treated as observables with meaningful values.
+    The motivation for this definition is that if \(a\) and \(a^\hermit\) commuted (they don't, as we'll see soon) we could factorise the Hamiltonian as
+    \begin{equation}
+        \omega aa^\hermit.
+    \end{equation}
+    
+    A bit of algebra allows us to rewrite \(q\) and \(p\) in terms of \(a\) and \(a^\hermit\):
+    \begin{equation}
+        q = \frac{1}{2m\omega} (a + a^\dagger), \qqand p = -i\sqrt{\frac{m\omega}{2}} (a - a^\hermit).
+    \end{equation}
+    We can now compute the commutation relations for \(a\) and \(a^\hermit\) from the canonical commutation relation:
+    \begin{align}
+        i &= \commutator{q}{p}\\
+        &= -\frac{i}{2}\commutator{a + a^\hermit}{a - a^\hermit}\\
+        &= -\frac{i}{2}\left( \commutator{a}{a} - \commutator{a}{a^\hermit} + \commutator{a^\hermit}{a} - \commutator{a^\hermit}{a^\hermit} \right)\\
+        &= i\commutator{a}{a^\hermit}.
+    \end{align}
+    Hence, we have that
+    \begin{equation}
+        \commutator{a}{a^\hermit} = 1.
+    \end{equation}
+    
+    An alternative approach to quantum mechanics is to start with \(a\) and \(a^\hermit\), motivating them starting with the interpretation we'll see later, and then show that the canonical commutation relations are what they are as a consequence of this choice.
+    
+    We can write the Hamiltonian in terms of \(a\) and \(a^\hermit\):
+    \begin{align}
+        H &= -\frac{\omega}{4}(a - a^\hermit)^2 + \frac{\omega}{4}(a + a^\hermit)^2\\
+        &= -\frac{\omega}{4}(a^2 - aa^\hermit - a^\hermit a + (a^\hermit)^2) + \frac{\omega}{4}(a^2 + aa^\hermit + a^\hermit a + (a^\hermit)^2)\\
+        &= \frac{\omega}{2}(aa^\hermit + a^\hermit a).
+    \end{align}
+    Now use
+    \begin{equation}
+        1 = \commutator{a}{a^\hermit} = aa^\hermit - a^\hermit a \implies aa^\hermit = a^\hermit a + 1
+    \end{equation}
+    and we get
+    \begin{equation}
+        H = \frac{\omega}{2}(aa^\hermit + a^\hermit a) = \frac{\omega}{2}(a^\hermit a + 1 + a^\hermit a) = \omega\left( a^\hermit a + \frac{1}{2} \right).
+    \end{equation}
+    
+    To compute the spectrum of the Hamiltonian we work with the operator \(N \coloneqq a^\hermit a\).
+    This \emph{is} a Hermitian operator, \(N^\hermit = (a^\hermit a) = a^\hermit (a^\hermit)^\hermit = a^\hermit a = N\).
+    We can then write the Hamiltonian as
+    \begin{equation}
+        H = \omega\left( N + \frac{1}{2} \right),
+    \end{equation}
+    if you remember what the energy eigenvalues of the harmonic oscillator are you may see where this is going.
+    
+    Let \(\ket{n}\) be an eigenstate of \(N\) with eigenvalue \(n\), so \(N\ket{n} = n\ket{n}\).
+    For now all we know is that \(n \in \reals\), since \(N\) has real eigenvalues as a Hermitian operator.
+    We choose to normalise these states so that
+    \begin{equation}
+        \braket{n}{m} = \delta_{nm}
+    \end{equation}
+    The use of \(n\) and \(m\) as labels, as well as the Dirac delta hints at something we will show later, that \(n\) is an integer, but for now we just treat \(n\) as a real number.
+    
+    The expectation value of \(N\) in the state \(\ket{n}\) is
+    \begin{equation}
+        \expected{N} = \bra{n}N\ket{n} = n\braket{n}{n} = n.
+    \end{equation}
+    Using \(N = a^\hermit a\) we can calculate this expectation value a different way:
+    \begin{equation}
+        n = \bra{n} N \ket{n} = \bra{n} a^\hermit a \ket{n} = \norm{a \ket{n}}^2,
+    \end{equation}
+    and since \(\norm{a \ket{n}}^2 \ge 0\) we have that \(n \ge 0\).
+    
+    Now consider commutators of \(N\) with \(a^\hermit\) and \(a\):
+    \begin{align}
+        \commutator{N}{a^\hermit} = \commutator{a^\hermit a}{a^\hermit} = a^\hermit \commutator{a}{a^\hermit} + \commutator{a^\hermit}{a^\hermit}a = a^\hermit.
+    \end{align}
+    Similarly,
+    \begin{equation}
+        \commutator{N}{a} = \commutator{a^\hermit a}{a} = a^\hermit\commutator{a}{a} + \commutator{a^\hermit}{a}a = -a.
+    \end{equation}
+    
+    Suppose we have an eigenstate, \(\ket{n}\).
+    What happens when we act on this with \(N\)?
+    Well, it turns out that we get another eigenstate:
+    \begin{align}
+        N a^\hermit \ket{n} &= (\commutator{N}{a^\hermit} + a^\hermit N)\ket{n}\\
+        &= (a^\hermit + a^\hermit N)\ket{n}\\
+        &= a^\hermit \ket{n} + a^\hermit N \ket{n}\\
+        &= a^\hermit \ket{n} + a^\hermit n \ket{n}\\
+        &= (n + 1)a^\hermit \ket{n}.
+    \end{align}
+    So, \(a^\hermit \ket{n}\) is an eigenstate of \(N\) with eigenvalue \(n + 1\).
+    That is, \(a^\hermit \ket{n} \propto \ket{n + 1}\).
+    We can fairly easily figure out the constant of proportionality by considering \(\norm{a^\hermit\ket{n}}^2\):
+    \begin{align}
+        \norm{a^\hermit \ket{n}}^2 &= \bra{n} aa^\hermit \ket{n}\\
+        &= \bra{n} (a^\hermit a + \commutator{a}{a^\hermit}) \ket{n}\\
+        &= \bra{n} (a^\hermit a + 1) \ket{n}\\
+        &= \bra{n} a^\hermit a \ket{n} + \braket{n}{n}\\
+        &= \bra{n} N \ket{n} + 1\\
+        &= n + 1.
+    \end{align}
+    Since the overall phase of a state has no physical significance we are free to choose the phase of the proportionality constant, so we make the sensible choice that its real and positive.
+    That is, we choose the positive square root, \(\norm{a^\hermit \ket{n}} = \sqrt{n + 1}\), and we then have
+    \begin{equation}
+        a^\hermit \ket{n} = \sqrt{n + 1}\ket{n}.
+    \end{equation}
+    
+    We can proceed similarly for \(a\ket{n}\), we have
+    \begin{align}
+        N a \ket{n} &= (\commutator{N}{a} + aN)\ket{n}\\
+        &= (-a + aN)\ket{n}\\
+        &= (n - 1)a \ket{n}.
+    \end{align}
+    So \(a\ket{n}\) is an eigenstate of \(N\) with eigenvalue \(n - 1\), so \(a\ket{n} \propto \ket{n - 1}\).
+    We can, again, work out the constant of proportionality:
+    \begin{equation}
+        \norm{a\ket{n}}^2 = \bra{n} a^\hermit a \ket{n} = \bra{n} N \ket{n} = n.
+    \end{equation}
+    So, again choosing a real, positive, solution we have
+    \begin{equation}
+        a\ket{n} = 
+        \begin{cases}
+            \sqrt{n}\ket{n - 1} & n > 0,\\
+            0 & n = 0,
+        \end{cases}
+    \end{equation}
+    the reason for the careful distinction when \(n = 0\) is that the state \(\ket{0 - 1} = \ket{-1}\) is not defined, as the eigenvalues of \(N\) are nonnegative.
+    The reason we don't have to exclude, say, \(n = 0.5\), which would have \(\ket{0.5 - 1} = \ket{-0.5}\), is that, as we will now show, \(n\) is a nonnegative integer, that is \(n \in \naturals = \{0, 1, 2, \dotsc\}\).
+    
+    Suppose that \(n \notin \naturals\).
+    Consider some \(m \in \naturals \setminus \{0\}\).
+    Then we can apply \(a\) \(m\) times to \(\ket{n}\):
+    \begin{multline}
+        a^m \ket{n} = \sqrt{n} a^{m - 1}\ket{n} = \sqrt{n}\sqrt{n - 1} a^{m - 2} \ket{n}\\
+        = \dotsb = \sqrt{n} \sqrt{n - 1} \dotsm \sqrt{n - m + 1} \ket{n - m}.
+    \end{multline}
+    For sufficiently large \(m\) we will have \(n - m < 0\).
+    However, \(n - m\) is an eigenvalue and all eigenvalues of \(N\) are nonnegative.
+    This is a contradiction and so we must have \(n \in m\).
+    In this case one of the square roots will vanish before we get to negative eigenvalues and we'll avoid the contradiction.
+    
+    Since \(H = \omega(N + 1/2)\) we can see that the eigenvalues of the Hamiltonian are
+    \begin{equation}
+        \left( n + \frac{1}{2} \right)\omega \qqwhere n \in \naturals.
+    \end{equation}
+    The eigenvectors of the Hamiltonian can all be written as
+    \begin{equation}
+        \ket{n} = \frac{(a^\hermit)^n}{\sqrt{n!}} \ket{0}
+    \end{equation}
+    where \(\ket{0}\) is such that when \(a\) acts on it we get zero:
+    \begin{equation}
+        a\ket{0} \coloneqq 0.
+    \end{equation}
+    Note that \(\ket{0}\) is an eigenstate with eigenvalue 0, and \(0\) is the zero vector, these are not the same.
+    The factor of \(1/\sqrt{n!}\) is just normalisation, if \(\ket{0}\) is normalised then \(a^\hermit \ket{0} = \ket{1} = \sqrt{1}\ket{1}\), then \((a^\hermit)^2\ket{0} = \sqrt{1}a^\hermit \ket{1} = \sqrt{1} \sqrt{2} \ket{2}\), and so on, so we can get rid of all these factors with \(1/\sqrt{n!}\), and we're left with the normalised states \(\ket{n}\).
+    
+    The most important thing about the harmonic oscillator is that the energy eigenvalues are equally spaced.
+    This makes harmonic oscillators very nice.
+    Another nice property is that the energy eigenvalues are nonnegative.
+    This means that the energy is bounded below, which is good as if it wasn't then systems would quickly decay to having negative infinite energies.
+    The equally spaced eigenvalues is what makes all of quantum field theory possible.
+    
+    \section{Interpretations}
+    \epigraph{It's fine, but in a sense, it's just wrong.}{Richard Ball}
+    There are two ways to interpret the harmonic oscillator.
+    Historically the first we discuss here was Schrödinger's interpretation, and actually came a year after the second interpretation we'll discuss, which is due to Heisenberg.
+    However, for a long time Schrödinger's interpretation was preferred, mostly because it uses more familiar mathematics, like differential equations, and also because it aligns more similarly with the notion of a classical harmonic oscillator.
+    
+    \subsection{Wave Function Interpretation}
+    \epigraph{This is the way you were taught the harmonic oscillator in kindergarten I guess.}{Richard Ball}
+    The quantum harmonic oscillator is a quantised classical harmonic oscillator.
+    We take the normal harmonic oscillator Hamiltonian, replace the position and momentum with operators, and solve the equations of motion.
+    The picture that people then have in their head is a harmonic potential with equally spaced energy levels, as seen in \cref{fig:harmonic potential and energy levels}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{HO-wave-function-interpretation-energy-levels}
+        \begin{tikzpicture}
+            \draw[->, thick] (-2, 0) -- (2, 0) node [below] {\(q\)};
+            \draw[->, thick] (0, 0) -- (0, 3) node [left] {\(E\)};
+            \draw[highlight, very thick, domain={-sqrt(3)}:{sqrt(3)}] plot (\x, \x*\x);
+            \foreach \y in {0, 0.5, ..., 2.5} {
+                \draw[Blue, very thick] (-1, \y) -- (1, \y);
+            }
+        \end{tikzpicture}
+        \caption{The harmonic potential and the evenly spaced energy levels it produces.}
+        \label{fig:harmonic potential and energy levels}
+    \end{figure}
+    
+    The physical variables are \(q\) and \(p\), with \(q = x\) the position operator, and \(p\) chosen to satisfy the canonical commutation relations, which it can be shown is the case if \(p = -i\diff{}/{x}\).
+    We solve the equation \(a \ket{0} = 0\) to find the vacuum state \(\ket{0}\), and it's wave function \(\psi_0(x) = \braket{x}{0}\):
+    \begin{equation}
+        \psi_0(x) = \sqrt{\frac{m\omega}{2\pi}} \exp\left[ -\frac{1}{2}m\omega x^2 \right].
+    \end{equation}
+    We then find the wave equation for the \(n\)th excited state, \(\sqrt{n!}\psi_n(x) = \bra{x}(a^\hermit)^n \ket{0}\):
+    \begin{equation}
+        \psi_n(x) = \frac{1}{\sqrt{n!}} \left( 0\frac{i}{\sqrt{m\omega}} \diff{}{x} + i\sqrt{\frac{m\omega}{2}} x \right)^n \psi_0(x)
+    \end{equation}
+    where the expression in brackets is just \(a^\hermit = i/\sqrt{2m\omega} p + \sqrt{m\omega/2} q\) with the operators substituted in.
+    After working through lots of derivatives of Gaussians we will find that the solutions are Gaussians times a Hermite polynomial, \(H_n\):
+    \begin{equation}
+        \psi_n(x) = \frac{1}{\sqrt{2^n n!}} \left( \frac{m\omega}{\pi} \right)^{1/4} \exp\left[ -\frac{1}{2}m\omega x^2 \right] H_n\left( \sqrt{m\omega}x \right).
+    \end{equation}
+    
+    This interpretation is called \defineindex{first quantisation}, presumably because it is the first way that most people are taught to interpret the harmonic oscillator.
+    
+    \subsection{Quanta}
+    The energy eigenvalues of the harmonic oscillator are evenly spaced.
+    This allows us to interpret the state \(\ket{n}\) as consisting of \(n\) identical quanta, all of the same energy, \(\omega\).
+    The state \(\ket{0}\) is then the vacuum state, where there are no quanta, and we have the vacuum energy \(\omega/2\).
+    
+    Rather than try to interpret what a harmonic oscillator is we focus on what it does.
+    Think of it as a black box which can absorb a quanta of energy, so it has \(n + 1\) quanta, or it can emit a quanta, so it has \(n - 1\) quanta.
+    Clearly these occurrences align with the action of \(\ket{a}^\hermit\) and \(\ket{a}\) respectively.
+    This leads to us interpreting \(a^\hermit\) as a \defineindex{creation operator}, producing a quanta of energy in the black box, and \(a\) as a \defineindex{annihilation operator}, destroying a quanta of energy in the black box.
+    Of course this energy must come from somewhere and go somewhere, but just within the black box it may as well be appearing and vanishing.
+    
+    This interpretation, while a bit odd at first, is actually closer to what we do in experiments.
+    We scatter particles, essentially adding them to the black box, and see what comes out, that is, what leaves the black box.
+    This interpretation also works well when considering atomic spectra, which occur in much the same way.
+    
+    This interpretation is intrinsically multiparticle, which is good for quantum field theory.
+    This interpretation is called \defineindex{second quantisation}, presumably because it is the second way that most people are taught to interpret the harmonic oscillator.
+    
+    \section{Harmonic Oscillator with Time Dependence}
+    If we include time dependence in the Harmonic oscillator the, working in the Heisenberg picture, this corresponds to replacing \(q\) and \(p\) with time dependent operators, which in term means introducing a time dependence to \(a\) and \(a^\hermit\).
+    This time dependence doesn't change the first step of solving the Harmonic oscillator, which is finding \(q\) and \(p\) in terms of \(a\) and \(a^\hermit\), which gives us
+    \begin{align}
+        q(t) &= \frac{1}{\sqrt{2m\omega}} [a(t) + a^\hermit(t)],\\
+        p(t) &= i\sqrt{\frac{m\omega}{2}} [a(t) - a^\hermit(t)].
+    \end{align}
+    The commutation relations for \(a(t)\), \(a^\hermit(t)\), and \(H\) are \(\commutator{a(t)}{a^\hermit(t)} = 1\), \(\commutator{H}{a(t)} = -\omega a(t)\), and \(\commutator{H}{a^\hermit(t)} = \omega a^\hermit(t)\), which are the same as if we replace \(H\) with \(N\), since \(H = \omega(N + 1/2)\).
+    The time dependence doesn't change the commutators, which we can check quite easily:
+    \begin{align}
+        \commutator{a(t)}{a^\hermit(t)} &= \commutator{\e^{-iHt}a\e^{iHt}}{\e^{-iHt}a^\hermit\e^{iHt}}\\
+        &= \e^{-iHt}a\e^{iHt}\e^{-iHt}a^\hermit\e^{iHt} - \e^{-iHt}a^\hermit\e^{iHt}\e^{-iHt}a\e^{iHt}\\
+        &= \e^{-iHt}aa^\hermit\e^{iHt} - \e^{-iHt}a^\hermit a\e^{iHt}\\
+        &= \e^{-iHt} \commutator{a}{a^\hermit}\e^{iHt}\\
+        &= \e^{-iHt} 1 \e^{iHt}\\
+        &= 1.
+    \end{align}
+    Likewise, the commutators with the Hamiltonian are unchanged:
+    \begin{align}
+        \commutator{H}{a^\hermit(t)} &= \commutator{H}{\e^{-iHt}a^\hermit \e^{iHt}}\\
+        &= H\e^{-iHt}a^\hermit\e^{iHt} - \e^{-iHt}a^\hermit\e^{iHt} H\\
+        &= \e^{-iHt} Ha^\hermit \e^{iHt} - \e^{-iHt} a^\hermit H \e^{iHt}\\
+        &= \e^{-iHt} \commutator{H}{a^\hermit} \e^{iHt}\\
+        &= \e^{-iHt} \omega a^\hermit \e^{iHt}\\
+        &= \omega a^\hermit(t).
+    \end{align}
+    An similarly for \(\commutator{H}{a(t)}\).
+    
+    We can then solve the Heisenberg equation for the creation and annihilation operators:
+    \begin{align}
+        \dot{a}(t) = i \commutator{H}{a(t)} = -i \omega a(t).
+    \end{align}
+    This very simple differential equation, \(\dot{a}(t) = -i\omega a(t)\), has a plane wave solution,
+    \begin{equation}
+        a(t) = a \e^{-i\omega t},
+    \end{equation}
+    where \(a = a(0)\) is the annihilation operator in the Schrödinger picture.
+    Taking the Hermitian conjugate of this we get
+    \begin{equation}
+        \dot{a}^\hermit(t) = a^\hermit \e^{i\omega t}.
+    \end{equation}
+    The position and momentum operators are then
+    \begin{align}
+        q(t) &= \frac{1}{\sqrt{2m\omega}} [a \e^{-i\omega t} + a^\hermit \e^{i\omega t}],\\
+        p(t) &= i\sqrt{\frac{m\omega}{2}} [a \e^{-i\omega t} - a^\hermit \e^{i\omega t}].
+    \end{align}
+    
+    \chapter{Mode Expansions}
+    \section{Expanding the Field}
+    The field \(\varphi(x)\) satisfies the Klein--Gordon equations.
+    We've seen that this allows plane wave solutions, \(\e^{\pm i p \cdot x}\).
+    This suggests that we can write a general solution as a superposition of wave solutions, which is just a Fourier transform.
+    Since \(\varphi\) is a function of \(x\) this is really an inverse Fourier transform.
+    For comparison consider the inverse transform of a single variable, real, one-dimensional function, \(f\):
+    \begin{equation}
+        f(x) = \int \frac{\dl{p}}{2\pi} (\tilde{f}(p) \e^{-ip x} + \tilde{f}^*(p) \e^{ip x}).
+    \end{equation}
+    Here \(\tilde{f}(p)\) is the Fourier transformed function, which acts as a Fourier coefficient here.
+    We need both the \(\e^{ipx}\) and conjugate \(\e^{-ipx}\) terms to get a real function.
+    The factor of \(2\pi\) is part of the normalisation, but exactly where it appears between the forward and inverse is just convention.
+    
+    We want our field to have on-shell momentum, that is \(p^2 = m^2\).
+    To enforce this we include a factor of \(2\pi \delta(p^2 - m^2)\), where the \(2\pi\) is factor is from the integral representation of the Dirac delta, as the Fourier transform of one:
+    \begin{equation}
+        \int \dl{x} \, \e^{-ip \cdot x} = 2\pi \delta(p).
+    \end{equation}
+    We also want to restrict ourselves to positive energy solutions, so \(p_0 > 0\), we can enforce this with a factor of \(\theta(p_0)\), where \(\theta\)\index{\(\theta\), Heaviside step function} is the \defineindex{Heaviside step function} defined by
+    \begin{equation}
+        \theta(u) = 
+        \begin{cases}
+            1 & u > 0,\\
+            1/2 & u = 0,\\
+            0 & u < 0.
+        \end{cases}
+    \end{equation}
+    
+    The \defineindex{mode expansion} of \(\varphi\) is then
+    \begin{equation}
+        \varphi(x) = \int \frac{\dl{^4p}}{(2\pi)^4} 2\pi \delta(p^2 - m^2) \theta(p_0) [ a(\vv{p}) \e^{-ip\cdot x} + a^\hermit(\vv{p}) \e^{i p \cdot x} ].
+    \end{equation}
+    Here \(a(\vv{p})\) and \(a^\hermit(\vv{p})\) are Fourier coefficients, we'll see later that they are the quantum field theory analogues of the creation and annihilation operators for the harmonic oscillator.
+    They depend only on \(\vv{p}\), rather than the four-vector \(p\), since we can take \(\delta(p^2 - m^2)\) as fixing the value of \(p_0\).
+    
+    Define \(\omega(\vv{p}) \coloneqq +\sqrt{\vv{p}^2 + m^2}\), which is always nonnegative.
+    This allows us to rewrite the argument of the Dirac delta:
+    \begin{equation}
+        (p_0 - \omega(\vv{p}))(p_0 + \omega(\vv{p})) = p_0p_0 - \omega(\vv{p})^2 = p_0p_0 - \vv{p}^2 -m^2 = p^2 - m^2.
+    \end{equation}
+    So, now we have \(\delta(\omega(\vv{p}))\) in our integral.
+    Recall the distribution identity
+    \begin{equation}
+        \delta(f(x)) = \sum_i \frac{\delta(x - a_i)}{\abs{f'(a_i)}}
+    \end{equation}
+    where \(a_i\) are all the zeros of \(f\) lying in the range of integration.
+    Since in the integral we are enforcing \(p_0 \ge 0\) the only time \(p^2 - m^2 = (p_0 - \omega(\vv{p}))(p_0 + \omega(\vv{p}))\) vanishes is when \(p_0 = \omega(\vv{p})\), and
+    \begin{equation}
+        \diffp{}{p} (p^2 - m^2) \bigg|_{p_0 = \omega(\vv{p})} = 2\omega(\vv{p})
+    \end{equation}
+    so, as distributions, we have
+    \begin{equation}
+        \delta(p^2 - m^2)\theta(p_0) = \frac{1}{2\omega(\vv{p})} \delta(p^0 - \omega(\vv{p})).
+    \end{equation}
+    
+    This lets us write \(\varphi(x)\) as
+    \begin{equation}
+        \varphi(x) = \int \frac{\dl{^4 p}}{(2\pi)^3} \frac{1}{2\omega(\vv{p})} \delta(p^0 - \omega(\vv{p})) [ a(\vv{p}) \e^{-ip\cdot x} + a^\hermit(\vv{p}) \e^{i p \cdot x} ].
+    \end{equation}
+    Performing the \(p^0\) integral using the sifting property of the Dirac delta we have
+    \begin{equation}
+        \varphi(x) = \int \frac{\dl{^3\vv{p}}}{(2\pi)^3} \frac{1}{2\omega(\vv{p})} [ a(\vv{p}) \e^{-ip\cdot x} + a^\hermit(\vv{p}) \e^{i p \cdot x} ] \, \bigg|_{p_0 = \omega(\vv{p})}.
+    \end{equation}
+    
+    At this point we make some remarks on this expansion:
+    \begin{itemize}
+        \item The expansion is manifestly Lorentz invariant, while the presence of \(p^0\) may be concerning orthochronous Lorentz transformations (the only type we consider in this course) don't change the sign of \(p^0\), and so \(\theta(p^0)\) is Lorentz invariant.
+        \item Since \(p^0 = \omega(\vv{p})\) the energy is always positive, and so is bounded below.
+        \item The integral over \(\delta(p^0 - \omega(\vv{p}))\) fixes \(p^0 = \omega(\vv{p})\), and from now on this will be implicit in the integrals, instead of writing \(|_{p_0 = \omega(\vv{p})}\).
+        \item The operator \(\varphi(x)\) is in the Heisenberg picture, but the time dependence comes from the exponential factors, both \(a(\vv{p})\) and \(a^\hermit(\vv{p})\) are time independent operators.
+        \item We need both the \(a\) and \(a^\hermit\) terms for \(\varphi\) to be Hermitian.
+        \item The measure
+        \begin{equation}
+            \frac{\dl{^3\vv{p}}}{(2\pi)^3} \frac{1}{2\omega(\vv{p})} = \frac{\dl{^4p}}{(2\pi)^4} 2\pi \delta(p^2 - m^2) \theta(p^0)
+        \end{equation}
+        is Lorentz invariant, but takes a lot of writing, we will use the shorthand notation
+        \begin{equation}
+            \invariantmeasure{p} = \frac{\dl{^3\vv{p}}}{(2\pi)^3} \frac{1}{2\omega(\vv{p})} = \int \frac{\dl{^4p}}{(2\pi)^4} 2\pi \delta(p^2 - m^2) \theta(p^0).
+        \end{equation}
+    \end{itemize}
+    
+    Now that we've expanded the field \(\varphi\) it is easy to expand the conjugate field, \(\pi\), using \(\pi = \dot{\varphi}\):
+    \begin{align}
+        \pi(x) = \dot{\varphi}(x) &= -\frac{i}{2} \int \frac{\dl{^3\vv{p}}}{(2\pi)^3} [a(\vv{p}) \e^{-ip\cdot x} - a^\hermit(\vv{p}) \e^{ip \cdot x}]\\
+        &= -\frac{i}{2} \int \invariantmeasure{p} [a(\vv{p}) \e^{-ip\cdot x} - a^\hermit(\vv{p}) \e^{ip \cdot x}].
+    \end{align}
+    Here we've used
+    \begin{multline}
+        \diffp{}{x^0} \e^{\pm ip \cdot x} = \diffp{}{x^0} \exp[\pm ip^0x_0 \mp p^ix_i]\\
+        = \pm ip^0 \exp[\pm ip^0x_0 \mp p^ix_i] = \pm i p^0 \exp[\pm ip \cdot x]
+    \end{multline}
+    and then set \(p^0 = \omega(\vv{p})\).
+    
+    \section{The Fourier Coefficients}
+    As with the Harmonic oscillator we now want to invert these relations to find expressions for \(a(\vv{p})\) and \(a^\hermit(\vv{p})\).
+    Since these are inverse Fourier transformations the inversion happens through Fourier transformation.
+    For a single variable, real, one-dimensional function, \(f\), the Fourier transform is
+    \begin{equation}
+        \tilde{f}(p) = \int \dl{x} \, f(x) \e^{ip \cdot x}.
+    \end{equation}
+    Using this, but in three dimensions, we have
+    \begin{align*}
+        \int \dl{^3\vv{x}} \, \e^{ip' \cdot x} \varphi(x) &= \int \! \invariantmeasure{p} \frac{1}{2\omega(\vv{p})} \int \! \dl{^3\vv{x}} \, \big[a(\vv{p}) \e^{i(p' - p) \cdot x} + a^\hermit \e^{i(p' + p)\cdot x}\big]\\
+        &= \int \! \invariantmeasure{p} \, (2\pi)^3 \big[a(\vv{p}) \delta^3(\vv{p}' - \vv{p})\e^{i(p'^0 - p^0)t}\\
+        &\qquad\qquad\qquad+ a^\hermit(\vv{p}) \delta^3(\vv{p}' + \vv{p})\e^{i(p'^0 + p^0)t} \big]\\
+        &= \int \frac{\dl{^3\vv{p}}}{2\omega(\vv{p})} \big[a(\vv{p}) \delta^3(\vv{p}' - \vv{p})\e^{i(p'^0 - p^0)t}\\
+        &\qquad\qquad\qquad+ a^\hermit(\vv{p}) \delta^3(\vv{p}' + \vv{p})\e^{i(p'^0 + p^0)t}\big].
+    \end{align*}
+    Here we've recognised the integral representation of the Dirac delta:
+    \begin{equation}
+        \int \dl{^3\vv{x}} \, \e^{-ip\cdot x} = (2\pi)^3 \delta^3(\vv{x}) \e^{ip^0t},
+    \end{equation}
+    and made the usual assumption that everything is sufficiently convergent for us to be able to swap the order of integrals.
+    Performing the integrals now using the Dirac deltas, and the fact that \(\omega(-\vv{p}) = \omega(\vv{p})\), we have
+    \begin{align}
+        \int \dl{^3\vv{x}} \, \e^{ip' \cdot x} \varphi(x) &= \frac{1}{2\omega(\vv{p}')}a(\vv{p}') + \frac{1}{2\omega(-\vv{p}')} a^\hermit(-\vv{p}') \e^{2ip'^0t}\\
+        &= \frac{1}{2\omega(\vv{p}')} \big[a(\vv{p}') + a^\hermit(-\vv{p}') \e^{2i\omega(\vv{p}')t}\big].
+    \end{align}
+    Here we've used the Dirac delta's to set \(\vv{p} = \pm\vv{p}'\) in each term as appropriate.
+    Restricting ourselves to on-shell, positive energy, solutions this then fixes the value of \(p^0\) to \(\sqrt{\vv{p}'^2 + m^2} = \omega(\vv{p}')\).
+    
+    We can do exactly the same for \(\pi\), the only difference is signs and a factor of \(1/\omega(\vv{p})\), so we get
+    \begin{equation}
+        \int \dl{^3\vv{x}} \, \e^{ip'\cdot x}  \pi(x) = -\frac{i}{2}[a(\vv{p}') - a(-\vv{p}')^\hermit \e^{2i\omega(\vv{p}')t}].
+    \end{equation}
+    Adding \(i\) times this to \(\omega(\vv{p})\) times the result for \(\varphi\) we get
+    \begin{equation}
+        a(\vv{p}) = \int \dl{^3\vv{x}} \, \e^{ip \cdot x} [\omega(\vv{p}) \varphi(t, \vv{x}) + i\pi(t, \vv{x})].
+    \end{equation}
+    Taking the conjugate we get
+    \begin{equation}
+        a^\hermit(\vv{p}) = \int \dl{^3\vv{x}} \, \e^{-ip \cdot x} [\omega(\vv{p}) \varphi(t, \vv{x}) - i\pi(t, \vv{x})].
+    \end{equation}
+    
+    Now we have expressions for \(a(\vv{p})\) and \(a^\hermit(\vv{p})\) we can compute their commutator:
+    \begin{align}
+        \commutator{a(\vv{p})}{a^\hermit(\vv{p}')} &= \int \! \dl{^3\vv{x}} \! \int \dl{^3\vv{x}'} \, \e^{ip\cdot x - ip'\cdot x'}\\
+        &\qquad\qquad\commutator{\omega(\vv{p}) \varphi(t, \vv{x}) + i\pi(t, \vv{x})}{\omega(\vv{p}')\varphi(t, \vv{x}') - i\pi(t, \vv{x}')}. \notag
+    \end{align}
+    Using the equal time commutation relations only the cross terms don't vanish, and so this becomes
+    \begin{align}
+        &\commutator{a(\vv{p})}{a^\hermit(\vv{p}')} = \int \! \dl{^3\vv{x}} \! \int \dl{^3\vv{x}'} \, \e^{ip\cdot x - ip'\cdot x'} \big(-i\omega(\vv{p})\commutator{\varphi(t, \vv{x})}{\pi(t, \vv{x}')}\\
+        &\hspace{17.5em}+ i\omega(\vv{p}')\commutator{\pi(t, \vv{x})}{\varphi(t, \vv{x}')}\big). \notag\\
+        &= \int \! \dl{^3\vv{x}} \! \int \dl{^3\vv{x}'} \, \e^{ip\cdot x - ip'\cdot x'} (\omega(\vv{p}) \delta^3(\vv{x} - \vv{x}') + \omega(\vv{p}') \delta^3(\vv{x} - \vv{x}'))\\
+        &= \int \dl{^3\vv{x}} \, \e^{i(p - p')\cdot x} (\omega(\vv{p}) + \omega(\vv{p}'))\\
+        &= (2\pi)^3 \delta(\vv{p} - \vv{p}') 2\omega(\vv{p})
+    \end{align}
+    where again we've recognised the integral representation of the Dirac delta, and made use of the resulting Dirac delta to set \(\vv{p} = \pm \vv{p}'\), and hence \(p^0 = p'^0\) choosing to stay on-shell and positive energy.
+    We introduce the shorthand notation,
+    \begin{equation}
+        (2\pi)^3 \delta(\vv{p} - \vv{p}') 2\omega(\vv{p}) = \bardelta(\vv{p} - \vv{p}').
+    \end{equation}
+    This allows us to write
+    \begin{equation}
+        \commutator{a(\vv{p})}{a^\hermit(\vv{p}')} = \bardelta(\vv{p} - \vv{p}').
+    \end{equation}
+    Compare this to \(\commutator{a}{a^\hermit} = 1\) for the harmonic oscillator.
+    We also have
+    \begin{equation}
+        \commutator{a(\vv{p})}{a(\vv{p}')} = \commutator{a^\hermit(\vv{p}')}{a^\hermit(\vv{p}')} = 0.
+    \end{equation}
+    
+    Note that \(\bardelta(\vv{p} - \vv{p}')\) is just a number, not an operator.
+    This notation is nice, since if we combine the invariant measure, \(\invariantmeasure{p}\), and \(\bardelta(\vv{p} - \vv{p}')\) then we can just pretend we have \(\dl{p}\) and \(\delta^3(\vv{p} - \vv{p})\):
+    \begin{equation}
+        \int \invariantmeasure{p} \, f(\vv{p}) \bardelta(\vv{p} - \vv{p}') = f(\vv{p}').
+    \end{equation}
+    
+    \section{The Hamiltonian}
+    To complete the analogy with the harmonic oscillator we need to find the Hamiltonian in terms of \(a(\vv{p})\) and \(a^\hermit(\vv{p})\).
+    Starting with the hamiltonian
+    \begin{equation}
+        H = \frac{1}{2} \int \dl{^3\vv{x}} \left[ \pi(x)^2 + (\grad \varphi(x))^2 + m^2 \varphi(x)^2 \right]
+    \end{equation}
+    we can split this into three components,
+    \begin{align}
+        H_1 &= \frac{1}{2}\int \dl{^3\vv{x}} \, \pi(x)^2,\\
+        H_2 &= \frac{1}{2}\int \dl{^3\vv{x}} \, (\grad\varphi(x))^2,\\
+        H_3 &= \frac{1}{2}\int \dl{^3\vv{x}} \, m^2\varphi(x)^2,\\
+    \end{align}
+    We'll then treat each of these separately.
+    
+    Start with the first term.
+    Substituting in the expansion for \(\pi(x)\), being careful to use different integration variables for each factor of \(\pi\), we get
+    \begin{multline}
+        H_1 = -\frac{1}{8} \int \!\! \dl{^3\vv{x}} \int \! \frac{\dl{^3\vv{p}}}{(2\pi)^3} \left[ a(\vv{p}) \e^{-ip\cdot x} - a^\hermit(\vv{p}) \e^{ip\cdot x} \right] \\
+        \times\int \! \frac{\dl{^3\vv{p}'}}{(2\pi)^3} \left[ a(\vv{p}') \e^{-ip'\cdot x} - a^\hermit(\vv{p}') \e^{ip'\cdot x} \right].
+    \end{multline}
+    Expanding this all the integrand becomes
+    \begin{multline}
+        a(\vv{p}) a(\vv{p}') \e^{-i(p + p')\cdot x} - a(\vv{p}) a^\hermit(\vv{p}') \e^{-i(p - p')\cdot x}\\
+        - a^\hermit(\vv{p})a(\vv{p}')\e^{i(p - p') \cdot x} + a^\hermit(\vv{p}) a^\hermit(\vv{p}') \e^{i(p + p')\cdot x}.
+    \end{multline}
+    We can perform the integration over position first, and, recalling that \(p^0 = \omega(\vv{p})\), we get two types of terms, time dependent and time independent, these come from recognising the integral representation of the Dirac delta:
+    \begin{align}
+        \int \dl{^3\vv{x}} \, \e^{\pm i(p + p') \cdot x} &= (2\pi)^3 \delta(\vv{p} + \vv{p}') \e^{\pm 2i\omega(\vv{p})t},\\
+        \int \dl{^3\vv{x}} \, \e^{\pm i(p - p') \cdot x} &= (2\pi)^3 \delta(\vv{p} - \vv{p}').
+    \end{align}
+    We should expect that the time dependent terms in \(H\) will all cancel, since \(H\) is time independent.
+    
+    After performing the integral over positions we are left with the following integrand
+    \begin{multline*}
+        (2\pi)^3 a(\vv{p}) a(\vv{p}') \delta(\vv{p} - \vv{p}')\e^{-2i\omega(\vv{p})t} - (2\pi)^3 a(\vv{p}) a^\hermit(\vv{p}') \delta(\vv{p} - \vv{p}')\\
+        - (2\pi)^3a^\hermit(\vv{p})a(\vv{p}')\delta(\vv{p} - \vv{p}') + (2\pi)^3a^\hermit(\vv{p}) a^\hermit(\vv{p}') \delta(\vv{p} + \vv{p}') \e^{2i\omega(\vv{p})t}.
+    \end{multline*}
+    Performing the integral over \(\vv{p}'\), and cancelling one factor of \((2\pi)^3\) we are left with
+    \begin{align}
+        H_1 &= -\frac{1}{8} \int \frac{\dl{^3\vv{p}}}{(2\pi)^3} \big[ a(\vv{p}) a(\vv{p}) \e^{-2i\omega(\vv{p})t}  - a(\vv{p}) a^\hermit(\vv{p})\\
+        &\qquad\qquad\qquad\qquad- a^\hermit(\vv{p}) a(\vv{p}) + a^\hermit(\vv{p})a^\hermit(\vv{p}) \e^{2i\omega(\vv{p})t} \big].\notag
+    \end{align}
+    Keeping only the time independent terms, since the time independent terms will cancel with terms in \(H_2\) and \(H_3\), we get the contribution from the first term:
+    \begin{equation}
+        H_1 \to \frac{1}{8} \int \frac{\dl{^3\vv{p}}}{(2\pi)^3} \big[ a(\vv{p}) a^\hermit(\vv{p})+ a^\hermit(\vv{p}) a(\vv{p}) \big].
+    \end{equation}
+    Doing the same for the other two terms we get their time independent contributions:
+    \begin{align}
+        H_2 &\to \frac{1}{8} \int \frac{\dl{^3\vv{p}}}{(2\pi)^3} \frac{\vv{p}^2}{\omega(\vv{p})^2} \big[ a(\vv{p}) a(\vv{p})^\hermit + a(\vv{p})^\hermit a(\vv{p}) \big],\\
+        H_3 &\to \frac{1}{8} \int \frac{\dl{^3\vv{p}}}{(2\pi)^3} \frac{m^2}{\omega(\vv{p})^2} \big[ a(\vv{p}) a^\hermit(\vv{p}) + a^\hermit(\vv{p}) a(\vv{p}) \big].
+    \end{align}
+    Noticing that \(\vv{p}^2 + m^2\) cancels with \(1/\omega(\vv{p})^2\) in the full expression we get
+    \begin{equation}
+        H = \frac{1}{4} \int \frac{\dl{^3p}}{(2\pi)^3} \big[ a(\vv{p})a^\hermit(\vv{p}) + a(\vv{p})a^\hermit(\vv{p}) \big].
+    \end{equation}
+    Compare this to the Harmonic oscillator result,
+    \begin{equation}
+        H = \frac{1}{2}\omega(aa^\hermit + a^\hermit a).
+    \end{equation}
+    
+    We can now compute the commutators of \(H\) with \(a(\vv{p})\) and \(a^\hermit(\vv{p})\):
+    \begin{align}
+        \commutator{H}{a^\hermit(\vv{p})} &= \frac{1}{4} \int \frac{\dl{^3p'}}{(2\pi)^3} \commutator{a(\vv{p}')a^\hermit(\vv{p}') + a^\hermit(\vv{p}')a(\vv{p}')}{a^\hermit(\vv{p})}\\
+        &= \frac{1}{4} \int \frac{\dl{^3p'}}{(2\pi)^3} \big( \commutator{a(\vv{p}')a^\hermit(\vv{p}')}{a^\hermit(\vv{p})} + \commutator{a^\hermit(\vv{p}')a(\vv{p}')}{a^\hermit(\vv{p})}  \big) \notag\\
+        &= \frac{1}{4} \int \frac{\dl{^3p'}}{(2\pi)^3} \big( a(\vv{p}')\commutator{a^\hermit(\vv{p}')}{a^\hermit(\vv{p})} + \commutator{a(\vv{p}')}{a^\hermit(\vv{p})}a^\hermit(\vv{p}') \notag\\
+        &\qquad\qquad\qquad+ a^\hermit(\vv{p}')\commutator{a(\vv{p}')}{a^\hermit(\vv{p})} + \commutator{a^\hermit(\vv{p}')}{a^\hermit(\vv{p})} \big)\\
+        &= \frac{1}{4} \int \dl{^3p'} \, 2\omega(\vv{p}) [ \delta(\vv{p} - \vv{p}')a^\hermit(\vv{p}') + a^\hermit(\vv{p}') \delta(\vv{p}' - \vv{p}) ]\\
+        &= \omega(\vv{p})a^\hermit(\vv{p}).
+    \end{align}
+    
+    Similarly, with \(a(\vv{p})\) we get
+    \begin{equation}
+        \commutator{H}{a(\vv{p})} = -\omega(\vv{p})a(\vv{p}).
+    \end{equation}
+    Compare these to the harmonic oscillator results, \(\commutator{H}{a^\hermit} = \omega a^\hermit\) and \(\commutator{H}{a} = -\omega a\).
+    
+    We can view the quantum fields as being a quantum harmonic oscillator of energy \(\omega(\vv{p}) = \sqrt{\vv{p}^2 + m^2}\) for every Fourier mode, \(\vv{p}\).
+    
+    \section{Particle Interpretation}
+    Consider an energy eigenstate, \(\ket{E}\), with eigenvalue \(E\), so \(H\ket{E} = E\ket{E}\).
+    Then the state \(a^\hermit(\vv{p})\ket{E}\) is also an energy eigenstate, with energy \(E + \omega(\vv{p})\):
+    \begin{align}
+        Ha^\hermit(\vv{p})\ket{E} &= \left( \commutator{H}{a^\hermit(\vv{p})} + a^\hermit(\vv{p})H \right)\ket{E}\\
+        &= (\omega(\vv{p})a^\hermit(\vv{p}) + a^\hermit(\vv{p})E)\\
+        &= (\omega(\vv{p}) + E)a^\hermit(\vv{p})\ket{E}.
+    \end{align}
+    Similarly, \(a(\vv{p})\ket{E}\) is an energy eigenstate with energy \(E - \omega(\vv{p})\).
+    
+    This suggests that, following the interpretation of the harmonic oscillator, \(a^\hermit(\vv{p})\) is a \defineindex{creation operator}, creating a quantum with energy \(\omega(\vv{p}) = \sqrt{\vv{p}^2 + m^2}\), and \(a(\vv{p})\) is an \defineindex{annihilation operator}, destroying a quantum with energy \(\omega(\vv{p})\).
+    Note that all quanta in this interpretation have positive energy.
+    There is another interpretation, which we'll discuss later, where \(a^\hermit(\vv{p})\) creates a quantum with energy \(\omega(\vv{p})\) and \(a(\vv{p})\) creates a quantum with energy \(-\omega(\vv{p})\).
+    
+    Since the Hamiltonian is nonnegative, its defined as a sum of squares of real quantities, there must be some lowest energy state, \(\ket{0}\), which we call the \defineindex{vacuum state}.
+    This state is such that any annihilation operator acting on it gives the zero vector:
+    \begin{equation}
+        a(\vv{p}) \ket{0} = 0 \quad \forall \vv{p}.
+    \end{equation}
+    
+    Starting with \(\ket{0}\) we can act with creation operators to make new states.
+    Each creation operator, \(a^\hermit(\vv{p})\), makes a new particle with energy \(\omega(\vv{p})\) and momentum \(\vv{p}\).
+    For example, 
+    \begin{equation}
+        \ket{\psi} = a^\hermit(\vv{p}) a^\hermit(\vv{q}) a^\hermit(\vv{r}) \ket{0}
+    \end{equation}
+    is a state with three particles with total energy \(\omega(\vv{p}) + \omega(\vv{q}) + \omega(\vv{r})\), and total momentum \(\vv{p} + \vv{q} + \vv{r}\).
+    
+    Since all \(a^\hermit(\vv{p})\) commute the state
+    \begin{equation}
+        a^\hermit(\vv{p}) a^\hermit(\vv{q}) a^\hermit(\vv{r}) \ket{0}
+    \end{equation}
+    is the same as \(\ket{\psi}\).
+    We interpret this as meaning that the particles are bosons, swapping any two particles leaves the state unchanged.
+    This means the particles follow Bose--Einstein statistics.
+    
+    The space of all states which can be constructed in this way, called \defineindex{Fock space}, is the space given by all complex-linear combinations of
+    \begin{equation}
+        a^\hermit(\vv{p_1}) \dotsm a^\hermit(\vv{p_n})\ket{0}
+    \end{equation}
+    for any values of \(n \in \naturals\).
+    
+    Formally, the Fock space (for bosons) is defined to be
+    \begin{equation}
+        F(\hilbertSpace) = \overline{\bigoplus_{n = 0}^{\infty} S \hilbertSpace^{\otimes n}} = \overline{\complex \oplus \hilbertSpace \oplus S(\hilbertSpace \otimes \hilbertSpace) \oplus S(\hilbertSpace \otimes \hilbertSpace \otimes \hilbertSpace) \oplus \dotsb}
+    \end{equation}
+    where \(\hilbertSpace\) is the single particle Hilbert space,
+    \begin{equation}
+        \hilbertSpace^{\otimes n} \coloneqq \bigotimes_{i = 1}^{n}\hilbertSpace = \underbrace{\hilbertSpace \otimes \dotsb \otimes \hilbertSpace}_{n \text{ times}},
+    \end{equation}
+    the operator \(S\) symmetrises all tensors, the direct sum, \(\oplus\), runs from \(n = 0\), for states with no particles, to infinity, with each term representing an \(n\)-particle state space, and the line represents that we complete the space to form a Hilbert space, this entails adding in the values of all absolutely convergent series.
+    
+    We make the normalisation choice that \(\braket{0}{0} = 1\), then, if \(\ket{\vv{p}} = a^\hermit(\vv{p})\ket{\vv{p}}\) is a single particle state we have
+    \begin{align}
+        \braket{\vv{p}}{\vv{q}} &= \bra{0} a(\vv{p}) a^\hermit(\vv{q})\ket{0}\\
+        &= \bra{0} \commutator{a(\vv{p})}{a^\hermit(\vv{q})}\ket{0} + \bra{0} a^\hermit(\vv{q}) a(\vv{p})\ket{0}\\
+        &= \bardelta(\vv{p} - \vv{q}).
+    \end{align}
+    Note that \(a(\vv{p})\ket{0}\) and \(\bra{0}a^\hermit(\vv{q}) = [a(\vv{q}) \ket{0}]^\hermit\) both vanish, since they are annihilators acting on the vacuum state.
+    
+    As with the harmonic oscillator we can define a \defineindex{number density operator}, \(N(\vv{p}) \coloneqq a^\hermit(\vv{p})a(\vv{p})\), the eigenvalues of which integrate to give the number of particles in the state with momentum \(\vv{p}\).
+    
+    \section{Ground State Energy}
+    We can rewrite the Hamiltonian in terms of the number density operator:
+    \begin{align}
+        H &= \frac{1}{4} \int \invariantmeasure{p} \, \omega(\vv{p}) \big( a^\hermit(\vv{p}) a(\vv{p}) + a(\vv{p})a^\hermit(\vv{p}) \big)\\
+        &= \frac{1}{2} \int \invariantmeasure{p} \, \omega(\vv{p}) \left( a^\hermit(\vv{p})a(\vv{p}) + \frac{1}{2} \commutator{a(\vv{p})}{a^\hermit(\vv{p})} \right)\\
+        &= \frac{1}{2} \int \invariantmeasure{p} \, \omega(\vv{p}) \left( N(\vv{p}) + \omega(\vv{p})(2\pi)^3 \delta^3(\vv{p} - \vv{p}) \right)\\
+        &= \frac{1}{2} \int \invariantmeasure{p} \, \omega(\vv{p}) \left( N(\vv{p}) + \omega(\vv{p})(2\pi)^3 \delta^3(\vv{0}) \right).
+    \end{align}
+    
+    Clearly we have \(\bra{0}N(\vv{p})\ket{0} = \bra{0} a^\hermit(\vv{p})a(\vv{p})\ket{0} = 0\), and so
+    \begin{equation}
+        \bra{0}H\ket{0} = \frac{1}{2} \int \dl{^3\vv{p}} \omega(\vv{p}) \delta^3(\vv{0}).
+    \end{equation}
+    This is infinite.
+    In fact, its \emph{very} infinite.
+    Each \(\delta(0)\) is infinite, and we have three of them multiplied together, then we integrate over all momentum space, which is infinite, to make matters worse \(\omega(\vv{p})\) grows arbitrarily large with \(\abs{\vv{p}}\).
+    
+    The solution, as with so many similar problems in physics, is just not to think about it.
+    All that we can measure is the energy of particles absorbed and emitted by the system.
+    We cannot measure the ground state energy, so it doesn't matter that our theory gives a nonsensical answer when we try to compute the expected ground state energy.
+    
+    \subsection{Normal Ordering}
+    One solution to the infinity arising in the ground state energy is to be careful about how we order \(a(\vv{p})\) and \(a^\hermit(\vv{p})\).
+    If we keep all \(a^\hermit(\vv{p})\) on the left of all \(a(\vv{p})\) then, when we take expectation values, one of our \(a(\vv{p})\) will act on \(\ket{0}\) giving the zero vector, and one of our \(a^\hermit(\vv{p})\) will act on \(\bra{0}\), also giving the zero vector.
+    
+    Mathematically what happens is that when we change to order of operators to have all \(a^\hermit(\vv{p})\) on the left we'll get commutators of \(a(\vv{p})\) and \(a^\hermit(\vv{p}')\), which give rise to Dirac deltas which cancel with the existing ones, to leave a finite result.
+    
+    This idea that careful ordering of operators can avoid infinities goes beyond the expectation value of the ground state energy.
+    Consider our field, \(\varphi(x)\).
+    We can split this into parts,
+    \begin{equation}\label{eqn:phi +}
+        \varphi(x) = \varphi^+(x) + \varphi^-(x)
+    \end{equation}
+    where
+    \begin{equation}
+        \varphi^+(x) = \int \invariantmeasure{p} \, a(\vv{p}) \e^{-ip\cdot x},
+    \end{equation}
+    and
+    \begin{equation}\label{eqn:phi -}
+        \varphi^-(x) = \int \invariantmeasure{p} \, a^\hermit(\vv{p}) \e^{ip\cdot x} = (\varphi^+)^\hermit.
+    \end{equation}
+    If these were single particle states in quantum mechanics then they would correspond to positive and negative energy states respectively, but they aren't, although we'll see an interpretation along these lines later.
+    
+    Now suppose we want to consider the product \(\varphi(x)\varphi(y)\) for two arbitrary spacetime points, \(x\) and \(y\).
+    We can expand this as follows:
+    \begin{align}
+        \varphi(x)\varphi(y) &= [\varphi^+(x) + \varphi^-(x)][\varphi^+(y) + \varphi^-(y)]\\
+        &= \varphi^+(x)\varphi^+(y) + \varphi^+(x)\varphi^-(y) + \varphi^-(x)\varphi^+(y) + \varphi^-(x)\varphi^-(y).
+    \end{align}
+    The \defineindex{normal ordering} of \(\varphi(x)\varphi(y)\), denoted \(\normalordering{\varphi(x)\varphi(y)}\), is defined as the result of taking this product, but swapping terms so that all \(a^\hermit(\vv{p})\) appear on the left of all \(a(\vv{p}')\), that is all \(\varphi^+\) appear on the left of all \(\varphi^-\), so
+    \begin{equation}
+        \normalordering{\varphi(x)\varphi(y)} = \varphi^+(x)\varphi^+(y) + \varphi^+(x)\varphi^-(y) + \textcolor{highlight}{\varphi^+(y)\varphi^-(x)} + \varphi^-(x)\varphi^-(y).
+    \end{equation}
+    Then we have
+    \begin{equation}
+        \bra{0} \normalordering{\varphi(x)\varphi(y)} \ket{0} = 0.
+    \end{equation}
+    In general, if \(X\) is any nontrivial\footnote{That is, \(X\) is not just a scalar, in which case \(\bra{0}\normalordering{X}\ket{0} = X\braket{0}{0} = X\).} polynomial in \(a^\hermit(\vv{p})\) and \(a(\vv{p})\) we'll have
+    \begin{equation}
+        \bra{0} \normalordering{X} \ket{0} = 0.
+    \end{equation}
+    
+    Subtracting the zero point energy of \(H\) from \(H\) is equivalent to normal ordering
+    \begin{equation}
+        \normalordering{H} = H - \bra{0} H \ket{0},
+    \end{equation}
+    since by normal ordering \(H\) we swap exactly those terms which give infinity, and all others give zero, so we can think of normal ordering as subtracting them off.
+    
+    From now on we'll assume that \(H\) and \(\vv{p}\) are normal ordered, often without writing it.
+    
+    \section{Ground State Momentum}
+    The physical momentum operator is given by
+    \begin{equation}
+        \vv{P} = \int \dl{^3 \vv{x}} \, \pi(x) \grad\varphi(x).
+    \end{equation}
+    Recall that this comes from the \(T^{i0}\) component of the energy-momentum tensor.
+    Expressing the fields in terms of \(a(\vv{p})\) and \(a^\hermit(\vv{p})\) we get
+    \begin{equation}
+        \vv{P} = \frac{1}{2} \invariantmeasure{p} \, \vv{p} (a(\vv{p}) a^\hermit(\vv{p}) + a^\hermit(\vv{p})a(\vv{p}))
+    \end{equation}
+    where the factor of \(\vv{p}\) comes from computing \(\grad\varphi\).
+    Rewriting this using the commutator of \(a(\vv{p})\) and \(a^\hermit(\vv{p})\) we get
+    \begin{equation}
+        \vv{P} = \int \invariantmeasure{p} \, \vv{p}(N(\vv{p}) + \omega(\vv{p})(2\pi)^3\delta(\vv{0})).
+    \end{equation}
+    
+    Unlike with the ground state energy the \(\delta(\vv{0})\) factor doesn't cause a problem.
+    Integrating over all modes in the modes with momenta \(\vv{p}\) and \(-\vv{p}\) cancel, since \(\omega(\vv{p}) = \omega(-\vv{p})\).
+    So, we have
+    \begin{equation}
+        \bra{0} \vv{P} \ket{0} = \bra{0} \normalordering{\vv{P}} \ket{0} = 0,
+    \end{equation}
+    that is, the vacuum state has no momentum, which really ought to be the case.
+    
+    \chapter{Covariant Commutators}
+    \section{What are They}
+    The equal time commutation relations treat time specially.
+    This is generally undesirable in relativity.
+    So, in this section we derive a commutator, \(\commutator{\varphi(x)}{\varphi(y)}\) at two arbitrary spacetime points, \(x\) and \(y\).
+    We start by writing
+    \begin{equation}
+        \varphi(x) = \varphi^+(x) + \varphi^-(x),
+    \end{equation}
+    where \(\varphi^+\) and \(\varphi^-\) are as in \cref{eqn:phi +,eqn:phi -}.
+    Since \(\varphi^+\) only consists of annihilation operators and \(\varphi^-\) only consists of creation operators we have
+    \begin{equation}
+        \commutator{\varphi^+(x)}{\varphi^+(y)} = \commutator{\varphi^-(x)}{\varphi^-(y)} = 0.
+    \end{equation}
+    Hence, expanding out the commutator we have
+    \begin{equation}
+        \commutator{\varphi(x)}{\varphi(y)} = \commutator{\varphi^-(x)}{\varphi^+(y)} + \commutator{\varphi^-(x)}{\varphi^+(y)}.
+    \end{equation}
+    
+    Consider the first of these,
+    \begin{align}
+        \commutator{\varphi^+(x)}{\varphi^-(y)} &= \int \invariantmeasure{p} \int \invariantmeasure{p'} \, \commutator{a(\vv{p})}{a^\hermit(\vv{p}')} \e^{-ip\cdot x + ip'\cdot y}\\
+        &= \int \invariantmeasure{p} \int \invariantmeasure{p'} \, \bardelta(\vv{p} - \vv{p}') \e^{-ip\cdot x + ip' \cdot y}\\
+        &= \int \invariantmeasure{p} \, \e^{-ip \cdot (x - y)}\\
+        &\eqqcolon i\Delta^+(x - y),
+    \end{align}
+    where the last line defines \(\Delta^+\):
+    \begin{equation}
+        \Delta^+(x) \coloneqq i \int \frac{\dl{^3\vv{p}}}{(2\pi)^3} \frac{1}{2\omega(\vv{p})} \e^{ip\cdot x}
+    \end{equation}
+    The factor of \(i\) is a convention to make \(\Delta^+\) a real function.
+    
+    The second commutator can now easily be worked out using antisymmetry:
+    \begin{equation}
+        \commutator{\varphi^-(x)}{\varphi^+(y)} = -\commutator{\varphi^+(y)}{\varphi^-(x)} = -i\Delta^+(y - x) \eqqcolon i\Delta^-(x - y),
+    \end{equation}
+    where the last equality defines \(\Delta^-\).
+    
+    Combining these results we have
+    \begin{align}
+        \commutator{\varphi(x)}{\varphi(y)} = i\Delta^+(x - y) + i\Delta^-(x - y) \eqqcolon i\Delta(x - y)
+    \end{align}
+    where
+    \begin{align}
+        \Delta(x) &\coloneqq \Delta^+(x) + \Delta^-(x)\\
+        &\hphantom{:}= i \int \invariantmeasure{p} (\e^{ip\cdot x} - \e^{-ip\cdot x})\\
+        &\hphantom{:}= -2\int \invariantmeasure{p} \, \sin (p \cdot x).
+    \end{align}
+    Note that \(\Delta\) is a real (\(\Delta(x) = \Delta(x)^*\)), odd (\(\Delta(-x) = -\Delta(x)\)) function.
+    This is what we would expect since the field is real and the commutator is antisymmetric.
+    
+    Consider the full form of \(\Delta^+\):
+    \begin{equation}
+        i\Delta^+(x) = \int \frac{\dl{^4p}}{(2\pi)^4} 2\pi \delta(p^2 - m^2) \theta(p_0) \e^{-ip\cdot x}.
+    \end{equation}
+    We can also write \(\Delta^-\) similarly:
+    \begin{equation}
+        i\Delta^-(x) = -\int \frac{\dl{^4p}}{(2\pi)^4} 2\pi \delta(p^2 - m^2) \theta(p_0) \e^{ip\cdot x}.
+    \end{equation}
+    If we make a change of variables, \(p \to -p\), then \(\dl{^4p} \to \dl{^4p}\), and
+    \begin{equation}
+        i\Delta^-(x) = -\int \frac{\dl{^4p}}{(2\pi)^4} 2\pi\delta(p^2 - m^2) \theta(-p_0) \e^{-ip\cdot x}.
+    \end{equation}
+    This allows us to write \(\Delta\) as
+    \begin{equation}
+        i\Delta(x) = \int \frac{\dl{^4p}}{(2\pi)^4} 2\pi \delta(p^2 - m^2) \varepsilon(p_0) \e^{-ip\cdot x}
+    \end{equation}
+    where
+    \begin{equation}
+        \varepsilon(p_0) \coloneqq \theta(p_0) - \theta(-p_0) = 
+        \begin{cases}
+            + 1 & p_0 > 0,\\
+            0 & p_0 = 0,\\
+            -1 & p_0 < 0,
+        \end{cases}
+    \end{equation}
+    is the sign function.
+    
+    Note that for proper orthochronous Lorentz transformations \(\Delta\) is Lorentz invariant, since the sign of \(p_0\) doesn't change and all other terms are manifestly Lorentz invariant.
+    
+    \section{Microcausality}
+    Suppose \(x\) is space-like, that is \(x^2 < 0\).
+    Then there exists some proper orthochronous Lorentz transformation, \(\Lambda\), taking \(x\) to \(-x\).
+    Space-like vectors lie outside the light cone, and we can view this transformation as rotating around the light cone.
+    Since \(\Delta^{\pm}(x)\) are individually Lorentz invariant we can apply a Lorentz transformation to one of them and not the other when computing \(\Delta\) and get the same result, so
+    \begin{align}
+        \Delta(x) &= \Delta^+(x) + \Delta^-(x)\\
+        &= \Delta^+(x) + \Delta^-(\Lambda x)\\
+        &= \Delta^+(x) + \Delta^-(-x)\\
+        &= \Delta^+(x) - \Delta^+(x)\\
+        &= 0,
+    \end{align}
+    so \(\Delta\) vanishes for all space-like points.
+    Hence, \(\commutator{\varphi(x)}{\varphi(y)}\) vanishes for all space-like separations, \(x - y\).
+    
+    On the other hand no such transformation exists for time-like or light-like points, since it would have to map from one half of the light cone to the other, which is a discontinuous transformation.
+    
+    We can interpret this as a requirement for causality, specifically for a nonzero commutator between fields at space-like separated points which happen to have the same time coordinate we'd need some form of communication at this time between these points, and that can't happen between space-like points at the same time without violating causality.
+    
+    This analysis tells us that \(\Delta\) is not analytic, it has a sudden jump from zero to nonzero at light-like points.
+    
+    \section{Equal Time Commutation Relations}
+    The equal time commutation relations can now be viewed as a special case of the covariant commutation relations.
+    Since we have \(\pi = \dot{\varphi}\) we want to compute \(\commutator{\varphi(t, \vv{x})}{\pi(t, \vv{x}')} = \commutator{\varphi(t, \vv{x})}{\dot{\varphi}(t, \vv{x}')}\).
+    To do this take the time derivative of \(\Delta\):
+    \begin{align}
+        \diffp{}{x^0} \Delta(x - y) &= i \int \frac{\dl{^3\vv{p}}}{(2\pi)^3} \frac{1}{2\omega(\vv{p})} \diffp{}{x^0} \left[ \e^{ip\cdot(x - y)} - \e^{-ip\cdot(x - y)} \right]\\
+        &=i \int \frac{\dl{^3\vv{p}}}{(2\pi)^3} \frac{1}{2\omega(\vv{p})} i\omega(\vv{p}) \left[ \e^{ip\cdot(x - y)} + \e^{-ip\cdot(x - y)} \right]\\
+        &= -\frac{1}{2} \int \frac{\dl{^3\vv{p}}}{(2\pi)^3} \left[ \e^{ip\cdot(x - y)} + \e^{-ip\cdot(x - y)} \right].
+    \end{align}
+    For the equal time commutation relations we have \(x^0 = y^0\) and so
+    \begin{equation}
+        p \cdot (x - y) = \vv{p} \cdot (\vv{x} - \vv{y}).
+    \end{equation}
+    Hence,
+    \begin{align}
+        \diffp{}{x^0} \Delta(x - y) &= -\frac{1}{2} \int \frac{\dl{^3\vv{p}}}{(2\pi)^3} \left[ \e^{i\vv{p}\cdot(\vv{x} - \vv{y})} + \e^{-i\vv{p}\cdot(\vv{x} - \vv{y})} \right]\\
+        &= -\delta^3(\vv{x} - \vv{y}),
+    \end{align}
+    where we've recognised the integral representation of the Dirac delta:
+    \begin{equation}
+        \int \frac{\dl{^3\vv{p}}}{(2\pi)^3} \e^{\pm i\vv{p} \cdot (\vv{x} - \vv{y})} = \delta^3(\vv{x} - \vv{y}).
+    \end{equation}
+    
+    We then have
+    \begin{align}
+        \diffp{}{x^0} [i\Delta(x - y)] \bigg|_{x^0 = y^0 = t} &= \diffp{}{x^0} \commutator{\varphi(t, \vv{x})}{\varphi(t, \vv{y})}\\
+        &= \commutator{\dot{\varphi}(t, \vv{x})}{\varphi(t, \vv{y})}\\
+        &= \commutator{\pi(t, \vv{x})}{\varphi(t, \vv{y})}\\
+        &= -i\delta^3(\vv{x} - \vv{y})
+    \end{align}
+    Hence,
+    \begin{equation}
+        \commutator{\varphi(t, \vv{x})}{\pi(t, \vv{y})} = i\delta^3(\vv{x} - \vv{y}).
+    \end{equation}
+    So, we can view the equal time commutation relations as a specific case of the covariant commutation relations.
+    This is why the equal time commutation relations can still produce Lorentz invariant physics.
+    
+    \section{Contour Representation}
+    \begin{rmk}
+        This section makes use of some complex analysis, in particular contour integrals and the residue theorem.
+        See either \course{Methods of Theoretical Physics} or \course{Methods of Mathematical Physics} for details.
+    \end{rmk}
+    
+    The contour representation of \(\Delta^{\mp}\) is
+    \begin{equation}
+        \Delta^{\pm}(x) = - \int_{C^{\pm}} \frac{\dl{^4p}}{(2\pi)^4} \frac{\e^{-ip\cdot x}}{p^2 - m^2}.
+    \end{equation}
+    The contours \(C^{\pm}\) are anticlockwise circles containing the poles at \(\pm\omega(\vv{p})\).
+    This is shown in \cref{fig:contours for Delta}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{contours-for-Delta}
+        \begin{tikzpicture}
+            \draw[thick, ->] (-3, 0) -- (3, 0) node [right] {\(\Re(p_0)\)};
+            \draw[thick, ->] (0, -2) -- (0, 2) node [above] {\(\Im(p_0)\)};
+            \fill[Red] (1, 0) circle [radius = 0.05cm] node [below, text=black] {\(\omega(\vv{p})\)};
+            \fill[Red] (-1, 0) circle [radius = 0.05cm] node [below, text=black] {\(-\omega(\vv{p})\)};
+            \draw[very thick, Blue] (1, 0) circle [radius = 0.8cm];
+            \draw[very thick, Blue] (-1, 0) circle [radius = 0.8cm];
+            \draw[very thick, Blue, ->] (1.01, 0.8) -- ++ (-0.02, 0);
+            \draw[very thick, Blue, ->] (-1.01, 0.8) -- ++ (-0.02, 0);
+            \node[below] at (1, -0.8) {\(C^+\)};
+            \node[below] at (-1, -0.8) {\(C^-\)};
+            \draw[very thick, Purple] (0, 0) circle [x radius = 2.2cm, y radius = 1.6 cm];
+            \draw[very thick, Purple, ->] (0.01, 1.6) -- ++ (-0.02, 0);
+            \node[below right] at (0, -1.6) {\(C^+ + C^-\)};
+        \end{tikzpicture}
+        \caption{The contours used in the contour representation of \(\Delta^{\pm}\) and \(\Delta\).}
+        \label{fig:contours for Delta}
+    \end{figure}
+    
+    To see why this works start with
+    \begin{equation}
+        p^2 - m^2 = (p_0 + \omega(\vv{p})) (p_0 - \omega(\vv{p})),
+    \end{equation}
+    which shows there are poles at \(p_0 = \pm \omega(\vv{p})\).
+    We can then apply the residue theorem, which says that 
+    \begin{equation}
+        \oint_\gamma f(z) \dd{z} = 2\pi i \sum_i \Res(f, a_i)
+    \end{equation}
+    where \(\gamma\) is a closed contour, \(f\) is analytic on and inside \(\gamma\), \(a_i\) are the poles of \(f\) inside \(\gamma\), and \(\Res(f, a_i)\) is the residue of \(f\) at \(a_i\).
+    
+    We have a particularly easy case of two simple poles.
+    In the case of a simple pole the residue at \(a_i\) is given by
+    \begin{equation}
+        \Res(f, a_i) = (z - a_i)f(z)|_{z = a_i},
+    \end{equation}
+    so
+    \begin{equation}
+        \Res\left( \frac{\e^{-ip\cdot x}}{(p_0 + \omega(\vv{p}))(p_0 - \omega(\vv{p}))}, \pm \omega(\vv{p}) \right) = \frac{\e^{-ip\cdot x}}{p_0 \mp \omega(\vv{p})} \bigg|_{p_0 = \pm \omega(\vv{p})} = \mp \frac{\e^{-ip\cdot x}}{2\omega(\vv{p})}.
+    \end{equation}
+    Hence,
+    \begin{equation}
+        -\int_{C^+} \frac{\dl{p_0}}{2\pi} \frac{\e^{-ip\cdot x}}{p^2 - m^2} = -i \frac{\e^{-ip\cdot x}}{2\omega(\vv{p})}\bigg|_{p_0 = \omega(\vv{p})},
+    \end{equation}
+    and
+    \begin{equation}
+        -\int_{C^+} \frac{\dl{p_0}}{2\pi} \frac{\e^{-ip\cdot x}}{p^2 - m^2} = i \frac{\e^{ip\cdot x}}{2\omega(\vv{p})}\bigg|_{p_0 = -\omega(\vv{p})}.
+    \end{equation}
+    That is,
+    \begin{equation}
+        -\int_{C^{\pm}} \frac{\dl{p_0}}{2\pi} \frac{\e^{-ip\cdot x}}{p^2 - m^2} = \mp i \frac{\e^{\mp ip\cdot x}}{2\omega(\vv{p})}\bigg|_{p_0 = \omega(\vv{p})}.
+    \end{equation}
+    Having performed the integral over \(p_0\) we are left with an integral over \(\vv{p}\) so
+    \begin{equation}
+        -\int_{C^{\pm}} \frac{\dl{^4p}}{(2\pi)^4} \frac{\e^{-ip\cdot x}}{p^2 - m^2} = \mp i \int \frac{\dl{^3\vv{p}}}{(2\pi)^3} \frac{\e^{mp ip \cdot x}}{2\omega(\vv{p})} = \Delta^{\pm}(x).
+    \end{equation}
+    
+    The contour representation of \(\Delta\) is then simply given by
+    \begin{equation}
+        \Delta(x) = - \int_{C} \frac{\dl{^4p}}{(2\pi)^4} \frac{\e^{-ip\cdot x}}{p^2 - m^2}
+    \end{equation}
+    where \(C = C^+ + C^-\) is the combined contour, with the middle parts cancelling out, to give a contour containing both poles as shown in \cref{fig:contours for Delta}.
+    
+    \section{\texorpdfstring{\(\Delta\)}{Delta} as Green's Functions}
+    To interpret \(\Delta\) and \(\Delta^{\pm}\) consider the Klein--Gordon equation,
+    \begin{equation}
+        0 = (\dalembertian + m^2)\varphi.
+    \end{equation}
+    Taking the Fourier transform and using the rule that \(\partial_x \to -ip\) we have
+    \begin{equation}
+        0 = ((-ip)^2 + m^2)\tilde{\varphi} \implies (p^2 - m^2)\tilde{\varphi} = 0.
+    \end{equation}
+    Transforming back then gives us the contour representation of \(\Delta\) or \(\Delta^{\pm}\), depending on the boundary conditions.
+    
+    This means we can interpret \(\Delta\) and \(\Delta^{\pm}\) as classical Green's functions for the Klein--Gordon equation, so
+    \begin{equation}
+        (\dalembertian + m^2)\Delta(x) = \delta^4(x).
+    \end{equation}
+    
+    We call \(\Delta\) and \(\Delta^{\pm}\) propagators, since they tell us how a quantum propagates between states.
     
     %   Appdendix
     \appendixpage
     \begin{appendices}
-        \chapter{Pre-Course Revision}
-        The content of this appendix is based on the notes released before the course began to recap key ideas from previous courses.
-        In particular, it covers material from Quantum Theory and Classical Electrodynamics.
-        
-        \section{Special Relativity}
-        \subsection{Four Vectors}
-        Consider some event occurring at the spatial position \(\vv{x}\) and at time \(t\).
-        The coordinates of this event, in four-dimensional Minkowski space, form a \defineindex{contravariant} four-vector, which we write with upper indices:
-        \begin{equation}
-            x^\mu = (x^0, x^1, x^2, x^3) = (ct, \vv{x}).
-        \end{equation}
-        The \defineindex{covariant} four-vector has lower indices:
-        \begin{equation}
-            x_\mu = (x_0, x_1, x_2, x_3) = (ct, -\vv{x}).
-        \end{equation}
-        Similarly a general four-vector has a contravariant and covariant form:
-        \begin{equation}
-            a^\mu = (a^0, a^1, a^2, a^3) = (a^0, \vv{a}), \qand a_\mu = (a_0, a_1, a_2, a_3) = (a^0, -\vv{a}).
-        \end{equation}
-        In particular, \(a^0 = a_0\) and \(a^i = -a_i\), where we follow the convention that Greek indices run from 0 to 3 and Latin indices run from 1 to 3.
-        
-        We move between upper and lower indices using the \defineindex{metric tensor}, \(\minkowskiMetric\)\index{\(\eta\)|see{metric tensor}}, also denoted \(g\):
-        \begin{equation}
-            a^\mu = \minkowskiMetric^{\mu\nu}a_\nu, \qqand a_\mu = \minkowskiMetric_{\mu\nu}a^\nu,
-        \end{equation}
-        where we apply the summation convention, summing over repeated indices with one up and one down.
-        The covariant and contravariant components of the Minkowski metric are given by
-        \begin{equation}
-            \minkowskiMetric^{\mu\nu} = \minkowskiMetric_{\mu\nu} = 
-            \begin{pmatrix}
-                1 & 0 & 0 & 0\\
-                0 & -1 & 0 & 0\\
-                0 & 0 & -1 & 0\\
-                0 & 0 & 0 & -1
-            \end{pmatrix}
-            ,
-        \end{equation}
-        and the mixed components are given by
-        \begin{equation}
-            \tensor{\minkowskiMetric}{_\mu^\nu} = \tensor{\minkowskiMetric}{^\nu_\mu} = 
-            \begin{pmatrix}
-                1 & 0 & 0 & 0\\
-                0 & 1 & 0 & 0\\
-                0 & 0 & 1 & 0\\
-                0 & 0 & 0 & 1
-            \end{pmatrix}
-            = \tensor{\delta}{_\mu^\nu} = \tensor{\delta}{^\nu_\mu}.
-        \end{equation}
-        Here \(\tensor{\delta}{^\mu_\nu}\) is the Kronecker delta, defined to be 1 if \(\mu = \nu\) and 0 otherwise.
-        Note that we have made a choice of signs here.
-        \begin{wrn}
-            Sometimes the Minkowski metric is instead chosen to be
-            \begin{equation}
-                \minkowskiMetric^{\mu\nu} \stackrel{!}{=} 
-                \begin{pmatrix}
-                    -1 & 0 & 0 & 0\\
-                    0 & 1 & 0 & 0\\
-                    0 & 0 & 1 & 0\\
-                    0 & 0 & 0 & 1
-                \end{pmatrix}
-                .
-            \end{equation}
-            These two conventions are known as \(({+}{-}{-}{-})\) and \(({-}{+}{+}{+})\) for short, where the signs refer to the signs along the diagonal.
-        \end{wrn}
-        
-        The \defineindex{scalar product} of two four-vectors, \(a\) and \(b\), in Minkowski space is defined to be
-        \begin{equation}
-            a \cdot b \coloneqq a^\mu b_\mu = a_\mu b^\mu = a_\mu b_\nu \minkowskiMetric^{\mu\nu} = a^\mu b^\nu \minkowskiMetric_{\mu\nu} = a^0b^0 - \vv{a} \cdot \vv{b}
-        \end{equation}
-        where \(\vv{a} \cdot \vv{b} = a^1b^1 + a^2b^2 + a^3b^3\) is the normal three-dimensional scalar product.
-        
-        \subsection{Lorentz Transformations}
-        \define{Lorentz transformations}\index{Lorentz transformation} are linear transformations on four-vectors which leave the scalar product invariant.
-        If \(\Lambda\) is a Lorentz transformation then the four-vector \(a\) transforms as
-        \begin{equation}
-            a^\mu \to a'^\mu = \tensor{\Lambda}{^\mu_\nu} a^\nu.
-        \end{equation}
-        These are the \defineindex{homogeneous Lorentz transformations}, and they form a group called the \defineindex{homogeneous Lorentz group}, or just the Lorentz group, denoted \(\orthogonal(1, 3)\), where \((1,3)\) is the signature of the metric, one time component and three spatial components.
-        Including translations as well we get the Poincar\'e group, \(\reals^{1,3} \rtimes \orthogonal(1, 3)\), where \(\reals^{1,3}\) denotes translations in Minkowski space\footnote{for more details on groups see Symmetries of Quantum Mechanics or Symmetries of Particles and Fields}.
-        
-        The \enquote{standard} Lorentz transformation is a \defineindex{boost} along the \(x\)-axis, where the boosted frame moves at a constant speed, \(v\), along the \(x\)-axis:
-        \begin{equation}
-            \tensor{\Lambda}{^\mu_\nu} = 
-            \begin{pmatrix}
-                \cosh \omega & -\sinh \omega & 0 & 0\\
-                -\sinh \omega & \cosh \omega & 0 & 0\\
-                0 & 0 & 1 & 0\\
-                0 & 0 & 0 & 1
-            \end{pmatrix}
-        \end{equation}
-        where
-        \begin{align}
-            \tanh \omega &= \beta \coloneqq \frac{v}{c},\\
-            \cosh \omega &= \gamma \coloneqq \frac{1}{\sqrt{1 - \beta^2}} = \frac{1}{\sqrt{1 - v^2/c^2}},\\
-            \sinh \omega &= \gamma\beta.
-        \end{align}
-        In terms of coordinates we have
-        \begin{align}
-            ct' &= \gamma\left( ct -  \frac{v}{c}x \right),\\
-            x' &= \gamma(x - vt),\\
-            y' &= y,\\
-            z' &= z.
-        \end{align}
-        
-        Note that the Lorentz group contains ordinary three-dimensional rotations as a subgroup, \(\orthogonal(3)\), for example, the following Lorentz transformation is a clockwise rotation by \(\varphi\) about the \(z\)-axis, leaving time unaffected:
-        \begin{equation}
-            \tensor{\Lambda}{^\mu_\nu} = 
-            \begin{pmatrix}
-                1 & 0 & 0 & 0\\
-                0 & \cos\varphi & \sin\varphi & 0\\
-                0 & -\sin\varphi & \cos\varphi & 0\\
-                0 & 0 & 0 & 1
-            \end{pmatrix}
-            .
-        \end{equation}
-        
-        By definition the scalar product is invariant under the action of the Lorentz group.
-        This means that for some Lorentz transformation \(\Lambda\) and four-vectors \(a\) and \(b\) we have
-        \begin{equation}
-            b'^\mu b'^\nu \minkowskiMetric_{\mu\nu} = \tensor{\Lambda}{^\mu_\rho} a^\rho \tensor{\Lambda}{^\nu_\sigma} b^\sigma \minkowskiMetric_{\mu\nu} = a^\rho b^\sigma \minkowskiMetric_{\rho\sigma}.
-        \end{equation}
-        The last equality is given by computing the scalar product after the transformation.
-        Since \(a\) and \(b\) are arbitrary this means we must have
-        \begin{equation}\label{eqn:lorentz transformation of metric}
-            \tensor{\Lambda}{^\mu_\rho} \tensor{\Lambda}{^\nu_\sigma} \minkowskiMetric_{\mu\nu} = \minkowskiMetric_{\rho\sigma}.
-        \end{equation}
-        We can rewrite this as
-        \begin{equation}
-            \tensor{(\Lambda^\trans)}{_\rho^\mu} \minkowskiMetric_{\mu\nu} \tensor{\Lambda}{^\nu_\sigma} = \minkowskiMetric_{\rho\sigma}.
-        \end{equation}
-        In matrix notation we then have \(\Lambda^{\trans} \minkowskiMetric \Lambda = \minkowskiMetric\).
-        Taking the determinant we have
-        \begin{equation}
-            \det(\Lambda^\trans \minkowskiMetric \Lambda) = \det(\Lambda^\trans) \det(\minkowskiMetric) \det(\Lambda) = \det(\minkowskiMetric) \implies (\det\Lambda)^2 = 1,
-        \end{equation}
-        where we've used \(\det(AB) = \det(A)\det(B)\), and \(\det(A^\trans) = \det(A)\).
-        Hence, we have
-        \begin{equation}
-            \det \Lambda = \pm 1
-        \end{equation}
-        for all \(\Lambda \in \orthogonal(1, 3)\).
-        Transformations with \(\det \Lambda = +1\) are called \define{proper Lorentz transformations}\index{proper Lorentz transformation}, and form a subgroup, \(\specialOrthogonal(1, 3)\)\index{SO(1,3)|seealso{proper Lorentz transformation}}.
-        Lorentz transformations with \(\det \Lambda = -1\) are called \define{improper Lorentz transformations}\index{improper Lorentz transformation}.
-        
-        Now set the free indices, \(\rho\) and \(\sigma\), to 0 in \cref{eqn:lorentz transformation of metric} and we get
-        \begin{equation}
-            \tensor{\Lambda}{^\mu_0} \tensor{\Lambda}{^\nu_0} \minkowskiMetric_{\mu\nu} = \minkowskiMetric_{00} = 1.
-        \end{equation}
-        Writing out the components this becomes
-        \begin{equation}
-            \tensor{\Lambda}{^0_0} \tensor{\Lambda}{^0_0} - \tensor{\Lambda}{^1_0}\tensor{\Lambda}{^1_0} - \tensor{\Lambda}{^2_0}\tensor{\Lambda}{^2_0} - \tensor{\Lambda}{^3_0}\tensor{\Lambda}{^3_0} = 1
-        \end{equation}
-        which gives
-        \begin{equation}
-            (\tensor{\Lambda}{^0_0})^2 = 1 + \sum_{i = 1}^{3} (\tensor{\Lambda}{^i_0})^2 \ge 1,
-        \end{equation}
-        where the inequality follows from the fact that \(\tensor{\Lambda}{^i_0}\) is real, so its square is nonnegative.
-        We can conclude from this that either
-        \begin{equation}
-            \tensor{\Lambda}{^0_0} \ge 1 \qor \tensor{\Lambda}{^0_0} \le -1.
-        \end{equation}
-        We call transformations with \(\tensor{\Lambda}{^0_0} \ge 1\) \define{orthochronous Lorentz transformations}\index{orthochronous Lorentz transformation}, these form a subgroup, \(\orthogonal^+(1, 3)\)\index{orthochronous Lorentz group}\index{O+(1,3)@\(\orthogonal^+(1,3)\)|seealso{orthochronous Lorentz group}}.
-        There is also a subgroup of proper orthochronous Lorentz transformations, \(\specialOrthogonal^+(1, 3)\)\index{proper orthochronous Lorentz group}\index{SO+(1,3)@\(\specialOrthogonal^+(1,3)\)|seealso{proper orthochronous Lorentz group}}.
-        
-        We can divide homogeneous Lorentz transformations into four classes, or in more technical language, the Lie group \(\orthogonal(1, 3)\) has four connected components:
-        \begin{equation}
-            \begin{array}{ccc}
-                & \det \Lambda = + 1 & \det \Lambda = -1\\
-                \tensor{\Lambda}{^0_0} \ge +1 & \symrm{I} & \symrm{II}\\
-                \tensor{\Lambda}{^0_0} \le -1 & \symrm{III} & \symrm{IV}
-            \end{array}
-        \end{equation}
-        It is component I, the proper orthochronous Lorentz transformations, which contains the identity and so is the most important.
-        In particular, it is the Lie group generated by the Lie algebra \(\specialOrthogonalLie(1, 3)\).
-        
-        Any transformation of type II, III, or IV can be generated by combing a proper orthochronous transformation of type I with one of the following:
-        \begin{itemize}
-            \item \define{Spatial inversion}\index{spatial inversion}: The parity operation \(x^0 \to x^0\) and \(\vv{x} \to -\vv{x}\):
-            \begin{equation}
-                \tensor{\Lambda}{^\mu_\nu} = 
-                \begin{pmatrix}
-                    1 & 0 & 0 & 0\\
-                    0 & -1 & 0 & 0\\
-                    0 & 0 & -1 & 0\\
-                    0 & 0 & 0 & -1
-                \end{pmatrix}
-                .
-            \end{equation}
-            \item \define{Time reversal}\index{time reversal}: the operation \(x^0 \to -x^0\) and \(\vv{x} \to \vv{x}\):
-            \begin{equation}
-                \tensor{\Lambda}{^\mu_\nu} =
-                \begin{pmatrix}
-                    -1 & 0 & 0 & 0\\
-                    0 & 1 & 0 & 0\\
-                    0 & 0 & 1 & 0\\
-                    0 & 0 & 0 & 1
-                \end{pmatrix}
-                .
-            \end{equation}
-            \item \define{Spacetime inversion}\index{spacetime inversion}: The operation \(x^\mu \to -x^\mu\):
-            \begin{equation}
-                \tensor{\Lambda}{^\mu_\nu} =
-                \begin{pmatrix}
-                    -1 & 0 & 0 & 0\\
-                    0 & -1 & 0 & 0\\
-                    0 & 0 & -1 & 0\\
-                    0 & 0 & 0 & -1
-                \end{pmatrix}
-                .
-            \end{equation}
-        \end{itemize}
-        
-        If \(x\) and \(y\) are four vectors then the \defineindex{spacetime interval} \(s^2 \coloneqq (x - y)^\mu(x - y)_\mu\) is invariant under Lorentz transformations, since its just a scalar product of some four-vector \(x - y\).
-        
-        \subsection{Classification of Four-Vectors}
-        We classify four-vectors, \(a\), by whether their scalar product with themselves is positive, negative, or zero:
-        \begin{itemize}
-            \item if \(a^2 > 0\) we call \(a\) \defineindex{time-like},
-            \item if \(a^2 = 0\) we call \(a\) \defineindex{light-like},
-            \item if \(a^2 < 0\) we call \(a\) \defineindex{space-like}.
-        \end{itemize}
-        
-        \subsection{Differential Operators}
-        The gradient operator in normal \(\reals^n\) consists of spatial derivatives at each component.
-        The generalisation to Minkowski space includes a time derivative, and a factor of \(c\) for dimensional consistency:\index{\(\partial_\mu\)}
-        \begin{equation}
-            \partial_\mu = \diffp{}{x^\mu} = \left( \frac{1}{c}\diffp{}{t}, \grad \right) = \left( \frac{1}{c}\diffp{}{t}, \diffp{}{x}, \diffp{}{y}, \diffp{}{z} \right).
-        \end{equation}
-        Note that the derivative with respect to a contravariant vector gives a covariant operator.
-        As with normal four-vectors we can raise the index to get the operator
-        \begin{equation}
-            \partial^\mu = \diffp{}{x_\mu} = \left( \frac{1}{c}\diffp{}{t}, -\grad \right) = \left( \frac{1}{c}\diffp{}{t}, -\diffp{}{x}, -\diffp{}{y}, -\diffp{}{z} \right).
-        \end{equation}
-        
-        The Laplacian, \(\laplacian = \div \grad\), can also be generalised to Minkowski space as the scalar product of \(\partial\) with itself, we call the result the \defineindex{d'Alembertian}:
-        \begin{equation}
-            \dalembertian \coloneqq \partial_\mu \partial^\mu = \partial^\mu \partial_\mu = \frac{1}{c^2}\diffp[2]{}{t} - \laplacian = \frac{1}{c^2} \diffp[2]{}{t} - \diffp[2]{}{x} - \diffp[2]{}{y} - \diffp[2]{}{z}.
-        \end{equation}
-        This is also denoted \(\square^2\) or \(\square\).
-        Note that the wave equation for some field, \(\varphi\), can then be written as \(\dalembertian\varphi = 0\).
-        
-        \subsection{Momentum and Energy}
-        The four-momentum, \(p\), is a four-vector given by
-        \begin{equation}
-            p^\mu = \left( \frac{E}{c}, \vv{p} \right)
-        \end{equation}
-        where \(E\) is the energy of the particle and \(\vv{p}\) is the relativistic three-momentum of the particle.
-        
-        For a free particle of mass \(m\) we have that
-        \begin{equation}
-            p^2 = \frac{E^2}{c^2} - \vv{p} \cdot \vv{p} = m^2c^2.
-        \end{equation}
-        This can be rewritten as
-        \begin{equation}
-            E^2 = \abs{\vv{p}}^2c^2 + m^2c^4,
-        \end{equation}
-        which is known as the \defineindex{energy-momentum relation}, or the \defineindex{mass-shell condition}.
-        
-        Particles for which \(p^\mu p_\mu = m^2c^2\) are said to be on their \defineindex{mass-shell}.
-        
-        \section{Electromagnetic Theory}
-        \subsection{Maxwell's Equations}
-        We use \defineindex{Heaviside--Lorentz units}, where \(\varepsilon_0 = 1\).
-        In these units \defineindex{Maxwell's equations} are
-        \begin{align}
-            \div \vv{B} &= 0, \tag{ME1}\\
-            \curl \vv{E} &= -\frac{1}{c}\diffp{\vv{B}}{t}, \tag{ME2}\\
-            \curl \vv{B} &= \vv{j} + \frac{1}{c} \diffp{\vv{E}}{t}, \tag{ME3}\\
-            \div \vv{E} &= \rho. \tag{ME4}
-        \end{align}
-        Here \(\vv{E}\) is the electric field, \(\vv{B}\) is the magnetic field, \(\vv{j}\) is the current density, and \(\rho\) is the charge density.
-        
-        Any vector field with vanishing divergence, including \(\vv{B}\), can be written as the curl of another field, say \(\vv{A}\), then \(\div\vv{B} = 0\) follows from the identity that \(\div(\curl \vv{A}) = 0\) for any vector field \(\vv{A}\).
-        Hence, we can rewrite the first equation as
-        \begin{equation}
-            \vv{B} = \curl \vv{A}. \tag{ME1'}
-        \end{equation}
-        Similarly we can write \(\vv{E}\) as
-        \begin{equation}
-            \vv{E} = -\frac{1}{c}\diffp{\vv{A}}{t} - \grad \Phi \tag{ME2'}
-        \end{equation}
-        since \(\curl(\grad\Phi) = \vv{0}\) for all scalar fields \(\Phi\) and the curl of the first term just gets us back to \(\vv{B}\), so this equation can replace the second of Maxwell's equations.
-        
-        Combing the third and fourth equation it is possible to derive the continuity equation
-        \begin{equation}
-            \div\vv{j} + \frac{1}{c}\diffp{\rho}{t} = 0.
-        \end{equation}
-        Defining the electromagnetic \defineindex{four-current}, \(j_{\EM}^{\mu} \coloneqq (\rho, \vv{j})\) then we can write this as
-        \begin{equation}
-            \partial_\mu j_{\EM}^\mu = 0.
-        \end{equation}
-        This is a statement of charge conservation.
-        
-        \subsection{Four-Vector Potential}
-        We can define the \defineindex{four-potential} as
-        \begin{equation}
-            A^\mu \coloneqq (\Phi, \vv{A}).
-        \end{equation}
-        Recall the identity
-        \begin{equation}
-            \curl (\curl \vv{A}) = \grad(\div\vv{A}) - \laplacian\vv{A}.
-        \end{equation}
-        Substitute the modified Maxwell equations into the third Maxwell equation, giving
-        \begin{equation}
-            \curl(\curl \vv{A}) = \vv{j} - \frac{1}{c^2}\diffp[2]{\vv{A}}{t} - \frac{1}{c} \grad \diffp{\Phi}{t}.
-        \end{equation}
-        On the left we can use the identity to get
-        \begin{equation}
-            \grad(\div\vv{A}) - \laplacian\vv{A} = \vv{j} - \frac{1}{c^2}\diffp[2]{\vv{A}}{t} - \frac{1}{c} \grad \diffp{\Phi}{t}.
-        \end{equation}
-        Rearranging this gives
-        \begin{equation}
-            \frac{1}{c^2}\diffp[2]{\vv{A}}{t} - \laplacian\vv{A} + \grad\left[ \div\vv{A} + \frac{1}{c}\diffp{\Phi}{t} \right] = \dalembertian\vv{A} + \grad\left[ \div\vv{A} + \frac{1}{c}\diffp{\Phi}{t} \right] = \vv{j}.
-        \end{equation}
-        Doing something similar with the fourth Maxwell equation we get
-        \begin{equation}
-            -\frac{1}{c}\diffp{}{t}(\div\vv{A}) - \laplacian\Phi = \rho.
-        \end{equation}
-        We can combine these two equations into a covariant form:
-        \begin{equation}\label{eqn:dalembertian Amu - partial mu partial nu Anu = jmu}
-            \dalembertian A^\mu - \partial^\mu \partial_\nu A^\nu = j_{\EM}^\mu.
-        \end{equation}
-        
-        \subsection{Gauge Transformations}
-        We can define two new potentials, \(\tilde{\vv{A}}\) and \(\tilde{\Phi}\), via the \defineindex{gauge transformation}
-        \begin{equation}
-            \tilde{\vv{A}} = \vv{A} - \grad\chi \qand \tilde{\Phi} = \Phi + \frac{1}{c}\diffp{\chi}{t},
-        \end{equation}
-        or in covariant form,
-        \begin{equation}
-            \tilde{A}^\mu = A^\mu + \partial^\mu \chi.
-        \end{equation}
-        Here \(\chi\) is any scalar field (with second derivatives).
-        Importantly the fields \(\vv{E}\) and \(\vv{B}\) don't change if we make this transformation.
-        We can use this to choose potentials satisfying the \defineindex{Lorenz gauge condition}
-        \begin{equation}
-            \div \vv{A} + \frac{1}{c}\diffp{\Phi}{t} = 0,
-        \end{equation}
-        or in covariant form,
-        \begin{equation}
-            \partial_\nu A^\nu = 0.
-        \end{equation}
-        
-        In this case Maxwell's equations reduce to two decoupled equations,
-        \begin{equation}
-            \dalembertian \vv{A} = \vv{j}, \qand \dalembertian\Phi = \rho,
-        \end{equation}
-        or in covariant form,
-        \begin{equation}
-            \dalembertian A^\mu = j_{\EM}^{\mu}.
-        \end{equation}
-        
-        Note that the Lorenz gauge doesn't fix the potentials uniquely, since
-        \begin{equation}
-            \div\tilde{\vv{A}} + \frac{1}{c}\diffp{\tilde{\Phi}}{t} = \div\vv{A} + \frac{1}{c}\diffp{\Phi}{t} - \laplacian \chi + \frac{1}{c^2} \diffp[2]{\chi}{t}.
-        \end{equation}
-        So if the original potential, \(A^\mu\), satisfies \(\partial_\mu A^\mu = 0\) then we can choose to have \(\partial_\mu \tilde{A}^\mu = 0\) so long as \(\chi\) is such that \(\dalembertian\chi = 0\).
-        
-        \subsection{Covariant Form of Maxwell's Equations}
-        The \define{Maxwell tensor}\index{Maxwell tensor|see{electromagnetic field strength tensor}}, or \defineindex{electromagnetic field strength tensor} is defined to be
-        \begin{equation}
-            F^{\mu\nu} \coloneqq \partial^\mu A^\nu - \partial^\nu A^\mu.
-        \end{equation}
-        \begin{wrn}
-            Note that there is a different sign convention used, for example, by Mandl and Shaw, where
-            \begin{equation}
-                F^{\mu\nu} \stackrel{!}{\coloneqq} \partial^\nu A^\mu - \partial^\mu A^\nu.
-            \end{equation}
-        \end{wrn}
-    
-        We can think of the electromagnetic field strength tensor as the four-dimensional \enquote{curl} of the four-potential\footnote{this becomes precise in the language of geometric algebra, where we replace curl with the wedge product, and the wedge product of two vectors gives a bivector, which four our purposes is a two index tensor.}
-        
-        The electromagnetic field strength tensor is manifestly gauge invariant, since any gauge transformation cancels between the two terms.
-        
-        Considering the space-time and space-space components of \(F\) we can fairly simply show that they correspond to the normal electric and magnetic fields:
-        \begin{align}
-            F^{i0} &= \partial^iA^0 - \partial^0A^i = \diffp{\Phi}{x^i} - \frac{1}{c}\diffp{A^i}{t} = E^i,\\
-            F^{ij} &= \partial^iA^j - \partial^jA^i = -\diffp{A^i}{x^i} + \diffp{A^i}{x^j} = -\varepsilon^{ijk}B^k.
-        \end{align}
-        Here \(\varepsilon^{ijk}\) is the Levi-Civita symbol, which is defined to be 1 if \(ijk\) is an even permutation of \(123\), \(-1\) if it's an odd permutation, and 0 otherwise.
-        
-        We can write \(F\) as a \(4 \times 4\) matrix:
-        \begin{equation}
-            F^{\mu\nu} =
-            \begin{pmatrix}
-                0 & -E_x & -E_y & -E_z\\
-                E_x & 0 & -B_z & B_y\\
-                E_y & B_z & 0 & -B_z\\
-                E_z & -B_y & B_x & 0
-            \end{pmatrix} 
-            .
-        \end{equation}
-        We can then write \cref{eqn:dalembertian Amu - partial mu partial nu Anu = jmu} as
-        \begin{equation}
-            \partial_\mu F^{\mu\nu} = j_{\EM}^{\nu}.
-        \end{equation}
-        Conservation of the electromagnetic four-current is then very obvious, since
-        \begin{equation}
-            \partial_\nu j_{\EM}^\nu = \partial_\nu \partial_\mu F^{\mu\nu} = 0,
-        \end{equation}
-        since \(F^{\mu\nu}\) is antisymmetric in \(\mu\) and \(\nu\) and \(\partial_\nu\partial_\mu\) is symmetric in \(\mu\) and \(\nu\).
-        
-        \subsection{Interaction of Matter with EM Fields}
-        The classical Hamiltonian for a free, non-relativistic particle is
-        \begin{equation}
-            H = \frac{\abs{\vv{p}}^2}{2m}.
-        \end{equation}
-        For a particle with charge \(q\) in an electromagnetic field we modify the Hamiltonian through the \defineindex{minimal coupling prescription},
-        \begin{equation}
-            H \to H - q\Phi, \qand \vv{p} \to \vv{p} - \frac{q}{c}\vv{A},
-        \end{equation}
-        giving the classical Hamiltonian for a non-relativistic particle in an electromagnetic field:
-        \begin{equation}
-            H = \frac{\abs{\vv{p} - q\vv{A}/c}^2}{2m} + q\Phi.
-        \end{equation}
-        Note that this equation is in Heaviside--Lorentz units, in SI units there is no factor of \(c\).
-        
-        This Hamiltonian is chosen such that the force on a particle due to the electromagnetic field is
-        \begin{equation}
-            \vv{F} = q\left( \vv{E} + \frac{1}{c}\vv{v} \times \vv{B} \right),
-        \end{equation}
-        which is the Lorentz force in Heaviside--Lorentz units, again the factor of \(c\) is absent in SI units.
-        
-        \section{Relativistic Quantum Mechanics}
-        \subsection{Klein--Gordon Equation}
-        The \defineindex{Schrödinger equation} for a free particle of mass \(m\) is
-        \begin{equation}
-            -\frac{\hbar^2}{2m} \laplacian \Psi(\vv{r}, t) = i\hbar\diffp{}{t}\Psi(\vv{r}, t).
-        \end{equation}
-        One way to obtain this is from the non-relativistic energy-momentum relation,
-        \begin{equation}
-            E = \frac{\abs{\vv{p}}^2}{2m} = H,
-        \end{equation}
-        by substituting in the relevant operators:
-        \begin{equation}
-            E \to i\hbar\diffp{}{t}, \qand \vv{p} \to -i\hbar\grad.
-        \end{equation}
-        
-        To obtain a relativistic equation then we should use the relativistic energy-momentum relation,
-        \begin{equation}
-            E^2 = \abs{\vv{p}}^2 c^2 + m^2 c^4.
-        \end{equation}
-        Then after the operator substitution we have
-        \begin{equation}
-            -\hbar^2 \diffp[2]{}{t}\varphi(\vv{r}, t) = -\hbar^2c^2\laplacian \varphi(\vv{r}, t) + m^2c^2\varphi(\vv{r}, t).
-        \end{equation}
-        This is the \defineindex{Klein--Gordon equation}.
-        
-        We can write the Klein--Gordon equation in a manifestly covariant form as
-        \begin{equation}
-            \left( \dalembertian + \frac{m^2c^2}{\hbar^2} \right)\varphi(x) = 0 \qqor (\dalembertian + \mu^2)\varphi(x) = 0
-        \end{equation}
-        where \(\mu = mc/\hbar\).
-        We can jump straight to this covariant form by instead using the operator prescription
-        \begin{equation}
-            p^\mu \to i\hbar \diffp{}{x^\mu} = i\hbar\left( \frac{1}{c}\diffp{}{t}, -\grad \right).
-        \end{equation}
-        
-        Note that if \(m = 0\) then the Klein--Gordon equation reduces to a wave equation, \(\dalembertian \varphi(x) = 0\).
-        
-        The Klein--Gordon equation is valid for any spin 0 particle.
-        
-        \subsubsection{Free Particle Solutions}
-        The Klein--Gordon equation has plane-wave solutions,
-        \begin{equation}
-            \varphi(\vv{r}, t)  = \exp[i\vv{k} \cdot \vv{r} - i\omega t].
-        \end{equation}
-        Substituting this into the Klein--Gordon equation we see it is a solution as long as \(\omega\), \(\vv{k}\), and \(m\) are related by
-        \begin{equation}
-            \hbar^2\omega^2 = \hbar^2c^2\abs{\vv{k}}^2 + m^2c^4.
-        \end{equation}
-        Taking the square root we have
-        \begin{equation}
-            \hbar\omega = \pm \sqrt{\hbar^2c^2\abs{\vv{k}}^2 + m^2c^4}.
-        \end{equation}
-        
-        These solutions are eigenfunctions of the momentum operator and the energy operator, with eigenvalues \(\vv{p} = \hbar\vv{k}\) and \(E = \hbar\omega\) respectively.
-        Interpreting \(\hbar\omega\) as the allowed energy of the free particle there is ambiguity in the sign of the total energy.
-        We have both positive and negative energy solutions.
-        Initially this was viewed as a problem, but later people realised that both sorts of solutions were important, with negative energy solutions corresponding to antiparticles.
-        
-        Define the four-vector \(k^\mu = (\omega/c, \vv{k})\).
-        Then the solutions to the Klein--Gordon equation can be written in a covariant form as
-        \begin{equation}
-            \varphi(x) = \exp[-ik \cdot x] = \exp[-ik^\mu x_\mu] = \exp[-ip^\mu x_\mu/\hbar].
-        \end{equation}
-        This allows us to interpret the four-momentum as \(p^\mu = \hbar k^\mu\).
-        
-        If \(\varphi\) is a solution of the Klein--Gordon equation then so is its complex conjugate, \(\varphi^*\).
-        The general solution is a superposition of plane-wave solutions:
-        \begin{equation}
-            \varphi(x) = \int \frac{\dl{^3x}}{2E_p(2\pi)^3}[f(p)\exp[-ip\cdot x/\hbar] + g(p) \exp[ip\cdot x/\hbar]].
-        \end{equation}
-        Here the factors in the denominator of the measure are included for future convenience, and
-        \begin{equation}
-            E_p \coloneqq +\sqrt{\abs{\vv{p}}^2c^2 + m^2c^4}
-        \end{equation}
-        is defined to be positive.
-        
-        \subsection{Continuity Equation and Probability Interpretation}
-        Denote the Schrödinger equation by \((\symrm{SE})\) and its conjugate by \((\symrm{SE})^*\), that is
-        \begin{equation}
-            (\symrm{SE}) = -\frac{\hbar^2}{2m} \laplacian \Psi(\vv{r}, t) - i\hbar\diffp{}{t}\Psi(\vv{r}, t) = 0.
-        \end{equation}
-        Then by considering
-        \begin{equation}
-            \Psi^*(\symrm{SE}) - \Psi(\symrm{SE}) = 0
-        \end{equation}
-        we can derive a continuity equation
-        \begin{equation}
-            \div\vv{j} + \diffp{\rho}{t} = 0,
-        \end{equation}
-        where
-        \begin{equation}
-            \rho \coloneqq \Psi^*\Psi, \qand \vv{j} \coloneqq -\frac{i\hbar}{2m} (\Psi^*\grad \Psi - \Psi \grad \Psi^*).
-        \end{equation}
-        These are the \defineindex{probability density} and \defineindex{probability current} respectively.
-        
-        We can do the same for the Klein--Gordon equation and obtain the same continuity equation, but now with
-        \begin{equation}
-            \rho \coloneqq \frac{i\hbar}{2mc^2} \left( \varphi^* \diffp{\varphi}{t} - \varphi \diffp{\varphi^*}{t} \right), \qand \vv{j} \coloneqq -\frac{i\hbar}{2m}(\varphi^*\grad \varphi - \varphi\grad\varphi^*).
-        \end{equation}
-        Here we chose to make \(\vv{j}\) identical to the non-relativistic Schrödinger current.
-        We can show that in the non-relativistic limit \(\rho\) reduces to \(\varphi^*\varphi\).
-        There is a problem however, the candidate for the probability density, \(\rho(x)\), is no longer positive definite, the negative energy solutions will have \(\rho(x) < 0\).
-        This means that there is no simple probability density interpretation for \(\rho\) from the Klein--Gordon equation.
-        
-        \subsection{Dirac Equation}
-        Dirac, aiming to avoid the problems with negative energy/probability solutions, looked for a relativistic equation linear in \(\diffp{}/{t}\).
-        He then proceeded to argue that the equation must be linear in spatial derivatives, since in relativity we have to treat space and time on an equal footing.
-        We therefore start with an equation of the form
-        \begin{equation}
-            i\hbar\diffp{}{t}\psi(\vv{r}, t) = \operator{H}\psi(\vv{r}, t)
-        \end{equation}
-        where \(\operator{H}\) is linear in space and time derivatives.
-        These requirements mean that we can write out a candidate Hamiltonian with some unknown coefficients:
-        \begin{equation}
-            i\hbar\diffp{}{t}\psi(\vv{r}, t) = -i\hbar c\left( \alpha^1\diffp{}{x^1} + \alpha^2\diffp{}{x^2} + \alpha^3\diffp{}{x^3} \right) \psi(\vv{r}, t) + \beta mc^2 \psi(\vv{r}, t).
-        \end{equation}
-        We choose to have \(\alpha^i\) and \(\beta\) be dimensionless by including the required factors of \(c\), \(\hbar\), and \(m\), we also include a conventional factor of \(-i\).
-        Using the operator prescription \(\vecoperator{p} = -i\hbar\grad\) we can write this more compactly as
-        \begin{equation}
-            i\hbar\diffp{}{t}\psi(\vv{r}, t) = (c\vv{\alpha} \cdot \vecoperator{p} + \beta mc^2) \psi(\vv{r}, t).
-        \end{equation}
-        This is the \defineindex{Dirac equation} for a free particle.
-        We assume that the Hamiltonian is independent of position and time, which is what we would want for free particle solutions.
-        Hence \(\alpha^i\) and \(\beta\) must be independent of position and time, so commute with the derivatives, such as \(\vecoperator{p}\), but not necessarily each other.
-        
-        Next, we impose the relativistic energy-momentum equation:
-        \begin{equation}
-            \operator{H}^2\psi(\vv{r}, t) = (c^2\abs{\vecoperator{p}}^2 + m^2c^4)\psi(\vv{r}, t).
-        \end{equation}
-        We know that
-        \begin{equation}
-            \operator{H}^2\psi(\vv{r}, t) = (c\vv{\alpha} \cdot \vecoperator{p} + \beta mc^2)(c\vv{a} \cdot \vecoperator{p} + \beta mc^2)\psi(\vv{r}, t).
-        \end{equation}
-        Expanding the right hand side, while being careful about the ordering of terms, we get
-        \begin{align}
-            \operator{H}^2\psi(\vv{r}, t) &= \left\{ c^2[(\alpha^1)^2(\operator{p}^1)^2 + (\alpha^2)^2(\operator{p}^2)^2 + (\alpha^3)^2(\operator{p}^3)^2] + m^2c^4\beta^2 \right\} \psi(\vv{r}, t)\\
-            & \quad + \left\{ (\alpha^1\alpha^2 + \alpha^2\alpha^1)\operator{p}^1\operator{p}^2 + (\alpha^2\alpha^3 + \alpha^3\alpha^2)\operator{p}^2\operator{p}^3 \right\}\psi(\vv{r}, t)\\
-            & \quad + mc^3\left\{ (\alpha^1\beta + \beta\alpha^1)\operator{p}^1 + (\alpha^2\beta + \beta\alpha^2)\operator{p}^2 + (\alpha^3\beta + \beta\alpha^3)\operator{p}^3 \right\}\psi(\vv{r}, t).
-        \end{align}
-        The relativistic energy-momentum relation is satisfied if
-        \begin{align}
-            (\alpha^1)^2 = (\alpha^2)^2 = (\alpha^3)^2 = \beta^2 &= 1,\\
-            \alpha^i\alpha^j + \alpha^j\alpha^i &= 0,\\
-            \alpha^i\beta + \beta\alpha^i &= 0,
-        \end{align}
-        which can be written more compactly sa
-        \begin{equation}
-            \anticommutator{\alpha^i}{\alpha^j} = 2\delta^{ij}, \quad \anticommutator{\alpha^i}{\beta} = 0, \qand \beta^2 = 1,
-        \end{equation}
-        where \(\anticommutator{A}{B} = AB + BA\) is the \defineindex{anticommutator}.
-        
-        Clearly \(\alpha^i\) and \(\beta\) cannot just be numbers for these requirements to hold.
-        Instead, we assume they are matrices.
-        Since \(\operator{H}\) is Hermitian they must be Hermitian, and hence are square matrices.
-        This means they must have real eigenvalues.
-        Since these matrices square to the identity their squares have eigenvalues whose product is 1, since the determinant is the product of the eigenvalues and the determinant of the unit matrix is 1.
-        Since the eigenvalues are real the eigenvalues of \(\alpha^i\) and \(\beta\) must be \(\pm 1\).
-        \begin{lma}{}{}
-            We have that \(\tr \alpha^i = \tr \beta = 0\).
-            \begin{proof}
-                Consider \(\tr\alpha^i\).
-                Since \(\beta^2 = 1\) we can insert \(\beta^2\) into the argument of the trace and then use the cyclic property to get
-                \begin{equation}
-                    \tr \alpha^i = \tr(\beta^2\alpha^i) = \tr(\beta\alpha^i\beta).
-                \end{equation}
-                Now using the anticommutation relations we can replace \(\alpha^i\beta\) with \(-\beta\alpha^i\) and then take the negative outside the trace to get
-                \begin{equation}
-                    \tr \alpha^i = \tr(\beta\alpha^i\beta) = \tr(\beta(-\beta\alpha^i)) = -\tr(\beta^2\alpha^i) = -\tr(\alpha^i)
-                \end{equation}
-                since \(\beta^2 = 1\), and so \(\tr\alpha^i = -\tr\alpha^i\), which must mean \(\tr\alpha^i = 0\).
-                
-                Similarly, consider \(\tr\beta\), we have
-                \begin{equation}
-                    \tr\beta = \tr((\alpha^i)^2\beta) = \tr(\alpha^i\beta\alpha^i) = -\tr((\alpha^i)^2\beta) = -\tr \beta,
-                \end{equation}
-                and so \(\tr\beta = 0\).
-            \end{proof}
-        \end{lma}
-        
-        So, if \(\alpha^i\) and \(\beta\) are \(n \times n\) matrices with eigenvalues \(\pm 1\) since the trace is the sum of the eigenvalues and the trace vanishes \(n\) must be even so that the eigenvalues can cancel pairwise.
-        There is no \(2\times 2\) set of Hermitian traceless \(2\times 2\) matrices satisfying the anticommutation relations, although the Pauli matrices come close, satisfying
-        \begin{equation}
-            \anticommutator{\sigma^i}{\sigma^j} = 2\delta^{ij},
-        \end{equation}
-        but there is no viable candidate for \(\beta\).
-        
-        The simplest representation is \(4 \times 4\).
-        The \defineindex{standard representation} is
-        \begin{align}
-            \beta &= 
-            \begin{pmatrix}
-                1 & 0 & 0 & 0\\
-                0 & 1 & 0 & 0\\
-                0 & 0 & -1 & 0\\
-                0 & 0 & 0 & -1
-            \end{pmatrix}
-            , \qquad & \alpha^1 &=
-            \begin{pmatrix}
-                0 & 0 & 0 & 1\\
-                0 & 0 & 1 & 0\\
-                0 & 1 & 0 & 0\\
-                1 & 0 & 0 & 0
-            \end{pmatrix}
-            ,\\
-            \alpha^2 &= 
-            \begin{pmatrix}
-                0 & 0 & 0 & -i\\
-                0 & 0 & i & 0\\
-                0 & -i & 0 & 0\\
-                i & 0 & 0 & 0
-            \end{pmatrix}
-            , \qquad & \alpha^3 &= 
-            \begin{pmatrix}
-                0 & 0 & 1 & 0\\
-                0 & 0 & 0 &-1\\
-                1 & 0 & 0 & 0\\
-                0 & -1 & 0 & 0
-            \end{pmatrix}
-            .
-        \end{align}
-        These can be written in a \(2\times 2\) block form as
-        \begin{equation}
-            \beta = 
-            \begin{pmatrix}
-                1 & 0\\
-                0 & 1
-            \end{pmatrix}
-            , \qqand \vv{\alpha} = 
-            \begin{pmatrix}
-                0 & \vv{\sigma}\\
-                \vv{\sigma} & 0
-            \end{pmatrix}
-        \end{equation}
-        where \(\vv{\sigma} = (\sigma^1, \sigma^2, \sigma^3)\) are the Pauli matrices.
-        We can also write these as \(\alpha^i = \sigma^1 \otimes \sigma^i\).
-        It's not too difficult to check that these matrices have the desired properties.
-        
-        \begin{cde}{}{}
-            \begin{lstlisting}[gobble=16, language=mathematica, mathescape]
-                Unprotect[TensorProduct];
-                a_ $\otimes$ b_ := KroneckerProduct[a, b]
-                Protect[TensorProduct];
-                $\delta_{i\_, j\_}$ := KroneckerDelta[i, j]
-                $\alpha_{i\_}$ := PauliMatrix[1] $\otimes$ PauliMatrix[i]
-                anticommutator[a_, b_] := a.b + b.a
-                And@@
-                    Flatten@
-                        Table[anticommutator[$\alpha_{\symrm{i}}$, $\alpha_{\symrm{j}}$]
-                            == 2 $\delta_{\symrm{i,j}}$ IdentityMatrix[4],
-                            {i,1,3}, {j, 1, 3}]
-                True
-            \end{lstlisting}
-        \end{cde}
-        
-        Since the Hamiltonian is a \(4 \times 4\) matrix the wave function, \(\psi(\vv{r}, t)\), must be a four component column vector:
-        \begin{equation}
-            \psi(\vv{r}, t) = 
-            \begin{pmatrix}
-                \psi_1(\vv{r}, t)\\ \psi_2(\vv{r}, t)\\ \psi_3(\vv{r}, t)\\ \psi_4(\vv{r}, t)\\
-            \end{pmatrix}
-            .
-        \end{equation}
-        
-        \subsection{Probability Density}
-        The Dirac equation for a free particle is
-        \begin{equation}
-            i\hbar\diffp{}{t}\psi(\vv{r}, t) = (-i\hbar c\vv{\alpha} \cdot \overrightarrow{\grad} + \beta mc^2)\psi(\vv{r}, t).
-        \end{equation}
-        Here \(\overrightarrow{\grad}\) is the normal gradient operator acting to the right.
-        From this we can construct a probability density.
-        Take the Hermitian conjugate of this equation:
-        \begin{equation}
-            -i\hbar\diffp{}{t}\psi^\hermit (\vv{r}, t) = \psi^\hermit(\vv{r}, t) \left( i\hbar c\vv{\alpha} \cdot \overleftarrow{\grad} + \beta mc^2 \right).
-        \end{equation}
-        Here \(\overleftarrow{\grad}\) denotes a gradient operator acting to the left.
-        Note that \(\psi^\hermit\) is a row vector.
-        Multiplying the first equation by \(\psi^\hermit\) on the left, and the second by \(\psi\) on the right we obtain
-        \begin{align}
-            i\hbar\diffp{}{t}(\psi^\hermit \psi) &= -i\hbar c(\psi^\hermit \vv{\alpha} \cdot \overrightarrow{\grad} \psi + \psi^\hermit \vv{\alpha} \cdot \overleftarrow{\grad}\psi)\\
-            &= -i\hbar c(\psi^\hermit \vv{\alpha} \cdot \grad \psi + (\grad\psi^\hermit)\cdot \vv{\alpha}\psi)\\
-            &= -i\hbar c\div(\psi^\hermit \vv{\alpha} \psi).
-        \end{align}
-        We can write this as a continuity equation,
-        \begin{equation}
-            \div\vv{j} + \frac{1}{c}\diffp{\rho}{t} = 0,
-        \end{equation}
-        where
-        \begin{equation}
-            \rho \coloneqq \psi^\hermit \psi, \qqand \vv{j} = \psi^{\hermit} \vv{\alpha} \psi.
-        \end{equation}
-        We can write this in a covariant form:
-        \begin{equation}
-            \partial_\mu j^\mu = 0,
-        \end{equation}
-        where \(j = (\rho, \vv{j})\) is the \defineindex{four-probability current}.
-        
-        This tells us that \(\psi^\hermit \psi\) transforms as the time component of a four-vector, and \(\psi^\hermit \vv{\alpha} \psi\) transforms as the corresponding space part.
-        
-        Note that \(\rho = \abs{\psi}^2\) is positive definite, solving one of our earlier problems with the Klein--Gordon equation.
-        
-        \subsection{Free Particle Solutoins}
-        The Dirac equation has plane-wave solutions:
-        \begin{equation}
-            \psi(\vv{r}, t) = \psi(x) = \exp[-ik_\mu x^\mu]u(\vv{p}) = \exp\left[ -\frac{i}{\hbar}(cp_0t - \vv{p} \cdot r) \right]u(\vv{p}).
-        \end{equation}
-        Here \(u(\vv{p})\) is a four component column vector.
-        
-        Substituting this into the Dirac equation we get
-        \begin{equation}
-            p^0u = (\vv{\alpha} \cdot \vv{p} + \beta mc)u.
-        \end{equation}
-        We interpret this solution as representing a particle of energy \(cp^0\) and momentum \(\vv{p}\).
-        Putting in the matrices \(\alpha^i\) and \(\beta\) this becomes
-        \begin{equation}\label{eqn:dirac equation wave solution matrix form}
-            \begin{pmatrix}
-                -p^0 + mc & 0 & p^3 & p^1 - ip^2\\
-                0 & -p^0 + mc & p^1 + ip^2 & -p^3\\
-                p^3 & p^1 - ip^2 & -(p^0 + mc) & 0\\
-                p^1 + ip^2 & -p^3 & 0 & -(p^0 + mc)
-            \end{pmatrix}
-            \begin{pmatrix}
-                u_1\\ u_2\\ u_3\\ u_4
-            \end{pmatrix}
-            = 0.
-        \end{equation}
-        The condition for a nontrivial solution for \(u_i\) to exist is that the determinant of the matrix vanishes.
-        Computing the determinant we find that the determinant vanishes exactly when
-        \begin{equation}
-            [m^2 c^2 + \abs{\vv{p}}^2 - (p^0)^2]^2 = 0,
-        \end{equation}
-        which is exactly the energy-momentum relation.
-        Taking the square root we have
-        \begin{equation}
-            p^0 = \pm \sqrt{m^2c^2 + \abs{\vv{p}}^2},
-        \end{equation}
-        so we still have negative energy solutions.
-        
-        \subsubsection{Positive Energy Solutions}
-        First suppose \(p^0 > 0\), that is
-        \begin{equation}
-            p^0 = +\sqrt{m^2c^2 + \abs{\vv{p}}^2} \eqqcolon p^0_+ = \frac{E}{c},
-        \end{equation}
-        where we choose to take \(E > 0\) as the magnitude of the energy.
-        Substituting into the first two rows of \cref{eqn:dirac equation wave solution matrix form} we get
-        \begin{align}
-            0 &= (-p_+^0 + mc)u_1 + p_3u_3 + (p^1 - ip^2)u_4,\\
-            0 &= (-p_+^0 + mc)u_2 + (p^1 + ip^2)u_3 - p^3 u_4.
-        \end{align}
-        Only two of the four \(u_i\) are linearly independent, so we are free to fix two values.
-        The conventional choice is either \(u_1 = 1\) and \(u_2 = 0\), or \(u_1 = 0\) and \(u_2 = 1\).
-        The first choice gives
-        \begin{equation}
-            u_3 = \frac{p^3}{p_+^0 + mc}, \qand u_4 = \frac{p^1 + ip^2}{p_+^0 + mc},
-        \end{equation}
-        whereas the second gives
-        \begin{equation}
-            u_3 = \frac{p^1 - ip^2}{p_+^0 + mc}, \qand u_4 = \frac{-p^3}{p_+^0 + mc}.
-        \end{equation}
-        
-        \subsubsection{Negative Energy Solutions}
-        Now suppose \(p^0 < 0\), that is
-        \begin{equation}
-            p^0 = -\sqrt{m^2c^2 + \abs{\vv{p}}^2} \eqqcolon p^0_- = -\frac{E}{c},
-        \end{equation}
-        where again, we choose to have \(E > 0\).
-        We can follow a similar process to the positive energy solutions, but for the lower two rows of \cref{eqn:dirac equation wave solution matrix form}.
-        Again, we make an arbitrary choice for two components, the conventions being either \(u_3 = 1\) and \(u_4 = 0\), or \(u_3 = 0\) and \(u_4 = 1\).
-        The first choice leads to 
-        \begin{equation}
-            u_1 = \frac{p^3}{p^0_- - mc}, \qand u_2 = \frac{p^1 + ip^2}{p^0_- - mc},
-        \end{equation}
-        and the second gives
-        \begin{equation}
-            u_1 = \frac{p^1 - ip^2}{p^0_- - mc}, \qand u_2 = \frac{-p^3}{p^0_- - mc}.
-        \end{equation}
-        
-        \subsubsection{Summary}
-        The positive energy solutions with four-momentum \(p^\mu_+ = (p^0_+, \vv{p})\) are
-        \begin{equation}
-            \omega^1(\vv{p}) =
-            \begin{pmatrix}
-                1\\ 0\\
-                \frac{p^3}{p^0_+ + mc}\\
-                \frac{p^1 + ip^2}{p^0_+ + mc}
-            \end{pmatrix}
-            ,\qand \omega^2(\vv{p}) = 
-            \omega^1(\vv{p}) =
-            \begin{pmatrix}
-                0\\ 1\\
-                \frac{p^1 - ip^2}{p^0_+ + mc}\\
-                \frac{-p^3}{p^0_+ + mc}
-            \end{pmatrix}
-            .
-        \end{equation}
-        The negative energy solutions with four-momentum \(p^\mu_- = (p^0_-, -\vv{p})\) are
-        \begin{equation}
-            \omega^1(\vv{p}) =
-            \begin{pmatrix}
-                -\frac{p^1 - ip^2}{p^0_+ + mc}\\
-                \frac{p^3}{p^0_+ + mc}\\
-                0\\ 1
-            \end{pmatrix}
-            ,\qand \omega^2(\vv{p}) = 
-            \omega^1(\vv{p}) =
-            \begin{pmatrix}
-                -\frac{p^3}{p^0_+ + mc}\\
-                -\frac{p^1 + ip^2}{p^0_+ + mc}\\
-                1\\ 0
-            \end{pmatrix}
-            .
-        \end{equation}
-        Note that there are varying conventions on how the \(\omega^\mu\) are labelled.
-        
-        \subsubsection{Rest Frame Solutions}
-        When the particle is at rest, that is \(\vv{p} = \vv{0}\), we have
-        \begin{equation}
-            \omega^1(\vv{0}) = 
-            \begin{pmatrix}
-                1\\ 0\\ 0\\ 0
-            \end{pmatrix}
-            , \quad \omega^2(\vv{0}) = 
-            \begin{pmatrix}
-                0\\ 1\\ 0\\ 0
-            \end{pmatrix}
-            , \quad \omega^3(\vv{0}) = 
-            \begin{pmatrix}
-                0\\ 0\\ 0\\ 1
-            \end{pmatrix}
-            , \qand \omega^4(\vv{0}) = 
-            \begin{pmatrix}
-                0\\ 0\\ 1\\ 0
-            \end{pmatrix}
-            .
-        \end{equation}
-        These are such that the solutions
-        \begin{equation}
-            \psi^{(1)} = \exp\left[ -\frac{imc^2t}{\hbar} \right] 
-            \begin{pmatrix}
-                1\\ 0\\ 0\\ 0
-            \end{pmatrix}
-            \qand
-            \psi^{(2)} = \exp\left[ -\frac{imc^2t}{\hbar} \right]
-            \begin{pmatrix}
-                0\\ 1\\ 0\\ 0
-            \end{pmatrix}
-        \end{equation}
-        are degenerate in energy.
-        There should therefore be another operator which commutes with the Hamiltonian and whose eigenvalues label the states.
-        One such operator is
-        \begin{equation}
-            \Sigma^3 \coloneqq
-            \begin{pmatrix}
-                \sigma^3 & 0\\
-                0 & \sigma^3
-            \end{pmatrix}
-            = 
-            \begin{pmatrix}
-                1 & 0 & 0 & 0\\
-                0 & -1 & 0 & 0\\
-                0 & 0 & 1 & 0\\
-                0 & 0 & 0 & -1
-            \end{pmatrix}
-            .
-        \end{equation}
-        The rest frame four-component spinors, \(\omega^\mu(\vv{0})\), are eigenvectors of \(\Sigma^3\) with eigenvalues \(\pm 1\).
-        This suggests that we can interpret the Dirac equation as describing a spin \(1/2\) particle, and the eigenvalues of \(\Sigma^3\) are interpreted as the 3rd component of the spin in the rest frame.
-        
-        The notation \(\Sigma^3\) suggests we should define
-        \begin{equation}
-            \vv{\Sigma} \coloneqq 
-            \begin{pmatrix}
-                \vv{\sigma} & 0\\
-                0 & \vv{\sigma}
-            \end{pmatrix}
-            , \qor \Sigma^i \coloneqq
-            \begin{pmatrix}
-                \sigma^i & 0\\
-                0 & \sigma^i
-            \end{pmatrix}
-            .
-        \end{equation}
-        We then have
-        \begin{equation}
-            \left( \frac{1}{2}\hbar \vv{\Sigma} \right) \cdot \left( \frac{1}{2}\hbar \vv{\Sigma} \right) = \frac{3}{4}\hbar^2 \operator{1}
-        \end{equation}
-        and \(\hbar\Sigma^3/2\) has eigenvalues of \(\pm \hbar/2\) suggesting that the spin operator is
-        \begin{equation}
-            \vecoperator{s} = \frac{1}{2}\hbar \vv{\Sigma}.
-        \end{equation}
-        
-        Note that \(\vv{\Sigma}\) does not commute with the Hamiltonian in frames other than the rest frame, when \(\vv{p} = \vv{0}\).
-        The operator \(\vecoperator{L} = \vecoperator{r} \times \vecoperator{p}\) also doesn't commute with the Hamiltonian.
-        However, the operator
-        \begin{equation}
-            \vecoperator{J} = \vecoperator{L} + \vecoperator{s} = \vecoperator{r} \times \vecoperator{p} + \frac{1}{2}\hbar\vv{\Sigma}
-        \end{equation}
-        does commute with the Hamiltonian.
-        This suggests we can interpret \(\vecoperator{J}\) as the total angular momentum.
-        
-        When \(\vv{p} \ne \vv{0}\) there are two independent states for any fixed four-momentum.
-        Therefore there exists some operator which commutes with \(c\vv{\alpha} \cdot \vecoperator{p} + \beta mc^2\) and labels the states.
-        One option is the \defineindex{helicity operator}
-        \begin{equation}
-            \operator{h}(\vv{p}) = 
-            \begin{pmatrix}
-                \frac{\vv{\sigma} \cdot \vv{p}}{\abs{\vv{p}}} & 0\\
-                0 & \frac{\vv{\sigma}\cdot\vv{p}}{\abs{\vv{p}}}
-            \end{pmatrix}
-            .
-        \end{equation}
-        This commutes with \(c\vv{\alpha} \cdot\vecoperator{p} + \beta mc^2\) and has eigenvalues \(\pm 1\).
-        We can therefore chose general plane-wave states with \(\vv{p} \ne \vv{0}\) to be helicity states.
-        
+        \include{parts/prelim}
     \end{appendices}
     
     \backmatter
-    %    \renewcommand{\glossaryname}{Acronyms}
-    %    \printglossary[acronym]
+    \renewcommand{\glossaryname}{Acronyms}
+    \printglossary[acronym]
     \printindex
 \end{document}
