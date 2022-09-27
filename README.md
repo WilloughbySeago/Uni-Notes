@@ -125,6 +125,8 @@ As the main source of this material I would like to thank the following people w
 * [Prof Martin Evans](https://www.ph.ed.ac.uk/people/martin-evans)
 * [Prof Davide Marenduzzo](https://www.ph.ed.ac.uk/people/davide-marenduzzo)
 * [Prof Donal O'Connell](https://www.ph.ed.ac.uk/people/donal-oconnell)
+* [Prof Neil Turok](https://www.ph.ed.ac.uk/people/neil-turok)
+* [Prof Richard Ball](https://www.ph.ed.ac.uk/people/richard-ball)
 
 ### Bibliography
 Some of the books I have used to help write these notes:
