@@ -5,8 +5,8 @@
 
 %% Packages
 \usepackage{csquotes}
-
 \usepackage{siunitx}
+\usepackage{subcaption}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -50,6 +50,42 @@ noabbrev
 % \subtitle{}
 % \subsubtitle{}
 
+% Open Question environment ---------------------------------------------------
+\BeforeBeginEnvironment{openquestion}{%
+    \vspace*{0pt plus 3pt} % To help with underfull vbox warnings
+    \refstepcounter{equation}%
+}
+
+\AfterEndEnvironment{openquestion}{%
+    \vspace*{0pt plus 3pt} % To help with underfull vbox warnings
+}
+
+\newtcbtheorem[number freestyle={\noexpand\theequation},%
+crefname={Open Question}{Open Questions}]%
+{openquestion}{Open Question}%
+{enhanced jigsaw,%
+    enforce breakable,%
+    shrink break goal=0.5\baselineskip,%
+    segmentation style=solid,%
+    theorem style=plain,%
+    %    before title app={{\tiny\ensuremath{\blacksquare}}\nobreakspace},%
+    fonttitle=\sffamily\upshape\bfseries\small,%
+    coltitle=black,%
+    description font=\sffamily\upshape\bfseries\small,%
+    description color=black,%
+    colframe=highlight,%
+    colback=azure(web)(azuremist)!45,%
+    boxrule=0pt,%
+    leftrule=4pt,%
+    sharp corners,%
+    description delimiters={}{},%
+    separator sign={\nobreakspace {\color{black}---}},%
+    terminator sign={\ },%
+    label type=app,%
+    label separator=,
+}{}
+% End application environment -----------------------------------------------
+
 % Commands
 
 % Particles
@@ -68,6 +104,7 @@ noabbrev
 \newcommand{\Pnutau}{\ensuremath{\Pparticle{\nu_{\tau}}}}
 \newcommand{\PH}{\ensuremath{\Pparticle{H}}}
 \newcommand{\PZ}{\ensuremath{\Pparticle{Z}}}
+\newcommand{\PW}{\ensuremath{\Pparticle{W}}}
 \newcommand{\PWpm}{\ensuremath{\Pparticle{W}^{\pm}}}
 \newcommand{\PWp}{\ensuremath{\Pparticle{W}^{+}}}
 \newcommand{\PWm}{\ensuremath{\Pparticle{W}^{-}}}
@@ -76,6 +113,7 @@ noabbrev
 \newcommand{\Pq}{\ensuremath{\Pparticle{q}}}
 \newcommand{\Ppip}{\ensuremath{\Pparticle{\pi}^{+}}}
 \newcommand{\Ppim}{\ensuremath{\Pparticle{\pi}^{-}}}
+\newcommand{\Pf}{\ensuremath{\Pparticle{f}}}
 
 
 
@@ -101,12 +139,20 @@ noabbrev
 \newcommand{\APg}{\ensuremath{\Pparticle{g}}}
 \newcommand{\APq}{\ensuremath{\APantiparticle{\Pparticle{q}}}}
 
+% Text
+\newcommand{\course}[1]{\textit{#1}}
+
 % Maths
 \newcommand{\strongCoupling}{g_{\symrm{s}}}
 \newcommand{\wCoupling}{g_{\symrm{W}}}
 \newcommand{\zCoupling}{g_{\symrm{Z}}}
+\newcommand{\EM}{\text{EM}}
+\newcommand{\strongForce}{\text{S}}
+\newcommand{\e}{\symrm{e}}
+\newcommand{\probability}{\symbb{P}}
+\DeclareMathOperator{\sinc}{sinc}
 
-\includeonly{}
+\includeonly{parts/appParticleData, parts/appFermiGoldenRule}
 
 \begin{document}
     \frontmatter
@@ -116,6 +162,45 @@ noabbrev
     \listoffigures
     \mainmatter
     
+    \chapter{Preliminaries}
+    This course is not interested in the finer mathematical details, but the broader principles.
+    For details see the \course{Quantum Field Theory} course.
+    Knowledge is assumed of quantum mechanics (see the \course{Principles of Quantum Mechanics} and \course{Quantum Theory} courses), and special relativity (see the \course{Relativity, Nuclear, and Particle Physics} course, or \course{Classical Electrodynamics}).
+    
+    We use natural units where \(c = \hbar = \varepsilon_0 = \mu_0 = 1\).
+    This means that masses, momentums, and energies are all measured in electron volts, force in electron volts squared, lengths and times in inverse electron volts, and speeds and angular momentums are dimensionless.
+    Electric charge is also dimensionless, but the charge of an electron is  \emph{not} set to unity, although particle charges are given in terms of the (absolute value of the) electron charges.
+    Instead we have the fine structure constant,
+    \begin{equation}
+        \alpha = \frac{e^2}{4\pi \varepsilon_0 \hbar c} \quad (\text{SI}) \qquad \alpha = \frac{e^2}{4\pi} \quad (c = \hbar = \varepsilon_0 = 1).
+    \end{equation}
+    The charge of an electron then has magnitude
+    \begin{equation}
+        e = \sqrt{4\pi \alpha}.
+    \end{equation}
+    Since \(\alpha\) is dimensionless its value is the same in any system of units, and is approximately \(1/137\), so
+    \begin{equation}
+        e \approx \num{0.303}.
+    \end{equation}
+    
+    We use the Minkowski metric with the \(({+}{-}{-}{-})\) convention:
+    \begin{equation}
+        \eta_{\mu\nu} = \eta^{\mu\nu} = 
+        \begin{pmatrix}
+            1 & 0 & 0 & 0\\
+            0 & -1 & 0 & 0\\
+            0 & 0 & -1 & 0\\
+            0 & 0 & 0 & -1
+        \end{pmatrix}
+        .
+    \end{equation}
+    
+    \begin{openquestion}{}{}
+        Particle physics is full of many unanswered questions.
+        Relevant questions will be flagged in a box like this one.
+        These are typically beyond the scope of the course, and are mentioned simply for interest.
+    \end{openquestion}
+        
     \chapter{Introduction}
     \section{The Standard Model}
     The \defineindex{standard model of particle physics}, or the standard model for short, is our best model of the fundamental constituents of matter and fundamental forces.
@@ -203,6 +288,11 @@ noabbrev
     Most antiparticles are denoted as the same symbol with a bar, so \APu{} is an antiup quark.
     If the symbol usually has a sign, such as \Pe, or \PWp, then the antiparticle is denoted with the opposite sign, so \APe\index{e+@\APe|see{positron}}, or \PWm.
     
+    \begin{openquestion}{}{}
+        It is not known if the neutrinos are their own antiparticles or not.
+        Fermions which are their own antiparticles are called Majorana fermions, whereas fermions which which aren't are called Dirac fermions.
+    \end{openquestion}
+    
     \section{Composite Particles}
     As well as the fundamental particles, of which there are 18 particles, there are \emph{a lot} of \define{composite particles}\index{composite particle}, particles formed by combining quarks and/or antiquarks into a bound state.
     Note that there aren't composite leptons because the strong force is required to form bound states.
@@ -239,7 +329,6 @@ noabbrev
         \feynmandiagram [horizontal=i to o] {
             i -- [fermion] o
         };
-        .
     \end{equation}
     Antifermions are then depicted as fermions travelling back in time, so an antifermion current looks like
     \begin{equation}
@@ -247,7 +336,6 @@ noabbrev
         \feynmandiagram [horizontal=i to o] {
             i -- [anti fermion] o
         };
-        .
     \end{equation}
     Spin 1 bosons, apart from gluons, so photons, \PZ{} bosons, and \PWpm{} bosons, are depicted with a wavy line:
     \begin{equation}
@@ -255,7 +343,6 @@ noabbrev
         \feynmandiagram [horizontal=i to o] {
             i -- [boson] o
         };
-        .
     \end{equation}
     Gluons are depicted with a curly line,
     \begin{equation}
@@ -263,7 +350,6 @@ noabbrev
         \feynmandiagram [horizontal=i to o] {
             i -- [gluon] o
         };
-        .
     \end{equation}
     The Higgs boson is depicted with a dashed line,
     \begin{equation}
@@ -271,7 +357,6 @@ noabbrev
         \feynmandiagram [horizontal=i to o] {
             i -- [scalar] o
         };
-        .
     \end{equation}
     
     It's fine not to draw an arrow for bosons as either the particle is its own antiparticle, in which case the direction does not matter, or in the case of the \PWpm{} bosons or gluons the antiparticle is of the same type, so changing direction corresponds to changing the charge (electric charge for \PWpm, and colour charge for gluons).
@@ -291,7 +376,6 @@ noabbrev
             v -- [boson] o1,
             v -- [fermion] o2
         };
-        .
     \end{equation}
     
     If we want to specify particular particles we can do so by labelling the lines:
@@ -309,7 +393,6 @@ noabbrev
             v -- [gluon] o1 [particle=\Pg],
             v -- [fermion] o2 [particle=\Ps]
         };
-        .
     \end{equation}
     These represent the processes \(\Pmu \to \Pmu\Pphoton\) and \(\Ps \to \Ps\Pg\).
     
@@ -341,7 +424,6 @@ noabbrev
             i2 [particle=\APs] -- [anti fermion] v,
             v -- [gluon] o [particle=\Pg] 
         };
-        .
     \end{equation}
     The only thing that changes here is the interpretation, these processes now represent \(\Pg \to \Ps\APs\) and \(\Ps\APs \to \Pg\).
     
@@ -354,7 +436,7 @@ noabbrev
         \tikzsetnextfilename{fd-vertex-electromagnetic-vertex}
         \begin{tikzpicture}[baseline=(i)]
             \begin{feynman}[horizontal=i to v, inline=(i)]
-                \diagram{
+                \diagram[small]{
                     i -- [fermion] v,
                     v -- [boson] o1 [particle=\Pphoton],
                     v -- [fermion] o2,
@@ -372,7 +454,7 @@ noabbrev
         \tikzsetnextfilename{fd-vertex-strong-vertex}
         \begin{tikzpicture}[baseline=(i)]
             \begin{feynman}[horizontal=i to v, inline=(i)]
-                \diagram{
+                \diagram[small]{
                     i [particle=\Pq] -- [fermion] v,
                     v -- [gluon] o1 [particle=\Pg],
                     v -- [fermion] o2 [particle=\Pq],
@@ -390,7 +472,7 @@ noabbrev
         \tikzsetnextfilename{fd-vertex-weak-neutral-vertex}
         \begin{tikzpicture}[baseline=(i)]
             \begin{feynman}[horizontal=i to v, inline=(i)]
-                \diagram{
+                \diagram[small]{
                     i -- [fermion] v,
                     v -- [boson] o1 [particle=\PZ],
                     v -- [fermion] o2,
@@ -407,72 +489,392 @@ noabbrev
     \begin{equation}
         \tikzsetnextfilename{fd-vertex-weak-charged-vertex}
         \begin{tikzpicture}[baseline=(i)]
-            \begin{feynman}[horizontal=i to v, inline=(i)]
-                \diagram{
-                    i [particle=\(\symrm{f}\)] -- [fermion] v,
-                    v -- [boson] o1 [particle=\PWpm],
-                    v -- [fermion] o2 [particle=\(\symrm{f}'\)],
+            \begin{feynman}[horizontal=i to v]
+                \diagram[small]{
+                    i [particle=\(\Pf\)] -- [fermion] v,
+                    v -- [boson] o1 [particle=\PW],
+                    v -- [fermion] o2 [particle=\(\Pf'\)],
                 };
-                \node [right] at (v) {\(Q\)};
+                \node [right] at (v) {\(g_{\PW}\)};
             \end{feynman}
         \end{tikzpicture}
     \end{equation}
     
+    \subsubsection{Higgs}
+    A Higgs vertex has a Higgs boson and any fermion, except, at least for the purposes of this course, neutrinos.
+    If the fermion has mass \(m_{\Pf}\) then the coupling constant is \(m_{\Pf}/v\), where \(v\) is a constant of value \(v \approx \qty{246}{\giga\electronvolt}\).
+    There will be no fermion flavour change.
+    \begin{equation}
+        \tikzsetnextfilename{fd-vertex-higgs}
+        \begin{tikzpicture}[baseline=(i)]
+            \begin{feynman}[horizontal=i to v]
+                \diagram[small]{
+                    i -- [fermion] v,
+                    v -- [scalar] o1,
+                    v -- [fermion] o2,
+                };
+                \node [right] at (v) {\(m_{\Pf}/v\)};
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    
+    \begin{openquestion}{}{}
+        It is not known whether neutrinos couple to the Higgs field, or get their mass through another mechanism.
+        Since neutrino masses are incredibly small no coupling has ever been observed, but cannot be ruled out.
+    \end{openquestion}
+    
+    \subsection{Coupling Constants}
+    The coupling constants come with related quantities, which are also referred to as the coupling constants, given by
+    \begin{equation}
+        \alpha = \frac{g^2}{4\pi},
+    \end{equation}
+    where \(g\) is the relevant coupling constant:
+    \begin{itemize}
+        \item \(g_{\EM} = e\) for an electromagnetic vertex, where \(e\) is the charge of the fermion involved in the interaction, not the charge of an electron;
+        \item \(\strongCoupling\) for a strong vertex;
+        \item \(\zCoupling\) for a neutral current weak vertex; and
+        \item \(\wCoupling\) for a charged current weak vertex.
+    \end{itemize}
+    
+    The value of \(\alpha\) is a measure of how likely a particular vertex is to occur.
+    The strong force is, unsurprisingly, the strongest by which we mean that, assuming it's an allowed interaction, a strong vertex is more likely to occur than any other sort.
+    This is expressed through the (relatively) high value of \(\alpha\) for the strong force:
+    \begin{equation}
+        \alpha_{\strongForce} \sim 1,
+    \end{equation}
+    as an order of magnitude estimate.
+    This causes problems when we try to do perturbation theory with the strong force, as it means very often things don't converge.
+    
+    Next up in the list is the weak force, which has
+    \begin{equation}
+        \alpha_{\PW} \approx \alpha_{\PZ} \sim \frac{1}{40}.
+    \end{equation}
+    Last, is electromagnetism, with
+    \begin{equation}
+        \alpha_{\EM} = \alpha \approx \frac{1}{137}.
+    \end{equation}
+    
+    The actual likelihood of any particular interaction depends on much more than the value of the coupling constant.
+    In reality we have to consider all possible ways the interaction can occur, compute the sum of the amplitudes for these processes, and square it to get a probability.
+    This means that things like the small range of the strong and weak interactions means that they are actually far less relevant on a human scale than electromagnetism and gravity.
+    However, on the scale of fundamental particles, and small composite particles, the strong and weak interactions cannot be ignored.
+    
+    Notice that we aren't giving precise values for the coupling constants.
+    This is because, despite the name, these aren't really constants.
+    Instead their values depend on the energy scale at which the interaction occurs.
+    This is called running of the coupling constant, and we'll see more detail later.
+    
+    \subsection{Boson Vertices}
+    As well as vertices involving a fermion we can vertices with bosons.
+    These are more varied, and we'll meet examples throughout the course.
+    For now, a few examples of valid boson vertices are shown in \cref{fig:boson verticies}.
+    
+    \begin{figure}[p]
+        \tikzsetnextfilename{fd-boson-vertex-1}
+        \subcaptionbox{Two \PW{} bosons and a \PZ{} boson or a photon.}[0.31\textwidth]{
+            \feynmandiagram [inline=(i)] {
+                i -- [boson] v,
+                v -- [boson] o1,
+                v -- [boson] o2
+            };
+        }
+        \tikzsetnextfilename{fd-boson-vertex-2}
+        \subcaptionbox{Either two \PW{} bosons or two \PZ{} bosons and a Higgs boson.}[0.31\textwidth]{
+            \feynmandiagram [inline=(i)] {
+                i -- [boson] v,
+                v -- [boson] o1,
+                v -- [scalar] o2
+            };
+        }
+        \tikzsetnextfilename{fd-boson-vertex-3}
+        \subcaptionbox{Three Higgs bosons.}[0.31\textwidth]{
+            \feynmandiagram [inline=(i)] {
+                i -- [scalar] v,
+                v -- [scalar] o1,
+                v -- [scalar] o2
+            };
+        }
+        \tikzsetnextfilename{fd-boson-vertex-4}
+        \subcaptionbox{Two \PW{} bosons and either two \PW{} bosons, two \PZ{} bosons, a \PZ{} boson and a photon, or two photons.}[0.31\textwidth]{
+            \feynmandiagram [inline=(v)] {
+                i1 -- [boson] v,
+                i2 -- [boson] v,
+                v -- [boson] o1,
+                v -- [boson] o2,
+            };
+        }
+        \tikzsetnextfilename{fd-boson-vertex-5}
+        \subcaptionbox{Four Higgs bosons.}[0.31\textwidth]{
+            \feynmandiagram [inline=(v)] {
+                i1 -- [scalar] v,
+                i2 -- [scalar] v,
+                v -- [scalar] o1,
+                v -- [scalar] o2,
+            };
+        }
+        \tikzsetnextfilename{fd-boson-vertex-6}
+        \subcaptionbox{Two \PW{} bosons or two \PZ{} bosons and two Higgs bosons.}[0.31\textwidth]{
+            \feynmandiagram [inline=(v)] {
+                i1 -- [boson] v,
+                i2 -- [boson] v,
+                v -- [scalar] o1,
+                v -- [scalar] o2,
+            };
+        }
+        \tikzsetnextfilename{fd-boson-vertex-7}
+        \subcaptionbox{Three gluons.}[0.31\textwidth]{
+            \feynmandiagram [inline=(i)] {
+                i -- [gluon] v,
+                v -- [gluon] o1,
+                v -- [gluon] o2
+            };
+        }
+        \tikzsetnextfilename{fd-boson-vertex-8}
+        \subcaptionbox{Four gluons.}[0.31\textwidth]{
+            \feynmandiagram [inline=(v)] {
+                i1 -- [gluon] v,
+                i2 -- [gluon] v,
+                v -- [gluon] o1,
+                v -- [gluon] o2,
+            };
+        }
+        \caption{Some allowed boson vertices.}
+        \label{fig:boson verticies}
+    \end{figure}
+    
+    \section{Feynman Diagrams}
+    A complete Feynman diagram is then a combination of two or more vertices such that all conservation laws are obeyed.
+    Exactly what the conservation laws are we'll get to later, but the basic conserved properties are charge, lepton number, quark number, and of course momentum and energy.
+    
+    We can consider three broad classes of interactions, first, we have \defineindex{scattering}, where two particles come in, interact, then go their separate ways.
+    A simple scattering diagram is
+    \begin{equation}
+        \tikzsetnextfilename{fd-scattering}
+        \feynmandiagram [inline=(v1), vertical=v1 to v2] {
+            i1 -- [fermion] v1,
+            i2 -- [fermion] v2,
+            v1 -- [boson] v2,
+            v1 -- [fermion] o1,
+            v2 -- [fermion] o2
+        };
+    \end{equation}
+    
+    Another possibility is \defineindex{annihilation}, where two particles come in, annihilate into a boson, and then the boson produced decays into another two particles.
+    A simple annihilation diagram is
+    \begin{equation}
+        \tikzsetnextfilename{fd-annihilation}
+        \feynmandiagram [inline=(v1), horizontal=v1 to v2] {
+            i1 -- [fermion] v1,
+            i2 -- [fermion] v2,
+            v1 -- [boson] v2,
+            v1 -- [fermion] o1,
+            v2 -- [fermion] o2
+        };
+    \end{equation}
+    
+    The third possibility is \defineindex{decay}, where a single particle comes in, decays into a fermion and a boson, and the boson then decays into another two fermions.
+    A simple decay diagram is
+    \begin{equation}
+        \tikzsetnextfilename{fd-decay}
+        \feynmandiagram [inline=(v1), horizontal=i to v1, layered layout] {
+            i -- [fermion] v1,
+            v1 -- [fermion] o1,
+            v1 -- [boson] v2,
+            v2 -- [fermion] o2,
+            v2 -- [anti fermion] o3
+        };
+    \end{equation}
+    
+    It is important to note that Feynman diagrams are \emph{not} physical.
+    We set up an experiment with some ingoing particles, and measure the outgoing particles.
+    What happens between is a black box process.
+    The actual process should be viewed more like the diagram
+    \begin{equation}
+        \rotatebox{45}{
+            \feynmandiagram [inline=(v)] {
+                i1 -- [fermion] v [blob] -- [fermion] o1,
+                i2 -- [fermion] v -- [fermion] o2
+            };
+        }
+    \end{equation}
+    where the blob in the middle is all possible intermediate processes, all occurring at once.
+    After all, from the perspective of quantum field theory a Feynman diagram is just a single term in an infinite expansion summing over all possible processes.
+    
+    \chapter{What do we Measure}
+    \section{Types of Interactions}
+    There are three different things that can occur and we can measure to get information about the particles and forces involved.
+    The first is particles can decay.
+    That is, we start with some particle, \(A\), and end up with particles \(1, 2, \dotsc, n\),
+    \begin{equation}
+        A \to 1 + 2 + \dotsb + n.
+    \end{equation}
+    We measure the decay rate, that is the rate at which a given decay from one particle into some other set of other particles, occurs, and compare this to theoretical predictions.
+    Often we compare ratios of decay rates to get rid of constant factors and make comparison easier.
+    
+    The second thing that can occur is scattering.
+    Here two particles, say \(A\) and \(B\), interact and produce particles \(1, 2, \dotsc, n\),
+    \begin{equation}
+        A + B \to 1 + 2 + \dotsb + n.
+    \end{equation}
+    Note that its possible that particles \(1, 2, \dotsc, n\) contain particles that are the same as the incoming particles, \(A\) and \(B\).
+    However, we shouldn't think of these as the same particles, since from a quantum field theory perspective all scattering occurs by annihilating all particles, and then creating new particles.
+    That said, one of the most common scattering occurrences is \(A + B \to A + B\), which is essentially the two particles bouncing off each other.
+    
+    The third thing that can occur is bound states, such as \defineindex{positronium} (\(\Pe\APe\)), \defineindex{charmonium} (\(\Pc\APc\)), or \defineindex{bottomonium} (\(\Pb\APb\)).
+    Measuring the properties of these, such as their lifetimes, can also tell us a lot about the particles and the forces binding them.
+    
+    More generally we measure the transition rate for the system to go from an initial quantum state to some other final quantum state.
+    
+    \section{Feynman Diagrams vs.\texorpdfstring{\@}{} the Lab Picture}
+    Suppose we are doing a scattering experiment scattering electrons off quarks, the quarks in term being wrapped up in a proton, since we can't get unbound quarks.
+    Consider a particular scattering event in which no new particles are produced, so \(\Pe\Pq \to \Pe\Pq\).
+    A Feynman diagram for this is
+    \begin{equation}
+        \tikzsetnextfilename{fd-feynman-diagram-picture}
+        \feynmandiagram [inline=(v1), vertical=v1 to v2] {
+            i1 [particle=1 \Pe] -- [fermion] v1,
+            i2 [particle=2 \Pq]-- [fermion] v2,
+            v1 -- [boson] v2,
+            v1 -- [fermion] o1 [particle=\Pe{} 3],
+            v2 -- [fermion] o2 [particle=\Pq{} 4],
+        };
+    \end{equation}
+    Here we label the particles, with 1 and 2 being the incoming particles, and 3 and 4 being the outgoing particles.
+    
+    The scattering experiment could be of two types, either two beams, or a fixed target.
+    However these are really the same but related by a change of frame.
+    So, for simplicity, we assume two beams.
+    We also assume that, like most real scattering experiments, the two beams are head on.
+    Then the interaction looks something like this:
+    \begin{equation}
+        \tikzsetnextfilename{scattering-beams}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+                \draw[highlight, very thick, text=black] (-3, 0) node [left] {1} .. controls (0, 0) .. (3, 2) node [above right] {3};
+                \draw[highlight, very thick, text=black] (3, 0) node [right] {2} .. controls (0, 0) .. (-3, -2) node [below left] {4};
+        \end{tikzpicture}
+    \end{equation}
+    Here the labels 1 and 2 refer to the incoming electron and quark, and the labels 3 and 4 are the outgoing electron and quark.
+    
+    Momentum is conserved in this interaction.
+    This is a relativistic statement, so we mean that the four-momentum is conserved.
+    Let \(p_1\) be the four-momentum of the incoming electron, \(p_2\) the four-momentum of the incoming quark, \(p_3\) the four-momentum of the outgoing electron, and \(p_4\) the four momentum of the outgoing quark.
+    Then we have
+    \begin{equation}
+        p_1 + p_2 = p_3 + p_4.
+    \end{equation}
+    
+    We will generally be interested in measuring/predicting the rate of the process, say \(1 + 2 \to 3 + 4\), that is, of all scatterings with particles \(1\) and \(2\) incoming with four-momenta \(p_1\) and \(p_2\) how many result in particles 3 and 4 with four-momenta \(p_3\) and \(p_4\).
+    
+    In this experiment the initial state is something that we control, we choose the particles to scatter and set their momenta based on how we create the beams.
+    The final state is then what we measure.
+    
+    \section{Mandelstam Variables}
+    Consider the following three processes:
+    \begin{equation}
+        \tikzsetnextfilename{fd-mandelstam-s-channel}
+        \feynmandiagram[small, horizontal=v1 to v2, baseline=(current bounding box)]{
+            i1 [particle=2] -- [fermion] v1,
+            i2 [particle=1] -- [anti fermion] v1,
+            v1 -- [boson] v2,
+            v2 -- [anti fermion] o1 [particle=3],
+            v2 -- [fermion] o2 [particle=4]
+        };
+        \qquad
+        \tikzsetnextfilename{fd-mandelstam-t-channel}
+        \feynmandiagram[small, vertical=v1 to v2, baseline=(current bounding box)]{
+            i1 [particle=1] -- [fermion] v1,
+            i2 [particle=3] -- [anti fermion] v1,
+            v1 -- [boson] v2,
+            v2 -- [anti fermion] o1 [particle=2],
+            v2 -- [fermion] o2 [particle=4]
+        };
+        \qquad
+        \tikzsetnextfilename{fd-mandelstam-u-channel}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \begin{feynman}
+                \diagram [vertical=a to b, small] {
+                    i1 [particle=1] -- [fermion] a -- [draw=none] f1 [particle=3],
+                    a -- [boson] b,
+                    i2 [particle=2] -- [fermion] b -- [draw=none] f2 [particle=4],
+                };
+                \diagram* [small] {
+                    (a) -- [fermion] (f2),
+                    (b) -- [fermion] (f1),
+                };
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    These are called the \define{\(\symbf{s}\)-channel}\index{s-channel@\(s\)-channel}, \define{\(\symbf{t}\)-channel}\index{t-channel@\(t\)-channel}, and \define{\(\symbf{u}\)-channel}\index{u-channel@\(u\)-channel} processes.
+    For each one we can define a Lorentz invariant from the four momenta of the particles:
+    \begin{equation}
+        s \coloneqq (p_1 + p_2)^2, \qquad t \coloneqq (p_1 - p_3)^2, \qqand u \coloneqq (p_1 - p_4)^2.
+    \end{equation}
+    These are called the \defineindex{Mandelstam variables}
+    
+    The most useful of these quantities is \(s\).
+    Expanding it out we get
+    \begin{equation}
+        s = p_1^2 + p_2^2 + 2 p_1 \cdot p_2.
+    \end{equation}
+    Now, if we work in the rest frame of a particle with mass \(m\) its four momentum is simply \(p = (E, \vv{0})\), and \(E^2 = m^2 + \vv{0}^2\), so \(E = m\).
+    Hence \(p = (m, \vv{0})\) and so \(p^2 = m^2\).
+    This is true in the rest frame, but \(p^2\) is Lorentz invariant so it must be true in any frame.
+    Thus, we have
+    \begin{equation}
+        s = m_1^2 + m_2^2 + 2p_1 \cdot p_2,
+    \end{equation}
+    where \(m_1\) and \(m_2\) are the masses of particles 1 and 2.
+    
+    In the lab frame the four-momentum of each particle is \(p = (E, \vv{p})\), where \(E\) is the energy and \(\vv{p}\) the three-momentum.
+    In our set up the two beams are head on, so the angle between the incoming particles is \ang{180}.
+    This is one of the reasons \(s\) is more useful than \(t\) or \(v\), these involve \(p_3\) or \(p_4\), and we can't control the direction of the outgoing particles.
+    Using this we have
+    \begin{equation}
+        p_1 \cdot p_2 = E_1E_2 - \vv{p_1}\cdot \vv{p_2} = E_1E_2 - \abs{\vv{p_1}}\abs{\vv{p_2}}\sin(\ang{180}) = E_1E_2 + \abs{\vv{p_1}}\abs{\vv{p_2}}.
+    \end{equation}
+    
+    Now, we know that \(E^2 = m^2 + \abs{\vv{p}}^2\).
+    Suppose we have very energetic particles, so that \(m \ll \abs{\vv{p}}\), then \(E \approx \abs{\vv{p}}\).
+    Hence, we have
+    \begin{equation}
+        p_1 \cdot p_2 = E_1E_2 + \abs{\vv{p_1}}\abs{\vv{p_2}} \approx E_1 E_2 + E_1E_2 = 2E_1E_2.
+    \end{equation}
+    Further, assuming that \(m_1 \ll E_1\) and \(m_2 \ll E_2\) we have
+    \begin{equation}
+        s = m_1^2 + m_2^2 + 2p_1 \cdot p_2 \approx m_1^2 + m_2^2 + 4E_1E_2 \approx 4E_1E_2.
+    \end{equation}
+    
+    If both beams have the same energy, \(E\), then \(s = 4E^2\), and so \(\sqrt{s} = 2E\), which is the total energy of the two particles scattering.
+    This means that \(\sqrt{s}\) has a nice interpretation as the energy of the collision.
+    
+    \section{Fermi's Golden Rule}
+    We are interested in the transition rate for going from some state \(\ket{i}\) to some state \(\ket{f}\).
+    We suppose that the system evolves under the Hamiltonian
+    \begin{equation}
+        \operator{H} = \operator{H}_0 + \operator{H}'(x),
+    \end{equation}
+    where \(\operator{H}_0\) is a time independent Hamiltonian for which we can solve the Schrödinger equation and \(\operator{H}'(x)\) is the interaction Hamiltonian, which induces the transitions between states.
+    The interaction is generally position dependent.
+    The state of the system then evolves according to the Schrödinger equation:
+    \begin{equation}
+        i \diffp{}{t}\ket{\psi, t} = \operator{H}\ket{\psi, t} = [\operator{H}_0 + \operator{H}'(x)]\ket{\psi, t}.
+    \end{equation}
+    
+    Fermi's golden rule says that the transition rate from state \(\ket{i}\) to state \(\ket{f}\) is given by
+    \begin{equation}
+        \Gamma_{fi} = 2\pi \abs{T_{fi}}^2 \rho(E_i)
+    \end{equation}
+    where \(\Gamma_{fi}\) is the transition rate, \(T_{fi}\) is the transition matrix, and \(\rho(E_i)\) is the density of states.
+    The full derivation is in \cref{app:fermi's golden rule}.
+    
+    
+    
+    
      %   Appdendix
     \appendixpage
     \begin{appendices}
-        \chapter{List of Particles}
-        \section{Fundamental Particles}
-        \subsection{Fermions}
-        \subsubsection{Leptons}
-        \begin{center}
-            \begin{tabular}{lcrSl}\toprule
-                Particle & Symbol & Charge & Mass & \\ \hline
-                Electron & \Pe & \(-1\) & 511.0 & \si{\kilo\electronvolt} \\
-                Muon & \Pmu & \(-1\) & 105.6 & \si{\mega\electronvolt} \\
-                Muon & \Ptau & \(-1\) & 1776.9 & \si{\mega\electronvolt} \\
-                Electron Neutrino & \Pnue & \(0\) & < 0.120 & \si{\electronvolt} \\
-                Muon Neutrino & \Pnumu & \(0\) & < 0.120 & \si{\electronvolt} \\
-                Tau Neutrino & \Pnutau & \(0\) & < 0.120 & \si{\electronvolt} \\
-                \bottomrule
-            \end{tabular}
-        \end{center}
-    
-        \subsubsection{Quarks}
-        \begin{center}
-            \begin{tabular}{lcrSl}\toprule
-                Particle & Symbol & Charge & Mass & \\ \hline
-                Up Quark & \Pu & \(+2/3\) & 2.3 & \si{\mega\electronvolt} \\
-                Down Quark & \Pd & \(-1/3\) & 4.8 & \si{\mega\electronvolt} \\
-                Charm Quark & \Pc & \(+2/3\) & 1.275 & \si{\giga\electronvolt} \\
-                Strange Quark & \Ps & \(-1/3\) & 95 & \si{\mega\electronvolt} \\
-                Top Quark & \Pt & \(+2/3\) & 173.2 & \si{\giga\electronvolt} \\
-                Bottom Quark & \Pb & \(-1/3\) & 4.18 & \si{\giga\electronvolt} \\
-                \bottomrule
-            \end{tabular}
-        \end{center}
-        
-        \subsubsection{Vector Bosons}
-        \begin{center}
-            \begin{tabular}{lcrSl}\toprule
-                Particle & Symbol & Charge & Mass & \\ \hline
-                Photon & \Pphoton & \(0\) & 0 & \\
-                Gluon & \Pg & \(0\) & 4.8 & \\
-                \PZ{} boson & \PZ & \(0\) & 91.19 & \si{\giga\electronvolt} \\
-                \PWpm{} boson & \PWpm & \(\pm 1\) & 80.38 & \si{\giga\electronvolt} \\
-                \bottomrule
-            \end{tabular}
-        \end{center}
-        Note that recent measurements place the mass of the \PWpm{} boson at the slightly higher value of \qty{80.43}{\giga\electronvolt}.
-        
-        \subsubsection{Scalar Bosons}
-        \begin{center}
-            \begin{tabular}{lcrSl}\toprule
-                Particle & Symbol & Charge & Mass & \\ \hline
-                Higgs Boson & \PH & \(0\) & 125.25 & \si{\giga\electronvolt} \\
-                \bottomrule
-            \end{tabular}
-        \end{center}
+        \include{parts/appParticleData}
+        \include{parts/appFermiGoldenRule}
     \end{appendices}
     
     \backmatter
