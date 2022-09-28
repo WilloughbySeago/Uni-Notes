@@ -16,7 +16,7 @@
 \tikzexternalize[prefix=tikz-external/]
 % Other libraries
 
-%\usepackage[compat=1.1.0]{tikz-feynman}
+\usepackage[compat=1.1.0]{tikz-feynman}
 
 % References, should be last things loaded
 \usepackage[pdfauthor={Willoughby Seago},pdftitle={Quantum Field Theory},pdfkeywords={quantum field theory, QFT, quantisation, perturbation theory, Feynman diagrams, QED, QCD, standard model, path integral, renormalisation},pdfsubject={Quantum Field Theory}]{hyperref}  % Should be loaded second last (cleveref last)
@@ -87,6 +87,8 @@ noabbrev
 \newcommand{\EM}{\text{em}}
 \newcommand{\interaction}{\symrm{I}}
 \newcommand{\probability}{\symbb{P}}
+\newcommand{\heaviside}{\theta}
+\DeclareMathOperator{\timeOrdering}{T}
 \DeclarePairedDelimiterX{\anticommutator}[2]{\{}{\}}{#1, #2}
 \DeclareMathOperator{\tr}{tr}
 
@@ -202,6 +204,13 @@ noabbrev
     \begin{equation}
         a^2 = a \cdot a = a^0 a^0 - \vv{a} \cdot \vv{a} = (a^0)^2 - \vv{a}^2 .
     \end{equation}
+    
+    Four vectors transform under Lorentz transformations.
+    The broadest class of such transformations is the \defineindex{Lorentz group}, \(\orthogonal(1, 3)\).
+    This includes all boosts and rotations, including those that invert the directions of space or time.
+    In this course we only consider \define{proper orthochronous Lorentz transformations}\index{proper orthochronous Lorentz transformation}, that is Lorentz transformations preserving the orientation of space (proper) and time (orthochronous).
+    These form the \defineindex{proper orthochronous Lorentz group} \(\specialOrthogonal^+(1, 3)\).
+    From now on if we say Lorentz transformation we mean \emph{proper orthochronous} Lorentz transformation.
     
     \subsection{Specific-Four Vectors}
     The position is a four-vector, \(x^\mu = (t, \vv{x})\), where \(t\) is the time coordinate and \(\vv{x}\) is the spatial position.
@@ -853,6 +862,46 @@ noabbrev
         \dot{Q} = \int \dl{^3\vv{x}} \, \partial_0 J^0(x) = -\int \dl{^3\vv{x}} \, \partial_i J^i(x) = 0
     \end{equation}
     where in the last step we've used the divergence theorem to rewrite the last term as a surface integral, then take this surface to be at infinity, and made the usual assumption that fields vanish sufficiently quickly at infinity.
+    
+    \begin{exm}{Probability Current}{}
+        Consider the Lagrangian
+        \begin{equation}
+            \lagrangianDensity = i\psi^* \partial_t \psi - \frac{1}{2m} (\grad\psi^*) \cdot (\grad\psi) - V(\vv{x}, t)\psi^* \psi.
+        \end{equation}
+        If we treat \(\psi\) and \(\psi^*\) as separate fields then varying one of them gives the Schrödinger equation.
+        This Lagrangian is invariant under the transformation
+        \begin{equation}
+            \psi \to \e^{i\alpha}\psi, \qand \psi^* \to \e^{-i\alpha}\psi^*
+        \end{equation}
+        where \(\alpha\) is a constant.
+        Linearising we get the transformation
+        \begin{equation}
+            \psi \to \psi(1 + i\alpha), \qand \psi^* \to \psi^*(1 - i\alpha).
+        \end{equation}
+        Since we have two fields, \(\psi\) and \(\psi^*\), the conserved current is a sum over field:
+        \begin{equation}
+            J^\mu = \diffp{\lagrangianDensity}{(\partial_\mu \psi)} \delta \psi + \diffp{\lagrangianDensity}{(\partial_\mu \psi^*)} \delta \psi^*.
+        \end{equation}
+        Computing the derivatives we have
+        \begin{align}
+            \diffp{\lagrangianDensity}{(\partial_t \psi)} &= i\psi^*, \qquad & \diffp{\lagrangianDensity}{(\partial_i \psi)} = -\frac{1}{2m}\partial^i \psi^*,\\
+            \diffp{\lagrangianDensity}{(\partial_t \psi^*)} &= 0, \qquad & \diffp{\lagrangianDensity}{(\partial_i \psi^*)} = -\frac{1}{2m}\partial^i \psi.
+        \end{align}
+        Hence, using the variations
+        \begin{equation}
+            \delta \psi = i\alpha \psi, \qand \delta \psi^* = -i\alpha \psi^*
+        \end{equation}
+        we have the time component of the conserved current:
+        \begin{equation}
+            J^0 = \rho = -\alpha \psi^*\psi,
+        \end{equation}
+        and the position components:
+        \begin{align}
+            J^i &= \frac{i\alpha}{2m}(\psi^* \partial^i \psi - \psi \partial^i \psi^*)\\
+            \vv{J} &= \frac{i\alpha}{2m}(\psi \grad \psi^* - \psi^* \grad \psi).
+        \end{align}
+        We can then identify \(J^\mu\) as, up to a constant, the conserved probability current of \cref{sec:continuity equation}.
+    \end{exm}
     
     It can be shown that the Euler--Lagrange equations are invariant under the addition of a four-divergence, 
     \begin{equation}
@@ -1555,9 +1604,9 @@ noabbrev
     \begin{equation}
         \int \dl{x} \, \e^{-ip \cdot x} = 2\pi \delta(p).
     \end{equation}
-    We also want to restrict ourselves to positive energy solutions, so \(p_0 > 0\), we can enforce this with a factor of \(\theta(p_0)\), where \(\theta\)\index{\(\theta\), Heaviside step function} is the \defineindex{Heaviside step function} defined by
+    We also want to restrict ourselves to positive energy solutions, so \(p_0 > 0\), we can enforce this with a factor of \(\heaviside(p_0)\), where \(\heaviside\)\index{\(\heaviside\), Heaviside step function} is the \defineindex{Heaviside step function} defined by
     \begin{equation}
-        \theta(u) = 
+        \heaviside(u) = 
         \begin{cases}
             1 & u > 0,\\
             1/2 & u = 0,\\
@@ -1567,7 +1616,7 @@ noabbrev
     
     The \defineindex{mode expansion} of \(\varphi\) is then
     \begin{equation}
-        \varphi(x) = \int \frac{\dl{^4p}}{(2\pi)^4} 2\pi \delta(p^2 - m^2) \theta(p_0) [ a(\vv{p}) \e^{-ip\cdot x} + a^\hermit(\vv{p}) \e^{i p \cdot x} ].
+        \varphi(x) = \int \frac{\dl{^4p}}{(2\pi)^4} 2\pi \delta(p^2 - m^2) \heaviside(p_0) [ a(\vv{p}) \e^{-ip\cdot x} + a^\hermit(\vv{p}) \e^{i p \cdot x} ].
     \end{equation}
     Here \(a(\vv{p})\) and \(a^\hermit(\vv{p})\) are Fourier coefficients, we'll see later that they are the quantum field theory analogues of the creation and annihilation operators for the harmonic oscillator.
     They depend only on \(\vv{p}\), rather than the four-vector \(p\), since we can take \(\delta(p^2 - m^2)\) as fixing the value of \(p_0\).
@@ -1589,7 +1638,7 @@ noabbrev
     \end{equation}
     so, as distributions, we have
     \begin{equation}
-        \delta(p^2 - m^2)\theta(p_0) = \frac{1}{2\omega(\vv{p})} \delta(p^0 - \omega(\vv{p})).
+        \delta(p^2 - m^2)\heaviside(p_0) = \frac{1}{2\omega(\vv{p})} \delta(p^0 - \omega(\vv{p})).
     \end{equation}
     
     This lets us write \(\varphi(x)\) as
@@ -1603,18 +1652,18 @@ noabbrev
     
     At this point we make some remarks on this expansion:
     \begin{itemize}
-        \item The expansion is manifestly Lorentz invariant, while the presence of \(p^0\) may be concerning orthochronous Lorentz transformations (the only type we consider in this course) don't change the sign of \(p^0\), and so \(\theta(p^0)\) is Lorentz invariant.
+        \item The expansion is manifestly Lorentz invariant, while the presence of \(p^0\) may be concerning orthochronous Lorentz transformations (the only type we consider in this course) don't change the sign of \(p^0\), and so \(\heaviside(p^0)\) is Lorentz invariant.
         \item Since \(p^0 = \omega(\vv{p})\) the energy is always positive, and so is bounded below.
         \item The integral over \(\delta(p^0 - \omega(\vv{p}))\) fixes \(p^0 = \omega(\vv{p})\), and from now on this will be implicit in the integrals, instead of writing \(|_{p_0 = \omega(\vv{p})}\).
         \item The operator \(\varphi(x)\) is in the Heisenberg picture, but the time dependence comes from the exponential factors, both \(a(\vv{p})\) and \(a^\hermit(\vv{p})\) are time independent operators.
         \item We need both the \(a\) and \(a^\hermit\) terms for \(\varphi\) to be Hermitian.
         \item The measure
         \begin{equation}
-            \frac{\dl{^3\vv{p}}}{(2\pi)^3} \frac{1}{2\omega(\vv{p})} = \frac{\dl{^4p}}{(2\pi)^4} 2\pi \delta(p^2 - m^2) \theta(p^0)
+            \frac{\dl{^3\vv{p}}}{(2\pi)^3} \frac{1}{2\omega(\vv{p})} = \frac{\dl{^4p}}{(2\pi)^4} 2\pi \delta(p^2 - m^2) \heaviside(p^0)
         \end{equation}
         is Lorentz invariant, but takes a lot of writing, we will use the shorthand notation
         \begin{equation}
-            \invariantmeasure{p} = \frac{\dl{^3\vv{p}}}{(2\pi)^3} \frac{1}{2\omega(\vv{p})} = \int \frac{\dl{^4p}}{(2\pi)^4} 2\pi \delta(p^2 - m^2) \theta(p^0).
+            \invariantmeasure{p} = \frac{\dl{^3\vv{p}}}{(2\pi)^3} \frac{1}{2\omega(\vv{p})} = \int \frac{\dl{^4p}}{(2\pi)^4} 2\pi \delta(p^2 - m^2) \heaviside(p^0).
         \end{equation}
     \end{itemize}
     
@@ -1992,15 +2041,15 @@ noabbrev
     
     Consider the full form of \(\Delta^+\):
     \begin{equation}
-        i\Delta^+(x) = \int \frac{\dl{^4p}}{(2\pi)^4} 2\pi \delta(p^2 - m^2) \theta(p_0) \e^{-ip\cdot x}.
+        i\Delta^+(x) = \int \frac{\dl{^4p}}{(2\pi)^4} 2\pi \delta(p^2 - m^2) \heaviside(p_0) \e^{-ip\cdot x}.
     \end{equation}
     We can also write \(\Delta^-\) similarly:
     \begin{equation}
-        i\Delta^-(x) = -\int \frac{\dl{^4p}}{(2\pi)^4} 2\pi \delta(p^2 - m^2) \theta(p_0) \e^{ip\cdot x}.
+        i\Delta^-(x) = -\int \frac{\dl{^4p}}{(2\pi)^4} 2\pi \delta(p^2 - m^2) \heaviside(p_0) \e^{ip\cdot x}.
     \end{equation}
     If we make a change of variables, \(p \to -p\), then \(\dl{^4p} \to \dl{^4p}\), and
     \begin{equation}
-        i\Delta^-(x) = -\int \frac{\dl{^4p}}{(2\pi)^4} 2\pi\delta(p^2 - m^2) \theta(-p_0) \e^{-ip\cdot x}.
+        i\Delta^-(x) = -\int \frac{\dl{^4p}}{(2\pi)^4} 2\pi\delta(p^2 - m^2) \heaviside(-p_0) \e^{-ip\cdot x}.
     \end{equation}
     This allows us to write \(\Delta\) as
     \begin{equation}
@@ -2008,7 +2057,7 @@ noabbrev
     \end{equation}
     where
     \begin{equation}
-        \varepsilon(p_0) \coloneqq \theta(p_0) - \theta(-p_0) = 
+        \varepsilon(p_0) \coloneqq \heaviside(p_0) - \heaviside(-p_0) = 
         \begin{cases}
             + 1 & p_0 > 0,\\
             0 & p_0 = 0,\\
@@ -2360,10 +2409,225 @@ noabbrev
     
     Continuing on like this we have a series
     \begin{multline}
-        \ket{\Psi, t} = \ket{i} + (-i) \int \!\! \dl{t_1} \, H_{\interaction}(t_1) \ket{i} + (-i)^2 \int_{-\infty}^{t} \!\! \dl{t_1} \int_{-\infty}^{t_1} \!\! \dl{t_2} H_{\interaction}(t_1) H_{\interaction}(t_2) \ket{i}\\
+        \ket{\Psi, t} = \ket{i} + (-i) \int_{-\infty}^{t} \!\! \dl{t_1} \, H_{\interaction}(t_1) \ket{i} + (-i)^2 \int_{-\infty}^{t} \!\! \dl{t_1} \int_{-\infty}^{t_1} \!\! \dl{t_2} H_{\interaction}(t_1) H_{\interaction}(t_2) \ket{i}\\
         + (-i)^3 \int_{-\infty}^{t} \!\! \dl{t_1} \int_{-\infty}^{t_1} \!\! \dl{t_2} \int_{-\infty}^{t_2} \!\! \dl{t_3} \, H_{\interaction}(t_1) H_{\interaction}(t_2) H_{\interaction}(t_3) \ket{i} + \dotsb.
     \end{multline}
     Each term in this series is \enquote{smaller} than the previous term and so we can truncate at some point once we've achieved the required level of accuracy.
+    
+    Taking \(t\) to infinity we get
+    \begin{multline}
+        \ket{\Psi, +\infty} = \ket{i} + (-i) \int_{-\infty}^{\infty} \!\! \dl{t_1} \, H_{\interaction}(t_1) \ket{i} + (-i)^2 \int_{-\infty}^{t} \!\! \dl{t_1} \int_{-\infty}^{t_1} \!\! \dl{t_2} H_{\interaction}(t_1) H_{\interaction}(t_2) \ket{i}\\
+        + (-i)^3 \int_{-\infty}^{t} \!\! \dl{t_1} \int_{-\infty}^{t_1} \!\! \dl{t_2} \int_{-\infty}^{t_2} \!\! \dl{t_3} \, H_{\interaction}(t_1) H_{\interaction}(t_2) H_{\interaction}(t_3) \ket{i} + \dotsb.
+    \end{multline}
+    Recognising that this has the form of an operator, albeit an infinite series of integrals, acting on the initial state to give the final state we can identify this operator as the \(S\) matrix:
+    \begin{multline}
+        S = \ident + (-i) \int_{-\infty}^{\infty} \!\! \dl{t_1} \, H_{\interaction}(t_1) + (-i)^2 \int_{-\infty}^{t} \!\! \dl{t_1} \int_{-\infty}^{t_1} \!\! \dl{t_2} H_{\interaction}(t_1) H_{\interaction}(t_2)\\
+        + (-i)^3 \int_{-\infty}^{t} \!\! \dl{t_1} \int_{-\infty}^{t_1} \!\! \dl{t_2} \int_{-\infty}^{t_2} \!\! \dl{t_3} \, H_{\interaction}(t_1) H_{\interaction}(t_2) H_{\interaction}(t_3) + \dotsb.
+    \end{multline}
+    Or, more compactly,
+    \begin{equation}
+        S = \sum_{n = 0}^{\infty} (-i)^n \int_{-\infty}^{\infty} \!\! \dl{t_1} \int_{-\infty}^{t_1} \!\! \dl{t_2} \dotsm \int_{-\infty}^{t_{n-1}} \!\! \dl{t_n} \, H_{\interaction}(t_1) H_{\interaction}(t_2) \dotsm H_{\interaction}(t_n).
+    \end{equation}
+    Notice that the times, \(t_1\), \(t_2\), and so on appear in increasing order, that is in the integral \(t_1 < t_2 < \dotsb < t_n\), we can neglect the endpoints of the integration ranges where we may have equality since individual points don't contribute to an integral.
+    
+    To proceed we make use of the following identity:
+    \begin{multline}
+        \int_{t_a}^{t_b} \!\! \dl{t_1} \int_{t_a}^{t_1} \!\! \dl{t_2} \int_{t_a}^{t_2} \dotsm \int_{t_a}^{t_{n-1}} \!\! \dl{t_n} A(t_1)A(t_2) \dotsb A(t_n)\\
+        = \frac{1}{n!} \int_{t_a}^{t_b} \!\! \dl{t_1} \int_{t_a}^{t_b} \dl{t_2} \dotsm \int_{t_a}^{t_b} \!\! \dl{t_n} \timeOrdering[A(t_1)A(t_2) \dotsm A(t_n)].
+    \end{multline}
+    Here \(t_a\) and \(t_b\) are arbitrary initial and final times with \(t_a < t_b\), and \(A\) is an arbitrary operator.
+    The operator \(\timeOrdering\) is called the \defineindex{time ordering}.
+    We take the arguments, which are operators, and order according to evaluation time in order of increasing time from left to right, so that the first operator to act on some state is the operator evaluated at the earliest time.
+    That is, for two operators
+    \begin{align}
+        \timeOrdering[A(t_1), B(t_2)] &\coloneqq
+        \begin{cases}
+            A(t_1)B(t_2) & t_1 > t_2\\
+            B(t_2)A(t_1) & t_2 > t_1
+        \end{cases}
+        \\
+        &\hphantom{:}= \heaviside(t_1 - t_2) A(t_1)B(t_2) + \heaviside(t_2 - t_1) B(t_2)A(t_1).
+    \end{align}
+    This can then be extended to \(n\) operators in the obvious way, although it becomes harder to write in terms of Heaviside step functions.
+    
+    We'll show how this works for the \(n = 2\) case, and then the general case follows by induction.
+    Start with the right hand side of the identity.
+    For \(n = 2\) we have
+    \begin{equation}
+        I = \int_{t_a}^{t_b} \dl{t_1} \int_{t_a}^{t_b} \dl{t_2} \, \timeOrdering[A(t_1)A(t_2)].
+    \end{equation}
+    We can split the integral over \(t_2\) into two parts, one running from \(t_a\) to \(t_1\), and the other from \(t_1\) to \(t_b\):
+    \begin{equation}
+        I = \int_{t_a}^{t_b} \dl{t_1} \left[ \int_{t_a}^{t_1} \dl{t_2} \, \timeOrdering[A(t_1)A(t_2)] + \int_{t_2}^{t_b} \dl{t_2} \, \timeOrdering[A(t_1) A(t_2)] \right].
+    \end{equation}
+    Consider the second term,
+    \begin{equation}
+        \int_{t_a}^{t_b} \dl{t_1} \int_{t_2}^{t_b} \dl{t_2} \, \timeOrdering[A(t_1) A(t_2)].
+    \end{equation}
+    This is a double integral.
+    This corresponds to integrating over the triangle in the plane bounded by \(t_1 = t_2\), \(t_1 = t_a\), and \(t_2 = t_b\).
+    We can integrate over the same region in a different way.
+    Instead integrate along \(t_2\) from \(t_a\) to \(t_1\) and then along \(t_1\) from \(t_a\) to \(t_b\).
+    This corresponds to the integral
+    \begin{equation}
+        \int_{t_a}^{t_b} \dl{t_2} \int_{t_a}^{t_2} \dl{t_1} \, \timeOrdering[A(t_1)A(t_2)].
+    \end{equation}
+    Now, \(t_1\) and \(t_2\) are just integration variables, and the integrand is symmetric in \(t_1\) and \(t_2\), as \(\timeOrdering[A(t_1)A(t_2)] = \timeOrdering[A(t_2)A(t_1)]\), the ordering of operators at different times within a time ordering is not important, since we're going to time order them.
+    We are then free to rename \(t_1\) and \(t_2\), and in particular swap them without changing anything else,
+    \begin{equation}
+        \int_{t_a}^{t_b} \dl{t_1} \int_{t_a}^{t_1} \dl{t_2} \, \timeOrdering[A(t_1) A(t_2)].
+    \end{equation}
+    Combing this back with the first term we get
+    \begin{equation}
+        I = 2 \int_{t_a}^{t_b} \dl{t_1} \int_{t_a}^{t_1} \dl{t_2} \, \timeOrdering[A(t_1)A(t_2)].
+    \end{equation}
+    Noticing with these integration ranges the operators are already time ordered, so we can drop the explicit time ordering, and that \(2 = 2!\) and dividing through by 2 we have proven the identity for \(n = 2\).
+    
+    Now, suppose that the identity holds for \(k\) integrals, and we have \(k + 1\) integrals.
+    We can use the induction hypothesis to swap \(k\) integrals, and then we pairwise swap integrals as above before the unswapped integral has also been swapped.
+    
+    \begin{figure}
+        \tikzsetnextfilename{region-of-integration-for-identity}
+        \begin{tikzpicture}
+            \draw[very thick, <->] (0, 4) node[above] {\(t_2\)} -- (0, 0) -- (4, 0) node[right] {\(t_1\)};
+            \draw[highlight, very thick] (0, 0) -- (4, 4);
+            \coordinate (t1=t2) at (3.53, 3.8);
+            \node[rotate around={45:(t1=t2)}] at (t1=t2) {\(t_1 = t_2\)};
+            \node[below] at (1, 0) {\(t_a\)};
+            \node[left] at (0, 1) {\(t_a\)};
+            \node[below] at (3, 0) {\(t_b\)};
+            \node[left] at (0, 3) {\(t_b\)};
+            \draw[highlight] (1, 0) -- ++ (0, 1);
+            \draw[highlight] (3, 0) -- ++ (0, 3);
+            \draw[highlight] (0, 1) -- ++ (1, 0);
+            \draw[highlight] (0, 3) -- ++ (3, 0);
+            \draw[very thick, highlight, fill=highlight!50] (1, 1) -- (3, 3) -- (1, 3) -- cycle;
+        \end{tikzpicture}
+        \caption{The region of integration for the \(n = 2\) case of the identity.}
+    \end{figure}
+    
+    We can use this identity to write
+    \begin{equation}
+        S = \sum_{n = 0}^{\infty} \frac{(-i)^n}{n!} \int_{-\infty}^{\infty} \!\! \dl{t_1} \int_{-\infty}^{\infty} \!\! \dl{t_2} \dotsm \int_{-\infty}^{\infty} \!\! \dl{t_n} \, \timeOrdering[H_{\interaction}(t_1) H_{\interaction}(t_2) \dotsm H_{\interaction}(t_n)].
+    \end{equation}
+    We can now replace \(H_{\interaction}\) with an integral over the Hamiltonian density giving
+    \begin{equation}
+        S = \sum_{n = 0}^{\infty} \frac{(-i)^n}{n!} \int \!\! \dl{x_1} \int \!\! \dl{x_2} \dotsm \int \!\! \dl{x_n} \, \timeOrdering[\hamiltonianDensity_{\interaction}(x_1) \hamiltonianDensity_{\interaction}(x_2) \dotsm \hamiltonianDensity_{\interaction}(x_n)].
+    \end{equation}
+    This is called the \defineindex{Dyson series}.
+    
+    Note that the interaction Hamiltonian density is given by \(\hamiltonianDensity_{\interaction} = -\lagrangianDensity_{\interaction}\).
+    This follows directly from the definition
+    \begin{equation}
+        \hamiltonianDensity = \hamiltonianDensity_0 + \hamiltonianDensity_{\interaction} = \pi \dot{\varphi} - \lagrangianDensity = \pi \dot{\varphi} - \lagrangianDensity_0 - \lagrangianDensity_{\interaction}
+    \end{equation}
+    where the \(\pi\dot{\varphi} - \lagrangianDensity_0\) term is the unperturbed Hamiltonian density.
+    Using this we can write
+    \begin{align}
+        S &= \sum_{n = 0}^{\infty} \frac{i^n}{n!} \int \!\! \dl{x_1} \int \!\! \dl{x_2} \dotsm \int \!\! \dl{x_n} \, \timeOrdering[\lagrangianDensity{\interaction}(x_1) \lagrangianDensity{\interaction}(x_2) \dotsm \lagrangianDensity{\interaction}(x_n)]\\
+        &= \exp\left[ i\int \dl{^4x} \lagrangianDensity_{\interaction} \right].
+    \end{align}
+    So the \(S\) matrix can be viewed as the phase factor given by the interaction action.
+    This last step is simply a formal rewriting recognising the exponential series.
+    When expanding make sure to have each integral in each power be over a different variable, and to time order the integrand.
+    From this form we can see that, assuming the action is Lorentz invariant, then so is the \(S\) matrix.
+    This works because time ordering is Lorentz invariant, because it can be done using only terms like \(\heaviside(t - t')\), and each such term is invariant under proper orthochronous Lorentz transformations.
+    
+    \section{Interpretation}
+    For a given initial state, \(\ket{i}\), and final state, \(\ket{f}\), we need to find terms in the interaction Lagrangian, \(\lagrangianDensity_{\interaction}\) which give a nonzero transition amplitude for \(\ket{i}\) to \(\ket{f}\).
+    The entire effect of the interaction is in \(\lagrangianDensity_{\interaction}\), which is an operator given by a polynomial in the fields.
+    This means that really it's just a collection of creation and annihilation operators.
+    Therefore the entire effect of the interaction is to create and destroy particles.
+    We then look for terms with
+    \begin{itemize}
+        \item annihilation operators destroying the initial state,
+        \item creation operators creating the final state,
+        \item paired creation/annihilation operators creating and then destroying intermediate states.
+    \end{itemize}
+
+    In terms of particles, we look for terms which destroy the incoming particles, potentially create and then destroy one or more new particles, then create some particles which form the final state.
+    The initial and final particles must be on-shell for us to observe them.
+    The intermediate particles however needn't be on-shell, since we cannot observe them.
+    These are called \define{virtual particles}\index{virtual particle}.
+    Don't put too much stock in the existence and off-shell nature of these virtual particles, they're really just a mathematical construct with different combinations of intermediate particles corresponding to different terms in the Dyson series.
+    
+    In the interaction picture the fields satisfy the free field equation, and therefore have the usual creation and annihilation operators.
+    We can therefore use normal ordering, placing all creation operators on the left and all annihilation operators on the right, in order to ensure that incoming particles are destroyed and then new particles are created, rather than the other way round.
+    
+    \section{\texorpdfstring{\(\varphi^3\)}{Phi Cubed} Interactions}
+    In \(\varphi^3\) theory the interaction Hamiltonian is
+    \begin{equation}
+        \hamiltonianDensity_{\interaction} = -\lagrangianDensity_{\interaction} = \frac{1}{6}g\normalordering{\varphi^3},
+    \end{equation}
+    where we now normal order the \(\varphi^3\) factor in order to destroy existing particles and then create new particles.
+    
+    We will consider 2--2 scattering, that is two particles come in, interact in some way, and two particles leave.
+    This can be represented by a diagram like
+    \vspace{2.4cm}
+    \begin{equation}
+        \tikzsetnextfilename{fd-2-2-phi-cubed-scattering-general-diagram}
+        \smash{\rotatebox{45}{
+            \feynmandiagram[inline=(v)]{
+                {a, b, c, d} -- v [blob]
+            };
+        }}
+    \end{equation}
+    Here the blob represents some unknown black box type interaction.
+    Time flows, in our convention, from left to right, so the left two legs represent the incoming particles, and the right two the outgoing particles.
+    In order to destroy the incoming particles we start with a \(\varphi^+\varphi^+\) term.
+    Then to create two new particles we need a \(\varphi^-\varphi^-\) term.
+    Recall that we order operators from right to left, as we want the \(\varphi^+\varphi^+\) term to act on the initial before the \(\varphi^-\varphi^-\) term.
+    We could therefore look for a
+    \begin{equation}
+        \varphi^-\varphi^-\varphi^+\varphi^+
+    \end{equation}
+    term in the series.
+    However, we won't find such a term since in \(\varphi^3\) theory we can only have terms with a multiple of 3 factors of \(\varphi^{\pm}\).
+    This means that there are no direct 2--2 scattering events in \(\varphi^3\) theory, such events must always go via at least one intermediate virtual particle state.
+    So, next we look at the term in the series which is quadratic in the Hamiltonian, and hence has six factors of \(\varphi^{\pm}\).
+    There are two possible orderings of terms with the required starting point of \(\varphi^+\varphi^+\) to annihilate the initial state and end point of \(\varphi^-\varphi^-\) to create the final state.
+    They are
+    \begin{equation}
+        \varphi^-\varphi^- \varphi^- \varphi^+ \varphi^+ \varphi^+, \qqand \varphi^- \varphi^- \varphi^+ \varphi^- \varphi^+ \varphi^+.
+    \end{equation}
+    When acting on the initial state the the first vanishes, since after annihilating the initial state we are left with the vacuum state, which we then act on with the annihilator \(\varphi^+\).
+    So, the only nonzero second term quadratic in the Hamiltonian is
+    \begin{equation}
+        \varphi^-\varphi^-\varphi^+\varphi^-\varphi^+\varphi^+.
+    \end{equation}
+    We interpret this as annihilating the initial state, creating a new particle, annihilating it, and then destroying it again.
+    The amplitude for this particular term is proportional to \(g^2\), since each Hamiltonian introduces a factor of \(g\).
+    Further, by assuming that energy is conserved and everything is local when we annihilate the two initial particles we must immediately create the virtual particle, and all of this must happen at the same position, so this is a single spacetime event, \(x_2\).
+    Then when the virtual particle is annihilated we must immediately, and at the same location, create the new particles, so this is a second spacetime event, \(x_1\).
+    These correspond to the two points at which the interaction Hamiltonians are evaluated
+    so we'll have a nonzero term
+    \begin{equation}
+        -\frac{g^2}{36}\int_{-\infty}^{\infty} \dl^4{x_1} \int_{-\infty}^{\infty} \dl{^4x_2} \, \varphi^-(x_2)\varphi^-(x_2)\varphi^+(x_1)\varphi^-(x_2)\varphi^+(x_2)\varphi^+(x_2).
+    \end{equation}
+    Pictorially we can represent this as
+    \begin{equation}
+        \tikzsetnextfilename{fd-2-2-phi-cubed-single-virtual-particle}
+        \begin{tikzpicture}[baseline=(v1)]
+            \begin{feynman}
+                \diagram[small, horizontal=v1 to v2] {
+                    {i1, i2} -- v1 -- v2 -- {o1, o2}
+                };
+                \node[left] at (v1) {\(g\)};
+                \node[right] at (v2) {\(g\)};
+                \node[above, xshift=0.05cm] at (v1) {\(x_2\)};
+                \node[above, xshift=-0.05cm] at (v2) {\(x_1\)};
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    Here the left and right legs represent the incoming and outgoing particles, and the single line in the middle is the virtual particle.
+    
+    Next, we would consider terms cubic in the Hamiltonian.
+    However, things quickly get out of hand if we proceed as we did here.
+    The cubic term will have nine factors of \(\varphi\).
+    So, we want a way to do this all more systematically.
+    This is the theory we will develop in the next chapter.
+    
+    \chapter{Wick's Theorem}
     
     
     %   Appdendix
