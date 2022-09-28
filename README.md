@@ -79,7 +79,7 @@ In both cases the '2' refers to the fact that this course is delivered in second
 
 As well as these courses, which are a compulsory part of the theoretical physics degree, I also took one course with the School of Chemistry, and one course with the School of Mathematics:
 * Chemistry 1A (s1) \[No notes\]
-* [Proofs and Problem Soloving](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-1/Optional-Courses/PPS) (s2)
+* [Proofs and Problem Solving](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-1/Optional-Courses/PPS) (s2)
 
 
 ## Sources
