@@ -7,6 +7,7 @@
 \usepackage{tensor}
 \usepackage{csquotes}
 \usepackage{scalerel,stackengine}  % needed for d with slash
+\usepackage{simpler-wick}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -15,6 +16,7 @@
 \usetikzlibrary{external}
 \tikzexternalize[prefix=tikz-external/]
 % Other libraries
+\usetikzlibrary{calc}
 
 \usepackage[compat=1.1.0]{tikz-feynman}
 
@@ -75,7 +77,7 @@ noabbrev
             \stackengine{-.3\LMpt}{\SavedStyle \delta}{\SavedStyle\overbar{}%
                 \mkern4.5mu}{O}{r}{F}{F}{L}}}}
 \newcommand{\hilbertSpace}{\symbb{H}}
-\newcommand{\normalordering}[1]{{\vcentcolon}{#1}{\vcentcolon}}
+\newcommand{\normalordering}[1]{\mathopen{\vcentcolon}{#1}\mathclose{\vcentcolon}}
 \AtBeginDocument{
     \let\Re\relax
     \let\Im\relax
@@ -89,6 +91,8 @@ noabbrev
 \newcommand{\probability}{\symbb{P}}
 \newcommand{\heaviside}{\theta}
 \DeclareMathOperator{\timeOrdering}{T}
+\newcommand{\feynman}{\symrm{F}}
+\newcommand{\amplitude}{\symcal{M}}
 \DeclarePairedDelimiterX{\anticommutator}[2]{\{}{\}}{#1, #2}
 \DeclareMathOperator{\tr}{tr}
 
@@ -1924,11 +1928,11 @@ noabbrev
     This idea that careful ordering of operators can avoid infinities goes beyond the expectation value of the ground state energy.
     Consider our field, \(\varphi(x)\).
     We can split this into parts,
-    \begin{equation}\label{eqn:phi +}
+    \begin{equation}
         \varphi(x) = \varphi^+(x) + \varphi^-(x)
     \end{equation}
     where
-    \begin{equation}
+    \begin{equation}\label{eqn:phi +}
         \varphi^+(x) = \int \invariantmeasure{p} \, a(\vv{p}) \e^{-ip\cdot x},
     \end{equation}
     and
@@ -2126,13 +2130,13 @@ noabbrev
     So, we can view the equal time commutation relations as a specific case of the covariant commutation relations.
     This is why the equal time commutation relations can still produce Lorentz invariant physics.
     
-    \section{Contour Representation}
+    \section{Contour Representation}\label{sec:contour representation}
     \begin{rmk}
         This section makes use of some complex analysis, in particular contour integrals and the residue theorem.
         See either \course{Methods of Theoretical Physics} or \course{Methods of Mathematical Physics} for details.
     \end{rmk}
     
-    The contour representation of \(\Delta^{\mp}\) is
+    The contour representation of \(\Delta^{\pm}\) is
     \begin{equation}
         \Delta^{\pm}(x) = - \int_{C^{\pm}} \frac{\dl{^4p}}{(2\pi)^4} \frac{\e^{-ip\cdot x}}{p^2 - m^2}.
     \end{equation}
@@ -2178,7 +2182,7 @@ noabbrev
     \end{equation}
     so
     \begin{equation}
-        \Res\left( \frac{\e^{-ip\cdot x}}{(p_0 + \omega(\vv{p}))(p_0 - \omega(\vv{p}))}, \pm \omega(\vv{p}) \right) = \frac{\e^{-ip\cdot x}}{p_0 \mp \omega(\vv{p})} \bigg|_{p_0 = \pm \omega(\vv{p})} = \mp \frac{\e^{-ip\cdot x}}{2\omega(\vv{p})}.
+        \Res\left( \frac{\e^{-ip\cdot x}}{(p_0 + \omega(\vv{p}))(p_0 - \omega(\vv{p}))}, \pm \omega(\vv{p}) \right) = \frac{\e^{-ip\cdot x}}{p_0 \pm \omega(\vv{p})} \bigg|_{p_0 = \mp \omega(\vv{p})} = \mp \frac{\e^{-ip\cdot x}}{2\omega(\vv{p})}.
     \end{equation}
     Hence,
     \begin{equation}
@@ -2432,7 +2436,7 @@ noabbrev
     
     To proceed we make use of the following identity:
     \begin{multline}
-        \int_{t_a}^{t_b} \!\! \dl{t_1} \int_{t_a}^{t_1} \!\! \dl{t_2} \int_{t_a}^{t_2} \dotsm \int_{t_a}^{t_{n-1}} \!\! \dl{t_n} A(t_1)A(t_2) \dotsb A(t_n)\\
+        \int_{t_a}^{t_b} \!\! \dl{t_1} \int_{t_a}^{t_1} \!\! \dl{t_2} \int_{t_a}^{t_2} \dotsm \int_{t_a}^{t_{n-1}} \!\! \dl{t_n} \, A(t_1)A(t_2) \dotsb A(t_n)\\
         = \frac{1}{n!} \int_{t_a}^{t_b} \!\! \dl{t_1} \int_{t_a}^{t_b} \dl{t_2} \dotsm \int_{t_a}^{t_b} \!\! \dl{t_n} \timeOrdering[A(t_1)A(t_2) \dotsm A(t_n)].
     \end{multline}
     Here \(t_a\) and \(t_b\) are arbitrary initial and final times with \(t_a < t_b\), and \(A\) is an arbitrary operator.
@@ -2628,6 +2632,1008 @@ noabbrev
     This is the theory we will develop in the next chapter.
     
     \chapter{Wick's Theorem}
+    To proceed we need to be able to deal with time orderings of operators.
+    Our interpretation, of particles being created and destroyed, works best if we normal order things, placing all creation operators on the left and annihilation operators on the right.
+    So, we look for a way to rewrite a time ordering in terms of normal orderings, and other quantities which can be calculated more easily.
+    We proceed with the case of two operators, then we introduce a general theorem central to much of quantum field theory.
+    
+    \section{Two Operator Case}
+    Suppose we have two operator valued fields, \(A\) and \(B\), which we can write as
+    \begin{equation}
+        A = A^+ + A^-, \qqand B = B^+ + B^-,
+    \end{equation}
+    where \(A^+\) and \(B^+\) are expressions in the annihilation operators and \(A^-\) and \(B^-\) are expressions in the creation operators.
+    Consider the product \(\normalordering{A(x)B(x')}\).
+    Notice that the normal ordering of a sum is the sum of the normal ordering of the individual terms, that is \(\normalordering{C + D} = \normalordering{C} + \normalordering{D}\).
+    Expanding in terms of \(A^{\pm}\) and \(B^{\pm}\) we have
+    \begin{align*}
+        \normalordering{A(x)B(x')} &= \normalordering{[A^+(x) + A^-(x')][B^+(x') + B^-(x')]}\\
+        &= \normalordering{A^+(x)B^+(x') + A^+(x)B^-(x') + A^-(x)B^+(x') + A^-(x)B^-(x')}\\
+        &= A^+(x)B^+(x') + B^-(x')A^+(x) + A^-(x)B^+(x') + A^-(x)B^-(x').
+    \end{align*}
+    
+    Now, consider what happens when we subtract this result from \(A(x)B(x')\) without the normal ordering, that is
+    \begin{equation}
+        A(x)B(x') = A^+(x)B^+(x') + A^+(x)B^-(x') + A^-(x)B^+(x') + A^-(x)B^-(x').
+    \end{equation}
+    The only term that doesn't cancel is the second term where we have to swap the ordering, so
+    \begin{equation}
+        A(x)B(x') - \normalordering{A(x)B(x')} = A^+(x)B^-(x') - B^-(x')A^+(x) = \commutator{A^+(x)}{B^-(x')}.
+    \end{equation}
+    
+    The commutator of creation and annihilation operators is just a number, or more accurately a Dirac delta, and so it doesn't act on states, in particular
+    \begin{equation}
+        \bra{0} \commutator{A^+(x)}{B^-(x')}\ket{0} = \braket{0}{0} \commutator{A^+(x)}{B^-(x')} = \commutator{A^+(x)}{B^-(x')},
+    \end{equation}
+    since we choose to normalise the vacuum state.
+    We also have
+    \begin{equation}
+        \bra{0} \commutator{A^+(x)}{B^-(x')}\ket{0} = \bra{0} A^+(x)B^-(x')\ket{0} - \bra{0} B^-(x')A^+(x)\ket{0} = \bra{0} A^+(x)B^-(x')\ket{0},
+    \end{equation}
+    where the second term vanishes since the annihilation operator \(A^+(x)\) acts on the vacuum.
+    
+    We then have
+    \begin{equation}\label{eqn:almost wicks theorem for two operators}
+        A(x)B(x') = \normalordering{A(x)B(x')} + \bra{0} A(x) B(x') \ket{0}.
+    \end{equation}
+    We're nearly there, recall that the definition of time ordering is
+    \begin{equation}
+        \timeOrdering[A(x)B(x')] = \heaviside(t - t')A(x)B(x') + \heaviside(t' - t)B(x')A(x),
+    \end{equation}
+    where \(t\) is the time component of \(x\) and \(t'\) is the time component of \(x'\).
+    
+    At this point we make the observation that it doesn't matter what order we write operators in if we are normal ordering them, since we're going to change the order anyway, so
+    \begin{equation}
+        \normalordering{A(x)B(x')} = \normalordering{B(x')A(x)}.
+    \end{equation}
+    Hence, if we normal order the time ordering we have
+    \begin{align}
+        \normalordering{\timeOrdering[A(x)B(x')]} &= \heaviside(t - t')\normalordering{A(x)B(x')} + \heaviside(t' - t)\normalordering{B(x')A(x)}\\
+        &= \heaviside(t - t')\normalordering{A(x)B(x')} + \heaviside(t' - t)\normalordering{A(x)B(x')}\\
+        &= \normalordering{A(x)B(x')}.
+    \end{align}
+    So, the normal ordering of a time ordering is just the normal ordering.
+    
+    Consider \cref{eqn:almost wicks theorem for two operators}.
+    This holds for any product of two operators, in particular if we time order the operators it still works, since we can just separate into the \(t < t'\) and \(t > t'\) cases and then proceed without the time ordering.
+    Hence,
+    \begin{equation}
+        \timeOrdering[A(x)B(x')] = \normalordering{A(x)B(x')} + \bra{0} \timeOrdering[A(x)B(x')] \ket{0}.
+    \end{equation}
+    Here we use \(\normalordering{\timeOrdering[A(x)B(x')]} = \normalordering{A(x)B(x')}\) to drop the time ordering in the first term on the right.
+    
+    This equation, and others like it, are very important in quantum field theory, so important that we introduce a notation to simplify it.
+    We define the \defineindex{Wick contraction} of two operators, \(A\) and \(B\) to be
+    \begin{equation}
+        \wick{\c A(x) \c B(x')} \coloneqq \bra{0} \timeOrdering[A(x)B(x')] \ket{0}.
+    \end{equation}
+    Note that this is just a number, not an operator.
+    This allows us to state Wick's theorem for two operators.
+    
+    \begin{lma}{}{lma:wick's theorem for two operators}
+        For two operators, \(A\) and \(B\), such that \(A = A^+ + A^-\) and \(B = B^+ + B^-\) where \(A^+\) and \(B^+\) are expressions in the annihilation operator and \(A^-\) and \(B^-\) are expressions in the creation operators we have
+        \begin{equation}
+            \timeOrdering[A(x)B(x')] = \normalordering{A(x)B(x')} + \wick{\c A(x) \c B(x')}.
+        \end{equation}
+        \begin{proof}
+            See above work.
+        \end{proof}
+    \end{lma}
+    
+    \section{Three Operator Case}
+    The proof of Wick's theorem, the generalisation of the previous lemma to an arbitrary number of operators, proceeds inductively.
+    It will be simpler to prove if we first prove the three operator case to see how the inductive logic works in detail.
+    As before our goal is to express a time ordered product of operators in terms of their normal ordering and contractions.
+    We now have an extra operator, \(C\), which we again assume can be written as \(C = C^+ + C^-\) where \(C^+\) is an expression in the annihilation operators and \(C^-\) an expression in the creation operators.
+    
+    We want to evaluate \(\timeOrdering[A(x_1)B(x_2)C(x_2)]\) where \(x_i\) has time component \(t_i\).
+    For simplicity, and without loss of generality, we assume that \(t_1 > t_2 > t_3\).
+    If this isn't the case we can reorder freely within the time ordering and then relabel our operators so that it is.
+    We don't consider here the case where the operators are evaluated at the same time, we'll do this later.
+    From now on we suppress the arguments to our operators, but be aware that they are not all evaluated at the same point.
+    
+    Since, by assumption, \(A\) is the first operator evaluated we can move it outside of the time ordering, since it will always appear on the left of any time ordered product of operators:
+    \begin{equation}
+        \timeOrdering[ABC] = A\timeOrdering[BC].
+    \end{equation}
+    Now we can apply \cref{lma:wick's theorem for two operators} to the time ordering of \(B\) and \(C\), giving
+    \begin{equation}
+        \timeOrdering[ABC] = A\normalordering{BC} + A\wick{\c B \c C}.
+    \end{equation}
+    Now express \(A\) as \(A^+ + A^-\), so
+    \begin{align}
+        \timeOrdering[ABC] &= (A^+ + A^-)\normalordering{BC} + \wick{\c B \c C}\\
+        &= A^+ \normalordering{BC} + A^+\wick{\c B \c C} + A^- \normalordering{BC} + A^- \wick{\c B \c C}.
+    \end{align}
+    Notice that since \(A^-\) is a creation operator and is on the left of \(\normalordering{BC}\) we can move it into the normal ordering without changing anything, so
+    \begin{equation}
+        \timeOrdering[ABC] = A^+ \normalordering{BC} + A^+\wick{\c B \c C} + \normalordering{A^-BC} + A^- \wick{\c B \c C}.
+    \end{equation}
+    
+    Things aren't quite so simple for \(A^+\normalordering{BC}\).
+    In order to bring \(A^+\), which is an annihilation operator, into the normal ordering we need it to be on the right.
+    We can achieve this at the cost of a commutator:
+    \begin{equation}
+        A^+ \normalordering{BC} = \normalordering{BC}A^+ + \commutator{A^+}{\normalordering{BC}} = \normalordering{BCA^+} + \commutator{A^+}{\normalordering{BC}}.
+    \end{equation}
+    Now that \(A^+\) has been brought into the normal ordering we can move it around within the ordering, so
+    \begin{equation}
+        A^+ \normalordering{BC} = \normalordering{A^+BC} + \commutator{A^+}{\normalordering{BC}}.
+    \end{equation}
+    The commutator can be evaluated with the identity
+    \begin{equation}\label{eqn:commutator identity x and yz}
+        \commutator{X}{YZ} = XYZ - YZX = XYZ - YXZ + YXZ - YZX = \commutator{X}{Y}Z + Y\commutator{X}{Z}.
+    \end{equation}
+    Since the commutator is just a number the normal ordering doesn't effect it, and so we have
+    \begin{equation}
+        A^+ \normalordering{BC} = \normalordering{A^+BC} + \normalordering{\commutator{A^+}{B^-}C} + \normalordering{B\commutator{A^+}{C^-}}.
+    \end{equation}
+    We've also used here that \(\commutator{X^+}{Y} = \commutator{X^+}{Y^-}\), since \(X^+\) commutes with \(Y^+\), as both are just formed from annihilation operators.
+    
+    Exactly as in the two operator case we can replace the commutator with its vacuum expectation value, and then drop the commutator, these are just numbers, so can be brought out of the normal ordering.
+    \begin{align}
+        A^+ \normalordering{BC} &= \normalordering{A^+BC} + \commutator{A^+}{B^-}\normalordering{C} + \commutator{A^+}{C^-}\normalordering{B}\\
+        &= \normalordering{A^+BC} + \bra{0}\commutator{A^+}{B^-}\ket{0}\normalordering{C} + \bra{0}\commutator{A^+}{C^-}\ket{0}\normalordering{B}\\
+        &= \normalordering{A^+BC} + \bra{0}A^+B^-\ket{0}\normalordering{C} + \bra{0}A^+C^-\ket{0}\normalordering{B}.
+    \end{align}
+    Notice that since we're normal ordering a single term which decomposes as the sum of creation and annihilation operators we don't really need the normal orderings any more, but we keep them so our result fits the general result.
+    
+    Going back to our starting point we now have
+    \begin{align}
+        \timeOrdering[ABC] &= A^+ \normalordering{BC} + A^+\wick{\c B \c C} + \normalordering{A^-BC} + A^- \wick{\c B \c C}\\
+        &= \normalordering{ABC} + \bra{0}\timeOrdering[A^+B^-]\ket{0}\normalordering{C} + \bra{0}\timeOrdering[A^+C^-]\ket{0}\normalordering{B} + A\wick{\c B \c C} \notag\\
+        &= \normalordering{ABC} + \wick{\c A \c B}\normalordering{C} + \wick{\c A \c C}\normalordering{B}.
+    \end{align}
+    Here we use
+    \begin{equation}
+        A^+\wick{\c B \c C} + A^- \wick{\c B \c C} = (A^+ + A^-) \wick{\c B \c C} = A\wick{\c B \c C},
+    \end{equation}
+    and
+    \begin{equation}
+        \normalordering{A^+ BC} + \normalordering{A^- BC} = \normalordering{(A^+ + A^-)BC} = \normalordering{ABC}
+    \end{equation}
+    
+    The result here is that the time ordering is given by the normal ordering plus all pairs of contractions, normal ordering anything that isn't contracted.
+    
+    \section{General Theorem}
+    We can now prove the general theorem relating time orderings of an arbitrary number of operators and their normal orderings and contractions.
+    
+    \begin{thm}{Wick's Theorem}{thm:wick}
+        Given operators, \(A, B, C, D, \dotsc\), which can all be written as a sum of an annihilator and creation operators.
+        Suppose \(A\) is evaluated at \(x_1\), \(B\) at \(x_2\), \(C\) at \(x_3\), \(D\) at \(x_4\), and so on, and \(t_i\) is the time component of \(x_i\).
+        Then if none of the \(t_i\) are equal we have
+        \begin{align}
+            \timeOrdering[ABCD\dotsm] &= \normalordering{ABCD\dotsm}\\
+            &+ \wick{\c A \c B}\normalordering{CD\dotsm} + \wick{\c A \c C} \normalordering{BD\dotsm} + \wick{\c A \c D} \normalordering{BC} + \dotsb\\
+            &+ \wick{\c B \c C} \normalordering{AD \dotsm } + \wick{\c B \c D} \normalordering{AC\dotsm} + \dotsb\\
+            &\vdotswithin{+}\\
+            &+ \wick{\c A \c B} \wick{\c C \c D} \normalordering{ \dotsm } + \wick{\c A \c C} \wick{\c B \c D} \normalordering{ \dotsm } + \wick{\c A \c D} \wick{\c B \c C} \normalordering{ \dotsm } + \dotsb\\
+            &+ \text{all other possible contractions}.
+        \end{align}
+        That is, the time ordering is given by the normal ordering, plus the normal ordering contracting each pair of operators, plus the normal ordering contracting every possible pair of pairs of operators, and so on, doing every single contraction possible and normal ordering anything not contracted.
+        
+        \begin{proof}
+            We proceed by strong induction on the number of operators.
+            The one operator case is trivial and acts as the basis case, equivalently the two operator case can be the basis case and we then use \cref{lma:wick's theorem for two operators} as the proof of our basis case.
+            
+            Now, suppose that The hypothesis holds for \(k - 1\) operators for some positive integer \(k\).
+            Take \(k\) operators \(A, B, C, D \dotsb\), evaluated at \(x_1, x_2, x_3, x_4, \dotsc\) respectively, with \(t_i\) the time component of \(x_i\).
+            Without loss of generality we assume \(t_1 > t_2 > \dotsb > t_k\), if this isn't the case we can reorder within the time ordering and relabel such that it is the case.
+            
+            We can pull \(A\) outside of the time ordering, since it is evaluated last:
+            \begin{equation}
+                \timeOrdering[ABCD\dotsm] = A\timeOrdering[BCD\dotsm].
+            \end{equation}
+            Writing \(A = A^+ + A^-\) where \(A^+\) and \(A^-\) are expressions in the annihilation and creation operators respectively we have
+            \begin{equation}
+                \timeOrdering[ABCD\dotsm] = (A^+ + A^-)\timeOrdering[BCD\dotsm].
+            \end{equation}
+            The time ordering on the right has \(k - 1\) operators, so the induction hypothesis allows us to write this as
+            \begin{align}
+                \timeOrdering[ABCD\dotsm] &= (A^+ + A^-)(\normalordering{BCD\dotsm} + \wick{\c B \c C}\normalordering{B \dotsm}\\
+                &\qquad+ \text{all contractions not involving \(A\)}).
+            \end{align}
+            We can trivially put \(A^-\) into all of the normal orderings, since it is a creation operator and is on the left.
+            Therefore consider the \(A^+\) terms.
+            We have
+            \begin{align}
+                A^+ \normalordering{BCD\dotsm} &= \normalordering{BCD\dotsm}A^+ + \commutator{A^+}{\normalordering{BCD\dotsm}}\\
+                &= \normalordering{BCD\dotsm A^+} + \commutator{A^+}{\normalordering{BCD\dotsm}}\\
+                &= \normalordering{A^+BCD\dotsm} + \commutator{A^+}{\normalordering{BCD\dotsm}},
+            \end{align}
+            Iteratively applying the identity in \cref{eqn:commutator identity x and yz} we have
+            \begin{multline}
+                A^+\normalordering{BCD\dotsm} = \normalordering{A^+BCD\dotsm} + \commutator{A^+}{B^-}\normalordering{CD\dotsm}\\
+                + \commutator{A^+}{C^-} \normalordering{BD\dotsm} + \commutator{A^+}{D^-}\normalordering{BC\dotsm} + \dotsb.
+            \end{multline}
+            As with the two and three operator cases we can replace the commutators with contractions, giving
+            \begin{multline}
+                A^+\normalordering{BCD\dotsm} = \normalordering{A^+BCD} + \wick{\c A \c B}\normalordering{CD\dotsm}\\
+                + \wick{\c A \c C}\normalordering{BD\dotsm} +  \wick{\c A \c D}\normalordering{BC\dotsm} + \dotsb.
+            \end{multline}
+            So we end up with all contractions containing \(A\) and some other operator, normal ordering all other operators.
+            
+            The exact same logic works for other terms, like
+            \begin{equation}
+                A^+ \wick{\c B \c C} \normalordering{D \dotsm} = \wick{\c A \c D} \wick{\c B \c C} \normalordering{\dotsm} + \dotsb,
+            \end{equation}
+            where we have all pairs of pairs of contractions with one pair being \(B\) and \(C\) and the other containing \(A\).
+            Considering all such terms we see that we get all possible contractions involving \(A\).
+            Going back to our result for \(\timeOrdering[ABCD\dotsm]\) as containing all contractions not involving \(A\), and recombining \(A^+\) and \(A^-\) to get \(A\) we prove the theorem.
+        \end{proof}
+    \end{thm}
+    
+    \begin{crl}{Wick's Theorem for Mixed Time Products}{}
+        Suppose that some of the operators in the statement of \cref{thm:wick} are evaluated at the same time.
+        Then the time ordering is instead given by all contractions not involving contractions of equal time operators and normal ordering everything left over.
+        \begin{proof}
+            This follows by applying Wick's theorem at unequal times, and then setting some times equal and seeing that contractions of equal time terms vanish, since
+            \begin{equation}
+                \timeOrdering(\normalordering{A(t, \vv{x})B(t, \vv{x}')}) = \normalordering{A(t, \vv{x})B(t, \vv{x}')}
+            \end{equation}
+            so
+            \begin{equation}
+                \wick{\c A \c B} = \timeOrdering[\normalordering{AB}] - \normalordering{AB} = 0.
+            \end{equation}
+        \end{proof}
+    \end{crl}
+
+    \section{Feynman Propagator}
+    Consider the contraction
+    \begin{align}
+        \wick{\c \varphi(x) \c \varphi(x')} &= \bra{0} \timeOrdering[\varphi(x)\varphi(x')]\ket{0}\\
+        &= \heaviside(t - t') \bra{0}  \varphi(x) \varphi(x')\ket{0} + \heaviside(t' - t) \bra{0} \varphi(x')\varphi(x)\ket{0}
+    \end{align}
+    where \(t\) is the time component of \(x\) and \(t'\) is the time component of \(x'\).
+    
+    We've seen that
+    \begin{equation}
+        i\Delta^+(x - x') = \commutator{\varphi^+(x)}{\varphi^-(x')}
+    \end{equation}
+    is just a number, and so
+    \begin{equation}
+        \bra{0} \commutator{\varphi^+(x)}{\varphi^-(x')} \ket{0} = \commutator{\varphi^+(x)}{\varphi^-(x')} \braket{0}{0} = \commutator{\varphi^+(x)}{\varphi^-(x')}.
+    \end{equation}
+    Hence, we have
+    \begin{align}
+        i\Delta^+(x - x') &= \bra{0} \commutator{\varphi^+(x)}{\varphi^-(x')} \ket{0}\\
+        &= \bra{0} \varphi^+(x)\varphi^-(x') \ket{0}\\
+        &= \bra{0} \varphi(x) \varphi(x') \ket{0},
+    \end{align}
+    where expanding the commutator the \(\varphi^-(x')\varphi^+(x)\) term annihilates the vacuum, and so vanishes, and in the last part expanding \(\varphi\) using \(\varphi^{\pm}\) shows that all terms apart from the \(\varphi^+(x)\varphi^-(x')\) term vanish as they involve annihilating the vacuum:
+    \begin{align}
+        \varphi(x)\varphi(x') &= (\varphi^+(x) + \varphi^-(x))(\varphi^+(x') + \varphi^-(x'))\\
+        &= \varphi^+(x)\varphi^+(x') + \varphi^+(x)\varphi^-(x') + \varphi^-(x)\varphi^+(x') + \varphi^-(x)\varphi^-(x') \notag
+    \end{align}
+    
+    Similarly, we have
+    \begin{equation}
+        i\Delta^-(x - x') = -\bra{0} \commutator{\varphi(x')}{\varphi(x)}\ket{0}.
+    \end{equation}
+    This just follows from \(\Delta^+(x) = -\Delta^-(-x)\).
+    We can then define
+    \begin{align}
+        i\Delta_{\feynman} (x - x') &\coloneqq \wick{\c \varphi(x) \c \varphi(x')}\\
+        &\hphantom{:}= \bra{0} \timeOrdering[\varphi(x)\varphi(x')]\ket{0}\\
+        &= \heaviside(t - t') i\Delta^+(x - x') - \heaviside(t' - t)i\Delta^-(x - x').
+    \end{align}
+    This is called the \defineindex{Feynman propagator}.
+    Without the factor of \(i\) it's defined as
+    \begin{equation}
+        \Delta_{\feynman}(x) = \heaviside(t)\Delta^+(x) - \heaviside(-t)\Delta^-(x).
+    \end{equation}
+    The interpretation is as follow:
+    \begin{itemize}
+        \item For \(t > t'\) we have a positive energy, that is \(\Delta^+\), mode propagating from \(x'\) to \(x\).
+        \item For \(t < t'\) we have a negative energy, that is \(\Delta^-\), mode propagating from \(x'\)  to \(x\).
+    \end{itemize}
+    
+    Notice that we can rewrite the Feynman propagator as
+    \begin{equation}
+        \Delta_{\feynman}(x - x') = \heaviside(t - t')\Delta^+(x - x') + \heaviside(t' - t)\Delta^+(x' - x).
+    \end{equation}
+    This is has the same value but a different interpretation:
+    \begin{itemize}
+        \item For \(t > t'\) we have a positive energy, that is \(\Delta^+\), mode propagating from \(x'\) to \(x\).
+        \item For \(t < t'\) we have a positive energy, that is \(\Delta^+\), mode propagating from \(x\) to \(x'\).
+    \end{itemize}
+    
+    Comparing these interpretations we see that a negative energy mode (which we'll later associate with antiparticles) is equivalent to a positive energy mode travelling in the opposite direction.
+    
+    \subsection{Contour Representation}
+    As well as this interpretation the Feynman propagator has the nice property of automatically encoding the time ordering.
+    This isn't that useful in the current form, since we have explicit Heaviside step functions doing the encoding.
+    However, the Feynman propagator has a contour representation which makes the time ordering less obvious.
+    
+    The contour representation of \(\Delta_{\feynman}\) is
+    \begin{equation}
+        \Delta_{\feynman}(x) = \int_{C_{\feynman}} \frac{\dl{^4p}}{(2\pi)^4} \frac{\e^{-ip\cdot x}}{p^2 - m^2}
+    \end{equation}
+    where \(C_{\feynman}\) is the contour given by the real axis in the \(p_0\) plane with a slight dip below the pole at \(-\omega(\vv{p})\) and a slight dip above the pole at \(\omega(\vv{p})\).
+    This is shown in \cref{fig:contour for feynman propagator}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{contour-for-feynman-propagator}
+        \begin{tikzpicture}
+            \draw[thick, ->] (-3, 0) -- (3, 0) node [right] {\(\Re(p_0)\)};
+            \draw[thick, ->] (0, -2) -- (0, 2) node [above] {\(\Im(p_0)\)};
+            \fill[Red] (1, 0) circle [radius = 0.05cm] node [below, text=black] {\(\omega(\vv{p})\)};
+            \fill[Red] (-1, 0) circle [radius = 0.05cm] node [above, text=black] {\(-\omega(\vv{p})\)};
+            \draw[very thick, Blue] (-3, 0) -- (-1.5, 0) arc (-180:0:0.5) -- (0.5, 0) arc(180:0:0.5) -- (3, 0);
+            \draw[very thick, Blue, ->] (-3, 0) -- (-2.25, 0) node [below, text=black, yshift=-0.05cm] {\(C_{\symrm{F}}\)};
+            \draw[very thick, Blue, ->] (1.5, 0) -- (2.25, 0);
+        \end{tikzpicture}
+        \caption{The contour used to compute the Feynman propagator.}
+        \label{fig:contour for feynman propagator}
+    \end{figure}
+    
+    To see why this works we consider two cases, first, suppose that \(x_0 > 0\).
+    Then close the contour in the lower half plane, so that \(p_0\) has a large, negative, imaginary component and overall \(-ip\cdot x\) has a large, negative, real component.
+    Closing with a semicircle Jordan's lemma tells us that the integral along this arc vanishes.
+    Hence, the value of the integral along the \(C_{\feynman}\) contour is equal to the value of the integral around this closed loop.
+    We can apply the residue theorem to the contour about the loop.
+    There is a single pole enclosed in this loop, the one at \(\omega(\vv{p})\).
+    However, we've already computed the integral of this function around a contour containing the pole \(\omega(\vv{p})\) in \cref{sec:contour representation}, the only difference is a minus sign not in the Feynman propagator contour representation, so we can conclude that the result is \(\Delta^+(x)\).
+    
+    Similarly, if \(x_0 < 0\) we close the contour in the upper half plane.
+    Again the integral vanishes along this arc and we can then treat this as a contour containing only the pole at \(-\omega(\vv{p})\), the result of which tells us that this integral gives \(-\Delta^-(x)\).
+    So, combining these results we see that we get the expected result of \(\pm \Delta^{\pm}(x)\) depending on the sign of \(x_0\).
+    
+    \subsubsection{The \texorpdfstring{\(i\varepsilon\)}{i epsilon} Prescription}
+    This contour integral is not particular nice to evaluate, we have to awkwardly detour around the poles on the real axis.
+    Instead we can slightly modify the integrand to give the representation
+    \begin{equation}
+        \Delta_{\feynman}(x) = \int \frac{\dl{^4p}}{(2\pi)^4} \frac{\e^{-ip\cdot x}}{p^2 - m^2 + i\varepsilon}.
+    \end{equation}
+    This moves the two poles slightly off the real axis.
+    Let \(\varepsilon > 0\) be a small positive real number, then
+    \begin{equation}
+        p^2 - m^2 + i\varepsilon = p_0^2 - \left( \omega(\vv{p}) - \frac{i\varepsilon}{2\omega(\vv{p})} \right)^2,
+    \end{equation}
+    just expand this out to check, and drop terms of order \(\varepsilon^2\).
+    The poles are then shifted by \(i\varepsilon/[2\omega(\vv{p})]\), so that the pole which was at \(-\omega(\vv{p})\) is now at \(-\omega(\vv{p}) + i\varepsilon/[2\omega(\vv{p})]\), and the pole which was at \(\omega(\vv{p})\) is now at \(\omega(\vv{p}) - i\varepsilon/[2\omega(\vv{p})]\).
+    This is shown in \cref{fig:contour for feynman propagator with i epsilon prescription}.
+    We can then integrate along the real axis as normal, and then take \(\varepsilon \to 0\) after our computations have finished.
+    
+    \begin{figure}
+        \tikzsetnextfilename{contour-for-feynman-propagator-with-i-epsilon-prescription}
+        \begin{tikzpicture}
+            \draw[thick, ->] (-3, 0) -- (3, 0) node [right] {\(\Re(p_0)\)};
+            \draw[thick, ->] (0, -2) -- (0, 2) node [above] {\(\Im(p_0)\)};
+            \fill[Red] (1, -0.3) circle [radius = 0.05cm] node [below, text=black, xshift=0.5cm] {\(\omega(\vv{p}) + i\varepsilon/[2\omega(\vv{p})]\)};
+            \fill[Red] (-1, 0.3) circle [radius = 0.05cm] node [above, text=black, xshift=-0.55cm] {\(-\omega(\vv{p}) - i\varepsilon/[2\omega(\vv{p})]\)};
+            \draw[very thick, Blue] (-3, 0) -- (3, 0);
+            \draw[very thick, Blue, ->] (-3, 0) -- (-2.25, 0) node [below, text=black, yshift=-0.05cm] {\(C_{\symrm{F}}\)};
+            \draw[very thick, Blue, ->] (1.5, 0) -- (2.25, 0);
+        \end{tikzpicture}
+        \caption{The contour for calculating the Feynman propagator using the \(i\varepsilon\) prescription.}
+        \label{fig:contour for feynman propagator with i epsilon prescription}
+    \end{figure}
+    
+    \subsection{Feynman Propagator as a Green's Function}
+    Like the other propagators the Feynman propagator is a Green's function of the Klein--Gordon equation, that is
+    \begin{equation}
+        (\dalembertian + m^2) \Delta_{\feynman}(x) = \delta^4(x).
+    \end{equation}
+    The difference is just in the boundary conditions.
+    
+    The classical retarded and advanced Green's functions, as well as the \(\Delta^{\pm}\) propagators are Green's functions for an equation with Neumann boundary conditions, that is, the boundary conditions fix initial conditions on a function and its derivative, in our case we have an initial condition on \(\varphi\) and \(\pi = \dot{\varphi}\).
+    This is a classical way of thinking, we have some initial state and we let it evolve according to some equation.
+    The problem is that the assumption is we can know both \(\varphi\) and \(\pi\) at the same time, this is not possible due to the uncertainty principle.
+    
+    The Feynman propagator on the other hand corresponds to Dirichlet boundary conditions, where we set initial and final conditions on some function, in this case \(\varphi\).
+    This is much closer to how we think in quantum mechanics, where we consider an initial and final state and transitions between them.
+    
+    \chapter{Feynman Diagrams}
+    \epigraph{This is a great course because there are loads and loads of integrals to do but they're all really easy, so you don't feel any pain but you get to feel proud after.}{Richard Ball}
+    In this section we develop the theory of Feynman diagrams.
+    A diagrammatic representation of interactions which have the benefit of greatly simplifying the maths and also seeming quite physical.
+    We stress however, that any one diagram is not a true representation of a physical process, rather it corresponds to a single term in an expansion describing a physical process.
+    
+    We start from the Dyson expansion,
+    \begin{equation}
+        S = \sum_{n = 0}^{\infty} S^{(n)},
+    \end{equation}
+    where
+    \begin{equation}
+        S^{(n)} = \frac{(-i)^n}{n!} \int \!\! \dl{^4x_1} \dotsm \int \!\! \dl{^4x_n} \, \timeOrdering[\hamiltonianDensity_{\interaction}(x_1) \dotsm \hamiltonianDensity_{\interaction}(x_n)].
+    \end{equation}
+
+    We will use \(\varphi^3\) theory as an example, but the process is basically the same, but usually with harder integrals, for other theories.
+    This means that
+    \begin{equation}
+        \hamiltonianDensity_{\interaction}(x) = \frac{g}{3!} \normalordering{\varphi(x)^3} = \frac{g}{3!}\normalordering{(\varphi^+(x) + \varphi^-(x))^3}.
+    \end{equation}
+    We consider low order terms in this series, and develop Feynman diagrams as we go along.
+    
+    \section{Evaluating Low Order Terms}
+    \subsection{\texorpdfstring{\(n = 0\)}{n = 0}}
+    The \(n = 0\) term, \(S^{(0)}\), is just 1.
+    This represents the case where nothing happens, our initial state just remains and is equal to the final state.
+    
+    \subsection{\texorpdfstring{\(n = 1\)}{n = 1}}
+    The \(n = 1\) term is
+    \begin{equation}
+        S^{(1)} = \frac{-ig}{3!} \int \dl{^4x} \, ({\varphi^+}^3 + 3{\varphi^-}^2\varphi^+ + 3\varphi^-{\varphi^+}^2 + {\varphi^-}^3).
+    \end{equation}
+    We can consider each term in the integrand separately.
+    
+    The first term represents three annihilators, therefore this corresponds to three particles in the initial state entering, being destroyed, and then a vacuum final state.
+    As a diagram we represent this as
+    \begin{equation}
+        \tikzsetnextfilename{fd-phi-cubed-S1-3-0}
+        \begin{tikzpicture}[baseline=(v)]
+            \begin{feynman}
+                \diagram[horizontal=i2 to v, small, layered layout]{
+                    {i1, i2, i3} -- v
+                };
+                \node[right] at (v) {\(x\)};
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    This interaction doesn't conserve momentum, so it must give zero contribution to the overall value of \(S^{(1)}\).
+    
+    The second term represents an annihilator and two creators, so this corresponds to a single particle entering, being destroyed, and then two new particles being created.
+    Since all three factors of \(\varphi\) are evaluated at the same spacetime point, \(x\), this occurs all at once, which we draw as
+    \begin{equation}
+        \tikzsetnextfilename{fd-phi-cubed-S1-1-2}
+        \begin{tikzpicture}[baseline=(v)]
+            \begin{feynman}
+                \diagram[horizontal=i to v, small]{
+                    i -- v,
+                    v -- {o1, o2}
+                };
+                \node[below left] at (v) {\(x\)};
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    It's not immediately obvious, but this term cannot actually conserve momentum in \(\varphi^3\) theory, since all three particles have the same mass, and so it gives zero, which we'll show later.
+    
+    The third term is two annihilators and one creation operator, it corresponds to two particles being annihilated and then one new particle being created.
+    As a diagram it is
+    \begin{equation}
+        \tikzsetnextfilename{fd-phi-cubed-S1-2-1}
+        \begin{tikzpicture}[baseline=(v)]
+            \begin{feynman}
+                \diagram[horizontal=v to o, small]{
+                    {i1, i2} -- v,
+                    v -- o
+                };
+                \node[below right] at (v) {\(x\)};
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    Like the previous term this vanishes in \(\varphi^3\) theory.
+    
+    The fourth term is three creation operators, so represents three particles being created from an initial vacuum state.
+    Diagrammatically it is
+    \begin{equation}
+        \tikzsetnextfilename{fd-phi-cubed-S1-0-3}
+        \begin{tikzpicture}[baseline=(v)]
+            \begin{feynman}
+                \diagram[horizontal=v to o2, small, layered layout]{
+                    v -- {o1, o2, o3}
+                };
+                \node[left] at (v) {\(x\)};
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    Like the first term this one doesn't conserve momentum and so must have no net contribution to \(S^{(1)}\).
+    
+    \subsection{\texorpdfstring{\(n = 2\)}{n = 2}}
+    The \(n = 2\) term is
+    \begin{equation}
+        S^{(2)} = \frac{g^2}{2!(3!)^2} \int \dl{^4x} \int \dl{^4y} \timeOrdering(\normalordering{\varphi(x)^3} \normalordering{\varphi(y)^3}).
+    \end{equation}
+    We can use Wick's theorem to evaluate this normal ordered product.
+    We can then split \(S^{(2)}\) further into four terms based on the number of contractions:
+    \begin{equation}
+        S^{(2)} = S^{(2)}_0 + S^{(2)}_1 + S^{(2)}_2 + S^{(2)}_{3},
+    \end{equation}
+    Where \(S^{(2)}_i\) is the term in \(S^{(2)}\) corresponding to terms with \(i\) contractions.
+    Note that since we have six factors of \(\varphi\) we have a maximum of three contractions.
+    
+    \subsubsection{No Contractions}
+    The terms with no contractions correspond to the first term in Wick's theorem,
+    \begin{equation}
+        \normalordering{\varphi(x)^3\varphi(y)^3}.
+    \end{equation}
+    Since there are no contractions between the field evaluated at the two spacetime points, \(x\) and \(y\), we get disconnected diagrams, such as
+    \begin{equation}
+        \tikzsetnextfilename{fd-phi-cubed-S2-0-contractions}
+        \begin{tikzpicture}[baseline=(vx)]
+            \begin{feynman}
+                \diagram[horizontal=vx to ox, small]{
+                    {i1x, i2x} -- vx,
+                    vx -- ox
+                };
+                \diagram[horizontal=iy to vy, small, xshift=2.5cm, yshift=-1.095cm]{
+                    iy -- vy,
+                    vy -- {o1y, o2y}
+                };
+                \node[below right] at (vx) {\(x\)};
+                \node[below left] at (vy) {\(y\)};
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    This is a single diagram corresponding to two separate processes occurring at \(x\) and \(y\).
+    This diagram corresponds to the term
+    \begin{equation}
+        \varphi^-(x)\varphi^-(y)\varphi^-(y)\varphi^+(x)\varphi^+(x)\varphi^+(y),
+    \end{equation}
+    and other terms give similar diagrams.
+    
+    It can be shown that all disconnected diagrams vanish in \(\varphi^3\) theory.
+    Further, any disconnected diagram is simply a combination of connected diagrams, so we don't every need to consider disconnected diagrams.
+    In terms of physics disconnected diagrams correspond to multiple unrelated scattering events occurring, and we can simply treat them all separately.
+    
+    \subsubsection{One Contraction}
+    Wick's theorem, generalised for equal times, doesn't have contractions between operators at the same time.
+    Hence, we don't need to consider contractions of \(\varphi(x)\) with itself, or \(\varphi(y)\) with itself.
+    This means that we have the term\\
+    \begin{equation}
+        3^2 \wick{\c \varphi(x) \c \varphi(y)} \normalordering{\varphi(x)^2 \varphi(y)^2}.
+    \end{equation}
+    The factor of \(3^2\) is combinatoric, it comes from there being three ways to select which \(\varphi(x)\) field to contract and three ways to select which \(\varphi(y)\) field to contract, and then since these are all really identical we can combine them into a single term with weighting \(3^2\).
+    
+    The contraction corresponds to a virtual particle propagating from \(x\) to \(y\).
+    The four factors of \(\varphi\) in the normal ordering tell us that we'll have four external particles.
+    There are three ways to do this, we can have 1-3, 2-2, or 3-1 interactions, where these are the number of initial particles to final particles.
+    
+    An example of a 1-3 term is given by the diagram
+    \begin{equation}
+        \tikzsetnextfilename{fd-phi-cubed-S2-1-contraction-1-3}
+        \begin{tikzpicture}[baseline=(v1)]
+            \begin{feynman}
+                \diagram[horizontal=i to v1, layered layout, small]{
+                    i -- v1 -- v2 -- {o2, o3},
+                    v1 -- o1,
+                };
+                \node[below left] at (v1) {\(x\)};
+                \node[below] at (v2) {\(y\)};
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    This corresponds to the term
+    \begin{equation}
+        \wick{\c \varphi(x) \c \varphi(y)} \varphi^+(x)\varphi^-(x)\varphi^-(y)\varphi^-(y).
+    \end{equation}
+    This term, in \(\varphi^3\) theory, doesn't conserve momentum since all particles have the same mass, so must give no overall contribution to \(S^{(2)}\).
+    
+    Similarly any 3-1 terms must vanish.
+    
+    More interesting are the 2-2 terms.
+    There are three such terms.
+    The first is
+    \begin{equation}
+        \tikzsetnextfilename{fd-phi-cubed-S2-1-contraction-2-2-s-channel}
+        \begin{tikzpicture}[baseline=(v1)]
+            \begin{feynman}
+                \diagram[horizontal=v1 to v2, small]{
+                    {i1, i2} -- v1 -- v2 -- {o1, o2}
+                };
+                \node[below] at (v1) {\(x\)};
+                \node[below] at (v2) {\(y\)};
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    This corresponds to the term
+    \begin{equation}
+        \wick{\c \varphi(x) \c \varphi(y)} \varphi^+(x)\varphi^+(x)\varphi^-(y)\varphi^-(y).
+    \end{equation}
+    We call this the \define{\(\symbf{s}\)-channel}\index{s-channel@\(s\)-channel} diagram.
+    
+    The second is
+    \begin{equation}
+        \tikzsetnextfilename{fd-phi-cubed-S2-1-contraction-2-2-t-channel}
+        \begin{tikzpicture}[baseline=(v1)]
+            \begin{feynman}
+                \diagram[horizontal=i1 to o1, small]{
+                    i1 -- v1 -- o1,
+                    i2 -- v2 -- o2,
+                    v1 -- v2,
+                    i1 -- [draw=none] i2,
+                    o1 -- [draw=none] o2
+                };
+                \node[below] at (v1) {\(y\)};
+                \node[above] at (v2) {\(x\)};
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    This corresponds to the term
+    \begin{equation}
+        \wick{\c \varphi(x) \c \varphi(y)} \varphi^+(x) \varphi^+(y) \varphi^-(x) \varphi^-(y).
+    \end{equation}
+    We call this the \define{\(\symbf{t}\)-channel}\index{t-channel@\(t\)-channel} diagram.
+    
+    The third is
+    \begin{equation}
+        \tikzsetnextfilename{fd-phi-cubed-S2-1-contraction-2-2-u-channel}
+        \begin{tikzpicture}[baseline=(v1)]
+            \begin{feynman}
+                \diagram[horizontal=i1 to o1, small]{
+                    i1 -- v1 -- [draw=none] o1,
+                    i2 -- v2 -- [draw=none] o2,
+                    v1 -- v2,
+                    i1 -- [draw=none] i2,
+                    o1 -- [draw=none] o2,
+                };
+                \draw (v2) -- (o1);
+                \draw[line width=0.1cm, white] ($(v1)!0.3!(o2)$) -- ($(v1)!0.7!(o2)$);
+                \draw (v1) -- (o2);
+                \node[below] at (v1) {\(y\)};
+                \node[above] at (v2) {\(x\)};
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    This corresponds to the term
+    \begin{equation}
+        \wick{\c \varphi(x) \c \varphi(y)}\varphi^+(x)\varphi^+(y)\varphi^-(y)\varphi^-(x)
+    \end{equation}
+    
+    If we take any of these three diagrams and swap \(x\) and \(y\) then nothing changes, so this gives us a factor of 2 to include, which nicely cancels the factor of \(1/2!\) in the full expression for \(S^{(2)}\).
+    
+    \subsubsection{Two Contractions}
+    Terms with two contractions correspond to a term proportional to
+    \begin{equation}
+        \wick{\c \varphi(x) \c \varphi(y)} \wick{\c \varphi(x) \c \varphi(y)} \normalordering{\varphi(x)\varphi(y)}.
+    \end{equation}
+    The two contractions mean we have two internally propagating virtual particles, and the two normal ordered terms mean we have two external particles.
+    
+    There is a single such diagram, up to swapping \(x\) and \(y\):
+    \begin{equation}
+        \tikzsetnextfilename{fd-phi-cubed-S2-2-contractions}
+        \begin{tikzpicture}[baseline=(v1)]
+            \begin{feynman}
+                \vertex (i);
+                \vertex[right=of i] (v1);
+                \vertex[right=of v1] (v2);
+                \vertex[right=of v2] (o);
+                \draw (i) -- (v1);
+                \draw (v2) -- (o);
+                \draw (v1) to[bend left=90] (v2);
+                \draw (v1) to[bend right=90] (v2);
+                \node[right] at (v1) {\(x\)};
+                \node[left, yshift=-0.05cm] at (v2) {\(y\)};
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    
+    It can be shown that this term actually diverges, giving an infinite result.
+    We call this a one \defineindex{loop diagram}, since it has a single loop.
+    In contrast the diagrams we have considered so far without loops are \define{tree diagrams}\index{tree diagram}.
+    
+    \subsubsection{Three Contractions}
+    Terms with three contractions correspond to a term proportional to
+    \begin{equation}
+        \wick{\c \varphi(x) \c \varphi(y)} \wick{\c \varphi(x) \c \varphi(y)} \wick{\c \varphi(x) \c \varphi(y)}.
+    \end{equation}
+    This has no external particles and three internal virtual particles propagating from \(x\) to \(y\).
+    It corresponds to the diagram
+    \begin{equation}
+        \tikzsetnextfilename{fd-phi-cubed-S2-3-contractions}
+        \begin{tikzpicture}[baseline=(x)]
+            \begin{feynman}
+                \vertex (x);
+                \vertex[right=of x] (y);
+                \draw (x) -- (y);
+                \draw (x) to[bend left=90] (y);
+                \draw (x) to[bend right=90] (y);
+                \node[left] at (x) {\(x\)};
+                \node[right] at (y) {\(y\)};
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    This is called a \define{vacuum bubble} since it is formed entirely of virtual particles, and both the initial and final state are vacuums.
+    Since there are no external particles there are no physically observable contributions from terms like this.
+    It can be shown that bubble diagrams factor out to all levels in all theories, so we don't need to consider them.
+    The correspond to some virtual particles coming into existence and then all annihilating.
+    
+    \section{Feynman Diagrams in Momentum Space}
+    \epigraph{As always in QFT you have to get everything right.}{Richard Ball}
+    So far with these diagrams we've been working in position space, evaluating the fields at \(x\).
+    External states are momentum eigenstates, this suggests that we should instead work in momentum space instead, which means working with \(a(\vv{p})\) and \(a^\hermit(\vv{p})\).
+    
+    We are interested in computing the matrix element
+    \begin{equation}
+        S_{fi} = \bra{f} S \ket{i}.
+    \end{equation}
+    We can express \(\ket{i}\) and \(\ket{f}\) as free particle states created by \(a^\hermit(\vv{p})\) from the vacuum state.
+    These states have definite momentum and all of the particles are on-shell.
+    
+    Consider the one particle state with momentum \(\vv{p}\).
+    This is created with a single creation operator acting on the vacuum:
+    \begin{equation}
+        \ket{\vv{p}} \coloneqq a^\hermit(\vv{p})\ket{0}.
+    \end{equation}
+    Now act on this with \(\varphi^+(x)\).
+    We can expand \(\varphi^+(x)\) in momentum space using \cref{eqn:phi +}:
+    \begin{align}
+        \textcolor{Red}{\varphi^+(x)}\textcolor{Purple}{\ket{\vv{p}}} &= \textcolor{Red}{\int \invariantmeasure{p'} \, \e^{-ip' \cdot x} a(\vv{p}')} \textcolor{Purple}{a^\hermit(\vv{p})\ket{0}}\\
+        &= \int \invariantmeasure{p'} \, \e^{-ip'\cdot x} \commutator{a(\vv{p}')}{a^\hermit(\vv{p}')} \ket{0}\\
+        &= \int \invariantmeasure{p'} \, \e^{-ip'\cdot x} \bardelta(\vv{p} - \vv{p}') \ket{0}\\
+        &= \e^{-ip\cdot x}\ket{0}.
+    \end{align}
+    Here we've used
+    \begin{equation}
+        \commutator{a(\vv{p}')}{a^\hermit(\vv{p})} \ket{0} = a(\vv{p}')a^\hermit(\vv{p})\ket{0} - a^\hermit(\vv{p})a(\vv{p}')\ket{0} = a(\vv{p}')a^\hermit(\vv{p})\ket{0}
+    \end{equation}
+    with the second term vanishing as we annihilate the vacuum.
+    
+    Taking the conjugate of this result, and using \((\varphi^+)^\hermit = \varphi^-\) we have
+    \begin{equation}
+        \bra{\vv{p}} \varphi^-(x) = \bra{0} \e^{ip\cdot x}.
+    \end{equation}
+    
+    Since we're going to be working in momentum space it's useful to have an expression for the contraction in momentum space, we get this through the contour representation of the Feynman propagator:
+    \begin{equation}
+        \wick{\c \varphi(x) \c \varphi(y)} = i \int \frac{\dl{^4k}}{(2\pi)^4} \frac{\e^{-ik\cdot (x - y)}}{k^2 - m^2 + i\varepsilon} = i\Delta_{\feynman}(x - y),
+    \end{equation}
+    where the \(k^0\) integral is performed along the real axis, and we set \(\varepsilon\) ot zero after our calculations.
+    Note that we've written this here using \(k\), the wavenumber, which is the same as the momentum when \(\hbar = 1\).
+    This is mostly to free up the letter \(p\) for the momentum of the particles.
+    
+    We are now in a position to start computing terms in the Dyson series, which we can view as an expansion in \(g\).
+    We won't do all of the ones discussed above, just enough to get the idea.
+    
+    \subsection{First Order}
+    Consider the first order term
+    \begin{equation}
+        \tikzsetnextfilename{fd-phi-cubed-first-order-full-calculation}
+        \begin{tikzpicture}[baseline=(x)]
+            \begin{feynman}
+                \diagram[small, horizontal=i to x]{
+                    i [particle=\(p\)] -- x -- {o1 [particle=\(q\)], o2 [particle=\(q'\)]}
+                };
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    Here we've labelled the particles with their momenta.
+    The initial state contains just a single particle, so its \(\ket{i} = \ket{\vv{p}}\).
+    The final states contain two particles, so the final state is a tensor product of single particle states:
+    \begin{equation}
+        \ket{f} = \ket{\vv{q},\ket{\vv{q}'}} = \ket{\vv{q}}\ket{\vv{q}'} = \ket{\vv{q}} \otimes \ket{\vv{q}'}.
+    \end{equation}
+    This works because we assume no interaction between the two final particles, at least not at first order in \(g\).
+    
+    The matrix element we wish to compute is
+    \begin{equation}
+        \bra{f} S^{(1)}_{\text{1-2}} \ket{i} = \bra{\vv{q}, \vv{q}'}\left[ \frac{-ig}{3!} \int \dl{^4x} 3\varphi^-(x)^2 \varphi^+(x) \right] \ket{\vv{p}}.
+    \end{equation}
+    Here \(S^{(1)}_{\text{1-2}}\) is the term in \(S^{(1)}\) corresponding to the term we wish to compute.
+    The factor of 3 in the integral comes from the number of ways we can choose one of the factors of \(\varphi\) to be \(\varphi^+\).
+    We can show that
+    \begin{equation}
+        \bra{\vv{q}, \vv{q}'} \varphi^-(x)^2 = 2\e^{iq\cdot x} \e^{iq'\cdot x}\bra{0},
+    \end{equation}
+    where the factor of two comes from the number of ways we can act on \(\bra{\vv{q}, \vv{q}'}\) with \(\varphi^-(x)^2\).
+    We can either act on \(\bra{\vv{q}}\) and then \(\bra{\vv{q}'}\), or the other way round.
+    We also have
+    \begin{equation}
+        \varphi^+(x)\ket{\vv{p}} = \e^{-ip\cdot x}\ket{0}.
+    \end{equation}
+    
+    Putting this into our calculation, and noticing that the factors of \(2\) and \(3\) cancel with the \(3!\) we have
+    \begin{align}
+        \bra{f} S^{(1)}_{\text{1-2}} \ket{i} &= -ig \int \dl{^4x} \, \e^{iq\cdot x} \e^{iq'\cdot x} \e^{-ip\cdot x}\\
+        &= -ig (2\pi)^4\delta^4(q + q' - p).
+    \end{align}
+    The Dirac delta enforces conservation of momentum, the momentum in, \(p\), must equal the momentum out, \(q + q'\), in order to get a nonzero result.
+    
+    All external particles are on-shell, and in \(\varphi^3\) theory all particles have the same mass.
+    This means that \(p^2 = q^2 = q'^2 = m^2\).
+    Now, consider \((p - q)^2\).
+    Conservation of momentum tells us that \(p - q = q'\), and so \((p - q)^2 = q'^2 = m^2\).
+    We can also expand \((p - q)^2\) to get
+    \begin{align}
+        m^2 &= (p - q)^2\\
+        &= p^2 + q^2 - 2p\cdot q\\
+        &= m^2 + m^2 + 2p\cdot q.
+    \end{align}
+    Hence, we have \(2p\cdot q = m^2\).
+    In the rest frame of the incoming particle we have \(p^\mu = (m, \vv{0})\), and we can write \(q^\mu = (E, \vv{q})\) without loss of generality.
+    We therefore have
+    \begin{equation}
+        2 p \cdot q = 2mE = m^2 \implies E = \frac{m}{2}.
+    \end{equation}
+    This is what we would expect, since the two particles are produced each must get exactly half of the energy available from the first particle, and that energy is just its mass.
+    We also know that \(E^2 = m^2 + \vv{q}^2\), and so \(E \ge m\).
+    This means that \(E = m/2\) can't satisfy \(p = q + q'\).
+    Hence, the contribution from this term vanishes as the condition imposed by the Dirac delta can never be fulfilled.
+    
+    Note that in other theories with multiple particles with different masses it is possible for this term to be nonzero.
+    It's also not true that all vertices like this vanish, the key difference is that if one of the particles is a virtual particle then it needn't satisfy the on-shell condition and so it can have arbitrary momentum, and we can conserve momentum with particles of the same mass.
+    
+    The key result is that, in \(\varphi^3\) theory,
+    \begin{equation}
+        \bra{f} S^{(1)}_{\text{1-2}} \ket{i} = 0.
+    \end{equation}
+    
+    \subsection{Second Order}
+    For now we restrict ourselves to tree diagrams, we'll come to loops later.
+    There are three diagrams to consider then:
+    \begin{equation}
+        \tikzsetnextfilename{fd-phi-cubed-second-order-full-calculation-s}
+        \feynmandiagram[horizontal=v1 to v2, inline=(v1)] {
+            {i1 [particle=\(p\)], i2 [particle=\(p'\)]} -- v1 -- [edge label=\(k\)] v2 -- {o1 [particle=\(q\)], o2 [particle=\(q'\)]}
+        };
+        \quad
+        \tikzsetnextfilename{fd-phi-cubed-second-order-full-calculation-t}
+        \feynmandiagram[vertical'=v1 to v2, small, baseline=(current bounding box)] {
+            i1 [particle=\(p\)] -- v1 -- o1 [particle=\(q\)],
+            i2 [particle=\(p'\)] -- v2 -- o2 [particle=\(q'\)],
+            v1 -- [edge label=\(k\)] v2,
+            i1 -- [draw=none] i2,
+            o1 -- [draw=none] o2
+        };
+        \quad
+        \tikzsetnextfilename{fd-phi-cubed-second-order-full-calculation-u}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \begin{feynman}
+                \diagram[horizontal=i1 to o1, small]{
+                    i1 [particle=\(p'\)] -- v1 -- [draw=none] o1 [particle=\(q'\)],
+                    i2 [particle=\(p\)] -- v2 -- [draw=none] o2 [particle=\(q\)],
+                    v1 -- [edge label=\(k\)] v2,
+                    i1 -- [draw=none] i2,
+                    o1 -- [draw=none] o2,
+                };
+                \draw (v2) -- (o1);
+                \draw[line width=0.1cm, white] ($(v1)!0.3!(o2)$) -- ($(v1)!0.7!(o2)$);
+                \draw (v1) -- (o2);
+                \node[below] at (v1) {\(y\)};
+                \node[above] at (v2) {\(x\)};
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    
+    Note that while we assume the same initial and final states the momenta of the virtual particles need not, and in fact aren't, the same, even though we've labelled them all \(k\).
+    
+    Let's start with the \(s\)-channel process.
+    We want to compute
+    \begin{equation*}
+        \bra{f} S^{(2)}_{s} \ket{i} = \bra{\vv{q}, \vv{q}'}\left[ \frac{-g^2}{(3!)^2} \int \dl{^4x} \int \dl{^4y} \varphi^-(y)^2 3^2 \wick{\c \varphi(x) \c \varphi(y)} \varphi^+(x)^2 \right] \ket{\vv{p}, \vv{p}'}
+    \end{equation*}
+    We can compute the action of \((\varphi^{\pm})^2\) on our initial and final states fairly easily:
+    \begin{align}
+        \varphi^+(x)^2 \ket{\vv{p}, \vv{p}'} &= 2\e^{-ip\cdot x} \e^{-ip'\cdot x}\ket{0},\\
+        \bra{\vv{q}, \vv{q}'} \varphi^-(y)^2 &= 2\e^{iq\cdot y} \e^{iq'\cdot y}\bra{0}.
+    \end{align}
+    Again, the factors of 2 come from there being two orders in which we can act on the paired states.
+    
+    Noticing that the factor of \(3^2\) in the integrand, as well as the factors of 2 above, cancel with the \(1/(3!)^2\) term, and using \(\braket{0}{0} = 1\), we have
+    \begin{equation*}
+        \bra{f} S^{(2)}_{s} \ket{i} = -g^2 \int \dl{^4x} \int \dl{^4y} \, \e^{iq\cdot y} \e^{iq'\cdot y} i \int \frac{\dl{^4k}}{(2\pi)^4} \frac{\e^{ik\cdot (x - y)}}{k^2 - m^2 + i\varepsilon} \e^{ip\cdot x} \e^{ip' \cdot x}.
+    \end{equation*}
+    Performing the \(x\) and \(y\) integrals we get more Dirac deltas:
+    \begin{equation*}
+        \bra{f} S^{(2)}_{s} \ket{i} = -ig^2 \int \frac{\dl{^4k}}{(2\pi)^4} (2\pi)^4 \delta^4(q + q' - k) (2\pi)^4 \delta^4(k - p - p') \frac{1}{k^2 - m^2 + i\varepsilon}.
+    \end{equation*}
+    The two Dirac deltas ensure that momentum is conserved at each vertex, and hence overall, since we must have \(q + q' = k\) and \(k = p + p'\) to have a nonzero contribution, and so \(p + p' = q + q'\).
+    We can then perform the integral over \(k\) using one the second Dirac delta and we get
+    \begin{equation}
+        \bra{f} S^{(2)}_{s} \ket{i} = (2\pi)^4\delta^4(q + q' - p - p') \frac{-ig^2}{(p + p')^2 - m^2}.
+    \end{equation}
+    Note that we can drop the \(i\varepsilon\) term since \(k^2 = (p + p')^2 \ge 4m^2\), using \(p^2 = p'^2 = m^2\), and so the denominator never vanishes.
+    It turns out that this is always the case for tree level diagrams, the \(i\varepsilon\) prescription is only needed in loop diagrams.
+    If instead we had used the first Dirac delta to perform the integral we would have gotten a factor of \((q + q')^2\) in the denominator instead, but this is equal to \((p + p')^2\) by momentum conservation.
+    
+    The Dirac delta in this result is again conserving momentum.
+    The interesting thing is the rest, which we call the \defineindex{Feynman amplitude} for this process:
+    \begin{equation}
+        \amplitude_s = \frac{-ig^2}{(p + p')^2 - m^2}.
+    \end{equation}
+    
+    % TODO: Calculate the t and/or u channel processes
+%    \subsubsection{The \texorpdfstring{\(t\)}{t}-Channel Process}
+%    Now consider the \(t\)-channel process.
+%    We want to compute
+%    \begin{equation}
+%        \bra{f} S^{(2)}_{t} \ket{i} = \bra{\vv{q}, \vv{q}'} \left[ \frac{-g^2}{(3!)^2} \varphi^-(x)\varphi^-(y) 3^2 \wick{\c \varphi(x) \c \varphi(y)} \varphi^+(x)\varphi^+(y) \right] \ket{\vv{p}, \vv{p}'}.
+%    \end{equation}
+%    We then have
+%    \begin{align}
+%        \varphi^+(x)\varphi^-(y) \ket{\vv{p}, \vv{p}'} &= \e^{-ip\cdot x}\e^{-ip'\cdot y}\ket{0} + \e^{-ip'\cdot x}\e^{-ip\cdot y}\ket{0},\\
+%        \bra{\vv{q}, \vv{q}'} \varphi^-(x)\varphi^-(y) &= \e^{iq\cdot x}\e^{iq'\cdot y}\bra{0} + \e^{iq'\cdot x}\e^{iq\cdot y}\bra{0}.
+%    \end{align}
+    
+    Similarly we can compute the \(t\) and \(u\)-channel processes, and we find
+    \begin{align}
+        \bra{f} S^{(2)}_{t} \ket{i} &= (2\pi)^4 \delta^4(q + q' - p - p') \frac{-ig^2}{(p - q)^2 - m^2},\\
+        \bra{f} S^{(2)}_{u} \ket{i} &= (2\pi)^4 \delta^4(q + q' - p - p') \frac{-ig^2}{(p - q')^2 - m^2}.
+    \end{align}
+    That is, the amplitudes for the \(t\) and \(u\)-channel processes are
+    \begin{align}
+        \amplitude_t &= \frac{-ig^2}{(p - q)^2 - m^2},\\
+        \amplitude_u &= \frac{-ig^2}{(p - q')^2 - m^2}.
+    \end{align}
+    
+    We now introduce the \defineindex{Mandelstam invariants}, \(s\), \(t\), and \(u\), defined as
+    \begin{alignat}{2}
+        s &= (p + p')^2 &&= (q + q')^2,\\
+        t &= (p - q)^2 &&= (p' - q')^2,\\
+        u &= (p - q')^2 &&= (p' - q)^2.
+    \end{alignat}
+    These are Lorentz invariants characterising each of the three channels.
+    
+    Consider the sum of these three invariants:
+    \begin{align}
+        s + t + u &= (p + p')^2 + (p - q)^2 + (p - q')^2\\
+        &= p^2 + p'^2 + 2p\cdot p' + p^2 + q^2 - 2p\cdot q^ + p^2 + q'^2 - 2 p \cdot q'\notag \\
+        &= 6m^2 + 2(p\cdot p' - p\cdot q - p\cdot q')
+    \end{align}
+    having used the on-shell condition, \(p^2 = p'^2 = q^2 = q'^2 = m^2\).
+    Now using conservation of momentum we have \(q' = p + p' - q\), and so
+    \begin{align}
+        s + t + u &= 6m^2 + 2(p \cdot p' - p \cdot q - p \cdot [p + p' - q])\\
+        &= 6m^2 + 2(p \cdot p' - p \cdot q - p \cdot p - p \cdot p' + p \cdot q)\\
+        &= 6m^2 + 2m^2\\
+        &= 4m^2.
+    \end{align}
+    This shows that, in a theory where all particles have the same mass, the three Mandelstam invariants are not independent.
+    
+    We are interested in the total matrix element at second order which, ignoring loops, is
+    \begin{equation}
+        \bra{f} S^{(2)} \ket{i} = \bra{\vv{q}, \vv{q}'} (S^{(2)}_s + S^{(2)}_t + S^{(2)}_u) \ket{\vv{p}, \vv{p}'}.
+    \end{equation}
+    Combing our results we have
+    \begin{equation}
+        \bra{f} S^{(2)} \ket{i} = (2\pi)^4 \delta^4(q + q' - p - p') (-ig^2) \left[ \frac{1}{s - m^2} + \frac{1}{t - m^2} + \frac{1}{u - m^2} \right]
+    \end{equation}
+    and the amplitude is
+    \begin{align}
+        \amplitude^{(2)} &= \amplitude_s + \amplitude_t + \amplitude_u
+        &= -ig^2\left[ \frac{1}{s - m^2} + \frac{1}{t - m^2} + \frac{1}{u - m^2} \right].
+    \end{align}
+    Notice that the amplitude is invariant under swapping \(p\) and \(p'\) and/or swapping \(q\) and \(q'\), since this simply swaps \(t\) and \(u\) if we make one swap, or does nothing if we make two.
+    This implies that our particles are bosons.
+    
+    Now consider scattering in the centre of mass frame.
+    Here the incoming particles enter with equal and opposite momenta, and therefore also with equal energy since they have the same mass and are on shell.
+    So, \(p^\mu = (E, \vv{p})\) and \(p'^\mu = (E, -\vv{p})\).
+    The energy must split equally between the outgoing particles, so they also have energy \(E\), and the total momentum after the interaction must vanish so they have equal and opposite momenta, \(q^\mu = (E, \vv{q})\) and \(q'^\mu = (E, -\vv{q})\).
+    
+    Calculating \(s\) we have \(s = (p + p')^2 = 4E^2 \ge 4m^2\), where the inequality comes from \(E^2 = m^2 + \vv{p}^2 \ge m^2\).
+    This is what justified us dropping the \(i\varepsilon\) earlier, since if \(s \ge 4m^2\) then \(s - m^2\) will never be zero.
+    
+    Since all particles have the same mass and energy and are on-shell we must have that \(\vv{q}^2 = \vv{p}^2\), hence
+    \begin{equation}
+        t = -(\vv{p} - \vv{q})^2 = -2\abs{\vv{p}}^2(1 - \cos \vartheta) \le 0
+    \end{equation}
+    where \(\cos\vartheta = \vv{p} \cdot \vv{q}/(\abs{\vv{p}\abs{\vv{q}}})\).
+    Similarly,
+    \begin{equation}
+        u = -(\vv{p} + \vv{q})^2 = -2\vv{p}^2(1 + \cos\vartheta) \le 0.
+    \end{equation}
+    This means that \(t - m^2\) and \(u - m^2\) will always be negative, and in particular are never zero allowing us to drop the \(i\varepsilon\) term.
+    This also implies that virtual particles are \emph{always} off-shell, as otherwise we would not be able to conserve momentum in 2-1 and 1-2 vertices.
+    
+    \section{Feynman Rules}
+    The calculations above all follow roughly the same steps, this suggests that we can formulate a way to go from the diagrams to the final result without having to do these steps every time.
+    This is what Feynman rules do.
+    
+    For any \(\varphi^3\) process we have
+    \begin{equation}
+        \bra{f} S \ket{i} = \delta_{fi} + (2\pi)^4 \delta^4\left( \sum p_f - \sum p_i \right) \sum_{n = 2}^{\infty} \amplitude^{(n)}.
+    \end{equation}
+    The Kronecker delta accounts for the case where nothing happens, the Dirac delta enforces energy conservation, where the sums are over all final and then all initial states.
+    The interesting bit is the amplitude, \(\amplitude^{(n)}\).
+    Wick's theorem tells us that the total amplitude, \(\amplitude\), has contributions from all topologically distinct diagrams\footnote{that is, all diagrams which are not related by rearranging where nodes and edges are}, and \(\amplitude^{(n)}\) has contributions from all topologically distinct \(n\) vertex diagrams.
+    Further, we have to consider all diagrams with equal weight due to Wick's theorem, bt the factor of \(g^n\) means that we can drop higher order terms, since \(g\) is taken to be small.
+    
+    From what we've seen so far we can guess most of the Feynman rules, and the others aren't too bad to demonstrate.
+    The \defineindex{Feynman rules}\index{Feynman rules!\(\varphi^3\) theory} for \(\varphi^3\) theory are
+    \begin{itemize}
+        \item Every vertex contributes a factor of \(-ig\) to the amplitude.
+        \item Every internal line contributes a factor of \(i\tilde{\Delta}_{\feynman}(k) = i/(k^2 - m^2 + i\varepsilon)\) to the amplitude.
+        \item Every external line contributes a factor of \(1\) to the amplitude.
+        \item Impose conservation of four-momentum at every vertex.
+        \item Every momentum, \(k\), which is not fixed by conservation of four-momentum gives a factor of
+        \begin{equation}
+            \int \frac{\dl{^4k}}{(2\pi)^4}.
+        \end{equation}
+        \item A symmetry factor (trivial for simple diagrams).
+    \end{itemize}
+    Note that \(\tilde{\Delta}_{\feynman}\) is the Fourier transform of \(\Delta_{\feynman}\), which is to say it is the integrand in the contour representation.
     
     
     %   Appdendix
