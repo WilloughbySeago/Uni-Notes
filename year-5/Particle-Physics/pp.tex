@@ -7,6 +7,7 @@
 \usepackage{csquotes}
 \usepackage{siunitx}
 \usepackage{subcaption}
+\usepackage{slashed}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -151,6 +152,8 @@ crefname={Open Question}{Open Questions}]%
 \newcommand{\e}{\symrm{e}}
 \newcommand{\probability}{\symbb{P}}
 \DeclareMathOperator{\sinc}{sinc}
+\newcommand{\amplitude}{\symcal{M}}
+\newcommand{\dalembertian}{\partial^2}
 
 \includeonly{parts/appParticleData, parts/appFermiGoldenRule}
 
@@ -864,13 +867,191 @@ crefname={Open Question}{Open Questions}]%
     \begin{equation}
         \Gamma_{fi} = 2\pi \abs{T_{fi}}^2 \rho(E_i)
     \end{equation}
-    where \(\Gamma_{fi}\) is the transition rate, \(T_{fi}\) is the transition matrix, and \(\rho(E_i)\) is the density of states.
+    where \(\Gamma_{fi}\) is the transition rate, \(T_{fi}\) is the transition matrix, and \(\rho(E_i)\) is the density of accessible states.
     The full derivation is in \cref{app:fermi's golden rule}.
     
+    To first order the transition matrix is simply the matrix elements of the perturbation Hamiltonian,
+    \begin{equation}
+        T_{fi} = \bra{f} \operator{H}' \ket{i}.
+    \end{equation}
+    This represents a process where the state evolves directly from \(\ket{i}\) to \(\ket{f}\).
+    To second order the transition matrix is
+    \begin{equation}
+        T_{fi} = \bra{f} \operator{H}' \ket{i} + \sum_{k \ne i} \frac{\bra{f} \operator{H}' \ket{k} \bra{k} \operator{H}' \ket{i}}{E_i - E_k}.
+    \end{equation}
+    The second term accounts for all transitions via an intermediate state, \(\ket{k}\).
+    Continuing on the next term would have transitions via two intermediate states and so on.
+    
+    \subsection{Density of States}
+    We want our processes to be physical.
+    This means they have to obey several conservation laws, such as energy and momentum conservation.
+    We enforce this by having a Dirac delta in our terms, such as
+    \begin{equation}
+        \delta(E_i - E_f), \qquad \delta^3(\vv{p_i} - \vv{p_f}), \qqand \delta^4(p_i - p_f),
+    \end{equation}
+    where \(E_i\) and \(E_f\) are the total energy of the initial and final states, \(\vv{p_i}\) and \(\vv{p_f}\) are the total three-momenta of the initial and final states, and \(p_i\) and \(p_f\) are the total four-momenta of the initial and final states.
+    
+    The density of final accessible states depends on the kinematics of the process being considered.
+    In particular, the initial energy, \(E_i\), is the total amount of energy available to the final states.
+    The density of states is given by integrating over all states with energy conservation enforced by a Dirac delta:
+    \begin{equation}
+        \rho(E_i) = \int \delta(E_i - E) \dd{n} = \int \delta(E_i - E) \diff{n}{E} \dd{E} = \diff{n}{E}[E = E_i].
+    \end{equation}
+    Here \(\dl{n}\) gives the number of states with energies between \(E\) and \(E + \dl{E}\).
+    
+    Fermi's golden rule is then that
+    \begin{equation}
+        \Gamma_{fi} = 2\pi \int \abs{T_{fi}}^2 \delta(E_i - E) \dd{n}.
+    \end{equation}
+    
+    The complication with this is that states are quantised, so this integral is nontrivial.
+    A spinless, massless particle can be described with a plane wave
+    \begin{equation}
+        \psi = A\e^{-ip\cdot x}.
+    \end{equation}
+    We consider the particle to be in a box of side length \(a\) and impose vanishing boundary conditions.
+    Normalising the wave function gives us \(A = 1/V\) where \(V = a^3\) is the volume of the box.
+    The momentum of the particle is then quantised as
+    \begin{equation}
+        p_i = \frac{2\pi n_i}{a}.
+    \end{equation}
+    
+    The volume occupied by a state in momentum space is then
+    \begin{equation}
+        \dl{^3\vv{p}} = \dl{p_x} \dd{p_y}\dd{p_z} = \left( \frac{2\pi}{a} \right)^3 = \frac{(2\pi)^3}{V}.
+    \end{equation}
+    The number of states, \(\dl{n}\), with a momentum in the range \(p\) to \(\dl{p}\) is the volume in momentum space of the spherical shell of inner radius \(p\) and thickness \(\dl{p}\) divided by the volume of a single state:
+    \begin{equation}
+        \dl{n} = 4\pi p^2 \dd{p} \frac{V}{(2\pi)^3}.
+    \end{equation}
+    We can choose our box such that we have one particle per unit volume, and call this volume 1, we then have
+    \begin{equation}
+        \dl{n} = \frac{4p^2 \dd{p}}{(2\pi)^3} = \frac{\dl{^3\vv{p}}}{(2\pi)^3}.
+    \end{equation}
+    
+    For example, consider a decay \(A \to 1 + 2 + \dotsb + N\).
+    Then
+    \begin{equation}
+        \dl{n} = (2\pi)^3 \prod_{i=1}^{N} \frac{\dl{^3\vv{p_i}}}{(2\pi)^3} \delta^3\left( \vv{p_A} - \sum_{i = 1}^{N} \vv{p_i} \right).
+    \end{equation}
+    
+    So far we haven't considered the effects of relativity.
+    Our box of unit volume will be Lorentz contracted in the direction of motion.
+    The contraction is proportional to \(\gamma\), which for a single particle of mass \(m\) and energy \(E\) is given by \(\gamma = E/m\).
+    The fix is to redefine the wave function to \(\psi'\), so that
+    \begin{equation}
+        \int \psi'^*\psi' \dd{V} \propto E.
+    \end{equation}
+    The convention is to choose the constant of proportionality to be 2, and then set \(\psi' = \sqrt{2E}\psi\).
+    We can then define a Lorentz invariant matrix element:
+    \begin{equation}
+        \amplitude_{fi} = \sqrt{2E_1 \cdot 2E_2 \dotsm 2E_N} T_{fi}
+    \end{equation}
+    where the product is over the energies of all particles, in both the initial and final states.
+    
+    The transition rate is then
+    \begin{equation}
+        \Gamma_{fi} = 2\pi \int \abs{T_{fi}}^2 \delta(E_i - E) \dd{n}.
+    \end{equation}
+    For simplicity consider the decay \(A \to 1 + 2\), the transition rate is
+    \begin{equation}
+        \Gamma_{fi} = 2\pi \int \abs{T_{fi}}^2 \delta(E_A - E_1 - E_2) \dd{n}.
+    \end{equation}
+    Moving to momentum space we have
+    \begin{equation}
+        \dl{n} = (2\pi)^3 \frac{\dl{^3\vv{p_1}}}{(2\pi)^3} \frac{\dl{^3\vv{p_2}}}{(2\pi)^3} \delta^3(\vv{p_A} - \vv{p_1} - \vv{p_2}).
+    \end{equation}
+    Making this Lorentz invariant we have
+    \begin{equation}
+        \amplitude_{fi} = \sqrt{2E_12E_22E_A} T_{fi} \implies T_{fi} = \frac{\amplitude_{fi}}{\sqrt{2E_12E_22E_A}}
+    \end{equation}
+    and so
+    \begin{equation}
+        \Gamma_{fi} = \frac{(2\pi)^4}{2E_A} \int \abs{\amplitude_{fi}}^2 \delta^4(p_A - p_1 - p_2) \frac{\dl{^3\vv{p_1}}}{(2\pi)^32E_1} \frac{\dl{^3\vv{p_2}}}{(2\pi)^32E_2}.
+    \end{equation}
+    
+    This is just a rewriting of Fermi's golden rule, but now in an explicitly Lorentz invariant form.
+    There are several key features:
+    \begin{itemize}
+        \item The Lorentz invariant phase space measure, \(\dl{^3\vv{p}}/[(2\pi)^32E]\).
+        \item Energy and Momentum conservation from the Dirac delta.
+        \item The decay rate is inversely proportional to the energy fo the decaying particle.
+        \item The Lorentz invariant \(\amplitude_{fi}\) is the part that encodes the physics of the process, and working out what value this should have for a given interaction is the goal of a large part of quantum field theory.
+    \end{itemize}
+    
+    Consider the \(A \to 1 + 2\) decay again, we can partially evaluate the integral and we find that
+    \begin{equation}
+        \Gamma_{fi} = \frac{\abs{\vv{p}^*}}{32\pi^2 m_A^2} \int \abs{\amplitude_{fi}}^2 \dd{\Omega}
+    \end{equation}
+    where \(\abs{\vv{p}^*}\) is the magnitude of the three-momenta of particles 1 and 2 in the rest frame of \(A\), note that they must have the same magnitude of three-momenta as the initial momentum is zero in this frame.
+    The integral is over all angles, with \(\dl{\Omega} = \sin\theta \dd{\varphi} \dd{\vartheta}\).
+    This is valid for all two body decays.
+    
+    If instead we consider scattering, \(A + B \to 1 + 2\), again in the centre of mass frame then we find that
+    \begin{equation}
+        \sigma = \frac{1}{64\pi^2s} \frac{\abs{\vv{p_f}^*}}{\abs{\vv{p_i}^*}} \int \abs{\amplitude_{fi}}^2 \dd{\Omega}
+    \end{equation}
+    where \(\abs{\vv{p_i}^*}\) and \(\abs{\vv{p_f}^*}\) are the magnitude of the three-momenta of the initial and final states in the centre of mass frame, and \(s = (p_A + p_B)^2\) is a Mandelstam variable.
+    Note that this is Lorentz invariant, despite the appearance of three-vectors.
+    
+    \chapter{Schrödinger to Dirac}
+    \section{Schrödinger}
+    Start with the nonrelativistic energy-momentum relation
+    \begin{equation}
+        E = \frac{p^2}{2m} + V,
+    \end{equation}
+    where \(p\) is the magnitude of the particles momentum, \(m\) is its mass, and \(V\) is some potential.
+    To get the Schrödinger equation we substitute in operators:
+    \begin{equation}
+        \operator{p}_j = -i\diffp{}{x^j} = -i\partial_j, \qquad \vecoperator{p} = -i\grad, \qqand E = i\diffp{}{t} = i\partial_t.
+    \end{equation}
+    Acting with the resulting operator on a wave function we get the \defineindex{Schrödinger equation}:
+    \begin{equation}
+        i\diffp{\psi}{t} = \left( -\frac{1}{2m} \laplacian + V \right)\psi.
+    \end{equation}
+    Note that this is first order in time, and second order in space, which makes it not relativistic.
+    
+    \section{Klein--Gordon Equation}
+    If we want a relativistic equation we should start with the relativistic energy-momentum relation,
+    \begin{equation}
+        E^2 = \vv{p}^2 + m^2.
+    \end{equation}
+    Substituting in the same operators we get
+    \begin{equation}
+        \diffp[2]{\varphi}{t} = (\laplacian - m^2)\varphi \implies (\dalembertian + m^2)\varphi = 0.
+    \end{equation}
+    Here \(\dalembertian = \partial_\mu \partial^\mu\) is the d'Alembert operator.
+    This is the \defineindex{Klein--Gordon equation}, it describes free spin 0 bosons.
+    The problem is that we have negative energy solutions, and worse still, if we try to interpret \(\varphi\) as a wave function then we can get negative probabilities.
+    
+    \section{Dirac Equation}
+    The negative energies appear due to the presence of \(E^2\), giving a positive and negative branch when we take the square root.
+    To avoid this Dirac looked for a first order relationship between energy and momentum.
+    He started with
+    \begin{equation}
+        \operator{E}\psi = (\vv{\alpha} \cdot \vecoperator{p} + \beta m)\psi
+    \end{equation}
+    where \(\vv{\alpha}\) and \(\beta\) are some constants.
+    Inserting the operators we have
+    \begin{equation}
+        i\diffp{\psi}{t} = \left( -i\alpha_x \diffp{}{x} - i\alpha_y \diffp{}{y} - i\alpha_z \diffp{}{z} + \beta m \right)\psi.
+    \end{equation}
+    Defining \(\gamma^0 = \beta\), \(\gamma^i = \beta \alpha_i\) some rearranging gives this equation in the form
+    \begin{equation}
+        \left( i\gamma^0 \diffp{}{t} + i\gamma^1 \diffp{}{x} + i\gamma^2 \diffp{}{y} + i\gamma^3 \diffp{}{z} - m \right) \psi = 0.
+    \end{equation}
+    This can be written more compactly as
+    \begin{equation}
+        (i\gamma^\mu \partial_\mu - m)\psi = 0.
+    \end{equation}
+    Defining \(\slashed{a} \coloneqq \gamma^\mu a_\mu\) we can write this even more compactly as
+    \begin{equation}
+        (i\slashed{\partial} - m)\psi = 0.
+    \end{equation}
+    This is the \defineindex{Dirac equation}, it describes spin 1/2 fermions.
     
     
-    
-     %   Appdendix
+    % Appdendix
     \appendixpage
     \begin{appendices}
         \include{parts/appParticleData}
