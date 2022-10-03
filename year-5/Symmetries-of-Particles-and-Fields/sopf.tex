@@ -53,6 +53,7 @@ noabbrev
 \newcommand{\cyclicGroupZ}[1][n]{\integers_{#1}}
 \newcommand{\cyclicGroupC}[1][n]{C_{#1}}
 \newcommand{\symmetricGroup}[1][n]{S_{#1}}
+\newcommand{\dihedralGroup}[1][n]{D_{n}}
 \newcommand{\subgroup}{\subseteq}
 \newcommand{\properSubgroup}{\subset}
 \DeclarePairedDelimiter{\cardinality}{\lvert}{\rvert}
@@ -89,6 +90,9 @@ noabbrev
     \clist_use:Nn \l_willougbhy_cycle_clist { #1 }  % print list separated by #1
 }
 \ExplSyntaxOff
+\newcommand{\order}{\symcal{O}}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\spn}{span}
 
 \includeonly{}
 
@@ -243,8 +247,8 @@ noabbrev
     
     \begin{dfn}{Morphisms}{}
         Let \(G\) and \(H\) be groups.
-        A group \defineindex{homomorphism} is a function \(\varphi \colon G \to H\) such that \(\varphi(g_1 g_2) = \varphi(g_1)\varphi(g_2)\) for all \(g_1, g_2 \in G\).
-        If this function is invertible it is called a group \defineindex{isomorphism}.
+        A \defineindex{group homomorphism}\index{homomorphism!of groups} is a function \(\varphi \colon G \to H\) such that \(\varphi(g_1 g_2) = \varphi(g_1)\varphi(g_2)\) for all \(g_1, g_2 \in G\).
+        If this function is invertible it is called a \defineindex{group isomorphism}\index{isomorphism!of groups}.
         
         If there exists an isomorphism \(G \to H\) then we say \(G\) and \(H\) are \defineindex{isomorphic}, and write \(G \isomorphic H\).
     \end{dfn}
@@ -310,6 +314,109 @@ noabbrev
         \end{itemize}
     \end{exm}
     
+    As well as direct products, which just pair up elements in a non-interacting way, we can act on one of the groups with the other, and then pair up the elements.
+    This gives a new type of product, and so allows us to construct new groups.
+    
+    \begin{dfn}{Semidirect Product}{}
+        Let \(N\) and \(H\) be groups, and let consider a group action of \(N\) on \(H\).
+        We can define a group, \(N \rtimes H\), consisting of pairs \((n, h)\) with \(n \in N\) and \(h \in H\), and with the group operation
+        \begin{equation}
+            (n, h)(n', h') = (n(h \action n'), hh').
+        \end{equation}
+        This is called the \defineindex{semidirect product}.
+    \end{dfn}
+    That is, we act on the second element of \(N\) with the first element of \(H\), and then proceed with the usual direct product.
+    
+    \begin{exm}{Dihedral Group}{}
+        The dihedral group, \(\dihedralGroup\), of order \(2n\) is the semidirect product of \(\cyclicGroupC\) and \(\cyclicGroupC[2]\) where \(\cyclicGroupC[2]\) acts on \(\cyclicGroupC\) by the nonidentity element of \(\cyclicGroupC[2]\) sending elements of \(\cyclicGroupC\) to their inverses.
+        It can be shown that this is the symmetry group of the regular \(n\)-gon, where we interpret the action of \(\cyclicGroupC\) on the \(n\)-gon as rotations by \(2\pi/n\) and the action of \(\cyclicGroupC[2]\) as reflections.
+    \end{exm}
+    
+    Groups can act on sets, and groups \emph{are} sets, so it makes sense to have groups act on groups, and in particular, its pretty obvious we can have a group act on itself.
+    One example is the left action of \(G\) on \(G\), given by \(g \action h = gh\) for all \(g, h \in G\).
+    Here we interpret this as \(g\) acting on \(h\).
+    A slightly less trivial example is \defineindex{conjugation}, where \(g \action h = ghg^{-1}\) for all \(g, h \in G\).
+    We can view conjugacy as a symmetry of the group, but what does it act on?
+    Well, we can just act on the group, but this isn't that helpful.
+    Instead, we define the \defineindex{conjugacy class} of some \(g \in G\) to be the set of all \(h \in G\) conjugate to \(G\), that is, all \(h\) such that there exists \(k \in G\) with \(khk^{-1} = g\).
+    This partitions \(G\) into sets, since this defines an equivalence relation.
+    
+    Now that we have a particular symmetry of \(G\) we should ask if there are any invariants, and indeed there is.
+    
+    \begin{dfn}{Normal Subgroup}{}
+        Let \(G\) be a group and \(N\) a subgroup of \(G\).
+        Then we call \(N\) a \defineindex{normal subgroup}, or \define{invariant subgroup}\index{invariant subgroup|see{normal subgroup}} if \(N\) is invariant under conjugation.
+        That is if \(n \in N\) then \(gng^{-1} \in N\) for all \(g \in G\).
+    \end{dfn}
+
+    \begin{exm}{Normal Subgroups}{}
+        \begin{itemize}
+            \item The trivial group, consisting of just the identity, is a normal subgroup of any group.
+            \item The \defineindex{centre of a group}, defined as the set of all elements which commute with every element of the group is a normal subgroup.
+            If the only normal subgroups are the trivial group and the centre then we call the group a \define{simple}\index{simple!group}.
+            \item The group \(\{\cycle{}, \cycle{1,2,3}, \cycle{3,2,1}\}\) is a normal subgroup of \(\symmetricGroup[3]\).
+        \end{itemize}
+    \end{exm}
+    
+    We've seen products of groups, we now ask if there is a sensible notion of a quotient of groups, and indeed there is!
+    The definition only makes sense if one of the groups is a normal subgroup of the other.
+    But first, we need another definition.
+    \begin{dfn}{Coset}{}
+        Let \(G\) be a group and \(H\) a subgroup of \(G\).
+        For each \(g \in G\) we define the \defineindex{left coset}\index{coset} to be \(gH \coloneqq \{gh \mid h \in H\}\).
+        That is, it's the set of all elements of the form \(gh\) for \(h \in H\).
+        Similarly the \defineindex{right coset} is \(Hg \coloneqq \{hg \mid h \in H\}\).
+    \end{dfn}
+    
+    \begin{wrn}
+        Cosets are not, in general, groups, since only the coset \(H\) contains the identity.
+    \end{wrn}
+    
+    \begin{exm}{Cosets}{}
+        \begin{itemize}
+            \item Let \(\integers\) be the group of integers under addition.
+            Then \(2\integers\) is the subgroup of even integers under addition.
+            We can define cosets, \(0 + 2\integers = 2\integers\) and \(1 + 2\integers\) corresponding to the even integers and odd integers.
+            \item Consider \(\reals^3\), then we can view \(\reals\) as a subgroup of this given by the \(x\)-axis.
+            Then the cosets \(\vv{a} + \reals\) for \(\vv{a} \in \reals\) consist of lines parallel to the \(x\)-axis.
+        \end{itemize}
+    \end{exm}
+    
+    \begin{dfn}{Quotient Group}{}
+        Let \(G\) be a group, and \(N\) a normal subgroup of \(G\).
+        Define \(G/N\) to be the set of all left cosets in \(G\), that \(G/N \coloneqq \{aN, a \in G\}\).
+        We can define a group operation on this set: \((gN)(g'N) \coloneqq (gg')N\).
+        We then call \(G/N\) the \defineindex{quotient group} of \(G\) by \(N\), also known as the \define{factor group}\index{factor group|see{quotient group}}.
+    \end{dfn}
+    
+    \begin{wrn}
+        This definition only defines a group if \(N\) is a normal subgroup of \(G\).
+        If this isn't the case then the operation will not be well defined.
+    \end{wrn}
+    
+    \begin{dfn}{Quotient Groups}{}
+        \begin{itemize}
+            \item Consider the group of integers, \(\integers\), under addition, and the normal subgroup \(2\integers\), of even integers.
+            The quotient group \(\integers/2\integers\) consists of the cosets \(2\integers\) and \(1 + 2\integers\), where the second is all odd integers.
+            Considering \(2\integers\) to be \(0 + 2\integers\) we see that, for example,
+            \begin{equation}
+                (1 + 2\integers)(0 + 2\integers) = (1 + 0) + 2\integers = 1 + 2\integers
+            \end{equation}
+            and
+            \begin{equation}
+                (1 + 2\integers)(1 + 2\integers) = (1 + 1) + 2\integers = 2 + 2\integers = 0 + 2\integers = 2\integers.
+            \end{equation}
+            We can conclude that \(\integers/2\integers \isomorphic \cyclicGroupZ[2]\), and indeed some people use \(\integers/n\integers\) to denote \(\cyclicGroupZ\).
+            
+            \item Consider the real numbers, \(\reals\), viewed as an additive group, with the subgroup \(\integers\).
+            Each coset of \(\integers\) is then of the form \(a + \integers\) where \(a \in \reals\).
+            When the noninteger parts of \(a\) and \(b\) are equal the cosets \(a + \integers\) and \(b + \integers\) are equal, and so we can subtract the integer parts of \(a\) and \(b\) and just consider the noninteger parts, identifying the groups with the noninteger part of their representative we notice that \(a + \integers\) is essentially covering the interval \([0, 1)\) over and over again as \(a\) is varied.
+            In fact, \(\reals/\integers \isomorphic \sphere[1]\), identifying \(a + \integers\) with a rotation by \(2\pi\tilde{a}\), where \(\tilde{a}\) is the noninteger part of \(a\).
+            
+            \item The group \(G/G\) is the trivial group, and the group \(G/\{e\}\) is (isomorphic to) \(G\).
+        \end{itemize}
+    \end{dfn}
+    
     \section{Lie Groups}
     Often the groups of interest in physics have an uncountable number of elements, in this case they are continuos groups.
     We can define this more rigorously by parametrising the elements in a continuous way.
@@ -332,7 +439,7 @@ noabbrev
     As is usually the case in physics we assume that most things are analytic, they can be expanded in Taylor series.
     This assumption defines Lie groups, one of the main subjects of our study in this course.
     \begin{dfn}{Lie Group}{}
-        A \defineindex{Lie group}, \(G\), is a continuous group for which the group multiplication has an analytic structure.
+        A \defineindex{Lie group}\footnote{pronounced \emph{lee}}, \(G\), is a continuous group for which the group multiplication has an analytic structure.
         That is, if \(g(\alpha) = g(\beta)g(\gamma)\) then \(\alpha_i = \varphi_i(\beta, \gamma)\) where \(\varphi_i\) are analytic functions of \(\beta\) and \(\gamma\).
     \end{dfn}
     
@@ -634,7 +741,7 @@ noabbrev
     
     The special unitary group is a group for exactly the same reasons that \(\unitary(N)\) and \(\specialLinear(N, \field)\) are.
     
-    \begin{exm}{\(\specialUnitary(2)\)}{}
+    \begin{exm}{\(\specialUnitary(2)\)}{exm:SU(2) = three sphere}
         Consider \(\specialUnitary(2)\).
         Start with some \(2\times 2\) matrix over \(\complex\),
         \begin{align}
@@ -772,7 +879,7 @@ noabbrev
     One-dimensional Lie groups are, unsurprisingly, some of the simplest Lie groups.
     In fact, they're so simple that they're not that interesting, a theory we'll develop rigorously through a collection of theorems.
     
-    \begin{thm}{}{}
+    \begin{thm}{}{thm:one dim lie group parameters add}
         All one-dimensional Lie groups can be parametrised so that
         \begin{equation}
             g(a) g(b) = g(a + b)
@@ -948,7 +1055,7 @@ noabbrev
     There are two ways to formalise the notion of a representation, they are as follows.
     \begin{dfn}{Representation}{}
         Let \(G\) be a group.
-        Then a group \defineindex{representation}, \((D, V)\), is a vector space, \(V\), and a homomorphism, \(D \colon G \to \generalLinear(V)\).
+        Then a group \define{representation}\index{representation!of a group}, \((D, V)\), is a vector space, \(V\), and a homomorphism, \(D \colon G \to \generalLinear(V)\).
     \end{dfn}
     
     \begin{dfn}{Representation}{}
@@ -1118,6 +1225,682 @@ noabbrev
     The amplitude for this is \(\braket{\psi}{\varphi}\).
     The time reversed system evolves from state \(\ket{\varphi}\) to state \(\ket{\psi}\).
     The amplitude for this is \(\braket{\varphi}{\psi} = \braket{\psi}{\varphi}^*\).
+    
+    \part{Lie Algebras}
+    \chapter{Lie Algebras}
+    There are, broadly, two approaches to Lie algebras.
+    One can derive their properties and then abstract, or abstract and then show that there is a connection to Lie groups.
+    The first is how a typical physics course goes about it, and fits the historical process of discovering Lie algebras, but I prefer to abstract and then look at applications where possible, so that's what these notes will do.
+    
+    We'll define Lie algebras as abstract objects, and briefly discuss some properties which follow immediately.
+    Then we'll discuss the link to Lie groups, and then go into more detail about the properties of Lie algebras.
+    
+    \section{What is an Algebra?}
+    An algebra is a vector space equipped with a product compatible with the vector space structure.
+    Formally, the definition is as follows.
+    
+    \begin{dfn}{Algebra}{}
+        Let \(\field\) be a field and \(A\) a vector space over \(\field\).
+        Equip \(A\) with a binary operation \(A \times A \to A\), denoted by juxtaposition here.
+        If this product has the following properties then \(A\) is an \defineindex{algebra}:
+        \begin{itemize}
+            \item Left distributivity: \(x(y + z) = xy + xz\) for all \(x, y, z \in A\);
+            \item Right distributivity: \((x + y)z = xz + yz\) for all \(x, y, z \in A\);
+            \item Compatibility with scalar multiplication: \((\alpha x)(\beta y) = (\alpha\beta)(xy)\) for all \(\alpha, \beta \in \field\) and \(x, y \in A\).
+        \end{itemize}
+        We call \(A\) an \defineindex{associative algebra} if the product is associative.
+    \end{dfn}
+    
+    \begin{exm}{Algebra}{}
+        \begin{itemize}
+            \item The real numbers are a vector space over themselves, and also an algebra over themselves with the product being normal multiplication.
+            \item The complex numbers are a vector space over themselves, and also an algebra over themselves with the product being normal multiplication.
+            \item The complex numbers are a vector space over \(\reals\), and also an algebra over \(\reals\) with the product being normal complex multiplication when we think of complex numbers as ordered pairs of real numbers.
+            \item The vector space \(\reals^3\) when equipped with the cross product forms an algebra over \(\reals\).
+            \item The vector space \(\reals^4\) when identified with the quaternions forms an algebra over \(\reals\) with the product being the quaternion product.
+            \item Polynomials over \(\reals\), that is \(\reals[x]\), form a vector space over \(\reals\) and when equipped with polynomial multiplication this is an algebra.
+            \item The set of \(m \times n\) matrices over \(\reals\) forms an \(mn\)-dimensional vector space.
+            This forms an algebra over \(\reals\) when equipped with the normal matrix product.
+            \item The set of \(m \times n\) matrices over \(\reals\) forms an \(mn\)-dimensional vector space.
+            This forms an algebra over \(\reals\) when equipped with the \defineindex{commutator}, \(\commutator{A}{B} \coloneqq AB - BA\).
+        \end{itemize}
+    \end{exm}
+    
+    \section{What is a Lie Algebra}
+    A Lie algebra is an algebra where the product is given by a Lie bracket, which is just a particular form of product with a couple of properties which we write as a bracket, so \(\commutator{a}{b}\) instead of \(ab\).
+    
+    \begin{dfn}{Lie Algebra}{}
+        A \defineindex{Lie algebra}, \(\lie{g}\), is a vector space over some field, \(\field\), equipped with a binary operation, \(\commutator{-}{-} \colon \lie{g} \times \lie{g} \to \lie{g}\), satisfying the following:
+        \begin{itemize}
+            \item \define{Bilinearity}\index{bilinear}: for all \(\alpha, \beta \in \field\) and \(x, y, z \in \lie{g}\) we have
+            \begin{equation*}
+                \commutator{\alpha x + \beta y}{z} = \alpha\commutator{x}{z} + \beta \commutator{y}{z}, \qand \commutator{z}{\alpha x + \beta y} = \alpha\commutator{z}{x} + \beta \commutator{z}{y}.
+            \end{equation*}
+            \item \define{Alternativity}\index{alternating}: for all \(x \in \lie{g}\) we have
+            \begin{equation}
+                \commutator{x}{x} = 0,
+            \end{equation}
+            where \(0\) is the zero vector.
+            \item The \defineindex{Jacobi identity}: for all \(x, y, z \in \lie{g}\) we have
+            \begin{equation}
+                \commutator{x}{\commutator{y}{z}} + \commutator{y}{\commutator{z}{x}} + \commutator{z}{\commutator{x}{y}} = 0.
+            \end{equation}
+            Note that this is just \(\commutator{x}{\commutator{y}{z}}\) plus cyclic permutations.
+        \end{itemize}
+    \end{dfn}
+    \begin{ntn}{}{}
+        Lie algebras are, unsurprisingly, related to Lie groups.
+        If we have a Lie group denoted with capital letters, such as \(G\), \(\generalLinear\), \(\specialOrthogonal\), \(\unitary\), and so on, then we denote the associated Lie algebra by the same letter but lowercase and in the Fraktur script, so \(\lie{g}\), \(\generalLinearLie\), \(\specialOrthogonalLie\), \(\unitaryLie\), and so on.
+        For future reference here is the alphabet, in order, in Fraktur:
+        \begin{equation}
+            \lie{a \, b \, c \, d \, e \, f \, g \, h \, i \, j \, k \, l \, m \, n \, o \, p \, q \, r \, s \, t \, u \, v \, w \, x \, y \, z}.
+        \end{equation}
+        It is also common to use lowercase, non-Fraktur letters for Lie algebras, such as \(g\), \(\symrm{gl}\), \(\symrm{so}\), \(\symrm{u}\), and so on.
+    \end{ntn}
+    
+    Note that some sources define the Lie bracket to be anticommutative, instead of alternating.
+    That is, \(\commutator{x}{y} = -\commutator{y}{x}\) for all \(x, y \in \lie{g}\).
+    This is necessarily the case for an alternating Lie bracket:
+    \begin{multline}
+        0 = \commutator{x + y}{x + y} = \commutator{x}{x + y} + \commutator{y}{x + y}\\
+        = \commutator{x}{x} + \commutator{x}{y} + \commutator{y}{x} + \commutator{y}{y} = \commutator{x}{y} + \commutator{y}{x},
+    \end{multline}
+    and so \(\commutator{x}{y} = -\commutator{y}{x}\).
+    However, the reverse implication, that an anticommutative product is alternating, only holds if the characteristic\footnote{the \defineindex{characteristic} of a ring, and hence field, is the number of times you have to add 1 to itself to get 0, or 0 if you never get 0 this way.} of the field is not 2, so our definition is \emph{slightly} more general.
+    However, we'll almost entirely work over \(\reals\) and \(\complex\) which have characteristic 0, so it's not an important distinction.
+    So, suppose that we work over a field with characteristic not equal to 2, then \(\commutator{x}{x} = -\commutator{x}{x}\) by anticommutativity (in the second bracket we swapped the \(x\)s, you just can't tell).
+    Hence, we have
+    \begin{equation}
+        2 \commutator{x}{x} = \commutator{x}{x} + \commutator{x}{x} = \commutator{x}{x} - \commutator{x}{x} = 0,
+    \end{equation}
+    and so long as we can divide by 2 we have \(\commutator{x}{x} = 0\).
+    It is this dividing by 2 step that fails in a field with characteristic 2.
+    
+    The Jacobi identity is a bit weird as a requirement.
+    Define \(D_x(y) = \commutator{x}{y}\), then we can write the Jacobi identity as
+    \begin{equation}
+        D_x(\commutator{y}{z}) = \commutator{D_x(y)}{z} + \commutator{y}{D_x(z)},
+    \end{equation}
+    which looks a lot like the product rule.
+    Going back to writing Lie brackets this is
+    \begin{equation}
+        \commutator{x}{\commutator{y}{z}} = \commutator{\commutator{x}{y}}{z} + \commutator{y}{\commutator{x}{z}}.
+    \end{equation}
+    Using the anticommutativity of the Lie bracket (in fields of characteristic other than 2, an implicit assumption from now on) and the bilinearity we can rewrite
+    \begin{equation}
+        \commutator{\commutator{x}{y}}{z} = -\commutator{z}{\commutator{x}{y}}
+    \end{equation}
+    and
+    \begin{equation}
+        \commutator{y}{\commutator{x}{z}} = \commutator{y}{-\commutator{z}{x}} = -\commutator{y}{\commutator{z}{x}}.
+    \end{equation}
+    Hence,
+    \begin{equation}
+        \commutator{x}{\commutator{y}{z}} = -\commutator{z}{\commutator{x}{y}} - \commutator{y}{\commutator{z}{x}},
+    \end{equation}
+    which is just the Jacobi identity with some terms moved to the other side.
+    
+    \begin{exm}{Lie Algebra}{}
+        \begin{itemize}
+            \item Consider the set of \(m \times n\) matrices over \(\reals\).
+            This forms a Lie algebra when equipped with the commutator, \(\commutator{A}{B} = AB - BA\).
+            \item Consider \(\reals^3\).
+            This forms a Lie algebra when equipped with the cross product, \(\commutator{\vv{v}}{\vv{u}} = \vv{v} \times \vv{u}\).
+        \end{itemize}
+    \end{exm}
+    
+    \section{Subalgebras}
+    As with groups we can often find Lie algebras hiding inside other Lie algebras, and certain such Lie algebras are special.
+    \begin{dfn}{Lie Subalgebra and Ideals}{}
+        Let \(\lie{g}\) be a Lie algebra and \(\lie{h}\) a subspace of \(\lie{g}\) (as vector spaces).
+        Then \(\lie{h}\) is a \defineindex{Lie subalgebra}, or simply a \defineindex{subalgebra}, of \(\lie{g}\) if \(\commutator{x}{y} \in \lie{h}\) for all \(x, y \in \lie{h}\), where \(\commutator{-}{-}\) is the Lie bracket of \(\lie{g}\).
+        
+        An \defineindex{ideal} is a Lie subalgebra \(\lie{i}\) with the stronger condition that \(\commutator{g}{i} \in \lie{i}\) for all \(g \in \lie{g}\).
+    \end{dfn}
+    
+    The definition of an ideal here is analogous to that of a normal subgroup.
+    A normal subgroup is invariant under conjugation with any group element and an ideal is invariant under Lie brackets with any algebra element.
+    Note that if \(\commutator{g}{i} \in \lie{i}\) then \(\commutator{i}{g} = -\commutator{g}{i} \in \lie{i}\) also as \(\lie{i}\) is a subspace of \(\lie{g}\).
+    Similar to the group case a Lie algebra is \defineindex{simple!Lie algebra} if it has no nontrivial ideals, that is the only ideals are itself and the zero dimensional vector space, and it is not Abelian.
+    A Lie algebra is \define{Abelian}\index{Abelian!Lie algebra} if the Lie bracket vanishes, that is \(\commutator{x}{y} = 0\) for all \(x, y \in \lie{g}\).
+    Note that this is equivalent to saying \(\commutator{x}{y} = \commutator{y}{x}\), the more usual notion of being Abelian, but anticommutativity means \(\commutator{y}{x} = -\commutator{x}{y}\), so we have \(\commutator{x}{y} = -\commutator{x}{y}\), and so \(\commutator{x}{y} = 0\).
+    
+    \section{Morphisms Between Lie Algebras}
+    As often happens in maths after defining an object we should define maps between these objects.
+    These maps should preserve the structure of the object, and if such a map is invertible then the structure, at least at the Lie algebra level, of the two objects is the same, and so, when thinking about Lie algebras, we treat the two objects as if they were identical.
+    \begin{dfn}{Morphisms}{}
+        Let \(\lie{g}\) and \(\lie{h}\) be Lie algebras.
+        A \defineindex{Lie algebra homomorphism}\index{homomorphism!of Lie algebras} is a function \(\varphi \colon \lie{g} \to \lie{h}\) preserving the bracket, that is
+        \begin{equation}
+            \varphi(\commutator{x}{y}) = \commutator{\varphi(x)}{\varphi(y)}
+        \end{equation}
+        for all \(x, y \in \lie{g}\).
+        Here the Lie bracket on the left is that of \(\lie{g}\), and on the right the Lie bracket is that of \(\lie{h}\).
+        
+        An \defineindex{Lie algebra isomorphism}\index{isomorphism!of Lie algebras} is an invertible Lie algebra homomorphism.
+    \end{dfn}
+    
+    \section{Generators and Structure Constants}
+    Lie algebras are vector spaces, and as such have lots of nice things, like bases, that we can use to make calculations easier.
+    \begin{dfn}{Generators}{}
+        Let \(\lie{g}\) be a Lie algebra.
+        A set of elements of \(\lie{g}\) are said to \define{generate}\index{generator} \(\lie{g}\) if the smallest subalgebra containing these elements is \(\lie{g}\) itself.
+        That is, if all elements of \(\lie{g}\) can be be generated from linear combinations of the generators, and Lie brackets of the generators, and Lie brackets of Lie brackets of the generators and so on.
+        The generators are the basis for \(\lie{g}\) as a vector space.
+    \end{dfn}
+    
+    \begin{ntn}{}{}
+        Generators are commonly denoted \(T_a\), where \(a\) indexes the generating set.
+    \end{ntn}
+    
+    Let \(\lie{g}\) be a Lie algebra with generators \(T_a\).
+    Since A Lie algebra is a vector space, and any element of it can be expressed as a linear combination of basis vectors, which for a Lie algebra are the generators.
+    In particular, the Lie bracket of two elements of the Lie algebra is another element of the Lie algebra, and so can be expressed in this way:
+    \begin{equation}
+        \commutator{x}{y} = f^a(x, y) T_a
+    \end{equation}
+    where \(f^a(x, y)\) is the coefficient of \(T_a\) in this expansion, and there is an implicit sum over \(a\).
+    Naturally we can consider the case when \(x\) and \(y\) are themselves generators, and this leads to the following definition.
+    \begin{dfn}{Structure Constants}{}
+        Let \(\lie{g}\) be a Lie algebra with generators \(T_a\).
+        Then the \defineindex{structure constant} \(\tensor{c}{^c_{ab}}\) is defined as the coefficient in one of the following:
+        \begin{equation}
+            \commutator{T_a}{T_b} = \tensor{c}{^c_{ab}}T_c, \qqor \commutator{T_a}{T_b} = \textcolor{highlight}{i}\tensor{c}{^c_{ab}}T_c,
+        \end{equation}
+        where there is an implicit sum over the index \(c\).
+    \end{dfn}
+    
+    Which of these two statements defines the structure constants depends on convention.
+    For Lie algebras formed from real matrices we usually choose the first, and for Lie algebras formed from complex matrices the second.
+    If we include the factor of \(i\) here then there are other places we need to include it later, but it can make the generators slightly nicer for physics, such as making them Hermitian when they would otherwise have been anti-Hermitian.
+    
+    We can use the Jacobi identity to derive an equivalent identity for the structure constants.
+    Start with the Jacobi identity applied to three generators:
+    \begin{equation}
+        0 = \commutator{T_a}{\commutator{T_b}{T_c}} + \commutator{T_b}{\commutator{T_c}{T_a}} + \commutator{T_c}{\commutator{T_a}{T_b}}.
+    \end{equation}
+    Replacing the inner Lie bracket with structure constants then applying linearity we have
+    \begin{align}
+        0 &= \commutator{T_a}{\tensor{c}{^d_{bc}}T_d} + \commutator{T_b}{\tensor{c}{^d_{ca}}T_d} + \commutator{T_c}{\tensor{c}{^d_{ab}}T_d}\\
+        &= \tensor{c}{^d_{bc}}\commutator{T_a}{T_d} + \tensor{c}{^d_{ca}}\commutator{T_b}{T_d} + \tensor{c}{^d_{ab}}\commutator{T_c}{T_d}.
+    \end{align}
+    Now replace the Lie brackets with structure constants again:
+    \begin{equation}
+        0 = \tensor{c}{^d_{bc}}\tensor{c}{^e_{ad}}T_e + \tensor{c}{^d_{ca}}\tensor{c}{^e_{bd}}T_e + \tensor{c}{^d_{ab}}\tensor{c}{^e_{cd}}T_e.
+    \end{equation}
+    Requiring this to hold for initial choices of generators the coefficients here must vanish, and so
+    \begin{equation}
+        0 = \tensor{c}{^d_{bc}}\tensor{c}{^e_{ad}} + \tensor{c}{^d_{ca}}\tensor{c}{^e_{bd}} + \tensor{c}{^d_{ab}}\tensor{c}{^e_{cd}}.
+    \end{equation}
+    
+    \begin{lma}{}{}
+        Let \(\lie{g}\) be the Lie algebra generated by \(\{T_a\}\) with structure constants \(\tensor{c}{^c_{ab}}\).
+        If \(T_a\) are Hermitian then the structure constants are real.
+        \begin{proof}
+            If \(\{T_a\}\) generates the Lie algebra then so does \(\{-T_a^*\}\).
+            Taking the complex conjugate of the defining relation for the structure constants we have
+            \begin{equation}
+                \commutator{T_a}{T_b}^* = (i\tensor{c}{^c_{ab}}T_a)^* \implies \commutator{T_a^*}{T_b^*} = -i\tensor{c}{^c_{ab}}^*T_c^*.
+            \end{equation}
+            Linearity tells us that \(\commutator{A}{B} = \commutator{-A}{-B}\), and so
+            \begin{equation}
+                \commutator{-T_a^*}{T_b^*} = i\tensor{c}{^c_{ab}}^*(-T_c^*).
+            \end{equation}
+            The structure constants are independent of the choice of generators, so we must have \(\tensor{c}{^c_{ab}} = \tensor{c}{^c_{ab}}^*\), that is \(\tensor{c}{^c_{ab}} \in \reals\).
+        \end{proof}
+    \end{lma}
+
+    \section{Representations}
+    Representations of Lie algebras aren't that different to representations of groups.
+    The idea is to find some set of matrices, \(D\), parametrised by the elements of the Lie algebra, say \(x, y \in \lie{g}\), such that the Lie bracket in \(\lie{g}\) corresponds to the commutator of these matrices, that is
+    \begin{equation}
+        D(\commutator{x}{y}) = D(x)D(y) - D(y)D(x) = \commutator{D(x)}{D(y)},
+    \end{equation}
+    where the first \(\commutator{-}{-}\) is an abstract Lie bracket, which may or may not take the form of a commutator, and the second \(\commutator{-}{-}\) is the normal commutator.
+    The formal definition of a representation of a Lie algebra is as follows.
+    
+    \begin{dfn}{Representation}{}
+        Let \(\lie{g}\) be a Lie algebra.
+        Then a \define{Lie algebra representation}\index{representation!of a Lie algebra}, \((D, V)\), is a vector space, \(V\), and a homomorphism of Lie algebras
+        \begin{equation}
+            D \colon \lie{g} \to \generalLinearLie(V)
+        \end{equation}
+        where \(\generalLinearLie(V) = \End(V)\) is made into a Lie algebra by equipping it with the commutator as a Lie bracket.
+    \end{dfn}
+    
+    Representations essentially equate to a choice of generators.
+    We have already met one of the most important representations of any Lie group, the structure constants themselves.
+    
+    \begin{dfn}{Adjoint Representation}{}
+        The \defineindex{adjoint representation} of a Lie algebra, \(\lie{g}\), is the representation on \(\complex^{\dim \lie{g}}\) given by choosing the generators to satisfy
+        \begin{equation}
+            \tensor{(T_a)}{^b_c} = i\tensor{c}{^b_{ac}}.
+        \end{equation}
+    \end{dfn}
+    
+    To show that this is indeed a representation we need to show that \(T_a\) defined in this way satisfy \(\commutator{T_a}{T_b} = i\tensor{c}{^c_{ab}}T_c\).
+    We can use the antisymmetry of the structure constants to write the Jacobi identity as
+    \begin{equation}
+        \tensor{(T_a)}{^d_e} \tensor{(A_b)}{^e_c} - \tensor{(A_b)}{^d_e}\tensor{(A_a)}{^e_c} = i\tensor{(A_e)}{^d_c} \tensor{c}{^e_{ab}},
+    \end{equation}
+    which in matrix notation gives
+    \begin{equation}
+        \commutator{T_a}{T_b} = i\tensor{c}{^e_{ab}}T_e.
+    \end{equation}
+    
+    \chapter{Lie Algebras and Lie Groups}
+    In this chapter we discuss the relationship between a Lie group and the associated Lie algebra.
+    Starting with how we can get a Lie algebra from a Lie group by linearisation, then we'll see some examples, then we'll look at how to get back to the Lie group (or close to it) from the Lie algebra.
+    
+    \section{Linearising}
+    Let \(G\) be a Lie group.
+    An important idea is that every point in a Lie group is essentially equivalent, since if we study a neighbourhood of \(g \in G\) then we can transform this into a neighbourhood of \(h \in G\) by multiplying on the left by \(hg^{-1}\).
+    This suggests that we can learn about a Lie group by studying just a single neighbourhood, and if we have to select a single point in the group it makes sense to choose the identity.
+    
+    If we want to study the behaviour of something near a fixed point it makes sense to expand about this point, which we're allowed to do for Lie groups by the analyticity part of the definition.
+    Doing so up to first order we \defineindex{linearise} the group.
+    If the group elements are \(g(\alpha)\), where \(\alpha = \{\alpha^a\}\) is parametrising the group, then expanding about the identity, 1, we get
+    \begin{equation}
+        g(\alpha) = 1 + i\alpha^a T_a + \order(\alpha^2)
+    \end{equation}
+    where
+    \begin{equation}
+        T_a = -i \diffp{g(\alpha)}{\alpha^a}[\alpha = 0]
+    \end{equation}
+    and \(a\) runs from 1 to \(\dim G\).
+    We call \(T_a\) the \define{generators}\index{generator}.
+    \begin{wrn}
+        The factor of \(i\) here in these definitions is convention.
+        It allows us to work with Hermitian matrices rather than anti-Hermitian matrices.
+        Not everyone follows this convention, and we won't include it if we're working with real matrices.
+    \end{wrn}
+    
+    \section{Lie Bracket}
+    In a group we can measure how Abelian the group is using the \defineindex{group commutator}, defined for \(g, h \in G\) to be the product \(f = ghg^{-1}h^{-1}\).
+    Notice that this gives the identity if \(g\) and \(h\) commute.
+    If \(G\) is a Lie group then we can expand each term to evaluate this:
+    \begin{align}
+        g &= 1 + i\alpha^aT_a + \frac{1}{2}(i\alpha^aT_a)^2 + \order(\alpha^3),\\
+        h &= 1 + i\beta^aT_a + \frac{1}{2}(i\beta^aT_a)^2 + \order(\beta^3),\\
+        f &= 1 + i\gamma^aT_a + \frac{1}{2}(i\gamma^aT_a)^2 + \order(\gamma^3).
+    \end{align}
+    The inverse of \(g\) can similarly be expanded as
+    \begin{equation}
+        g^{-1} = 1 - i\alpha^aT_a + \frac{1}{2}(i\alpha^aT_a)^2 + \order(\alpha^3),
+    \end{equation}
+    this can be checked by expanding \(gg^{-1}\) and showing that we get 1.
+    Write \(\alpha\) for \(\alpha^aT_a\) and \(\beta\) for \(\beta^aT_a\), then we have
+    \begin{align}
+        ghg^{-1}h^{-1} &\approx \left( 1 + i\alpha + \frac{1}{2}(i\alpha)^2 \right)\left( 1 + i\beta + \frac{1}{2}(i\beta)^2 \right)\\
+        &\qquad\left( 1 - i\alpha + \frac{1}{2}(i\alpha)^2 \right)\left( 1 - i\beta + \frac{1}{2}(i\beta)^2 \right)\\
+        &= 1 + i\alpha + i\beta - i\alpha - i\beta\\
+        &- \alpha\beta + \alpha\alpha + \alpha\beta + \beta\alpha + \beta\beta -\alpha\beta\\
+        &+ \frac{1}{2}[(i\alpha)^2 + (i\beta)^2 + (i\alpha)^2 + (i\beta)^2] + \order(\alpha^3, \beta^3)\\
+        &= -\alpha\beta + \beta\alpha + \order(\alpha^3, \beta^3).
+    \end{align}
+    That is,
+    \begin{equation}
+        f = -\alpha^aT_a \beta^bT_b + \beta^bT_b\alpha^aT_a + \order(\alpha^3, \beta^3) = -\commutator{\alpha^aT_a}{\beta^bT_b} + \order(\alpha^3, \beta^3)
+    \end{equation}
+    where \(\commutator{-}{-}\) is the usual commutator.
+    
+    From here we define the Lie algebra of the Lie group \(G\) as the Lie algebra, \(\lie{g}\), generated by
+    \begin{equation}
+        T_a = -i\diffp{g(\alpha)}{\alpha^a}[\alpha = 0]
+    \end{equation}
+    with the Lie bracket given by the commutator, which is such that
+    \begin{equation}
+        \commutator{T_a}{T_b} = i\tensor{c}{^c_{ab}}T_c
+    \end{equation}
+    
+    \section{Exponential Map}
+    Let \(G\) be a Lie group.
+    Consider some one-dimensional Lie subgroup, \(G_1 \subgroup G\).
+    We can think of \(G_1\) as a path on the manifold \(G\) parametrised by some parameter \(t\), so
+    \begin{equation}
+        G_1 = \{g(\alpha(t)) t \in \reals\},
+    \end{equation}
+    we then write \(g(t)\) for \(g(\alpha(t))\).
+    
+    Since this is a one-dimensional Lie group by \cref{thm:one dim lie group parameters add} we can choose the parametrisation to be such that \(g(t)g(s) = g(t + s)\) and \(g(0) = 1\).
+    Now differentiate this with respect to \(s\) and then set \(s = 0\), we get
+    \begin{equation}
+        g(t)g'(0) = g'(t).
+    \end{equation}
+    A solution to this is
+    \begin{equation}
+        g(t) = \e^{g'(0)t}.
+    \end{equation}
+    Now, define \(g'(0) = i\gamma^aT_a\), since this is what we get if \(g(s) = 1 + i\gamma^aT_a + \order(\gamma^2)\) and we find that we can write an arbitrary element of \(G_1\) as
+    \begin{equation}
+        g(t) = \e^{it\gamma^aT_a}.
+    \end{equation}
+    
+    This motivates the following theorem, which we won't prove.
+    \begin{thm}{}{}
+        Let \(G\) be a compact Lie group with Lie algebra \(\lie{g}\).
+        Let \(g \in G\) be continuously connected to the identity.
+        Then
+        \begin{equation}
+            g = \e^{i\gamma^aT_a}
+        \end{equation}
+        for some \(\gamma^a\) and \(T_a\) the generators of \(\lie{g}\).
+    \end{thm}
+    In words, if \(G\) is a compact Lie group then every element connected to the identity can be obtained by exponentiating the Lie algebra.
+    
+    A compact Lie group is a Riemannian manifold.
+    The exponential map, \(t \mapsto \exp[it\gamma^aT_a]\), then gives geodesics through the origin on this manifold.
+    Every point connected to the identity is then on one of these geodesics.
+    Intuitively this makes sense because by definition such a point is connected to the identity and so by simply minimising the path connecting it we get a geodesic.
+    
+    \subsection{Noncompact Lie Groups}
+    The compact requirement is important, for noncompact Lie groups the theorem does not hold, which we demonstrate now by example.
+    The group \(\specialLinear(2, \reals)\) is noncompact, it is formed of elements of the form
+    \begin{equation}
+        \begin{pmatrix}
+            a & b\\ c & d
+        \end{pmatrix}
+    \end{equation}
+    with \(ab - cd = 1\).
+    The values of \(a\), \(b\), \(c\), and \(d\) are unbounded, and so \(\specialLinear(2, \reals)\) is not compact.
+    
+    Suppose that all \(g \in \specialLinear(2, \reals)\) can be expressed as \(\exp[l]\) for some \(l \in \specialLinearLie(2, \reals)\).
+    Then we can define a one-dimensional path in \(\specialLinear(2, \reals)\) as the image of the map \(t \mapsto \exp[tl]\) with \(t \in [0, 1]\).
+    In particular, \(h = \exp[l/2]\) satisfies \(h^2 = g\), so we can talk of \enquote{square roots} of group elements.
+    
+    We now proceed to demonstrate that such an \(h\) does not exist for all choices of \(g\).
+    Let
+    \begin{equation}
+        g = 
+        \begin{pmatrix}
+            -4 & 0\\
+            0 & -1/4
+        \end{pmatrix}
+    \end{equation}
+    Then suppose that 
+    \begin{equation}
+        h = 
+        \begin{pmatrix}
+            a & b\\ c & d
+        \end{pmatrix}
+        .
+    \end{equation}
+    We then have
+    \begin{equation}
+        h^2 = 
+        \begin{pmatrix}
+            a^2 + bc & b(a + d)\\
+            c(a + d) & d^2 + bc
+        \end{pmatrix}
+        .
+    \end{equation}
+    Since \(g\) has zero off diagonal elements we have \(b(a + d) = c(a + d) = 0\), meaning either \(b\) and \(c\) are both zero or \(a + d = 0\).
+    Suppose that \(b = c = 0\), then looking at the first entry in \(g\) we have \(a^2 + bc = a^2 = -4\), but this can't be the case as \(a\) is real.
+    Suppose then that \(a + d = 0\), then \(a = -d\) and so \(a^2 = d^2\).
+    The first entry in \(g\) gives us \(a^2 + bc = -4\), but the last gives \(d^2 + bc = a^2 + bc = -1/4\).
+    It is not possible for \(a^2 + bc\) to have two separate values so we conclude that there is no way to satisfy the conditions and there is no \(h \in \specialLinear(2, \reals)\) satisfying \(h^2 = g\).
+    
+    Note that \(\specialLinear(2, \reals)\) is connected, so it's the lack of compactness that is causing the problems here.
+    We can show that \(g\) is connected to the identity by considering the piecewise path first defined by
+    \begin{equation}
+        \begin{pmatrix}
+            \cos\vartheta & -\sin\vartheta\\
+            \sin\vartheta & \cos\vartheta
+        \end{pmatrix}
+    \end{equation}
+    for \(\vartheta \in [0, \pi]\), which gets us from the identity to
+    \begin{equation}
+        \begin{pmatrix}
+            -1 & 0\\
+            0 & -1
+        \end{pmatrix}
+        ,
+    \end{equation}
+    and then the path given by
+    \begin{equation}
+        \begin{pmatrix}
+            -\lambda & 0\\ 0 & -\frac{1}{\lambda}
+        \end{pmatrix}
+        ,
+    \end{equation}
+    for \(\lambda \in [1, 4]\), which ends us at
+    \begin{equation}
+        \begin{pmatrix}
+            -4 & 0\\
+            0 & -\frac{1}{4}
+        \end{pmatrix}
+        .
+    \end{equation}
+    That is, the path given by the image of
+    \begin{equation}
+        t \mapsto
+        \begin{cases}
+            \begin{pmatrix}
+                \cos\vartheta & -\sin\vartheta\\
+                \sin\vartheta & \cos\vartheta
+            \end{pmatrix}
+            & \vartheta = t \in [0, \pi],\\
+            \begin{pmatrix}
+                -\lambda & 0\\
+                0 & -\frac{1}{\lambda}
+            \end{pmatrix}
+            & \lambda = t + 1 - \pi, t \in [\pi, \pi + 3].
+        \end{cases}
+    \end{equation}
+    This path is continuous (but not differentiable at \(t = \pi\)).
+    
+    \subsection{Baker--Campbell--Hausdorff}
+    For two matrices, \(A\) and \(B\), we have
+    \begin{equation*}
+        \exp[A]\exp[B] = \exp\left[ A + B + \frac{1}{2}\commutator{A}{B} + \frac{1}{12}(\commutator{A}{\commutator{A}{B}} + \commutator{\commutator{A}{B}}{B}) + \dotsb \right]
+    \end{equation*}
+    If we know that \(A, B \in \lie{g}\) for some Lie algebra \(\lie{g}\) then we can evaluate the commutators and hence can determine the product of \(\exp[A]\) and \(\exp[B]\) in \(G\).
+    
+    \section{Matrix Lie Algebras}
+    \subsection{General Linear}
+    Consider the general linear group, \(\generalLinear(n, \field)\).
+    This consists of all invertible \(n \times n\) matrices over \(\field\).
+    Now let \(A\) be any \(n \times n\) matrix over \(\field\).
+    Then \(\exp[A]\) is an invertible \(n\times n\) matrix over \(\field\), in particular \(\exp[A]^{-1} = \exp[-A]\).
+    This shows that the Lie algebra of \(\generalLinear(n, \field)\), denoted \(\generalLinearLie(n, \field)\), is the set of all \(n \times n\) matrices over \(\field\).
+    Note that this can be identified with the set of all linear transformations, \(\generalLinearLie(n, \field) \isomorphic \End(\field^n)\).
+    Since we have \(n^2\) entries into an \(n \times n\) matrix, and no conditions, we conclude that \(\dim\generalLinearLie(n, \reals) = n^2\).
+    Similarly, if \(\field = \complex\) then each entry has two real parameters and so we have \(2n^2\) degrees of freedom so the dimension of \(\generalLinearLie(n, \complex)\) as a real vector space is \(2n^2\).
+    
+    Now consider the special linear group, \(\specialLinear(n, \field)\).
+    We then have the extra condition that \(\det M = 1\) for all \(M \in \specialLinear(n, \field)\).
+    To proceed we need the following lemma
+    \begin{lma}{}{}
+        Let \(A\) be an \(n \times n\) matrix and \(I\) the \(n\)-dimensional identity matrix.
+        Then
+        \begin{equation}
+            \det(I + \varepsilon A) = 1 + \varepsilon\tr A
+        \end{equation}
+        to first order in \(\varepsilon\).
+        \begin{proof}
+            Let \(a_i\) be the eigenvalues of \(A\).
+            Then the characteristic polynomial of \(A\) is
+            \begin{equation}
+                \det(t I - A) = (t - a_1)(t - a_2) \dotsm (t - a_n).
+            \end{equation}
+            Setting \(t = -1\) we get
+            \begin{align}
+                \det(-I - A) &= (-1)^n \det(I + A)\\
+                &= (-1 - a_1)(-1 - a_2) \dotsm (-1 - a_n)\\
+                &= (-1)^n(1 + a_1)(1 + a_2) \dotsm (1 + a_n)\\
+                &= (-1)^n[1 + a_1 + a_2 + \dotsb + a_n + \order(a_ia_j)]\\
+                &= (-1)^n[1 + \tr A + \order(a_ia_j)].
+            \end{align}
+            Hence \(\det(I + A) = 1 + \tr A + \order(a_ia_j)\)
+            Rescaling so that \(A \to \varepsilon A\) we get the result \(\det(I + \varepsilon A) = 1 + \varepsilon\tr A + \order(\varepsilon^2)\).
+        \end{proof}
+    \end{lma}
+    Using this we can see that if \(M \in \specialLinear(n, \field)\) we can expand \(M = I + i\alpha^aT_a + \order(\alpha^2)\) and we get
+    \begin{equation}
+        1 = \det M \approx \det(I + i\alpha^aT_a) \approx 1 + \alpha^a \tr T_a,
+    \end{equation}
+    and so the generators of \(\specialLinearLie(n, \field)\) must be traceless, and hence all matrices in \(\specialLinearLie(n, \field)\) are traceless.
+    So, \(\specialLinearLie(n, \field)\) consists of all traceless \(n \times n\) matrices.
+    We have \(n^2\) entries, but being traceless fixes one, since we can force a matrix to be traceless by setting \(A_{11} = -A_{22} - A_{33} - \dotsb - A_{nn}\), and so \(\dim \specialLinearLie(n, \reals) = n^2 - 1\) and being traceless in both the real and imaginary components fixes two degrees of freedom in the complex case, so \(\dim \specialLinearLie(n, \complex) = 2(n^2 - 1)\) as a real vector space.
+    
+    Now consider the orthogonal group, \(\orthogonal(n)\).
+    Writing some generic \(O \in \orthogonal(n)\) as \(I + \varepsilon A + \order(\varepsilon^2)\) and expanding the defining condition, \(O^\trans O = I\), we get
+    \begin{multline}
+        I = (I + \varepsilon A + \order(\varepsilon^2)) (I + \varepsilon A^\trans + \order(\varepsilon^2))\\
+        = I + \varepsilon A + \varepsilon A^\trans + \order(\varepsilon^2) = I + \varepsilon(A + A^\trans) + \order(\varepsilon^2).
+    \end{multline}
+    So we must have that \(A = -A^{\trans}\), that is \(A\) is antisymmetric.
+    So the Lie algebra, \(\specialOrthogonalLie(n)\) consists of all \(n \times n\) real antisymmetric matrices.
+    Being antisymmetric sets all values below the diagonal, and the diagonal must be zero, so we get an upper triangle to fill in of base \(n - 1\), the number of entries in this triangle is \(n(n - 1)/2\).
+    
+    Consider the special orthogonal group, \(\specialOrthogonal(n)\).
+    As with \(\orthogonal(n)\) the matrices in the Lie algebra must be antisymmetric.
+    But, this then enforces that these matrices are traceless, since an antisymmetric matrix has zeros down the diagonal, and hence \(\orthogonalLie(n) \isomorphic \specialOrthogonalLie(n)\).
+    
+    Now consider the unitary group, \(\unitary(n)\).
+    Suppose that \(H \in \unitaryLie(n)\), that is \(\exp[i\varepsilon H] \in \unitary(n)\), then \(\exp[i\varepsilon H]\exp[i\varepsilon H]^\hermit = I\) by definition, and we have
+    \begin{equation}
+        I = \exp[i\varepsilon H]\exp[i\varepsilon H]^\hermit \approx (I + i\varepsilon H)(I - i\varepsilon H^\hermit) = I + i\varepsilon(H - H^\hermit) + \order(\varepsilon^2),
+    \end{equation}
+    and so we must have \(H = H^\hermit\), so \(H\) is Hermitian.
+    Note that if we had not included the factor of \(i\) we would instead have found \(H\) to be anti-Hermitian, which isn't as nice and this is why we include the factor of \(i\).
+    So, \(\unitaryLie(n)\) consists of all \(n \times n\) Hermitian matrices.
+    Being Hermitian fixes the values below the diagonal, removing \(n(n - 1)/2\) entries, but \(n(n - 1)\) degrees of freedom, since these are complex numbers with two real parameters.
+    Being Hermitian also forces the diagonal to be real, removing another \(n\) parameters from the imaginary part of the diagonal.
+    This leaves \(n(n - 1)\) real parameters defining the upper triangle and \(n\) defining the diagonal, for a total of \(n(n - 1) + n = n^2\) real parameters, so \(\dim \unitaryLie(n) = n^2\).
+    
+    Finally, consider \(\specialUnitary(n)\).
+    This consists of all Hermitian, traceless, \(n \times n\) matrices.
+    Being traceless fixes one real parameter on the diagonal, since the diagonal is real anyway, and so \(\dim \specialUnitaryLie(n) = n^2 - 1\).
+    
+    \section{Universal Covering Group}
+    Every Lie group has a unique Lie algebra which we find by linearising the group.
+    Every Lie algebra can be exponentiated to form a Lie group.
+    However, this Lie group is not necessarily the same one that we linearised to find the Lie algebra.
+    The exponentiated Lie algebra forms a simply connected Lie group, even if the original Lie group wasn't simply connected.
+    This means that multiple Lie groups can have the same Lie algebra, but only one of these groups is attained by exponentiating the Lie algebra, this Lie group is called the \defineindex{universal covering group}.
+    
+    If two Lie groups have the same Lie algebra it is because they are indistinguishable in the neighbourhood of the identity.
+    
+    \begin{exm}{}{}
+        Consider \(\unitary(1)\).
+        This has elements \(\e^{i\vartheta}\) for some \(\vartheta \in [0, 2\pi)\).
+        Since we identify \(0\) and \(2\pi\) this group is compact, and topologically equivalent to the circle, which is not simply connected.
+        The Lie algebra is then just \([0, 2\pi)\).
+        
+        Consider instead the set of elements of the form \(\e^{\vartheta}\) for \(\vartheta \in \reals\).
+        This gives \(\reals_{>0}\), the set of positive real numbers.
+        However, the Lie algebra is, up to an unimportant factor of \(i\), the same as for \(\unitary(1)\).
+        The ray consisting of the positive real numbers is simply connected, and hence exponentiating this Lie algebra gives this group, rather than \(\unitary(1)\).
+    \end{exm}
+    
+    \begin{exm}{}{}
+        We've seen that both \(\orthogonal(n)\) and \(\specialOrthogonal(n)\) have the same Lie algebra.
+        This is because the requirement of unit determinant is not relevant in the neighbourhood of the identity, where it is satisfied in both groups.
+        
+        The orthogonal group, \(\orthogonal(n)\), is formed of two disconnected components, one with determinant \(+1\) and one with determinant \(-1\).
+        The piece with determinant \(+1\) is just the subgroup \(\specialOrthogonal(n)\).
+        The characterisation of the piece determinant \(-1\) depends on the dimension.
+        If \(n\) is odd then we can form pairs \((A, +1)\) and \((A, -1)\) for all \(A \in \specialOrthogonal(n)\).
+        Then identifying \((A, +1) = A \in \orthogonal(n)\) and \((A, -1) = -A \in \orthogonal(n)\) we get a one-to-one correspondence between these pairs and \(\orthogonal(n)\).
+        That means we have
+        \begin{equation}
+            \orthogonal(n) \isomorphic \specialOrthogonal(n) \times \integers_2 \qquad n \text{ odd}.
+        \end{equation}
+        
+        If instead \(n\) is even then, for example, both \(I\) and \(-I\) are in \(\specialOrthogonal(n)\), and so we cannot do the same thing with pairs.
+        The result is that the two components don't commute with each other.
+        
+        Consider the case where \(n = 2\).
+        We can then split \(\orthogonal(2)\) into two parts, the first formed of matrices of the form
+        \begin{equation}
+            g = 
+            \begin{pmatrix}
+                \cos \vartheta & -\sin \vartheta\\
+                \sin \vartheta & \cos \vartheta
+            \end{pmatrix}
+            \in \specialOrthogonal(2),
+        \end{equation}
+        and the second formed of matrices of the form
+        \begin{equation}
+            \overbar{g} = 
+            \begin{pmatrix}
+                -\cos \psi & \sin \psi\\
+                \sin \psi & \cos \psi
+            \end{pmatrix}
+            \in \overline{\specialOrthogonal(2)}.
+        \end{equation}
+        That is, \(\specialOrthogonal(2)\) consists of all matrices in \(\orthogonal(2)\) with determinant 1 and \(\overline{\specialOrthogonal(2)}\) consists of all matrices in \(\orthogonal(2)\) with determinant \(-1\).
+        Notice that if \(\overbar{g}, \overbar{h} \in \overline{\specialOrthogonal(2)}\) then we have \(\det(\overbar{g}\overbar{h}) = \det(\overbar{g})\det(\overbar{h}) = (-1)(-1) = 1\), so \(\overbar{g}\overbar{h} \in \specialOrthogonal(2)\).
+        
+        It can be shown that \(\specialOrthogonal(2)\) is a normal subgroup of \(\orthogonal(2)\), that is \(ghg^{-1} \in \specialOrthogonal(2)\) for all \(g \in \orthogonal(2)\) and \(h \in \specialOrthogonal(2)\).
+        In particular, if \(g \in \specialOrthogonal(2)\) and \(\overbar{g} \in \overline{\specialOrthogonal(2)}\) then \(\overbar{g} g \overbar{g}^{-1} \in \specialOrthogonal(2)\).
+        
+        If we have a normal subgroup then we can write the original group as a semidirect product of the normal subgroup and some other group, in this case
+        \begin{equation}
+            \orthogonal(2) \isomorphic \specialOrthogonal(2) \rtimes \integers_2,
+        \end{equation}
+        where the action of \(\integers_2\) on \(\specialOrthogonal(2)\) is
+        \begin{equation}
+            0 \action g =
+            \begin{pmatrix}
+                1 & 0\\
+                0 & 1
+            \end{pmatrix}
+            g, \qqand 1 \action g = 
+            \begin{pmatrix}
+                -1 & 0\\
+                0 & 1
+            \end{pmatrix}
+            g.
+        \end{equation}
+    \end{exm}
+    
+    \begin{exm}{}{}
+        Perhaps the most important example, at least for physics, of two Lie groups with the same Lie algebras is \(\specialOrthogonal(3)\) and \(\specialUnitary(2)\).
+        Start with \(\specialUnitary(2)\), this has a Lie algebra formed from all Hermitian traceless \(2 \times 2\) matrices.
+        A basis for these matrices is given by the Pauli matrices, although to we include a factor of \(1/2\) as a matter of convention, giving
+        \begin{equation}
+            \specialUnitaryLie(2) = \spn_{\reals} \left\{ \frac{1}{2}\sigma_a \right\}.
+        \end{equation}
+        This Lie algebra then satisfies
+        \begin{equation}
+            \commutator{\sigma_a/2}{\sigma_b/2} = i\varepsilon_{cab}\sigma_c/2,
+        \end{equation}
+        that is, the structure constants are \(\tensor{c}{^c_{ab}} = \varepsilon_{cab}\).
+        Note that we are free to raise and lower indices here since the Killing form (defined later) is positive definite.
+        
+        For \(\specialOrthogonal(3)\) the Lie algebra is formed from the matrices \(T_a\) with components \((T_a)_{bc} = i\varepsilon_{bac}\).
+        This is simply the adjoint representation of \(\specialOrthogonalLie(2)\) as defined above, so clearly these two Lie algebras are the same.
+        
+        Consider what happens when we exponentiate them.
+        We can consider
+        \begin{equation}
+            \exp\left[ i\omega \vh{n} \cdot \vv{\sigma}/2 \right]
+        \end{equation}
+        where our parameters, \(\omega\vh{n}\), are formed from a unit vector, \(\vh{n} \in \sphere[2]\), and some \(\omega \in \reals\).
+        Note that a unit vector in \(n\) dimensions requires \(n - 1\) parameters to define.
+        Using the identity \(\sigma_i \sigma_j = \delta_{ij}I + i\varepsilon_{ijk}\sigma_k\) we can expand the exponential and collect terms to show that
+        \begin{equation}
+            \exp[i\omega \vh{n} \cdot \vv{\sigma} /2] = \cos\left( \frac{\omega}{2} \right) I + i\vh{n} \cdot \vv{\sigma} \sin\left( \frac{\omega}{2} \right).
+        \end{equation}
+        Thus we have to take \(\omega \in [0, 4\pi)\) in order to cover every element of \(\specialUnitary(2)\), at least those which can be reached in this way.
+        
+        Instead we can consider \(\specialOrthogonal(3)\) and exponentiate
+        \begin{equation}
+            \exp[i\omega\vh{n}(i\varepsilon_{bac})] = n_bn_c + (\delta_{bc} - n_bn_c)\cos\omega + \varepsilon_{abc} n_a \sin \omega.
+        \end{equation}
+        This requires a lot of algebra to show, but in the \course{Vectors, Tensors, and Continuum Mechanics} part of the \course{Methods of Theoretical Physics} course we show that this is the general form of a rotation.
+        Note then that if \(\omega \in [0, 4\pi)\) as for \(\specialUnitary(2)\) we will hit every element of \(\specialOrthogonal(3)\) twice.
+        We say that \(\specialUnitary(2)\) is a double cover of \(\specialOrthogonal(3)\).
+        
+        As a manifold \(\specialOrthogonal(3)\) corresponds to the three-dimensional ball of radius \(\pi\), where a vector in this ball picks out an axis, and its length picks out the angle of rotation.
+        In particular, a vector, \(\vv{x}\), of length \(\pi\) is equivalent as a rotation to the vector \(-\vv{x}\), and so we identify opposite points on the ball.
+        This means that a line going from one side of the ball to the other is technically a loop, but is not contractible to a point so \(\specialOrthogonal(3)\) is not simply connected.
+        
+        On the other hand, we showed in \cref{exm:SU(2) = three sphere} that \(\specialUnitary(2)\) as a manifold is the three sphere, \(\sphere[3]\), which is simply connected.
+        We conclude that both the Lie algebras of \(\specialUnitary(2)\) and \(\specialOrthogonal(3)\) both exponentiate to give \(\specialUnitary(2)\).
+    \end{exm}
     
     
     \backmatter
