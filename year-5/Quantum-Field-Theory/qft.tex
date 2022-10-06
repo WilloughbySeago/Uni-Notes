@@ -8,6 +8,7 @@
 \usepackage{csquotes}
 \usepackage{scalerel,stackengine}  % needed for d with slash
 \usepackage{simpler-wick}
+\usepackage{siunitx}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -95,6 +96,8 @@ noabbrev
 \newcommand{\amplitude}{\symcal{M}}
 \DeclarePairedDelimiterX{\anticommutator}[2]{\{}{\}}{#1, #2}
 \DeclareMathOperator{\tr}{tr}
+\newcommand{\order}{\symcal{O}}
+\newcommand{\phaseSpaceMeasure}[1][n]{(\dl{\symrm{PS}})_{#1}}
 
 \includeonly{parts/prelim}
 
@@ -428,7 +431,7 @@ noabbrev
         See the \course{Lagrangian Dynamics} course for more details.
     \end{rmk}
     Consider a particle of mass \(m\) moving in one dimension in a conservative force field.
-    We can define its position with a \defineindex{generalised coordinate}, \(q\), which gives us a \defineindex{generalised velocity}, \(\dot{q} \coloneqq \diff{q}/{t}\).
+    We can define its position with a \define{generalised coordinate}\index{generalised!coordinate}, \(q\), which gives us a \define{generalised velocity}\index{generalised!velocity}, \(\dot{q} \coloneqq \diff{q}/{t}\).
     We can then define the \defineindex{Lagrangian}:
     \begin{equation}
         \lagrangian(q, \dot{q}) = T(\dot{q}) - V(q).
@@ -593,7 +596,7 @@ noabbrev
     \section{Lagrangian Dynamics of a Field}
     Lagrangian dynamics doesn't change that much when we work with fields.
     We start by replacing the generalised coordinate \(q(t)\) with the field, \(\varphi(x)\), which now depends on a position in spacetime, rather than just a time.
-    Instead of a Lagrangian we work with a \defineindex{Lagrangian density}, \(\lagrangianDensity(\varphi, \partial_\mu \varphi)\), replacing the time derivative of the coordinate with a four-vector derivative.
+    Instead of a Lagrangian we work with a \define{Lagrangian density}\index{Lagrangian!density}, \(\lagrangianDensity(\varphi, \partial_\mu \varphi)\), replacing the time derivative of the coordinate with a four-vector derivative.
     We then have to integrate over a region of spacetime to get the action:
     \begin{equation}
         S[\varphi(x)] \coloneqq \int \dl{^4x} \, \lagrangianDensity(\varphi, \partial_\mu \varphi).
@@ -854,7 +857,7 @@ noabbrev
     \end{equation}
     where
     \begin{equation}
-        J^\mu(x) \coloneqq \diffp{\lagrangianDensity}{(\partial_\mu)} \delta \varphi
+        J^\mu(x) \coloneqq \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \delta \varphi
     \end{equation}
     is the conserved current, a generalisation of the normal current in electrodynamics.
     There is also a corresponding conserved \enquote{charge}:
@@ -1909,7 +1912,7 @@ noabbrev
     
     Clearly we have \(\bra{0}N(\vv{p})\ket{0} = \bra{0} a^\hermit(\vv{p})a(\vv{p})\ket{0} = 0\), and so
     \begin{equation}
-        \bra{0}H\ket{0} = \frac{1}{2} \int \dl{^3\vv{p}} \omega(\vv{p}) \delta^3(\vv{0}).
+        \bra{0}H\ket{0} = \frac{1}{2} \int \dl{^3\vv{p}} \, \omega(\vv{p}) \delta^3(\vv{0}).
     \end{equation}
     This is infinite.
     In fact, its \emph{very} infinite.
@@ -2462,7 +2465,7 @@ noabbrev
     \end{equation}
     We can split the integral over \(t_2\) into two parts, one running from \(t_a\) to \(t_1\), and the other from \(t_1\) to \(t_b\):
     \begin{equation}
-        I = \int_{t_a}^{t_b} \dl{t_1} \left[ \int_{t_a}^{t_1} \dl{t_2} \, \timeOrdering[A(t_1)A(t_2)] + \int_{t_2}^{t_b} \dl{t_2} \, \timeOrdering[A(t_1) A(t_2)] \right].
+        I = \int_{t_a}^{t_b} \dl{t_1} \left[ \int_{t_a}^{t_1} \dl{t_2} \, \timeOrdering[A(t_1)A(t_2)] + \int_{t_1}^{t_b} \dl{t_2} \, \timeOrdering[A(t_1) A(t_2)] \right].
     \end{equation}
     Consider the second term,
     \begin{equation}
@@ -2798,7 +2801,7 @@ noabbrev
     \section{General Theorem}
     We can now prove the general theorem relating time orderings of an arbitrary number of operators and their normal orderings and contractions.
     
-    \begin{thm}{Wick's Theorem}{thm:wick}
+    \begin{thm}{Wick's Theorem}{thm:wick}\index{Wick's theorem}
         Given operators, \(A, B, C, D, \dotsc\), which can all be written as a sum of an annihilator and creation operators.
         Suppose \(A\) is evaluated at \(x_1\), \(B\) at \(x_2\), \(C\) at \(x_3\), \(D\) at \(x_4\), and so on, and \(t_i\) is the time component of \(x_i\).
         Then if none of the \(t_i\) are equal we have
@@ -3488,10 +3491,11 @@ noabbrev
     
     Note that while we assume the same initial and final states the momenta of the virtual particles need not, and in fact aren't, the same, even though we've labelled them all \(k\).
     
+    \subsubsection{\texorpdfstring{\(s\)}{s}-Channel}
     Let's start with the \(s\)-channel process.
     We want to compute
     \begin{equation*}
-        \bra{f} S^{(2)}_{s} \ket{i} = \bra{\vv{q}, \vv{q}'}\left[ \frac{-g^2}{(3!)^2} \int \dl{^4x} \int \dl{^4y} \varphi^-(y)^2 3^2 \wick{\c \varphi(x) \c \varphi(y)} \varphi^+(x)^2 \right] \ket{\vv{p}, \vv{p}'}
+        \bra{f} S^{(2)}_{s} \ket{i} = \bra{\vv{q}, \vv{q}'}\left[ \frac{-g^2}{(3!)^2} \int \dl{^4x} \int \dl{^4y} \, \varphi^-(y)^2 3^2 \wick{\c \varphi(x) \c \varphi(y)} \varphi^+(x)^2 \right] \ket{\vv{p}, \vv{p}'}
     \end{equation*}
     We can compute the action of \((\varphi^{\pm})^2\) on our initial and final states fairly easily:
     \begin{align}
@@ -3523,29 +3527,59 @@ noabbrev
         \amplitude_s = \frac{-ig^2}{(p + p')^2 - m^2}.
     \end{equation}
     
-    % TODO: Calculate the t and/or u channel processes
-%    \subsubsection{The \texorpdfstring{\(t\)}{t}-Channel Process}
-%    Now consider the \(t\)-channel process.
-%    We want to compute
-%    \begin{equation}
-%        \bra{f} S^{(2)}_{t} \ket{i} = \bra{\vv{q}, \vv{q}'} \left[ \frac{-g^2}{(3!)^2} \varphi^-(x)\varphi^-(y) 3^2 \wick{\c \varphi(x) \c \varphi(y)} \varphi^+(x)\varphi^+(y) \right] \ket{\vv{p}, \vv{p}'}.
-%    \end{equation}
-%    We then have
-%    \begin{align}
-%        \varphi^+(x)\varphi^-(y) \ket{\vv{p}, \vv{p}'} &= \e^{-ip\cdot x}\e^{-ip'\cdot y}\ket{0} + \e^{-ip'\cdot x}\e^{-ip\cdot y}\ket{0},\\
-%        \bra{\vv{q}, \vv{q}'} \varphi^-(x)\varphi^-(y) &= \e^{iq\cdot x}\e^{iq'\cdot y}\bra{0} + \e^{iq'\cdot x}\e^{iq\cdot y}\bra{0}.
-%    \end{align}
+    \subsubsection{\texorpdfstring{\(t\)}{t}-Channel}
+    Now consider the \(t\)-channel diagram.
+    Like the \(s\)-channel term the \(t\)-channel term comes from a term which is sixth order in \(\varphi\).
+    In particular, it is \(\normalordering{\varphi(x)^3\varphi(y)^3}\), where we call the vertex shared by \(p\) and \(q\) \(x\), and the vertex shared by \(p'\) and \(q'\) \(y\).
+    Since we have four external particles we must contract a pair of fields, and since contractions at the same point give zero we must contract \(\varphi(x)\) and \(\varphi(y)\).
+    There are 3 ways to choose which \(\varphi(x)\) and 3 ways to choose which \(\varphi(y)\).
+    We then have two factors of \(\varphi(x)\) left and two factors of \(\varphi(y)\).
+    Looking back at the diagrams we see that a particle is created and destroyed at each vertex, as well as the internal line corresponding to the contraction.
+    This means one of our \(\varphi(x)\) values contributes a \(\varphi^+(x)\) to this term, destroying an incoming particle, and the other contributes a \(\varphi^-(x)\), creating one of the final particles.
+    There are two ways to select which \(\varphi(x)\) contributes \(\varphi^+(x)\) and which contributes \(\varphi^-(x)\).
+    The exact same is true for \(\varphi(y)\), so on top of the two factors of 3 from choosing the contraction we have two factors of 2.
+    This gives an overall combinatorial factor of \(3 \cdot 3 \cdot 2 \cdot 2 = (3!)^2\), cancelling the \((3!)^2\) which appears in the interaction term.
+    Hence, we have
+    \begin{multline*}
+        \bra{f} S^{(2)}_{t} \ket{i}\\
+        = \bra{\vv{q}, \vv{q}'} \left[ \frac{-g^2}{(3!)^2} \int \dl{^4x} \int \dl{^4y} \, (3!)^2\wick{\c \varphi(x) \c \varphi(y)} \varphi^-(x)\varphi^-(y)\varphi^+(x)\varphi^+(y) \right] \ket{\vv{p}, \vv{p}'}.
+    \end{multline*}
+    Now, as before we act on the initial state with the annihilators and the final state with the creation operators, giving
+    \begin{align}
+        \varphi^+(x)\varphi^+(y) \ket{\vv{p}, \vv{p}'} &= \e^{-ip \cdot x} \e^{-ip' \cdot y} \ket{0},\\
+        \bra{\vv{q}, \vv{q}'} \varphi^-(x)\varphi^-(y) &= \e^{iq \cdot x} \e^{iq' \cdot y} \bra{0}.
+    \end{align}
+    Note that there is no factor of 2 this time, since the particle with momentum \(p\) must be destroyed at \(x\) in this interaction, and hence we cannot act on this particle with \(\varphi^+(y)\), doing so corresponds instead to a \(u\)-channel process.
     
-    Similarly we can compute the \(t\) and \(u\)-channel processes, and we find
-    \begin{align}
-        \bra{f} S^{(2)}_{t} \ket{i} &= (2\pi)^4 \delta^4(q + q' - p - p') \frac{-ig^2}{(p - q)^2 - m^2},\\
-        \bra{f} S^{(2)}_{u} \ket{i} &= (2\pi)^4 \delta^4(q + q' - p - p') \frac{-ig^2}{(p - q')^2 - m^2}.
-    \end{align}
-    That is, the amplitudes for the \(t\) and \(u\)-channel processes are
-    \begin{align}
-        \amplitude_t &= \frac{-ig^2}{(p - q)^2 - m^2},\\
-        \amplitude_u &= \frac{-ig^2}{(p - q')^2 - m^2}.
-    \end{align}
+    Putting this together with our results we have
+    \begin{equation*}
+        \bra{f} S^{(2)}_{t} \ket{i} = -g^2 \int \dl{^4x} \int \dl{^4y} \, \e^{iq\cdot x} \e^{iq' \cdot y} \int \frac{\dl{^4x}}{(2\pi)^4} \frac{\e^{-ik \cdot (y - x)}}{k^2 - m^2 + i\varepsilon} \e^{-ip \cdot x} \e^{-ip' \cdot y}.
+    \end{equation*}
+    Collecting the exponents into \(x\) and \(y\) exponentials we have
+    \begin{equation*}
+        \bra{f} S^{(2)}_{t} \ket{i} = -g^2 \int \dl{^4x} \int \dl{^4y} \int \frac{\dl{^4k}}{(2\pi)^4} \e^{i(q + k - p) \cdot x} \e^{i(q' - k - p')} \frac{1}{k^2 - m^2 + i\varepsilon}.
+    \end{equation*}
+    Performing the \(x\) and \(y\) integrals gives Dirac deltas:
+    \begin{equation*}
+        \bra{f} S^{(2)}_{t} \ket{i} = -g^2 \int \frac{\dl{^4k}}{(2\pi)^4} (2\pi)^4 \delta^4(q + k - p) (2\pi)^4 \delta^4(q' - k - p') \frac{1}{k^2 - m^2 + i\varepsilon}.
+    \end{equation*}
+    Performing the \(k\) integral with the first Dirac delta fixes \(k = p - q\), and so we get
+    \begin{equation}
+        \bra{f} S^{(2)}_{t} \ket{i} = (2\pi)^4\delta^4(q + q - p - p') \frac{-g^2}{(p - q)^2 - m^2}.
+    \end{equation}
+    As before we have the Dirac delta enforcing energy conservation, and then the amplitude is 
+    \begin{equation}
+        \amplitude_t = \frac{-ig^2}{(p - q)^2 - m^2}.
+    \end{equation}
+    
+    Similarly we can compute the \(u\)-channel process, and we find
+    \begin{equation}
+        \bra{f} S^{(2)}_{u} \ket{i} = (2\pi)^4 \delta^4(q + q' - p - p') \frac{-ig^2}{(p - q')^2 - m^2}.
+    \end{equation}
+    That is, the amplitudes for the \(u\)-channel process is
+    \begin{equation}
+        \amplitude_u = \frac{-ig^2}{(p - q')^2 - m^2}.
+    \end{equation}
     
     We now introduce the \defineindex{Mandelstam invariants}, \(s\), \(t\), and \(u\), defined as
     \begin{alignat}{2}
@@ -3635,6 +3669,869 @@ noabbrev
     \end{itemize}
     Note that \(\tilde{\Delta}_{\feynman}\) is the Fourier transform of \(\Delta_{\feynman}\), which is to say it is the integrand in the contour representation.
     
+    \chapter{Getting Measurable Results}
+    Experiments can't measure the \(S\) matrix directly.
+    Instead we can measure transition rates between states, including decay rates and cross sections.
+    In this chapter we'll discuss how to compute these from the \(S\) matrix for comparison with experimental results.
+    
+    Our starting point will be
+    \begin{equation}
+        S_{fi} = \delta_{fi} + (2\pi)^4\delta^4\left( \sum p_f - \sum p_i \right) \amplitude.
+    \end{equation}
+    The \(\delta_{fi}\) term corresponds to the case where nothing happens.
+    The Dirac delta, where the sums are over all final and initial particles, enforces conservation of momentum, and \(\amplitude\) is the Feynman amplitude, which is what we compute in QFT.
+    
+    \section{Transition Rate}
+    Consider the probability, \(P_{fi}\), of transitioning from the initial state \(\ket{i}\) to the final state \(\ket{f}\).
+    This is simply the square of the \(S\) matrix, which is given by
+    \begin{equation}
+        P_{fi} = \abs{S_{fi}}^2 = (2\pi)^4\delta^4(0)(2\pi)^4 \sum_f \delta^4\left( \sum p_f - \sum p_i \right) \abs{\amplitude}^2.
+    \end{equation}
+    assuming \(i \ne f\), that is that something happens.
+    We have used here \(\delta(x)^2 = \delta(0)\delta(x)\) as distributions, which follows since
+    \begin{equation}
+        \int \dl{x} \, f(x) \delta(x)^2 = \delta(0) f(0),
+    \end{equation}
+    having used the sifting property of one of the Dirac deltas.
+    The first sum over \(f\), outside of the Dirac delta, corresponds to a sum, which will turn out to really be an integral, over allowed values of the final momentum.
+    
+    There's a problem here, in that \(\delta^4(0)\) is infinite.
+    Consider
+    \begin{equation}
+        (2\pi)^4 \delta^4(p) = \int \dl{^4x}  \, \e^{-ip\cdot x}.
+    \end{equation}
+    This suggests that
+    \begin{equation}
+        (2\pi)^4\delta^4(0) = \int \dl{^4x} = VT
+    \end{equation}
+    where \(V\) is the infinite volume of space and \(T\) is the infinite length of time.
+    So, \(VT\) is the volume of spacetime.
+    To get around the problem we treat the entire system as if it is in a finite box in spacetime, and then proceed to compute quantities per unit spacetime volume.
+    
+    We therefore look to compute the transition rate per unit volume,
+    \begin{equation}
+        w_{fi} = \frac{P_{fi}}{VT} = \sum_f (2\pi)^4\delta(\sum p_f - \sum p_i) \abs{\amplitude}^2.
+    \end{equation}
+    We can proceed using the completeness relation,
+    \begin{equation}
+        1 = \int \invariantmeasure{p} \, \ket{\vv{p}}\bra{\vv{p}},
+    \end{equation}
+    which holds if
+    \begin{equation}
+        \braket{\vv{p}}{\vv{p}'} = \bardelta(\vv{p} - \vv{p}').
+    \end{equation}
+    Writing out the measure in full,
+    \begin{equation}
+        1 = \int \frac{\dl{^3\vv{p}}}{(2\pi)^3} \frac{1}{2\omega(\vv{p})} \ket{\vv{p}} \bra{\vv{p}}.
+    \end{equation}
+    
+    The incident flux is
+    \begin{equation}
+        \braket{\vv{p}}{\vv{p}} = 2\omega(\vv{p}) (2\pi)^3 \delta^3(\vv{0}).
+    \end{equation}
+    Identifying \((2\pi)^3\delta^3(\vv{0}) = V\) we have
+    \begin{equation}
+        \frac{\braket{\vv{p}}{\vv{p}'}}{V} = 2\omega(\vv{p}).
+    \end{equation}
+    This implies we have \(2\omega(\vv{p})\) states per unit volume.
+    
+    Now consider the decay of a single particle, \(p\), into \(n\) particles, \(p_i\).
+    The decay rate in the frame of the particle, that is the transition rate per decaying particle, is then
+    \begin{equation}
+        \dl{\Gamma} = (2\pi)^4 \delta\left( p - \sum p_f \right) \frac{1}{2\omega(\vv{p})} \prod_f \frac{\dl{^3\vv{p}}}{(2\pi)^32E_f} \abs{\amplitude}^2,
+    \end{equation}
+    where we write \(E_f = \omega(\vv{p_f})\).
+    We can package the measure up into a single thing called the \(n\) particle \defineindex{phase space measure}:
+    \begin{equation}
+        \phaseSpaceMeasure \coloneqq (2\pi)^4 \delta^4\left( p - \sum p_f \right) \prod_f \frac{\dl{^3p_f}}{(2\pi)^32E_f},
+    \end{equation}
+    so
+    \begin{equation}
+        \dl{\Gamma} = \frac{1}{2E(\vv{p})} \abs{\amplitude}^2 \phaseSpaceMeasure,
+    \end{equation}
+    where \(E(\vv{p}) = \omega(\vv{p})\).
+    
+    \subsection{One to Two Decay}
+    Consider the decay \(p \to p_1 + p_2\).
+    When doing an experiment we have detectors covering some solid angle, and so we are interested in not just the decay rate, but the decay rate into some particular solid angle, which is
+    \begin{equation}
+        \diff{\Gamma}{\Omega}.
+    \end{equation}
+    
+    We have two final particles, so we need to compute \(\phaseSpaceMeasure[2]\), which is given by
+    \begin{equation}
+        \phaseSpaceMeasure[2] = (2\pi)^4 \delta^4(p - p_1 - p_2) \frac{\dl{^3\vv{p_1}}}{(2\pi)^32\omega(\vv{p_1})} \frac{\dl{^3\vv{p_2}}}{(2\pi)^32\omega(\vv{p_2})}.
+    \end{equation}
+    We can perform the \(p_2\) integral using one of the Dirac deltas:
+    \begin{equation}
+        \int \dl{^3\vv{p_2}} \delta^4(p_1 + p_2 - p) = \delta(E_1 + E_2 - E),
+    \end{equation}
+    where we now fix \(\vv{p_2} = \vv{p} - \vv{p_1}\) and \(E_2 = \abs{\vv{p_2}}^2 + m_2^2\).
+    We can then express the momentum space volume element for \(p_1\) in terms of polar variables:
+    \begin{equation}
+        \dl{^3p_1} = \abs{\vv{p_1}}^2 \dd{p_1} \dd{\Omega}.
+    \end{equation}
+    Now use
+    \begin{equation}
+        E_1^2 = \abs{\vv{p_1}}^2 + m_1^2 \implies E_1 \dd{E_1} = p_1\dd{p_1},
+    \end{equation}
+    since \(\dl{m_1} = 0\).
+    Then, the partially integrated phase space is
+    \begin{equation}
+        \int \phaseSpaceMeasure[2] = \frac{1}{4\pi} \dd{\Omega} \frac{p_1 \dd{E_1}}E_2{} \delta(E_1 + E_2 - E).
+    \end{equation}
+    We can then write the phase space measure as
+    \begin{equation}
+        \int \phaseSpaceMeasure[2] = \frac{1}{(4\pi)^2} \frac{\abs{\vv{p}}}{m} \dd{\Omega}.
+    \end{equation}
+    Thus in the centre of mass frame the decay rate into some solid angle is
+    \begin{equation}
+        \left( \diff{\Gamma}{\Omega} \right)_{\text{CoM}} = \frac{1}{32\pi^2} \frac{\abs{\vv{p}}}{m^2} \abs{\amplitude}^2.
+    \end{equation}
+    
+    \section{Cross Sections}
+    When we consider collisions there is almost no point in considering collisions with three or more particles, since these are so unlikely to occur.
+    So, consider a scattering of two particles, \(p_1\) and \(p_2\).
+    We can work in the lab frame, where, say, the second particle is stationary, so
+    \begin{equation}
+        p_1 = (\omega(\vv{p_1}), \vv{p_1}), \qqand p_2 = (m_2, \vv{0}).
+    \end{equation}
+    We can also write \(E_1 = \omega(\vv{p_1})\).
+    
+    The incident flux, that is the number of particles crossing unit area per unit time, is given by the volume of particles which would cross through said area in unit time times the density of particles.
+    The volume is simply \(\abs{\vv{v}}\), where \(\vv{v}\) is the velocity of the particle, since in one unit time the particles will have moved a distance \(\abs{\vv{v}}\) forward.
+    The density of particles is \(2E_1\), so the incident flux is \(2E_1\abs{\vv{v}} = 2\abs{\vv{p_1}}\), where we've used \(\vv{p} = \gamma m\vv{v}\) and \(E = \gamma m\), so \(\abs{\vv{v}} = \abs{\vv{p}}/E\) as expected.
+    
+    The number of scattering centres in the target per unit volume is the density of particle states, which is \(2E_2 = 2m_2\).
+    
+    The differential cross section is defined as the transition rate per scattering centre per unit incident flux.
+    The idea being that the number of scattering centres and the incident flux are both dependent on the experiment, and the differential cross section is independent of experimental details.
+    The differential cross section is then
+    \begin{equation}
+        \dl{\sigma} = (2\pi)^4 \delta^4\left( \sum p_i - \sum p_f \right) \frac{1}{4\abs{\vv{p_1}}m_2} \left( \prod_f \frac{\dl{^3\vv{p_f}}}{(2\pi)^32E_f} \right) \abs{\amplitude}^2.
+    \end{equation}
+    
+    Now we can use \((p_1 \cdot p_2)^2 = (E_1m_2)^2 = (\vv{p_1} + m_1)^2 m_2^2\) which gives \(\abs{\vv{p_1}}^2m_2^2 = (p_1\cdot p_2)^2 - m_1^2 m_2^2\), which is Lorentz invariant.
+    This means that we can write the result in a frame independent way as
+    \begin{equation}
+        \dl{\sigma} = \frac{\abs{\amplitude}^2}{4\sqrt{(p_1 \cdot p_2)^2 - m_1^2 m_2^2}} \phaseSpaceMeasure.
+    \end{equation}
+    
+    \subsection{Two to Two Scattering}
+    Consider the case where we have two incoming and two outgoing particles, \(p_1 + p_2 \to p_3 + p_4\).
+    In the centre of mass frame we have
+    \begin{equation}
+        \int \phaseSpaceMeasure[2] = \frac{1}{(4\pi)^2} \frac{p'}{W}
+    \end{equation}
+    where \(p' = \abs{\vv{p_3}} = \abs{\vv{p_4}}\), where equality between the magnitude of the momenta of the particles follows by conservation of momentum in the centre of mass frame, meaning \(\vv{p_1} + \vv{p_2} = \vv{0}\), so \(\vv{p_3} + \vv{p_4} = \vv{0}\) also.
+    As well, \(W = E_1 + E_2 = E_3 + E_4\), where the second equality is just conservation of energy.
+    
+    In the centre of mass frame we have
+    \begin{equation}
+        p_1 = (E_1, \vv{p}), \qqand p_2 = (E_2, -\vv{p}).
+    \end{equation}
+    Define \([ = \abs{\vv{p}}]\), and so
+    \begin{equation}
+        \vv{p_1} \cdot \vv{p_2} = E_1E_2 + \vv{p}^2 \implies (p_1 \cdot p_2)^2 - m_1^2 m_2^2 = p^2W^2,
+    \end{equation}
+    where we've used the on-shell requirement to show this.
+    
+    Hence, the cross section for scattering per unit solid angle is
+    \begin{equation}
+        \left( \diff{\sigma}{\Omega} \right)_{\text{CoM}} = \frac{1}{64\pi^2} \frac{1}{W^2} \left( \frac{p'}{p} \right)^2 \abs{\amplitude}^2.
+    \end{equation}
+    Note that if all particles have the same mass then \(p' = p\) and so often we see this equation without the \(p'/p\) factor.
+    This is also a valid approximation in the high energy case where the masses provide a negligible contribution to the energy-momentum relation.
+    
+    \subsubsection{In \texorpdfstring{\(\varphi^3\)}{Phi Cubed} Theory}
+    In \(\varphi^3\) theory the two to two scattering gives us the amplitude
+    \begin{equation}
+        \amplitude = (-ig^2) \left[ \frac{1}{s - m^2} + \frac{1}{t - m^2} + \frac{1}{u - m^2} \right].
+    \end{equation}
+    Here \(s = W^2\).
+    Hence
+    \begin{equation}
+        \left( \diff{\sigma}{\Omega} \right)_{\text{CoM}} = \frac{1}{64\pi^2} \frac{g^4}{s} \abs{\frac{1}{s - m^2} + \frac{1}{t - m^2} + \frac{1}{u - m^2}}^2.
+    \end{equation}
+    
+    Now consider high energy fixed angle scattering.
+    Then \(\abs{\vv{p}}^2 \gg m^2\), so \(\abs{\vv{p}}^2 \approx E^2\).
+    We also have \(s = 4E^2 \approx 4\vv{p}^2\), \(t \approx -2E^2(1 - \cos\vartheta)\) and \(u \approx -2E^2(1 + \cos\vartheta)\).
+    This means that the ratios \(s/u\) and \(s/t\) are fixed since \(\vartheta\) is fixed and the factors of \(E^2\) cancel.
+    The angular distribution can be written as
+    \begin{equation}
+        \dl{\Omega} = 2\pi \dd{\cos \vartheta},
+    \end{equation}
+    and so
+    \begin{equation}
+        \left( \diff{\sigma}{(\cos \vartheta)} \right)_{\text{CoM}} = \frac{1}{32\pi} \frac{g^4}{s^3}\left( 1 + \frac{s}{t} + \frac{s}{u} \right)^2,
+    \end{equation}
+    where we get an extra factor of \(2\pi\) from the \(\int_0^{2\pi}\dl{\varphi}\) integral and the term in brackets follows from neglecting the masses and some trig identities.
+    
+    Note that dimensionally this all works out since the action, \(S\), has dimensions of \([S] = [\text{length}]^4[g\varphi^3]\), which follows from the action being the spacetime integral of \(-g\varphi^3/4!\), and so since action is dimensionless (when \(\hbar = 1\)) and length and energy have inverse units of each other (when \(c = 1\) also) we have \([g\varphi^3] = [\text{energy}]^4\).
+    We know that \([(\partial \varphi)^2] = [\text{energy}]^4\), and so we have \([\varphi] = [\text{energy}]\), since \([\partial] = [\text{length}]^{-1} = [\text{energy}]\).
+    Hence, we must have that \([g] = 1\) and so this entire quantity has units of \(1/[s^3] = [\text{momentum}]^3\).
+    This tells us that the cross section drops off inversely proportionally to the momentum squared, so at high momentums interactions are much less likely, which is what we would expect, high momentum particles move past each other very quickly without much of a chance for interactions.
+    
+    \part{Complex Scalar Fields}
+    \chapter{Charge}
+    Classical fields, such as the electromagnetic field, are always real since they are observables.
+    Wave functions on the other hand are always complex, since their time evolution, \(\ket{\psi, t} = \e^{iEt}\ket{\psi}\), demands it.
+    In quantum field theory fields can be either real or complex, since they are not observable.
+    However, the action, Lagrangian, and Hamiltonian must be real, this is needed to ensure that the \(S\) matrix is unitary, which is required for conservation of probability.
+    Also, the Hamiltonian corresponds to the energy of the system which is observable, and hence real.
+    
+    \section{Multiple Real Fields}
+    Consider the common definition of complex numbers which starts something like \enquote{a complex number is an ordered pair of real numbers with operations of \dots}.
+    Much like this definition a complex field can be thought of as a pair of real fields.
+    So, we need to be able to deal with multiple fields.
+    Fortunately our work so far generalises very well to multiple real fields, we just have to sum over fields in certain expressions.
+    
+    Suppose we have \(N\) real scalar fields, \(\varphi_r\), with \(r = 1, \dotsc, N\).
+    For simplicity, and because it's all we need for the complex case, we assume that all \(N\) fields correspond to particles of mass \(m\).
+    The Lagrangian is then
+    \begin{equation}
+        \lagrangianDensity = \frac{1}{2}(\partial_\mu \varphi_r(x))(\partial^\mu \varphi_r(x)) - m^2\varphi_r(x)^2,
+    \end{equation}
+    where we have an implied sum over \(r\).
+    We can then define the conjugate fields, and we find
+    \begin{equation}
+        \pi_r(x) \coloneqq \diffp{\lagrangianDensity}{\dot{\varphi}_r(x)} = \dot{\varphi}_r(x).
+    \end{equation}
+    Any two distinct fields commute, and for two of the same field we have the usual commutation relations.
+    That is, we have the equal time commutation relation
+    \begin{equation}
+        \commutator{\varphi_r(t, \vv{x})}{\pi_s(t, \vv{x}')} = i\delta_{rs} \delta(\vv{x} - \vv{x}'),
+    \end{equation}
+    and all other commutators vanish.
+    
+    The mode expansion is the same as for a single field, but we have independent creation and annihilation operators for each field:
+    \begin{equation}
+        \varphi_r(x) = \int \frac{\dl{^3\vv[p]}}{(2\pi)^3} \frac{1}{2\pi(\vv{p})} [a_r(\vv{p})\e^{-ip\cdot x} + a_r^\hermit(\vv{p})\e^{ip\cdot x}].
+    \end{equation}
+    These have the covariant commutation relations
+    \begin{equation}
+        \commutator{a_r(\vv{p})}{a_s^\hermit(\vv{p}')} = \delta_{rs} 2\omega(\vv{p}) (2\pi)^3\delta(\vv{p} - \vv{p}'),
+    \end{equation}
+    and all other commutators vanish.
+    
+    From here we proceed as before, we can define the energy-momentum tensor,
+    \begin{equation}
+        T^{\mu\nu}(x) \coloneqq \normalordering{(\partial^\mu \varphi_r(x))(\partial^\nu \varphi_r(x)) - \minkowskiMetric^{\mu\nu}\lagrangianDensity(x)},
+    \end{equation}
+    with an implied sum over \(r\).
+    We then get the conserved momentum
+    \begin{equation}
+        P^\nu = \int \dl{^3x} \, T^{0\nu}(x),
+    \end{equation}
+    and the conserved current
+    \begin{equation}
+        j^\mu = \diffp{\lagrangianDensity}{(\partial_\mu \varphi_r)}\delta \varphi_r,
+    \end{equation}
+    with an implied sum over \(r\).
+    
+    The interpretation of \(a_r^\hermit(\vv{p})\) and \(a_r(\vv{p})\) as creation and annihilation operators is the same, each creating/annihilating particles of type \(r\).
+    This follows since we have
+    \begin{equation}
+        \commutator{H}{a_r^\hermit(\vv{p})} = Ea_r^\hermit(\vv{p}), \qqand \commutator{H}{a_r(\vv{p})} = -Ea_r(\vv{p}).
+    \end{equation}
+    So, \(a_r^\hermit(\vv{p})\) creates a particle of type \(r\) and momentum \(\vv{p}\), which we might write as
+    \begin{equation}
+        a_r^\hermit(\vv{p}) \ket{0} = \ket{\vv{p}, r}.
+    \end{equation}
+    
+    The only time when we \emph{don't} sum over the fields is when defining the number operator, which we want to count particles of type \(r\), not the total number of particles, so we define
+    \begin{equation}
+        N_r(\vv{p}) \coloneqq a_r^\hermit(\vv{p}) a_r(\vv{p}) \qquad \text{(no sum on \(r\)).}
+    \end{equation}
+    
+    \section{Complex Scalar Field}
+    Now, consider a complex scalar field, \(\varphi\).
+    We can write this as a sum of two real fields, \(\varphi_1\) and \(\varphi_2\), one multiplied by \(i\):
+    \begin{equation}
+        \varphi(x) = \frac{1}{\sqrt{2}} [\varphi_1(x) + i\varphi_2(x)].
+    \end{equation}
+    The factor of \(1/\sqrt{2}\) here is so that the free Lagrangian comes out as the sum of two free Lagrangians for the real fields \(\varphi_1\) and \(\varphi_2\).
+    
+    Motivated by the need for the Lagrangian to be real we take the usual real scalar field Lagrangian and replace one of every pair of \(\varphi\)s with \(\varphi^\hermit\).
+    We then treat \(\varphi\) and \(\varphi^\hermit\) as two independent fields, since from these we have
+    \begin{equation}
+        \varphi_1 = \frac{1}{\sqrt{2}}(\varphi + \varphi^\hermit), \qand i\varphi_2 = \frac{1}{\sqrt{2}}(\varphi - \varphi^\hermit),
+    \end{equation}
+    and we assume \(\varphi_1\) and \(\varphi_2\) are independent.
+    Doing so we see that if we also drop the factor of \(2\) then we get
+    \begin{align}
+        \lagrangianDensity &= (\partial_\mu \varphi^\hermit)(\partial^\mu \varphi) - m^2\varphi^\hermit \varphi\\
+        &= \frac{1}{2}(\partial_\mu \varphi_i)(\partial^\mu \varphi_i) - \frac{1}{2}m^2\varphi_i^2,
+    \end{align}
+    with an implied sum over \(i\).
+    Note that we assume both fields have particles of the same mass, since otherwise we cannot guarantee that the Lagrangian will be real.
+    
+    We can define the conjugate field
+    \begin{equation}
+        \pi \coloneqq \diffp{\lagrangianDensity}{\dot{\varphi}} = \dot{\varphi}^\hermit, \qqand \pi^\hermit = \diffp{\lagrangianDensity}{\dot{\varphi}^\hermit} = \dot{\varphi}.
+    \end{equation}
+    We then have the equal time commutation relations
+    \begin{equation}
+        \commutator{\varphi(t, \vv{x})}{\pi(t, \vv{x}')} = \commutator{\varphi^\hermit(t, \vv{x})}{\pi^\hermit(t, \vv{x}')} = i\delta^3(\vv{x} - \vv{x}'),
+    \end{equation}
+    and all other commutators vanish.
+    
+    We can define the Hamiltonian as before:
+    \begin{align}
+        H &= \int \dl{^3\vv{x}} \, (\pi\dot{\varphi} + \pi^\hermit \dot{\varphi}^\hermit - \lagrangianDensity)\\
+        &= \int \dl{^3\vv{x}} \, (\pi^\hermit \pi + (\grad \varphi^\hermit) \cdot (\grad \varphi) + m^2 \varphi^\hermit \varphi).
+    \end{align}
+    This second form makes it clear that this is real.
+    
+    Computing the Heisenberg equations of motion gives
+    \begin{equation}
+        (\dalembertian + m^2)\varphi = 0, \qqand (\dalembertian + m^2)\varphi^\hermit = 0.
+    \end{equation}
+    
+    \section{Mode Expansion}
+    The mode expansion is similar to the real case, except, in the real case we needed \(a\) and \(a^\hermit\) to give a real field.
+    We don't need a real field here, but we do require a second term since this then causes things to cancel when the canonical commutation relations are evaluated outside of the light cone, which enforces causality.
+    As a result we still include two terms in the mode expansion, but we no longer require one to be the Hermitian conjugate of the other, so we introduce some other operator, \(b^\hermit\), to replace \(a^\hermit\), with the conjugate for consistency with the real case:
+    \begin{equation}
+        \varphi(x) = \int \invariantmeasure{p} \, [a(\vv{p}) \e^{-ip\cdot x} + b^\hermit(\vv{p}) \e^{ip \cdot x}].
+    \end{equation}
+    We then have
+    \begin{equation}
+        \varphi^\hermit(x) = \int \invariantmeasure{p} \, [b(\vv{p}) \e^{-ip\cdot x} + a^\hermit(\vv{p})\e^{ip\cdot x}].
+    \end{equation}
+    
+    We then have the equal time commutation relations
+    \begin{equation}
+        \commutator{a(\vv{p})}{a^\hermit(\vv{p})} = \commutator{b(\vv{p})}{b^\hermit(\vv{p})} = \bardelta(\vv{p} - \vv{p}'),
+    \end{equation}
+    and the two independent mode operators commute:
+    \begin{equation}
+        \commutator{a(\vv{p})}{b(\vv{p})} = \commutator{a^\hermit(\vv{p})}{b^\hermit(\vv{p})} = 0,
+    \end{equation}
+    as we as all other commutators vanishing.
+    
+    We can then show that
+    \begin{alignat}{2}
+        \commutator{H}{a^\hermit(\vv{p})} &= Ea^\hermit \qquad & \commutator{H}{a(\vv{p})} = -Ea(\vv{p}),\\
+        \commutator{H}{b^\hermit(\vv{p})} &= Eb^\hermit \qquad & \commutator{H}{b(\vv{p})} = -Eb(\vv{p}).
+    \end{alignat}
+    Recall that a real scalar field can be interpreted as an infinite set of harmonic oscillators, one for each momentum, \(\vv{p}\).
+    We can then interpret the complex  scalar field as two independent sets of harmonic oscillators, with two for each momentum, \(\vv{p}\).
+    This leads to the interpretation of \(a^\hermit\) and \(b^\hermit\) as creating independent particles.
+    These particles are bosons, both with respect to exchanging particles made by the same mode operator, so, for example, both created by \(a^\hermit\), and with respect to exchanging particles made by different mode operators, so for example, exchanging a particle created by \(a^\hermit\) with a particle created by \(b^\hermit\).
+    
+    The energy-momentum operator is
+    \begin{equation}
+        T^{\mu\nu} = \normalordering{(\partial^\mu\varphi^\hermit)(\partial^\nu \varphi) + (\partial^\nu \varphi^\hermit) (\partial^\mu \varphi) - \minkowskiMetric^{\mu\nu}\lagrangianDensity}.
+    \end{equation}
+    The conserved momentum is
+    \begin{equation*}
+        P^\nu = \int \dl{^3\vv{x}} \, T^{0\nu} = \int \invariantmeasure{p} \, p^\nu(a^\hermit(\vv{p})a(\vv{p}) + b^\hermit(\vv{p})b(\vv{p})) = \int \invariantmeasure{p} \, p^\nu (N_a(\vv{p}) + N_b(\vv{p})).
+    \end{equation*}
+    This means it is the momentum of the combined two sets of particles which is conserved, not the momentum of each set individually.
+    
+    \section{Charge Conservation}
+    There must be something that sets apart particles created by \(a^\hermit\) and particles created by \(b^\hermit\).
+    In this section we work out what this is.
+    Consider the Lagrangian again,
+    \begin{equation}
+        \lagrangianDensity = (\partial_\mu\varphi^\hermit)(\partial^\mu\varphi) - m^2\varphi^\hermit \varphi.
+    \end{equation}
+    Notice that this is invariant under the transformation
+    \begin{equation}
+        \varphi \mapsto \e^{i\alpha}\varphi
+    \end{equation}
+    for some constant \(\alpha\).
+    Notice that \(\alpha\) cannot depend on \(x\), since then the derivatives would cause problems.
+    Under this transformation we have \(\varphi^\hermit \mapsto \e^{-i\alpha}\varphi^\hermit\) as well.
+    This is a \(\unitary(1)\) symmetry\footnote{see the \course{Symmetries of Quantum Mechanics} or \course{Symmetries of Particles and Fields} course for details}.
+    This is an internal symmetry, acting on the fields, rather than on spacetime.
+    
+    A symmetry implies a conserved quantity, so lets find out what it is\footnote{If the title of this section hasn't already given it away!}.
+    Assume \(\alpha \ll 1\), so we have \(\exp[i\alpha] \approx 1 + i\alpha\), and hence
+    \begin{equation}
+        \varphi \mapsto \e^{i\alpha}\varphi \approx (1 + i\alpha)\varphi = \varphi + i\alpha \varphi,
+    \end{equation}
+    and hence
+    \begin{equation}
+        \delta \varphi = \e^{i\alpha}\varphi - \varphi \approx i\alpha\varphi.
+    \end{equation}
+    Similarly,
+    \begin{equation}
+        \delta \varphi^\hermit \approx -i\alpha\varphi.
+    \end{equation}
+    We then have
+    \begin{equation}
+        \diffp{\lagrangianDensity}{(\partial_\mu\varphi)} \delta \varphi = i\alpha(\partial^\mu\varphi^\hermit)\varphi, \qqand \diffp{\lagrangianDensity}{(\partial_\mu\varphi^\hermit)}\delta\varphi^\hermit = -i\alpha\varphi^\hermit(\partial^\mu\varphi).
+    \end{equation}
+    The conserved current is then, normal ordering to avoid later issues\footnote{actually, normal ordering isn't strictly necessary here, but it is in other similar cases so we'll do so here for consistency},
+    \begin{align}
+        j^\mu &= \normalordering{\diffp{\lagrangianDensity}{(\partial_\mu\varphi)}\delta\varphi + \diffp{\lagrangianDensity}{(\partial_\mu\varphi^\hermit)}\delta\varphi^\hermit}\\
+        &= \normalordering{i\alpha(\partial^\mu\varphi^\hermit)\varphi - i\alpha\varphi^\hermit(\partial^\mu\varphi)}.
+    \end{align}
+    We can rescale this by a factor of \(-\alpha\) to get:
+    \begin{equation}
+        j^\mu = i\normalordering{\varphi^\hermit (\partial^\mu\varphi) - (\partial^\mu\varphi^\hermit)\varphi}
+    \end{equation}
+    Notice that we can easily show this is conserved, that is that \(\partial_\mu j^\mu = 0\):
+    \begin{align}
+        \partial_\mu j^\mu &= i\normalordering{[(\partial_\mu\varphi^\hermit)(\partial^\mu\varphi) + \varphi^\hermit(\dalembertian\varphi) - (\dalembertian\varphi^\hermit)\varphi - (\partial^\mu\varphi^\hermit)(\partial_\mu\varphi)]}\\
+        &= i\normalordering{[\varphi^\hermit(\dalembertian\varphi) - (\dalembertian\varphi^\hermit)\varphi]}.
+    \end{align}
+    The equations of motion for the fields give \(\dalembertian\varphi = -m^2\varphi\) and \(\dalembertian\varphi^\hermit = -m^2\varphi^\hermit\), so
+    \begin{equation}
+        \partial_\mu j^\mu = i\normalordering{[\varphi^\hermit(-m^2\varphi) - (-m^2\varphi^\hermit)\varphi]} = 0,
+    \end{equation}
+    where we've used the normal ordering to allow us to swap the order of \(\varphi\) and \(\varphi^\hermit\).
+    
+    Along with this conserved current we have a conserved charge:
+    \begin{equation}
+        Q = \int \dl{^3\vv{x}} \, j^0 = i\int \dl{^3\vv{x}} \, \normalordering{(\varphi^\hermit \dot{\varphi} - \dot{\varphi}^\hermit \varphi)}.
+    \end{equation}
+    We can write \(\varphi\) and \(\varphi^\hermit\) in terms of mode operators, with the time derivatives bringing down a factor of \(\pm i\omega(\vv{p})\), giving
+    \begin{align}
+        Q &= i \int \dl{^3\vv{x}} \int \invariantmeasure{p} \int \invariantmeasure{p'}\\
+        &\quad\quad \Big\{ \normalordering{[a^\hermit(\vv{p}) \e^{ip \cdot x} + b\e^{-ip \cdot x}]i\omega(\vv{p}')[-a(\vv{p}')\e^{-ip'\cdot x} + b^\hermit(\vv{p}')\e^{ip'\cdot x}]} \notag\\
+        &\qquad\quad -i\omega(\vv{p})\normalordering{[a^\hermit(\vv{p})\e^{ip\cdot x} - b(\vv{p})\e^{-ip\cdot x}] [a(\vv{p}')\e^{-ip'\cdot x} + b^\hermit(\vv{p}')\e^{ip'\cdot x}]} \Big\}.\notag
+    \end{align}
+    After expanding this, integrating over \(x\) to get Dirac deltas, and then using these to perform the \(p'\) integral we're left with
+    \begin{align}
+        Q &= \int \invariantmeasure{p} \normalordering{(a^\hermit(\vv{p})a(\vv{p}) - b(\vv{p}) b^\hermit(\vv{p}))}\\
+        &= \int \invariantmeasure{p} (a^\hermit(\vv{p}) a(\vv{p}) - b^\hermit(\vv{p})b(\vv{p})).
+    \end{align}
+    
+    From this we can then show that the following commutation relations hold:
+    \begin{alignat}{2}
+        \commutator{Q}{a^\hermit(\vv{p})} &= \hphantom{-}a^\hermit \qquad & \commutator{Q}{a(\vv{p})} = -a(\vv{p}),\\
+        \commutator{Q}{b^\hermit(\vv{p})} &= -b^\hermit \qquad & \commutator{Q}{b(\vv{p})} = \hphantom{-}b(\vv{p}).
+    \end{alignat}
+    So finally we have a difference between \(a\) and \(b\).
+    This leads to the interpretation that
+    \begin{itemize}
+        \item \(a^\hermit(\vv{p})\) creates a particle with momentum \(\vv{p}\) and \enquote{charge} \(+1\),
+        \item \(b^\hermit(\vv{p})\) creates a particle with momentum \(\vv{p}\) and \enquote{charge} \(-1\),
+        \item \(a(\vv{p})\) annihilates a particle with momentum \(\vv{p}\) and \enquote{charge} \(+1\),
+        \item \(b(\vv{p})\) annihilates a particle with momentum \(\vv{p}\) and \enquote{charge} \(-1\).
+    \end{itemize}
+    Here we write \enquote{charge}, since this may not be electrical charge, but it can be.
+    
+    So, a complex scalar field gives a theory with a pair of charged particles.
+    Conservation of \(Q\) implies that particles must always be created and destroyed in pairs.
+    This all follows simply from recognising that the Lagrangian must be real and so must depend only on products like \(\varphi^\hermit \varphi\).
+    
+    There is another interpretation of this, which is that \(a^\hermit\) creates particles, and \(b^\hermit\) creates antiparticles (or vice versa).
+    An antiparticle being a particle with the same mass but opposite charge.
+    Then
+    \begin{itemize}
+        \item \(a^\hermit(\vv{p})\) creates a particle with momentum \(\vv{p}\) and \enquote{charge} \(+1\),
+        \item \(b^\hermit(\vv{p})\) creates an antiparticle with momentum \(\vv{p}\) and \enquote{charge} \(-1\),
+        \item \(a(\vv{p})\) annihilates a particle with momentum \(\vv{p}\) and \enquote{charge} \(+1\),
+        \item \(b(\vv{p})\) annihilates an antiparticle with momentum \(\vv{p}\) and \enquote{charge} \(-1\).
+    \end{itemize}
+    Notice that destroying a particle of charge \(+1\) is the same as creating a particle of charge \(-1\) and vice versa.
+    
+    For a real field we have \(a = b\) and we can interpret this as the statement that the particles in this theory are their own antiparticles.
+    
+    \section{Feynman Rules}
+    \epigraph{It's useful for you to get used to confusing notation in this course, because it will get a whole lot worse.}{Richard Ball}
+    Consider the mode expansions of the fields:
+    \begin{align}
+        \varphi &= \int \invariantmeasure{p} [a(\vv{p})\e^{-ip\cdot x} + b^\hermit(\vv{p})\e^{ip\cdot x}],\\
+        \varphi^\hermit &= \int \invariantmeasure{p} [b(\vv{p})\e^{-ip\cdot x} + a^\hermit(\vv{p})\e^{ip\cdot x}].
+    \end{align}
+    Using these and the commutation relations for the mode operators we can derive the covariant commutator
+    \begin{equation}
+        \commutator{\varphi(x)}{\varphi^\hermit(x')} = i\Delta(x - x')
+    \end{equation}
+    where \(\Delta\) is the same function as for real scalar fields.
+    The other commutators, \(\commutator{\varphi(x)}{\varphi(x')}\) and \(\commutator{\varphi^\hermit(x)}{\varphi^\hermit(x)}\), vanish.
+    
+    A result of this vanishing of of commutators between \(\varphi\)s or between \(\varphi^\hermit\)s is that contractions between two \(\varphi\)s or two \(\varphi^\hermit\)s also vanish, and so the only nonvanishing contractions are
+    \begin{equation}
+        \wick{\c \varphi(x) \c \varphi^\hermit(x')} = \bra{0} \timeOrdering[\varphi(x) \varphi^\hermit(x')] \ket{0} = i\Delta_{\feynman}(x - x'),
+    \end{equation}
+    where \(\Delta_{\feynman}\) is the same as for a real scalar field.
+    
+    As before our state space is given by direct products of single particle states, which are now labelled with the charge as well as the momentum of the particle:
+    \begin{equation}
+        \ket{\vv{p}, +} = a^\hermit(\vv{p})\ket{0}, \qqand \ket{\vv{p}, -} = b^\hermit(\vv{p})\ket{0}.
+    \end{equation}
+    Writing \(\varphi = \varphi_+ + \varphi_-\) as before\footnote{We lower the \(+\) and \(-\) labels to make room for \(\hermit\).} we have
+    \begin{alignat}{2}
+        \varphi_+(x)\ket{\vv{p}, +} &= \e^{-ip\cdot x} \ket{0} \qquad & \varphi_+^\hermit(x)\ket{\vv{p}, -} &= \e^{-ip\cdot x}\ket{0},\\
+        \bra{\vv{p}, +}\varphi_-^\hermit(x) &= \e^{ip\cdot x} \bra{0} \qquad & \bra{\vv{p}, -} \varphi_-(x) &= \e^{ip\cdot x}\bra{0}.
+    \end{alignat}
+    
+    So, we conclude that
+    \begin{itemize}
+        \item \(\varphi_+\) destroys an incoming particle of charge \(+1\),
+        \item \(\varphi_+^\hermit\) destroys an incoming particle of charge \(-1\),
+        \item \(\varphi_-\) creates an outgoing particle of charge \(-1\),
+        \item \(\varphi_-^\hermit\) creates an outgoing particle of charge \(+1\).
+    \end{itemize}
+    From this we can compute all the Feynman rules for any given interaction.
+    
+    \part{Gaussian Integrals}
+    \chapter{Gaussian Integrals}
+    This part of the course is full of \define{Gaussian integrals}\index{Gaussian!integral}, so we'll spend some time to get comfortable with them, starting from the simplest one-dimensional case, and then adding in constants, before moving on to the arbitrary dimension case.
+    \section{One Dimension}
+    \subsection{No Constant Coefficient}
+    It is well known that
+    \begin{equation}
+        Z_{1} \coloneqq \int_{-\infty}^{\infty} \dl{x} \, \exp\left[ -\frac{1}{2}x^2 \right] = \sqrt{2\pi}.
+    \end{equation}
+    This follows by considering
+    \begin{align}
+        Z_{1}^2 &= \int_{-\infty}^{\infty} \dl{x} \int \dl{y} \, \exp\left[ -\frac{1}{2}(x^2 + y^2) \right]\\
+        &= \int_{0}^{2\pi} \dl{\vartheta} \int_{0}^{\infty} \dl{r} \, r \exp\left[ -\frac{1}{2}r^2 \right]\\
+        &= 2\pi \left[ -\exp\left[ -\frac{1}{2}r^2 \right] \right]_{0}^{\infty}\\
+        &= 2\pi,
+    \end{align}
+    and so \(Z_1 = \sqrt{Z_1^2} = 2\pi\).
+    
+    \subsection{With Coefficient}
+    If we include a coefficient, \(a\), with \(\Re(a) > 0\) then we have
+    \begin{equation}
+        Z_a \coloneqq \int_{-\infty}^{\infty} \dl{x} \, \exp\left[ -\frac{1}{2}ax^2 \right] = \sqrt{\frac{2\pi}{a}},
+    \end{equation}
+    For \(a \in \reals\) this follows by a change of variables, \(x \mapsto u/\sqrt{a}\), so \(\dl{x} = \dl{u}/\sqrt{a}\), and since \(a > 0\) and so \(\sqrt{a} > 0\) the integration limits are unchanged so we have
+    \begin{equation}
+        Z_a = \frac{1}{\sqrt{a}} \int_{-\infty}^{\infty} \dl{u} \, \exp\left[ -\frac{1}{2}u^2 \right] = \frac{1}{\sqrt{a}} Z_1 = \sqrt{\frac{2\pi}{a}}.
+    \end{equation}
+    The same thing holds for \(a \in \complex\) with \(\Re(a) > 0\), but we have to consider some contour integral and its not as straight forward to show.
+    
+    \subsection{With Linear Term}
+    Now consider
+    \begin{equation}
+        Z_a(b) \coloneqq \int_{-\infty}^{\infty} \dl{x} \, \exp\left[ -\frac{1}{2}ax^2 + bx \right] = \sqrt{\frac{2\pi}{a}} \exp\left[ -\frac{b^2}{2a} \right].
+    \end{equation}
+    This is shown by completing the square:
+    \begin{equation}
+        -\frac{1}{2}ax^2 + bx = -\frac{a}{2}\left( x + \frac{b}{a} \right)^2 + \frac{b^2}{2a}.
+    \end{equation}
+    Hence,
+    \begin{equation}
+        Z_a(b) = \int_{-\infty}^{\infty} \dl{x} \, \exp\left[ -\frac{1}{2}a\left( x - \frac{b}{a} \right) \right] \exp\left[ -\frac{b^2}{2a} \right].
+    \end{equation}
+    Making a change of variables \(x \mapsto u + b/a\), so \(\dl{x} = \dl{u}\) and the integration region is unchanged we get
+    \begin{equation*}
+        Z_a(b) = \exp\left[ -\frac{b^2}{2a} \right] \int_{-\infty}^{\infty} \dl{u} \, \exp\left[ -\frac{1}{2}au^2 \right] = \exp\left[ -\frac{b^2}{2a} \right] Z_a = \sqrt{\frac{2\pi}{a}} \exp\left[ -\frac{b^2}{2a} \right].
+    \end{equation*}
+    
+    \section{Arbitrary Dimension}
+    \subsection{Diagonal Case}
+    Let \(x \in \reals^n\), then
+    \begin{equation}
+        Z_I \coloneqq \int \dl{^nx} \, \exp\left[ -\frac{1}{2}x^\trans x \right] = (2\pi)^{n/2}
+    \end{equation}
+    where an integral without bounds is understood to be over all of \(\reals^n\).
+    This follows since \(x^\trans x = x_ix_i\) and we then can factorise this into a product of \(n\) one-dimensional Gaussian integrals, each giving a factor of \(\sqrt{2\pi}\):
+    \begin{equation}
+        Z_I = (Z_1)^n = (2\pi)^{n/2}.
+    \end{equation}
+    
+    Now let \(A \in \matrices{n}{\complex}\) be diagonal with \(\Re(A_{ij}) > 0\) for all \(i, j = 1, \dotsc, n\).
+    Then we have
+    \begin{equation}
+        Z_A \coloneqq \int \dl{^nx} \, \exp\left[ -\frac{1}{2}x^\trans A x \right] = (2\pi)^{n/2} \left( \prod_{i=1}^{n} \frac{1}{\sqrt{A_{ij}}} \right).
+    \end{equation}
+    This follows since \(x^\trans Ax = x_iA_{ij}x_j\), and for \(A\) diagonal we have \(x^\trans Ax = x_i^2A_{ii}\), so \(Z_A\) factorises into a product of one-dimensional Gaussian integrals:
+    \begin{equation}
+        Z_A = \prod_{i = 1}^{n} Z_{A_{ii}} = (2\pi)^{n/2} \frac{1}{\sqrt{A_{ij}}}.
+    \end{equation}
+    Now notice that for a diagonal matrix
+    \begin{equation}
+        \det A = \prod_{i = 1}^{n} A_{ii},
+    \end{equation}
+    so
+    \begin{equation}
+        Z_A = (2\pi)^{n/2} (\det A)^{-1/2}.
+    \end{equation}
+    
+    \subsection{Diagonalisable Case}
+    Suppose that instead of being diagonal \(A\) is symmetric, and hence diagonalisable.
+    That is, there exists some \(D \in \specialOrthogonal(n)\) such that \(A' = D^{-1}AD\) is diagonal.
+    Consider the change of variables \(x \mapsto Dx\), and \(x^\trans \mapsto x^\trans D^\trans = x^{\trans}D^{-1}\).
+    Since \(\det D = 1\) we have \(\dl{^nx} \mapsto \det(D) \dl{^nx} = \dl{^nx}\).
+    Under this transformation we then have
+    \begin{align}
+        Z_A &= \int \dl{^nx} \, \exp\left[ -\frac{1}{2}x^\trans Ax \right]\\
+        &= \int \dl{^nx} \, \exp\left[ -\frac{1}{2}x^\trans D^{-1}ADx \right]\\
+        &= (2\pi)^{n/2}(\det(D^{-1}AD))^{-1/2}\\
+        &= (2\pi)^{n/2} (\det A)^{-1/2},
+    \end{align}
+    having used
+    \begin{equation*}
+        \det(D^{-1}AD) = \det(D^{-1})\det(A)\det(D) = \det(D)^{-1}\det(A)\det(D) = \det A.
+    \end{equation*}
+    
+    This shows that if \(A \in \matrices{n}{\complex}\) is a symmetric matrix with \(\Re(A_{ij}) \ge 0\) for all \(i, j = 1, \dotsc, n\) and the eigenvalues of \(A\), call them \(a_i\), are nonzero, which guarantees that \(\det A \ne 0\), then
+    \begin{equation}
+        Z_A \coloneq \int \dl{^nx} \, \exp\left[ -\frac{1}{2}x^\trans Ax \right] = (2\pi)^{n/2} (\det A)^{-1/2}.
+    \end{equation}
+    
+    \subsection{With Linear Term}
+    Now let \(b \in \reals^n\) and consider
+    \begin{equation}
+        Z_A(b) \coloneqq \int \dl{^nx} \, \exp\left[ -\frac{1}{2} x^\trans Ax + b^\trans x \right].
+    \end{equation}
+    Consider the change of variables
+    \begin{equation}
+        x = u + \Delta b
+    \end{equation}
+    where \(\Delta = A^{-1}\).
+    We then have \(\dl{^nx} = \dl{^nu}\), and there is no change to the region of integration.
+    Note that since \(A\) is symmetric so is \(\Delta\).
+    We then have
+    \begin{align}
+        -\frac{1}{2}x^\trans A x &= -\frac{1}{2}(u^\trans + b^\trans \Delta^\trans) A (u + \Delta b)\\
+        &= -\frac{1}{2}(u^\trans A u + u^\trans A\Delta b + b^\trans \Delta^\trans A u + b^\trans \Delta^\trans A \Delta b).
+    \end{align}
+    Now we can use \(\Delta^\trans = \Delta\) and \(u^\trans b = u_ib_i = b^\trans u\) to get
+    \begin{align}
+        -\frac{1}{2} x^\trans A x &= -\frac{1}{2}(u^\trans A u + u^\trans b + b^\trans u + b^\trans \Delta b)\\
+        &= -\frac{1}{2}u^\trans A u - b^\trans u - b \Delta b.
+    \end{align}
+    Similarly,
+    \begin{equation}
+        b^\trans x = b^\trans u + b^\trans \Delta b,
+    \end{equation}
+    and so
+    \begin{align}
+        -\frac{1}{2}x^\trans A x + b^\trans x &= -\frac{1}{2}u^\trans A u - b^\trans u - \frac{1}{2} b^\trans \Delta b + b^\trans u + b^\trans \Delta b\\
+        &=  -\frac{1}{2} u^\trans A u + \frac{1}{2} b^\trans \Delta b.
+    \end{align}
+    Hence, we have
+    \begin{equation}
+        \exp\left[ -\frac{1}{2}x^\trans A x + b^\trans x \right] = \exp[-\frac{1}{2} u^\trans A u] \exp\left[ \frac{1}{2} b^\trans \Delta b \right].
+    \end{equation}
+    Note that these are just exponentials of numbers, so everything commutes and the usual exponential laws apply.
+    Finally, we have
+    \begin{align}
+        Z_A(b) &= \int \dl{^nx} \, \exp\left[ -\frac{1}{2}x^\trans A x + b^\trans x \right]\\
+        &= \exp\left[ \frac{1}{2}b^\trans \Delta b \right] \int \dl{^nu} \, \exp\left[ -\frac{1}{2}u^\trans A u \right]\\
+        &= Z_A\exp\left[ \frac{1}{2}b^\trans \Delta b \right]\\
+        &= (2\pi)^{n/2} (\det A)^{-1/2} \exp\left[ -\frac{1}{2}b^\trans \Delta b \right].
+    \end{align}
+    
+    \section{Generating Function}
+    Let \(\mu\) be a measure on \(\reals^n\).
+    For our purposes a measure, \(\mu\), is something such that \(\dl{\mu(x)} = \dl{^nx}\, \Omega(x)\) where \(\Omega\) is some integrable function.
+    We define the \define{expectation value}\index{expectation value!with respect to a measure} of \(F \colon \reals^n \to \reals\) with respect to \(\mu\) to be
+    \begin{equation}
+        \expected{F}_\mu \coloneqq \int \dl{\mu(x)} \, F(x) = \int \dl{^nx} \, \Omega(x) F(x).
+    \end{equation}
+    
+    We assume that the measure is normalised such that
+    \begin{equation}
+        \int \dl{\mu(x)} = 1.
+    \end{equation}
+    This allows for a probability interpretation of our results.
+    
+    We then define the \defineindex{generating function}
+    \begin{equation}
+        Z_\mu(b) \coloneqq \expected{\e^{b^\trans x}}_\mu = \int \dl{\mu(x)} \, \exp[b^\trans x].
+    \end{equation}
+    We can expand the exponential in a series to get
+    \begin{equation}
+        \exp[b^\trans x] = \sum_{\ell = 0}^{\infty} \frac{1}{\ell!} (b^\trans x)^n = \sum_{\ell = 0}^{\infty} \sum_{i_1, \dotsc, i_{\ell} = 1}^{n} b_{i_1}\dotsm b_{i_\ell} x_{i_1} \dotsm x_{i_\ell}.
+    \end{equation}
+    Applying this to the generating function, and realising that we can use the linearity of the integral to pull out all the sums and factors of \(b_i\), we have
+    \begin{equation}
+        Z_\mu(b) = \sum_{\ell = 0}^{\infty} \frac{1}{\ell!} \sum_{i_1, \dotsc, i_\ell = 1}^{n} b_{i_1} \dotsm b_{i_\ell} \expected{x_{i_1} \dotsm x_{i_\ell}}_\mu
+    \end{equation}
+    We call
+    \begin{equation}
+        \expected{x_{i_1} \dotsm x_{i_\ell}}_\mu = \int \dl{\mu(x)} \, x_{i_1} \dotsm x_{i_\ell}
+    \end{equation}
+    the \defineindex{correlation function} of \(x\) with respect to the measure \(\mu\).
+    In particular it's called the \(\ell\)-point correlation function, since it has \(\ell\) points, \(x_{i_1}\) through \(x_{i_\ell}\).
+    
+    From this work we can see that the generating function is simply a polynomial in \(b_i\), after computing the integrals in the correlation functions they are just numbers.
+    We can then take derivatives to get
+    \begin{equation}
+        \diffp{}{_k} Z_\mu(b) = \int \dl{\mu(x)} \, \diffp{}{b_k} \exp[b_ix_i] = \int \dl{\mu(x)} \, x_k \exp[b_ix_i].
+    \end{equation}
+    This allows us to write the correlation function as
+    \begin{equation}
+        \expected{x_{i_1} \dotsm x_{i_\ell}}_\mu = \diffp{}{b_{i_1}} \dotsm \diffp{}{b_{i_\ell}} Z_\mu(b) \bigg|_{b = 0},
+    \end{equation}
+    since \(\exp[b^\trans x]|_{b = 0} = 1\).
+    
+    We can use this same method to find the expectation value of any function with a Taylor series.
+    If
+    \begin{equation}\label{eqn:taylor series}
+        F(x) = \sum_{\ell = 0}^{\infty} \sum_{i_1, \dotsc, i_{\ell} = 1}^{n} F_{i_1, \dotsc, i_{\ell}} x_{i_1} \dotsm x_{i_\ell}
+    \end{equation}
+    for some constants \(F_{i_1, \dotsc, i_{\ell}}\), then
+    \begin{equation}
+        \expected{F}_\mu = \sum_{\ell = 0}^{\infty} \sum_{i_1, \dotsc, i_{\ell} = 1}^{n} F_{i_1, \dotsc, i_{\ell}} \expected{x_{i_1} \dotsm x_{i_\ell}}_\mu.
+    \end{equation}
+    
+    \section{Gaussian Generating Functions}
+    Consider the \define{Gaussian measure}\index{Gaussian!measure}
+    \begin{equation}
+        \dl{\mu_0(x)} \coloneqq \dl{^nx} \, \Omega_0(x) = \dl{^n x} \, \symcal{N}_0 \exp\left[ -\frac{1}{2} x^\trans A x \right]
+    \end{equation}
+    where \(A \in \matrices{n}{\complex}\) is a symmetric matrix with \(\Re(A_{ij}) \ge 0\) for all \(i, j = 1, \dotsc, n\) and with nonzero eigenvalues, and \(\symcal{N}_0\) is the normalisation factor
+    \begin{equation}
+        \symcal{N}_0 = (2\pi)^{-n/2} (\det A)^{1/2} = Z_A^{-1}
+    \end{equation}
+    which ensures that
+    \begin{equation}
+        \int \dl{\mu_0(x)} = 1.
+    \end{equation}
+    
+    We can then define the \define{Gaussian generating function}\index{Gaussian!generating function},
+    \begin{equation}
+        Z_0(b) = \frac{Z_A(b)}{Z_A} = \exp\left[ \frac{1}{2} b^\trans \Delta b \right].
+    \end{equation}
+    Then the \define{Gaussian correlation function}\index{Gaussian!correlation function} is
+    \begin{equation}
+        \expected{x_{i_1} \dotsm x_{i_\ell}}_0 \coloneqq \expected{x_{i_1} \dotsm x_{i_\ell}}_{\mu_0} = \diffp{}{b_{i_1}} \dotsm \diffp{}{b_{i_\ell}} \exp\left[ \frac{1}{2}b^\trans \Delta b \right]\bigg|_{b = 0}.
+    \end{equation}
+    
+    If \(F\) is an arbitrary function with a Taylor series as in \cref{eqn:taylor series} then
+    \begin{align}
+        \expected{F}_0 &= \sum_{\ell = 0}^{\infty} \sum_{i_1, \dotsc, i_\ell = 1}^{n} F_{i_1, \dotsc, i_{\ell}} \diffp{}{b_{i_1}} \dotsm \diffp{}{b_{i_{\ell}}} \exp\left[ \frac{1}{2} b^\trans \Delta b \right] \bigg|_{b = 0}\\
+        &= F(\diffp{}/{b}) \exp\left[ \frac{1}{2} b^\trans \Delta b \right]\bigg|_{b = 0}
+    \end{align}
+    where \(F(\diffp{}/{b})\) is a formal operator expression given by \enquote{evaluating} the Taylor series for \(F\) at the partial derivatives:
+    \begin{equation}
+        F(\diffp{}/{b}) = \sum_{\ell = 0}^{\infty} \sum_{i_1, \dotsc, i_{\ell} = 1}^{n} F_{i_1, \dotsc, i_{\ell}} \diffp{}{b_{i_1}} \dotsm \diffp{}{b_{i_\ell}}.
+    \end{equation}
+    
+    \subsection{One Point Gaussian Correlator}
+    Consider the one point Gaussian correlation function,
+    \begin{equation}
+        \expected{x_k}_0 = \diffp{}{b_k} \expected{\exp[b^\trans x]}_0 \bigg|_{b = 0} = \diffp{}{b_k} \exp\left[ \frac{1}{2}b^\trans \Delta b \right].
+    \end{equation}
+    We have
+    \begin{equation}
+        \diffp{}{b_k} \exp\left[ \frac{1}{2}b_i\Delta_{ij}b_j \right] = \frac{1}{2}[\Delta_{kj}b_j + b_i\Delta_{ik}]\exp[b^\trans \Delta b] = \Delta_{kj}b_j \exp[b^\trans \Delta b],
+    \end{equation}
+    where we've used the symmetry of \(\Delta\) and \(\diffp{b_i}/{b_k} = \delta_{ik}\).
+    We then have
+    \begin{equation}
+        \expected{x_k}_0 = (\Delta_{kj}b_j) \exp\left[ \frac{1}{2}b^\trans \Delta b \right]\bigg|_{b = 0} = 0.
+    \end{equation}
+    We could have realised that this must vanish since our integrand is an odd function of \(x\) over an even range.
+    We can interpret the one point correlation as the mean of a normally distributed value.
+    
+    \subsection{Two Point Gaussian Correlator}
+    Consider the two point Gaussian correlation function,
+    \begin{equation}
+        \expected{x_kx_l}_{0} = \diffp{}{b_k}\diffp{}{b_l} \expected{\exp[b^\trans x]}_0 \bigg|_{b = 0}.
+    \end{equation}
+    We've already done the first derivative, so we just have to compute
+    \begin{align}
+        \expected{x_kx_l}_0 &= \diffp{}{b_l} \left( (\Delta_{kj b_j})\left[ \frac{1}{2}b^\trans \Delta b \right] \right)\bigg|_{b = 0}\\
+        &= [\delta_{kkj}\Delta_{kj} + (\Delta_{kj}b_j)(\Delta_{li}b_i)] \exp\left[ \frac{1}{2}b^\trans b \right]\bigg|_{b = 0}\\
+        &= \Delta_{kl}.
+    \end{align}
+    We can interpret the two point correlation as the covariance of two normally distributed values.
+    
+    \subsection{General Gaussian Correlator}
+    Now consider the \(\ell\)-point Gaussian correlation function
+    \begin{equation}
+        \expected{x_{i_1} \dotsm x_{i_\ell}}_0 = \diffp{}{b_{i_1}} \dotsm \diffp{}{b_{i_\ell}} \expected{\exp[b^\trans x]}_0 \bigg|_{b = 0}.
+    \end{equation}
+    In general the derivatives will either act on the exponential term, giving a factor of \(\Delta b\), or they can act on an existing \(\Delta b\) term giving a \(\Delta\) term.
+    The only nonzero terms after setting \(b = 0\) are those where each \(\Delta b\) has been acted on by a derivative to remove the \(b\) dependence.
+    This requires an even number of derivatives to get a nonzer result.
+    In the case when \(\ell\) is even the process for determining the result is as follows:
+    \begin{itemize}
+        \item Write all pairings \((i_p, i_q)\), which can be formed from the indices \(i_1, \dotsc, i_\ell\).
+        Treat \((i_p, i_q)\) and \((i_q, i_p)\) as the same and no index can be in a pair with itself.
+        \item Build the set, \(P\), of all sets of pairings, so the elements of \(P\) are sets of \(\ell/2\) pairs such that every index appears in exactly one pair.
+        \item The correlator is given by
+        \begin{equation}
+            \expected{x_{i_1}\dotsm x_{i_\ell}}_0 = \sum_{P} \Delta_{i_p i_q} \dotsm \Delta_{i_ri_s}.
+        \end{equation}
+    \end{itemize}
+    This is \defineindex{Wick's theorem}.
+    
+    To make this clearer lets consider some examples.
+    First, the two point correlator, \(\expected{x_{i_1}x_{i_2}}_0\).
+    We have two indices, \(i_1\) and \(i_\ell\), so there is a single pairing, \((i_1, i_2)\), and we have
+    \begin{equation}
+        \expected{x_{i_1}x_{i_2}}_0 = \Delta_{i_1i_2}.
+    \end{equation}
+    We can also write this as
+    \begin{equation}
+        \expected{x_{i_1}x_{i_2}}_0 = \wick{\c x_{i_1} \c x_{i_2}}
+    \end{equation}
+    where
+    \begin{equation}
+        \wick{\c x_{i_1} \c x_{i_2}} \coloneqq \Delta_{i_1i_2}.
+    \end{equation}
+    
+    Now consider the four point correlator, \(\expected{x_{i_1}x_{i_2}x_{i_3}x_{i_4}}_0\).
+    The set of possible pairings is
+    \begin{equation}
+        P = \{\{(i_1, i_2), (i_3, i_4)\}, \{(i_1, i_3), (i_2, i_4)\}, \{(i_1, i_4), (i_2, i_3)\}\}.
+    \end{equation}
+    The correlator is then
+    \begin{align}
+        \expected{x_{i_1}x_{i_2}x_{i_3}x_{i_4}}_0 &= \Delta_{i_1i_2}\Delta_{i_3i_4} + \Delta_{i_1i_3}\Delta_{i_2i_3} + \Delta_{i_1i_4}\Delta_{i_2i_3}\\
+        &= \wick{\c x_{i_1} \c x_{i_2}} \wick{\c x_{i_3} \c x_{i_4}} + \wick{\c1 x_{i_1} \c2 x_{i_2} \c1 x_{i_3} \c2 x_{i_4}} + \wick{\c2 x_{i_1} \c1 x_{i_2} \c1 x_{i_3} \c2 x_{i_4}}.
+    \end{align}
+    
+    Finally, lets do the six point correlation function.
+    We'll jump straight to the contractions:
+    \begin{align}
+        \expected{x_{i_1}x_{i_2}x_{i_3}x_{i_4}x_{i_5}x_{i_6}} &=
+        \wick{\c x_{i_1} \c x_{i_2}} \wick{\c x_{i_3} \c x_{i_4}} \wick{\c x_{i_5} \c x_{i_6}}
+        + \wick{\c x_{i_1} \c x_{i_2}} \wick{\c1 x_{i_3} \c2 x_{i_4} \c1 x_{i_5} \c2 x_{i_6}}\\
+        &+ \wick{\c x_{i_1} \c x_{i_2}} \wick{\c2 x_{i_3} \c1 x_{i_4} \c1 x_{i_5} \c2 x_{i_6}}
+        + \wick{\c1 x_{i_1} \c2 x_{i_2} \c1 x_{i_3} \c2 x_{i_4}} \wick{\c x_{i_5} \c x_{i_6}}\\
+        &+ \wick{\c1 x_{i_1} \c2 x_{i_2} \c1 x_{i_3} \c1 x_{i_4} \c2 x_{i_5} \c1 x_{i_6}}
+        + \wick{\c1 x_{i_1} \c2 x_{i_2} \c1 x_{i_3} \c1 x_{i_4} \c1 x_{i_5} \c2 x_{i_6}}\\
+        &+ \wick{\c2 x_{i_1} \c1 x_{i_2} \c1 x_{i_3} \c2 x_{i_4}} \wick{\c x_{i_5} \c x_{i_6}}
+        + \wick{\c1 x_{i_1} \c2 x_{i_2} \c3 x_{i_3} \c1 x_{i_4} \c2 x_{i_5} \c3 x_{i_6}}\\
+        &+ \wick{\c1 x_{i_1} \c3 x_{i_2} \c2 x_{i_3} \c1 x_{i_4} \c2 x_{i_5} \c3 x_{i_6}}
+        + \wick{\c2 x_{i_1} \c1 x_{i_2} \c1 x_{i_3} \c1 x_{i_4} \c2 x_{i_5} \c1 x_{i_6}}\\
+        &+ \wick{\c2 x_{i_1} \c1 x_{i_2} \c3 x_{i_3} \c1 x_{i_4} \c2 x_{i_5} \c3 x_{i_6}}
+        + \wick{\c1 x_{i_1} \c3 x_{i_2} \c2 x_{i_3} \c2 x_{i_4} \c1 x_{i_5} \c3 x_{i_6}}\\
+        &+ \wick{\c2 x_{i_1} \c1 x_{i_2} \c1 x_{i_3} \c1 x_{i_4} \c1 x_{i_5} \c2 x_{i_6}}
+        + \wick{\c3 x_{i_1} \c2 x_{i_2} \c1 x_{i_3} \c2 x_{i_4} \c1 x_{i_5} \c3 x_{i_6}}\\
+        &+ \wick{\c3 x_{i_1} \c2 x_{i_2} \c1 x_{i_3} \c1 x_{i_4} \c2 x_{i_5} \c3 x_{i_6}}
+    \end{align}
+    
+    \begin{cde}{}{}
+        Here's some Mathematica code to generate all pairs.
+        \textcolor{Red}{WARNING:} Horribly inefficient code!
+        It generates all permutations of the indices, groups them into pairs, then eliminates repeats, so its \(\order(\ell!)\) in memory, I can't even run it for \(\ell = 12\).
+        \begin{lstlisting}[gobble=12, language=mathematica, mathescape]
+            Union[Sort /@ 
+              Union[Sort /@ Partition[#[[1]], 2] & /@ 
+               Table[
+                 {#[[i]], #[[i + 1]]}, {i, 1, Length[#], 2}] &@
+               Permutations[Range[$\ell$]]
+            (* replace $\textcolor{codeCommentColor}{\ell}$ with number of indices (even) *)
+        \end{lstlisting}
+    \end{cde}
+    
+    As you can see the number of indices grows quickly.
+    Suppose we have \(2m\) indices for some integer \(m\).
+    Then there are \(2m - 1\) options for what to pair the first variable with, since it can't be paired with itself.
+    Then take the next unpaired variable, there are \(2m - 3\) variables to pair it with, since it can't be paired with itself or either of the already paired variables.
+    The next unpaired variable has \(2m - 5\) potential pairings, and so on, until we have four variables left, one of these has three options for pairing, and then we're left with two variables which we have to pair.
+    That is, the number of pairings is given by
+    \begin{equation}
+        \text{number of pairings} = (2m - 1)(2m - 3) \dotsm 3 \dotsm 1 = (2m - 1)!!
+    \end{equation}
+    where \(!!\) is the double factorial, defined recursively as \(n!! = n(n - 2)!!\) with \(1!! = 0!! = 1\).
+    Here are the number of pairings for the first few nonzero correlators:
+    \begin{equation*}
+        \begin{array}{rrrrrrrrrr}
+            2 & 4 & 6  & 8   & 10  & 12    & 14     & 16      & 18       & 20\\
+            1 & 3 & 15 & 105 & 945 & \num{10395} & \num{135135} & \num{2027025} & \num{34459425} & \num{654729075}\\
+        \end{array}
+    \end{equation*}
+    So its fair to say that evaluating general correlators with more than a couple of points quickly becomes intractable.
+
     
     %   Appdendix
     \appendixpage
