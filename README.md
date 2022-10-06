@@ -139,3 +139,5 @@ Some of the books I have used to help write these notes:
 * Feynman, R. P. et al. _Quantum Mechanics and Path Integrals_ emended edition (Dover Publications, Mineloa, 2010)
 * Kitel, C. _Introduction to Solid State Physics_, Global edition (Wiley, Hoboken, 2018)
 * Tomson, M. _Modern Particle Physics_, First edition (Cambridge University Press, Cambridge, 2013)
+* Allanach, B. _Symmetries, Particles, and Fields_, (Museum of Wrong, Cambridge, 2022)
+* Peskin, M. _An Introduction to Quantum Field Theory_, (CRC Press, Boca Raton, 1995)
