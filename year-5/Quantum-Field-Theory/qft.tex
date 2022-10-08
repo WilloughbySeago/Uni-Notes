@@ -99,7 +99,7 @@ noabbrev
 \newcommand{\order}{\symcal{O}}
 \newcommand{\phaseSpaceMeasure}[1][n]{(\dl{\symrm{PS}})_{#1}}
 
-\includeonly{parts/prelim}
+\includeonly{parts/prelim, parts/hamiltonian-calculation}
 
 \begin{document}
     \frontmatter
@@ -1761,7 +1761,7 @@ noabbrev
         \int \invariantmeasure{p} \, f(\vv{p}) \bardelta(\vv{p} - \vv{p}') = f(\vv{p}').
     \end{equation}
     
-    \section{The Hamiltonian}
+    \section{The Hamiltonian}\label{sec:the hamiltonian}
     To complete the analogy with the harmonic oscillator we need to find the Hamiltonian in terms of \(a(\vv{p})\) and \(a^\hermit(\vv{p})\).
     Starting with the hamiltonian
     \begin{equation}
@@ -1809,9 +1809,10 @@ noabbrev
     \end{equation}
     Doing the same for the other two terms we get their time independent contributions:
     \begin{align}
-        H_2 &\to \frac{1}{8} \int \frac{\dl{^3\vv{p}}}{(2\pi)^3} \frac{\vv{p}^2}{\omega(\vv{p})^2} \big[ a(\vv{p}) a(\vv{p})^\hermit + a(\vv{p})^\hermit a(\vv{p}) \big],\\
+        H_2 &\to \frac{1}{8} \int \frac{\dl{^3\vv{p}}}{(2\pi)^3} \frac{\vv{p}^2}{\omega(\vv{p})^2} \big[ a(\vv{p}) a^\hermit(\vv{p}) + a^\hermit(\vv{p}) a(\vv{p}) \big],\\
         H_3 &\to \frac{1}{8} \int \frac{\dl{^3\vv{p}}}{(2\pi)^3} \frac{m^2}{\omega(\vv{p})^2} \big[ a(\vv{p}) a^\hermit(\vv{p}) + a^\hermit(\vv{p}) a(\vv{p}) \big].
     \end{align}
+    See \cref{app:hamiltonian mode expansion} for the full calculation.
     Noticing that \(\vv{p}^2 + m^2\) cancels with \(1/\omega(\vv{p})^2\) in the full expression we get
     \begin{equation}
         H = \frac{1}{4} \int \frac{\dl{^3p}}{(2\pi)^3} \big[ a(\vv{p})a^\hermit(\vv{p}) + a(\vv{p})a^\hermit(\vv{p}) \big].
@@ -4426,7 +4427,7 @@ noabbrev
     \end{equation}
     We've already done the first derivative, so we just have to compute
     \begin{align}
-        \expected{x_kx_l}_0 &= \diffp{}{b_l} \left( (\Delta_{kj b_j})\left[ \frac{1}{2}b^\trans \Delta b \right] \right)\bigg|_{b = 0}\\
+        \expected{x_kx_l}_0 &= \diffp{}{b_l} \left( (\Delta_{kj b_j})\exp\left[ \frac{1}{2}b^\trans \Delta b \right] \right)\bigg|_{b = 0}\\
         &= [\delta_{kkj}\Delta_{kj} + (\Delta_{kj}b_j)(\Delta_{li}b_i)] \exp\left[ \frac{1}{2}b^\trans b \right]\bigg|_{b = 0}\\
         &= \Delta_{kl}.
     \end{align}
@@ -4473,7 +4474,7 @@ noabbrev
         P = \{\{(i_1, i_2), (i_3, i_4)\}, \{(i_1, i_3), (i_2, i_4)\}, \{(i_1, i_4), (i_2, i_3)\}\}.
     \end{equation}
     The correlator is then
-    \begin{align}
+    \begin{align}\label{eqn:4 point correlator}
         \expected{x_{i_1}x_{i_2}x_{i_3}x_{i_4}}_0 &= \Delta_{i_1i_2}\Delta_{i_3i_4} + \Delta_{i_1i_3}\Delta_{i_2i_3} + \Delta_{i_1i_4}\Delta_{i_2i_3}\\
         &= \wick{\c x_{i_1} \c x_{i_2}} \wick{\c x_{i_3} \c x_{i_4}} + \wick{\c1 x_{i_1} \c2 x_{i_2} \c1 x_{i_3} \c2 x_{i_4}} + \wick{\c2 x_{i_1} \c1 x_{i_2} \c1 x_{i_3} \c2 x_{i_4}}.
     \end{align}
@@ -4532,11 +4533,233 @@ noabbrev
     \end{equation*}
     So its fair to say that evaluating general correlators with more than a couple of points quickly becomes intractable.
 
+    \section{Perturbed Correlators}
+    As with the Gaussian case we can write the expected value of any analytic function, \(F\), with respect to some measure, \(\mu\), as a sum over correlators with respect to \(\mu\):
+    \begin{align}
+        \expected{F}_\mu &= \sum_{\ell = 0}^{\infty} \sum_{i_1, \dotsc, i_\ell = 1}^{n} F_{i_1\dotso i_{\ell}} \expected{x_{i_1} \dotsm x_{i_\ell}}_\mu\\
+        &= \sum_{\ell = 0}^{\infty} \sum_{i_1, \dotsc, i_{\ell} = 1}^{n} F_{i_1\dotso i_\ell} \diffp{}{b_{i_1}} \dotsm \diffp{}{b_{i_\ell}} Z_\mu(b) \bigg|_{b = 0}\\
+        &= F(\diffp{}/{b}) Z_\mu(b)|_{b = 0}.
+    \end{align}
+    
+    We now consider a slightly more general measure, \(\dl{\mu(x)} = \dl{^nx} \,\Omega(x)\) where
+    \begin{equation}
+        \Omega(x) = \frac{1}{Z_\lambda} \e^{-S_\lambda(x)}
+    \end{equation}
+    where
+    \begin{equation}
+        S_\lambda(x) = S_0(x) + \lambda V(x)
+    \end{equation}
+    with \(S_0(x) = x^\trans Ax/2\), giving the usual Gaussian measure, and \(V\) being some \enquote{potential} acting as a perturbation.
+    We will assume \(\lambda\) is small and consider expansions in \(\lambda\).
+    The factor \(Z_\lambda\) is given by
+    \begin{align}
+        Z_\lambda &= \int \dl{^nx}  \, \exp[-S_\lambda(x)]\\
+        &= \int \dl{^nx} \, \exp[-S_0(x)]\exp[-\lambda V(x)]\\
+        &= Z_0 \expected{\exp[-\lambda V(x)]}_0.
+    \end{align}
+    We will be interested in computing the value of
+    \begin{equation}
+        \frac{Z_\lambda}{Z_0} = \expected{\exp[-\lambda V(x)]}_0 = \sum_{k = 0}^{\infty} \frac{(-\lambda)^k}{k!} \expected{V(x)^k}_0.
+    \end{equation}
+    We can work out the expectation value once we know \(V\) by expanding \(V\).
+    
+    \subsection{\texorpdfstring{\(x^4\)}{x to the four} Potential}
+    \epigraph{The first instant of a long series of asking \enquote{how do we count?}}{Luigi Del Debbio}
+    Consider the example
+    \begin{equation}
+        V(x) = \frac{1}{4!} \sum_{i = 1}^n x_i^4.
+    \end{equation}
+    We can quickly write down a series for \(Z_\lambda/Z_0\) in terms of correlators:
+    \begin{equation}
+        \frac{Z_\lambda}{Z_0} = 1 - \lambda \frac{1}{4!} \sum_i \expected{x_i^4}_0 + \frac{\lambda^2}{2}\frac{1}{(4!)^2} \sum_i \sum_j \expected{x_i^4 x_j^4}_0 + \order(\lambda^3).
+    \end{equation}
+    Now we just need to compute the correlators.
+    
+    Starting with \(\expected{x_i^4}_0\).
+    This is just a special case of the four point correlator in \cref{eqn:4 point correlator} where we set all indices equal.
+    This means that we have
+    \begin{align}
+        \expected{x_ix_ix_ix_i}_0 &= \Delta_{ii}\Delta_{ii} + \Delta_{ii}\Delta_{ii} + \Delta_{ii}\Delta_{ii}\\
+        &= \wick{\c x_i \c x_i} \wick{\c x_i \c x_i} + \wick{\c1 x_i \c2 x_i \c1 x_i \c2 x_i} + \wick{\c2 x_i \c1 x_i \c1 x_i \c2 x_i}\\
+        &= 3 \Delta_{ii}^2.
+    \end{align}
+    Notice that we could have worked this out without needing to do the full four point correlator for arbitrary indices, we just need to find a way to count the number of pairings.
+    In this case there are 3 choices for what to pair the first \(x_i\) with, then the two remaining \(x_i\)s must be paired, so there are 3 terms, and all three are the same.
+    
+    This is good because as we saw for the six point correlator things quickly get out of hand, and the next term involves an 8 point correlator, which would be even worse at \((8 - 1)!! = 105\) terms.
+    So, what sort of pairings are there going to be in this correlator?
+    First there are going to be pairings akin to two copies of the four point correlator, with all \(x_i\)s paired with \(x_i\)s, and all \(x_j\)s paired with \(x_j\)s.
+    There are nine ways to do this, getting a factor of three from pairing up \(x_i\)s and a factor of three from pairing up \(x_j\)s.
+    This means we have the term \(9\Delta_{ii}^2\Delta_{jj}^2\).
+    
+    The next logical term to consider is one which pairs one \(x_i\) with one \(x_j\), however, if we do so we're left with an odd number of \(x_i\)s, so another of these must pair with an \(x_j\).
+    So, our next term pairs two \(x_i\)s with two \(x_j\)s, and then the remaining \(x_i\)s are paired with each other and likewise for the remaining \(x_j\)s.
+    How many ways are there to do this?
+    There are actually (at least) two ways to count this.
+    First, we have \(\binom{4}{2}\) ways to choose the two \(x_i\) to pair with \(x_j\)s.
+    Then we have four choices of which \(x_j\) to pair with the first and 3 choices of which \(x_j\) to pair with the second, for a total of \(\binom{4}{2} \cdot 4 \cdot 3 = 72\) terms.
+    The second way to count starts with choosing two \(x_i\)s, again giving a factor of \(\binom{4}{2}\), and then choosing two \(x_j\)s, for another factor of \(\binom{4}{2}\).
+    We can then pair up between these pairs in two ways, pairing the first of each pair, or the first of the \(x_i\)s and the second of the \(x_j\)s, for a factor of 2, giving \(\binom{4}{2}^2 \cdot 2 = 72\).
+    Hence, we have the term \(72\Delta_{ij}^2\Delta_{ii}\Delta_{jj}\).
+    
+    There's no way to pair up exactly three \(x_i\)s with \(x_j\)s, so the only other term is pairing all four \(x_i\)s with an \(x_j\).
+    This can be done by holding the \(x_i\) in some fixed order, then considering all permutations of the four \(x_j\)s, and pairing them up in order for each permutation.
+    So, we have a factor of \(4! = 24\).
+    The final term is then \(24\Delta_{ij}^4\).
+    
+    At this point there are some checks we can do.
+    First, we should, including repeated terms, have 8 indices, and 4 \(\Delta\)s in each term.
+    Second, adding up the combinatorial factors should give \(105\), the total number of ways to pair 8 things, and indeed this does work out.
+    So, we conclude that
+    \begin{equation}
+        \expected{x_i^4 x_j^4}_0 = 9\Delta_{ii}^2\Delta_{jj}^2 + 72\Delta_{ij}^2\Delta_{ii}\Delta_{jj} + 24\Delta_{ij}^4.
+    \end{equation}
+    
+    Hence, to second order, we have
+    \begin{align}
+        \frac{Z_\lambda}{Z_0} &= 1 - \frac{\lambda}{4!} \sum_{i} 3\Delta_{ii}^2 + \frac{\lambda^2}{2 (4!)^2}\sum_{i,j}[9\Delta_{ii}^2\Delta_{jj}^2 + 72\Delta_{ij}^2\Delta_{ii}\Delta_{jj} + 24\Delta_{ij}^4]\\
+        &= 1 - \frac{\lambda}{8} \sum_i \Delta_{ii}^2 + \lambda^2\sum_{i,j} \left[ \frac{1}{128}\Delta_{ii}^2\Delta_{jj}^2 + \frac{1}{16}\Delta_{ij}^2\Delta_{ii}\Delta_{jj} + \frac{1}{48}\Delta_{ij}^4 \right]
+    \end{align}
+    
+    \subsubsection{Diagrammatic Representation}
+    There is a diagrammatic representation of terms like this.
+    For each propagator, \(\Delta_{ij}\), we draw a line connecting the nodes \(i\) and \(j\):
+    \begin{equation}
+        \Delta_{ij} = 
+        \tikzsetnextfilename{fd-propagator}
+        \begin{tikzpicture}[baseline=(i.base)]
+            \draw (0, 0) node[left] (i) {\(i\)} -- (1, 0) node[right] {\(j\)};
+        \end{tikzpicture}
+    \end{equation}
+    Note that the position of the nodes doesn't matter, just how they're connected.
+    For terms like \(\Delta_{ii}\) with a repeated index we have a sum over \(i\) when these appear.
+    As a diagram a repeated index means a closed loop, and so any closed loop implies a sum:
+    \begin{equation}
+        \sum_i \Delta_{ii} = 
+        \tikzsetnextfilename{fd-propgator-repeated-index}
+        \begin{tikzpicture}[baseline=(i.base)]
+            \draw[looseness=1.5] (0, 0) to[out=40, in=90] (1, 0) to[out=270, in=-40] (0, 0) node [left] (i) {\(i\)};
+        \end{tikzpicture}
+    \end{equation}
+    Another example might be the term \(\sum_{j}\Delta_{ij}\Delta_{jj}\), which corresponds to the diagram
+    \begin{equation}
+        \sum_j \Delta_{ij}\Delta_{jj} = 
+        \tikzsetnextfilename{fd-propagator-repeated-index-2}
+        \begin{tikzpicture}[baseline=(i.base)]
+            \draw[looseness=1.5] (0, 0) node[left] (i) {\(i\)} -- (1, 0) to[out=40, in=90] (2, 0) to[out=270, in=-40] (1, 0) node [below] {\(j\)};
+        \end{tikzpicture}
+    \end{equation}
+    Fun Fact™: Diagrams like this one are called tadpole diagrams!
+    
+    Using this we can write the first order (in \(\lambda\)) \(\Delta_{ii}^2\) term as
+    \begin{equation}
+        \sum_i \Delta_{ii}^2 = 
+        \tikzsetnextfilename{fd-first-order-x4-term}
+        \begin{tikzpicture}[baseline={(0, -0.1)}]
+            \draw[looseness=1.5] (0, 0) to[out=40, in=90] (1, 0) to[out=270, in=-40] (0, 0) node [below] {\(i\)};
+            \draw[looseness=1.5, xscale=-1] (0, 0) to[out=40, in=90] (1, 0) to[out=270, in=-40] (0, 0);
+        \end{tikzpicture}
+    \end{equation}
+    Similarly we can write the following
+    \begin{equation}
+        \expected{x_i^4 x_j^4}_0 = 9\Delta_{ii}^2\Delta_{jj}^2 + 72\Delta_{ij}^2\Delta_{ii}\Delta_{jj} + 24\Delta_{ij}^4.
+    \end{equation}
+    as
+    \begin{equation}
+        \sum_{i,j} \expected{x_i^4x_j^4} = 9
+        \tikzsetnextfilename{fd-second-order-x4-term-1}
+        \begin{tikzpicture}[baseline={(0, -0.6)}]
+            \draw[looseness=1.5] (0, 0) to[out=40, in=90] (1, 0) to[out=270, in=-40] (0, 0) node [below] {\(i\)};
+            \draw[looseness=1.5, xscale=-1] (0, 0) to[out=40, in=90] (1, 0) to[out=270, in=-40] (0, 0);
+            \begin{scope}[yshift=-1cm]
+                \draw[looseness=1.5] (0, 0) to[out=40, in=90] (1, 0) to[out=270, in=-40] (0, 0) node [below] {\(j\)};
+                \draw[looseness=1.5, xscale=-1] (0, 0) to[out=40, in=90] (1, 0) to[out=270, in=-40] (0, 0);
+            \end{scope}
+        \end{tikzpicture}
+        + 72 \,
+        \tikzsetnextfilename{fd-second-order-x4-term-2}
+        \begin{tikzpicture}[baseline={(0, -0.1)}]
+            \draw[looseness=1.5] (0, 0) to[out=40, in=90] (1, 0) to[out=270, in=-40] (0, 0) node [below] {\(i\)};
+            \draw[looseness=1.5, xshift=-1cm, xscale=-1] (0, 0) to[out=40, in=90] (1, 0) to[out=270, in=-40] (0, 0) node [below] {\(j\)};
+            \draw (0, 0) to[bend right=40] (-1, 0);
+            \draw (0, 0) to[bend left=40] (-1, 0);
+        \end{tikzpicture}
+        + 24 \,
+        \tikzsetnextfilename{fd-second-order-x4-term-3}
+        \begin{tikzpicture}[baseline=(i.base)]
+            \draw (0, 0) node [left] (i) {\(i\)} to[bend right=20] (1, 0) node [right] {\(j\)};
+            \draw (0, 0) node [left] (i) {\(i\)} to[bend right=60] (1, 0);
+            \draw (0, 0) node [left] (i) {\(i\)} to[bend left=20] (1, 0);
+            \draw (0, 0) node [left] (i) {\(i\)} to[bend left=60] (1, 0);
+        \end{tikzpicture}
+    \end{equation}
+    
+    \subsubsection{Computing \texorpdfstring{\(\log(Z_\lambda/Z_0)\)}{log(Zlambda/Z0)}}
+    Suppose we want to compute \(\log(Z_\lambda/Z_0)\).
+    To do this we notice that \(Z_\lambda/Z_0 = 1 + \order(\lambda)\), and so we can use the Taylor expansion
+    \begin{equation}
+        \log(1 + \varepsilon) = \sum_{n = 1}^{\infty} \frac{(-1)^{n + 1}}{n}\varepsilon^n \approx \varepsilon - \frac{1}{2}\varepsilon^2 + \frac{1}{3}\varepsilon^3 - \dotsb.
+    \end{equation}
+    Since we already have \(\varepsilon\) here as a power series in \(\lambda\) we should work this out in powers of \(\lambda\).
+    The first order term has only a single contribution, from the first order term in \(\lambda\).
+    That is, to first order
+    \begin{equation}
+        \log\left( \frac{Z_\lambda}{Z_0} \right) = -\frac{\lambda}{8}\sum_i \Delta_{ii}^2 + \order(\lambda^2).
+    \end{equation}
+    For the second order term there are two contributions, we have the first order term squared, which also picks up a factor of \(-1/2\) from the expansion of the log:
+    \begin{equation}
+        -\frac{1}{2} \frac{\lambda^2}{8^2} \sum_{i} \Delta_{ii}^2 \sum_j \Delta_{jj}^2 = -\frac{1}{2} \frac{\lambda^2}{128} \sum_{i, j} \Delta_{ii}^2\Delta_{jj}^2.
+    \end{equation}
+    We also have the first order in \(\varepsilon\) term from the second order in \(\lambda\) term:
+    \begin{equation}
+        \lambda^2 \sum_{i,j} \left[ \frac{1}{128}\Delta_{ii}^2\Delta_{jj}^2 + \frac{1}{16} \Delta_{ij}^2\Delta_{ii}\Delta_{jj} + \frac{1}{48}\Delta_{ij}^4 \right].
+    \end{equation}
+    Notice that the first term here cancels with the other \(\lambda^2\) term, to give the second order result
+    \begin{equation}
+        \log\left( \frac{Z_\lambda}{Z_0} \right) = -\frac{\lambda}{8} \sum_{i} \Delta_{ii}^2 + \lambda^2 \left[ \frac{1}{128}\Delta_{ii}^2\Delta_{jj}^2 + \frac{1}{16}\Delta_{ij}^2 \Delta_{ii} \Delta_{jj} + \frac{1}{48}\Delta_{ij}^4 \right] + \order(\lambda^3).
+    \end{equation}
+    
+    In terms of diagrams, this corresponds to
+    \begin{multline}
+        \log\left( \frac{Z_\lambda}{Z_0} \right) = -\frac{\lambda}{8} 
+        \vcenter{\hbox{\includegraphics{tikz-external/fd-first-order-x4-term}}}\\
+        + \frac{\lambda^2}{16} \vcenter{\hbox{\includegraphics{tikz-external/fd-second-order-x4-term-2}}} + \frac{\lambda^2}{48} \vcenter{\hbox{\includegraphics{tikz-external/fd-second-order-x4-term-3}}} + \order(\lambda^3).
+    \end{multline}
+    Notice that there are no disconnected diagrams, they cancelled out.
+    In fact disconnected diagrams will cancel out here to all orders, and this isn't just the case for this potential.
+    Taking the log of the generating function yields the generating function of connected contributions.
+    We'll prove this later.
+    
+    \section{Correlators}
+    \epigraph{That's it. That's QFT done.}{Luigi Del Debbio}
+    Much of the rest of the course will be focused on computing various correlators with respect to some perturbed Gaussian, and of course linking these mathematical expressions to physics.
+    We'll often be interested in calculating
+    \begin{align}
+        \expected{x_{i_1} \dotsm x_{i_\ell}}_\lambda &= \frac{1}{Z_\lambda} \int \dl{^nx} \exp[-S_\lambda(x)] x_{i_1} \dotsm x_{i_\ell}\\
+        &= \frac{Z_0}{Z_\lambda} \frac{1}{Z_0} \int \dl{^nx} \exp[-S_\lambda(x)] x_{i_1} \dotsm x_{i_\ell}\\
+        &= \frac{Z_0}{Z_\lambda} \frac{1}{Z_0} \int \dl{^nx} \exp[-S_0(x)] \sum_{k = 0}^{\infty} \frac{(-\lambda)^k}{k!} V(x)^k x_{i_1} \dotsm x_{i_\ell}\\
+        &= \frac{Z_0}{Z_\lambda} \sum_{k = 0}^{\infty} \frac{(-\lambda)^k}{k!} \expected{V(x)^kx_{i_1} \dotsm x_{i_\ell}}_0.
+    \end{align}
+    
+    The good news is that we've just seen how to compute \(Z_\lambda/Z_0\), so all we need to do is invert this result to get \(Z_0/Z_\lambda\).
+    This can be done in a similar way to the logarithm by again noticing that \(Z_\lambda/Z_0 = 1 - \order(\lambda)\) and then using the result
+    \begin{equation}
+        \frac{1}{1 - \varepsilon} = \sum_{n = 0}^{\infty} \varepsilon^n \approx 1 + \varepsilon + \varepsilon^2 + \dotsb.
+    \end{equation}
+    
+    The results we get will be of the form
+    \begin{equation}
+        \expected{x_{i_1} \dotsm x_{i_\ell}}_0 = \order(\lambda^0) + \order(\lambda) + \order(\lambda^2) + \dotsb.
+    \end{equation}
+    The order of \(\lambda^0\) (i.e., constant) term will be the result we get with an unperturbed Gaussian.
+    We then have first order corrections, and second order corrections, and so on.
+    
     
     %   Appdendix
     \appendixpage
     \begin{appendices}
         \include{parts/prelim}
+        \include{parts/hamiltonian-calculation}
     \end{appendices}
     
     \backmatter
