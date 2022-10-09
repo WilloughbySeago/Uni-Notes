@@ -64,9 +64,9 @@ noabbrev
 \newcommand{\lagrangianDensity}{\symcal{L}}
 \newcommand{\hamiltonianDensity}{\symcal{H}}
 \DeclarePairedDelimiterX{\poissonBracket}[2]{\{}{\}}{#1, #2}
-\newcommand{\parity}{\symrm{P}}
-\newcommand{\chargeConjugation}{\symrm{C}}
-\newcommand{\timeReversal}{\symrm{T}}
+\newcommand{\parity}{\symcal{P}}
+\newcommand{\chargeConjugation}{\symcal{C}}
+\newcommand{\timeReversal}{\symcal{T}}
 \newcommand{\hermit}{{\dagger}}
 \DeclarePairedDelimiterX{\commutator}[2]{[}{]}{#1, #2}
 \newcommand{\ident}{1}
@@ -98,6 +98,7 @@ noabbrev
 \DeclareMathOperator{\tr}{tr}
 \newcommand{\order}{\symcal{O}}
 \newcommand{\phaseSpaceMeasure}[1][n]{(\dl{\symrm{PS}})_{#1}}
+\DeclarePairedDelimiterX{\innerproduct}[2]{\langle}{\rangle}{#1 , #2}
 
 \includeonly{parts/prelim, parts/hamiltonian-calculation}
 
@@ -4172,6 +4173,388 @@ noabbrev
         \item \(\varphi_-^\hermit\) creates an outgoing particle of charge \(+1\).
     \end{itemize}
     From this we can compute all the Feynman rules for any given interaction.
+    
+    \chapter{Interactions and Symmetries}
+    \section{Types of Interaction}
+    We choose to look for interactions which conserve charge.
+    While we can easily construct theories where this isn't the case charge conservation is a common phenomena and we wish our theories to exhibit it.
+    This means we can no longer have a \(\varphi^3\) interaction, since this would not conserve charge.
+    Even if we consider a \(\varphi^3 + (\varphi^\hermit)^3\) interaction, so the Lagrangian is real, we still don't get charge conservation, since the first term transforms as \(\varphi^3 \mapsto \e^{3i\alpha}\varphi^3\), and the second as \((\varphi^{\hermit})^3 \mapsto \e^{-3i\alpha}(\varphi^\hermit)^3\).
+    The only way to have a theory conserve charge is if every term in the Lagrangian has as many factors of \(\varphi\) as it does \(\varphi^\hermit\).
+    There are a few ways to do this.
+    
+    \subsection{Four Point Interactions}
+    Instead of the three point interaction, \(\varphi^3\), we can consider a four point interaction, \((\varphi^\hermit\varphi)^2\), where interactions involve four particles at once, this would lead to the interaction Lagrangian
+    \begin{equation}
+        \lagrangianDensity_{\interaction}^{(4)} = -\frac{\lambda}{2}(\varphi^\hermit \varphi)^2.
+    \end{equation}
+    To keep track of charge in our Feynman diagrams it is conventional to put an arrow on our Feynman diagrams pointing in the direction of charge flow.
+    Note that charge flowing backwards in time is the same as negative charge flowing forward in time, that is antiparticles correspond to arrows pointing left and particles to arrows pointing right.
+    
+    There are three vertices in this theory which are all slightly different, but have the same shape.
+    The first is
+    \begin{equation}
+        \tikzsetnextfilename{fd-charge-4-point-interaction-neutral}
+        \rotatebox{45}{\feynmandiagram[inline=(v)]{
+                i1 -- [anti fermion] v -- [fermion] i2,
+                o1 -- [fermion] v -- [anti fermion] o2
+            };}
+    \end{equation}
+    This corresponds to a particle and antiparticle coming in and a particle and antiparticle going out.
+    The net charge in and out is then 0.
+    So charge is conserved in this vertex.
+    
+    The next vertex is
+    \begin{equation}
+        \tikzsetnextfilename{fd-charge-4-point-interaction-positive}
+        \rotatebox{45}{\feynmandiagram[inline=(v)]{
+                i1 -- [fermion] v -- [fermion] i2,
+                o1 -- [fermion] v -- [fermion] o2
+            };}
+    \end{equation}
+    This corresponds to two particles coming in and two particles going out.
+    The net charge in and out is then 2, so charge is conserved in this vertex.
+    
+    The final vertex is
+    \begin{equation}
+        \tikzsetnextfilename{fd-charge-4-point-interaction-negative}
+        \rotatebox{45}{\feynmandiagram[inline=(v)]{
+                i1 -- [anti fermion] v -- [anti fermion] i2,
+                o1 -- [anti fermion] v -- [anti fermion] o2
+            };}
+    \end{equation}
+    This corresponds to two antiparticles coming in and two antiparticles going out.
+    The net charge in and out is then \(-2\), so charge is conserved in this vertex.
+    
+    As with the real case the constant factor in this interaction has been chosen such that every vertex gives a factor of \(-i\lambda\).
+    
+    \subsection{Three Point Interactions}
+    If we introduce a new, neutral, real scalar field, \(\Phi\), then we can have a three point interaction of the form
+    \begin{equation}
+        \lagrangianDensity_{\interaction}^{(3)} = -y\Phi \varphi^\hermit \varphi.
+    \end{equation}
+    This is known as a \defineindex{Yukawa interaction}.
+    
+    As with \(\varphi^3\) theory we get three particles in each interaction.
+    There are a variety of vertices we can create in this case.
+    Denoting the neutral particle with a dashed line one possibility is
+    \begin{equation}
+        \tikzsetnextfilename{fd-charge-3-point-interaction-annihilation}
+        \feynmandiagram[inline=(v), horizontal=v to o]{
+            i1 -- [fermion] v,
+            i2 -- [anti fermion] v,
+            v -- [scalar] o
+        };
+    \end{equation}
+    This corresponds to a particle and antiparticle annihilating into a neutral particle.
+    
+    Another vertex is
+    \begin{equation}
+        \tikzsetnextfilename{fd-charge-3-point-interaction-particle-emit}
+        \feynmandiagram[inline=(v), horizontal=i to v]{
+            i -- [fermion] v,
+            v -- [scalar] o1,
+            v -- [fermion] o2
+        };
+    \end{equation}
+    This corresponds to a particle emitting a neutral particle.
+    Similarly the vertex 
+    \begin{equation}
+        \tikzsetnextfilename{fd-charge-3-point-interaction-antiparticle-emit}
+        \feynmandiagram[inline=(v), horizontal=i to v]{
+            i -- [anti fermion] v,
+            v -- [scalar] o1,
+            v -- [anti fermion] o2
+        };
+    \end{equation}
+    corresponds to an antiparticle emitting a neutral particle.
+    Notice that in all of these diagrams the total charge is conserved at each vertex.
+    
+    As before the constant factors are chosen such that each vertex contributes a factor of \(-iy\) to the amplitude.
+    
+    A full Lagrangian in a theory with this interaction may take the form
+    \begin{equation}
+        \lagrangianDensity = (\partial_\mu\varphi^\hermit)(\partial_\mu\varphi) - m^2\varphi^\hermit \varphi + \frac{1}{2}(\partial_\mu \Phi)(\partial^\mu \Phi) - \frac{1}{2}M^2\Phi^2 - y\Phi \varphi^\hermit \varphi,
+    \end{equation}
+    corresponding to a neutral particle, call it \(s_0\), of mass \(M\) and charged (anti)particles, call them \(s_{\pm}\), of mass \(m\).
+    
+    In many ways this theory is not that different from the real \(\varphi^3\) theory.
+    For example, we still have 2--2 scattering, such as \(s_+s_- \to s_+s_-\), \(s_+s_+ \to s_+s_+\), and \(s_-s_- \to s_-s_-\).
+    The exchange particle in these cases is a neutral scalar, \(s_0\).
+    Note that in the \(s_+s_- \to s_+s_-\) case since the final two particles are distinct there is no \(u\)-channel diagram.
+    Similarly for \(s_{\pm}s_{\pm} \to s_{\pm}s_{\pm}\) there is no \(s\)-channel diagram, since the intermediate particle would have to carry a charge of \(\pm2\).
+    
+    There is one sort of interaction which we don't have in \(\varphi^3\) theory, and that is decays.
+    If \(M > 2m\) then it is possible to have the interaction \(s_0 \to s_+s_-\).
+    This would correspond to an \(n = 1\) contribution to the Dyson series, and these terms vanished for \(\varphi^3\) theory.
+    This would look like
+    \begin{equation}
+        \tikzsetnextfilename{fd-neutral-decay-to-charged-particles}
+        \feynmandiagram[inline=(v), horizontal=i to v]{
+            i -- [scalar] v,
+            v -- [fermion] o1,
+            v -- [anti fermion] o2
+        };
+    \end{equation}
+    The amplitude for this is \(\amplitude = -iy\).
+    We can work out the decay rate starting with
+    \begin{equation}
+        \left( \diff{\Gamma}{\Omega} \right)_{\text{CoM}} = \frac{1}{32\pi^2} \frac{p}{M^2} \abs{\amplitude}^2,
+    \end{equation}
+    where \(p\) is the magnitude of the three-momentum of the two charged particles in the centre of mass frame.
+    The amplitude squared will give \(\abs{\amplitude}^2 = \abs{-iy}^2 = y^2\).
+    % TODO: Kinematics, where does p^2 = M^2 - 4m^2 come from?
+%    In this frame the neutral particle has four-momentum \(p^{(0)} = (M, \vv{0})\), and the two charged particles have four-momenta \(p^{(+)} = (E, \vv{p})\) and \(p^{(-)} = (E, -\vv{p})\).
+%    Note that they must have the same energy as, apart from charge, the decay is symmetric in the two particles.
+%    Hence, we have
+%    \begin{equation}
+%        M^2 = (p^{(0)})^2 = (p^{(+)} + p^{(-)})^2 = 2m^2 - 2(E^2 + p^2).
+%    \end{equation}
+    We then have
+    \begin{equation}
+        \left( \diff{\Gamma}{\Omega} \right)_{\text{CoM}} = \frac{y^2}{64\pi^2} \frac{\sqrt{M^2 - 4m^2}}{M^2}.
+    \end{equation}
+    So we see that we must have \(M > 2m\) for this to be nonzero and real, assuming \(M, m \ge 0\).
+    
+    We just said \enquote{assuming \(M, m \ge 0\)}, but what if they aren't?
+    In fact, what if they aren't even real?
+    We can analytically extend this decay rate as a function of the complex variable \(M\).
+    Recall that \(\sqrt{f(z)}\) has a branch cut from \(f(z) = 0\) to infinity.
+    So the decay rate has a branch cut from \(M = 2m\) to infinity.
+    This is part of a general rule, particles correspond to poles, such as the pole at \(m = \sqrt{s}\) in \(1/(s - m^2)\), and decays correspond to branch cuts, such as the one starting at \(M = 2m\) here.
+    
+    \section{Symmetries}
+    In this section we'll study the effect of parity, time reversal, and charge conjugation on scalar fields.
+    We'll start from their action on spacetime, and then derive their action on the fields and mode operators.
+    These three symmetries are all \(\integers_2\) symmetries, meaning that, apart from doing nothing, we have a single operation and applying this operation twice is the same as doing nothing.
+    The technical word for this is that these symmetries are \defineindex{idempotent}.
+    
+    \subsection{Parity}
+    Parity acts on spacetime by sending \(\vv{x}\) to \(-\vv{x}\).
+    That is
+    \begin{equation}
+        \parity \colon x^\mu = (t, \vv{x}) \mapsto \overbar{x}^\mu = (t, -\vv{x}).
+    \end{equation}
+    Since the direction of space is also changed the momentum is also changed by sending \(\vv{p}\) to \(-\vv{p}\):
+    \begin{equation}
+        \parity \colon p^\mu = (E, \vv{p}) \mapsto \overbar{p}^\mu = (E, -\vv{p}).
+    \end{equation}
+    We will use the notation \(\overbar{x}\) and \(\overbar{p}\) with this meaning throughout this section, including when discussing time reversal and charge conjugation.
+    
+    The definition of parity above is classical.
+    In quantum field theory we have operators and states.
+    Parity is promoted to be a unitary operator, \(\parity\), on the states, that is \(\parity^\hermit \parity = 1\).
+    Starting with the simplest case, the vacuum state should be invariant under parity, since there's nothing there to change:
+    \begin{equation}
+        \parity \ket{0} = \ket{0}.
+    \end{equation}
+    The next simplest state is a single particle state, \(\ket{\vv{p}}\).
+    We expect that the momentum of this particle should be reversed under parity:
+    \begin{equation}
+        \parity \ket{\vv{p}} = \ket{-\vv{p}}.
+    \end{equation}
+    We can write this momentum state as \(\ket{\vv{p}} = a^\hermit(\vv{p})\ket{0}\), and so we can identify the action of the parity operator on the state with an equivalent action on \(a^\hermit(\vv{p})\).
+    Since \(a^\hermit(\vv{p})\) is an operator it transforms with two copies of \(\parity\) as
+    \begin{equation}
+        \parity a^\hermit(\vv{p}) \parity^{\hermit} = a^\hermit(-\vv{p}),
+    \end{equation}
+    so
+    \begin{equation}
+        (\parity a^\hermit(\vv{p}) \parity^\hermit)\ket{0} = a^\hermit(-\vv{p}) \ket{0} = \ket{-\vv{p}}.
+    \end{equation}
+    Taking the adjoint of this we have
+    \begin{equation}
+        [\parity a^\hermit(\vv{p}) \parity]^\hermit = (\parity^\hermit)^\hermit a(\vv{p}) \parity^\hermit = \parity a(\vv{p}) \parity^\hermit,
+    \end{equation}
+    and so
+    \begin{equation}
+        \parity a(\vv{p}) \parity^\hermit = [a^\hermit(-\vv{p})]^\hermit = a(-\vv{p}).
+    \end{equation}
+    
+    To derive the effect on the field, which is an operator and so transforms as \(\varphi \mapsto \parity \varphi \parity^\hermit\), we can expand \(\varphi\) in the mode operators:
+    \begin{align}
+        \parity \varphi(x) \parity^\hermit &= \int \invariantmeasure{p} [\parity a(\vv{p}) \parity^\hermit \e^{-ip\cdot x} + \parity a^\hermit(\vv{p}) \parity^\hermit \e^{ip\cdot x}]\\
+        &=- \int \invariantmeasure{p} [a(-\vv{p}) \e^{-ip\cdot x} + a^\hermit(-\vv{p})\e^{ip\cdot x}].
+    \end{align}
+    Note that the parity operator doesn't act on the phase factors, even though they depend on position and momentum, they're just scalars and so aren't affected by operators on the Hilbert space.
+    Now take \(\vv{p} \to -\vv{p}\) in the integral, this doesn't change the measure or region of integration and takes \(p \to \overbar{p}\), giving
+    \begin{equation}
+        \parity \varphi(x) \parity^\hermit = \int \invariantmeasure{p} [a(\vv{p}) \e^{-i\overbar{p}\cdot x} + a^\hermit(\vv{p})\e^{i\overbar{p}\cdot x}].
+    \end{equation}
+    Now notice that \(\overbar{p} \cdot x = Et + \vv{p} \cdot \vv{x} = p \cdot \overbar{x}\), and so
+    \begin{align}
+        \parity \varphi(x) \parity^\hermit &= \int \invariantmeasure{p} [a(\vv{p})\e^{-ip\cdot \overbar{x}} + a^\hermit(\vv{p})\e^{ip\cdot \overbar{x}}]\\
+        &= \varphi(\overbar{x}).
+    \end{align}
+    So under parity the field transforms as
+    \begin{equation}
+        \parity \colon \varphi(x) \mapsto \parity \varphi(x) \parity^\hermit = \varphi(\overbar{x}).
+    \end{equation}
+    This is what we would expect.
+    Note that exactly the same argument can be applied to the conjugate field, and to complex scalar fields, they all transform the same.
+    
+    One thing that we didn't consider is that quantum states are only defined up to phase.
+    This means that its possible to have an equivalent transformation which introduces a phase, so we could have that parity acts on the single particle state as
+    \begin{equation}
+        \parity \ket{\vv{p}} = \eta_{p} \ket{-\vv{p}}.
+    \end{equation}
+    Since \(\parity\) is idempotent we have \(\parity \parity \ket{\vv{p}} = \parity \eta_p \ket{-\vv{p}} = \eta_p^2 \ket{\vv{p}}\), and we must have \(\parity \parity \ket{\vv{p}} = \ket{\vv{p}}\), so \(\eta_p^2 = 1\), meaning \(\eta_p = \pm 1\).
+    Above we assumed \(\eta_p = 1\), suppose instead that \(\eta_p = -1\), then the mode operators must transform as
+    \begin{equation}
+        \parity \colon a(\vv{p}) \mapsto \parity a(\vv{p}) \parity^\hermit = -a(-\vv{p}),
+    \end{equation}
+    and hence the field transforms as
+    \begin{equation}
+        \parity \colon \varphi(x) \mapsto \parity \varphi(x) \parity^\hermit = -\varphi(\overbar{x}).
+    \end{equation}
+    In this case we say that \(\varphi\) is a \defineindex{pseudoscalar} field.
+    
+    \subsection{Time Reversal}
+    Time reversal acts on spacetime by sending \(t\) to \(-t\).
+    That is
+    \begin{equation}
+        \timeReversal \colon x^\mu = (t, \vv{x}) \mapsto -\overbar{x}^\mu = (-t, \vv{x}).
+    \end{equation}
+    Since the direction of time reverses the direction of momentum, proportional to the velocity, \(\dot{x}\), and hence first order in time derivatives, changes direction.
+    The energy is unaffected.
+    The simplest explanation for why is that the kinetic energy is proportional to \(\dot{x}^2\) and so picks up two negatives upon time reversal, cancelling out for no overall change.
+    So, momentum transforms under time reversal as
+    \begin{equation}
+        \timeReversal \colon p^\mu = (E, \vv{p}) \mapsto \overbar{p}^\mu = (E, -\vv{p}).
+    \end{equation}
+    
+    Again when moving to quantum field theory time reversal is promoted to an operator, \(\timeReversal\) on the states.
+    One effect of time reversal is that the initial and final state are swapped.
+    This means that amplitudes change:
+    \begin{equation}
+        \timeReversal \colon \braket{f}{i} \mapsto \braket{i}{f} = \braket{f}{i}^*.
+    \end{equation}
+    So, time reversal means we have to take the complex conjugate of everything.
+    Another way to view this is to consider the time evolution operator, \(\exp[-iEt]\).
+    Under time reversal this changes to \(\exp[iEt] = \exp[-iEt]^*\).
+    We say that \(\timeReversal\) is an antiunitary operator.
+    
+    \begin{dfn}{Antiunitary Operator}{}
+        Let \(\hilbertSpace\) be a complex Hilbert space with inner product \(\innerproduct{-}{-}\), and let \(U \colon \hilbertSpace \to \hilbertSpace\) be an operator.
+        Then \(U\) is an \defineindex{antiunitary operator} if
+        \begin{equation}
+            \innerproduct{Ux}{Uy} = \innerproduct{x}{y}^*
+        \end{equation}
+        for all \(x, y \in \hilbertSpace\).
+    \end{dfn}
+    
+    This means that under time reversal the exponential phase factor transforms as
+    \begin{equation}
+        \timeReversal \colon \e^{ip\cdot x} \mapsto \e^{(-i)\overbar{p} \cdot (-\overbar{x})} = \e^{i\overbar{p}\cdot\overbar{x}} = \e^{ip \cdot x}.
+    \end{equation}
+    
+    Consider the transformation of a single particle state:
+    \begin{equation}
+        \timeReversal\ket{\vv{p}} = \ket{-\vv{p}}.
+    \end{equation}
+    We must therefore have
+    \begin{equation}
+        \timeReversal a^\hermit(\vv{p}) \timeReversal^\hermit = a^\hermit(-\vv{p}), \qqand \timeReversal a(\vv{p}) \timeReversal^\hermit = a(-\vv{p}).
+    \end{equation}
+    The field then transforms as
+    \begin{align}
+        \timeReversal \varphi(x) \timeReversal^\hermit &= \int \invariantmeasure{p} [a(-\vv{p}) \e^{ip\cdot x} + a^\hermit(-\vv{p}) \e^{-ip\cdot x}]\\
+        &= \int \invariantmeasure{p} [a(\vv{p}) \e^{i\overbar{p} \cdot x} + a(\vv{p})\e^{-i\overbar{p}\cdot x}]\\
+        &= \int \invariantmeasure{p} [a(\vv{p}) \e^{-ip\cdot (-\overbar{x})} + a(\vv{p})\e^{ip \cdot (-\overbar{x})}]\\
+        &= \varphi(-\overbar{x}).
+    \end{align}
+    Here we changed \(\vv{p}\) to \(-\vv{p}\) in the second line.
+    This means the field transforms as
+    \begin{equation}
+        \timeReversal \colon \varphi(x) \mapsto \timeReversal \varphi(x) \timeReversal^\hermit = \varphi(-\overbar{x}).
+    \end{equation}
+    
+    Again, we can include a phase factor, \(\eta_t\), which is restricted to be \(\pm 1\).
+    Also all of this logic applies to both the conjugate field and to complex scalar fields.
+    
+    \subsection{Charge Conjugation}
+    Classically charge conjugation changes the sign of electric charge.
+    So
+    \begin{equation}
+        \chargeConjugation \colon Q \mapsto -Q.
+    \end{equation}
+    In quantum field theory this corresponds to exchanging particles and antiparticles.
+    Hence, charge conjugation is only interesting for complex scalar fields.
+    Charge conjugation acts on the single particle states according to
+    \begin{equation}
+        \chargeConjugation \ket{\vv{p}, +} = \ket{\vv{p}, -}, \qqand \chargeConjugation \ket{\vv{p}, -} = \ket{\vv{p}, +}.
+    \end{equation}
+    Exchanging particles and antiparticles is the same as exchanging mode operators \(a \leftrightarrow b\):
+    \begin{alignat}{2}
+        \chargeConjugation \colon a(\vv{p}) &\mapsto \chargeConjugation a(\vv{p}) \chargeConjugation^\hermit &&= b(\vv{p}),\\
+        \chargeConjugation \colon a^\hermit(\vv{p}) &\mapsto \chargeConjugation a^\hermit(\vv{p}) \chargeConjugation^\hermit &&= b^\hermit(\vv{p}),\\
+        \chargeConjugation \colon b(\vv{p}) &\mapsto \chargeConjugation b(\vv{p}) \chargeConjugation^\hermit &&= a(\vv{p}),\\
+        \chargeConjugation \colon b^\hermit(\vv{p}) &\mapsto \chargeConjugation b^\hermit(\vv{p}) \chargeConjugation^\hermit &&= a^\hermit(\vv{p}).
+    \end{alignat}
+    The action on the field is then
+    \begin{align}
+        \chargeConjugation \varphi(x) \chargeConjugation^\hermit = \int \invariantmeasure{p} [b(\vv{p})\e^{-ip\cdot x} + a^\hermit(\vv{p})\e^{ip\cdot x}] = \varphi^\hermit(x),
+    \end{align}
+    so
+    \begin{equation}
+        \chargeConjugation\colon \varphi(x) \mapsto \chargeConjugation \varphi(x) \chargeConjugation^\hermit = \varphi^\hermit(x).
+    \end{equation}
+    Similarly,
+    \begin{equation}
+        \chargeConjugation\colon \varphi^\hermit(x) \mapsto \chargeConjugation \varphi^\hermit(x) \chargeConjugation^\hermit = \varphi(x).
+    \end{equation}
+    
+    For a complex scalar field we also have the current, \(j^\mu\).
+    Acting on this with charge conjugation exchanges \(\varphi^\hermit\) and \(\varphi\), giving
+    \begin{align}
+        \chargeConjugation j^\mu \chargeConjugation^\hermit &= i \chargeConjugation \normalordering{\varphi^\hermit \partial^\mu \varphi - \varphi \partial^\mu \varphi^\hermit} \chargeConjugation^\hermit\\
+        &= i\normalordering{\varphi\partial^\mu \varphi^\hermit - \varphi^\hermit \partial^\mu \varphi}\\
+        &= -j^\mu,
+    \end{align}
+    which is what we would expect.
+    Since the total charge is defined as the spatial integral of \(j^0\) we also have
+    \begin{equation}
+        \chargeConjugation Q \chargeConjugation^\hermit = -Q,
+    \end{equation}
+    which is the same as the classical action of charge conjugation.
+    
+    \subsection{Acting on the Lagrangian}
+    The free Lagrangian is
+    \begin{equation}
+        \lagrangianDensity = \frac{1}{2}(\partial_\mu \varphi)(\partial^\mu \varphi) - \frac{1}{2}m^2\varphi^2
+    \end{equation}
+    for a real scalar field, or
+    \begin{equation}
+        \lagrangianDensity = (\partial_\mu \varphi^\hermit)(\partial^\mu \varphi) - m^2\varphi^\hermit \varphi
+    \end{equation}
+    for a complex scalar field.
+    In either case the the result is invariant under \(\parity\), \(\timeReversal\), and \(\chargeConjugation\).
+    
+    Now suppose that the interaction Lagrangian is also invariant under \(\parity\), \(\timeReversal\) and \(\chargeConjugation\).
+    Then, under \(\parity\) or \(\chargeConjugation\) the amplitude transforms as
+    \begin{align}
+        \parity \colon \amplitude &\mapsto \amplitude,\\
+        \chargeConjugation \colon \amplitude &\mapsto \amplitude.
+    \end{align}
+    That is, the amplitude is unchanged.
+    Under \(\timeReversal\) the amplitude transforms as
+    \begin{equation}
+        \timeReversal \colon \amplitude \mapsto \amplitude^*.
+    \end{equation}
+    However, in all three cases \(\abs{\amplitude}^2\) is unchanged and so the physics doesn't change.
+    
+    Invariance of the interaction term under these symmetries is not a given.
+    For example, a \(\varphi^3\) interaction with a pseudoscalar field gains a minus sign under parity.
+    However, for the purposes of this course we will only consider theories invariant under \(\parity\), \(\timeReversal\) and \(\chargeConjugation\) separately.
+    In \course{Gauge Theories in Particle Physics} we will consider theories which aren't invariant under these symmetries individually, but instead are invariant under the combined \(\chargeConjugation \parity \timeReversal\)
+    symmetry.
+    
+    
+    
+    
+    
+    
+    
     
     \part{Gaussian Integrals}
     \chapter{Gaussian Integrals}
