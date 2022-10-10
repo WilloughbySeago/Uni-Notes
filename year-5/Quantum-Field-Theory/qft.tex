@@ -69,7 +69,7 @@ noabbrev
 \newcommand{\timeReversal}{\symcal{T}}
 \newcommand{\hermit}{{\dagger}}
 \DeclarePairedDelimiterX{\commutator}[2]{[}{]}{#1, #2}
-\newcommand{\ident}{1}
+\newcommand{\ident}{\symbb{1}}
 \newcommand\dbar{\ThisStyle{\ensurestackMath{%
             \stackengine{-.3\LMpt}{\SavedStyle \symrm{d}}{\SavedStyle\overbar{}%
                 \mkern2.25mu}{O}{r}{F}{F}{L}}}}
@@ -99,6 +99,8 @@ noabbrev
 \newcommand{\order}{\symcal{O}}
 \newcommand{\phaseSpaceMeasure}[1][n]{(\dl{\symrm{PS}})_{#1}}
 \DeclarePairedDelimiterX{\innerproduct}[2]{\langle}{\rangle}{#1 , #2}
+\newcommand{\DL}[1]{\symcal{D}#1}
+\newcommand{\DD}[1]{\,\symcal{D}#1}
 
 \includeonly{parts/prelim, parts/hamiltonian-calculation}
 
@@ -4587,7 +4589,7 @@ noabbrev
     
     \subsection{With Linear Term}
     Now consider
-    \begin{equation}
+    \begin{equation}\label{eqn:gaussian 1d with linear term}
         Z_a(b) \coloneqq \int_{-\infty}^{\infty} \dl{x} \, \exp\left[ -\frac{1}{2}ax^2 + bx \right] = \sqrt{\frac{2\pi}{a}} \exp\left[ -\frac{b^2}{2a} \right].
     \end{equation}
     This is shown by completing the square:
@@ -4916,7 +4918,8 @@ noabbrev
     \end{equation*}
     So its fair to say that evaluating general correlators with more than a couple of points quickly becomes intractable.
 
-    \section{Perturbed Correlators}
+    \chapter{Perturbed Correlators}
+    \section{General Theory}
     As with the Gaussian case we can write the expected value of any analytic function, \(F\), with respect to some measure, \(\mu\), as a sum over correlators with respect to \(\mu\):
     \begin{align}
         \expected{F}_\mu &= \sum_{\ell = 0}^{\infty} \sum_{i_1, \dotsc, i_\ell = 1}^{n} F_{i_1\dotso i_{\ell}} \expected{x_{i_1} \dotsm x_{i_\ell}}_\mu\\
@@ -4946,7 +4949,7 @@ noabbrev
     \end{equation}
     We can work out the expectation value once we know \(V\) by expanding \(V\).
     
-    \subsection{\texorpdfstring{\(x^4\)}{x to the four} Potential}
+    \section{\texorpdfstring{\(x^4\)}{x to the four} Potential}
     \epigraph{The first instant of a long series of asking \enquote{how do we count?}}{Luigi Del Debbio}
     Consider the example
     \begin{equation}
@@ -5004,7 +5007,7 @@ noabbrev
         &= 1 - \frac{\lambda}{8} \sum_i \Delta_{ii}^2 + \lambda^2\sum_{i,j} \left[ \frac{1}{128}\Delta_{ii}^2\Delta_{jj}^2 + \frac{1}{16}\Delta_{ij}^2\Delta_{ii}\Delta_{jj} + \frac{1}{48}\Delta_{ij}^4 \right]
     \end{align}
     
-    \subsubsection{Diagrammatic Representation}
+    \subsection{Diagrammatic Representation}
     There is a diagrammatic representation of terms like this.
     For each propagator, \(\Delta_{ij}\), we draw a line connecting the nodes \(i\) and \(j\):
     \begin{equation}
@@ -5077,7 +5080,7 @@ noabbrev
         \end{tikzpicture}
     \end{equation}
     
-    \subsubsection{Computing \texorpdfstring{\(\log(Z_\lambda/Z_0)\)}{log(Zlambda/Z0)}}
+    \subsection{Computing \texorpdfstring{\(\log(Z_\lambda/Z_0)\)}{log(Zlambda/Z0)}}
     Suppose we want to compute \(\log(Z_\lambda/Z_0)\).
     To do this we notice that \(Z_\lambda/Z_0 = 1 + \order(\lambda)\), and so we can use the Taylor expansion
     \begin{equation}
@@ -5136,6 +5139,250 @@ noabbrev
     \end{equation}
     The order of \(\lambda^0\) (i.e., constant) term will be the result we get with an unperturbed Gaussian.
     We then have first order corrections, and second order corrections, and so on.
+    
+    \part{Path Integrals in Quantum Mechanics}
+    \chapter{Path Integrals in QM}
+    \section{Preliminaries}
+    In this chapter we will develop the theory of path integrals in nonrelativistic quantum mechanics.
+    This should then rapidly generalise to relativistic quantum field theory, but for now we stick to the nonrelativistic case to avoid unnecessary complications.
+    
+    Working in quantum mechanics we have a position operator, \(\operator{Q}\), with eigenstates \(\ket{q}\), with eigenvalues \(q\):
+    \begin{equation}
+        \operator{Q}\ket{q} = q\ket{q}.
+    \end{equation}
+    We consider a system evolving under the Hamiltonian \(\operator{H}\).
+    We will be interested in computing the transition amplitude between two position eigenstates at two different times.
+    That is, we want to compute
+    \begin{equation}
+        \braket{q', t'}{q, t}
+    \end{equation}
+    where \(t' > t\).
+    This amplitude can be computed in terms of the states \(\ket{q}\) and \(\ket{q'}\) and the time evolution operator:
+    \begin{equation}
+        \braket{q', t'}{q, t} = \bra{q'} \e^{-i\operator{H}(t' - t)}\ket{q}.
+    \end{equation}
+    This is where path integrals come in.
+    
+    \section{Constructing the Path Integral}
+    \epigraph{We assume this limit exists, and I have no intrest in proving it does.}{Luigi Del Debbio}
+    Let \(T = t' - t\), so we're computing
+    \begin{equation}
+        \braket{q', t'}{q, t} = \bra{q'} \e^{-i\operator{H}T}\ket{q}.
+    \end{equation}
+    We can split up the time interval between \(t\) and \(t'\) into \(n - 1\) steps of length \(\varepsilon = T/n\).
+    Define \(t_k = t + k\varepsilon\), so \(t_0 = t\) and \(t_n = t + n\varepsilon = t + T = t'\).
+    We can then take our single factor of \(\exp[-i\operator{H}T]\) and split it into \(n\) factors of \(\exp[-i\operator{H}\varepsilon]\):
+    \begin{equation}
+        \braket{q', t'}{q, t} = \bra{q'} \underbrace{\e^{-i\operator{H}\varepsilon} \dotsm \e^{-i\operator{H}\varepsilon}}_{n \text{ factors}} \ket{q}.
+    \end{equation}
+    
+    Now take the completeness relation,
+    \begin{equation}
+        \int \dl{q} \, \ket{q} \bra{q} = \ident.
+    \end{equation}
+    We can insert this \(n - 1\) times between each of the factors of \(\exp[-i\operator{H}t]\) giving
+    \begin{equation}
+        \int \left( \prod_{k = 1}^{n - 1} \dl{q_k} \right) \bra{q} \e^{-i\operator{H}\varepsilon} \ket{q_{n-1}} \bra{q_{n-1}} \e^{-i\operator{H}\varepsilon} \ket{q_{n-2}}\bra{q_{n-2}} \dotsm \ket{q_1} \bra{q_1} \e^{-i\operator{H}\varepsilon} \ket{q}.
+    \end{equation}
+    Now suppose that \(\varepsilon\) is small, or equivalently \(n\) is large.
+    We can expand the exponential:
+    \begin{equation}
+        \e^{-i\operator{H}\varepsilon} = 1 - i\varepsilon\operator{H} + \order(\varepsilon^2).
+    \end{equation}
+    
+    Suppose we have the Hamiltonian
+    \begin{equation}
+        \operator{H} = \frac{\operator{P}^2}{2} + V(\operator{Q})
+    \end{equation}
+    where we choose units such that the mass is unity.
+    First consider the terms with the potential, here we simply replace the argument of \(V\) with the appropriate position, using \(V(\operator{Q}) \ket{q} = \sum_{\ell = 1}^{\infty} V^{(\ell)}(0) \operator{Q}^\ell \ket{q} = \sum_{\ell = 1}^{\infty} V^{(\ell)}(0)q^\ell = V(q)\ket{q}\), and so
+    \begin{align}
+        \bra{q_k} V(\operator{Q}) \ket{q_{k - 1}} &= V(q_{k-1}) \braket{q_k}{q_{k-1}}\\
+        &= V(q_{k - 1})\delta(q_k - q_{k-1})\\
+        &= V\left( \frac{q_k + q_{k-1}}{2} \right)\delta(q_k - q_{k-1})
+    \end{align}
+    where in the last step we note that for nonzero solutions we have \(q_k = q_{k - 1}\), and in this case \((q_k + q_{k-1})/2 = q_k\).
+    This choice is required to make things converge later.
+    We can then insert the integral representation of the Dirac delta,
+    \begin{equation}
+        \delta(q - q') = \int \frac{\dl{p}}{2\pi} \e^{ip(q - q')},
+    \end{equation}
+    giving
+    \begin{equation}
+        \bra{q_k} V(\operator{Q}) \ket{q_{k-1}} = \int \frac{\dl{p_k}}{2\pi} V\left( \frac{q_k + q_{k-1}}{2} \right) \e^{ip_k(q_k - q_{k-1})}.
+    \end{equation}
+    
+    For the momentum term we can insert a complete set of states,
+    \begin{equation}
+        \int \dl{p} \ket{p}\bra{p} = \ident,
+    \end{equation}
+    giving
+    \begin{align}
+        \frac{1}{2}\bra{q_k} \operator{P}^2 \ket{q_{k-1}} &= \int \dl{p_k} \, \frac{1}{2} \bra{q_k}\operator{P}^2 \ket{p_k}\braket{p_k}{q_{k-1}}\\
+        &= \int \dl{p_k} \, \frac{p_k^2}{2} \braket{q_k}{p_k} \braket{p_k}{q_{k-1}}\\
+        &= \int \frac{\dl{p_k}}{2\pi} \, \frac{p_k^2}{2} \e^{ip_k(q_k - q_{k-1})}
+    \end{align}
+    where in the last step we've recognised the amplitudes as the wave function of the state momentum eigenstate \(\ket{p_k}\) in the position basis,
+    \begin{equation}
+        \braket{q}{p} = \frac{1}{\sqrt{2\pi}} \e^{ipq}.
+    \end{equation}
+    
+    We can take this and go back to writing \(1 - i\varepsilon\operator{H}\) as \(\exp[-i\operator{H}\varepsilon]\), and the results will agree to first order in \(\varepsilon\), that is
+    \begin{multline}
+        \bra{q_k} \e^{-i\operator{H}\varepsilon} \ket{q_{k-1}} =\\
+        \int \frac{\dl{p_k}}{2\pi} \exp\left\{ -i\varepsilon \left[ \frac{p_k^2}{2} + V\left( \frac{q_k + q_{k-1}}{2} \right) \right] \right\} \exp[ip_k(q_k - q_{k-1})] + \order(\varepsilon^2).
+    \end{multline}
+    We can recognise the term in the first exponential as the Hamiltonian evaluated at \(\tilde{q}_k = (q_k + q_{k-1})/2\) and \(p_k\), allowing us to rewrite this as
+    \begin{equation}
+        \bra{q_k} \e^{-i\operator{H}\varepsilon}\ket{q_{k-1}} = \int \frac{\dl{p_k}}{2\pi} \exp[-i\varepsilon H(\tilde{q}_k, p_k)]\exp[ip_k(q_k - q_{k-1})] + \order(\varepsilon^2).
+    \end{equation}
+    Now combine the two exponentials and factor out \(i\varepsilon\):
+    \begin{equation}
+        \bra{q_k} \e^{-i\operator{H}\varepsilon}\ket{q_{k-1}} = \int \frac{\dl{p_k}}{2\pi} \exp\left\{ i\varepsilon\left[ p_k\frac{q_k - q_{k-1}}{\varepsilon} - H(\tilde{q}_k, p_k) \right] \right\} + \order(\varepsilon^2).
+    \end{equation}
+    
+    We can now put all of these factors together to get the desired result, although we have to take the limit of \(n \to \infty\), so \(\varepsilon \to 0\), in order to make it exact.
+    We end up with a product of the above terms, with the product of exponentials becoming a sum in the exponential.
+    We should take the limit in such a way that \(T = \varepsilon n\) is constant.
+    The result is
+    \begin{gather}
+        \braket{q', t'}{q, t} =\\
+        \lim_{n\to \infty} \int \left( \prod_{k=1}^{n-1} \dl{q_k} \right) \left( \prod_{j=1}^{n} \frac{\dl{p_j}}{2\pi} \right) \exp\left\{ i\varepsilon \sum_{m=1}^{n} \left[ p_m\frac{q_m - q_{m-1}}{\varepsilon} - iH(\tilde{q}_m, p_m) \right] \right\}.\notag
+    \end{gather}
+    We assume that this limit exists.
+    In the limit the sum becomes an integral and \((q_m - q_{m-1})/\varepsilon\) becomes the velocity, the distinction between \(q_m\) and \(\tilde{q}_m\) is not important in the limit.
+    We introduce the following shorthand for this expression:
+    \begin{equation}
+        \braket{q', t'}{q, t} = \int \DL{q} \DD{p} \exp\left\{ i\int_{t}^{t'} \!\! \dl{\tau} \, \left[ p(\tau)\dot{q}(\tau) - H(q(\tau), p(\tau)) \right] \right\}.
+    \end{equation}
+    This is the \defineindex{path integral} form of the amplitude.
+    Note that we absorb the \(1/(2\pi)\) factor for each momentum integral into the measure.
+    
+    \subsection{Quadratic Momentum}
+    For Hamiltonians, like the one we had above, which are quadratic in the momentum we can partially evaluate this integral.
+    Consider the integral
+    \begin{equation*}
+        \int \frac{\dl{p_k}}{2\pi} \exp\left[ ip_k(q_k - q_{k-1}) - i\varepsilon\frac{p_k^2}{2} \right] = (2\pi i\varepsilon)^{-1/2} \exp\left[ i\varepsilon\left( \frac{q_k - q_{k-1}}{\varepsilon} \right)^2 \right],
+    \end{equation*}
+    where we've used \cref{eqn:gaussian 1d with linear term} with \(a = i\varepsilon\) and \(b = q_k - q_{k-1}\).
+    Using this we can rewrite the amplitude as
+    \begin{gather}
+        \braket{q',t'}{q,t} =\\
+        \qquad \lim_{n\to \infty} \int \left( \prod_{k=1}^{n-1} \dl{q_k} \right) (2\pi i\varepsilon)^{-n/2} \exp\left\{ i\varepsilon \sum_{m=1}^{n} \left[ \frac{1}{2}\left( \frac{q_m - q_{m-1}}{\varepsilon} \right)^2 - V(\tilde{q}_m) \right] \right\} \notag
+    \end{gather}
+    In the limit \((q_m - q_{m-1})/\varepsilon\) becomes \(\dot{q}\), and the sum becomes an integral.
+    We then have
+    \begin{equation}
+        \frac{1}{2}\dot{q}^2 - V(q) = \lagrangian(q, \dot{q}),
+    \end{equation}
+    so we can identify the exponent as the integral of the Lagrangian, which is just the action, \(S[q]\).
+    We can also absorb the \((2\pi i\varepsilon)^{-n/2}\) into the measure and, again assuming the limit exists, we get the shorthand
+    \begin{equation}
+        \braket{q', t'}{q, t} = \int_{q, q'} \!\! \DL{q} \, \exp\left[ i\int_t^{t'} \dl{\tau} \, \lagrangian(q, \dot{q}) \right] = \int_{q,q'} \!\! \DL{q} \, \e^{-iS[q]}.
+    \end{equation}
+    Here we write \(q,q'\) as the limit of the integrals to remind us that \(q\) and \(q'\) are the fixed endpoints.
+    
+    The interpretation of this integral is that we split time into very narrow slices.
+    We then integrate over all positions at each time.
+    An alternative way of viewing this, rather than considering one time slice at a time, is that we consider all possible paths between \(q\) and \(q'\), integrating over them with the weighting \(\exp\{iS[q]\}\).
+    This gives the quantum amplitude.
+    
+    Consider this equation in units where \(\hbar\ne 1\).
+    Then since the action has units of \(\hbar\) and the argument to the exponential must be dimensionless we must have that
+    \begin{equation}
+        \braket{q't'}{q,t} = \int_{q,q'} \!\! \DL{q} \, \e^{-iS[q]/\hbar}.
+    \end{equation}
+    Now consider the classical limit, where \(\hbar\) is much smaller than any other quantity with the same units appearing in our expressions.
+    We can treat this as taking the limit \(\hbar \to 0\).
+    In this limit \(1/\hbar\) is very large, and so small changes in the rest of the exponent cause large oscillations in the value.
+    Most of these oscillations cancel out, and only when \(S[q]\) is stationary do we get a meaningful contribution.
+    This is the root of the principal of least (or stationary) action.
+    This can be made rigorous with the method of stationary phase, see the course \course{Methods of Mathematical Physics} for more details.
+    Now set \(\hbar = 1\) again.
+    
+    \section{Correlators}
+    \subsection{One Point Correlator}
+    Suppose we wish to calculate the matrix element
+    \begin{equation}
+        \bra{q',t'} \operator{Q}(\overbar{t}) \ket{q,t}.
+    \end{equation}
+    We assume that \(t < \overbar{t} = t + \overbar{k}\varepsilon = t_{\overbar{k}} < t'\), this is a reasonable assumption since we'll be taking time to be a continuous parameter in the limit.
+    We can write the operator \(\operator{Q}(\overbar{t})\) in the Schrödinger picture as
+    \begin{equation}
+        \operator{Q}(t) = \e^{i\operator{H}\overbar{t}} \operator{Q} \e^{-i\operator{H}\overbar{t}}.
+    \end{equation}
+    We can then write the correlator in terms of time independent states:
+    \begin{equation}
+        \bra{q',t'}\operator{Q}(\overbar{t})\ket{q,t} = \bra{q'} \e^{-i\operator{H}(t' - \overbar{t})} \operator{Q} \e^{i\operator{H}(\overbar{t} - t)}\ket{q}.
+    \end{equation}
+    We follow the same procedure as before, splitting time into narrow slices.
+    We then split the exponential into many identical factors of \(\exp[-i\operator{H}\varepsilon]\):
+    \begin{equation}
+        \bra{q',t'}\operator{Q}(\overbar{t})\ket{q,t} = \bra{q'} \underbrace{\e^{-i\operator{H}\varepsilon} \dotsm \e^{-i\operator{H}\varepsilon}}_{\overbar{k} \text{ factors}} \operator{Q} \underbrace{\e^{-i\operator{H}\varepsilon} \dotsm \e^{-i\operator{H}\varepsilon}}_{n - \overbar{k} \text{ factors}} \ket{q}.
+    \end{equation}
+    
+    We can then proceed to insert the identity a bunch in terms of the completeness relation.
+    The result will be mostly the same, but we'll have one factor different.
+    Splitting into kinetic and potential terms again we'll have
+    \begin{equation}
+        \bra{q_{\overbar{k}}} \operator{Q}(\overbar{t}) V(\operator{Q}) \ket{q_{\overbar{k}-1}} = q_{\overbar{k}-1} V(\tilde{q}_{\overbar{k}}) \delta(q_{\overbar{k}} - q_{\overbar{k} - 1}),
+    \end{equation}
+    which differs from the other terms by a factor of \(q_{\overbar{k}}\).
+    The result is that we get an extra factor of \(q_{\overbar{k}}\) in our integral:
+    \begin{gather}
+        \bra{q',t'} \operator{Q}(\overbar{t})\ket{q,t} =\\
+        \lim_{n\to\infty} \left( \prod_{k=1}^{n-1}\dl{q_k} \right) \left( \prod_{j=1}^{n} \frac{\dl{p_j}}{2\pi} \right) q_{\overbar{k}-1} \exp\left\{ i\varepsilon \sum_{m=1}^{n} \left[ p_m \frac{q_m - q_{m-1}}{\varepsilon} - H(\tilde{q}_m, p_m) \right] \right\}.\notag
+    \end{gather}
+    Which, assuming the limit exists, we write as
+    \begin{equation}
+        \bra{q',t'}\operator{Q}(\overbar{t})\ket{q,t} = \int \DL{q} \DD{p} \, q(\overbar{t}) \exp\left\{ i \int_t^{t'} \!\! \dl{\tau} \, [p(\tau) \dot{qq}(\tau) - H(q, p)] \right\}.
+    \end{equation}
+    If the Hamiltonian has quadratic dependence on momentum we can again partially complete the integral to get
+    \begin{gather}
+        \bra{q',t'} \operator{Q}(\overbar{t})\ket{q,t} =\\
+        \lim_{n\to\infty} \int\left( \prod_{k=1}^{n-1} \dl{q_k} \right) (2\pi i\varepsilon)^{-n/2} q_{\overbar{k}} \exp\left\{ i\delta\sum_{m=1}^{n} \left[ \frac{1}{2}\left( \frac{q_m - q_{m-1}}{\varepsilon} \right)^2 - V(\tilde{q}_m) \right] \right\}. \notag
+    \end{gather}
+    If this limit exists then we write this as
+    \begin{equation}
+        \bra{q',t'} \operator{Q}(\overbar{t})\ket{q,t} = \int_{q,q'} \!\! \DL{q} \, q(\overbar{t}) \exp\left[ i \int_t^{t'} \!\! \dl{\tau} \, \lagrangian(q, \dot{q}) \right].
+    \end{equation}
+    
+    \subsection{Two Point Correlator}
+    Suppose we wish to calculate
+    \begin{equation}
+        \bra{q',t'} \operator{Q}(\overbar{t}_1)\operator{Q}(\overbar{t}_2)\ket{q,t}.
+    \end{equation}
+    We assume that \(t < \overbar{t}_2 < \overbar{t}_1 < t'\).
+    Exactly the same logic as before applies, except we now have two of these altered factors, so get two factors of \(q\) in our final path integral.
+    The result is
+    \begin{equation}
+        \bra{q',t'} \operator{Q}(\overbar{t}_1)\operator{Q}(\overbar{t}_2)\ket{q,t} = \int_{q,q'} \!\! \DL{q} \, q(\overbar{t}_1)q(\overbar{t}_2) \exp\left[ i\int_t^{t'} \!\! \dl{\tau} \, \lagrangian(q, \dot{q}) \right].
+    \end{equation}
+
+    Here we see something interesting.
+    On the right hand side it doesn't matter if we write \(q(\overbar{t}_1)q(\overbar{t_2})\) or \(q(\overbar{t}_2)q(\overbar{t_1})\), since these are just numbers.
+    However, the order of \(\operator{Q}(\overbar{t}_1)\operator{Q}(\overbar{t}_2)\) is important.
+    This ambiguity is due to the assumption that \(\overbar{t}_2 < \overbar{t}_1\).
+    If this isn't the case then the path integral here instead represents
+    \begin{equation}
+        \bra{q',t'} \operator{Q}(\overbar{t}_2)\operator{Q}(\overbar{t}_1)\ket{q,t}.
+    \end{equation}
+    
+    We can compactly summarise this by writing
+    \begin{equation}
+        \bra{q',t'} \timeOrdering[\operator{Q}(\overbar{t}_1)\operator{Q}(\overbar{t}_2)]\ket{q,t} = \int_{q,q'} \!\! \DL{q} \, q(\overbar{t}_1)q(\overbar{t}_2) \exp\left[ i\int_t^{t'} \!\! \dl{\tau} \, \lagrangian(q, \dot{q}) \right]
+    \end{equation}
+    where
+    \begin{equation}
+        \timeOrdering[A(t)B(t')] = \heaviside(t - t')A(t)B(t) + \heaviside(t' - t)B(t)A(t)
+    \end{equation}
+    is the time ordered product of the operators \(A(t)\) and \(B(t')\).
+    
+    Taking this process to its logical conclusion we have
+    \begin{multline}
+        \bra{q',t'} \timeOrdering[\operator{Q}(\overbar{t}_1) \dotsm \operator{Q}(\overbar{t}_\ell)]\ket{q,t} =\\
+        \int_{q,q'} \!\!\ \DL{q} \, q(\overbar{t}_1) \dotsm q(\overbar{q}_\ell) \exp\left[ i \int_t^{t'} \!\! \dl{\tau} \, \lagrangian(q, \dot{q}) \right].
+    \end{multline}
     
     
     %   Appdendix
