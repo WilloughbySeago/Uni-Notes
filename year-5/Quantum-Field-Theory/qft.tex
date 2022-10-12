@@ -9,6 +9,7 @@
 \usepackage{scalerel,stackengine}  % needed for d with slash
 \usepackage{simpler-wick}
 \usepackage{siunitx}
+\usepackage{slashed}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -2921,7 +2922,7 @@ noabbrev
     We can then define
     \begin{align}
         i\Delta_{\feynman} (x - x') &\coloneqq \wick{\c \varphi(x) \c \varphi(x')}\\
-        &\hphantom{:}= \bra{0} \timeOrdering[\varphi(x)\varphi(x')]\ket{0}\\
+        &\hphantom{:}= \bra{0} \timeOrdering[\varphi(x)\varphi(x')]\ket{0}\label{eqn:feynman propagator as vacuum expectation of time ordered product}\\
         &= \heaviside(t - t') i\Delta^+(x - x') - \heaviside(t' - t)i\Delta^-(x - x').
     \end{align}
     This is called the \defineindex{Feynman propagator}.
@@ -4195,35 +4196,38 @@ noabbrev
     
     There are three vertices in this theory which are all slightly different, but have the same shape.
     The first is
+    \vspace{2.4cm}
     \begin{equation}
         \tikzsetnextfilename{fd-charge-4-point-interaction-neutral}
-        \rotatebox{45}{\feynmandiagram[inline=(v)]{
+        \smash{\rotatebox{45}{\feynmandiagram[inline=(v)]{
                 i1 -- [anti fermion] v -- [fermion] i2,
                 o1 -- [fermion] v -- [anti fermion] o2
-            };}
+            };}}
     \end{equation}
     This corresponds to a particle and antiparticle coming in and a particle and antiparticle going out.
     The net charge in and out is then 0.
     So charge is conserved in this vertex.
     
     The next vertex is
+    \vspace{2.4cm}
     \begin{equation}
         \tikzsetnextfilename{fd-charge-4-point-interaction-positive}
-        \rotatebox{45}{\feynmandiagram[inline=(v)]{
+        \smash{\rotatebox{45}{\feynmandiagram[inline=(v)]{
                 i1 -- [fermion] v -- [fermion] i2,
                 o1 -- [fermion] v -- [fermion] o2
-            };}
+            };}}
     \end{equation}
     This corresponds to two particles coming in and two particles going out.
     The net charge in and out is then 2, so charge is conserved in this vertex.
     
     The final vertex is
+    \vspace{2.4cm}
     \begin{equation}
         \tikzsetnextfilename{fd-charge-4-point-interaction-negative}
-        \rotatebox{45}{\feynmandiagram[inline=(v)]{
+        \smash{\rotatebox{45}{\feynmandiagram[inline=(v)]{
                 i1 -- [anti fermion] v -- [anti fermion] i2,
                 o1 -- [anti fermion] v -- [anti fermion] o2
-            };}
+            };}}
     \end{equation}
     This corresponds to two antiparticles coming in and two antiparticles going out.
     The net charge in and out is then \(-2\), so charge is conserved in this vertex.
@@ -4283,7 +4287,7 @@ noabbrev
     In many ways this theory is not that different from the real \(\varphi^3\) theory.
     For example, we still have 2--2 scattering, such as \(s_+s_- \to s_+s_-\), \(s_+s_+ \to s_+s_+\), and \(s_-s_- \to s_-s_-\).
     The exchange particle in these cases is a neutral scalar, \(s_0\).
-    Note that in the \(s_+s_- \to s_+s_-\) case since the final two particles are distinct there is no \(u\)-channel diagram.
+    Note that in the \(s_+s_- \to s_+s_-\) case, since the final two particles are distinct, there is no \(u\)-channel diagram.
     Similarly for \(s_{\pm}s_{\pm} \to s_{\pm}s_{\pm}\) there is no \(s\)-channel diagram, since the intermediate particle would have to carry a charge of \(\pm2\).
     
     There is one sort of interaction which we don't have in \(\varphi^3\) theory, and that is decays.
@@ -4551,12 +4555,465 @@ noabbrev
     In \course{Gauge Theories in Particle Physics} we will consider theories which aren't invariant under these symmetries individually, but instead are invariant under the combined \(\chargeConjugation \parity \timeReversal\)
     symmetry.
     
+    \part{Dirac Equation}
+    \chapter{Deriving the Dirac Equation}\index{Dirac equation}
+    In this chapter we'll derive the Dirac equation in the way that Dirac did historically.
+    He was motivated by looking for an equation without the negative energies of the Klein--Gordon equation.
+    He failed to find such an equation, but it turns out that the negative energy solutions are actually important, and not just a problem to be eliminated.
     
+    \section{The Dirac Equation}
+    To avoid having to take square roots when computing the energy, which is the source of the negative energy terms in the Klein--Gordon equation, Dirac looked for a wave equation linear in \(\partial_t\).
+    For this to be relativistic Dirac knew that the equation would also have to be linear in \(\partial_x\).
+    Dirac also imposed one further constraint.
+    The equation he was deriving should imply the Klein--Gordon equation since this is how we get wave equations with the relativistic energy momentum relation.
     
+    Dirac started with the ansatz
+    \begin{equation}
+        \diffp{\psi}{t} + \vv{\alpha} \cdot \grad\psi + im\beta \psi = 0,
+    \end{equation}
+    which can be written in a Schrödinger-like form as
+    \begin{equation}
+        i\diffp{\psi}{t} = H\psi, \qqwhere H = -i\vv{\alpha} \cdot \grad + \beta m = \vv{\alpha} \cdot \vv{p} + \beta m
+    \end{equation}
+    is the \defineindex{Dirac Hamiltonian}.
+    It should be noted that this is \emph{not} actually the Hamiltonian for a system satisfying the Dirac equation.
     
+    Looking for real energies Dirac posited that \(H\) should be Hermitian, and hence \(\vv{\alpha}\) and \(\beta\) should be real.
+    Next Dirac looked for other conditions on \(\vv{\alpha}\) and \(\beta\) which would enforce this equation implying the Klein--Gordon equation.
+    Noticing that the Klein--Gordon equation has second derivatives we need to find a way to extract second derivatives from the Dirac equation.
+    To do this we square the operator, but in such a way that the cross terms cancel, so we compute the product of the operator and its adjoint:
+    \begin{equation}
+        \left( \diffp{}{t} - \vv{\alpha} \cdot \grad - im\beta \right) \left( \diffp{}{t} + \vv{\alpha} \cdot \grad + im\beta \right)\psi = 0.
+    \end{equation}
+    Expanding this we have
+    \begin{equation}
+        \left( \diffp[2]{}{t} - \alpha_i\alpha_j \diffp{}{x_i, x_j} + m^2\beta^2 - im(\alpha_i \beta + \beta \alpha_i) \diffp{}{x_i} \right)\psi = 0.
+    \end{equation}
+    Looking at this we see that if \(\alpha_i\alpha_j = 1\) the cross term vanishes then we get the Klein--Gordon equation.
+    The symmetry of \(\diffp{}/{x_i, x_j}\) implies that we should look for \(\alpha_i\alpha_j\) to be symmetric, so in terms of setting \(\alpha_i\alpha_j\) to 1 we impose
+    \begin{equation}
+        \anticommutator{\alpha_i}{\alpha_j} = 2\delta_{ij}
+    \end{equation}
+    where \(\anticommutator{A}{B} \coloneqq AB + BA\) is the \defineindex{anticommutator}.
+    Similarly to get the Klein--Gordon equation we need \(\beta^2 = 1\).
+    The cross term will vanish if
+    \begin{equation}
+        \anticommutator{\alpha_i}{\beta} = 0
+    \end{equation}
     
+    Clearly these requirements cannot be satisfied if \(\alpha_i\) and \(\beta\) are numbers.
+    We can have relations like these if \(\alpha_i\) and \(\beta\) are \emph{matrices} though.
+    Looking for \(H\) to be Hermitian means that \(\alpha_i\) and \(\beta\) must be \emph{Hermitian} matrices.
+    Suppose \(\alpha_i\) and \(\beta\) are \(N \times  N\) matrices.
+    Then \(\psi\) must be an object with \(N\) components.
     
+    We can go on to derive further properties of \(\alpha_i\) and \(\beta\) which will help us to narrow down what matrices they are.
+    First, \(\alpha_i^2 = \beta^2 = 1\) the eigenvalues must square to \(1\), so the eigenvalues of \(\alpha_i\) and \(\beta\) are \(\pm 1\).
     
+    Next consider the trace of \(\alpha_i\).
+    Using the anticommutation relations for \(\alpha_i\) and \(\beta\) we have
+    \begin{alignat}{2}
+        \tr \alpha_i &= \tr(\beta^2 \alpha_i) \qquad\qquad && \beta^2 = 1\\
+        &= \tr(\beta \alpha_i \beta) \qquad\qquad && \tr \text{ is cyclic}\\
+        &= \tr(-\alpha_i\beta^2) \qquad\qquad && \alpha_i \text{ and } \beta \text{ anticommute}\\
+        &= -\tr(\alpha_i\beta^2) \qquad\qquad && \tr \text{ is linear}\\
+        &= -\tr \alpha_i \qquad\qquad && \beta^2 = 1
+    \end{alignat}
+    So we can conclude that \(\tr \alpha_i = -\tr \alpha_i\) and so \(\tr\alpha_i = 0\).
+    We can do exactly the same swapping \(\beta\) and \(\alpha_i\) and so \(\tr\beta = 0\).
+    This means that \(\alpha_i\) and \(\beta\) are \emph{traceless} Hermitian matrices.
+    
+    In the basis where \(\alpha_i\) is diagonal the diagonal is just the eigenvalues, and so the trace is the sum of the eigenvalues.
+    The trace is basis independent so the trace is \emph{always} the sum of eigenvalues.
+    The fact that \(\alpha_i\) and \(\beta\) have eigenvalues \(\pm 1\) and the sum of the eigenvalues, that is the trace, must vanish means that \(\alpha_i\) and \(\beta\) must have an even number of eigenvalues, and hence \(\alpha_i\) and \(\beta\) are traceless Hermitian matrices of \emph{even dimension}.
+    
+    At this point we can just start trying to find a solution for \(\alpha_i\) and \(\beta\).
+    We start with the simplest case, \(N = 2\).
+    We know that the Pauli spin matrices,
+    \begin{equation}
+        \sigma_1 = 
+        \begin{pmatrix}
+            0 & 1\\
+            1 & 0
+        \end{pmatrix}
+        , \qquad \sigma_2 = 
+        \begin{pmatrix}
+            0 & -i\\
+            i & 0
+        \end{pmatrix}
+        , \qqand \sigma_3 = 
+        \begin{pmatrix}
+            1 & 0\\
+            0 & -1
+        \end{pmatrix}
+        ,
+    \end{equation}
+    form a basis for the \(2 \times 2\) traceless Hermitian matrices, and so we posit that \(\alpha_i = \sigma_i\), or more accurately \(\sigma_i\) is a \emph{representation}\footnote{see \course{Symmetries of Quantum Mechanics} or \course{Symmetries of Particles and Fields} for details on what a representation is.} of \(\alpha_i\).
+    The problem comes when we look for a \(2\times 2\) representation of \(\beta\).
+    There is no other \(2\times 2\) Hermitian traceless matrix, and so we cannot find a value for \(\beta\) in the \(2\times 2\) matrices.
+    This may not be a problem.
+    If we're looking at a massless particle then \(m = 0\) gets rid of the \(\beta\) term, so we don't need a value for \(\beta\) and we can use \(2 \times 2\) matrices and 2 component spinors to describe such particles.
+    
+    Move on to the next simplest case, \(N = 4\), here there are solutions.
+    One very common representation is the \defineindex{Dirac representation}, which is chosen such that \(\beta\) is diagonal:
+    \begin{equation}
+        \beta = 
+        \begin{pmatrix}
+            \ident_2 & 0\\
+            0 & -\ident_2
+        \end{pmatrix}
+        , \qqand \alpha_i = 
+        \begin{pmatrix}
+            0 & \sigma_i\\
+            \sigma_i & 0
+        \end{pmatrix}
+        .
+    \end{equation}
+    We call these the \defineindex{Dirac matrices} in this representation.
+    
+    These are complex, meaning that \(\psi\) is an object with four complex components.
+    We call \(\psi\) a \defineindex{spinor}, for reasons we'll see later.
+    As a four component thing it may be more accurate to write \(\psi\) with an index, say as \(\psi_a\), but spinor indices are traditionally suppressed unless there is ambiguity.
+    When we do write spinor indices we'll choose values from the start of the alphabet, \(a, b, c, \dotsc\), as opposed to the Greek letters, \(\mu, \nu, \rho, \dotsc\) we use for Lorentz indices or \(i, j, k, \dotsc\) for spatial indices.
+    
+    \section{Covariant Form}
+    The Dirac equation as we've written it so far is not \emph{manifestly} covariant.
+    We can fix this by changing up our notation slightly.
+    Start by multiplying through by \(i\beta\) to get
+    \begin{equation}
+        \left( i\beta\diffp{}{t} + i\beta\alpha_j\diffp{}{x_j} - m \right) \psi = 0,
+    \end{equation}
+    where we've used \(\beta^2 = 1\), although really we now know that \enquote{\(1\)} here is an identity matrix, which we leave implicit.
+    Now define \(\gamma^0 = \beta\) and \(\gamma^i = \beta \alpha^i\).
+    These form a four-vector, \(\gamma^\mu = (\gamma^0, \gamma^i) = (\beta, \beta\vv{\alpha})\).
+    We can then write
+    \begin{equation}
+        \left( i\gamma^0 \diffp{}{x_0} + i\gamma^j \diffp{}{x_j} - m \right) \psi = 0,
+    \end{equation}
+    or more compactly,
+    \begin{equation}
+        (i\gamma^\mu \partial_\mu - m)\psi = 0,
+    \end{equation}
+    or even more compactly,
+    \begin{equation}
+        (i\slashed{\partial} - m)\psi = 0
+    \end{equation}
+    where \(\slashed{a} \coloneqq \gamma^\mu a_\mu\) is a shorthand called \defineindex{slash notation}.
+
+    Like \(\alpha_i\) and \(\beta\) these \(\gamma^\mu\) are really \(N \times N\) matrices, which we call the \defineindex{gamma matrices} for obvious reasons.
+    If we reinstate the spinor indices then we might write \(\gamma^\mu_{ab}\), where \(\mu\) is an index telling us if we are considering \(\gamma^0\), \(\gamma^1\), \(\gamma^2\), or \(\gamma^3\) and the indices \(a\) and \(b\) tell us which component of the matrix we are considering.
+    
+    We can determine the anticommutation relations of \(\gamma^\mu\) using those of \(\alpha_i\) and \(\beta\), first, we have \(\anticommutator{\gamma^0}{\gamma^0} = \anticommutator{\beta}{\beta} = 2\beta^2 = 2\), next \(\anticommutator{\gamma^0}{\gamma^i} = \anticommutator{\beta}{\beta\alpha^i} = \beta^2\alpha^i + \beta\alpha^i\beta = \beta^2\alpha^i - \alpha^i\beta = 0\).
+    Finally, \(\anticommutator{\gamma^i}{\gamma^j} = \anticommutator{\beta\alpha^i}{\beta\alpha^j} = \beta\alpha^i\beta\alpha^j + \beta\alpha^j\beta\alpha^i = -\beta\alpha^i\alpha^j\beta - \beta\alpha^j\alpha^i\beta = -\beta\anticommutator{\alpha^i}{\alpha^j}\beta = -\beta 2\delta^{ij} \beta = 2\delta^{ij} \).
+    Hence,
+    \begin{equation}
+        \anticommutator{\gamma^\mu}{\gamma^\nu} = 2\minkowskiMetric^{\mu\nu}.
+    \end{equation}
+    This is called the \defineindex{Clifford algebra} of the gamma matrices.
+    We take this as the defining property of the gamma matrices, and it is this algebra which is being represented by a particular choice of matrices.
+    
+    It is useful to define a \defineindex{fifth gamma matrix}\index{5th gamma matrix|see{fifth gamma matrix}}, \(\gamma^5 = \gamma_5\).
+    This is \emph{not} part of the Clifford algebra.
+    The 5 is just a label, it's not an index and no index will ever take the value of 5 (while we remain in 4 dimensions, even in more dimensions there are only ever four gamma matrices), we use the label 5 because some sources label the gamma matrices 1 through 4 instead of 0 through 3.
+    This extra matrix is defined as
+    \begin{equation}
+        \gamma^5 = \gamma_5 \coloneqq i\gamma^0\gamma^1\gamma^2\gamma^3.
+    \end{equation}
+    \begin{wrn}
+        The factor of \(i\) here is sometimes left out, in which case \(\gamma^5\) will be anti-Hermitian.
+    \end{wrn}
+    
+    Using the anticommutator relations we have \(\gamma^\mu \gamma^\nu = -\gamma^\nu\gamma^\mu\) whenever \(\mu \ne \nu\), as well as \((\gamma^0)^2 = 1\) and \((\gamma^i)^2 = -1\), so
+    \begin{alignat}{2}
+        (\gamma^5)^2 &= -\gamma^0\gamma^1\gamma^2\gamma^3\gamma^0\gamma^1\gamma^2\gamma^3\\
+        &= \gamma^1\gamma^2\gamma^3(\gamma^0)^2\gamma^1\gamma^2\gamma^3 \qquad && \gamma^0 \text{ past 3 }\gamma^\mu\\
+        &= \gamma^1\gamma^2\gamma^3\gamma^1\gamma^2\gamma^3 && (\gamma^0)^2 = 1\\
+        &= \gamma^2\gamma^3(\gamma^1)^2\gamma^2\gamma^3 && \gamma^1 \text{ past 2 } \gamma^\mu\\
+        &= -\gamma^2\gamma^3\gamma^2\gamma^3 && (\gamma^1)^2 = -1\\
+        &= \gamma^3(\gamma^2)^2\gamma^3 && \gamma^2 \text{ past 1 } \gamma^\mu\\
+        &= -(\gamma^3)^2 && (\gamma^2)^2 = -1\\
+        &= 1 && (\gamma^3)^2 = -1.
+    \end{alignat}
+    We can also derive anticommutator relations for \(\gamma^5\) with the other gamma matrices:
+    \begin{align}
+        \anticommutator{\gamma^5}{\gamma^0} &= i\gamma^0\gamma^1\gamma^2\gamma^3\gamma^0 + i(\gamma^0)^2\gamma^1\gamma^2\gamma^3\\
+        &= -i(\gamma^0)^2\gamma^1\gamma^2\gamma^3 + i(\gamma^0)^2\gamma^1\gamma^2\gamma^3\\
+        &= 0,\\
+        \anticommutator{\gamma^5}{\gamma^1} &= i\gamma^0\gamma^1\gamma^2\gamma^3\gamma^1 + i\gamma^1\gamma^0\gamma^1\gamma^2\gamma^3\\
+        &= i\gamma^0(\gamma^1)^2\gamma^2\gamma^3 - i\gamma^0(\gamma^1)^2\gamma^2\gamma^3\\
+        &= 0,\\
+        \anticommutator{\gamma^5}{\gamma^2} &= i\gamma^0\gamma^1\gamma^2\gamma^3\gamma^2 + i\gamma^2\gamma^0\gamma^1\gamma^2\gamma^3\\
+        &= -i\gamma^0\gamma^1(\gamma^2)^2\gamma^3 + i\gamma^0\gamma^1(\gamma^2)^2\gamma^3\\
+        &= 0,\\
+        \anticommutator{\gamma^5}{\gamma^3} &= i\gamma^0\gamma^1\gamma^2(\gamma^3)^2 + i\gamma^3\gamma^0\gamma^1\gamma^2\gamma^3\\
+        &= i\gamma^0\gamma^1\gamma^2(\gamma^3)^2 - i\gamma^0\gamma^1\gamma^2(\gamma^3)^2\\
+        &= 0,
+    \end{align}
+    so in general
+    \begin{equation}
+        \anticommutator{\gamma^5}{\gamma^\mu} = 0.
+    \end{equation}
+    
+    The Dirac representation for \(\alpha_i\) and \(\beta\) also gives a representation of the gamma matrices, namely
+    \begin{equation}
+        \gamma^0 = 
+        \begin{pmatrix}
+            \ident_2 & 0\\
+            0 & -\ident_2
+        \end{pmatrix}
+        , \qquad \gamma^i = 
+        \begin{pmatrix}
+            0 & \sigma^i\\
+            -\sigma^i & 0
+        \end{pmatrix}
+        , \qqand \gamma^5 = 
+        \begin{pmatrix}
+            0 & \ident_2\\
+            \ident_2 & 0
+        \end{pmatrix}
+        .
+    \end{equation}
+    As with \(\alpha_i\) and \(\beta\) this is just one representation of the gamma matrices, the real definition is just anything satisfying the Clifford algebra.
+    In this representation \(\gamma^0\) is Hermitian, \({\gamma^0}^\hermit = \gamma^0\), \(\gamma^i\) are anti-Hermitian, \({\gamma^i}^\hermit = -\gamma^i\), and \(\gamma^5\) is hermitian, \({\gamma^5}^\hermit = \gamma^5\).
+    
+    We can now show that the Dirac equation implies the Klein--Gordon equation.
+    Start with the Dirac equation,
+    \begin{equation}
+        (i\slashed{\partial} - m)\psi = 0.
+    \end{equation}
+    Multiply by \(i\slashed{\partial} + m\) to get
+    \begin{equation}
+        (i\slashed{\partial} + m)(i\slashed{\partial} - m)\psi = 0.
+    \end{equation}
+    Expanding this the cross terms cancel and we get
+    \begin{equation}
+        (-\gamma^\mu \gamma^\nu \partial_\mu \partial_\nu + m^2)\psi = 0.
+    \end{equation}
+    Since \(\partial_\mu\partial_\nu\) is symmetric in \(\mu\) and \(\nu\) we can replace \(\gamma^\mu\gamma^\nu\) with the symmetrised product of \(\gamma^\mu\) and \(\gamma^\nu\), namely \(\anticommutator{\gamma^\mu}{\gamma^\nu}/2 = \eta^{\mu\nu}\), since any antisymmetric part of \(\gamma^\mu\gamma^\nu\) vanishes in the product with something totally symmetric.
+    Hence we can replace \(\gamma^\mu\gamma^\nu\) with \(\eta^{\mu\nu}\):
+    \begin{equation}
+        (\eta^{\mu\nu}\partial_\mu\partial_\nu + m^2)\psi = 0 \implies (\dalembertian + m^2) \psi = 0,
+    \end{equation}
+    which is exactly the Klein--Gordon equation, so the Dirac equation does imply the Klein--Gordon equation as required.
+    
+    \section{Spinor Transformations}
+    We've said that spinors are \emph{not} four-vectors, despite having four components in the Dirac representation.
+    The difference is in their transformation rules.
+    Recall that a four-vector, \(x\), is defined by transforming as
+    \begin{equation}
+        x \mapsto x' = \Lambda x \iff x^\mu = x'^\mu = \tensor{\Lambda}{^\mu_\nu}x^\nu
+    \end{equation}
+    for some Lorentz transformation \(\Lambda\).
+    We now ask how a general spinor transforms under a Lorentz transformation.
+    The Lorentz transformation acts on spacetime, not on the spinor, so we're looking for some spinor, \(\psi(x)\), to transform into another spinor, \(\psi'(x')\), when \(x\) transforms to \(x'\).
+    
+    Our starting point is the Dirac equation.
+    Before transformation we have
+    \begin{equation}
+        (i\gamma^\mu \partial_\mu - m)\psi(x) = 0,
+    \end{equation}
+    and after transformation we expect the form of the Dirac equation to remain unchanged, that is
+    \begin{equation}
+        (i\gamma'^\mu \partial_\mu' - m)\psi'(x') = 0.
+    \end{equation}
+    Since \(m\) is a scalar it doesn't change under Lorentz transformations.
+    The derivative is just a four-vector, so transforms as \(\partial_\mu \mapsto \partial'_\mu = \tensor{\Lambda}{^\mu_\nu}\partial_\nu\).
+    We assume that \(\gamma'^\mu\) are still gamma matrices, that is they satisfy the Clifford algebra \(\{\gamma'^\mu, \gamma'^\nu\} = 2\eta^{\mu\nu}\).
+    We can then, without loss of generality, take \(\gamma'^\mu = \gamma^\mu\), since we know that \(\gamma'^\mu\) must be a representation of this Clifford algebra and the physics shouldn't depend on our choice of representation, so we may as well choose the same representation before and after the transformation.
+    
+    We now assume that \(\psi\) transforms according to
+    \begin{equation}
+        \psi'(x') = S(\Lambda)\psi(x)
+    \end{equation}
+    where \(S(\Lambda)\) is some \(4 \times 4\) matrix depending on the Lorentz transformation \(\Lambda\), but \(S(\Lambda)\) is not necessarily a Lorentz transformation.
+    Since the two frames are equivalent descriptions of the same physics it must be possible to go between them in both directions, so \(S(\Lambda)\) must be nonsingular.
+    We can then write
+    \begin{equation}
+        \psi(x) = S^{-1}(\Lambda)\psi'(x').
+    \end{equation}
+    However, note that we can also go from the second frame to the first by the inverse Lorentz transformation, \(\Lambda^{-1}\), so we must have that
+    \begin{equation}
+        S^{-1}(\Lambda) = S(\Lambda^{-1}).
+    \end{equation}
+    We can now write out the original Dirac equation in terms of the transformed quantities by reversing our transformation, that is \(\partial_\mu = \tensor{\Lambda}{^\nu_\mu}\partial'_\nu\) and \(\psi(x) = S^{-1}(\Lambda)\psi'(x')\).
+    Then the Dirac equation in the first frame can be written as
+    \begin{equation}
+        (i\gamma^\mu \tensor{\Lambda}{^\nu_\mu}\partial'_\nu - m)S^{-1}(\Lambda)\psi'(x') = 0.
+    \end{equation}
+    Now multiply this on the left by \(S(\Lambda)\) and, noting that everything apart from \(\gamma^\mu\) commutes with \(S(\Lambda)\), we get
+    \begin{equation}
+        (iS(\Lambda)\gamma^\mu S^{-1}(\Lambda) \tensor{\Lambda}{^\nu_\mu}\partial'_\nu - m)\psi'(x').
+    \end{equation}
+    We see that this takes the form of the Dirac equation if
+    \begin{equation}
+        S(\Lambda)\gamma^\mu S^{-1}(\Lambda)\tensor{\Lambda}{^\nu_\mu} = \gamma^\nu.
+    \end{equation}
+    Multiplying on the left by \(S^{-1}(\Lambda)\) and the right by \(S(\Lambda)\) we get
+    \begin{equation}
+        \gamma^\mu \tensor{\Lambda}{^\nu_\mu} = S^{-1}(\Lambda)\gamma^\nu S(\Lambda).
+    \end{equation}
+    
+    We can think of this as a sort of consistency equation between Lorentz transformations of four-vectors on the left and Lorentz transformations of spinors on the right.
+    Note that \(\gamma^\mu\) is a four-vector as far as Lorentz indices are concerned, and so transforms under a single copy of \(\Lambda\).
+    On the other hand \(\gamma^\mu_{ab}\) is a rank 2 tensor for the purposes of spinor indices, and so transforms under two copies of \(S(\Lambda)\) and \(S^{-1}(\Lambda)\).
+    We can write this out in terms of spinor components as
+    \begin{equation}
+        \gamma^\mu_{ab} \tensor{\Lambda}{^\nu_\mu} = S^{-1}(\Lambda)^{ac} \gamma^\nu_{cd} S(\Lambda)^{db}.
+    \end{equation}
+    
+    The question now is, what is \(S(\Lambda)\)?
+    To answer this we consider the two basic types of Lorentz transformations.
+    
+    \subsection{Boosts}
+    Consider a boost
+    \begin{equation}
+        \Lambda = 
+        \begin{pmatrix}
+            \cosh \omega & \sinh \omega & 0 & 0\\
+            \sinh \omega & \cosh \omega & 0 & 0\\
+            0 & 0 & 1 & 0\\
+            0 & 0 & 0 & 1
+        \end{pmatrix}
+        .
+    \end{equation}
+    Then we claim that the corresponding spinor transformation matrix, \(S_B\), is given by
+    \begin{equation}
+        S_B = \exp\left[ \alpha^1 \frac{\omega}{2} \right] = \exp\left[ \gamma^0\gamma^1 \frac{\omega}{2} \right].
+    \end{equation}
+    
+    Since \((\alpha^1)^2 = 1\) we can expand the exponential into odd and even parts, and since everything is real those parts will be hyperbolic, so
+    \begin{equation}
+        \exp\left[ \alpha^1 \frac{\omega}{2} \right] = \cosh\frac{\omega}{2} + \alpha^1 \sinh\frac{\omega}{2} = 
+        \begin{pmatrix}
+            \ident_2 \cosh\frac{\omega}{2} & \sigma^1 \sinh\frac{\omega}{2}\\
+            \sigma^1 \cosh\frac{\omega}{2} & \ident_2\cosh\frac{\omega}{2}
+        \end{pmatrix}
+        .
+    \end{equation}
+    In the last step we choose to work in the Dirac representation.
+    Now using \(S(\Lambda^{-1}) = S^{-1}(\Lambda)\) and considering the \(\mu = 0\) case we can compute the product \(S_B^{-1}\gamma^0S_B\), using
+    \begin{equation}
+        S_B^{-1} =
+        \begin{pmatrix}
+            \ident_2\cosh\frac{\omega}{2} & -\sigma^1\sinh\frac{\omega}{2}\\
+            -\sigma^1\sinh\frac{\omega}{2} & \ident_2\cosh\frac{\omega}{2}
+        \end{pmatrix}
+    \end{equation}
+    and we find
+    \begin{equation}
+        S_B^{-1}\gamma^0S_B = 
+        \begin{pmatrix}
+            \ident_2\cosh \omega & \sigma^1\sinh\omega\\
+            -\sigma^1\sinh\omega & -\ident_2\cosh\omega
+        \end{pmatrix}
+        = \gamma^0 \cosh\omega + \gamma^1\sinh\omega.
+    \end{equation}
+    This shows that
+    \begin{equation}
+        S_B^{-1} \gamma^0 S_B = \tensor{\Lambda}{^0_\nu}\gamma^\nu.
+    \end{equation}
+    We can make similar arguments for the \(\mu = 1, 2, 3\) components by computing \(S_B^{-1}\gamma^\mu S_B\).
+    We find that
+    \begin{equation}
+        \tensor{\Lambda}{^1_\nu}\gamma^\nu = \gamma^0\sinh \omega + \gamma^1 \cosh \omega, \quad \tensor{\Lambda}{^2_\nu}\gamma^\nu = \gamma^2, \qand \tensor{\Lambda}{^3_\nu}\gamma^\nu = \gamma^3.
+    \end{equation}
+    This is what we would expect so \(S_B\) is the correct transformation matrix.
+    
+    This generalises to a boost along some arbitrary direction given by the unit vector \(\vh{n}\), by
+    \begin{equation}
+        S_B = \exp\left[ \vv{\alpha} \cdot \vh{n} \frac{\omega}{2} \right].
+    \end{equation}
+    
+    \subsection{Rotations}
+    Now consider a rotation,
+    \begin{equation}
+        \Lambda = 
+        \begin{pmatrix}
+            1 & 0 & 0 & 0\\
+            0 & \cos\vartheta & \sin\vartheta & 0\\
+            0 & -\sin\vartheta & \cos\vartheta & 0\\
+            0 & 0 & 0 & 1
+        \end{pmatrix}
+        .
+    \end{equation}
+    We claim that the corresponding spinor transformation matrix, \(S_R\), is given by
+    \begin{equation}
+        S_R = \exp\left[ i\Sigma^3 \frac{\vartheta}{2} \right]
+    \end{equation}
+    where
+    \begin{equation}
+        \Sigma^k = -\frac{i}{4}\varepsilon^{kij}\commutator{\gamma^i}{\gamma^j} \implies \Sigma^3 = -\frac{1}{2}
+        \begin{pmatrix}
+            \sigma^3 & 0\\
+            0 & \sigma^3
+        \end{pmatrix}
+        .
+    \end{equation}
+    Choosing to work in the Dirac representation in the last step.
+    More generally in the Dirac representation
+    \begin{equation}
+        \Sigma^k = 
+        \begin{pmatrix}
+            \sigma^k & 0\\
+            0 & \sigma^k
+        \end{pmatrix}
+        .
+    \end{equation}
+    We can check that \((\Sigma^3)^2 = 1\), and so we can again expand the exponential in even and odd parts.
+    This time the factor of \(i\) means we get normal trig:
+    \begin{equation}
+        S_R = \cos\frac{\vartheta}{2} + i\Sigma^3 \sin\frac{\vartheta}{2}.
+    \end{equation}
+    We can then proceed similarly to the boosts case computing \(S_R^{-1}\gamma^\mu S_R\) for each fixed value of \(\mu\).
+    We find that
+    \begin{alignat}{2}
+        \tensor{\Lambda}{^0_\nu}\gamma^\nu &= \gamma^0, \qquad & \tensor{\Lambda}{^1_\nu}\gamma^\nu &= \gamma^1\cos\vartheta + \gamma^2\sin\vartheta,\\
+        \tensor{\Lambda}{^2_\nu}\gamma^\nu &= -\gamma^1\sin\vartheta + \gamma^2\cos\vartheta, \qquad & \tensor{\Lambda}{^3_\nu}\gamma^\nu &= \gamma^3.
+    \end{alignat}
+    
+    This generalises to a rotation about an axis along \(\vh{n}\) as
+    \begin{equation}
+        S_R = \exp\left[ i\vv{\Sigma} \cdot \vh{n} \frac{\vartheta}{2} \right].
+    \end{equation}
+    
+    \subsection{General Lorentz Transformation}
+    First note that \(S_R\) is unitary, but \(S_B\) is not.
+    This corresponds to the fact that the rotations, \(\specialOrthogonal(3)\), form a compact subgroup of the Lorentz group, whereas the boosts form a noncompact subgroup\footnote{See \course{Symmetries of Particles and Fields} for details.}.
+    However, for both rotations and boosts we have the relation
+    \begin{equation}
+        S^{-1} = \gamma^0 S^\hermit \gamma^0,
+    \end{equation}
+    and since any Lorentz transformation can be formed from rotations and boosts this holds in general.
+    
+    We can combine the two results into one for a general transformation:
+    \begin{equation}
+        S(\Lambda) = \exp\left[ -\frac{i}{4}\omega_{\mu\nu}\sigma^{\mu\nu} \right]
+    \end{equation}
+    where
+    \begin{equation}
+        \sigma^{\mu\nu} \coloneqq \frac{i}{2}\commutator{\gamma^\mu}{\gamma^\nu}
+    \end{equation}
+    and \(\omega^{ij} = \varepsilon^{ijk}\vartheta^k\) where \(\vv{\vartheta} = \vartheta \vh{n}\) parametrises a rotation by angle \(\vartheta\) about the unit vector \(\vh{n}\).
+    
+    Considering just the spatial indices we have
+    \begin{equation}
+        -\frac{i}{4}\omega_{ij}\sigma^{ij} = -\frac{i}{4}\varepsilon^{ijk}\vartheta^k \frac{i}{2}\commutator{\gamma^i}{\gamma^j} = \frac{i}{2} \vv{\vartheta} \cdot \vv{\Sigma},
+    \end{equation}
+    so we recover the rotation result.
+    Similarly, considering \(\mu = 0\) and \(\nu = i\) we recover the boost result.
+    
+    Notice that for a rotation by \(2\pi\) we have
+    \begin{equation}
+        S_R(2\pi) = -S_R(0) = -\ident,
+    \end{equation}
+    so under a \(2\pi\) rotation a spinor transforms as \(\psi(x) \mapsto -\psi(x)\).
+    This means that it takes a rotation of \(4\pi\) to get back to the start, that is \(S_R(4\pi) = \ident\).
+    We can interpret this as the Dirac equation describing fermions.
+    The factors of \(1/2\) in the exponentials defining \(S_R\) and \(S_B\) tell us that in particular these fermions are spin \(1/2\).
+    One way to convince us that these are fermions is to consider two identical particles described by the Dirac equation.
+    If we rotate about the midpoint between them by \(\pi\) then the particles swap places.
+    However, two rotations by \(\pi\) are equivalent to one rotation by \(2\pi\), and so we get a minus sign.
+    This is exactly what we would expect for fermions following Fermi--Dirac statistics, swapping identical fermions gives a negative sign in the wave function.
     
     \part{Gaussian Integrals}
     \chapter{Gaussian Integrals}
@@ -5379,10 +5836,482 @@ noabbrev
     is the time ordered product of the operators \(A(t)\) and \(B(t')\).
     
     Taking this process to its logical conclusion we have
-    \begin{multline}
+    \begin{multline}\label{eqn:time ordered positions}
         \bra{q',t'} \timeOrdering[\operator{Q}(\overbar{t}_1) \dotsm \operator{Q}(\overbar{t}_\ell)]\ket{q,t} =\\
         \int_{q,q'} \!\!\ \DL{q} \, q(\overbar{t}_1) \dotsm q(\overbar{q}_\ell) \exp\left[ i \int_t^{t'} \!\! \dl{\tau} \, \lagrangian(q, \dot{q}) \right].
     \end{multline}
+    
+    \chapter{Generating Functions}
+    \section{Functional Derivatives}
+    Consider a \defineindex{functional}, \(F\), which associates a number, \(F[u]\), to a function, \(u \colon \reals^D \to \reals\).
+    The functional derivative, \(\diffd{F}/{u(x)}\), is defined such that
+    if we vary the function \(u\),
+    \begin{equation}
+        u(x) \mapsto u(x) + \delta u(x),
+    \end{equation}
+    then the variation in \(F\) is
+    \begin{equation}
+        \delta F = F[u + \delta u] - F[u] = \int \dl{^Dx} \, \diffd{F}{u(x)} \delta u(x).
+    \end{equation}
+    Compare this to to the case of a function \(f \colon \reals^D \to \reals\) when we vary each argument according to \(x_k \mapsto x_k + \delta x_k\) and so \(f\) varies as
+    \begin{equation}
+        \delta f = f(x + \delta x) - f(x) = \sum_k \diffp{f}{x_k}\delta x_k.
+    \end{equation}
+    
+    In this function case we have the identity
+    \begin{equation}
+        \diffp*{x_i}{x_j} = \delta_{ij},
+    \end{equation}
+    and in the functional case we have the analogous identity
+    \begin{equation}
+        \diffd*{f(y)}{f(x)} = \delta(x - y).
+    \end{equation}
+    This, and the fact that the product rule and chain rule also apply to functional derivatives, is pretty much all we'll need.
+    
+    \section{Sources}\label{sec:sources}
+    Consider two time dependent functions, \(f\) and \(h\).
+    We can add terms proportional to these into our path integral.
+    We call such terms source terms.
+    In particular, we'll be interested in the path integral with sources given below:
+    \begin{gather}
+        \braket{q', t'}{q, t}_{f,h}\\
+        \coloneqq \int \!\! \DL{p} \DD{q} \, \exp\left\{ i\int_t^{t'} \!\! \dl{\tau} \, [p(\tau)\dot{q}(\tau) - H(q(\tau), p(\tau))] + f(\tau)q(\tau) + h(\tau)p(\tau) \right\}. \notag
+    \end{gather}
+    
+    Consider the following functional derivative:
+    \begin{align}
+        A(\overbar{\tau}) &= \diffd{}{f(\overbar{\tau})} \exp\left[ i\int_t^{t'} \dl{\tau} \, f(\tau)q(\tau) \right]\\
+        &= \left( \diffd{}{f(\overbar{\tau})} i\int_t^{t'} \dl{\tau} \, f(\tau) q(\tau) \right) \exp\left[ i\int_t^{t'} \dl{\tau} \, f(\tau) q(\tau) \right],
+    \end{align}
+    where the last step is an application of the chain rule.
+    We now assume we can move the derivative through the integral to get
+    \begin{align}
+        A(\overbar{\tau}) &= \left( i\int_t^{t'} \dl{\tau} \, \diffd{}{f(\overbar{\tau})} f(\tau)q(\tau) \right) \exp\left[ i\int_t^{t'} \dl{\tau} \, f(\tau) q(\tau) \right]\\
+        &= \left( i\int_t^{t'} \dl{\tau} \, \delta(\tau - \overbar{\tau}) q(\tau) \right) \exp\left[ i\int_t^{t'} \dl{\tau} \, f(\tau) q(\tau) \right]\\
+        &= iq(\overbar{\tau}) \exp\left[ i\int_t^{t'} \dl{\tau} \, f(\tau) q(\tau) \right].
+    \end{align}
+    Hence, we can generate factors of \(q(\overbar{\tau})\) through
+    \begin{equation}
+        q(\overbar{\tau}) \exp\left[ i\int_t^{t'} \dl{\tau} \, f(\tau) q(\tau) \right] = \frac{1}{i}\diffd{}{f(\overbar{\tau})} \exp\left[ i\int_t^{t'} \dl{\tau} \, f(\tau) q(\tau) \right].
+    \end{equation}
+    
+    We can also apply this to \(\braket{q',t'}{q,t}_{f,h}\) to get factors of \(q(\overbar{\tau})\), since all of the terms without \(f(\tau)\) in them don't interact with the functional derivative.
+    That is, we have
+    \begin{gather}
+        \frac{1}{i} \diffd{}{f(\overbar{\tau})}
+        \braket{q', t'}{q, t}_{f,h}
+        \coloneqq \int \!\! \DL{p} \DD{q} \, \textcolor{highlight}{q(\overbar{\tau})}\\
+        \qquad\qquad\exp\left\{ i\int_t^{t'} \!\! \dl{\tau} \, [p(\tau)\dot{q}(\tau) - H(q(\tau), p(\tau))] + f(\tau)q(\tau) + h(\tau)p(\tau) \right\}. \notag
+    \end{gather}
+    We can apply the functional derivative again to get another factor,
+    \begin{gather}
+        \left( \frac{1}{i} \diffd{}{f(\overbar{\tau}_1)} \right) \left( \frac{1}{i} \diffd{}{f(\overbar{\tau}_2)} \right)
+        \braket{q', t'}{q, t}_{f,h} \coloneqq \int \!\! \DL{p} \DD{q} \, q(\overbar{\tau}_1) \textcolor{highlight}{q(\overbar{\tau}_2)}\\
+        \qquad\qquad\exp\left\{ i\int_t^{t'} \!\! \dl{\tau} \, [p(\tau)\dot{q}(\tau) - H(q(\tau), p(\tau))] + f(\tau)q(\tau) + h(\tau)p(\tau) \right\}. \notag
+    \end{gather}
+    Repeating this we have
+    \begin{gather}
+        \left( \frac{1}{i} \diffd{}{f(\overbar{\tau}_1)} \right) \dotsm \left( \frac{1}{i} \diffd{}{f(\overbar{\tau}_n)} \right)
+        \braket{q', t'}{q, t}_{f,h} \coloneqq \int \!\! \DL{p} \DD{q} \, q(\overbar{\tau}_1) \dotsm q(\overbar{\tau}_n)\\
+        \qquad\qquad\exp\left\{ i\int_t^{t'} \!\! \dl{\tau} \, [p(\tau)\dot{q}(\tau) - H(q(\tau), p(\tau))] + f(\tau)q(\tau) + h(\tau)p(\tau) \right\}. \notag
+    \end{gather}
+    
+    Comparing this to \cref{eqn:time ordered positions} we see that
+    \begin{equation}
+        \bra{q', t'} \timeOrdering[\operator{Q}(t_1) \dotsm \operator{Q}(t_n)] \ket{q, t} = \left( \frac{1}{i} \diffd{}{f(t_1)} \right) \dotsm \left( \frac{1}{i} \diffd{}{f(t_2)} \right) \braket{q', t'}{q, t} \bigg|_{f = h = 0}.
+    \end{equation}
+    
+    \section{Projection onto the Ground State}
+    Often it is useful to compute the amplitude for a system to evolve from the vacuum state at time \(t\) to the vacuum state at time \(t'\) under some external sources, \(f\) and \(h\).
+    That is, we want to compute \(\braket{0, t'}{0, t}\), where \(\ket{0, t}\) is the vacuum state at time \(t\).
+    Note that this is an eigenstate of the Hamiltonian, \emph{not} the position.
+    We can insert a complete set of states twice to get
+    \begin{align}
+        \braket{0, t'}{0, t}_{f,h} &= \int \dl{q} \dd{q'} \, \braket{0, t'}{q', t'}_{f,h} \braket{q', t'}{q, t}_{f,h} \braket{q, t}{0, t}_{f,h}\\
+        &= \int \dl{q} \dd{q'} \, \varphi_0^*(q') \braket{q', t'}{q, t}_{f,h} \varphi_0(q).
+    \end{align}
+    Here we use the ground state wave function in the position basis:
+    \begin{equation}
+        \varphi_0(q) = \braket{q, t}{0, t}, \implies \varphi_0^*(q) = \braket{0, t}{q, t}.
+    \end{equation}
+    More generally if \(\operator{H}\) is the Hamiltonian for our system then we have the energy eigenstate \(\ket{n}\), which is such that
+    \begin{equation}
+        \operator{H}\ket{n} = E_n,
+    \end{equation}
+    and the energy eigenfunction
+    \begin{equation}
+        \varphi_n(q) = \braket{q}{n}.
+    \end{equation}
+    We assume that the energy levels are defined such that the ground state energy vanishes, that is \(E_0 = 0\).
+    
+    Now suppose that \(f\) and \(h\) have support in \([t, t']\).
+    That is, outside the interval \([t, t']\) \(f\) and \(h\) vanish.
+    Suppose also that we have times \(T\) and \(T'\) such that \(T < t < t' < T'\).
+    Then between \(T\) and \(t\), and \(t'\) and \(T'\), the sources vanish and we can easily compute \(\braket{q,t}{Q,T}\) by inserting a complete set of energy eigenstates:
+    \begin{align}
+        \braket{q, t}{Q, T}_{f,h} &= \bra{q} \e^{-i\operator{H}(t - T)} \bra{Q}\\
+        &= \sum_n \bra{q} \e^{-i\operator{H}(t - T)} \ket{n} \braket{n}{Q}\\
+        &= \sum_n \e^{-iE_n(t - T)} \braket{q}{n} \braket{n}{Q}\\
+        &= \sum_n \e^{-iE_n(t - T)} \varphi_n(q) \varphi_n^*(Q).
+    \end{align}
+    
+    We can analytically extend this result to time with a small imaginary part, \(T_I = (1 - i\varepsilon)T\) where \(\varepsilon > 0\).
+    We then have
+    \begin{equation}
+        \e^{-iE_n(t - T_I)} = \e^{-iE_n(t - T + i\varepsilon T)} = \e^{-iE_n(t - T)} \e^{\varepsilon E_nT}.
+    \end{equation}
+    If we consider the limit \(T \to -\infty\) then all states apart from the ground state, where \(E_0 = 0\), will be exponentially suppressed.
+    We then have
+    \begin{equation}
+        \lim_{T \to -\infty} \braket{q, t}{Q, T_I}_{f,h} = \braket{q}{0}\braket{0}{Q} = \varphi_0(q)\varphi_0^*(Q).
+    \end{equation}
+    
+    We can do the same with \(\braket{Q',T'}{q',t'}\), we get
+    \begin{align}
+        \braket{Q',T'}{q',t'}_{f,h} &= \bra{Q} \e^{-i\operator{H}(T' - t')} \ket{t}\\
+        &= \sum_n \bra{Q'} \e^{-i\operator{H}(T' - t')} \ket{n} \braket{n}{q'}\\
+        &= \sum_n \e^{-iE_n(T' - t')} \braket{Q'}{n}\braket{n}{q'}\\
+        &= \sum_n \e^{-iE_n(T' - t')} \varphi_n(Q')\varphi_n^*(q').
+    \end{align}
+    Analytically extending this result to \(T_I' = (1 - i\varepsilon)T'\), and so
+    \begin{equation}
+        \e^{-iE_n(T_I' - t')} = \e^{-iE_n(T' - i\varepsilon T' - t')} \e^{-iE_n(T' - t')}\e^{-\varepsilon E_nT'},
+    \end{equation}
+    so this time all states apart from the ground state are exponentially suppressed in the limit \(T' \to \infty\).
+    We then have
+    \begin{equation}
+        \lim_{T' \to \infty} \braket{Q', T'_I}{q', t'}_{f,h}  = \braket{Q'}{0} \braket{0}{q'} = \varphi_0(Q') \varphi_0^*(q').
+    \end{equation}
+    
+    Putting these two results together we find that
+    \begin{equation}
+        \lim_{\substack{\mathllap{T} \to \mathrlap{-\infty}\\ \mathllap{T'} \to \mathrlap{+\infty}}} \frac{\braket{Q', (1 - i\varepsilon)T'}{Q, (1 - i\varepsilon)T}_{f,h}}{\varphi_0^*(Q) \varphi_0(Q')} = \braket{0, t'}{0, t}_{f,h}.
+    \end{equation}
+    Notice that we can get the same result by the transformation \(\operator{H} \mapsto (1 - i\varepsilon)\operator{H}\).
+    Note that the only dependence on the boundary is in the derivative on the left hand side, which is simply a normalisation factor which doesn't effect the values of derivatives with respect to the sources.
+    
+    \section{Weyl Ordering}
+    For more complicated Hamiltonians we may have to consider terms with products of \(\operator{P}\) and \(\operator{Q}\).
+    We then need a prescription for ordering terms in the Hamiltonian so that the amplitude matches the path integral.
+    We've used the mid-point prescription, evaluating the potential at \(\tilde{q}_k = (q_{k} + q_{k-1})/2\), to the same effect in this simple case.
+    In the more complex case we use the \defineindex{Weyl ordering}.
+    Here the order of a product of powers of some operators, \(\operator{A}\) and \(\operator{B}\), is defined by considering the operator \((\alpha\operator{A} + \beta\operator{B})^n\) and expanding in powers of \(\alpha\) and \(\beta\):
+    \begin{equation}
+        (\alpha\operator{A} + \beta\operator{B})^n = \sum_k \frac{n!}{k!\ell!} \alpha^k \beta^\ell [\operator{A}^k\operator{B}^\ell].
+    \end{equation}
+    Here \([\operator{A}^k\operator{B}^\ell]\) is the Weyl ordered product.
+    Notice that \(\ell = n - k\) and
+    \begin{equation}
+        \frac{n!}{k!\ell!} = \binom{n}{k} = \binom{n}{\ell}
+    \end{equation}
+    
+    \begin{exm}{}{}
+        Suppose we want to compute \([\operator{A}\operator{B}]\).
+        This is quadratic in the operators so we consider \((\alpha\operator{A} + \beta\operator{B})^2\):
+        \begin{equation}
+            (\alpha\operator{A} + \beta\operator{B})^2 = \alpha^2\operator{A} + \alpha\beta(\operator{A}\operator{B} + \operator{B}\operator{A}) + \beta\operator{B}^2.
+        \end{equation}
+        We then take the terms proportional to \(\alpha\beta\) and, after dividing by \(n!/(k!\ell!) = 2!/(1!1!) = 2\) we get the Weyl ordering,
+        \begin{equation}
+            [\operator{A}\operator{B}] = \frac{1}{2}(\operator{A}\operator{B} + \operator{B}\operator{A}).
+        \end{equation}
+        
+        Now suppose we want to compute all third order Weyl orderings.
+        We consider
+        \begin{multline}
+            (\alpha \operator{A} + \beta \operator{B})^3
+            \alpha^3\operator{A}^3 + \alpha^2\beta(\operator{A}^2\operator{B} + \operator{A}\operator{B}\operator{A} + \operator{B}\operator{A}^2)\\
+            + \alpha\beta^2(\operator{A}\operator{B}^2 + \operator{B}\operator{A}\operator{B} + \operator{B}^2\operator{A}) + \beta^3\operator{B}^3.
+        \end{multline}
+        We then have
+        \begin{align}
+            [\operator{A}^3] &= \frac{3!1!}{3!} \operator{A}^3 = \operator{A}^3,\\
+            [\operator{A}^2\operator{B}] &= \frac{2!1!}{3!}(\operator{A}^2\operator{B} + \operator{A}\operator{B}\operator{A} + \operator{B}\operator{A}^2) = \frac{1}{3}(\operator{A}^2\operator{B} + \operator{A}\operator{B}\operator{A} + \operator{B}\operator{A}^2),\\
+            [\operator{A}\operator{B}^2] &= \frac{1!2!}{3!}(\operator{A}\operator{B}^2 + \operator{B}\operator{A}\operator{B} + \operator{B}^2\operator{A}) = \frac{1}{3}(\operator{A}\operator{B}^2 + \operator{B}\operator{A}\operator{B} + \operator{B}^2\operator{A}),\\
+            [\operator{B}^3] &= \frac{1!3!}{3!}\operator{B}^3 = \operator{B}^3.
+        \end{align}
+        
+        Finally, suppose we want to compute \([\operator{A}^2\operator{B}^2]\).
+        Expanding \((\alpha \operator{A} + \beta \operator{B})^5\) we find the relevant term is
+        \begin{multline}
+            \alpha^3\beta^2(\operator{A}^3\operator{B}^2 + \operator{A}^2\operator{B}\operator{A}\operator{B} + \operator{A}^2\operator{B}^2\operator{A} + \operator{A}\operator{B}\operator{A}^2\operator{B} + \operator{A}\operator{B}\operator{A}\operator{B}\operator{A}\\
+            + \operator{A}\operator{B}^2\operator{A}^2+ \operator{B}\operator{A}^3\operator{B} + \operator{B}\operator{A}^2\operator{B}\operator{A} + \operator{B}\operator{A}\operator{B}\operator{A}^2 + \operator{B}^2\operator{A}^3)
+        \end{multline}
+        and so the Weyl ordered product is this result divided by \(5!/(3!2!) = 10\)
+        \begin{multline}
+            [\operator{A}^3\operator{B}^2] = \frac{1}{10} (\operator{A}^3\operator{B}^2 + \operator{A}^2\operator{B}\operator{A}\operator{B} + \operator{A}^2\operator{B}^2\operator{A} + \operator{A}\operator{B}\operator{A}^2\operator{B}\\
+            + \operator{A}\operator{B}\operator{A}\operator{B}\operator{A} +\operator{A}\operator{B}^2\operator{A}^2 + \operator{B}\operator{A}^3\operator{B} + \operator{B}\operator{A}^2\operator{B}\operator{A} + \operator{B}\operator{A}\operator{B}\operator{A}^2 + \operator{B}^2\operator{A}^3)
+        \end{multline}
+    \end{exm}
+    
+    \part{Path Integrals in Scalar Field Theory}
+    \chapter{Path Integrals in Scalar Field Theory}
+    \section{Scalar Field Theory Recap}
+    The Lagrangian for a free real scalar field, \(\varphi\), is
+    \begin{equation}
+        \lagrangianDensity_0(\varphi, \partial_\mu\varphi) = \frac{1}{2}(\partial_\mu\varphi)(\partial^\mu\varphi) - \frac{1}{2}m^2\varphi^2.
+    \end{equation}
+    Applying the Euler--Lagrange equations,
+    \begin{equation}
+        \partial_\mu\left( \diffp{\lagrangianDensity_0}{(\partial_\mu\varphi)} \right) - \diffp{\lagrangianDensity_0}{\varphi} = 0
+    \end{equation}
+    gives the Klein--Gordon equation,
+    \begin{equation}
+        (\dalembertian + m^2)\varphi = 0.
+    \end{equation}
+    
+    The action associated with this Lagrangian is, in \(D\) dimensions,
+    \begin{equation}
+        S_0[\varphi] = \int \dl{^Dx} \left[ \frac{1}{2}(\partial_\mu\varphi)(\partial^\mu\varphi) - \frac{1}{2}m^2\varphi^2 \right].
+    \end{equation}
+    There is already some physics going on here.
+    The Lagrangian and action tell us what the degrees of freedom of the system are, in this case we just have one, the field, \(\varphi\).
+    We can also examine the symmetries of the action.
+    Here we have one symmetry, Lorentz invariance.
+    Recall that if \(x\) transforms as
+    \begin{equation}
+        x^\mu \mapsto x'^\mu = \tensor{\Lambda}{^\mu_\nu}x^\nu \iff x \mapsto x' = \Lambda x
+    \end{equation}
+    for some Lorentz transformation \(\Lambda\) then the field transforms as
+    \begin{equation}
+        \varphi(x) \mapsto \varphi'(x') = \varphi(x),
+    \end{equation}
+    since by definition the field is a scalar.
+    Writing \(x'\) as \(\Lambda x'\) in the middle of this we have \(\varphi(x) \mapsto \varphi'(\Lambda x)\).
+    Redefining our variable so that \(x\) is the position in the new frame we have \(\varphi(x) \mapsto \varphi'(x) = \varphi(\Lambda^{-1}x)\).
+    If this is confusing think of a one-dimensional function, \(f \colon \reals \to \reals\).
+    If we want to translate this function to the right, in the positive \(x\) direction, by, say \(a\) units, then we transform it as \(f(x) \mapsto f'(x) = f(x - a)\), so we subtract.
+    The logic is the same here.
+    Our transformation moves the point of evaluation, so we have to move it back.
+    
+    We define the conjugate momentum as
+    \begin{equation}
+        \Pi(x) = \diffp{\lagrangianDensity_0}{(\partial_0\varphi)} = \partial_0\varphi(x) = \dot{\varphi}(x).
+    \end{equation}
+    The Hamiltonian is then
+    \begin{align}
+        \hamiltonianDensity(\varphi, \Pi) &= \Pi(x)\dot{\varphi}(x) - \lagrangianDensity_0(\varphi, \partial_\mu \varphi)\\
+        &= \frac{1}{2}\Pi(x)^2 + \frac{1}{2}\sum_{k = 1}^{3} (\partial_k\varphi(x))^2 + \frac{1}{2} m^2\varphi(x)^2.
+    \end{align}
+    
+    \section{The Path Integral}
+    We could derive the path integral in scalar field theory in a very similar way to how we derived it for quantum mechanics, but we won't.
+    Instead we'll assume the form is the same after making the usual substitutions which take us from quantum mechanics to quantum field theory.
+    These substitutions are as follows:
+    \begin{itemize}
+        \item \(t \to x\), we change from a single coordinate to \(D\) coordinates;
+        \item \(q(t) \to \varphi(x)\), we change from position to the field, \(\varphi\);
+        \item \(\operator{Q}(t) \to \operator{\varphi}(x)\), we change from the position operator to the field operator.
+    \end{itemize}
+    
+    Recall the quantum mechanical path integral:
+    \begin{equation}
+        \braket{q, t}{q', t'}_{f} = \int \DL{q} \, \exp\{i(S_0[q] + qf)\}.
+    \end{equation}
+    Moving to scalar field theory we replace this with
+    \begin{align}
+        Z_0[J] \coloneqq \braket{0}{0}_J = \int \DL{\varphi} \, \exp\{i(S_0[\varphi] + J \cdot \varphi)\}
+    \end{align}
+    where
+    \begin{equation}
+        J \cdot \varphi \coloneqq \int \dl{^Dx} \, J(x)\varphi(x).
+    \end{equation}
+    
+    This path integral is just a Gaussian integral, the one complication being that it's an infinite dimensional Gaussian integral.
+    We can make this more obvious with a bit of rewriting.
+    First, consider the action:
+    \begin{align}
+        S_0[\varphi] \coloneqq \int \dl{^Dx} \lagrangianDensity_0 = \frac{1}{2} \dl{^Dx} \, [(\partial_\mu\varphi)(\partial^\mu\varphi) - m^2\varphi^2].
+    \end{align}
+    Take the first term and integrate by parts to get
+    \begin{equation}
+        \int \dl{^Dx} \, (\partial_\mu \varphi)(\partial^\mu \varphi) = \int \dl{^Dx} \, [ \partial_\mu(\varphi\partial^\mu \varphi) - \varphi\dalembertian\varphi] = -\int \dl{^Dx} \, \varphi\dalembertian\varphi
+    \end{equation}
+    where in the last step we assume that the field vanishes sufficiently quickly at infinity that we can ignore the boundary term.
+    The action is then
+    \begin{equation}
+        S_0[\varphi] = \frac{1}{2} \int \dl{^Dx} \, \varphi(x) [-\dalembertian - m^2] \varphi(x).
+    \end{equation}
+    Now, we insert a factor of \(-i\varepsilon \varphi^2\) for some \(\varepsilon > 0\), which we will later take to zero.
+    This ensures convergence.
+    The modified action is then
+    \begin{equation}
+        S_0[\varphi] = \frac{1}{2} \int \dl{^Dx} \, \varphi(x) [-\dalembertian - m^2 - i\varepsilon] \varphi(x).
+    \end{equation}
+    Now define
+    \begin{equation}
+        K(x, x') \coloneqq \delta(x - x')[-\dalembertian - m^2].
+    \end{equation}
+    Then we can write the action as
+    \begin{equation}
+        S_0[\varphi] = \frac{1}{2} \int \dl{^Dx} \dd{^Dx'} \, \varphi(x) K(x, x') \varphi(x').
+    \end{equation}
+    Hence,
+    \begin{equation}
+        Z_0[0] = \int \DL{\varphi} \, \exp\left[ i\frac{1}{2} \int \dl{^Dx} \dd{^Dx'} \, \varphi(x) K(x, x') \varphi(x') \right].
+    \end{equation}
+    \begin{equation}
+        Z_A = \int \dl{^nx} \, \exp\left[ -\frac{1}{2}x^\trans A x \right] = \int \dl{^nx} \, \exp\left[ -\sum_{i}\sum_{j} x_iA_{ij}x_j \right].
+    \end{equation}
+    We can see that the kernel, \(K(x, x')\), plays the role of \(A\) and our sums become integrals, but other than that not much changes.
+    
+    It's easier to compute the action if we move to momentum space, since in momentum space \(\dalembertian \varphi\) simply becomes \(-p^2\tilde{\varphi}\).
+    To do this we write \(\varphi\) as the inverse transform of \(\tilde{\varphi}\):
+    \begin{equation}
+        \varphi(x) = \int \frac{\dl{^Dp}}{(2\pi)^D} \e^{-ip\cdot x}\tilde{\varphi}(p).
+    \end{equation}
+    We then have
+    \begin{equation}
+        S_0[\varphi] = \frac{1}{2} \int_x \int_{p,p'} \e^{-ip\cdot x} \tilde{\varphi}(p) (p'^2 - m^2 + i\varepsilon)\e^{-ip'\cdot x}\tilde{\varphi}(p').
+    \end{equation}
+    Here we've introduced the shorthand notation
+    \begin{equation}
+        \int_x \coloneqq \int \dl{^Dx}, \quad \int_{p} \coloneqq \int \frac{\dl{^Dp}}{(2\pi)^D}, \qand \int_{p,p'} = \int \frac{\dl{^Dp}}{(2\pi)^D} \int \frac{\dl{^Dp'}}{(2\pi)^D}
+    \end{equation}
+    and so on.
+    We can combine the two exponentials into \(\exp[-i(p + p') \cdot x]\), and then performing the \(x\) integral gives us a Dirac delta:
+    \begin{equation}
+        S_0[\varphi] = \frac{1}{2} \int_{p,p'} \tilde{\varphi}(p)(p'^2 - m^2 + i\varepsilon) \tilde{\varphi}(p') \delta(p + p').
+    \end{equation}
+    Using the Dirac delta we can perform the \(p'\) integral to get
+    \begin{equation}
+        S_0[\varphi] = \frac{1}{2} \int_p \tilde{\varphi}(p)(p^2 - m^2 + i\varepsilon) \tilde{\varphi}(-p).
+    \end{equation}
+    
+    We can simplify this slightly using a Fourier transform identity.
+    Let \(f \colon \reals \to \reals\) be a real function whose Fourier transform exists.
+    Then we have
+    \begin{equation}
+        \tilde{f}(p) = \int \dl{x} \, \e^{ipx} f(x).
+    \end{equation}
+    Hence, we have
+    \begin{equation}
+        \tilde{f}(-p) = \int \dl{x} \, \e^{-ipx} f(x) = \left[ \int \dl{x} \e^{ipx}f(x) \right]^* = \tilde{f}(p)^*.
+    \end{equation}
+    That is, for a real function, \(f(-p) = f(p)^*\).
+    This same result holds in arbitrary dimensions by an identical proof.
+    
+    Using this we can write the action as
+    \begin{equation}
+        S_0[\varphi] = \frac{1}{2} \int_p \tilde{\varphi}(p)(p^2 - m^2 + i\varepsilon) \tilde{\varphi}(p)^*.
+    \end{equation}
+    
+    \subsection{With a Source Term}
+    Now we want to compute
+    \begin{equation}
+        Z_0[J] = \int \!\! \DL{\varphi} \, \exp\left[  i\frac{1}{2} \int_p \tilde{\varphi}(p)(p^2 - m^2 + i\varepsilon) \tilde{\varphi}(p)^* + \int \dl{^Dx} \, J(x) \varphi(x) \right].
+    \end{equation}
+    This is the infinite dimensional analogue of
+    \begin{align}
+        Z_A(b) &= \int \dl{^nx} \, \exp\left[ -\frac{1}{2}x^\trans A x + b^\trans x \right]\\
+        &= \int \dl{^nx} \, \exp\left[ -\frac{1}{2}\sum_i\sum_j x_iA_{ij}x_j + \sum_i b_ix_i \right].
+    \end{align}
+    The source term simply has the sum turn into an integral.
+    To compute this integral we completed the square by making a substitution, \(x = y + \Delta b\), where \(\Delta = A^{-1}\).
+    We can do the same here, making the substitution in momentum space:
+    \begin{equation}
+        \tilde{\chi}(p) = \tilde{\varphi}(p) + \frac{\tilde{J}(p)}{p^2 - m^2 + i\varepsilon}.
+    \end{equation}
+    Notice that it's much easier to do this in Fourier space since we can literally divide by \(p^2 - m^2 + i\varepsilon\).
+    To do this in real space we'd have to somehow invert the operator \(-\dalembertian - m^2 + i\varepsilon\).
+    The finite dimensional analogue of this is that going to Fourier space is a basis change into a basis in which \(A\) is diagonal, and so easily inverted.
+    In a sense \(\tilde{K}(p, p')\) is \enquote{diagonal} in momentum space, in particular we get independent modes, one for each momentum.
+    
+    Before we do this we should Fourier transform the source term as well.
+    We have
+    \begin{equation}
+        J(x) = \int \frac{\dl{^Dp}}{(2\pi)^D} \e^{-ip\cdot x} \tilde{J}(p).
+    \end{equation}
+    Substituting this, and the Fourier transform of the field, into the source term we have
+    \begin{align}
+        \int_x J(x)\varphi(x) &= \int_x \int_{p,p'} \tilde{J}(p)\tilde{\varphi}(p') \e^{i(p + p') \cdot x}\\
+        &= \int_{p,p'} \tilde{J}(p)\tilde{\varphi}(p') (2\pi)^D\delta(p + p')\\
+        &= \int_p \tilde{J}(p) \tilde{\varphi}(-p).
+    \end{align}
+    Hence,
+    \begin{multline}
+        S_0[\varphi] + J \cdot \varphi =\\
+        \frac{1}{2}\int_p \left[ \tilde{\varphi}(p) (p^2 - m^2 + i\varepsilon) \tilde{\varphi}(-p) + \tilde{J}(p)\tilde{\varphi}(-p) + \tilde{J}(-p)\tilde{\varphi}(p) \right].
+    \end{multline}
+    The seemingly extra term of \(\tilde{J}(-p) \tilde{\varphi}(p)\) comes from factoring out the half, giving two \(\tilde{J}(p)\tilde{\varphi}(-p)\) terms. 
+    We then recognise that sine the integration range is symmetric all that matters is that the arguments of \(\tilde{J}\) and \(\tilde{\varphi}\) in this term differ by a sign.
+    So, we can make the substitution \(p \to -p\) in one of the factors then giving the final term above.
+    
+    Making this change of variables we can add the source term to the action:
+    \begin{align}
+        S_0[\varphi] + J \cdot \varphi &= \frac{1}{2}\int_p \Bigg[ \left( \tilde{\chi}(p) - \frac{\tilde{J}(p)}{p^2 - m^2 + i\varepsilon} \right)\\
+        &\qquad\qquad\times (p^2 - m^2 + i\varepsilon) \left( \tilde{\chi}(-p) - \frac{\tilde{J}(-p)}{p^2 - m^2 + i\varepsilon} \right)\\
+        &\qquad\qquad+ \tilde{J}(p)\left( \tilde{\chi}(p) - \frac{\tilde{J}(p)}{p^2 - m^2 + i\varepsilon} \right)\\
+        &\qquad\qquad+ \tilde{J}(-p)\left( \tilde{\chi}(-p) - \frac{\tilde{J}(-p)}{p^2 - m^2 + i\varepsilon} \right) \Bigg]
+    \end{align}
+    Expanding this most terms cancel and we're left with
+    \begin{multline}
+        S_0[\varphi] + J \cdot \varphi =\\
+        \frac{1}{2} \int_p \bigg[ \tilde{\chi}(p)(p^2 - m^2 + i\varepsilon)\tilde{\chi}(-p) - \tilde{J}(p) \frac{1}{p^2 - m^2 + i\varepsilon} \tilde{J}(-p)  \bigg].
+    \end{multline}
+    
+    Hence, we have
+    \begingroup
+    \allowdisplaybreaks
+    \begin{align}
+        Z_0[J] &= \int \!\! \DL{\mkern-2mu\chi} \exp\Bigg\{ i\frac{1}{2}\int_p \bigg[ \tilde{\chi}(p)(p^2 - m^2 + i\varepsilon)\tilde{\chi}(-p)\\
+        &\qquad\qquad\qquad- \tilde{J}(p) \frac{1}{p^2 - m^2 + i\varepsilon}\tilde{J}(-p) \bigg]  \Bigg\}\\
+        &= \exp\left[ -\frac{i}{2} \int_p \tilde{J}(p) \frac{1}{p^2 - m^2 + i\varepsilon} \tilde{J}(-p) \right]\\
+        &\qquad\qquad\times\int \DL{\mkern-2mu\chi} \exp\left[ \frac{i}{2} \int_p \tilde{\chi}(p)(p^2 - m^2 + i\varepsilon)\tilde{\chi}(-p) \right]\\
+        &= \symcal{N} \exp\left[ -\frac{i}{2} \int_p \tilde{J}(p) \frac{1}{p^2 - m^2 + i\varepsilon} \tilde{J}(-p) \right]
+    \end{align}
+    \endgroup
+    where
+    \begin{equation}
+        \symcal{N} = \int \DL{\mkern-2mu\chi} \exp\left[ \frac{i}{2} \int_p \tilde{\chi}(p)(p^2 - m^2 + i\varepsilon)\tilde{\chi}(-p) \right]
+    \end{equation}
+    is a normalisation factor.
+    
+    We can write this result as
+    \begin{equation}
+        Z_0[J] = \symcal{N}\exp\left[ -\frac{i}{2} \int \dl{^Dx} \dd{^Dx'} \, J(x) \Delta(x, x') J(x') \right]
+    \end{equation}
+    where
+    \begin{equation}
+        \Delta(x, x') = \Delta(x - x') = \int_p \frac{\e^{-ip\cdot (x - x')}}{p^2 - m^2 + i\varepsilon}
+    \end{equation}
+    is the \defineindex{Feynman propagator}.
+    We find this by doing the inverse transform
+    \begin{equation}
+        \tilde{J}(p) = \int \dl{^Dx} \, \e^{ip\cdot x} J(x), \qqand \tilde{J}(-p) = \int \dl{^Dx} \, \e^{-ip\cdot x} J(x),
+    \end{equation}
+    so
+    \begin{align*}
+        \int_p \tilde{J}(-p) \frac{1}{p^2 - m^2 + i\varepsilon} \tilde{J}(p) &= \int_p \int_{x,x'} \e^{-ip\cdot x} J(x) \frac{1}{p^2 - m^2 + i\varepsilon} \e^{ip \cdot x'} J(x')\\
+        &= \int_p \int_{x,x'} J(x)\frac{1}{p^2 - m^2 + i\varepsilon} J(x') \e^{-ip \cdot (x - x')}.
+    \end{align*}
+    
+    We can show that, in analogy to the finite dimensional integrals, \(\Delta\) is, in a sense, the inverse of \(K\), more specifically,
+    \begin{equation}
+        I = \int \dl{^Dz} \, K(x, z) \Delta(z, x') = \delta(x - x').
+    \end{equation}
+    This follows by substituting in the definitions:
+    \begin{align}
+        I &= \int \dl{^Dz} \int_p \delta(x - z)[-\dalembertian - m^2 - i\varepsilon] \frac{\e^{-ip\cdot (z - x')}}{p^2 - m^2 + i\varepsilon}\\
+        &= \int \dl{^Dz} \delta(x - z)[-\dalembertian - m^2 - i\varepsilon] \frac{\delta(z - x')}{p^2 - m^2 + i\varepsilon}
+    \end{align}
+    The two terms \([-\dalembertian - m^2 - i\varepsilon]\) and \(1/(p^2 - m^2 + i\varepsilon)\) cancel as they are inverses once we move the first to Fourier space, and we are left with the product \(\delta(x - z)\delta(z - x')\), which reduces to \(\delta(x - x')\) when we perform the \(z\) integral.
+    
+    \subsection{Using the Path Integral}
+    We can use the path integral to compute correlators, much like in \cref{sec:sources}.
+    We normalise so that \(\symcal{N} = 1\).
+    Consider, for example, the vacuum expectation of the time ordered product of two fields:
+    \begin{align*}
+        \bra{0} &\timeOrdering[\varphi(x_1)\varphi(x_2)] \ket{0} = \left( \frac{1}{i} \diffd{}{J(x_1)} \right) \left( \frac{1}{i} \diffd{}{J(x_2)} \right) Z_0[J] \bigg|_{J = 0}\\
+        &= \left( \frac{1}{i} \diffd{}{J(x_1)} \right) \left( \frac{1}{i} \diffd{}{J(x_2)} \right) \exp\left[ -\frac{i}{2} \int_{x,x'} J(x)\Delta(x, x')J(x') \right]\\
+        &= \left( \frac{1}{i} \diffd{}{J(x_1)} \right) \left[ -\frac{1}{2}\int_{x'} \{\Delta(x_2, x')J(x) + J(x)\Delta(x, x_2)\} \right]\\
+        & \qquad \qquad \times \exp\left[ -\frac{i}{2} \int_{x,x'} J(x)\Delta(x, x')J(x') \right]\\
+        &= -\frac{1}{i}\frac{1}{2}\{\Delta(x_1, x_2) + \Delta(x_2, x_1)\}\\
+        &= i\Delta(x_1, x_2)
+    \end{align*}
+    where we set \(J = 0\) in the penultimate term and then used the fact that \(\Delta\) is symmetric in its arguments.
+    This must be the case since \(\timeOrdering[\varphi(x_1)\varphi(x_2)]\) is symmetric in \(x_1\) and \(x_2\), and we've used this in the past to \emph{define} \(\Delta\) (see \cref{eqn:feynman propagator as vacuum expectation of time ordered product}).
+    
     
     
     %   Appdendix
