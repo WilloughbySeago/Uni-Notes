@@ -14,6 +14,7 @@
 \usetikzlibrary{external}
 \tikzexternalize[prefix=tikz-external/]
 % Other libraries
+\usepackage{tikz-cd}
 
 % References, should be last things loaded
 \usepackage[pdfauthor={Willoughby Seago},pdftitle={Symmetries of Particles and Fields},pdfkeywords={symmetry, group theory, lie groups, lie algebras, representation theory, lorentz group, SU(2), quantum field theory},pdfsubject={Lie Groups, Representation Theory, and Quantum Field Theory}]{hyperref}  % Should be loaded second last (cleveref last)
@@ -92,7 +93,10 @@ noabbrev
 \ExplSyntaxOff
 \newcommand{\order}{\symcal{O}}
 \DeclareMathOperator{\tr}{tr}
-\DeclareMathOperator{\spn}{span}
+\DeclareMathOperator*{\spn}{span}
+\newcommand{\parity}{\symcal{P}}
+\newcommand{\timeReversal}{\symcal{T}}
+\DeclareMathOperator{\artanh}{artanh}
 
 \includeonly{}
 
@@ -439,7 +443,7 @@ noabbrev
     As is usually the case in physics we assume that most things are analytic, they can be expanded in Taylor series.
     This assumption defines Lie groups, one of the main subjects of our study in this course.
     \begin{dfn}{Lie Group}{}
-        A \defineindex{Lie group}\footnote{pronounced \emph{lee}}, \(G\), is a continuous group for which the group multiplication has an analytic structure.
+        A \defineindex{Lie group}\footnote{Named after Sophus Lie, no relation to lying, pronounced \emph{lee}.}, \(G\), is a continuous group for which the group multiplication has an analytic structure.
         That is, if \(g(\alpha) = g(\beta)g(\gamma)\) then \(\alpha_i = \varphi_i(\beta, \gamma)\) where \(\varphi_i\) are analytic functions of \(\beta\) and \(\gamma\).
     \end{dfn}
     
@@ -1172,7 +1176,7 @@ noabbrev
         for all \(g, h \in G\).
     \end{dfn}
     
-    \begin{thm}{Maschke's Theorem}{}
+    \begin{thm}{Maschke's Theorem}{thm:maschke}
         Any representation of a finite group is equivalent to a unitary representation.
         \begin{proof}
             Let \(G\) be a finite group, \(V\) a vector space, and \((D, V)\) a representation.
@@ -1355,13 +1359,13 @@ noabbrev
         Let \(\lie{g}\) be a Lie algebra and \(\lie{h}\) a subspace of \(\lie{g}\) (as vector spaces).
         Then \(\lie{h}\) is a \defineindex{Lie subalgebra}, or simply a \defineindex{subalgebra}, of \(\lie{g}\) if \(\commutator{x}{y} \in \lie{h}\) for all \(x, y \in \lie{h}\), where \(\commutator{-}{-}\) is the Lie bracket of \(\lie{g}\).
         
-        An \defineindex{ideal} is a Lie subalgebra \(\lie{i}\) with the stronger condition that \(\commutator{g}{i} \in \lie{i}\) for all \(g \in \lie{g}\).
+        An \defineindex{ideal}, or an \defineindex{invariant subalgebra}, is a Lie subalgebra \(\lie{i}\) with the stronger condition that \(\commutator{g}{i} \in \lie{i}\) for all \(g \in \lie{g}\).
     \end{dfn}
     
     The definition of an ideal here is analogous to that of a normal subgroup.
     A normal subgroup is invariant under conjugation with any group element and an ideal is invariant under Lie brackets with any algebra element.
     Note that if \(\commutator{g}{i} \in \lie{i}\) then \(\commutator{i}{g} = -\commutator{g}{i} \in \lie{i}\) also as \(\lie{i}\) is a subspace of \(\lie{g}\).
-    Similar to the group case a Lie algebra is \defineindex{simple!Lie algebra} if it has no nontrivial ideals, that is the only ideals are itself and the zero dimensional vector space, and it is not Abelian.
+    Similar to the group case a Lie algebra is \define{simple}\index{simple!Lie algebra} if it has no nontrivial ideals, that is the only ideals are itself and the zero dimensional vector space, and it is not Abelian.
     A Lie algebra is \define{Abelian}\index{Abelian!Lie algebra} if the Lie bracket vanishes, that is \(\commutator{x}{y} = 0\) for all \(x, y \in \lie{g}\).
     Note that this is equivalent to saying \(\commutator{x}{y} = \commutator{y}{x}\), the more usual notion of being Abelian, but anticommutativity means \(\commutator{y}{x} = -\commutator{x}{y}\), so we have \(\commutator{x}{y} = -\commutator{x}{y}\), and so \(\commutator{x}{y} = 0\).
     
@@ -1472,7 +1476,7 @@ noabbrev
     We have already met one of the most important representations of any Lie group, the structure constants themselves.
     
     \begin{dfn}{Adjoint Representation}{}
-        The \defineindex{adjoint representation} of a Lie algebra, \(\lie{g}\), is the representation on \(\complex^{\dim \lie{g}}\) given by choosing the generators to satisfy
+        The \define{adjoint representation}\index{adjoint representation!of a Lie algebra} of a Lie algebra, \(\lie{g}\), is the representation on \(\lie{g}\) itself, given by choosing the generators to satisfy
         \begin{equation}
             \tensor{(T_a)}{^b_c} = i\tensor{c}{^b_{ac}}.
         \end{equation}
@@ -1481,7 +1485,7 @@ noabbrev
     To show that this is indeed a representation we need to show that \(T_a\) defined in this way satisfy \(\commutator{T_a}{T_b} = i\tensor{c}{^c_{ab}}T_c\).
     We can use the antisymmetry of the structure constants to write the Jacobi identity as
     \begin{equation}
-        \tensor{(T_a)}{^d_e} \tensor{(A_b)}{^e_c} - \tensor{(A_b)}{^d_e}\tensor{(A_a)}{^e_c} = i\tensor{(A_e)}{^d_c} \tensor{c}{^e_{ab}},
+        \tensor{(T_a)}{^d_e} \tensor{(T_b)}{^e_c} - \tensor{(T_b)}{^d_e}\tensor{(T_a)}{^e_c} = i\tensor{(T_e)}{^d_c} \tensor{c}{^e_{ab}},
     \end{equation}
     which in matrix notation gives
     \begin{equation}
@@ -1902,6 +1906,664 @@ noabbrev
         We conclude that both the Lie algebras of \(\specialUnitary(2)\) and \(\specialOrthogonal(3)\) both exponentiate to give \(\specialUnitary(2)\).
     \end{exm}
     
+    \chapter{Invariant Tensors}
+    \section{Structure Constants}
+    Recall that for a Lie algebra generated by \(T_a\) the structure constants, \(\tensor{c}{^c_{ab}}\) are defined as
+    \begin{equation}
+        \commutator{T_a}{T_b} = i\tensor{c}{^c_{ab}}T_c.
+    \end{equation}
+    These are independent of the representation chosen.
+    For example, we saw that the structure constants of \(\specialUnitaryLie(2) \isomorphic \specialOrthogonalLie(3)\) are \(\varepsilon_{ijk}\) whether we think of this Lie algebra as \(2\times 2\) traceless Hermitian matrices (\(\specialUnitaryLie(2)\)) or as antisymmetric traceless real matrices (\(\specialOrthogonalLie(3)\)).
+    
+    If the generators are Hermitian, so \(T_a^\hermit = T_a\), then the structure constants are real, to show this consider the conjugate of the defining equation:
+    \begin{equation}
+        \commutator{T_a}{T_b}^\hermit = -i\tensor{c}{^c_{ab}}^*T_c^\hermit,
+    \end{equation}
+    the conjugate of the commutator is the negative of the commutator of the conjugates:
+    \begin{multline}
+        \commutator{A}{B}^\hermit = (AB - BA)^\hermit = (AB)^\hermit - (BA)^\hermit\\
+        = B^\hermit A^\hermit - A^\hermit B^\hermit = \commutator{B^\hermit}{A^\hermit} = -\commutator{A^\hermit}{B^\hermit}
+    \end{multline}
+    Hence, we have
+    \begin{equation}
+        \commutator{T_a}{T_b}^\hermit = -\commutator{T_a^\hermit}{T_b^\hermit} = -\commutator{T_a}{T_b},
+    \end{equation}
+    and so we have
+    \begin{equation}
+        \commutator{T_a}{T_b} = i\tensor{c}{^c_{ab}}^* T_c.
+    \end{equation}
+    Hence we must have \(\tensor{c}{^c_{ab}}^* = \tensor{c}{^c_{ab}}\), and so \(\tensor{c}{^c_{ab}}\) is real.
+    This is useful because in a compact Lie group we can always choose finite dimensional representations to be unitary by Maschke's theorem (\cref{thm:maschke}), and the corresponding Lie algebra representation will be Hermitian.
+    
+    If the generators are purely imaginary, so \(iT_a\) is real, this follows since \(T_a\) being purely imaginary implies \(\commutator{T_a}{T_b}\) is real, and so in the defining equation we have something real, \(\commutator{T_a}{T_b}\) is equal to the structure constants, \(\tensor{c}{^c_{ab}}\), times something real, \(iT_a\), and hence \(\tensor{c}{^c_{ab}}\) must be real.
+    This is useful because we can often choose the generators of a noncompact group to be purely imaginary.
+    
+    The structure constants are antisymmetric in the second two indices, since
+    \begin{equation}
+        i\tensor{c}{^c_{ab}}T_c = \commutator{T_a}{T_b} = -\commutator{T_b}{T_a} = -i\tensor{c}{^c_{ba}}T_c.
+    \end{equation}
+    
+    If we rescale one of the generators, say \(T_a \mapsto \mu T_a\) for some fixed \(a\), then the structure constants rescale accordingly, for \(b \ne a\)
+    \begin{equation}
+        \commutator{T_a}{T_b} \mapsto \commutator{\mu T_a}{T_b} = \mu\commutator{T_a}{T_b} = i\mu\tensor{c}{^c_{ab}}T_c.
+    \end{equation}
+    This can be useful to swap between the physics and maths conventions, where the generators differ by a factor of \(i\).
+    
+    \subsection{Adjoint Representation}
+    The structure constants define the adjoint representation of the Lie algebra.
+    There is an associated representation of the Lie group on the Lie algebra.
+    This is fully determined by the action of the Lie group on the generators.
+    Consider the transformation \(T_a \mapsto gT_ag^{-1}\), where \(g = 1 + i\alpha^aT_a + \dotsb\) and so \(g^{-1} = 1 - i\alpha^aT_a + \dotsb\).
+    Expanding this to first order we have
+    \begin{align}
+        gT_ag^{-1} &\approx (1 + i\alpha^bT_b)T_a(1 - i\alpha^cT_c)\\
+        &= T_a + i\alpha^bT_bT_a - i\alpha^cT_aT_c + \order(\alpha^2)\\
+        &= T_a + i\alpha^b \commutator{T_b}{T_a} + \order(\alpha^2),
+    \end{align}
+    where we reindex \(c \to b\) in the last step.
+    It turns out that this holds to all orders, and so it can be shown that
+    \begin{equation}
+        gT_ag^{-1} = T_b \tensor{D}{^b_a}(g)
+    \end{equation}
+    where \(D(g)\) are some matrices.
+    We call \(D\) the \define{adjoint representation}\index{adjoint representation!of a Lie group}.
+    
+    We need to check that \(D\) really is a representation, that is, we need to check if the following holds for all \(g, h \in G\):
+    \begin{equation}
+        \tensor{D}{^b_c}(g) \tensor{D}{^c_d}(h) = \tensor{D}{^b_d}(gh).
+    \end{equation}
+    To do this multiply by \(T_b\) to give
+    \begin{align}
+        T_b \tensor{D}{^b_c}(g) \tensor{D}{^c_d}(h) &= gT_cg^-1 \tensor{D}{^c_d}(h)\\
+        &= gT_c\tensor{D}{^c_d}(h)g^{-1}\\
+        &= ghT_ch^{-1}g^{-1}\\
+        &= (gh)T_d(gh)^{-1}\\
+        &= T_b \tensor{D}{^b_d}(gh).
+    \end{align}
+    Note that while \(D(h)\) is a matrix \(\tensor{D}{^c_d}(h)\) is a number, so commutes with \(g^{-1}\).
+    Since this holds for all \(T_b\) we have
+    \begin{equation}
+        \tensor{D}{^b_c}(g) \tensor{D}{^c_d}(h) = \tensor{D}{^b_d}(gh),
+    \end{equation}
+    and so \(D\) is a representation.
+    
+    For either a real Lie group or a compact Lie group the adjoint representation is real.
+    This leads to many nice properties that make it a useful representation.
+    
+    \section{Invariant Tensors}
+    Consider some vector space \(V\), and some vector \(x \in V\) with components \(x^i\).
+    If \(G\) is a Lie group with some action on \(V\) defined by matrix multiplication with the representation \(D\) then \(x^i\) transforms under \(g \in G\) as
+    \begin{equation}
+        x^i \mapsto (g\action x)^i = \tensor{D}{^i_j}(g)x^j.
+    \end{equation}
+    Similarly, a vector in the dual space, \(\bar{V}\), has components \(x_i\), which transform as
+    \begin{equation}
+        x_i \mapsto (g\action x)_i = \tensor{D}{_i^j}(g)x_j.
+    \end{equation}
+    This extends to some tensor, \(T \in V^{\otimes n} \otimes \overbar{V}^{\otimes m}\) with components \(\tensor{T}{^{i_1i_2\dotso i_n}_{j_1j_2\dotso j_m}}\) transforming as
+    \begin{multline*}
+        \tensor{T}{^{i_1i_2\dotso i_n}_{j_1j_2\dotso j_m}} \mapsto \tensor{(g\action T)}{^{i_1i_2\dotso i_n}_{j_1j_2\dotso j_m}}\\
+        = \tensor{D}{^{i_1}_{k_1}}(g)\tensor{D}{^{i_2}_{k_2}}(g) \dotsm \tensor{D}{^{i_n}_{k_n}}(g) \tensor{D}{_{j_1}^{l_1}}(g) \tensor{D}{_{j_2}^{l_2}}(g) \tensor{D}{_{j_m}^{l_m}}(g) \tensor{T}{^{k_1k_2\dotso k_n}_{l_1l_2\dotso l_m}}.
+    \end{multline*}
+    
+    Some special tensors have the property that their components don't change under any transformation in \(G\), these are called invariant tensors, and they can tell us a lot about the group in question.
+    
+    \begin{dfn}{Invariant Tensor}{}
+        An \defineindex{invariant tensor} of rank \(n\), with components \(d_{a_1a_2\dotso a_n}\) is a tensor whose components are invariant under the action of some Lie group in some representation.
+        That is, for \(g \in G\) and representation \(D\) we have
+        \begin{align}
+            d_{a_1a_2\dotso a_n} \mapsto (g \action d)_{a_1a_2\dotso a_n} &= \tensor{D}{^{b_1}_{a_1}}(g)\tensor{D}{^{b_1}_{a_1}}(g) \dotsm \tensor{D}{^{b_1}_{a_1}}(g) d_{b_1b_2\dotso b_n}\notag\\
+            &= d_{a_1a_2\dotso a_n}.
+        \end{align}
+    \end{dfn}
+    
+    \begin{exm}{}{}
+        \begin{itemize}
+            \item Any scalar is an invariant tensor.
+            \item Consider the usual representation of \(\orthogonal(n)\) on \(\reals^n\), that is \(\orthogonal(n)\) just acts by matrix multiplication.
+            An invariant tensor in this case is \(\delta_{ij}\).
+            \item Now restrict things to \(\specialOrthogonal(n)\), we get an additional invariant tensor, \(\varepsilon_{i_1i_2\dotso i_n}\).
+            \item Given invariant tensors we can combine them to get other invariant tensors, such as \(\varepsilon_{ijk}\delta_{lm}\) or \(\delta_{ij}\delta_{kl}\delta_{mn}\).
+            \item The tensor \(\eta^{\mu\nu}\) is invariant under \(\specialOrthogonal^+(1, 3)\).
+            \item For \(\unitary(n)\) acting on \(\complex^n\) in the obvious way \(\delta_{ij}\) is \emph{not} an invariant tensor, but \(\tensor{\delta}{^i_j}\) is, since
+            \begin{equation}
+                \tensor{\delta}{^i_j} \mapsto \tensor{U}{^i_k}\tensor{\delta}{^k_l}\tensor{U}{_j^l} = \tensor{U}{^i_l}\tensor{U}{_j^l} = \delta^i_j
+            \end{equation}
+            for some unitary \(U \in \unitary(n)\).
+            \item Now restrict things to \(\specialUnitary(n)\), and we get two additional invariant tensors, \(\varepsilon_{i_1i_2\dotso i_n}\) and \(\varepsilon^{i_1i_2\dotso i_n}\).
+        \end{itemize}
+    \end{exm}
+    
+    One simple way to create invariant tensors is to take traces of products of generators.
+    For example, define some tensor \(d \in V^{\otimes 3}\) with components
+    \begin{equation}
+        d_{abc} \coloneqq \tr(T_aT_bT_c).
+    \end{equation}
+    Then this transforms in the adjoint representation as
+    \begin{align}
+        d_{abc} &\mapsto \tr(gT_ag^{-1}gT_bg^{-1}gT_cg^{-1})\\
+        &= \tr(gT_aT_bT_cg^{-1})\\
+        &= \tr(g^{-1}gT_aT_bT_c)\\
+        &= \tr(T_aT_bT_c)\\
+        &= d_{abc}
+    \end{align}
+    using the cyclic property of the trace.
+    
+    \section{Killing Form}
+    \epigraph{Set 2 equal to 1}{Neil Turok}
+    \begin{dfn}{Killing Form}{}
+        The \defineindex{Killing form}\footnote{named after Wilhelm Killing, no relation to murder.} is defined as the tensor with components
+        \begin{equation}
+            g_{ab} \coloneqq \tr_{\symrm{A}}(T_aT_b)
+        \end{equation}
+        where \(T_a\) are in the adjoint representation, which is what the subscript \(\symrm{A}\) tells us.
+    \end{dfn}
+    
+    The Killing form is symmetric, since
+    \begin{equation}
+        g_{ab} = \tr_{\symrm{A}}(T_aT_b) = \tr(T_bT_a) = g_{ba}
+    \end{equation}
+    by the cyclic property of the trace.
+    
+    If the structure constants are real then the Killing form is a real symmetric matrix, so can be used as a metric on the Lie group.
+    We can write the Killing form in terms of the structure constants:
+    \begin{equation}
+        g_{ab} = -\tensor{c}{^d_{ae}} \tensor{c}{^e_{bd}} = g_{ba}.
+    \end{equation}
+
+    For a compact Lie algebra it is possible to diagonalise the Killing form by some orthogonal transformation.
+    That is, there is some basis such that \(g_{ab} = \lambda_a\delta_{ab}\) (no sum on \(a\)).
+    We can then rescale the basis and reorder it to get a result in the canonical form:
+    \begin{equation}
+        g = 
+        \begin{pmatrix}
+            1 & & & & & & & & &\\
+            & \ddots & & & & & & &\\
+            & & 1 & & & & & &\\
+            & & & 0 & & & & & \\
+            & & & & \ddots & & & & \\
+            & & & & & 0 & & & & \\
+            & & & & & & \mathllap{-}1 & & \\
+            & & & & & & & \ddots & \\
+            & & & & & & & & \mathllap{-}1
+        \end{pmatrix}
+        .
+    \end{equation}
+
+    \begin{exm}{}{}
+        In \(\specialUnitaryLie(2)\) the structure constants are \(\varepsilon_{ijk}\), and so in the adjoint representation the generators have components \(\tensor{(T_i)}{^k_l} = i\varepsilon_{kil}\).
+        The Killing form is then
+        \begin{equation}
+            g_{ij} = -\varepsilon_{kil}\varepsilon_{ljk} = 2\delta_{ij},
+        \end{equation}
+        so the Killing form is already diagonal in this case.
+        We can rescale the generators \(T_a \mapsto T_a/\sqrt{2}\), and so \(\tensor{(T_i)}{^k_l} = i\varepsilon_{kil}/\sqrt{2}\) and \(g_{ij} = \delta_{ij}\).
+    \end{exm}
+    
+    The Killing form is an invariant tensor, since it transforms under the adjoint representation as
+    \begin{equation}
+        g_{ab} = \tr_{\symrm{A}}(T_aT_b) \mapsto \tr_{\symrm{A}}(gT_ag^{-1}gT_bg) = \tr_{\symrm{A}}(T_aT_b) = g_{ab},
+    \end{equation}
+    having used the cyclic property of the trace.
+    
+    We can use the Killing form to lower indices, so for example, we can define structure constants with all lower indices
+    \begin{equation}
+        c_{abc} = g_{ad}\tensor{c}{^d_{bc}}.
+    \end{equation}
+    The structure constants with lowered indices are invariant tensors, since the normal structure constants and the Killing form are invariant tensors.
+    We can write these lowered index structure constants in terms of traces of products of generators as follows:
+    \begin{align}
+        \tr_{\symrm{A}}(T_a \commutator{T_b}{T_c}) &= \tr_{\symrm{A}}(T_a i\tensor{c}{^d_{bc}}T_d)\\
+        &= i\tensor{c}{^d_{bc}} \tr_{\symrm{A}}(T_aT_d)\\
+        &= i\tensor{c}{^d_{bc}} g_{ad}\\
+        &= ic_{abc}.
+    \end{align}
+    
+    This form form is useful since we have the identity
+    \begin{multline}
+        \tr(A \commutator{B}{C}) = \tr(ABC - ACB) = \tr(ABC) - \tr(ACB)\\
+        = \tr(ABC) - \tr(BAC) = \tr(ABC - BAC) = \tr(\commutator{A}{B}C)
+    \end{multline}
+    and similarly
+    \begin{equation}
+        \tr(A\commutator{B}{C}) = \tr(\commutator{C}{A}B).
+    \end{equation}
+    This means we have
+    \begin{equation}
+        ic_{abc} = \tr(T_a\commutator{T_b}{T_c}) = \tr(\commutator{T_a}{T_b}T_c) = \tr(T_c\commutator{T_a}{T_b}) = ic_{cab}.
+    \end{equation}
+    So, we have \(c_{abc} = c_{cab}\), and we know that \(c_{abc}\) is antisymmetric in the last two indices, so \(c_{abc} = -c_{acb}\).
+    This means that exchanging the first two indices must also pick up a negative sign to cancel with this one.
+    We conclude that \(c_{abc}\) is antisymmetric in all three indices.
+    This result holds for compact and noncompact groups.
+    
+    We can form another similar invariant tensor by replacing the commutator with the \defineindex{anticommutator}, \(\anticommutator{A}{B} = AB + BA\), and then we have
+    \begin{equation}
+        d_{abc} \coloneqq \tr_{\symrm{A}}(T_a\anticommutator{T_b}{T_c}).
+    \end{equation}
+    This is symmetric in all three indices.
+    
+    In general for \(n > 3\) if we take the expression \(\tr(T_{a_1} \dotsm T_{a_n})\) we can always write the antisymmetric part in terms of \(c_{abc}\).
+    This means that each time we increment \(n\) we only get one independent extra invariant tensor given by the totally symmetric tensor on \(n\) indices.
+    This holds up to a point where we stop getting new tensors at all as we can even decompose the totally symmetric tensors in terms of lower rank symmetric tensors.
+    
+    \begin{dfn}{Rank}{}
+        The \defineindex{rank} of a Lie algebra is the number of invariant tensors under the universal covering group.
+    \end{dfn}
+    
+    \part{Simplicity and Compact Groups}
+    \chapter{Simplicity}
+    \section{Definitions}
+    We repeat some definitions here for ease of reference in this section.
+    \begin{dfn}{Lie Subalgebras and Ideals}{}
+        Let \(\lie{g}\) be a Lie algebra and \(\lie{h}\) a subspace of \(\lie{g}\) (as vector spaces).
+        Then \(\lie{h}\) is a \defineindex{Lie subalgebra}, or simply a \defineindex{subalgebra} of \(\lie{g}\) if \(\commutator{x}{y} \in \lie{h}\) for all \(x, y \in \lie{h}\), where \(\commutator{-}{-}\) is the Lie bracket of \(\lie{g}\).
+        
+        A \defineindex{proper subalgebra} of \(\lie{g}\) is a subalgebra of \(\lie{g}\) with a smaller set of generators than \(\lie{g}\).
+        
+        An \defineindex{ideal}, \(\lie{i}\), or \defineindex{invariant subalgebra} of \(\lie{g}\) is a subalgebra of \(\lie{g}\) such that \(\commutator{g}{i} \in \lie{i}\) for all \(g \in \lie{g}\) and \(i \in \lie{i}\).
+    \end{dfn}
+    Compare these definitions with those of subgroups.
+    A subgroup is one which is closed under the group operation, and a subalgebra is one which is closed under the Lie bracket.
+    A proper subgroup is one which is not equal to the original group, and a proper subalgebra is one in which the set of generators is not equal to the set of generators of the original Lie algebra.
+    An invariant subgroup is one which is closed under conjugation with any group element, and an invariant subalgebra is one which is closed under the Lie bracket with any Lie algebra element.
+    
+    \begin{dfn}{Simple and Semisimple}{}
+        Let \(\lie{g}\) be a Lie group.
+        If \(\lie{g}\) has no proper invariant subalgebras it is \defineindex{simple}.
+        If \(\lie{g}\) has no proper invariant Abelian subalgebras it is \defineindex{semisimple}.
+        Recall that a Lie algebra, \(\lie{h}\) is Abelian if \(\commutator{x}{y} = 0\) for all \(x, y \in \lie{h}\).
+    \end{dfn}
+    
+    \begin{exm}{}{}
+        The Lie algebra \(\specialUnitaryLie(2)\) is simple.
+        The Lie algebra \(\specialUnitaryLie(2) \times \specialUnitaryLie(2)\) is semisimple, having a subalgebra isomorphic to \(\specialUnitaryLie(2)\), but no Abelian proper subalgebras.
+    \end{exm}
+    
+    \section{Nonsemisimple Case}
+    Consider a Lie algebra, \(\lie{l}\), which is \emph{not} semisimple.
+    This means that there exists some Lie algebra, \(\lie{s}\), which is an Abelian subalgebra of \(\lie{l}\).
+    In this section we'll use the indices \(a, b, c, \dotsc\) to index elements of \(\lie{s}\).
+    We'll use the indices \(i, j, k, \dotsc\) to index elements of \(\lie{l}\), and we'll use the indices \(p, q, r, \dotsc\) to index elements of \(\lie{p} = \lie{l} \setminus \lie{s}\), that is the complement of \(\lie{s}\) in \(\lie{l}\), which is itself a vector space.
+    Denote by \(S_i\) the generators of \(\lie{s}\), \(P_p\) the generators of \(\lie{p}\), and \(T_a\) the generators of \(\lie{l}\), note that \(T_a\) coincide with \(S_i\) and \(P_p\).
+    Indices \(a, b, c, \dotsc\) run from \(1\) to \(\dim \lie{l}\).
+    Indices \(i, j, k, \dotsc\) run from \(1\) to \(\dim \lie{s}\).
+    Indices \(p, q, r, \dotsc\) run from \(\dim\lie{s} + 1\) to \(\dim\lie{l}\).
+    
+    We then have two facts:
+    \begin{enumerate}
+        \item \(\commutator{S_i}{S_j} = i\tensor{c}{^a_{ij}}T_a = 0\) since \(\lie{s}\) is Abelian.
+        Hence \(\tensor{c}{^a_{ij}} = 0\) since \(T_a\) are linearly independent so can only sum to zero if the coefficients vanish.
+        \item \(\commutator{S_i}{T_a} = i\tensor{c}{^b_{ia}}T_b \in \lie{s}\) since \(\lie{s}\) is an invariant subalgebra.
+        This implies that \(\tensor{c}{^p_{ia}} = 0\) as any element of \(\lie{s}\) can be expressed as a linear combination of \(S_i\) with no \(P_p\) terms.
+    \end{enumerate}
+    
+    Now, consider the elements of the Killing form with one index restricted to \(\lie{s}\).
+    By definition we have
+    \begin{equation}
+        g_{ia} = \tr_{\symrm{A}}(T_iT_a) = -\tensor{c}{^c_{id}} \tensor{c}{^d_{ac}}.
+    \end{equation}
+    Using the second fact we see that \(\tensor{c}{^c_{id}}\) vanishes unless \(c\) is between 1 and \(\dim\lie{s}\), and so we can set \(c = j\), giving
+    \begin{equation}
+        g_{ia} = -\tensor{c}{^j_{id}}\tensor{c}{^d_{aj}}.
+    \end{equation}
+    Using the second fact again we see that \(\tensor{c}{^d_{aj}}\) vanishes unless \(d\) is between 1 and \(\dim\lie{s}\), and so we can set \(d = k\), giving
+    \begin{equation}
+        g_{ia} = -\tensor{c}{^j_{ik}}\tensor{c}{^k_{aj}} = 0.
+    \end{equation}
+    Here we've used the first fact which tells us that \(\tensor{c}{^j_{ik}} = 0\) identically.
+    Symmetry means that \(g_{ai} = 0\) also, and so we see that the metric takes the form
+    \begin{equation}
+        \begin{pmatrix}
+            0 & 0\\
+            0 & g_{pq}
+        \end{pmatrix}
+    \end{equation}
+    where \(g_{pq}\) is a \((\dim\lie{l} - \dim\lie{s}) \times (\dim\lie{l} - \dim\lie{s})\) matrix and the zeros are all block matrices of zeros.
+    That is, the metric is zero apart from on the subspace \(\lie{p}\).
+    The metric has \(\dim\lie{s}\) zero eigenvalues.
+    
+    \subsection{Semisimple Case}
+    Consider a semisimple Lie algebra, \(\lie{g}\).
+    Then the Killing form has no zero eigenvalues, and so is invertible.
+    We define the inverse to be the tensor \(g^{ab}\) such that
+    \begin{equation}
+        g^{ab}g_{bc} = \tensor{\delta}{^a_c}.
+    \end{equation}
+    For a semisimple Lie algebra the killing form is a pseudo-Riemannian metric, this means we can choose a basis in which \(g_{ab}\) and \(g^{ab}\) are diagonal and have only 1 and \(-1\) on the diagonal.
+    
+    \section{Casimir Operators}
+    \begin{dfn}{Casimir Operator}{}
+        A \defineindex{Casimir operator} is anything\footnote{the technical definition being any element of the centre of the universal enveloping algebra, which is basically the associative algebra with the same representations as the Lie algebra, so in the case of matrix Lie algebras its simply the set of matrices with matrix multiplication as the associative product in the algebra, this is what allows us to work with the universal enveloping algebra informally. The formal definition of the universal enveloping algebra is to construct the tensor algebra, \(T(\lie{g}) \coloneqq \field \oplus \lie{g} \oplus (\lie{g} \otimes \lie{g}) \oplus (\lie{g} \otimes \lie{g} \otimes \lie{g}) \oplus \dotsb\), then define recursively the bracket on \(T^n(\lie{g}) \coloneqq \lie{g}^{\otimes n}\) by \(\commutator{x\otimes y}{z} \coloneqq x \otimes \commutator{y}{z} + \commutator{x}{y}\otimes z\) and extend this linearly, note that the Lie brackets on the right correspond to the Lie brackets on \(T^k(\lie{g})\) and \(T^{n - k}(\lie{g})\) for some \(k < n\). The universal enveloping algebra is then \(U(\lie{g}) = T(\lie{g})/{\sim}\) where \(\sim\) is the equivalence relation \(x \otimes y - y \otimes x = \commutator{x}{y}\)} which commutes with all elements of the Lie algebra.
+    \end{dfn}
+    
+    \begin{dfn}{Quadratic Casimir}{}
+        The \defineindex{quadratic Casimir} of a semisimple Lie algebra with Killing form \(g_{ab}\) is defined as
+        \begin{equation}
+            C^{(2)} \coloneqq g^{ab}T_aT_b.
+        \end{equation}
+        Note that this definition is independent of the representation we choose.
+    \end{dfn}
+    
+    For a nonsemisimple Lie algebra we can define a quadratic Casimir in a similar way but we have to choose a different bilinear form, since \(g^{ab}\) doesn't exist.
+    
+    Having claimed that \(C^{(2)}\) is a Casimir operator, and so commutes with all elements of the Lie algebra we should prove it.
+    It is sufficient to show that \(C^{(2)}\) commutes with all generators of the Lie algebra.
+    
+    \begin{lma}{}{}
+        Let \(\lie{g}\) be a semisimple Lie algebra with Killing form \(g_{ab}\).
+        Then the quadratic Casimir, \(C^{(2)} = g^{ab}T_aT_b\), commutes with all generators of \(\lie{g}\).
+        
+        \begin{proof}
+            We'll prove this two ways, first using the Lie group structure, then using the Lie algebra structure.
+            Let \(T_a\) be the generators of \(\lie{g}\).
+            Consider the universal covering group, \(G\), of \(\lie{g}\), that is we get \(G\) by exponentiating \(\lie{g}\).
+            Take some \(g \in G\).
+            Then consider \(gC^{(2)}g^{-1}\).
+            If \(C^{(2)}\) commutes with all the group elements then it must commute with the generators, since we can expand the group elements about the identity as a series of generators, so if \(gC^{(2)}g = C^{(2)}\) then \(g\) must have commuted with \(C^{(2)}\) and we will have proven the statement.
+            Inserting the definition of \(C^{(2)}\) we have
+            \begin{equation}
+                gC^{(2)}g^{-1} = g^{ab} gT_aT_bg^{-1}.
+            \end{equation}
+            Here we've pulled the inverse Killing form out since it is just a number.
+            We can insert an identity in the form \(g^{-1}g\) to get
+            \begin{equation}
+                gC^{(2)}g^{-1} = g^{ab}gT_ag^{-1}gT_bg^{-1}.
+            \end{equation}
+            Now we can recognise \(gT_ag = T_c \tensor{D}{^c_a}(g)\) as the adjoint representation acting on \(T_a\), and so
+            \begin{equation}
+                gC^{(2)}g^{-1} = g^{ab} T_c \tensor{D}{^c_a}(g) T_d\tensor{D}{^d_b}(g).
+            \end{equation}
+            Now using the fact that \(g^{ab}\) is an invariant tensor we have
+            \begin{equation}
+                g^{cd} \mapsto g^{ab} \tensor{D}{^c_a}(g)\tensor{D}{^d_b}(g) = g^{cd},
+            \end{equation}
+            and so
+            \begin{equation}
+                gC^{(2)}g^{-1} = g^{cd}T_cT_d = C^{(2)}.
+            \end{equation}
+            This completes the first proof.\\[1.5ex]
+            We have the identity
+            \begin{equation}
+                \commutator{AB}{C} = A\commutator{B}{C} + \commutator{A}{C}B.
+            \end{equation}
+            We then have
+            \begin{align}
+                \commutator{C^{(2)}}{T_c} &= \commutator{g^{ab}T_aT_b}{T_c}\\
+                &= g^{ab}\commutator{T_aT_b}{T_c}\\
+                &= g^{ab}T_a\commutator{T_b}{T_c} + g^{ab}\commutator{T_a}{T_c}T_b\\
+                &= g^{ab}T_ai\tensor{c}{^d_{bc}}T_d + g^{ab}i\tensor{c}{^d_{ac}}T_dT_b\\
+                &= i\tensor{c}{^d_{bc}}T^bT_d + i\tensor{c}{^d_{ac}}T_dT^a\\
+                &= i\tensor{c}{_{dbc}}T^bT^d + i\tensor{c}{_{dac}}T^dT^a \qquad b \to a\text{ in first term}\\
+                &= i\tensor{c}{_{dac}}T^aT^d + i\tensor{c}{_{dac}}T^dT^a\\
+                &= i\tensor{c}{_{dac}}\anticommutator{T^a}{T^d}\\
+                &= 0
+            \end{align}
+            where in the last step we notice that \(\tensor{c}{_{dac}}\) is antisymmetric in \(a\) and \(d\), and \(\anticommutator{T^a}{T^d}\) is symmetric in \(a\) and \(d\), so their product vanishes.
+            This completes the second proof.
+        \end{proof}
+    \end{lma}
+    
+    Consider the trace of two generators in some representation, \(R\):
+    \begin{equation}
+        \tr_{R}(T_aT_b) \eqqcolon \overbar{g}_{ab}.
+    \end{equation}
+    Obviously choosing \(R\) to be the adjoint representation recovers the definition of the Killing form.
+    This is an invariant tensor, meaning that
+    \begin{equation}
+        D^\trans \overbar{g} D = \overbar{g}
+    \end{equation}
+    for all \(D\) in the adjoint representation.
+    Now suppose that we are working in a semisimple Lie algebra.
+    Then the inverse of the Killing form exists.
+    Consider the product \(g^{ab}\overbar{g}_{bc}\), or in terms of matrices \(g^{-1}\overbar{g}\).
+    Since both \(g\) and \(\overbar{g}\) are invariant tensors we have \(g = D^\trans g D\) and \(\overbar{g} = D^\trans \overbar{g} D\) for representation \(D\) evaluated at some arbitrary group element.
+    Inverting the first of these we have \(g^{-1} = D^{-1}g^{-1}(D^\trans)^{-1}\).
+    Putting these together we have
+    \begin{equation}
+        g^{-1} \overbar{g} = D^{-1} g^{-1} (D^\trans)^{-1} D^{\trans} g D = D^{-1}g^{-1}\overbar{g}D.
+    \end{equation}
+    Multiplying on the left by \(D\) we get
+    \begin{equation}
+        D g^{-1} \overbar{g} D = g^{-1}\overbar{g},
+    \end{equation}
+    so \(g^{-1}\overbar{g}\) commutes with all \(D\) in the adjoint representation.
+    
+    \begin{lma}{Schur's Lemma}{}
+        Let \(G\) be a Lie group with finite dimensional irreducible representations \(D, D' \colon G \to \generalLinear(V)\).
+        Let \(T \colon V \to V'\) be a linear map satisfying \(T \circ D(g) = D'(g) \circ T\) for all \(g \in G\).
+        Then \(T = \lambda \ident\) for some \(\lambda \in \complex\).
+    \end{lma}
+    
+    Schur's lemma basically tells us that any matrix which commutes with all the matrices in an irreducible representation of a group is simply a multiple of the identity.
+    The adjoint representation of a semisimple Lie group is an irreducible representation, and so we must have that \(g^{-1}\overbar{g} = \lambda \ident\) for some \(\lambda \in \complex\).
+    This means that, up to a scale constant, \(\overbar{g}\) is the inverse to \(g^{-1}\), so up to a scale constant \(\overbar{g}\) is the Killing form, i.e., \(\overbar{g}_{ab} = \lambda g_{ab}\).
+    
+    This means that the trace of two generators is given by the Killing form times some, representation dependent, number, \(C(R)\):
+    \begin{equation}
+        \tr_R(T_aT_b) = C(R)g_{ab}.
+    \end{equation}
+    Now consider the quadratic Casimir \(C^{(2)} = g^{ab}T_aT_b\), which we can now write as
+    \begin{equation}
+        C^{(2)} = C_R^{(2)}\ident
+    \end{equation}
+    by Schur's lemma, where \(C_R^{(2)}\) is another representation dependent number.
+    
+    Now consider \(g^{ab}\tr_R(T_aT_b) = C(R)g^{ab}g_{ab}\).
+    The left hand side is 
+    \begin{equation}
+        g^{ab}\tensor{(T_a)}{^c_d}\tensor{(T_b)}{^d_c} = C_R^{(2)}\dim R.
+    \end{equation}
+    The right hand side is
+    \begin{equation}
+        g^{ab}g_{ab}C(R) = \tensor{\delta}{^a_a}C(R) = C(R) \dim G.
+    \end{equation}
+    This means we can work out the eigenvalue of the quadratic Casimir operator by evaluating
+    \begin{equation}
+        C_R^{(2)} = C(R)\frac{\dim G}{\dim R}
+    \end{equation}
+    for some representation \(R\).
+    
+    \begin{exm}{}{}
+        Consider \(\specialUnitary(2)\).
+        The adjoint representation is \(3 \times 3\) matrices \(\tensor{(T_a)}{^b_c} = \varepsilon_{bac}\).
+        Some basic identities give us \(\tr_{\symrm{A}}(T_aT_b) = 2\delta_{ab}\).
+        The Casimir operator in this case is \(\vv{J}^2\), and has eigenvalue \(j(j + 1)\), this should be familiar from quantum mechanics, see \course{Principles of Quantum Mechanics}, and \course{Symmetries of Quantum Mechanics} has the group theory details.
+        So we have the eigenvalue \(2\), meaning \(j = 1\).
+        
+        There is also a two dimensional representation given by \(T_a = \sigma_a/2\).
+        Then \(\tr_2(T_aT_b) = \tr(\sigma_a\sigma_b)/4 = \delta_{ab}/2\).
+        We then have \(C_R^{(2)} = (1/2)(3/2) = 3/4\), which is \(j(j + 1)\) with \(j = 1/2\).
+    \end{exm}
+    
+    \part{Spacetime Symmetries}
+    \chapter{Lorentz and Poincar\'e Groups and Algebras}
+    \section{Relativity Recap}
+    \begin{rmk}
+        We assume the reader is familiar with the basics of relativity.
+        Should this not be the case see notes from any and all of \course{Relativity Nuclear and Particle Physics} (basics), \course{Classical Electrodynamics}, \course{Quantum Theory}, or \course{Quantum Field Theory}.
+    \end{rmk}
+    
+    An event in spacetime is given by a four vector with components \(x^\mu = (x^0, \vv{x})\), where \(x^0 = ct\).
+    Four vectors are defined by their transformation rule:
+    \begin{equation}
+        x^\mu \mapsto x'^\mu = \tensor{\Lambda}{^\mu_\nu}x^\nu \iff x \mapsto x' = \Lambda x,
+    \end{equation}
+    where \(\Lambda\) is a Lorentz transformation, which we'll define shortly.
+    
+    There is a metric tensor, \(\minkowskiMetric_{\mu\nu}\), which is real, symmetric, and invertible (\(\det\minkowskiMetric \ne 1\)).
+    The inverse of this metric is \(\minkowskiMetric^{\mu\nu}\), and is such that \(\minkowskiMetric^{\mu\nu}\minkowskiMetric_{\nu\rho} = \tensor{\delta}{^\mu_\rho}\).
+    We can use this to raise and lower indices, \(\minkowskiMetric_{\mu\nu}x^\mu = x_\nu\), and \(\minkowskiMetric^{\mu\nu}x_\nu = x^\mu\).
+    We can define an inner product on four-vectors:
+    \begin{equation}
+        x \cdot y \coloneqq x^\mu y^\nu \minkowskiMetric_{\mu\nu} = x^\mu y_\mu = x^\trans \minkowskiMetric y.
+    \end{equation}
+    We can choose an orthonormal, with respect to this inner product, metric such that
+    \begin{equation}
+        \minkowskiMetric_{\mu\nu} = \minkowskiMetric^{\mu\nu} = \diag(1, -1, -1, -1).
+    \end{equation}
+    Then \(x_\mu = (x^0, -\vv{x})\).
+    
+    Formally the space of all position four-vectors forms a Lorentzian manifold, meaning the metric signature is \((1, D - 1)\) in \(D\) dimensions, here the first number is the number of positive eigenvalues of the metric and the second the number of negative eigenvalues.
+    This Lorentzian manifold is what we call \defineindex{Minkowski space}, \(\minkowskiSpace\)\index{R13@\(\minkowskiMetric\)|see{Minkowski space}}.
+    
+    \section{The Lorentz Group}
+    \begin{dfn}{Lorentz Transformation}{}
+        A \defineindex{Lorentz transformation}, \(\Lambda\), is a transformation of Minkowski space, \(\minkowskiSpace\), preserving the metric.
+        That is, \(\Lambda\) is a \(4 \times 4\) real matrix such that
+        \begin{equation}
+            \Lambda^\trans \minkowskiMetric \Lambda = \minkowskiMetric.
+        \end{equation}
+        
+        The \defineindex{Lorentz group}, \(\orthogonal(1, 3)\)\index{O(1,3)@\(\orthogonal(1, 3)\)|see{Lorentz group}}, is the group of all Lorentz transformations.
+    \end{dfn}
+    
+    A consequence of this definition is that Lorentz transformations preserve the inner product, if \(x \mapsto \Lambda x\) and \(y \mapsto \Lambda y\) then
+    \begin{equation}
+        x \cdot y \mapsto (\Lambda x)^\trans \minkowskiMetric (\Lambda y) = x^\trans (\Lambda^\trans \minkowskiMetric \Lambda) y = x^\trans \minkowskiMetric y = x \cdot y
+    \end{equation}
+    
+    We have the determinant identities
+    \begin{equation}
+        \det(AB) = \det(A)\det(B), \qqand \det A^\trans = \det A.
+    \end{equation}
+    Using these we have
+    \begin{equation}
+        \det \minkowskiMetric = \det(\Lambda^\trans \minkowskiMetric \Lambda) = \det(\Lambda^\trans)\det(\minkowskiMetric)\det(\Lambda) = \det(\Lambda)^2\det(\minkowskiMetric)
+    \end{equation}
+    and so
+    \begin{equation}
+        \det(\Lambda)^2 = 1 \implies \det(\Lambda) = \pm 1.
+    \end{equation}
+    We call Lorentz transformations with \(\det \Lambda = 1\) \define{proper Lorentz transformations}\index{proper Lorentz transformation}.
+    They are analogous to proper rotations.
+    
+    \begin{dfn}{Proper Lorentz Group}{}
+        The \defineindex{proper Lorentz group}, \(\specialOrthogonal(1, 3)\), is the subgroup of \(\orthogonal(1, 3)\) formed from all Lorentz transformations with unit determinant.
+    \end{dfn}
+    
+    Consider the defining property of Lorentz transformations, written out in terms of components:
+    \begin{equation}
+        \minkowskiMetric_{\mu\nu} \tensor{\Lambda}{^\mu_\rho} \tensor{\Lambda}{^\nu_\sigma} = \minkowskiMetric_{\rho\sigma}.
+    \end{equation}
+    Setting \(\rho = \sigma = 0\) gives
+    \begin{equation}
+        \minkowskiMetric_{\mu\nu} \tensor{\Lambda}{^\mu_0} \tensor{\Lambda}{^\nu_0} = 1.
+    \end{equation}
+    The term on the left is zero unless \(\mu = \nu\), and so we get
+    \begin{equation}
+        (\tensor{\Lambda}{^0_0}) - \sum_i (\tensor{\Lambda}{^i_0})^2 = 1.
+    \end{equation}
+    Hence, we have \((\tensor{\Lambda}{^0_0})^2 \ge 1\), since \(\Lambda\) is a real matrix, so \(\sum_i(\tensor{\Lambda}{^i_0})^2 \ge 0\).
+    Hence we either have \(\tensor{\Lambda}{^0_0} \ge 1\) or \(\tensor{\Lambda}{^0_0} \le -1\).
+    We call Lorentz transformations with \(\tensor{\Lambda}{^0_0} \ge 1\) \defineindex{orthochronous}, since they preserve the direction of time.
+    
+    \begin{dfn}{Proper Orthochronous Lorentz Group}{}
+        The \defineindex{proper orthochronous Lorentz group}, \(\specialOrthogonal^+(1, 3)\), is the subgroup of \(\specialOrthogonal(1, 3)\) formed from all Lorentz transformations, \(\Lambda\), with \(\tensor{\Lambda}{^0_0} \ge 1\).
+    \end{dfn}
+    
+    It is common refer to the proper orthochronous Lorentz group as simply \emph{the Lorentz group}, since it is the group of symmetries that we require our theories to be invariant under.
+    
+    The Lorentz group \(\orthogonal(1, 3)\), has four connected components:
+    \begin{itemize}
+        \item \(\det \Lambda = +1\) and \(\tensor{\Lambda}{^0_0} \ge +1\);
+        \item \(\det \Lambda = -1\) and \(\tensor{\Lambda}{^0_0} \ge +1\);
+        \item \(\det \Lambda = -1\) and \(\tensor{\Lambda}{^0_0} \le -1\);
+        \item \(\det \Lambda = +1\) and \(\tensor{\Lambda}{^0_0} \le -1\).
+    \end{itemize}
+    The first of these, which is \(\specialOrthogonal^+(1, 3)\), contains the identity.
+    The second contains the parity operator, \(\parity \coloneqq \diag(1, -1, -1, -1)\).
+    The third contains the time reversal operator, \(\timeReversal \coloneqq \diag(-1, 1, 1, 1)\).
+    The fourth contains the product \(\parity \timeReversal = \timeReversal \parity = \diag(-1, -1, -1, -1)\).
+    We can use these to move between the different components as follows:
+    \begin{equation}
+        \tikzexternaldisable
+        \begin{tikzcd}[sep=2.5cm, arrows={<->}]
+            ++ \arrow[r, "\displaystyle\timeReversal"] \arrow[d, "\displaystyle\parity"'] \arrow[dr, "\displaystyle\parity\timeReversal"'] & -- \arrow[d, "\displaystyle\parity"]\\
+            -+ \arrow[r, "\displaystyle\timeReversal"] & +-
+        \end{tikzcd}
+        \tikzexternalenable
+    \end{equation}
+    where \(\pm\pm\) corresponds to the sign of \(\det \Lambda\) and then the sign of \(\tensor{\Lambda}{^0_0}\), and since \(\parity\) and \(\timeReversal\) are self inverses we can move either way along the arrow using them.
+    
+    This is analogous to how \(\orthogonal(n)\) has two disconnected components, one with \(\det R = +1\) and one with \(\det R = -1\), and we can move between them using \(-\ident_n\).
+    As in this case elements of the disconnected parts of the Lorentz groups do not generally commute with each other.
+    
+    The proper orthochronous Lorentz group is formed from rotations and boosts.
+    A general rotation is of the form
+    \begin{equation}
+        \Lambda_R = 
+        \begin{pmatrix}
+            1 & 0\\
+            0 & R
+        \end{pmatrix}
+        =
+        \left(
+            \begin{array}{cccc}
+                1 & 0 & 0 & 0 \\ \cline{2-4}
+                0 & \multicolumn{3}{|c|}{} \\
+                0 & \multicolumn{3}{|c|}{R} \\
+                0 & \multicolumn{3}{|c|}{} \\ \cline{2-4}
+            \end{array}
+        \right).
+    \end{equation}
+    The property that \(\Lambda^\trans \Lambda = 1\) implies \(R^\trans R = 1\), and similarly \(\det \Lambda = 1\) implies \(\det R = 1\), so \(R \in \specialOrthogonal(3)\), which is how we interpret this as a rotation.
+    It simply leaves time, the first coordinate, unchanged.
+    There are three parameters needed to specify a rotation.
+    For example, we can specify a unit vector with two (the third component being fixed by the normalisation condition) and then the size of the rotation is the third, or we can use three Euler angles to specify a rotation.
+    If we go with the first specification then the parameters specifying two coordinates of a unit vector are taken from \([-1, 1]\), and the angle from \([0, 2\pi)\), identifying \(0\) and \(2\pi\).
+    Similarly in the third case the Euler angles are all taken from closed intervals, exactly which interval depending on you convention for defining Euler angles.
+    Either way we see that rotations form a compact subgroup of the Lorentz group, and this subgroup is (isomorphic to) \(\specialOrthogonal(3)\).
+    
+    A general boost is of the form
+    \begin{equation*}
+        \Lambda_{\vartheta, \vh{n}} = 
+        \begin{pmatrix}
+            \cosh(\vartheta) & \sinh(\vartheta) \vh{n}^\trans\\
+            \sinh(\vartheta) \vh{n}  & \ident_3 + \cosh(\vartheta) \vh{n} \vh{n}^\trans
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            c & n_1 s & n_2 s & n_3 s \\
+            s n_1 & 1 + c n_1^2 & cn_1n_2 & cn_1n_3 \\
+            s n_2 & n_2n_1 & 1 + n_2^2 & n_2n_3 \\
+            s n_3 & n_3n_1 & n_3n_2 & 1 + n_3^2
+        \end{pmatrix}
+    \end{equation*}
+    where \(c = \cosh \vartheta\) and \(s = \sinh \vartheta\).
+    Here \(\vh{n}\) specifies the direction of the boost, so \(\vh{n} = \vh{x}\) for the standard Lorentz boost, and \(\vartheta\) is a parameter called the \defineindex{rapidity}, defined as \(\artanh(v/c)\).
+    While the components defining \(\vh{n}\) are bounded between \([-1, 1]\) the rapidity is unbounded, since \(\artanh\) maps the interval \([0, 1]\) to \([0, \infty]\).
+    This means that the boosts form a noncompact subgroup of the Lorentz group.
+    
+    A general Lorentz transformation can then be written as a combination of a rotation and a boost, \(\Lambda_R\Lambda_B\).
+    There are then 6 parameters needed to specify this Lorentz transformation, the simplest being 3 specifying \(\Lambda_R\) and 3 specifying \(\Lambda_B\), as discussed above.
+    The Lorentz group is noncompact, since it has a noncompact subgroup (the boosts).
+    
+    \section{Lorentz Algebra}
+    The Lorentz group is a Lie group, and the component connected to the identity is the proper orthochronous Lorentz group, \(\specialOrthogonal^+(1, 3)\).
+    The Lie algebra of the full Lorentz group and this subgroup coincide, as does the Lie algebra of the in-between-subgroup \(\specialOrthogonal(1, 3)\), which is analogous to \(\orthogonal(n)\) and \(\specialOrthogonal(n)\) having the same Lie algebras.
+    
+    We can derive the Lorentz algebra, \(\specialOrthogonalLie^+(1, 3)\), in the same way as we did for the other matrix groups.
+    We consider some Lorentz transformation, \(\Lambda \in \specialOrthogonal^+(1, 3)\), close to the identity and expand.
+    It's easier to do this working with the components, rather than the full matrices, so in our expansion the identity matrix becomes \(\tensor{\delta}{^\mu_\nu}\) and we have
+    \begin{equation}
+        \tensor{\Lambda}{^\mu_\nu} = \tensor{\delta}{^\mu_\nu} + \tensor{\omega}{^\mu_\nu} + \order(\omega^2)
+    \end{equation}
+    where \(\tensor{\omega}{^\mu_\nu}\) are the components of some matrix and \(\abs{\tensor{\omega}{^\mu_\nu}} \ll 1\).
+    
+    We now use the defining property of a Lorentz transformation,
+    \begin{equation}
+        \minkowskiMetric_{\mu\nu} = \minkowskiMetric_{\sigma\rho} \tensor{\Lambda}{^\sigma_\mu} \tensor{\Lambda}{^\rho_\nu},
+    \end{equation}
+    and expanding this we get
+    \begin{align}
+        \minkowskiMetric_{\mu\nu} &= \minkowskiMetric_{\sigma\rho} \tensor{\Lambda}{^\sigma_\mu} \tensor{\Lambda}{^\rho_\nu}\\
+        &= \minkowskiMetric_{\sigma\rho}(\tensor{\delta}{^\sigma_\mu} + \tensor{\omega}{^\sigma_\mu} + \order(\omega^2)) (\tensor{\delta}{^\rho_\nu} + \tensor{\omega}{^\rho_\nu} + \order(\omega^2))\\
+        &= \minkowskiMetric_{\sigma\rho}(\tensor{\delta}{^\sigma_\mu}\tensor{\delta}{^\rho_\nu} + \tensor{\delta}{^\sigma_\mu} \tensor{\omega}{^\rho_\nu} + \tensor{\omega}{^\sigma_\mu}\tensor{\delta}{^\rho_\nu} + \order(\omega^2))\\
+        &= \minkowskiMetric_{\mu\nu} + \minkowskiMetric_{\mu\rho}\tensor{\omega}{^\rho_\nu} + \minkowskiMetric_{\sigma\nu}\tensor{\omega}{^\sigma_\mu} + \order(\omega^2)\\
+        &= \minkowskiMetric_{\mu\nu} + \omega_{\mu\nu} + \omega_{\nu\mu} +\order(\omega^2).
+    \end{align}
+    So, we see that \(\omega\) must be antisymmetric, \(\omega_{\mu\nu} = -\omega_{\nu\mu}\), so that the two linear terms in \(\omega\) cancel.
     
     \backmatter
 %    \renewcommand{\glossaryname}{Acronyms}
