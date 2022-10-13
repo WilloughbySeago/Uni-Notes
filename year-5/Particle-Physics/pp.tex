@@ -156,6 +156,7 @@ crefname={Open Question}{Open Questions}]%
 \newcommand{\dalembertian}{\partial^2}
 \DeclarePairedDelimiterX{\anticommutator}[2]{\{}{\}}{#1 , #2}
 \newcommand{\hermit}{\dagger}
+\newcommand{\minkowskiSpace}{\reals^{1,3}}
 
 \includeonly{parts/appParticleData, parts/appFermiGoldenRule}
 
@@ -1046,7 +1047,7 @@ crefname={Open Question}{Open Questions}]%
     \begin{equation}
         (i\gamma^\mu \partial_\mu - m)\psi = 0.
     \end{equation}
-    Defining \(\slashed{a} \coloneqq \gamma^\mu a_\mu\) we can write this even more compactly as
+    Defining \(\slashed{a} \coloneqq \gamma^\mu a_\mu\)\index{\(\slashed{a} \coloneqq \gamma^\mu a_\mu\)} we can write this even more compactly as
     \begin{equation}
         (i\slashed{\partial} - m)\psi = 0.
     \end{equation}
@@ -1080,7 +1081,7 @@ crefname={Open Question}{Open Questions}]%
     \begin{equation}
         (\gamma^0)^2 = 1, \qquad (\gamma^i)^2 = -1, \qqand \gamma^\mu \gamma^\nu = -\gamma^\nu \gamma^\mu.
     \end{equation}
-    More compactly we can write these requirements as
+    More compactly we can write these requirements as\index{\(\gamma^\mu\)}
     \begin{equation}
         \anticommutator{\gamma^\mu}{\gamma^\nu} = 2\eta^{\mu\nu}
     \end{equation}
@@ -1415,6 +1416,243 @@ crefname={Open Question}{Open Questions}]%
     
     One nice thing about these eigenstates is that for low momentum particles they become significantly simpler if we neglect the \(\abs{\vv{p}}/(E + m)\) terms.
     Many of our calculations will use these helicity eigenstates as a basis.
+    
+    \chapter{Getting Probabilities}
+    \section{Interpreting the Spinor Wave Function}
+    In nonrelativistic quantum mechanics we have a wave function, \(\psi\), which is a complex number valued function encoding all of the information we have about a quantum system.
+    This wave function is the solution to the Schrödinger equation.
+    We have the further restriction that \(\psi\) must be square integrable, to allow us to normalise probabilities.
+    To extract this information we consider \(\rho(\vv{x}, t) \coloneqq \psi^*(t, \vv{x}) \psi(t, \vv{x}) = \abs{\psi(t, \vv{x})}^2\), which we interpret as a probability density.
+    We can also define a three-vector probability current, \(\vv{j}(t, \vv{x})\)
+    To do this we consider the rate of change of the total probability in some region, \(V\), of spacetime:
+    \begin{equation}
+        \diffp{}{t}\int_V \rho \dd{V}.
+    \end{equation}
+    The rate of change of the total probability is equal to the flux out through the boundary of \(V\), denoted \(\partial V\).
+    This is given by 
+    \begin{equation}
+        \diffp{}{t} \int_V \rho \dd{V} = -\int_{\partial V} \vv{j} \cdot \dl{\vv{S}} = -\int_V \div\vv{j} \dd{V}
+    \end{equation}
+    where the last step is the divergence theorem.
+    We then have the continuity equation
+    \begin{equation}
+        \diffp{\rho}{t} = -\div\vv{j} \implies \diffp{\rho}{t} + \div\vv{j} = 0.
+    \end{equation}
+    It is also possible to express \(\vv{j}\) in terms of the wave function:
+    \begin{equation}
+        \vv{j} = -\frac{i}{2m} \left( \psi^* \grad \psi - \psi \grad \psi^* \right).
+    \end{equation}
+    We can write this relativistically by defining \(j^\mu = (\rho, \vv{j})\) and then the continuity equation is
+    \begin{equation}
+        \partial_\mu j^\mu = 0.
+    \end{equation}
+    
+    Things don't change that much when we consider spinors.
+    We still have a wave function, \(\psi\), but now it's spinor valued\footnote{Formally if \(\rho \colon \operatorname{Spin}(p, q) \to \generalLinear(V)\) is a representation of the spin group, which is the double cover of \(\specialOrthogonal^+(p, q, \reals)\), which is the (proper orthochronous) Lorentz group when \(p = 1\) and \(q = 3\), then spinors are elements of \(V\).}.
+    
+    So, to complete our probability finding step we just need to find a way to \enquote{square} a spinor to get a probability density and a probability current.
+    Appealing to the normal wave function case the obvious generalisation from the one (complex) dimensional complex-number-valued wave function to the four (in the Dirac representation) dimensional spinor-valued wave function is to replace \(\psi^*\psi\) with \(\psi^\hermit \psi\).
+    If we have a four-component spinor
+    \begin{equation}
+        \psi = 
+        \begin{pmatrix}
+            \varphi^1\\ \varphi^2\\ \varphi^3\\ \varphi^4
+        \end{pmatrix}
+        \e^{-ip\cdot x},
+    \end{equation}
+    then we can define \(\psi^\hermit\) to be
+    \begin{equation}
+        \psi^\hermit \coloneqq 
+        \begin{pmatrix}
+            \varphi^{1*} & \varphi^{2*} & \varphi^{3*} & \varphi^{4*}
+        \end{pmatrix}
+        \e^{ip\cdot x}.
+    \end{equation}
+    
+    Since we want to work relativistically we look directly for \(j^\mu\), rather than finding \(\rho\) and \(\vv{j}\) separately.
+    To do so we need to combine our spinor with something with a Lorentz index, in order to get a four vector.
+    The obvious choice when it comes to spinors is a gamma matrix, \(\gamma^\mu\).
+    After some consideration we see that if we consider \(\psi^\hermit \gamma^\mu \psi\) then, for a fixed value of \(\mu\), this just gives a number, so allowing \(\mu\) to take values \(\mu = 0, 1, 2, 3\) we get a four-vector.
+    
+    However, there is a problem.
+    This quantity is not Lorentz invariant\footnote{see \course{Quantum Field Theory} for details}.
+    It turns out that a small modification fixes this, we should instead consider \(j^\mu \coloneqq \psi^\hermit \gamma^0\gamma^\mu \psi\).
+    This is a four-vector with components
+    \begin{equation}
+        j^\mu = \psi^\hermit \gamma^0 \gamma^\mu \psi = (\psi^\hermit \psi, \psi^\hermit \gamma^0\gamma^1\psi, \psi^\hermit \gamma^0\gamma^2\psi, \psi^\hermit \gamma^0\gamma^3\psi),
+    \end{equation}
+    where we've used \((\gamma^0)^2 = 1\).
+    Quantities of the form \(a^\hermit \gamma^0\) are common enough that we define \(\overbar{a} \coloneqq a^\hermit \gamma^0\)\index{\(\overbar{\psi} \coloneqq a^\hermit\gamma^0\)}.
+    Hence,
+    \begin{equation}
+        j^\mu = \overbar{\psi} \gamma^\mu \psi = (\overbar{\psi} \gamma^0 \psi, \overbar{\psi} \gamma^1 \psi, \overbar{\psi} \gamma^2 \psi, \overbar{\psi} \gamma^3 \psi),
+    \end{equation}
+    which looks more symmetric in time and space.
+    We call \(\overbar{\psi}\) the \defineindex{Dirac adjoint} of \(\psi\) (as opposed to the Hermitian adjoint, \(\psi^\hermit\)).
+    It is then possible to show that \(\partial_\mu j^\mu = 0\) as expected.
+    
+    \section{Calculating Probabilities}
+    Our goal now is to use Fermi's golden rule,
+    \begin{equation}
+        \Gamma_{fi} = 2\pi \abs{T_{fi}}^2 \rho(E_i),
+    \end{equation}
+    to compute transition rates.
+    We'll do so using the Lorentz invariant form
+    \begin{equation}
+        \Gamma_{fi} = \frac{\abs{\vv{p}^*}}{32\pi^2 m_i^2} \int \abs{\amplitude_{fi}}^2 \dd{\Omega}
+    \end{equation}
+    for a decay rate for a decay \(a \to 1 + 2\), and
+    \begin{equation}
+        \sigma = \frac{1}{64\pi^2s} \frac{\abs{\vv{p_f}^*}}{\abs{\vv{p_i}^*}} \int \abs{\amplitude_{fi}}^2 \dd{\Omega}
+    \end{equation}
+    for the cross section for the scattering \(a + b \to 1 + 2\).
+    
+    For now we'll focus on the example \(\APe\Pe \to \APmu\Pmu\) with a photon as the intermediate state.
+    We'll consider the \(t\)-channel process
+    \begin{equation}
+        \tikzsetnextfilename{fd-electron-positron-scattering}
+        \feynmandiagram[vertical=v1 to v2, small, baseline=(current bounding box)]{
+            i1 [particle=\Pe] -- [fermion] v1 -- [fermion] o1 [particle=\Pe],
+            i2 [particle=\APe] -- [anti fermion] v2 -- [anti fermion] o2 [particle=\APe],
+            v1 -- [photon, edge label=\Pphoton] v2
+        };
+    \end{equation}
+    
+    \subsection{Diversion on Photons}
+    Before we get to the calculation we should consider what's happening in the interaction.
+    We start with two fermions, these are described by the Dirac equation.
+    We end with two fermions, also described by the Dirac equation.
+    In between we'll have a photon, which is a spin 1 boson.
+    Noninteracting photons are described by Maxwell's equation\footnote{for relativistic use of Maxwell's equations see \course{Classical Electrodynamics}, for use in relativistic quantum theory see \course{Quantum Field Theory}}, \(\dalembertian A^\nu - \partial^\nu\partial_\mu A^\mu = 0\).
+    This has plane wave solutions,
+    \begin{equation}
+        A_\mu = \varepsilon_\mu^{(\lambda)} \e^{-ip\cdot x}.
+    \end{equation}
+    Here \(\varepsilon_\mu^{(\lambda)}\) is the polarisation vector, with \(\lambda\) labelling the polarisation state.
+    This is just a normal four vector, since \(A_\mu\) is just a four-vector.
+    Since polarisation is a purely spatial phenomenon the time component of \(\varepsilon^{(\lambda)}\) is zero (at least we can always choose for it to be such).
+    For massless particles, like the photon, it's not possible for them to be polarised in the direction of travel, since this would, intuitively, require the field to oscillate in the direction of travel, so when oscillating forward it would propagate a signal faster than the speed of light.
+    There are therefore two polarisation states,
+    \begin{equation}
+        \varepsilon^{(1)} = 
+        \begin{pmatrix}
+            0\\ 1\\ 0\\ 0
+        \end{pmatrix}
+        , \qqand \varepsilon^{(2)} = 
+        \begin{pmatrix}
+            0\\ 0\\ 1\\ 0
+        \end{pmatrix}
+        .
+    \end{equation}
+    A general photon state will be a superposition of polarisations.
+    
+    We won't concern ourselves with the details of the photon too much here, since its the initial and final states that are really important.
+    
+    \subsection{Returning to The Calculation}
+    To second order in perturbation theory the transition matrix element, \(T_{fi}\), is given by
+    \begin{equation}
+        T_{fi} = \bra{f} V \ket{i} + \sum_{j \ne i} \frac{\bra{f} V \ket{j} \bra{j} V \ket{i}}{E_i - E_j}.
+    \end{equation}
+    The first term represents no interaction occurring, but we're considering the \(t\)-channel process, where there is an interaction, so its the second term here that we're interested in.
+    
+    Now consider the explicitly time-ordered interaction \(a + b \to c + d\) where \(a\) emits some intermediate particle, \(x\), and turns into \(c\), then \(b\) absorbs it and turns into \(d\).
+    We can draw this as
+    \begin{equation}
+        \tikzsetnextfilename{fd-electron-positron-scattering-time-ordered}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \begin{feynman}
+                \vertex (i1) at (0, 1) {\(a\)};
+                \vertex (i2) at (0, -1) {\(b\)};
+                \vertex (v1) at (1, 0.5);
+                \vertex (v2) at (1.5, -0.5);
+                \vertex (o1) at (3, 1) {\(c\)};
+                \vertex (o2) at (3, -1) {\(d\)};
+                \diagram* [small] {
+                    (i1) -- [fermion] (v1) -- [fermion] (o1),
+                    (i2) -- [anti fermion] (v2) -- [anti fermion] (o2),
+                    (v1) -- [photon, edge label=\(x\)] (v2)
+                };
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    
+    We then have three states, the initial state, \(\ket{a, b}\), the intermediate state, \(\ket{c, x, b}\), and the final state \(\ket{c, d}\).
+    The energy of the initial state is \(E_a + E_b\), and the energy of the intermediate state is \(E_c + E_x + E_b\).
+    Putting this together we get the contribution to the second term from this time ordering:
+    \begin{equation}
+        T_{fi}^{ab} = \frac{\bra{c, d} V \ket{c, x, b} \bra{c, x, b} V \ket{a, b}}{(E_a + E_b) - (E_c + E_x + E_b)} = \frac{\bra{c, d} V \ket{c, x, b} \bra{c, x, b} V \ket{a, b}}{E_a - E_c - E_x}.
+    \end{equation}
+    Here we write \(T_{fi}^{ab}\) for the process \(a + b \to c + d\) specifically time ordered so that \(a\) emits a particle which is then absorbed by \(x\).
+    
+    Recall that \(T_{fi}\) is given by the amplitude, \(\amplitude_{fi}\), divided by the square root of the product of twice the energies of all particles in the initial and final state.
+    We can use this to work out the amplitudes \(\bra{c, d} V \ket{c, x, b}\) and \(\bra{c, x, b} V \ket{a, b}\), which are just transition matrix elements for the processes \(x + b \to d\) and \(a \to c + x\) respectively.
+    We then have
+    \begin{equation}
+        \bra{c, d} V \ket{c, x, b} = \frac{\amplitude_{fi}^{a \to c + x}}{\sqrt{2E_a2E_c2E_x}} = \frac{g_a}{\sqrt{2E_a2E_c2E_x}},
+    \end{equation}
+    where \(g_a\) measures the strength of the interaction \(a \to c + x\).
+    Similarly,
+    \begin{equation}
+        \bra{c, x, b} V \ket{a, b} = \frac{\amplitude_{fi}^{x + b \to d}}{\sqrt{2E_d2E_x2E_b}} = \frac{g_b}{\sqrt{2E_d2E_x2E_b}},
+    \end{equation}
+    where \(g_b\) measures the strength of the interaction \(x + b \to d\).
+    
+    We can then compute the total amplitude for this particular time ordering of this process.
+    First we compute the total transition matrix element:
+    \begin{equation}
+        T_{fi}^{ab} = \frac{g_ag_b}{2E_x\sqrt{2E_a2E_b2E_c2E_d}} \frac{1}{\sqrt{E_a - E_x - E_c}},
+    \end{equation}
+    and then the amplitude is
+    \begin{equation}
+        \amplitude_{fi}^{ab} = g_ag_b \sqrt{2E_a2E_b2E_c2E_d} T_{fi}^{ab} = \frac{g_ag_b}{2E_x(E_a - E_c - E_x)}.
+    \end{equation}
+    Note that \(\amplitude_{fi}^{ab}\) is \emph{not} Lorentz invariant, since we are explicitly defining a time ordering for the processes occurring, which a Lorentz transformation may change.
+    
+    We can similarly consider the process where \(b\) emits the antiparticle \(\overbar{x}\), which is then absorbed by \(a\):
+    \begin{equation}
+        \tikzsetnextfilename{fd-electron-positron-scattering-alternate-order}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \begin{feynman}
+                \vertex (i1) at (0, 1) {\(a\)};
+                \vertex (i2) at (0, -1) {\(b\)};
+                \vertex (v1) at (1.5, 0.5);
+                \vertex (v2) at (1, -0.5);
+                \vertex (o1) at (3, 1) {\(c\)};
+                \vertex (o2) at (3, -1) {\(d\)};
+                \diagram* [small] {
+                    (i1) -- [fermion] (v1) -- [fermion] (o1),
+                    (i2) -- [anti fermion] (v2) -- [anti fermion] (o2),
+                    (v1) -- [photon, edge label=\(\overbar{x}\)] (v2)
+                };
+            \end{feynman}
+        \end{tikzpicture}
+    \end{equation}
+    An identical calculation gives
+    \begin{equation}
+        \amplitude_{fi}^{ba} = \frac{g_ag_b}{2E_x(E_b - E_d - E_x)}.
+    \end{equation}
+    
+    The total amplitude for this \(t\)-channel process is
+    \begin{align}
+        \amplitude_{fi}^t &= \amplitude_{fi}^{ab} + \amplitude_{fi}^{ba}\\
+        &= \frac{g_ag_b}{2E_x}\left( \frac{1}{E_a - E_c - E_x} + \frac{1}{E_b - E_d - E_x} \right).
+    \end{align}
+    Conservation of energy tells us that \(E_a + E_b = E_c + E_d\), and so we can write this as
+    \begin{align}
+        \amplitude_{fi}^t &= \frac{g_ag_b}{2E_x}\left( \frac{1}{E_a - E_c - E_x} - \frac{1}{E_a - E_c + E_x} \right)\\
+        &= \frac{g_ag_b}{2E_x} \frac{2E_x}{(E_a - E_c)^2 - E_x^2}\\
+        &= \frac{g_ag_b}{(E_a - E_c)^2 - E_x^2}.
+    \end{align}
+    The relativistic energy-momentum relation tells us that \(E_x^2 = \vv{p_x}^2 + m_x^2\) and if we consider the first time ordering then we have \(\vv{p_x} = \vv{p_a} - \vv{p_c}\), so
+    \begin{align}
+        \amplitude_{fi}^t &= \frac{g_ag_b}{(E_a - E_c)^2 - (\vv{p_a} - \vv{p_c})^2 - m_x^2}\\
+        &= \frac{g_ag_b}{(p_a - p_b)^2 - m_x}\\
+        &= \frac{g_ag_b}{q^2 - m_x^2}\\
+        &= \frac{g_ag_b}{t - m_x^2}.
+    \end{align}
+    Here \(q = p_a - p_c\) is the four-momentum of the exchange particle and \(t\) is the Mandelstam invariant.
+    This is a fairly common form for the amplitude to take.
+    
     
     % Appdendix
     \appendixpage
