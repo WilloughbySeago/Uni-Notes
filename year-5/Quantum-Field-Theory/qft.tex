@@ -10,6 +10,9 @@
 \usepackage{simpler-wick}
 \usepackage{siunitx}
 \usepackage{slashed}
+\declareslashed{}{\not}{.1}{.5}{A}
+\declareslashed{}{\not}{.05}{.5}{p}
+\declareslashed{}{\not}{.1}{.5}{\partial}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -102,13 +105,14 @@ noabbrev
 \DeclarePairedDelimiterX{\innerproduct}[2]{\langle}{\rangle}{#1 , #2}
 \newcommand{\DL}[1]{\symcal{D}#1}
 \newcommand{\DD}[1]{\,\symcal{D}#1}
+\newcommand{\diracadjoint}[1]{\overbar{#1}}
 
 \includeonly{parts/prelim, parts/hamiltonian-calculation}
 
 \begin{document}
     \frontmatter
     \titlepage
-    \innertitlepage{}
+    \innertitlepage{tikz-external/energy-momentum-relation}
     \tableofcontents
     \listoffigures
     \mainmatter
@@ -299,7 +303,7 @@ noabbrev
             \draw[thick, ->] (0, 0) -- (0, 3) node [left] {\(E\)};
             \draw[very thick, highlight, domain=-3:3, samples=500] plot (\x, \x*\x/3);
         \end{tikzpicture}
-        \caption{The nonrelativistic energy-momentum relation assigns a single energy to each three-momentum. Note that this is really just a slice through a four-dimensional plot, but all that really matters is the magnitude of the three-momentum.}
+        \caption[Nonrelativistic energy-momentum relation.]{The nonrelativistic energy-momentum relation assigns a single energy to each three-momentum. Note that this is really just a slice through a four-dimensional plot, but all that really matters is the magnitude of the three-momentum.}
         \label{fig:energy-momentum relation nonrelativistic}
     \end{figure}
     
@@ -347,7 +351,7 @@ noabbrev
             \draw[dashed, thick, black!50] (-3, 3) -- (3, -3);
             \node[above left] at (0, 1) {\(m\)};
         \end{tikzpicture}
-        \caption{The relativistic energy momentum assigns two energies to a each three-momentum. The curve is a hyperbola. Notice that at zero three-momentum there we don't have zero energy, instead we have energy \(\pm m\), since we are counting the mass towards the energy in the relativistic formulation. The hyperbola here are the \enquote{shell} referred to in \enquote{on-shell}.}
+        \caption[Relativistic energy-momentum relation]{The relativistic energy momentum assigns two energies to a each three-momentum. The curve is a hyperbola. Notice that at zero three-momentum there we don't have zero energy, instead we have energy \(\pm m\), since we are counting the mass towards the energy in the relativistic formulation. The hyperbola here are the \enquote{shell} referred to in \enquote{on-shell}.}
         \label{fig:energy-momentum relation relativistic}
     \end{figure}
     
@@ -4849,7 +4853,7 @@ noabbrev
         S(\Lambda)\gamma^\mu S^{-1}(\Lambda)\tensor{\Lambda}{^\nu_\mu} = \gamma^\nu.
     \end{equation}
     Multiplying on the left by \(S^{-1}(\Lambda)\) and the right by \(S(\Lambda)\) we get
-    \begin{equation}
+    \begin{equation}\label{eqn:spinor and Lorentz transformation of gamma matrices}
         \gamma^\mu \tensor{\Lambda}{^\nu_\mu} = S^{-1}(\Lambda)\gamma^\nu S(\Lambda).
     \end{equation}
     
@@ -5011,9 +5015,586 @@ noabbrev
     We can interpret this as the Dirac equation describing fermions.
     The factors of \(1/2\) in the exponentials defining \(S_R\) and \(S_B\) tell us that in particular these fermions are spin \(1/2\).
     One way to convince us that these are fermions is to consider two identical particles described by the Dirac equation.
-    If we rotate about the midpoint between them by \(\pi\) then the particles swap places.
+    If we rotate about the midpoint between them by \(\pi\) then the particles swap places, as shown in \cref{fig:rotating fermions into each other}.
     However, two rotations by \(\pi\) are equivalent to one rotation by \(2\pi\), and so we get a minus sign.
     This is exactly what we would expect for fermions following Fermi--Dirac statistics, swapping identical fermions gives a negative sign in the wave function.
+    
+    \begin{figure}
+        \tikzsetnextfilename{rotating-fermions-into-each-other}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \fill[highlight] (-1, 0) circle [radius = 0.1cm];
+            \fill[highlight] (1, 0) circle [radius = 0.1cm];
+            \draw[->, thick] (10:1) arc(10:170:1) node [midway, above, text=black] {\(\pi\)};
+            \draw[->, thick] (190:1) arc(190:350:1) node [midway, below, text=black] {\(\pi\)};
+        \end{tikzpicture}
+        \caption{Rotating two particles into each other.}
+        \label{fig:rotating fermions into each other}
+    \end{figure}
+    
+    \chapter{Dirac Lagrangian}
+    Our goal in this section will be to derive a Lagrangian which produces the Dirac equation as its equation of motion.
+    To do so we first need to look at the sort of quantities that can appear in the Lagrangian.
+    Presumably it includes a spinor, and since the Lagrangian must be real, and spinors are complex, we need to look for a way to take products with spinors in a way that results in a real value, sort of like how we consider products of \(\varphi^\hermit\) and \(\varphi\) in a complex scalar Lagrangian.
+    However, since spinors transform in a somewhat more complicated manner than scalars we need to carefully consider which combinations of spinors give us Lorentz scalars.
+    
+    \section{Dirac Adjoint}
+    We start by defining the \defineindex{Dirac adjoint} of a spinor, \(\psi\), to be
+    \begin{equation}
+        \diracadjoint{\psi} \coloneqq \psi^\hermit \gamma^0.
+    \end{equation}
+
+    Recall that under a Lorentz transformation, \(\Lambda\), a spinor, \(\psi\), transforms as
+    \begin{equation}
+        \psi \mapsto \psi' = S(\Lambda)\psi.
+    \end{equation}
+    The Hermitian conjugate of \(\psi\) then transforms as
+    \begin{equation}
+        \psi^\hermit \mapsto \psi'^\hermit = \psi^\hermit S(\Lambda)^\hermit.
+    \end{equation}
+    
+    We want the Lagrangian to be real.
+    For a complex scalar field this was achieved by building it from products of \(\varphi^\hermit\) and \(\varphi\).
+    Consider then \((\gamma^\mu)^\hermit\).
+    Every representation of the gamma matrices is equivalent to a unitary representation.
+    This follows from Maschke's theorem\footnote{see \course{Symmetries of Quantum Mechanics} or \course{Symmetries of Particles and Fields}} since the gamma matrices generate a finite group, the elements of which are the identity, products of gamma matrices, and their negatives, that this group is finite follows since any product of gamma matrices can be reduced to a product containing each gamma matrix at most once using the anticommutation relations.
+    Thus we have \((\gamma^\mu)^\hermit = (\gamma^\mu)^{-1}\).
+    The commutation relations tell us that \((\gamma^0)^2 = 1\), so \((\gamma^0)^{-1} = \gamma^0\), and \((\gamma^i)^2 = -1\), so \((\gamma^i)^{-1} = -\gamma^i\).
+    Now using \(-\gamma^i = -\gamma^i(\gamma^0)^2 = \gamma^0\gamma^i\gamma^0\), as well as \((\gamma^0)^3 = \gamma^0\), we have the identity
+    \begin{equation}
+        (\gamma^\mu)^\hermit = \gamma^0\gamma^\mu\gamma^0.
+    \end{equation}
+    
+    Now consider \(S(\Lambda)^\hermit\).
+    If we write \(S(\Lambda)\) as
+    \begin{equation}
+        S(\Lambda) = \exp\left[ -\frac{i}{4} \omega_{\mu\nu} \sigma^{\mu\nu} \right]
+    \end{equation}
+    then, using the fact that the parameters, \(\omega_{\mu\nu}\), are real we have
+    \begin{equation}
+        S(\Lambda)^\hermit = \exp\left[ \frac{i}{4}\omega_{\mu\nu} (\sigma^{\mu\nu})^{\hermit} \right].
+    \end{equation}
+    Now, we need to compute \((\sigma^{\mu\nu})^\hermit\).
+    Start from the definition, \(\sigma^{\mu\nu} = i\commutator{\gamma^\mu}{\gamma^\nu}/2\).
+    Taking the Hermitian conjugate turns \(i\) into \(-i\), and reverses the arguments of the commutator and sends them to their Hermitian conjugates, since taking the transpose reverses the order of a product:
+    \begin{equation}
+        (\sigma^{\mu\nu})^{\hermit} = -\frac{i}{2}\commutator{(\gamma^\nu)^\hermit}{(\gamma^\mu)^\hermit} = \frac{i}{2}\commutator{(\gamma^\mu)^{\hermit}}{(\gamma^\nu)^{\hermit}} = \frac{i}{2}\commutator{\gamma^0\gamma^\mu\gamma^0}{\gamma^0\gamma^\nu\gamma^0}
+    \end{equation}
+    where we've used the antisymmetry of the commutator to exchange the order of the arguments.
+    Expanding the commutator whenever we have two neighbouring factors of \(\gamma^0\) they square to the identity and so we're left only with the outer factors of \(\gamma^0\), giving
+    \begin{equation}
+        (\sigma^{\mu\nu})^\hermit = \frac{i}{2}\gamma^0 \commutator{\gamma^\mu}{\gamma^\nu} \gamma^0 = \gamma^- \sigma^{\mu\nu} \gamma^0.
+    \end{equation}
+    
+    Hence, we have
+    \begin{equation}
+        S(\Lambda)^{\hermit} = \exp\left[ \frac{i}{4}\omega_{\mu\nu}(\sigma^{\mu\nu})^\hermit \right] = \exp\left[ \frac{i}{4}\omega_{\mu\nu} \gamma^0 \sigma^{\mu\nu} \gamma^0 \right].
+    \end{equation}
+    Now considering \(\exp[\gamma^0 X \gamma^0]\) we have
+    \begin{multline}
+        \exp\left[ \gamma^0 X \gamma^0 \right] = \sum_{n = 0}^{\infty} \frac{1}{n!} (\gamma^0X\gamma^0)^n = \sum_{n = 0}^{\infty} \frac{1}{n!} \underbrace{\gamma^0X\gamma^0\gamma^0X\gamma^0 \dotsm \gamma^0X\gamma^0}_{n \text{ factors of } X}\\
+        = \sum_{n = 0}^{\infty} \frac{1}{n!} \gamma^0X^n\gamma^0 = \gamma^0\exp[X]\gamma^0,
+    \end{multline}
+    since the paired factors of \(\gamma^0\) square to the identity.
+    Hence,
+    \begin{equation}
+        S(\Lambda)^\hermit = \exp\left[ \frac{i}{4}\omega_{\mu\nu}\gamma^0\sigma^{\mu\nu}\gamma^0 \right] = \gamma^0\exp[ \frac{i}{4}\omega_{\mu\nu}\sigma^{\mu\nu} ] \gamma^0 = \gamma^0S^{-1}(\Lambda)\gamma^0.
+    \end{equation}
+    Hence the Hermitian conjugate transforms as
+    \begin{equation}
+        \psi^\hermit \mapsto \psi'^\hermit = \psi^\hermit S(\Lambda)^\hermit = \psi^\hermit \gamma^0 S^{-1}(\Lambda) \gamma^0
+    \end{equation}
+    and so the Dirac adjoint transforms as
+    \begin{equation}
+        \diracadjoint{\psi} = \psi^\hermit \gamma^0 \mapsto \diracadjoint{\psi}' = \textcolor{highlight}{\psi'^\hermit} \gamma^0 = \underbrace{\textcolor{highlight}{\psi^\hermit \gamma^0}}_{=\diracadjoint{\psi}} \textcolor{highlight}{S^{-1}(\Lambda)} \underbrace{\textcolor{highlight}{\gamma^0}\gamma^0}_{=1} = \diracadjoint{\psi} S^{-1}(\Lambda).
+    \end{equation}
+    
+    \section{Dirac Bilinears}
+    In order to form the Lagrangian we first need to consider what sort of quantities can appear in it.
+    Clearly, the Lagrangian must be a real Lorentz scalar, so we look for ways to form Lorentz scalars from \define{Dirac bilinears}\index{Dirac bilinear}, which are objects of the form \(\diracadjoint{\psi} \Gamma \psi\) where \(\psi\) is some spinor satisfying the Dirac equation and \(\Gamma\) is a product of gamma matrices.
+    It turns out that there are only a finite number of linearly independent possibilities for such objects.
+    
+    We start with the simplest case, where \(\Gamma\) is a product of zero gamma matrices, \(\diracadjoint{\psi}\psi\).
+    We can easily see that this is a Lorentz scalar, since it transforms as
+    \begin{equation}
+        \diracadjoint{\psi}\psi \mapsto \diracadjoint{\psi}S^{-1}(\Lambda)S(\Lambda)\psi = \diracadjoint{\psi}\psi.
+    \end{equation}
+    
+    The next simplest case is when \(\Gamma\) is a single gamma matrix, so let \(j^\mu = \diracadjoint{\psi}\gamma^\mu\psi\).
+    Under a Lorentz transformation we have
+    \begin{equation}
+        j^\mu \mapsto j'^\mu = \diracadjoint{\psi}'\gamma^\mu\psi' = \diracadjoint{\psi}S^{-1}(\Lambda)\gamma^\mu S(\Lambda) \psi.
+    \end{equation}
+    Now recall that, by definition
+    \begin{equation}
+        S^{-1}(\Lambda) \gamma^\nu S(\Lambda) = \gamma^\nu \tensor{\Lambda}{^\mu_\nu},
+    \end{equation}
+    so
+    \begin{equation}
+        j^\mu \mapsto \diracadjoint{\psi}\tensor{\Lambda}{^\mu_\nu}\gamma^\nu \psi = \tensor{\Lambda}{^\mu_\nu} j^\nu.
+    \end{equation}
+    Hence \(j^\mu\) is a four-vector.
+    
+    We can form a scalar from this four vector by contracting with another four-vector.
+    An important case is contraction with the derivative, we have a scalar
+    \begin{equation}
+        \diracadjoint{\psi}\gamma^\mu\partial_\mu\psi = \diracadjoint{\psi}\slashed{\partial}\psi.
+    \end{equation}
+    
+    In order to form a Lagrangian it's not enough for the quantities to be scalars, they also need to be real.
+    Starting with \(\diracadjoint{\psi}\psi\) we have
+    \begin{equation}
+        (\diracadjoint{\psi}\psi)^\hermit = (\psi^\hermit \gamma^0 \psi)^\hermit = \psi^\hermit \gamma^0 (\psi^\hermit)^\hermit = \psi^\hermit \gamma^0 \psi = \diracadjoint{\psi}\psi.
+    \end{equation}
+    So \(\diracadjoint{\psi}\psi\) is real.
+    On the other hand we have
+    \begin{equation}
+        (\diracadjoint{\psi}\slashed{\partial}\psi)^\hermit = (\psi^\hermit \gamma^0 \gamma^\mu \partial_\mu \psi) = (\partial_\mu\psi^\hermit) (\gamma^\mu)^\hermit (\gamma^0)^\hermit \psi = (\partial_\mu \diracadjoint{\psi}) \gamma^\mu \psi.
+    \end{equation}
+    Here we've used \((\gamma^\mu)^\hermit (\gamma^0)^\hermit = \gamma^0\gamma^\mu\gamma^0 \gamma^0 = \gamma^0 \gamma^\mu\).
+    It isn't immediately clear what this means for the realness of \(\diracadjoint{\psi}\slashed{\partial}\psi\).
+    When forming the action we integrate over the Lagrangian, so we can consider this quantity under an integral:
+    \begin{equation}
+        \int \dl{^4x} \, (\diracadjoint{\psi} \slashed{\partial} \psi)^\hermit = \int \dl{^4x} (\partial_\mu \diracadjoint{\psi}) \gamma^\mu \psi = \int \dl{^4x} [\partial_\mu(\diracadjoint{\psi}\gamma^\mu \psi) - \diracadjoint{\psi}\gamma^\mu\partial_\mu\psi].
+    \end{equation}
+    Now, the first term is a total derivative, and we are free to add a total derivative to the Lagrangian without changing anything, so we can drop this term without changing the physics.
+    The second term is just \(-\diracadjoint{\psi}\slashed{\partial}\psi\).
+    So, for the purpose of forming our Lagrangian \((\diracadjoint{\psi}\slashed{\partial}\psi)\) is equivalent to \(-\diracadjoint{\psi}\slashed{\partial}\psi\).
+    Hence, we can think of \(\diracadjoint{\psi}\slashed{\partial}\psi\) as a purely imaginary quantity, and so \(i\diracadjoint{\psi}\slashed{\partial}\psi\) is a real quantity.
+    
+    \section{Dirac Lagrangian}
+    We now have enough to form the Dirac Lagrangian.
+    We know that we can use \(\diracadjoint{\psi}\psi\) and \(i\diracadjoint{\psi}\slashed{\partial}\psi\) in our Lagrangian and after some thought we find that
+    \begin{equation}
+        \lagrangianDensity = \diracadjoint{\psi}(i\slashed{\partial} - m)\psi.
+    \end{equation}
+    The action is then
+    \begin{equation}
+        S = \int \dl{^4x} \, \diracadjoint{\psi}(i\slashed{\partial} - m)\psi.
+    \end{equation}
+    
+    We can readily check that this is the correct Lagrangian by finding the equations of motion.
+    Since \(\psi\) is complex we vary \(\psi\) and \(\diracadjoint{\psi}\) independently.
+    First varying \(\diracadjoint{\psi}\) we have
+    \begin{equation}
+        \diffp{\lagrangianDensity}{\diracadjoint{\psi}} = (i\slashed{\psi} - m)\psi, \qand \diffp{\lagrangianDensity}{(\partial_\mu \diracadjoint{\psi})} = 0 \implies (i\slashed{\partial} - m)\psi = 0,
+    \end{equation}
+    which is exactly the Dirac equation.
+    Now varying \(\psi\) we have
+    \begin{equation}
+        \diffp{\lagrangianDensity}{\psi} = -m\diracadjoint{\psi}, \qand \diffp{\lagrangianDensity}{(\partial_\mu \psi)} = i\diracadjoint{\psi}\gamma^\mu \implies i\partial_\mu\diracadjoint{\psi}\gamma^\mu + m\diracadjoint{\psi} = 0.
+    \end{equation}
+    This is simply the Hermitian conjugate of the Dirac equation:
+    \begin{align}
+        0 &= [i\gamma^\mu(\partial_\mu\psi) - m\psi]^\hermit\\
+        &= -i(\partial_\mu\psi)^\hermit (\gamma^\mu)^\hermit - m\psi^\hermit\\
+        &= -i\partial_\mu\psi^\hermit \gamma^0\gamma^\mu\gamma^0 - m\psi^\hermit\\
+        &= -i\partial_\mu\diracadjoint{\psi}\gamma^\mu\gamma^0 - m\psi^\hermit.
+    \end{align}
+    Now multiply by \(-\gamma^0\) on the right and we have
+    \begin{align}
+        0 &= -[i\gamma^\mu(\partial_\mu\psi) - m\psi]^\hermit\gamma^0\\
+        &= i\partial_\mu\diracadjoint{\psi} \gamma^\mu (\gamma^0)^2 + m\psi^\hermit\gamma^0\\
+        &= i\partial_\mu\diracadjoint{\psi} \gamma^\mu + m\diracadjoint{\psi},
+    \end{align}
+    which is the equation derived by varying \(\psi\).
+    
+    As a complex object the spinor has a \(\unitary(1)\) symmetry given by
+    \begin{equation}
+        \psi \mapsto \e^{-i\alpha}\psi \implies \diracadjoint{\psi} \mapsto \e^{i\alpha}\diracadjoint{\psi},
+    \end{equation}
+    and so \(\diracadjoint{\psi}\psi\) and \(\diracadjoint{\psi}\slashed{\partial}\psi\) are invariant under this symmetry.
+    Hence there is a conserved charge.
+    To find it we consider the case of infinitesimal \(\alpha\), where we have
+    \begin{equation}
+        \delta \psi = \e^{-i\alpha}\psi - \psi \approx (1 - i\alpha)\psi - \psi = -i\alpha\psi.
+    \end{equation}
+    Hence the conserved current is, scaling out the factor of \(\alpha\),
+    \begin{equation}
+        j^\mu = \diffp{\lagrangianDensity}{(\partial_\mu \psi)} \delta\psi = \diracadjoint{\psi}\gamma^\mu\psi.
+    \end{equation}
+    The associated conserved charge is
+    \begin{equation}
+        Q = \int \dl{^3\vv{x}} \, j^0 = \int\dl{^3\vv{x}} \, \diracadjoint{\psi} \gamma^0 \psi = \int \dl{^3\vv{x}} \, \psi^\hermit \gamma^0 \gamma^0 \psi = \int \dl{^3\vv{x}} \, \psi^\hermit \psi.
+    \end{equation}
+    
+    We can also derive a Hamiltonian for the Dirac equation.
+    First, we define the conjugate variables
+    \begin{equation}
+        \pi = \diffp{\lagrangianDensity}{\dot{\psi}} = i\psi^\hermit, \qqand \diracadjoint{\pi} = \diffp{\lagrangianDensity}{\dot{\diracadjoint{\psi}}} = 0.
+    \end{equation}
+    Then we form the Hamiltonian density in the usual way:
+    \begin{align}
+        \hamiltonianDensity &= \pi\dot{\psi} + \diracadjoint{\pi}\diracadjoint{\psi} - \lagrangianDensity\\
+        &= i\psi^\hermit \dot{\psi} - i\diracadjoint{\psi}\slashed{\partial}\psi + m\diracadjoint{\psi}\psi\\
+        &= \diracadjoint{\psi}(-i\gamma^i\partial_i + m)\psi.
+    \end{align}
+    \begin{wrn}
+        The Hamiltonian derived by integrating this over spacetime is \emph{not} the \enquote{Dirac Hamiltonian}, \(H = -i\vv{\alpha} \cdot \grad + \beta m\).
+        This second quantity was mistakenly identified as the Hamiltonian by Dirac when he first derived his equation and the name has stuck.
+    \end{wrn}
+    
+    It is also possible to derive the energy--momentum tensor for the Dirac Lagrangian, and we find that it is
+    \begin{equation}
+        T^{\mu\nu} = \diracadjoint{\psi} \gamma^\mu \partial^\nu \psi.
+    \end{equation}
+    
+    \chapter{Solutions to the Dirac Equation}
+    \section{Free Particle Solution}
+    We look for a free particle solution to the Dirac equation,
+    \begin{equation}
+        (i\slashed{\partial} - m) \psi = 0.
+    \end{equation}
+    We'll work in the Dirac representation in this chapter.
+    We start with the ansatz of plane wave solutions, multiplied by some spinor so that \(\psi\) is a spinor.
+    Assuming that the particle is on-shell, \(p^2 = m^2\), we expect this spinor to depend on the three-momentum and mass of the particles, and be independent of position since we're looking for free solutions.
+    So we look for solutions of the form
+    \begin{equation}
+        \psi(x) = u(\vv{p}) \e^{-ip\cdot x}
+    \end{equation}
+    for some spinor \(u\).
+    Substituting this into the Dirac equation we have
+    \begin{equation}
+        (i\slashed{\partial} - m)u(\vv{p})\e^{-ip\cdot x} = iu(\vv{p})\slashed{\partial}\e^{-ip\cdot x} - mu(\vv{p})\e^{-ip\cdot x} = 0.
+    \end{equation}
+    Consider the derivative term:
+    \begin{equation}
+        \slashed{\partial}\e^{-ip\cdot x} = \gamma^\mu\partial_\mu \e^{-ip_\nu x^\nu} = -i\gamma^\mu p_\mu\e^{-ip\cdot x} = -i\slashed{p}\e^{-ip\cdot x}.
+    \end{equation}
+    Hence, substituting this back into the above equation and dividing through by the phase factor we have
+    \begin{equation}
+        (\slashed{p} - m) u(\vv{p}) = 0.
+    \end{equation}
+    
+    In the Dirac representation \(u\) is a four-component spinor.
+    We can further split it into two two-component spinors, \(\varphi\) and \(\chi\):
+    \begin{equation}
+        u = 
+        \begin{pmatrix}
+            \varphi\\ \chi
+        \end{pmatrix}
+        .
+    \end{equation}
+    We then use the block form of the gamma matrices:
+    \begin{equation}
+        \gamma^0 = 
+        \begin{pmatrix}
+            \ident_2 & 0\\
+            0 & -\ident_2
+        \end{pmatrix}
+        , \qqand \gamma^i = 
+        \begin{pmatrix}
+            0 & \sigma^i\\
+            -\sigma^i & 0
+        \end{pmatrix}
+        ,
+    \end{equation}
+    to write
+    \begin{equation}
+        \slashed{p} = \gamma^\mu p_\mu = \gamma^0 p_0 - \gamma^i p_i = 
+        \begin{pmatrix}
+            p^0 & 0\\
+            0 & -p^0
+        \end{pmatrix}
+        -
+        \begin{pmatrix}
+            0 & \sigma^i p_i\\
+            \sigma^i p_i & 0
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            p^0 & -\vv{\sigma} \cdot \vv{p}\\
+            \vv{\sigma} \cdot \vv{p} & -p^0
+        \end{pmatrix}
+        .
+    \end{equation}
+    Then we can write
+    \begin{equation}
+        (\slashed{p} - m) = 
+        \begin{pmatrix}
+            p^0 & -\vv{\sigma} \cdot \vv{p}\\
+            \vv{\sigma} \cdot \vv{p} & -p^0
+        \end{pmatrix}
+        \begin{pmatrix}
+            \varphi\\ \chi
+        \end{pmatrix}
+        = m
+        \begin{pmatrix}
+            \varphi\\ \chi
+        \end{pmatrix}
+        .
+    \end{equation}
+    
+    \subsection{Positive Energy Solutions}
+    Take \(E = p^0\), and then we have
+    \begin{equation}
+        \begin{pmatrix}
+            E & -\vv{\sigma} \cdot \vv{p}\\
+            \vv{\sigma} \cdot \vv{p} & -E
+        \end{pmatrix}
+        \begin{pmatrix}
+            \varphi\\ \chi
+        \end{pmatrix}
+        = m
+        \begin{pmatrix}
+            \varphi\\ \chi
+        \end{pmatrix}
+        .
+    \end{equation}
+    Doing the matrix multiplication on the left we get
+    \begin{equation}
+        \begin{pmatrix}
+            E\varphi - \vv{\sigma} \cdot \vv{p} \chi\\
+            \vv{\sigma} \cdot \vv{p}\varphi - E\chi
+        \end{pmatrix}
+        = m
+        \begin{pmatrix}
+            \varphi\\ \chi
+        \end{pmatrix}
+        .
+    \end{equation}
+    So we must have
+    \begin{align}
+        E\varphi - \vv{\sigma} \cdot \vv{p}\chi &= m\varphi,\\
+        \vv{\sigma} \cdot \vv{p}\varphi - E\chi &= m\chi,
+    \end{align}
+    rearranging gives
+    \begin{align}
+        (E - m)\varphi = \vv{\sigma} \cdot \vv{p}\chi,\\
+        (E + m)\chi = \vv{\sigma} \cdot \vv{p}\varphi.
+    \end{align}
+    Solving the second for \(\chi\) we get
+    \begin{equation}
+        \chi = \frac{\vv{\sigma} \cdot \vv{p}}{E + m} \varphi.
+    \end{equation}
+    Substituting this into the first we get
+    \begin{equation}
+        (E - m)\varphi = \frac{(\vv{\sigma} \cdot \vv{p})^2}{E + m}\varphi.
+    \end{equation}
+    We can calculate \((\vv{\sigma} \cdot \vv{p})^2\):
+    \begin{align}
+        (\vv{\sigma} \cdot \vv{p})^2 &= \sigma^i p^i \sigma^j p^j\\
+        &= p^ip^j \sigma^i\sigma^j\\
+        &= p^ip^j \frac{1}{2}\anticommutator{\sigma^i}{\sigma^j}\\
+        &= p^ip^j \delta^{ij}\\
+        &= p^ip^j\\
+        &= \vv{p}^2.
+    \end{align}
+    Here we've used the fact that \(p^ip^j\) is symmetric in \(i\) and \(j\) to replace \(\sigma^i\sigma^j\) with its symmetric part, \(\anticommutator{\sigma^i}{\sigma^j}/2\), since any antisymmetric part vanishes in the product with something symmetric.
+    
+    Hence, we have
+    \begin{equation}
+        (E - m)\varphi = \frac{\vv{p}^2}{E + m}\varphi \implies \varphi = \frac{\vv{p}}{E^2 - m^2}\varphi = \varphi.
+    \end{equation}
+    since \(E^2 - m^2 = \vv{p}^2\) for an on-shell particle.
+    This means that \(\varphi\) is not fixed by the Dirac equation, only its relation to \(\chi\) is fixed.
+    We can therefore choose \(\varphi\), and as a two-component spinor we make the choice that
+    \begin{equation}
+        \varphi^1 = 
+        \begin{pmatrix}
+            1\\ 0
+        \end{pmatrix}
+        , \qqand \varphi^2 = 
+        \begin{pmatrix}
+            0\\ 1
+        \end{pmatrix}
+        .
+    \end{equation}
+    This is a basis for the space of two-component spinors allowing us to express arbitrary \(\varphi\).
+    We can then consider two positive energy solutions, one for each basis spinor:
+    \begin{equation}
+        u(\vv{p}, s) = N
+        \begin{pmatrix}
+            \varphi^s\\
+            \frac{\vv{\sigma} \cdot \vv{p}}{E + m}\varphi^s
+        \end{pmatrix}
+        .
+    \end{equation}
+    Here \(N\) is some normalisation factor which we'll discuss later.
+    
+    Note that in the rest frame of the particles we get
+    \begin{equation}
+        u(\vv{0}, s) = N
+        \begin{pmatrix}
+            \varphi_s\\ 0
+        \end{pmatrix}
+    \end{equation}
+    which is an eigenvector of the spin operator
+    \begin{equation}
+        \frac{1}{2}\Sigma^3 = \frac{1}{2}
+        \begin{pmatrix}
+            \sigma^3 & 0\\
+            0 & \sigma^3
+        \end{pmatrix}
+    \end{equation}
+    with eigenvalues \(1/2\) and \(-1/2\) for \(s = 1\) and \(s = 2\) respectively.
+    We therefore interpret \(\varphi^1\) with spin up particles and \(\varphi^2\) with spin down particles.
+    
+    \subsection{Negative Energy Solutions}
+    If instead we take \(p^\mu = (-E, -\vv{p})\) then we get slightly different solutions.
+    First, we make the alternative ansatz
+    \begin{equation}
+        \psi(x) = v(\vv{p})\e^{+ip\cdot x}.
+    \end{equation}
+    Substituting this into the Dirac equation and cancelling the phase factor we get
+    \begin{equation}
+        (\slashed{p} + m)v(\vv{p}) = 0.
+    \end{equation}
+    Following the same steps of writing this as a block matrix and computing the two components and rearranging we get
+    \begin{equation}
+        \varphi = \frac{\vv{\sigma} \cdot \vv{p}}{E + m}\chi,
+    \end{equation}
+    so \(\varphi\) and \(\chi\) have swapped compared to the positive energy case.
+    Again \(\chi\) is not fixed after substituting this into the equation from the other component, and we have the solution
+    \begin{equation}
+        v(\vv{p}, s) = N
+        \begin{pmatrix}
+            \frac{\vv{\sigma} \cdot \vv{p}}{E + m} \chi^s\\ \chi^s
+        \end{pmatrix}
+    \end{equation}
+    where
+    \begin{equation}
+        \chi^1 = 
+        \begin{pmatrix}
+            0\\ 1
+        \end{pmatrix}
+        , \qqand \chi^2 = 
+        \begin{pmatrix}
+            -1\\ 0
+        \end{pmatrix}
+    \end{equation}
+    is a basis for the space of two-component spinors.
+    We choose this basis, rather than the more obvious choice of \(\chi^1 = (1, 0)^{\trans}\) and \(\chi^2 = (0, 1)^\trans\), since we want to interpret the negative energy particles as antiparticles, which have opposite spin to the corresponding particles, and then the negative sign comes from requiring charge conjugation symmetry.
+    
+    The important thing is that, despite Dirac's best attempts, there are still negative energy solutions.
+    It turns out that these are unavoidable, since they correspond to antiparticles.
+    
+    \section{Spin, Angular Momentum and Helicity}
+    We've interpreted
+    \begin{equation}
+        S_3 = \frac{1}{2}\Sigma^3 = \frac{1}{2}
+        \begin{pmatrix}
+            \sigma^3 & 0\\
+            0 & \sigma^3
+        \end{pmatrix}
+    \end{equation}
+    as measuring the spin along the \(z\)-axis.
+    We can further define
+    \begin{equation}
+        \vv{S} \coloneqq \frac{1}{2}\vv{\Sigma} = \frac{1}{2}
+        \begin{pmatrix}
+            \vv{\sigma} & 0\\
+            0 & \vv{\sigma}
+        \end{pmatrix}
+    \end{equation}
+    as the spin operator with eigenvalues \(\pm 1/2\), and
+    \begin{equation}
+        \vv{S}^2 \coloneqq \frac{3}{4} (\vv{\Sigma}^3)^2 = \frac{3}{4}\ident_4
+    \end{equation}
+    is the spin operator with eigenvalues \(3/4 = 1/2(1/2 + 1)\).
+    
+    The operator \(\vv{\Sigma}\) only commutes with the Dirac Hamiltonian, \(\vv{\alpha} \cdot \vv{p} + \beta m\), in the rest frame of the particle.
+    The angular momentum operator, \(\vv{L} = \vv{r} \times \vv{p}\), also only commutes with the Dirac Hamiltonian in the rest frame of the particle.
+    However,
+    \begin{equation}
+        \vv{J} = \vv{L} + \vv{S}
+    \end{equation}
+    commutes with the Dirac Hamiltonian in any frame, suggesting we interpret it as the total angular momentum operator.
+    
+    Another choice of operator which commutes in any frame is the \defineindex{helicity} operator
+    \begin{equation}
+        h(\vv{p}) = \frac{\vv{\Sigma} \cdot \vv{p}}{\abs{\vv{p}}}.
+    \end{equation}
+    This measures the spin along the direction of propagation of the particle.
+    
+    \section{Normalisation}
+    There are different conventions for how to normalise spinors.
+    We'll make the choice to define
+    \begin{equation}
+        N = \sqrt{E + m}
+    \end{equation}
+    so
+    \begin{equation}
+        u(\vv{p}, s) = \sqrt{E + m}
+        \begin{pmatrix}
+            \varphi^s\\ \frac{\vv{\sigma} \cdot \vv{p}}{E + m}\varphi^s
+        \end{pmatrix}
+        , \qqand v(\vv{p}, s) = \sqrt{E + m}
+        \begin{pmatrix}
+            \frac{\vv{\sigma} \cdot \vv{p}}{E + m}\chi^s\\ \chi^s
+        \end{pmatrix}
+        .
+    \end{equation}
+    We then have
+    \begin{equation}
+        u^\hermit u = (E + m)\left[ \varphi^\hermit \varphi + \varphi^\hermit \left( \frac{\vv{\sigma} \cdot \vv{p}}{E + m} \right)^2 \varphi \right]
+    \end{equation}
+    and using \(\varphi^\hermit \varphi = 1\) for either spin and \((\vv{\sigma} \cdot \vv{p})^2 = \vv{p}^2 = E^2 - m^2\) we have
+    \begin{align}
+        u^\hermit u &= (E + m)\left[ 1 + \frac{E^2 - m^2}{(E + m)^2} \right]\\
+        &= (E + m)\left[ 1 + \frac{(E + m)(E - m)}{(E + m)^2} \right]\\
+        &= E + m + E - m\\
+        &= 2E.
+    \end{align}
+    Similarly \(v^\hermit v = 2E\).
+    
+    Defining the Dirac adjoints, \(\diracadjoint{u} = u^\hermit \gamma^0\) and \(\diracadjoint{v} = v^\hermit \gamma^0\) we can compute \(\diracadjoint{u}u\) in the rest frame, since \(\diracadjoint{u}u\) is a Lorentz invariant scalar, and we find
+    \begin{align}
+        \diracadjoint{u}u &= (E + m)\left[
+        \begin{pmatrix}
+            \varphi^\hermit & \chi^\hermit
+        \end{pmatrix}
+        \gamma^0
+        \begin{pmatrix}
+            \varphi\\ \chi
+        \end{pmatrix}
+        + 
+        \begin{pmatrix}
+            \varphi^\hermit & \chi^\hermit
+        \end{pmatrix}
+        \frac{(\vv{\sigma} \cdot \vv{p}) \gamma^0 (\vv{\sigma} \cdot \vv{p})}{(E + m)^2}
+        \begin{pmatrix}
+            \varphi\\ \chi
+        \end{pmatrix}
+         \right]\\
+        &= E + m\\
+        &= 2m
+    \end{align}
+    since the second term vanishes in the rest frame, with \(\vv{p} = \vv{0}\), and \(E = m\) in the rest frame.
+    Similarly we can show that
+    \begin{equation}
+        \diracadjoint{v}v = -2m.
+    \end{equation}
+    Other quantities, such as \(\diracadjoint{u}v\), \(\diracadjoint{v}u\), and \(\diracadjoint{u}(\vv{p}, s)u(\vv{p}, s')\) with \(s \ne s'\) vanish.
+    
+    We've just computed the inner products of our spinor solutions, we can also compute outer products, \(u\diracadjoint{u}\).
+    These are most interesting if we sum over spins, where we get the results
+    \begin{align}
+        \sum_s u(\vv{p}, s) \diracadjoint{u}(\vv{p}, s) &= \slashed{p} + m,\\
+        \sum_s v(\vv{p}, s) \diracadjoint{v}(\vv{p}, s) &= \slashed{p} - m.\\
+    \end{align}
+    Note that the sign is the opposite to the sign in \((\slashed{p} - m)u = (\slashed{v} + m)v = 0\).
+    
+    Finally, we can define the projection operators
+    \begin{equation}
+        \Lambda_{\pm} \coloneqq \frac{1}{2m}(\pm \slashed{p} + m).
+    \end{equation}
+    These have the effect of projecting on to the positive and negative energy eigenspaces:
+    \begin{align}
+        \Lambda_{+} u(\vv{p}, s) &= \frac{1}{2m}(\slashed{p} + m)u\\
+        &= \frac{1}{2m} \sum_{s'} u(\vv{p}, s')\diracadjoint{u}(\vv{p}, s') u(\vv{p}, s)\\
+        &= \frac{1}{2m} \delta_{ss'} u(\vv{p}, s') 2m\\
+        &= u(\vv{p}, s),
+    \end{align}
+    and similarly
+    \begin{equation}
+        \Lambda_- v(\vv{p}, s) = v(\vv{p}, s).
+    \end{equation}
+    Since they are projection operators they are idempotent, \(\Lambda_{\pm}^2 = \Lambda_{\pm}\), and the are also orthogonal projectors, \(\Lambda_{+}\Lambda_{-} = \Lambda_{-}\Lambda_{+} = 0\).
+    In particular we can show that \(\Lambda_+ u = u\), \(\Lambda_{+}v = 0\), \(\Lambda_- u = 0\), and \(\Lambda_{-}v = v\), so
+    \begin{equation}
+        \Lambda+ (\alpha u + \beta v) = \alpha u, \qqand \Lambda_- (\alpha u + \beta v) = \beta v
+    \end{equation}
+    for \(\alpha, \beta \in \complex\).
     
     \part{Gaussian Integrals}
     \chapter{Gaussian Integrals}
@@ -6266,6 +6847,8 @@ noabbrev
         \symcal{N} = \int \DL{\mkern-2mu\chi} \exp\left[ \frac{i}{2} \int_p \tilde{\chi}(p)(p^2 - m^2 + i\varepsilon)\tilde{\chi}(-p) \right]
     \end{equation}
     is a normalisation factor.
+    This normalisation factor is analgous to the \((\det A)^{-1/2}\) factor in the finite dimensional case.
+    Exactly how we're taking the determinant of an infinite dimensional operator and then inverting this is not important, since we always consider ratios, \(Z_0[J]/Z_0[0]\), where this normalisation vanishes.
     
     We can write this result as
     \begin{equation}
@@ -6304,13 +6887,20 @@ noabbrev
     \begin{align*}
         \bra{0} &\timeOrdering[\varphi(x_1)\varphi(x_2)] \ket{0} = \left( \frac{1}{i} \diffd{}{J(x_1)} \right) \left( \frac{1}{i} \diffd{}{J(x_2)} \right) Z_0[J] \bigg|_{J = 0}\\
         &= \left( \frac{1}{i} \diffd{}{J(x_1)} \right) \left( \frac{1}{i} \diffd{}{J(x_2)} \right) \exp\left[ -\frac{i}{2} \int_{x,x'} J(x)\Delta(x, x')J(x') \right]\\
-        &= \left( \frac{1}{i} \diffd{}{J(x_1)} \right) \left[ -\frac{1}{2}\int_{x'} \{\Delta(x_2, x')J(x) + J(x)\Delta(x, x_2)\} \right]\\
+        &= \left( \frac{1}{i} \diffd{}{J(x_1)} \right) \left[ -\frac{1}{2}\int_{x'} \Delta(x_2, x')J(x) - \frac{1}{2} \int_x J(x)\Delta(x, x_2)\} \right]\\
         & \qquad \qquad \times \exp\left[ -\frac{i}{2} \int_{x,x'} J(x)\Delta(x, x')J(x') \right]\\
         &= -\frac{1}{i}\frac{1}{2}\{\Delta(x_1, x_2) + \Delta(x_2, x_1)\}\\
         &= i\Delta(x_1, x_2)
     \end{align*}
     where we set \(J = 0\) in the penultimate term and then used the fact that \(\Delta\) is symmetric in its arguments.
     This must be the case since \(\timeOrdering[\varphi(x_1)\varphi(x_2)]\) is symmetric in \(x_1\) and \(x_2\), and we've used this in the past to \emph{define} \(\Delta\) (see \cref{eqn:feynman propagator as vacuum expectation of time ordered product}).
+    We can show its the case using the definition here also, since
+    \begin{equation}
+        \Delta(x) = \int \frac{\dl{^Dp}}{(2\pi)^D} \frac{\e^{-ip\cdot x}}{p^2 - m^2 + i\varepsilon} \stackrel{p \to -p}{=} \int \frac{\dl{^Dp}}{(2\pi)^D} \frac{\e^{ip\cdot x}}{p^2 - m^2 + i\varepsilon} = \Delta(-x).
+    \end{equation}
+    Note that even if \(D\) is odd we still don't have to change the overall sign since the integration region, \(\reals^D\), is even so we're integrating over all possible value of \(p\) or \(-p\) either way so the change in sign cancels with exchanging the limits.
+    
+    
     
     
     
