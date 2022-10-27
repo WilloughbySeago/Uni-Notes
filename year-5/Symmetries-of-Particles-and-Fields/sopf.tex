@@ -96,7 +96,21 @@ noabbrev
 \DeclareMathOperator*{\spn}{span}
 \newcommand{\parity}{\symcal{P}}
 \newcommand{\timeReversal}{\symcal{T}}
+\newcommand{\chargeConjugation}{\symcal{C}}
 \DeclareMathOperator{\artanh}{artanh}
+\newcommand{\Left}{\symup{L}}
+\newcommand{\Right}{\symup{R}}
+\makeatletter
+\renewcommand{\xmapsto}[2][]{\mathrel{\mathpalette\xmapsto@{{#1}{#2}}}}
+\newcommand{\xmapsto@}[2]{\xmapsto@@{#1}#2}
+\newcommand{\xmapsto@@}[3]{%
+    \begingroup
+    \sbox\z@{$\m@th#1\mathop{}\limits_{\;#2\;}^{\;#3\;}$}%
+    \mathop{\Uhextensible width \wd\z@ 0 "27FC}_{#2}^{#3}%
+    \endgroup
+}
+\newcommand{\diracadjoint}[1]{\overbar{#1}}
+\DeclareMathOperator{\ISO}{ISO}
 
 \includeonly{}
 
@@ -2803,11 +2817,16 @@ noabbrev
     Consider the Lie algebra \(\specialLinearLie(2, \complex)\).
     This consists of complex \(2 \times 2\) traceless matrices.
     One basis generating this algebra is \(\{\tfrac{1}{2}\sigma_i, -\tfrac{i}{2}\sigma_i\}\), where \(\sigma_i\) are the Pauli matrices.
+    Note that we need both \(\sigma_i\) and \(i\sigma_i\) since \(\specialLinearLie(2, \complex)\) is a real algebra, meaning that when we form a linear combination the coefficients are real, so \(i\sigma_i\) gives us different linear combinations.
+    
     After some playing around we find that \(\sigma_i/2\) have the same commutation relations as \(J_i\) and \(-i\sigma_i/2\) have the same commutation relations as \(K_i\).
     This means that
     \begin{equation}
         \specialOrthogonalLie(1, 3) \isomorphic \specialLinearLie(2, \complex).
     \end{equation}
+    \begin{wrn}
+        Strictly, this isn't quite true. Instead \(\specialOrthogonalLie_{\complex}(1, 3) \isomorphic \specialLinearLie_{\complex}(2, \complex)\) where \(V_{\complex} = {V \otimes \complex} = V \oplus iV\) is the complexification of \(V\) given by extending the scalars from \(\reals\) to \(\complex\) and extending scalar multiplication linearly. However, we have embeddings \(\specialOrthogonalLie(1, 3) \hookrightarrow \specialOrthogonalLie_{\complex}(1, 3)\) and \(\specialLinearLie(2, \complex) \hookrightarrow \specialLinearLie_{\complex}(2, \complex)\), and this all works out fine if we only consider finite dimensional representations.
+    \end{wrn}
     
     This extends to an isomorphism of groups:
     \begin{equation}
@@ -2853,6 +2872,447 @@ noabbrev
         A = \pm \frac{\sigma_\mu \tensor{\Lambda}{^\mu_\nu}\overbar{\sigma}^\nu}{\sqrt{\tensor{\Lambda}{^\mu_\mu}}}.
     \end{equation}
     It is this ambiguous \(\pm\) which is modded out by the \(\cyclicGroupZ[2]\) factor.
+    
+    \section{Representation of \texorpdfstring{\(\specialUnitaryLie(2)\)}{su(2)}}
+    \begin{rmk}
+        See \course{Principles of Quantum Mechanics} and \course{Symmetries of Quantum Mechanics} for details.
+    \end{rmk}
+    The generators of \(\specialUnitaryLie(2)\) are \(T_i\) with \(i = 1, 2, 3\), which satisfy the commutation relation
+    \begin{equation}
+        \commutator{T_i}{T_j} = i\varepsilon_{ijk}.
+    \end{equation}
+    We define the ladder operators \(T_{\pm} \coloneqq T_1 \pm i T_2\), as well as the Casimir \(T^2 = T_1^2 + T_2^2 + T_3^2\).
+    These are such that
+    \begin{equation}
+        \commutator{T_3}{T_{\pm}} = \pm T_{\pm}, \qquad \commutator{T_+}{T_-} = 2T_3, \qqand \commutator{T^2}{T_3} = 0.
+    \end{equation}
+    
+    We label the representations of \(\specialUnitaryLie(2)\) by \(j\), which for now is just some number.
+    The \(j\) representation has a basis formed of states \(\{\ket{j, m}\}\) where \(j\) labels the representation and \(m\) labels the basis element according to the eigenvalues of \(T_3\):
+    \begin{equation}
+        T_3 \ket{j, m} = m\ket{j, m}.
+    \end{equation}
+    we call \(m\) the weight of the state.
+    Consider
+    \begin{align}
+        T_3T_{\pm} \ket{j, m} &= (\commutator{T_3}{T_{\pm}} + T_{\pm}T_3)\ket{j, m}\\
+        &= (\pm T_{\pm} + T_{\pm} T_3)\ket{j, m}\\
+        &= T_{\pm}(\pm 1 + T_3)\ket{j, m}\\
+        &= (m \pm 1) T_{\pm}\ket{j, m}.
+    \end{align}
+    This tells us that \(T_{\pm}\ket{j, m}\) has eigenvalue \(m \pm 1\) for \(T_3\), so \(T_{\pm}\ket{j, m} \propto \ket{j, m \pm 1}\).
+    
+    It is possible to write \(T^2\) as \(T^2 = T_- T_+ + T_3^2 + T_3\), which can be shown by expanding \(T_{\pm}\) in terms of \(T_1\) and \(T_2\).
+    Take \(m = j\) as the highest allowed value, so that \(T_+\ket{j, j} = 0\).
+    This is allowed since we haven't otherwise specified what \(j\) is, so we can simply choose to label each representation by its highest weight.
+    Then we have
+    \begin{equation}
+        T^2\ket{j, j} = (T_-T_+ + T_3^2 + T_3) \ket{j, j} = j(j  + 1)\ket{j, j}.
+    \end{equation}
+    Considering finite dimensional representations there must also be a lowest weight, call it \(\overbar{m}\), which is such that \(T_- \ket{j, \overbar{m}} = 0\).
+    We can also write \(T^2\) as \(T^2 = T_+ T_- + T_3^2 - T_3\), and so we find
+    \begin{equation}
+        T^2\ket{j, \overbar{m}} = (T_+T_- + T_3^2 - T_3) \ket{j, \overbar{m}} = \overbar{m}(\overbar{m} - 1) \ket{j, \overbar{m}}.
+    \end{equation}
+    
+    Since \(T^2\) is a Casimir operator, and so commutes with all generators of the representation, it must be a multiple of the identity.
+    Hence the eigenvalues are all equal and so we have
+    \begin{equation}
+        j(j + 1) = \overbar{m}(\overbar{m} - 1) \implies \overbar{m} = -j.
+    \end{equation}
+    Note that we also get the solution \(\overbar{m} = j + 1\), but we neglect this since by definition \(j\) is the highest weight.
+    
+    So, the \(j\) representation of \(\specialUnitaryLie(2)\) has \(2j + 1\) states, \(\{\ket{j, m}\}\), with \(m \in \{-j, -j + 1, \dotsc, j - 1, j\}\).
+    It can be shown that \(j\) takes on integer of half integer values.
+    The fundamental representation of \(\specialUnitaryLie(2)\) corresponds to the two dimensional representation with \(j = 1/2\).
+    
+    \section{Representation of \texorpdfstring{\(\specialLinearLie(2, \complex)\)}{sl(2, C)}}
+    the representation theory of \(\specialLinearLie(2, \complex)\) follows almost immediately from
+    \begin{equation}
+        \specialLinearLie(2, \complex) \isomorphic \specialUnitaryLie(2) \oplus \specialUnitaryLie(2).
+    \end{equation}
+    Each representation of \(\specialLinearLie(2, \complex)\) is labelled by two numbers, \(\specialUnitaryLie(2)\) representations are labelled by \(j\), so a generic representation of \(\specialLinearLie(2, \complex)\) is labelled \((m, n)\).
+    For each copy of \(\specialUnitaryLie(2)\) we get a ladder operator:
+    \begin{equation}
+        N_{\pm} = N_1 \pm iN_2, \qqand N_{\pm}^\hermit = N_1^\hermit \pm iN_2^\hermit.
+    \end{equation}
+    We also get two Casimir operators,
+    \begin{equation}
+        N^2 = N_1^2 + N_2^2 + N_3^2, \qqand {N^\hermit}^2 = {N_1^\hermit}^2 + {N_2^\hermit}^2 + {N_3^\hermit}^2,
+    \end{equation}
+    These have eigenvalues \(m(m + 1)\) and \(n(n + 1)\) respectively.
+    The basis of the \((m, n)\) representation is then given by \(\{\ket{m, m_3} \oplus \ket{n, n_3}\}\), where \(m_3\) and \(n_3\) are the eigenvalues of \(N_3\) and \(N_3^\hermit\) respectively, and \(\ket{m, m_3}\) are basis states in the \(m\) representation of \(\specialUnitaryLie(2)\) and \(\ket{n, n_3}\) are basis states in the \(n\) representation of \(\specialUnitaryLie(2)\).
+    
+    We classify objects based on which representation of \(\specialLinearLie(2, \complex)\) they transform under.
+    We'll see more details later, but for now we just list some classes:
+    \begin{itemize}
+        \item \define{Scalars}\index{scalar}: Transform under the \((0, 0)\) representation.
+        These correspond to spin 0 particles.
+        \item \define{Weyl spinors}\index{Weyl spinor}, also known as two-component spinors: Transform under the \((\slashfrac{1}{2}, 0)\) or \((0, \slashfrac{1}{2})\) representations.
+        These correspond to spin \(1/2\) particles.
+        \item \defineindex{Dirac spinors}\index{Dirac spinor}, also known as four-component spinors: Transform under the \((\slashfrac{1}{2}, 0) \oplus (0, \slashfrac{1}{2})\) representations.
+        These correspond to spin \(1/2\) particles.
+        \item \define{Vectors}\index{vector}: Transform under the \((\slashfrac{1}{2}, \slashfrac{1}{2})\) representation.
+        These correspond to spin one particles.
+        \item Antisymmetric rank 2 tensors, such as \(F_{\mu\nu}\): Transform under \((1, 0)\) or \((0, 1)\).
+        The adjoint representation of \(\specialLinearLie(2, \complex)\) corresponds to \((1, 0) \oplus (0, 1)\).
+        \item Symmetric traceless rank 2 tensors: Transform under the \((1, 1)\) representation.
+    \end{itemize}
+    
+    Suppose that \(D_j \colon \specialUnitaryLie(2) \to \generalLinearLie(V_j)\) is a representations of \(\specialUnitaryLie(2)\) labelled by \(j\), so \(\dim V = 2j + 1\).
+    Then we can take two representations, \(D_j\) and \(D_{j'}\), and we can construct a representation of \(\specialLinearLie(2, \complex)\), which we label \((j, j')\), and has the representation space \(V_j \otimes V_{j'}\), and so \(\dim(j, j') = (2j + 1)(2j' + 1)\).
+    
+    \chapter{Spinors}
+    \section{\texorpdfstring{\(\specialLinearLie(2, \complex)\)}{sl(2, C)} Spinors}
+    Consider the \((\slashfrac{1}{2}, 0)\) and \((0, \slashfrac{1}{2})\) representations of \(\specialLinearLie(2, \complex)\).
+    We call objects transforming under these representations \define{Weyl spinors}, or just spinors for short.
+    Since \((2 \cdot \slashfrac{1}{2} + 1)(2 \cdot 0 + 1) = 2\) we have that \(\dim(\slash{1}{2}, 0) = \dim(0, \slashfrac{1}{2}) = 2\).
+    So, we define two two-component objects,
+    \begin{equation}
+        \psi_{\Left} = 
+        \begin{pmatrix}
+            \psi_{1\Left}\\ \psi_{2\Left}
+        \end{pmatrix}
+        \in (\slashfrac{1}{2}, 0)
+        , \qqand \psi_{\Right} = 
+        \begin{pmatrix}
+            \psi_{1\Right}\\ \psi_{2\Right}
+        \end{pmatrix}
+        \in (0, \slashfrac{1}{2}).
+    \end{equation}
+    Here \(\Left\) and \(\Right\) are just labels, standing for left and right, they don't have any physical significance (for now).
+    
+    If we want to talk of components of spinors, although this is not as common as working with components of vectors, we do so using indices near the start of the Latin alphabet, such as \(a, b, c, \dotsc\).
+    The convention is that we drop the \(\Left\) and \(\Right\) labels and then use undotted/dotted indices respectively, so a left handed spinor may have components \(\psi_a\), whereas a right handed spinor would have components \(\psi_{\dot{a}}\).
+    
+    Consider an \(\specialLinear(2, \complex)\) transformation.
+    This may be represented by \(\Lambda_{\Left}\) on \((\slashfrac{1}{2}, 0)\) and \(\Lambda_{\Right}\) on \((0, \slashfrac{1}{2})\).
+    These will be \(2 \times 2\) complex unit determinant matrices.
+    Under these representations we expect the left and right handed spinors to transform as
+    \begin{align}
+        \psi_{\Left} \xmapsto{\Lambda_{\Left}} \psi'_{\Left} = \Lambda_{\Left} \psi_{\Left},\\
+        \psi_{\Right} \xmapsto{\Lambda_{\Right}} \psi'_{\Right} = \Lambda_{\Right} \psi_{\Right}.
+    \end{align}
+    
+    We expect that \(\Lambda_{\Left}\) and \(\Lambda_{\Right}\) are given by exponentiating the generators of the Lie algebra, \(\{\sigma_i/2, -i\sigma_i/2\}\).
+    First consider rotations, given by \(\specialUnitary(2) \subseteq \specialLinear(2, \complex)\).
+    The generators are \(J_i = \sigma_i\), and both the left and right handed spinors transform under
+    \begin{equation}
+        \Lambda_{\Left, \Right} = \exp\left[ \frac{i}{2} \vv{\sigma} \cdot \vv{\omega} \right]
+    \end{equation}
+    where \(\vv{\sigma} = (\sigma_1, \sigma_2, \sigma_3)\) and \(\vv{\omega}\) has components \(\omega_i  = \varepsilon_{ijk} \omega^{jk}\), where \(\omega^{jk}\) are the parameters of the Lorentz group parametrising the equivalent \(\specialOrthogonal^+(1, 3)\) transformation.
+    Notice that this transformation is unitary since \(\omega_i \in \reals\) and \(\sigma_i\) are Hermitian.
+    
+    If we include boosts then the left and right spinors transform slightly differently:
+    \begin{align}
+        \Lambda_{\Left} &= \exp\left[ \frac{i}{2} \vv{\sigma} \cdot (\vv{\omega} - i\vv{\nu}) \right],\\
+        \Lambda_{\Right} &= \exp\left[ \frac{i}{2} \vv{\sigma} \cdot (\vv{\omega} + i\vv{\nu}) \right]
+    \end{align}
+    where \(\vv{\nu}\) has components \(\nu^i = \omega^{0i}\).
+    These are \emph{not} unitary, since \(K_i\) is not Hermitian.
+    
+    The two representations, \((\slashfrac{1}{2}, 0)\) and \((0, \slashfrac{1}{2})\), are related by parity, since under a parity transformation positions are inverted, \(x^i \mapsto -x^i\), so velocities are inverted, \(v^i \mapsto -v^i\), and hence momentum is inverted, \(p^i \mapsto -p^i\).
+    Hence \(\vv{x} \times \vv{p} \mapsto \vv{x} \times \vv{p}\), so angular momentum doesn't change.
+    This corresponds to the action of parity on \(J_i\) being \(J_i \mapsto J_i\).
+    On the other hand boosts are negated, since the direction of the boost is inverted, and so \(K_i \mapsto -K_i\), or equivalently \(\nu_i \mapsto -\nu_i\).
+    Hence, under parity
+    \begin{equation}
+        \psi_{\Left} \leftrightarrow \psi_{\Right}, \qqand \Lambda_{\Left} \leftrightarrow \Lambda_{\Right}.
+    \end{equation}
+    
+    \subsection{Properties of Spinors}
+    Notice that
+    \begin{equation}
+        \Lambda_{\Left}^{-1} = \Lambda_{\Right}^\hermit.
+    \end{equation}
+    We also have the identities \(\sigma_2\sigma_i\sigma_2 = -\sigma_i^*\) and \(\sigma_2^2 = \ident\), and so
+    \begin{align}
+        \sigma_2\Lambda_{\Left}\sigma_2 &= \exp\left[ \frac{i}{2}\sigma_2 \sigma_i \sigma_2 (\omega_i + i\nu_i) \right]\\
+        &= \exp\left[ -\frac{i}{2}\sigma_i^* (\omega_i + i\nu_i) \right]\\
+        &= \exp\left[ \frac{i}{2}\sigma_i(\omega_i - i\nu_i) \right]^*\\
+        &= \Lambda_{\Right}^*.
+    \end{align}
+    Hence,
+    \begin{equation}
+        \sigma_2 \Lambda_{\Left}^\hermit \sigma_2 = \Lambda_{\Right}^\trans.
+    \end{equation}
+    
+    We also have \(\sigma_i^* = \sigma_i^\trans\), and so \(\sigma_2\sigma_i\sigma_2 = -\sigma_i^\trans\), giving
+    \begin{align}
+        \sigma_2\Lambda_{\Left}^\trans \sigma_2 &= \sigma_2\exp\left[ \frac{i}{2}\sigma_i^\trans (\omega_i + i\nu_i) \right]\sigma_2\\
+        &= \exp\left[ \frac{i}{2}\sigma_2 \sigma_i^\trans \sigma_2(\omega_i + i \nu_i) \right] \\
+        &= \exp\left[ -\frac{i}{2}\sigma_i (\omega_i + i\nu_i) \right]\\
+        &= \Lambda_{\Left}^{-1}
+    \end{align}
+    since \(\sigma_i^2 = \ident\).
+    Hence, we have
+    \begin{equation}
+        \Lambda_{\Left}^\trans \sigma_2 \Lambda_{\Left} = \sigma_2,
+    \end{equation}
+    which follows since if we multiply on the left by \(\sigma_2\) the left hand side gives \(\sigma_2\Lambda_{\Left}^\trans \sigma_2 \Lambda_{\Left} = \Lambda_{\Left}^{-1}\Lambda_{\Left} = \ident\), and the right hand side gives \(\sigma_2^2 = \ident\).
+    Similarly, we have
+    \begin{equation}
+        \Lambda_{\Right}^\trans \sigma_2 \Lambda_{\Right} = \sigma_2.
+    \end{equation}
+    
+    Now consider some left handed spinor, \(\psi_{\Left} \in (\slashfrac{1}{2}, 0)\), transforming under \(\specialLinear(2, \complex)\) according to \(\Lambda_{\Left}\).
+    Taking the complex conjugate of the transformation definition we get
+    \begin{equation}
+        \psi_{\Left}'^* = \Lambda_{\Left}^* \psi_{\Left}^*.
+    \end{equation}
+    Multiplying on the left by \(\sigma_2\) we have
+    \begin{equation}
+        \sigma_2 \psi_{\Left}^* = \sigma_2\Lambda_{\Left}^* \psi_{\Left}^* = \Lambda_{\Right}\sigma_2\psi_{\Left}^*.
+    \end{equation}
+    Hence, we see that \(\sigma_2\psi_{\Left}^*\) transforms as a right handed spinor, and so \emph{is} a right handed spinor, \(\sigma_2\psi_{\Left}^* \in (0, \slashfrac{1}{2})\).
+    
+    The charge conjugation operation is defined by
+    \begin{align}
+        \psi_{\Left} \xmapsto{\chargeConjugation} \sigma_2 \psi_{\Left}^*,\\
+        \psi_{\Right} \xmapsto{\chargeConjugation} \sigma_2 \psi_{\Right}^*.
+    \end{align}
+    So, left and right handed spinors are related by charge conjugation.
+    
+    \section{Direct Product Representations}
+    Given two left handed spinors, \(\psi_{\Left}, \chi_{\Left} \in (\slashfrac{1}{2}, 0)\) we should be able to form a scalar, since we have
+    \begin{equation}
+        (\slashfrac{1}{2}, 0) \otimes (\slashfrac{1}{2}, 0) \isomorphic (0, 0) \oplus (1, 0).
+    \end{equation}
+    This is analagous to combing two spin \(1/2\) particles to get either a spin 0 system or a spin 1 system, and simultaneously combining two independent spin 0 particles to get a spin 0 system.
+    
+    A naive first attempt at constructing a scalar may be to consider \(\chi_{\Left}^\trans \psi_{\Left}\), after all this works to combine two vectors and form a scalar.
+    However, we see that this doesn't work since under an \(\specialLinear(2, \complex)\) transformation the product above transforms as
+    \begin{equation}
+        \chi_{\Left}^{\hermit} \psi_{\Left} \mapsto \chi_{\Left}^\trans \Lambda_{\Left}^\trans \Lambda_{\Left} \psi_{\Left}.
+    \end{equation}
+    Since \(\Lambda_{\Left}^\trans \Lambda_{\Left} \ne \ident\) this doesn't give a scalar.
+    
+    Instead, consider the product \(\chi_{\Left}^\trans \sigma_2 \psi_{\Left}\).
+    This transforms as
+    \begin{equation}
+        \chi_{\Left}^\trans \sigma_2 \psi_{\Left} \mapsto \chi_{\Left}^\trans \Lambda_{\Left}^{\trans} \sigma_2 \Lambda_{\Left} \psi_{\Left} = \chi_{\Left}^\trans \sigma_2 \psi_{\Left}.
+    \end{equation}
+    Here we've used one of the identities we derived in the last section, \(\Lambda_{\Left}^{\trans} \sigma_2 \Lambda_{\Left} = \sigma_2\).
+    Since \(\chi_{\Left}^\trans \sigma_2 \psi_{\Left}\) transforms trivially it is a scalar, \(\chi_{\Left}^\trans \sigma_2 \psi_{\Left} \in (0, 0)\).
+    
+    Now choose \(\chi_{\Left} = -\sigma_2\psi_{\Right}^*\), that is \(\psi_{\Right} = \sigma_2\chi_{\Left}\).
+    Then \(\psi_{\Right}^\hermit\psi_{\Left}\) is a scalar.
+    Similarly, \(\psi_{\Left}^\hermit \psi_{\Right}\) is a scalar.
+    
+    The fact that we have two different ways of forming a scalar is due to the fact that we have two different copies of \(\specialUnitaryLie(2)\).
+    
+    Going the other way we also get \((1, 0)\) in the decomposition of \((\slashfrac{1}{2}, 0) \otimes (\slashfrac{1}{2}, 0)\), suggesting we should be able to build a four-vector from two left handed spinors.
+    This corresponds to the important fact that \(2 \times 2 = 4\), so we can make four-component objects by taking tensor products of two-component objects.
+    
+    We start by considering \(\psi_{\Left}^\hermit \psi_{\Left}\).
+    Under a Lorentz transformation this transforms as
+    \begin{equation}
+        \psi_{\Left}^\hermit \psi_{\Left} \mapsto \psi_{\Left}^\hermit \Lambda_{\Left}^\hermit \Lambda_{\Left} \psi_{\Left}.
+    \end{equation}
+    Now, suppose that \(\Lambda_{\Left}\) is infinitesimal.
+    Then we can expand it to first order in the parameters giving
+    \begin{equation}
+        \Lambda_{\Left} = \exp\left[ \frac{i}{2} \vv{\sigma} \cdot (\vv{\omega} - i\vv{\nu}) \right] \approx 1 + \frac{i}{2}\vv{\sigma} \cdot (\vv{\omega} - i \vv{\nu}) + \order(\omega^2, \nu^2, \omega\nu).
+    \end{equation}
+    Similarly,
+    \begin{equation}
+        \Lambda_{\Left}^\hermit = \exp\left[ -\frac{i}{2}\vv{\sigma} \cdot (\vv{\omega} + i \vv{\nu}) \right] \approx 1 - \frac{i}{2} \vv{\sigma} \cdot (\vv{\omega} + i \vv{\nu}) + \order(\omega^2, \nu^2, \omega\nu).
+    \end{equation}
+    We can then expand the transformed spinor product to first order:
+    \begin{align}
+        \psi_{\Left}^\hermit\Lambda_{\Left}^\hermit \Lambda_{\Left}\psi_{\Left} &= \psi_{\Left}^\hermit \left[ 1 - \frac{i}{2} \sigma_i(\omega_i + i\nu_i) \right] \left[ 1 + \frac{i}{2} \sigma_j(\omega_j - i\nu_j) \right] \psi_{\Left}\\
+        &= \psi_{\Left}^\hermit \left[ 1 - \frac{i}{2} \sigma_i (\omega_i + i\nu_i) + \frac{i}{2} \sigma_j (\omega_j - i\nu_j) \right] \psi_{\Left}\\
+        &= \psi_{\Left}^\hermit \left[ 1 - \frac{1}{2}\left( i\omega_i\sigma_i - i\omega_i\sigma_j + \nu_i\sigma_i + \nu_i\sigma_i \right) \right] \psi_{\Left}\\
+        &= \psi_{\Left}^\hermit [ 1 + \nu_i\sigma_i ] \psi_{\Left}\\
+        &= \psi_{\Left}^\hermit \psi_{\Left} + \nu_i \psi_{\Left}^\hermit \sigma_i \psi_{\Left}\\
+        &= \psi_{\Left}^\hermit \psi_{\Left} - \omega_{0i}\psi_{\Left}^\hermit\sigma_i\psi_{\Left}\\
+        &= \psi_{\Left}^\hermit - \omega_{0j}\psi_{\Left}^\hermit\sigma_j\psi_{\Left} + \omega_{00}\psi_{\Left}^\hermit\psi_{\Left}
+    \end{align}
+    where we've used \(\nu_i = \omega_{i0} = -\omega_{0i}\) and \(\omega_{00} = 0\).
+    
+    Now, this isn't how a four-vector transforms, so we try the same thing as before, inserting a Pauli matrix in between the two terms.
+    Our current result doesn't have any free indices, which we'll need to make a four vector, so we put a free index on the Pauli matrix:
+    \begin{align}
+        \psi_{\Left}^\hermit \sigma_i \psi_{\Left} &\mapsto \psi_{\Left}^\hermit\Lambda_{\Left}^\hermit \sigma_i \Lambda_{\Left}\psi_{\Left}\\
+        &= \psi_{\Left}^\hermit \left[ 1 - \frac{i}{2} \sigma_j(\omega_j + i\nu_j) \right] \sigma_i \left[ 1 + \frac{i}{2} \sigma_k(\omega_k - i\nu_k) \right] \psi_{\Left}\\
+        &= \psi_{\Left}^\hermit \left[ \sigma_i - \frac{i}{2}\sigma_j\sigma_i\omega_j + \frac{i}{2}\sigma_i\sigma_k\omega_k + \frac{1}{2}\sigma_j\sigma_i\nu_j + \frac{1}{2}\sigma_i\sigma_k\nu_k \right]\psi_{\Left}\\
+        &= \psi_{\Left}^\hermit \left[ \sigma_i - \frac{i}{2}\commutator{\sigma_i}{\sigma_j}\omega_j + \frac{1}{2}\anticommutator{\sigma_i}{\sigma_j} \nu_j \right] \psi_{\Left}.
+    \end{align}
+    Now we use the identities
+    \begin{equation}
+        \commutator{\sigma_i}{\sigma_j} = i\varepsilon_{ijk}, \qqand \anticommutator{\sigma_i}{\sigma_j} = 2\delta_{ij}
+    \end{equation}
+    as well as inverting the relationship \(\omega_i = -\varepsilon_{ijk}\omega_{jk}/2\) to give \(\omega_{ij} = -\varepsilon_{ijk}\omega_k\), and so
+    \begin{equation}
+        \frac{i}{2}\commutator{\sigma_i}{\sigma_j}\omega_j = \frac{i}{2}i\varepsilon_{ijk}\sigma_k \omega_j = -\frac{1}{2}\varepsilon_{kij}\sigma_k \omega_j = \omega_{ki} \sigma_k.
+    \end{equation}
+    Hence,
+    \begin{align}
+        \psi_{\Left}^\hermit \sigma_i \psi_{\Left} &\mapsto \psi_{\Left}^\hermit \left[ \sigma_i - \omega_{ki} \sigma_k + \delta_{ij}\nu_j \right] \psi_{\Left}\\
+        &= \delta_{ij}\psi_{\Left}^\hermit \sigma_j\psi_{\Left} - \omega_{ij} \psi_{\Left}^\hermit \sigma_j \psi_{\Left} + \omega_{i0}\psi_{\Left}^\hermit \psi_{\Left}.
+    \end{align}
+    Define \(\sigma_\mu \coloneqq (1, \sigma_i)\).
+    Then we can combine these two results into
+    \begin{equation}
+        \psi_{\Left}^\hermit \sigma_\mu \psi_{\Left} \mapsto (\tensor{\delta}{_\mu^\nu} + \tensor{\omega}{_\mu^\nu})\psi_{\Left}^\hermit \sigma_\nu \psi_{\Left},
+    \end{equation}
+    which is exactly how a four-vector transforms under an infinitesimal Lorentz transformation, so we conclude that \(\psi_{\Left}^\hermit \sigma_\mu \psi_{\Left}\) \emph{is} a four-vector.
+    
+    If we similarly define \(\overbar{\sigma}_\mu = (1, -\sigma_i)\) then we find that \(\psi_{\Right}^\hermit \overbar{\sigma}_\mu \psi_{\Right}\) is also a four-vector.
+    
+    \section{Dirac Spinors}
+    \begin{rmk}
+        See the \course{Quantum Field Theory} course for \emph{a lot} more on spinors and the gamma matrices.
+        See \course{Particle Physics} for a brief, less technical introduction.
+    \end{rmk}
+    We've seen that the two-component spinors, \(\psi_{\Left} \in (\slashfrac{1}{2}, 0)\) and \(\psi_{\Right} \in (0, \slashfrac{1}{2})\), transform into each other under parity.
+    Therefore if we want parity invariance then we need to find a way to include left and right handed spinors equally.
+    The solution is to define a \defineindex{Dirac spinor},
+    \begin{equation}
+        \psi \coloneqq \psi_{\Left} \oplus \psi_{\Right} = 
+        \begin{pmatrix}
+            \psi_{\Left} \\ \psi_{\Right}
+        \end{pmatrix}
+        .
+    \end{equation}
+    This transforms under the reducible \((\slashfrac{1}{2}, 0) \oplus (0, \slashfrac{1}{2})\) representation of \(\specialUnitary(2, \complex)\), according to
+    \begin{equation}
+        \psi \mapsto 
+        \begin{pmatrix}
+            \Lambda_{\Left} & 0\\
+            0 & \Lambda_{\Right}
+        \end{pmatrix}
+        = \Lambda \psi.
+    \end{equation}
+    We can see that \(\psi\) has four components, two from each of \(\psi_{\Left}\) and \(\psi_{\Right}\).
+    This is due to the important fact that \(2 + 2 = 4\).
+    This collision between \(2 \times 2 = 4\) and \(2 + 2 = 4\) is why spinors and four-vectors have the same number of components, despite being quite different objects.
+    
+    Under parity a Dirac spinor transforms as
+    \begin{equation}
+        \psi = 
+        \begin{pmatrix}
+            \psi_{\Left}\\ \psi_{\Right}
+        \end{pmatrix}
+        \mapsto 
+        \begin{pmatrix}
+            \psi_{\Right}\\ \psi_{\Left}
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            0 & \ident\\
+            \ident & 0
+        \end{pmatrix}
+        \psi = \gamma^0 \psi
+    \end{equation}
+    where we identify the \(4 \times 4\) matrix \(\gamma0^5\) as representing the parity operator on Dirac spinors.
+    
+    We can project \(\psi\) onto the left and right handed spinor subspaces using the projection operators
+    \begin{equation}
+        P_{\Left} = \frac{1}{2}(1 + \gamma^5), \qqand P_{\Right} = \frac{1}{2}(1 - \gamma^5),
+    \end{equation}
+    where \(\gamma^5\) is the \(4 \times 4\) matrix
+    \begin{equation}
+        \gamma^5 \coloneqq 
+        \begin{pmatrix}
+            \ident & 0\\
+            0 & -\ident
+        \end{pmatrix}
+        .
+    \end{equation}
+    These are idempotent projectors, meaning \(P_{\Left, \Right}^2 = P_{\Left, \Right}\), and they are orthogonal, so \(P_{\Left} P_{\Right} = P_{\Right} P_{\Left} = 0\).
+    \begin{wrn}
+        There are varying conventions for the exact definition of these projectors, usually differing by a sign.
+    \end{wrn}
+    
+    We can use Dirac spinors to construct two scalars under \(\specialLinear(2, \complex)\).
+    First, we have
+    \begin{equation}
+        \psi_{\Left}^\hermit \psi_{\Right} + \psi_{\Right}^\hermit \psi_{\Left} = \psi^\hermit \gamma^0 \psi = \diracadjoint{\psi}\psi
+    \end{equation}
+    where \(\diracadjoint{\psi} \coloneqq \psi\gamma^0\) is the \defineindex{Dirac adjoint}.
+    This is a symmetric combination of the two scalars we can form from left and right handed two-component spinors.
+    Under parity it transforms into itself, we say it is even under parity, or a proper scalar.
+    
+    We can also take an antisymmetric combination of the two scalars:
+    \begin{equation}
+        \psi_{\Left}^\hermit\psi_{\Right} - \psi_{\Right}^\hermit\psi_{\Left} = -\psi\hermit \gamma^0\gamma^5\psi = -\diracadjoint{\psi}\gamma^5\psi.
+    \end{equation}
+    This transforms into its negative under parity.
+    We say it is odd under parity or a pseudoscalar.
+    
+    Similarly, we can define two four-vectors:
+    \begin{align}
+        \psi_{\Left}^\hermit \sigma_{\mu} \psi_{\Left} + \psi_{\Right}^\hermit \overbar{\sigma}_\mu \psi_{\Right} = \diracadjoint{\psi}\gamma_\mu \psi,\\
+        \psi_{\Left}^\hermit \sigma_{\mu} \psi_{\Left} - \psi_{\Right}^\hermit \overbar{\sigma}_\mu \psi_{\Right} = \diracadjoint{\psi}\gamma_\mu\gamma^5\psi.
+    \end{align}
+    The first of these is odd under parity, which is what we expect for vectors, and the second is even under parity, and we call it a \defineindex{pseudovector}, or an \define{axial vector}\index{axial vector!see{pseudovector}}.
+    Here we've define the \defineindex{Dirac matrices}, or \define{gamma matrices}\index{gamma matrices!see{Dirac matrices}} in the Weyl representation
+    \begin{equation}
+        \gamma_\mu = 
+        \begin{pmatrix}
+            0 & \overbar{\sigma}_\mu\\
+            \sigma_\mu & 0
+        \end{pmatrix}
+        , \qquad \gamma_0 = 
+        \begin{pmatrix}
+            0 & \ident\\
+            \ident & 0
+        \end{pmatrix}
+        , \qqand \gamma_i = 
+        \begin{pmatrix}
+            0 & -\sigma_i\\
+            \sigma_i & 0
+        \end{pmatrix}
+        .
+    \end{equation}
+    These satisfy the \defineindex{Clifford algebra}
+    \begin{equation}
+        \anticommutator{\gamma_\mu}{\gamma_\nu} = 2\minkowskiMetric_{\mu\nu}.
+    \end{equation}
+    The fifth gamma matrix, \(\gamma^5\), is related to \(\gamma^\mu\) by
+    \begin{equation}
+        \gamma^5 = i\gamma_0\gamma_1\gamma_2\gamma_3, \qqand\anticommutator{\gamma^5}{\gamma_\mu} = 0.
+    \end{equation}
+    We also have the identity
+    \begin{equation}
+        \gamma_\mu^\hermit = \gamma_0\gamma_\mu\gamma_0.
+    \end{equation}
+
+    \chapter{Poincar\'e Group}
+    \section{Definition}
+    \begin{dfn}{Poincar\'e Group}{}
+        The Poincar\'e group is defined as the group of all Lorentz transformations and translations of spacetime.
+    \end{dfn}
+    
+    The Poincar\'e group is also called the inhomogeneous Lorentz group.
+    Like the Lorentz group strictly we have nonorthochronous and nonproper Lorentz transformations, but we don't usually consider these and simply say \enquote{Poincar\'e group} for the group of proper orthochronous Lorentz transformations and translations.
+    
+    The Poincar\'e group is the group of all isometries of spacetime, so it is sometimes denoted \(\ISO(1, 3)\).
+    
+    A general Poincar\'e transformation is given by a pair \((\Lambda, a)\), with \(\Lambda \in \specialOrthogonal^+(1, 3)\) and \(a \in \minkowskiSpace\).
+    It acts on some \(x \in \minkowskiSpace\) via
+    \begin{equation}
+        x^\mu \mapsto x'^\mu = \tensor{\Lambda}{^\mu_\nu} x^\nu + a^\mu.
+    \end{equation}
+    
+    Now consider two Poincar\'e transformations, \((\Lambda, a)\) and \((\tilde{\Lambda}, \tilde{a})\).
+    Act on \(x \in \minkowskiSpace\) with these according to
+    \begin{equation}
+        x^\mu \xmapsto{(\Lambda, a)} x'^\mu \xmapsto{(\tilde{\Lambda}, \tilde{a})} x''^\mu,
+    \end{equation}
+    so,
+    \begin{align}
+        x''^\mu &= \tensor{\tilde{\Lambda}}{^\mu_\nu}x'^\nu + \tilde{a}^\mu\\
+        &= \tensor{\tilde{\Lambda}}{^\mu_\nu} (\tensor{\Lambda}{^\nu_\rho} x^\rho + a^\nu) + \tilde{a}^\mu\\
+        &= \tensor{\tilde{\Lambda}}{^\mu_\nu} \tensor{\Lambda}{^\nu_\rho} x^\rho + \tensor{\tilde{\Lambda}}{^\mu_\nu}a^\nu + \tilde{a}^\mu.
+    \end{align}
+    We can recognise this as a single Poincar\'e transformation \((\tilde{\Lambda}\Lambda, \tilde{\Lambda}a + \tilde{a})\).
+    We can identify this way of combining two transformations as a semidirect product.
+    In particular, we have \(\ISO(1, 3) = \minkowskiSpace \rtimes \orthogonal(1, 3)\), or more often we consider \(\minkowskiSpace \rtimes \specialOrthogonal^+(1, 3)\).
+    
+    
+    
     
     \backmatter
 %    \renewcommand{\glossaryname}{Acronyms}
