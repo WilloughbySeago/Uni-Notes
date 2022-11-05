@@ -54,7 +54,7 @@ noabbrev
 % Title page info
 \title{Quantum Field Theory}
 \author{Willoughby Seago}
-\date{}
+\date{September 20th, 2022}
 % \subtitle{}
 % \subsubtitle{}
 
@@ -118,7 +118,7 @@ noabbrev
 \newcommand{\diracadjoint}[1]{\overbar{#1}}
 \newcommand{\phys}{\symup{phys}}
 
-\includeonly{parts/prelim, parts/hamiltonian-calculation}
+\includeonly{parts/prelim, parts/hamiltonian-calculation, parts/grassmann-variables}
 
 \begin{document}
     \frontmatter
@@ -6931,13 +6931,168 @@ noabbrev
     \end{align}
     Now define
     \begin{align}
-        iD_{-}^{ij}(x - y) = \commutator{A_-^i(x)}{A_+^j(y)} = -D_+^{ij}*(y - x).
+        iD_{-}^{ij}(x - y) = \commutator{A_-^i(x)}{A_+^j(y)} = -D_+^{ij}(y - x).
     \end{align}
     We then define the \define{Feynman propagator}\index{Feynman propagator!for photons},
     \begin{equation}
         iD_{\feynman}^{ij}(x - y) \coloneqq \bra{0} \timeOrdering[A^i(x) A^j(y)] \ket{0} = i\int \frac{\dl{^4k}}{(2\pi)^4} \frac{P^{ij}(\vv{k})}{k^2 + i\varepsilon} \e^{-ik\cdot (x - y)}.
     \end{equation}
     This isn't covariant, but it does contain all the relevant physics.
+    
+    Since \(\grad \exp[-ik \cdot (x - y)] = \vv{k} \exp[-ik\cdot (x - y)]\) we can, at least formally, rewrite the projector as
+    \begin{equation}
+        P^{ij}(\vv{k}) \Delta_{\feynman}(x - y) =  \left( \delta^{ij} - \frac{\grad^i\grad^j}{\laplacian} \right) \Delta_{\feynman}(x - y)
+    \end{equation}
+    where \(\Delta_{\feynman}\) is the Feynman propagator for a massless scalar field.
+    The Feynman propagator for photons is then given by
+    \begin{equation}
+        D_{\feynman}^{ij} (x - y) = \left( \delta^{ij} - \frac{\grad^i\grad^j}{\laplacian} \right) \Delta_{\feynman}(x - y).
+    \end{equation}
+    
+    \section{Equal Time Commutation Relations}
+    \epigraph{The best thing I can say about this is it's unpleasant.}{Richard Ball}
+    We can derive the \define{equal time commutation relations}\index{equal time commutation relation!for photons} from the covariant commutation relations by noting that \(\pi^i = -\dot{A}^i\), and so
+    \begin{align}
+        \commutator{A^j(t, \vv{y})}{\pi^i(t, \vv{x})} &= \commutator{\dot{A}^i(t, \vv{x})}{A^j(t, \vv{y})}\\
+        &= \diffp{}{x_0} iD^{ij}(x - y) \bigg|_{x^0 = y^0}\\
+        &= \diffp{}{x_0} \int \frac{\dl{^4k}}{(2\pi)^k} \frac{1}{2\omega(\vv{k})} P^{ij}(\vv{k}) \e^{-ik\cdot (x - y)}\bigg|_{x^0 = y^0}\\
+        &= \int \frac{\dl{^4k}}{(2\pi)^4} \frac{1}{2\omega(\vv{k})} P^{ij}(\vv{k}) (-ik^0) \e^{-ik\cdot(x - y)}\bigg|_{x^0 = y^0}\\
+        &= -i\int \frac{\dl{^4k}}{(2\pi)^4} \frac{1}{2} P^{ij}(\vv{k}) \e^{i\vv{k} \cdot(\vv{x} - \vv{y})} \label{eqn:etcr photons}\\
+        &= -\frac{i}{2} \left( \delta^{ij} - \frac{\grad^i\grad^j}{\laplacian} \right) \int \frac{\dl{^4k}}{(2\pi)^4} \e^{i\vv{k} \cdot(\vv{x} - \vv{y})}\\
+        &= -\frac{i}{2} \left( \delta^{ij} - \frac{\grad^i\grad^j}{\laplacian} \right) \delta(\vv{x} - \vv{y})
+    \end{align}
+    \textcolor{red}{shouldn't have factor of 1/2, also should get overall -ve}
+    Here we've used \(k^0 = \omega(\vv{k})\), which follows since \(\omega(\vv{k}) = \sqrt{\abs{\vv{k}}^2} = \abs{\vv{k}}\), as \(m = 0\), and \(k^2 = (k^0)^2 - \abs{\vv{k}}^2 = 0\), so \(k^0 = \abs{\vv{k}} = \omega(\vv{k})\).
+    
+    This result is not very nice, its not even a real function, but a distribution.
+    It should be understood formally as simply a rewriting of \cref{eqn:etcr photons}.
+    
+    \section{Recovering Covariance}
+    Define a timelike unit four-vector, \(n\), such that in the frame in which we define the Coulomb gauge \(n^\mu = (1, \vv{0})\).
+    Then we can write the Coulomb gauge conditions, \(A^0 = 0\) and \(\div\vv{A} = 0\), as
+    \begin{equation}
+        n^\mu A_\mu = 0, \qqand \partial^\mu A_\mu = 0.
+    \end{equation}
+    The first is obvious, since the definition of \(n^\mu\) gives \(n^\mu A_\mu = A^0\), the second then follows since \(\partial^\mu A_\mu = \partial^0 A_0 - \partial^i A_i = -\partial^i A_i = -\div\vv{A}\) since \(A^0\) vanishes by the first condition.
+    This rewriting of the conditions, although fairly trivial, allows us to use them in  an frame, since they are now manifestly covariant.
+    The results may still be dependent on \(n\) in this new frame however, which means we still need to know how the new frame relates to the one used to define the Coulomb gauge in order to know what \(n\) is in the new frame.
+    
+    Since we have \(k^\mu = (\abs{\vv{k}}, \vv{k})\) in the frame defining the Coulomb gauge we have \(k^2 = 0\) and \(k \cdot n = k^0 = \abs{\vv{k}}\).
+    We then have
+    \begin{equation}
+        \frac{k^\mu}{k \cdot n} - n^\mu = \left( \frac{\abs{\vv{k}}}{\abs{\vv{k}}} - 1, \frac{\vv{k}}{\abs{\vv{k}^2}} \right) = \left( 0, \frac{\vv{k}}{\abs{\vv{k}}} \right).
+    \end{equation}
+
+    We can extend the polarisation vectors to be four-vectors by defining the four-vector \(\varepsilon_r^\mu = (0, \vv{\varepsilon}_r)\) in the frame defining the Coulomb gauge.
+    We then have \(n \cdot \varepsilon = 1 \cdot 0 - \vv{0} \cdot \vv{\varepsilon}_r = 0\), as well as \(k \cdot \vv{\varepsilon}_r = \abs{\vv{k}} \cdot 0 - \vv{k} \cdot \vv{\varepsilon}_r = 0\), since \(\vv{k} \cdot \vv{\varepsilon}_r = 0\).
+    We also have \(\vv{\varepsilon}_r \cdot \vv{\varepsilon}_s^* = \delta_{rs}\), and so \(\varepsilon_r \cdot \varepsilon_s^* = -\delta_{rs}\).
+    
+    We can now expand the field in a manifestly covariant mode expansion:
+    \begin{equation}
+        A^\mu(x) = \sum_{r=1,2} \int \invariantmeasure{k} [\varepsilon_r^\mu(\vv{k}) a_r(\vv{k})\e^{-ik\cdot x} + \varepsilon_r^\mu(\vv{k})^* a_r^\hermit(\vv{k})\e^{ik\cdot x}].
+    \end{equation}
+
+    In the frame defining the Coulomb gauge we have
+    \begin{equation}
+        -\minkowskiMetric^{\mu\nu} + n^\mu n^\nu = 
+        \begin{cases}
+            0 & \text{if } \mu = 0 \text{ or } \nu = 0,\\
+            \delta^{ij} & \text{if } \mu = i = 1, 2, 3 \text{ and } \nu = j = 1, 2, 3.
+        \end{cases}
+    \end{equation}
+    We also have
+    \begin{equation}
+        \left( \frac{k^\mu}{k \cdot n} - n^\mu \right)\left( \frac{k^\nu}{k \cdot n} - n^\nu \right) = 
+        \begin{cases}
+            0 & \text{if } \mu = 0 \text{ or } \nu = 0,\\
+            k^ik^j/\abs{\vv{k}}^2 & \text{if } \mu = i = 1, 2, 3 \text{ and } \nu = j = 1, 2, 3.
+        \end{cases}
+    \end{equation}
+    Recall that the polarisation vectors have the completeness relation
+    \begin{equation}
+        \sum_{r=1,2} \varepsilon^i_r \varepsilon^{j*}_r = \delta^{ij} - \frac{k^ik^j}{\abs{\vv{k}}^2}.
+    \end{equation}
+    We can then use the results we've just derived to replace \(\delta^{ij}\) with \(-\minkowskiMetric^{\mu\nu} + n^\mu n^\nu\) and \(k^ik^j/\abs{\vv{k}}\) with \((k^\mu/(k\cdot n) - n^\mu)(k^\nu/(k\cdot n) - n^\nu)\), giving the manifestly covariant
+    \begin{align}
+        \sum_{r=1,2} \varepsilon_r^\mu \varepsilon_r^{\nu*} &= -\minkowskiMetric^{\mu\nu} + n^\mu n^\nu - \left( \frac{k^\mu}{k \cdot n} - n^\mu \right) \left( \frac{k^\nu}{k \cdot n} - n^\nu \right)\\
+        &= -\minkowskiMetric^{\mu\nu} + n^\mu n^\nu - \frac{k^\mu k^\nu}{(k \cdot n)^2} + \frac{k^\mu n^\nu + n^\mu k^\nu}{k \cdot n} - n^\mu n^\nu\\
+        &= -\minkowskiMetric^{\mu\nu} - \frac{k^\mu k^\nu}{(k \cdot n)^2} + \frac{k^\mu n^\nu + n^\mu k^\nu}{k \cdot n}\\
+        &\eqqcolon P^{\mu\nu}(k)
+    \end{align}
+    where we now define the manifestly covariant quantity \(P^{\mu\nu}(k)\).
+    
+    We can further simplify this by defining the null four-vector \(\overbar{k}^\mu = (\abs{\vv{k}}, -\vv{k})\), which is such that \(\overbar{k}^2 = 0\), and \(k \cdot \overbar{k} = 2 \abs{\vv{k}} = 2(k \cdot n)^2\), so we can write
+    \begin{equation}
+        \frac{k^\mu + \overbar{k}^\mu}{2k\cdot n} = \frac{(2\abs{\vv{k}}, \vv{0})}{2\abs{\vv{k}}} = n^\mu
+    \end{equation}
+    and so
+    \begin{align}
+        P^{\mu\nu}(k) &= -\minkowskiMetric^{\mu\nu} - \frac{k^\mu k^\nu}{(k \cdot n)^2} + \frac{n^\mu k^\nu + k^\mu n^\nu}{k \cdot n}\\
+        &= -\minkowskiMetric^{\mu\nu} - \frac{k^\mu k^\nu}{(k \cdot n)^2} + \frac{1}{k \cdot n} \left[ \frac{k^\mu + \overbar{k}^\mu}{2 k \cdot n}k^\nu + k^\mu \frac{k^\nu + \overbar{k}^\nu}{2k \cdot n} \right]\\
+        &= -\minkowskiMetric^{\mu\nu} - \frac{k^\mu k^\nu}{(k \cdot n)^2} + \frac{1}{2(k \cdot n)^2} (k^\mu k^\nu + \overbar{k}^\mu k^\nu + k^\mu k^\nu + k^\mu \overbar{k}^\nu)\notag\\
+        &= -\minkowskiMetric^{\mu\nu} + \frac{1}{2(k \cdot n)^2}(\overbar{k}^\mu k^\nu + k^\mu \overbar{k}^\nu)\\
+        &= -\minkowskiMetric^{\mu\nu} + \frac{k^\mu \overbar{k}^\nu + \overbar{k}^\mu k^\nu}{k \cdot \overbar{k}}.
+    \end{align}
+    We can now check that, so long as the photon is on-shell, so \(k^2 = \overbar{k}^2 = 0\), \(P^{\mu\nu}\) is a projection operator, that is \(P^{\mu\alpha}\tensor{P}{_\alpha^\nu} \propto P^{\mu\nu}\):
+    \begin{align}
+        P^{\mu\alpha}(k) \tensor{P}{_\alpha^\nu}(k) &= \left( -\minkowskiMetric^{\mu\alpha} + \frac{k^\mu\overbar{k}^\alpha + \overbar{k}^\mu k^\alpha}{k \cdot \overbar{k}} \right) \left( -\tensor{\delta}{_\alpha^\nu} + \frac{k_\alpha \overbar{k}^\nu + \overbar{k}_\alpha k^\nu}{k \cdot \overbar{k}} \right)\\
+        &= \minkowskiMetric^{\mu\nu} - \frac{k^\mu\overbar{k}^\nu + \overbar{k}^\mu k^\nu}{k \cdot \overbar{k}} - \frac{k^\mu \overbar{k}^\nu + \overbar{k}^\mu k^\nu}{k \cdot \overbar{k}}\\
+        &\qquad\qquad + \frac{1}{(k \cdot \overbar{k})^2} (k^\mu \overbar{k}^\alpha + \overbar{k}^\mu k^\alpha)(k_\alpha \overbar{k}^\nu + \overbar{k}_\alpha k^\nu)\\
+    \end{align}
+    now using
+    \begin{align}
+        (k^\mu \overbar{k}^\alpha + \overbar{k}^\mu k^\alpha)(k_\alpha \overbar{k}^\nu + \overbar{k}_\alpha k^\nu) &= k^\mu \overbar{k}^\alpha k_\alpha \overbar{k}^\nu + k^\mu \overbar{k}^\alpha \overbar{k}_\alpha k^\nu \notag\\
+        &\qquad\qquad+ \overbar{k^\mu}k^\alpha k_\alpha \overbar{k}^\nu + \overbar{k}^\mu k^\alpha \overbar{k}_\alpha k^\nu\\
+        &= k^\mu\overbar{k}^\nu k\cdot \overbar{k} + \overbar{k}^\mu k^\nu k \cdot \overbar{k}
+    \end{align}
+    we have
+    \begin{align}
+        P^{\mu\alpha}(k) \tensor{P}{_\alpha^\nu}(k) &= \minkowskiMetric^{\mu\nu} - 2\frac{k^\mu \overbar{k}^\nu + \overbar{k}^\mu k^\nu}{k \cdot \overbar{k}} + \frac{k^\mu \overbar{k}^\nu + \overbar{k}^\mu k^\nu}{k \cdot \overbar{k}}\\
+        &= -P^{\mu\nu}(k).
+    \end{align}
+    
+    The operator \(P^{\mu\nu}(k)\) has two independent zero modes, since we have
+    \begin{align}
+        P^{\mu\nu}(k)k_\nu &= \left( -\minkowskiMetric^{\mu\nu} + \frac{k^\mu\overbar{k}^\nu + \overbar{k}^\mu k^\nu}{k \cdot \overbar{k}^\nu} \right) k_\nu\\
+        &= -k^\mu + \frac{k^\mu(k \cdot \overbar{k}) + \overbar{k}^\mu k^2}{k \cdot \overbar{k}}\\
+        &= 0,
+    \end{align}
+    since \(k^2 = 0\).
+    Similarly,
+    \begin{equation}
+        P^{\mu\nu}(k)\overbar{k}_\nu = 0.
+    \end{equation}
+    
+    We can then write the propagator in a manifestly covariant way:
+    \begin{equation}
+        iD_{\feynman}^{\mu\nu}(x - y) = \bra{0} \timeOrdering[A^\mu(x)A^\nu(y)]\ket{0} = i \int \frac{\dl{^4k}}{(2\pi)^4} \frac{P^{\mu\nu}(k)}{k^2 + i\varepsilon} \e^{-ik\cdot(x - y)}.
+    \end{equation}
+    
+    Note that \(P^{\mu\nu}\) are only projection operators if \(k\) is on-shell, that is \(k^2 = 0\).
+    While this isn't the case in the integral it is true at the pole at \(k^2 = -i\varepsilon\) in the limit \(\varepsilon \to 0\), and since this is the only contribution to the integral we can treat them as projection operators inside the integral.
+    This doesn't hold when we consider internal photons which can be off-shell.
+    These off-shell virtual photons will have extra, non-physical, degrees of freedom which real photons don't have.
+    
+    Note that despite having rewritten everything in a covariant way we are still in the Coulomb gauge.
+    The choice of \(n^\mu\) or \(\overbar{k}^\mu\) picks out a particular direction, so we still need to know about the initial frame in order to transform \(n^\mu\) and \(\overbar{k}^\mu\) into the new frame.
+    We will look for physical results independent of this specific direction, and hence independent of the choice of gauge.
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -9539,6 +9694,230 @@ noabbrev
         ig \int_{x, y} \diracadjoint{\eta}_\alpha(x) S_{\alpha\gamma}(x - z) S_{\gamma\gamma}(z - z) S_{\gamma\beta}(z - y) \eta_\beta(y).
     \end{equation}
     
+    \part{Gauge Fields}
+    \chapter{Gauge Fields}
+    \section{What's a Gauge Field}
+    A \defineindex{gauge field} is a field with a nontrivial local symmetry leaving the action invariant.
+    This symmetry is given by the action of some Lie group\footnote{see \course{Symmetries of Quantum Mechanics} or \course{Symmetries of Particles and Fields}}.
+    
+    We'll focus on the simplest case here, where the Lie group is \(\unitary(1)\)\index{U(1) gauge symmetry@\(\unitary(1)\) gauge symmetry}.
+    This is the symmetry group corresponding to electromagnetism, which is primarily what we consider here, but the standard model also has a \(\unitary(1)\) symmetry corresponding to electroweak interactions.
+    
+    In this case we consider the action
+    \begin{equation}
+        S[A] = \int \dl{^Dx} \, \left( -\frac{1}{4} F^{\mu\nu}(x)F_{\mu\nu}(x) \right)
+    \end{equation}
+    where
+    \begin{equation}
+        F^{\mu\nu}(x) \coloneqq \partial^\mu A^\nu(x) - \partial^\nu A^\mu(x)
+    \end{equation}    
+    is the electromagnetic field strength tensor and \(A^\mu = (\varphi, \vv{A})\) is the electromagnetic field (also known as the electromagnetic potential).
+    
+    Applying the Euler Lagrange equations to this one finds the classical equations of motion\footnote{see \course{Classical Electrodynamics} for this calculation}
+    \begin{equation}
+        \partial_\mu F^{\mu\nu} = 0.
+    \end{equation}
+    This is simply Maxwell's equations with no sources.
+    
+    The action is invariant under the transformation
+    \begin{equation}
+        A_\mu(x) \mapsto A_\mu^\Lambda(x) = A_\mu(x) + \partial_\mu \Lambda(x)
+    \end{equation}
+    where \(\Lambda\) is some function of spacetime with continuous second derivatives.
+    We call this transformation a \defineindex{gauge transformation}.
+    
+    We can readily check that \(F_{\mu\nu}\) is invariant under this transformation:
+    \begin{align}
+        F_{\mu\nu} &\mapsto \partial_\mu(A_\nu + \partial_\nu \Lambda) - \partial_\nu(A_\mu + \partial_\mu \Lambda)\\
+        &= \partial_\mu A_\nu - \partial_\nu A_\mu + \partial_\mu\partial_\nu \Lambda - \partial_\nu\partial_\mu \Lambda\\
+        &= \partial_\mu A_\nu - \partial_\nu A_\mu\\
+        &= F_{\mu\nu}.
+    \end{align}
+    Hence, the action is also invariant under this transformation.
+    
+    \section{First Attempt at a Path Integral}
+    The gauge potential is quadratic in the fields.
+    We can rewrite the action as
+    \begin{equation}
+        S[A] = \frac{1}{2} \int \dl{^Dx} \, A_\mu(x) [\minkowskiMetric^{\mu\nu}\dalembertian - \partial^\mu \partial^\nu] A_\nu(x).
+    \end{equation}
+    This follows by expanding 
+    \begin{align}
+        F_{\mu\nu}F^{\mu\nu} &= (\partial_\mu A_\nu - \partial_\nu A_\mu)(\partial^\mu A^\nu - \partial^\nu A^\mu)\\
+        &= (\partial_\mu A_\nu)(\partial^\mu A^\nu) + (\partial_\nu A_\mu) (\partial^\nu A^\mu) - (\partial_\mu A_\nu) (\partial^\nu A^\mu) - (\partial_\nu A_\mu)(\partial^\mu A^\nu), \notag
+    \end{align}
+    and then noticing that the first term here is
+    \begin{equation}
+        (\partial_\mu A_\nu)(\partial^\mu A^\nu) = \partial_\mu(A_\nu \partial^\mu A^\nu) - A_\nu \partial_\mu(\partial^\mu A^\nu) = \partial_\mu (A_\nu \partial^\mu A^\nu) - A_\nu \dalembertian A^\nu
+    \end{equation}
+    and the first term here is a total derivative, so becomes a surface term with an application of the divergence theorem, and so doesn't contribute to the variation in the action if we choose the variation to vanish on the surface.
+    We can then write \(A_\nu \dalembertian A^\nu = A_\mu \minkowskiMetric^{\mu\nu} \dalembertian A_\nu\).
+    The second term in \(F_{\mu\nu}F^{\mu\nu}\) also has the same form, the indices are just renamed, so we get a factor of 2.
+    The third term is
+    \begin{equation}
+        (\partial_\mu A_\nu)(\partial^\nu A^\mu) = \partial_\mu (A_\nu \partial^\nu A^\mu) - A_\nu\partial_\mu(\partial^\nu A^\mu) = \partial_\mu (A_\nu \partial^\nu A^\mu) - A_\nu \partial^\mu \partial^\nu A_\mu
+    \end{equation}
+    and the first term here again doesn't contribute to the variation in the action.
+    The fourth term is the same after renaming of indices.
+    
+    Having written the action in the form
+    \begin{equation}
+        S[A] = \frac{1}{2} \int \dl{^Dx} \, A_\mu(x) K^{\mu\nu}(x) A_\nu(x)
+    \end{equation}
+    where
+    \begin{equation}
+        K^{\mu\nu}(x) = \minkowskiMetric^{\mu\nu} \dalembertian - \partial^\mu \partial^\nu
+    \end{equation}
+    we may be tempted to recognise this as a quadratic form and then define the path integral to be the Gaussian integral
+    \begin{equation}
+        Z[A] = \int \DL{A} \, \exp\left\{ \frac{i}{2} \int \dl{^Dx} \, A_\mu(x) [\minkowskiMetric^{\mu\nu} \dalembertian - \partial^\mu \partial^\nu] A_\nu(x)  \right\}.
+    \end{equation}
+    
+    However, we quickly run into a problem.
+    In order to compute this integral we need to compute the inverse of the kernel, \(K^{\mu\nu}\), but we find that \(K^{\mu\nu}\) has zero modes and hence is not invertible.
+    This is easiest to see if we move to Fourier space.
+    We can write \(A_\mu(x)\) as
+    \begin{equation}
+        A_\mu(x) = \int \frac{\dl{^Dk}}{(2\pi)^D} \tilde{A}_\mu(k) \e^{-ik \cdot x}
+    \end{equation}
+    and we then have
+    \begin{align}
+        S[A] &= \frac{1}{2} \int \dl{^Dx} \int \frac{\dl{^Dk}}{(2\pi)^D} \int \frac{\dl{^Dk'}}{(2\pi)^D} \tilde{A}_\mu(k) \e^{-ik\cdot x} [\minkowskiMetric^{\mu\nu}\dalembertian - \partial^\mu \partial^\nu] \tilde{A}_\nu(k') \e^{-ik'\cdot x}\\
+        &= \frac{1}{2} \int \dl{^Dx} \int_{k,k'} \tilde{A}_\mu(k) \e^{-ik\cdot x} [-\minkowskiMetric^{\mu\nu}k'^2 + k'^\mu k'^\nu] \tilde{A}_\nu(k') \e^{-ik'\cdot x}\\
+        &= \frac{1}{2} \int_{k,k'} \tilde{A}_\mu(k) [-\minkowskiMetric^{\mu\nu}k'^2 + k'^\mu k'^\nu] \tilde{A}_\nu(k') \e^{-i(k' + k)\cdot x}\\
+        &= \frac{1}{2} \int_{k,k'} \tilde{A}_\mu(k) [-\minkowskiMetric^{\mu\nu}k'^2 + k'^\mu k'^\nu] \tilde{A}_\nu(k') (2\pi)^D\delta(k + k')\\
+        &= \frac{1}{2} \int \frac{\dl{^Dk}}{(2\pi^D)} \tilde{A}_\mu(k) [-\minkowskiMetric^{\mu\nu}k^2 + k^\mu k^\nu] \tilde{A}_\nu(-k).
+    \end{align}
+    The we can see that, defining \(\tilde{K}^{\mu\nu}(k) = -k^2\minkowskiMetric^{\mu\nu} + k^\mu k^\nu\), we have
+    \begin{equation}
+        \tilde{K}^{\mu\nu}(k)k_\nu = -k^2 \minkowskiMetric^{\mu\nu} k + k^\mu k^\nu k_\nu = -k^2 k^\mu + k^\mu k^2 = 0.
+    \end{equation}
+    So, \(\tilde{K}^{\mu\nu}\), and hence \(K^{\mu\nu}\), is not invertible.
+    
+    This generalises to any term \(A^{(0)}_\mu(x) = \partial_\mu \Lambda(x)\) in the gauge field, this becomes \(\tilde{A}^{(0)}_\mu(k) = -ik_\mu \tilde{\Lambda}\) in Fourier space and so is an eigenfunction of the kernel with zero eigenvalue.
+    This means that any gauge term is a zero mode of the kernel.
+    
+    Note that, for on-shell particles,
+    \begin{equation}
+        \tilde{K}^{\mu\nu}(k) = -k^2 \left( \minkowskiMetric^{\mu\nu} - \frac{k^\mu k^\nu}{k^2} \right) = -k^2\pi^{\mu\nu}(k)
+    \end{equation}
+    where \(\pi^{\mu\nu}(k)\) is a projection operator, with \(\pi^{\mu\nu}(k)k_\nu = 0\), so we project out the gauge terms from the action.
+    
+    We interpret this as two field configurations differing only by a gauge transformation having the same weight (action) in the average (path integral) and so giving the same statistical weighted average.
+    Note that in Euclidean space the factor of \(i\) in the path integral becomes \(-1\), and this analogy of a weighted average becomes exact with the Boltzmann distribution replacing the complex amplitude.
+    
+    \section{Faddeev--Popov Procedure}
+    \epigraph{Being physicists we're going to forget that this is undefined and see what happens. Otherwise we'd be mathematicians.}{Luigi Del Debbio}
+    \epigraph{We started with something undefined and ended up with something \dots{} undefined.}{Luigi Del Debbio}
+    A \defineindex{gauge orbit} is a set of fields related by a gauge transformation,
+    \begin{equation}
+        \Omega_A \coloneqq \{ A_\mu^\Lambda(x) \mid \Lambda \text{ is a gauge transformation} \}.
+    \end{equation}
+    This is exactly an orbit in the group theoretical sense, with the group action being that of the gauge group, here \(\unitary(1)\).
+    
+    All of the fields in a gauge orbit describe the same physical state, just in different gauges.
+    In the path integral we want to include one representative for each gauge orbit.
+    We select such a representative by taking it to be the solution to some \defineindex{gauge fixing} condition,
+    \begin{equation}
+        G(A_\mu(x)) = 0,
+    \end{equation}
+    where \(G\) is some function of the fields.
+    
+    By definition of the Dirac delta we have
+    \begin{equation}
+        \int \DL{G} \, \delta(G) = 1.
+    \end{equation}
+    We can perform a change of variables, considering \(G\) to be a function of \(\Lambda\), and we have
+    \begin{equation}
+        1 = \int \DL{\Lambda} \, \delta(G(A_\mu^\Lambda)) \det\left( \diffd{G(A_\mu^\Lambda)}{\Lambda} \right).
+    \end{equation}
+    
+    Now consider what happens when we plug this identity into the path integral, \(Z[A]\), now with an added source term, \(J \cdot A\) in the exponential:
+    \begin{equation}
+        Z[A] = \int \DL{A} \DD{\Lambda} \det\left( \diffd{G}{\Lambda} \right) \delta(G(A^\Lambda_\mu)) \exp\{iS[A] + iJ \cdot A\}.
+    \end{equation}
+    Suppose we choose
+    \begin{equation}
+        G(A^\Lambda_{\mu}) = \partial_\mu(A^\mu + \partial^\mu \Lambda),
+    \end{equation}
+    and we want to work in the Lorentz gauge, where \(\partial_\mu A^\mu = 0\).
+    Then we have \(G(A_\mu^{\Lambda}) = \dalembertian \Lambda\), and so
+    \begin{equation}
+        \diffd{G(A_\mu^\Lambda(x))}{\Lambda(y)} = \delta(x - y) \dalembertian.
+    \end{equation}
+    Notice that this doesn't depend on the gauge field, \(A_\mu\), and so we don't need to work out the determinant in full, since it cancels in the normalisation.
+    This is particular to the simple case of \(\unitary(1)\) gauge symmetries.
+    We then have
+    \begin{align}
+        Z[A] &= \int \DL{\Lambda} \DD{A} \, \delta(G(A_\mu^\Lambda)) \exp\{iS[A] + i \mkern2mu J\cdot A\}\\
+        &= \int \DL{\Lambda} \DD{\Lambda} \, \delta(G(A_\mu^\Lambda)) \exp[iS[A^\Lambda] + i \mkern2mu J \cdot A^\Lambda].
+    \end{align}
+    We can replace \(A\) with \(A^\Lambda\) in the action because we know the action is invariant under gauge transformations.
+    Replacing \(A\) with \(A^\Lambda\) in \(J \cdot A\) gives a term \(J \cdot \Lambda\), after integrating by parts, but we set \(J = 0\) when computing correlators, so this term doesn't change anything.
+    We then drop the \(\Lambda\) notation, writing
+    \begin{equation}
+        Z[A] \propto \int \DL{\Lambda} \DD{A} \, \delta(G(A_\mu)) \exp\{iS[A] + i \mkern2mu J \cdot A\}.
+    \end{equation}
+
+    What this process has done is move the explicitly undefined part of the path integral into the\(\int \DL{\Lambda}\) part, which is exactly the volume of the gauge orbit, and will be normalised out.
+    The rest of the path integral is free from problems when we work with a single representative of \(\Omega_A\), which is what the \(\delta(G(A_\mu))\) term does.
+    
+    We can consider a generalised gauge condition by setting
+    \begin{equation}
+        G(A_\mu) = \partial_\mu A^\mu - \omega(x)
+    \end{equation}
+    for some function \(\omega\).
+    We then have
+    \begin{equation}
+        Z[A] \propto \int \DL{A} \, \delta(\partial_\mu A^\mu - \omega) \exp\{iS[A] + i \mkern2mu J \cdot A\}.
+    \end{equation}
+    Changing \(\omega\) corresponds to changing the representative of \(\Omega_A\) we pick, but doesn't change the physics.
+    This means that all choices of \(\omega\) are equivalent.
+    We can then choose \emph{all} possible functions \(\omega\), and average over them with a Gaussian weight, giving
+    \begin{equation*}
+        Z[A] \propto \int \!\! \DL{\omega} \, \exp\left\{ -i \int \!\! \dl{^Dx} \, \frac{\omega(x)^2}{2\xi} \right\} \int \!\! \DL{A} \, \delta(\partial^\mu A_\mu - \omega) \exp[iS[A] + i \mkern2mu J \cdot A].
+    \end{equation*}
+    We can use the Dirac delta to compute the \(\omega\) integral and set \(\omega(x) = \partial^\mu A_\mu\), giving
+    \begin{align}
+        Z[A] &\propto \int \!\! \DL{A} \, \exp\left\{ -i \int \dl{^Dx} \!\! \, \frac{(\partial^\mu A_\mu)^2}{2\xi} \right\} \exp\left\{ iS[A] + i \mkern2mu J \cdot A \right\}\\
+        &= \int \!\! \DL{A} \exp \left\{ i \int \!\! \dl{^Dx} \left[ \frac{1}{2} A_\mu(x) \left( \minkowskiMetric^{\mu\nu} \dalembertian - \left( 1 - \frac{1}{\xi} \right) \partial^\mu \partial^\nu \right) A_\nu \right] + i \mkern2mu J \cdot A \right\}.\notag
+    \end{align}
+    We can then define the kernel
+    \begin{equation}
+        K^{\mu\nu}(x) = \minkowskiMetric^{\mu\nu}\dalembertian - \left( 1 - \frac{1}{\xi} \right) \partial^\mu \partial^\nu.
+    \end{equation}
+    In momentum space this becomes
+    \begin{equation}
+        \tilde{K}^{\mu\nu}(k) = -\minkowskiMetric^{\mu\nu}k^2 + \left( 1 - \frac{1}{\xi} \right) k^\mu k^\nu.
+    \end{equation}
+    Now notice that \(k_\nu\) is no longer a zero mode of this operator, and instead has eigenvalue \(-1/\xi\).
+    
+    From this we can compute the inverse, which will be the \define{Feynman propagator}\index{Feynman propagator!for photons} in momentum space for the photon field:
+    \begin{equation}
+        \tilde{D}_{\feynman}^{\mu\nu}(k) = \frac{-i}{k^2 + i\varepsilon} \left[ \minkowskiMetric^{\mu\nu} - (1 - \xi) \frac{k^\mu k^\nu}{k^2} \right].
+    \end{equation}
+    
+    We call \(\xi\) the \defineindex{gauge fixing parameter}.
+    If we set it to zero we get what is called the \defineindex{Landau gauge}, and if we set it to one we get the \defineindex{Feynman gauge}.
+    
+    We can then define the generating functional for the fee theory to be the value of the integral above, which we can now compute as a Gaussian integral since the kernel is invertible,
+    \begin{equation}
+        Z_0[J] = \exp\left[ \frac{1}{2} \int \frac{\dl{^{D}k}}{(2\pi)^D} \, \tilde{J}_\mu(x) \tilde{D}_{\feynman}^{\mu\nu}(k) \tilde{J}_\nu(-k) \right],
+    \end{equation}
+    or in position space,
+    \begin{equation}
+        Z_0[J] = \exp\left[ -\frac{1}{2} \int \dl{^D} \dd{^Dy} \, J_\mu(x) D_{\feynman}^{\mu\nu}(x - y) J_\nu(y)  \right]
+    \end{equation}
+    where
+    \begin{align}
+        D^{\mu\nu}_{\feynman}(x - y) &= \int \frac{\dl{^Dk}}{(2\pi)^D} \tilde{D}_{\feynman}^{\mu\nu}(k) \e^{-ik\cdot (x - y)}\\
+        &= -i \bra{0} \timeOrdering [A^\mu(x)A^\nu(t)] \ket{0}\\
+        &= x
+        \tikzsetnextfilename{fd-photon-propagator}
+        \feynmandiagram[small, horizontal=i to o, baseline=-3pt]{i -- [photon] o};
+        y
+    \end{align}
+    is the \defineindex{photon propagator}.
     
     
     %   Appdendix
@@ -9546,174 +9925,7 @@ noabbrev
     \begin{appendices}
         \include{parts/prelim}
         \include{parts/hamiltonian-calculation}
-        \chapter{Grassmann Variables}
-        \label{app:grasmmann variables}
-        \section{What Are They}
-        \begin{dfn}{Grassmann Algebra}{}
-            Let \(V\) be an \(n\)-dimensional vector space over a field, \(\field\), with a basis \(\{\vartheta_i\}\) for \(i =1, \dotsc, n\).
-            The \define{Grassmann algebra}\index{Grassmann!algebra} is defined to be the exterior algebra of \(V\):
-            \begin{equation}
-                \symcal{A} = \bigwedge V \coloneqq \complex \oplus V \oplus (V \wedge V) \oplus (V \wedge V \wedge V) \oplus \dotsb
-            \end{equation}
-            where \(\wedge\) is the totally antisymmetric exterior product.
-            The elements of this algebra are called \define{Grassmann numbers}\index{Grassmann!number} or \define{Grassmann variables}\index{Grassmann!variable}.
-        \end{dfn}
-        
-        Less abstractly, a Grassmann algebra, \(\symcal{A}\), over \(\reals\) or \(\complex\), is constructed from a set, \(\{\vartheta_i\}\), which can be added and scaled like vectors, and we define an antisymmetric product on these elements, so \(\vartheta_i \vartheta_j = -\vartheta_j\vartheta_i\), or
-        \begin{equation}
-            \anticommutator{\vartheta_i}{\vartheta_j} = 0.
-        \end{equation}
-        
-        A general element of this algebra is of the form
-        \begin{equation}
-            z = z_0 + \sum_{k=1}^{n} z_{i_1,i_2,\dotsc,i_k}\vartheta_{i_1}\vartheta_{i_2}\dotsm\vartheta_{i_k},
-        \end{equation}
-        for \(z_0, z_{i_1, \dotsc, i_k} \in \field\) and \(\vartheta_{i_j}\) the basis vectors of \(V\).
-        That is, a general element is a polynomial in the basis vectors such that each basis vector appears at most once in each product, since antisymmetry requires that any term with a repeated basis vector vanishes.
-        
-        If we have \(n\) generators then the Grassmann algebra is a vector space of dimension \(2^n\).
-        We can always pick some canonical ordering for basis vectors, say \(\vartheta_1\), \(\vartheta_2\), and so on, and reorder any term to be in this ordering, up to a sign change.
-        The basis for the Grassmann algebra is formed of products \(\vartheta_{i_1} \vartheta_{i_2} \dotsm \vartheta_{i_k}\) with \(1 \le k \le n\), such that \(i_{j} < i_{j+1}\) for all \(j = 1, \dotsc, n\).
-        There are \(2^n\) such objects, since there are \(\binom{n}{k}\) terms with \(k\) generators, and
-        \begin{equation}
-            \sum_{k = 1}^{n} \binom{n}{k} = 2^n
-        \end{equation}
-        is a well known identity.
-        
-        \section{Parity}
-        \begin{dfn}{Parity}{}
-            Let \(\symcal{A}\) be a Grassmann algebra.
-            \define{parity}\index{Grassmann!parity} is defined as an automorphism, \(P \colon \symcal{A} \to \symcal{A}\) defined on a single generator by
-            \begin{equation}
-                P(\vartheta_i) = -\vartheta_i
-            \end{equation}
-            and as an algebra automorphism we have \(P(\vartheta_i\vartheta_j) = P(\vartheta_i)P(\vartheta_j)\), and so on, and we then extend \(P\) linearly to be defined on all of \(\symcal{A}\).
-            
-            Parity acting on a monomial gives
-            \begin{equation}
-                P(\vartheta_{i_1} \dotsm \vartheta_{i_k}) = (-1)^{k} \vartheta_{i_1} \dotsm \vartheta_{i_k}.
-            \end{equation}
-        \end{dfn}
-        
-        Parity can be thought of as a generalisation of reflection through the origin.
-        As such it defines two eigenspaces, \(\symcal{A}^{\pm}\).
-        If \(a \in \symcal{A}^+\) then \(P(a) = a\), and if \(a \in \symcal{A}^-\) we have \(P(a) = -a\).
-        Note that a general sum of Grassmann variables may not be in either of these eigenspaces, for example, \(\vartheta_1 + \vartheta_2\vartheta_3\) maps to \(-\vartheta_1 + \vartheta_2\vartheta_3\) under parity.
-        
-        \section{Grassmann Differentiation}
-        \begin{dfn}{Grassmann Differentiation}{}
-            For a Grassmann algebra \(\symcal{A}\) we can define \define{Grassmann differentiation}\index{Grassmann!differentation} to be a linear mapping, \(D \colon \symcal{A} \to \symcal{A}\) satisfying the modified product rule
-            \begin{equation}
-                D(a_1a_2) = P(a_1)D(a_2) + D(a_1)a_2.
-            \end{equation}
-        \end{dfn}
-        This product rule is such that
-        \begin{equation}
-            DP + PD = 0,
-        \end{equation}
-        that is differentiation and parity anticommute.
-        We can think of the parity operation as arising because we have to commute \(D\) past \(a_1\) in order to take the derivative of \(a_2\).
-        
-        Note that if \(a \in \symcal{A}^\pm\) then \(D(a) \in \symcal{A}^{\mp}\), that is, the derivative changes the parity of a product of Grassmann variables.
-        
-        We can introduce differential operators, \(\diffp{}/{\vartheta_i}\), with respect ot a Grassmann variable, \(\vartheta_i\), by requiring that the identity
-        \begin{equation}
-            \diffp{\vartheta_j}{\vartheta_i} = \delta_{ij}
-        \end{equation}
-        holds.
-        These then satisfy the anticommutation relations
-        \begin{equation}
-            \diffp{}{\vartheta_i} \diffp{}{\vartheta_j} + \diffp{}{\vartheta_j}\diffp{}{\vartheta_i} = 0, \qqand \vartheta_i \diffp{}{\vartheta_j} + \diffp{}{\vartheta_j}\vartheta_i = 0,
-        \end{equation}
-        in other words we can define the derivatives and generators as operators on \(\symcal{A}\) satisfying the above anticommutation relations.
-        
-        Consider some functions \(\sigma \colon \symcal{A} \to \symcal{A}^-\) and \(x \colon \symcal{A} \to \symcal{A}^+\), and another function \(f \colon \symcal{A}^- \times \symcal{A}^+ \to \symcal{A}\).
-        Then we have the chain rule
-        \begin{equation}
-            \diffp{}{\vartheta} f(\sigma, x) = \diffp{\sigma}{\vartheta}\diffp{f}{\sigma} + \diffp{x}{\vartheta}\diffp{f}{x}.
-        \end{equation}
-        
-        Suppose now that \(F \colon \complex \to \complex\) is an analytic function, at least in the region of interest.
-        Then this function has a Taylor series at \(0\) given by
-        \begin{equation}
-            F(x) = F(0) + x\diffp{F}{x}\bigg|_{x=0} + \order(x^2).
-        \end{equation}
-        We can extend \(F\) to a function of Grassmann variables through its Taylor series, and this is particularly simple, since we have
-        \begin{equation}
-            F(\vartheta) = F(0) + \vartheta\diffp{F}{x}\bigg|_{x=0}
-        \end{equation}
-        exactly, since higher powers vanish by antisymmetry.
-        
-        \section{Grassmann Integration}
-        \begin{dfn}{Grassmann Integration}{}
-            Let \(\symcal{A}\) be a Grassmann algebra over a field, \(\field\), and \(D \colon \symcal{A} \to \symcal{A}\) a differential operator on \(\symcal{A}\).
-            We can define another linear operator \(I \colon \symcal{A} \to \symcal{A}\) called \define{Grassmann integration}\index{Grassmann!integration}.
-            It is defined by requiring the following properties:
-            \begin{itemize}
-                \item \(I\) is linear:
-                \begin{equation}
-                    I(\lambda_1 a_1 + \lambda_2 a_2) = \lambda_1 I(a_1) + \lambda_2 I(a_2)
-                \end{equation}
-                for all \(\lambda_1, \lambda_2 \in \field\) and \(a_1, a_2 \in \symcal{A}\).
-                \item The derivative anticommutes with parity:
-                \begin{equation}
-                    PI + IP = 0.
-                \end{equation}
-                \item \(DI = ID = 0\).
-                \item If \(D(a) = 0\) for some \(a \in \symcal{A}\) then \(I(ba) = I(b)a\) for all \(b \in \symcal{A}\).
-            \end{itemize}
-            Note that all of these properties are satisfied by \(D\), so we can define integration and differentiation to be the same:
-            \begin{equation}
-                \int \dl{\vartheta} \, a = \diffp{}{\vartheta}a
-            \end{equation}
-            for all \(\vartheta, a \in \symcal{A}\).
-        \end{dfn}
-        
-        The requirement that \(ID = 0\) is the requirement that the integral of a total derivative vanishes, which we often require for integration by parts, and that an derivative of an integral vanishes is then just a statement that we want to have \(DI + ID = 0\).
-        
-        This definition gives
-        \begin{equation}
-            \int \dl{\vartheta} \, f(\vartheta) = \frac{1}{\lambda} \int \dl{\vartheta'} \, f(\lambda \vartheta + \mu)
-        \end{equation}
-        for \(\lambda, \mu \in \field\).
-        This follows by writing \(\vartheta\) as a function of \(\vartheta'\), namely \(\vartheta(\vartheta') = \lambda \vartheta' + \mu\).
-        We then have
-        \begin{align}
-            \int \dl{\vartheta} \, f(\vartheta) &= \diffp*{f(\vartheta)}{\vartheta}\\
-            &= \left( \diffp*{f(\vartheta(\vartheta'))}{\vartheta'} \right) \diffp{\vartheta'}{\vartheta} \\
-            &= \left( \diffp*{f(\vartheta(\vartheta'))}{\vartheta'} \right) \left( \diffp{\vartheta}{\vartheta'} \right)^{-1} \\
-            &= \left( \diffp*{f(\vartheta(\vartheta'))}{\vartheta'} \right) \frac{1}{\lambda}\\
-            &= \frac{1}{\lambda} \int \dl{\vartheta'} \, f(\vartheta(\vartheta'))\\
-            &= \frac{1}{\lambda} \int \dl{\vartheta'} \, f(\lambda\vartheta' + \mu).
-        \end{align}
-        This generalises further to
-        \begin{equation}
-            \int \dl{\vartheta_1} \dotsm \dl{\vartheta_k} = \int \dl{\vartheta'_1} \dotsm \dl{\vartheta'_k} \, J(\vartheta')
-        \end{equation}
-        where \(J\) is the \emph{inverse} of the Jacobian for normal integration, meaning
-        \begin{equation}
-            J^{-1} = \det \diffp{\vartheta_i}{\vartheta_j'}.
-        \end{equation}
-        
-        \begin{dfn}{Complex Conjugation}{}
-            Let \(\symcal{A}\) be a Grassmann algebra generated by \(\{\vartheta_i\}\) with \(i = 1, \dotsc, n\).
-            We can define another Grassmann algebra with \(2n\) generators, \(\{\vartheta_i, \overbar{\vartheta}_i\}\).
-            We think of \(\overbar{\vartheta}_i\) as the \define{complex conjugate}\index{Grassmann!complex conjugate} of \(\vartheta_i\).
-        \end{dfn}
-        This process of taking complex conjugates acts much like the Hermitian conjugate, in particular, \(\overbar{\overbar{\vartheta}}_i = \vartheta_i\), \(\overline{(\lambda a + \mu b)} = \lambda^* \overbar{a} + \mu^* \overbar{b}\) for \(\lambda, \mu \in \field\) and \(a, b \in \symcal{A}\), and \(\overline{ab} = \overbar{b}\overbar{a}\) for \(a, b \in \symcal{A}\).
-        
-        This can be used to define a Grassmann Gaussian exponential:
-        \begin{equation}
-            \exp\left[ \sum_{i, j=1}^n \overbar{\vartheta}_i M_{ij} \vartheta_j \right].
-        \end{equation}
-        This is defined through the Taylor series, which vanishes beyond the first order term, so we can first pull out one of the sums giving
-        \begin{equation}
-            \prod_{i = 1}^n \exp\left[ \overbar{\vartheta}_i \sum_{j=1}^n M_{ij} \vartheta_j \right],
-        \end{equation}
-        and then expand the exponential giving
-        \begin{equation}
-            \prod_{i=1}^n \left( 1 + \overbar{\vartheta}_i \sum_{j=1}^n M_{ij}\vartheta_j \right).
-        \end{equation}
+        \include{parts/grassmann-variables}
     \end{appendices}
     
     \backmatter
