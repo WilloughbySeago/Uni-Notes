@@ -7,6 +7,9 @@
 \usepackage{tensor}
 \usepackage{csquotes}
 
+\usepackage{slashed}
+\declareslashed{}{\not}{.1}{.5}{\partial}
+
 % Tikz stuff
 \usepackage{tikz}
 %\tikzset{>=latex}
@@ -42,7 +45,7 @@ noabbrev
 % Title page info
 \title{Symmetries of Particles and Fields}
 \author{Willoughby Seago}
-\date{}
+\date{September 20th, 2022}
 % \subtitle{}
 % \subsubtitle{}
 
@@ -111,6 +114,8 @@ noabbrev
 }
 \newcommand{\diracadjoint}[1]{\overbar{#1}}
 \DeclareMathOperator{\ISO}{ISO}
+\newcommand{\dalembertian}{\partial^2}
+\newcommand{\lagrangianDensity}{\symcal{L}}
 
 \hyphenation{poin-car\'e}
 
@@ -3591,7 +3596,7 @@ noabbrev
     \begin{equation}
         W_\mu = \lambda P_\mu
     \end{equation}
-    where \(\Lambda\) is some invariant we call the \defineindex{helicity}.
+    where \(\lambda\) is some invariant we call the \defineindex{helicity}.
     
     Let \(\eta^\mu = (1, \vv{0})\).
     Then we have
@@ -3609,6 +3614,434 @@ noabbrev
     \subsection{\texorpdfstring{\(p^2 < 0\)}{p squared Negative}}
     This representation corresponds to tachyons, i.e., particles travelling faster than light.
     They are acausal and unphysical, so we won't consider them further.
+    
+    \chapter{Fields}
+    \section{Why Fields?}
+    The motivation for introducing fields into our theories is from Casimir operators.
+    In the semisimple or compact case the Casimirs have discrete spectra, and so states correspond to finite dimensional vectors (using vectors here in the mathematical sense to mean \enquote{elements of a vector space}, which in this case could include scalars, spinors, four-vectors, or tensors).
+    In the nonsemisimple case some Casimir operators will have continuous spectra, and so the states are instead given by elements of an infinite dimensional vector space, these are functions of spacetime, or fields as we call them in physics.
+    
+    In the case of a Poincar\'e transformation with \(p^2 = m^2 \ne 0\) we had states \(\ket{p_i, m, s, s_z}\) where \(p_i\) are continuous.
+    Now we generalise this by introducing fields, \(\varphi_s(x)\) where \(s\) labels the discrete dependencies of the field, which is usually, but not always, the spin, and \(x\) is a point in spacetime.
+    We then have states
+    \begin{equation}
+        \ket{x, s} = \varphi_s(x) \ket{0}
+    \end{equation}
+    where \(\ket{0}\) is the vacuum state, defined by transforming trivially in the \((0, 0)\) representation of the Poincar\'e group.
+    We then construct a general state as a superposition of \(\ket{x, s}\).
+    
+    \section{Transformation of Fields}
+    Under a Poincar\'e transformation a state \(\ket{\psi}\) transforms as
+    \begin{equation}
+        \ket{\psi} \mapsto U^{-1}(a, \Lambda) \ket{\psi}
+    \end{equation}
+    where \(U\) is a representation of the Poincar\'e group and \(x\) transforms according to \(x \mapsto \Lambda x + a\).
+    We use \(U^{-1}\) since this is a passive transformation, the state isn't changing, but the coordinate system is.
+    
+    Now consider how \(\ket{x, s} = \varphi_s(x)\ket{0}\) transforms under this representation:
+    \begin{equation}
+        \varphi_s(x) \mapsto U^{-1}(a, \Lambda) \varphi_s(x)\ket{0},
+    \end{equation}
+    but we know that \(\ket{0}\) is also a state, so transforms as
+    \begin{equation}
+        \ket{0} \mapsto U^{-1}(a, \Lambda)\ket{0}.
+    \end{equation}
+    In order for both of these transformation laws to hold it must be that \(\varphi_s(x)\) transforms as
+    \begin{equation}
+        \varphi_s(x) \mapsto U^{-1}(a, \Lambda) \varphi_s(x) U(a, \Lambda).
+    \end{equation}
+    
+    Suppose that \(\varphi\) is a scalar field depending only on position, then it must transform as
+    \begin{equation}
+        \varphi_s(x) \mapsto U^{-1}(a, \Lambda) \varphi(x) U(a, \Lambda) = \varphi(\Lambda x + a),
+    \end{equation}
+    since the value of the scalar field cannot change under a Poincar\'e transformation of the coordinates.
+    
+    We can write \(U(a, \Lambda)\) as
+    \begin{equation}
+        U(a, \Lambda) = U(a, \ident) U(0, \Lambda),
+    \end{equation}
+    and under an infinitesimal transformation we know that
+    \begin{equation}
+        U(a, \ident) \approx 1 + ia_\mu P^\mu, \qqand U(0, \Lambda) \approx 1 + \frac{i}{2}\omega^{\mu\nu}M_{\mu\nu}.
+    \end{equation}
+    Expanding \(U^{-1}\varphi U\) to first order we have
+    \begin{align}
+        U^{-1}\varphi U &= U^{-1}(a, \Lambda)\varphi(x)U(a, \Lambda)\\
+        &= U^{-1}(0, \Lambda)U^{-1}(a, \ident) \varphi(x) U(a, \ident) U(0, \Lambda)\\
+        &= \left( 1 - \frac{i}{2}\omega^{\mu\nu}M_{\mu\nu} \right)(1 - ia_\rho P^\rho) \varphi(x) (1 + ia_\sigma P^\sigma)\left( 1 + \frac{i}{2}\omega^{\alpha\beta}M_{\alpha\beta} \right)\notag\\
+        &= \varphi(x) - \frac{i}{2}\omega^{\mu\nu}M_{\mu\nu}\varphi(x) + \frac{i}{2}\varphi(x)\omega^{\alpha\beta}M_{\alpha\beta}\\
+        &\qquad- ia_\rho P^\rho \varphi(x) + a_\sigma\varphi(x) P^\sigma\\
+        &= \varphi(x) - \frac{i}{2}\omega^{\mu\nu} \commutator{M_{\mu\nu}}{\varphi(x)} - ia_\rho \commutator{P^\rho}{\varphi(x)}.
+    \end{align}
+    
+    If \(x \mapsto x' = \Lambda x + a\) then we have
+    \begin{equation}
+        \diffp{}{x_\mu} \mapsto \diffp{}{x_\mu'} = \diffp{x_\nu}{x'_\mu} \diffp{}{x_\nu} = \tensor{\Lambda}{^\mu_\nu} \diffp{}{x_\nu}
+    \end{equation}
+    where we've identified \(\diffp{x_\nu}/{x'_\mu} = \tensor{\Lambda}{^\mu_\nu}\) by differentiating the transformation law for \(x\).
+    What this means is that if \(\varphi\) is a scalar then \(\partial^\mu \varphi\) is a vector, \(\partial^\mu \partial^\nu \varphi\) is a rank 2 tensor, and \(\partial_\mu \partial^\mu \varphi \eqqcolon \dalembertian \varphi\) is a scalar again.
+    
+    Consider the translation \(x \mapsto x + a\), we have
+    \begin{equation}
+        \varphi(x) \mapsto \varphi(x + a) = \varphi(x) + a_\mu \partial^\mu \varphi + \order(a^2),
+    \end{equation}
+    and similarly under a Lorentz transformation, \(x \mapsto \Lambda x\), we have
+    \begin{equation}
+        \varphi(x) \mapsto \varphi(\Lambda x) = \varphi(x) + \tensor{\omega}{_\mu^\nu}x_\nu \partial^\mu \varphi + \order(\omega^2).
+    \end{equation}
+    We can then identify the change in \(\varphi\) under a Poincar\'e transformation as
+    \begin{equation}
+        \delta \varphi = -a_\mu \commutator{P^\mu}{\varphi} - \frac{i}{2}\omega_{\mu\nu} \commutator{M^{\mu\nu}}{\varphi} = a_\mu \partial^\mu \varphi + \tensor{\omega}{_\mu^\nu}x_\nu \partial^\mu \varphi.
+    \end{equation}
+    Since this holds for all infinitesimal Poincar\'e transformations we have
+    \begin{align}
+        \commutator{P^\mu}{\varphi} &= i\partial^\mu \varphi,\\ \commutator{M^{\mu\nu}}{\varphi} &= i(x^\nu \partial^\mu - x^\mu \partial^\nu) \varphi = (x^\nu P^\mu - x^\mu P^\nu)\varphi.
+    \end{align}
+    Here we antisymmetries the coefficient of \(\tensor{\omega}{_\mu^\nu}\) because we know that \(M^{\mu\nu}\) is antisymmetric.
+    Note that the last equality only holds when we are acting on the vacuum state, which has \(P^\mu \ket{0} = 0\).
+    
+    Writing \(P^\mu = (H, \vv{P})\) we have
+    \begin{align}
+        \commutator{H}{\varphi} &= i\diffp{\varphi}{t},\\
+        \commutator{\vv{P}}{\varphi} &= -i\grad \varphi,\\
+        \commutator{\vv{J}}{\varphi} &= -i\vv{x} \times \grad\varphi.
+    \end{align}
+    The first of these is pretty much Heisenberg's equation of motion, the second should be familiar from quantum mechanics where \(-i\grad\) is the momentum operator, and after making this identification we can identify the third as the angular momentum operator.
+    Using \(P^\mu\ket{0} = 0\) we have
+    \begin{equation}
+        H\ket{\vv{x}, t} = i\diffp{}{t} \ket{x, t},
+    \end{equation}
+    which is Schrödinger's equation.
+    
+    Now consider the Fourier transform of our field,
+    \begin{equation}
+        \tilde{\varphi}(p) = \int \dl{^4x} \, \e^{-ip\cdot x} \varphi(x).
+    \end{equation}
+    Then we have \(\commutator{P_\mu}{\tilde{\varphi}(p)} = p_\mu\varphi(p)\), essentially moving to the momentum basis.
+    
+    Suppose now that \(\varphi\) is \emph{not} a scalar field.
+    Then we'll have an extra factor of 
+    \begin{equation}
+        D(\Lambda) = \exp\left[ \frac{i}{2}\omega^{\mu\nu}S_{\mu\nu} \right]
+    \end{equation}
+    in the transformation law where \(S_{\mu\nu}\) is the generator of the Lorentz group in whatever representation \(\varphi\) transforms under.
+    That is,
+    \begin{equation}
+        U^{-1}(a, \Lambda) \varphi(x) U(a, \Lambda) = D(\Lambda)\varphi(\Lambda x + a).
+    \end{equation}
+    We then have
+    \begin{equation}
+        \commutator{P_\mu}{\varphi} = i\partial_\mu \varphi
+    \end{equation}
+    as before, since the \(a_\mu\) dependence is unchanged.
+    The commutation relation for \(M_{\mu\nu}\) becomes
+    \begin{equation}
+        \commutator{M_{\mu\nu}}{\varphi} = i(x_\nu \partial_\mu - x_\mu \partial_\nu)\varphi + S_{\mu\nu}.
+    \end{equation}
+    Defining \(L_{\mu\nu} \coloneqq x_\nu \partial_\mu - x_\mu \partial_\nu\) we can identify \(L_{\mu\nu} + S_{\mu\nu}\) as the total angular momentum, with \(L_{\mu\nu}\) being the orbital angular momentum and \(S_{\mu\nu}\) the spin.
+    
+    For a scalar \(D(\Lambda) = 1\), and so \(S_{\mu\nu} = 0\), meaning scalars have no spin.
+    For a Weyl spinor \(\omega^{\mu\nu}S_{\mu\nu} = i\omega^{\mu\nu}\sigma_{\mu\nu}/2\), where \(\sigma{\mu\nu} = \commutator{\sigma_\mu}{\overbar{\sigma}_\nu}\).
+    For a four-vector \(\tensor{(\omega^{\mu\nu}S_{\mu\nu})}{^\alpha_\beta} = \tensor{\omega}{^\alpha_\beta}\).
+    
+    The Pauli--Lubanski vector, \(W^\mu = \varepsilon_{\mu\nu\rho\sigma} M^{\nu\rho}P^\sigma/2\), becomes just \(W^\mu = \varepsilon_{\mu\nu\rho\sigma}S^{\nu\rho}P^\sigma/2\), since \(L^{\nu\rho}\) is symmetric.
+    This means that \(W^{\mu}\), and hence the Casimir \(W^2\), only depends on the spin angular momentum, not on the orbital angular momentum.
+    
+    \part{Symmetry in Action}
+    \chapter{Action Principles}
+    \section{Action}
+    \begin{rmk}
+        For action principles in classical mechanics see \course{Lagrangian Dynamics}, for action principles in classical field theory see \course{Classical Electrodynamics}, for action principles in quantum mechanics see \course{Quantum Theory}, and for action principles in quantum field theories see \course{Quantum Field Theory}.
+    \end{rmk}
+    It seems like all of physics can be described using action principles.
+    If we have some degrees of freedom, be they coordinates or fields, then the action is a functional of these degrees of freedom, such that the action is extremised for the classical path of motion.
+    Things get a little more complicated when we consider quantum mechanics, then we instead consider a sum (or integral) over the amplitudes for different paths, each weighted by a factor of \(\exp[i S]\), where \(S\) is the action.
+    This reduces to the classical path through the method of stationary phase\footnote{See \course{Methods of Mathematical Physics}.}
+    
+    We will consider a field theory with some field, \(\Phi\), which evolves according to an action principle.
+    We make no \textit{a priori} assumptions about \(\Phi\), apart from being differentiable, \(\Phi\) could be a scalar, vector, spinor, tensor, and so on.
+    We also allow for the theories with multiple fields by assuming a sum over all fields.
+    
+    We make the following assumptions of our action, chosen to give reasonable physics:
+    \begin{itemize}
+        \item \textit{Locality}: We assume that the action is of the form
+        \begin{equation}
+            S = \int_{V} \dl{^4x}\, \lagrangianDensity
+        \end{equation}
+        where \(\dl{^4x} = \dl{t} \dd{x} \dd{y} \dd{z}\) is the Lorentz invariant integration measure, \(V\) is some region of integration, and \(\lagrangianDensity\) is the \defineindex{Lagrangian density}, although we follow the very common abuse of termination calling this the \defineindex{Lagrangian}, which is more properly given by
+        \begin{equation}
+            L = \int \dl{^3x} \, \lagrangianDensity \implies S = \int \dl{t} \, L.
+        \end{equation}
+        We assume that \(\lagrangianDensity\) is a function of \(\Phi\) the field, and also derivatives of \(\Phi\), all evaluated at just a single point, \(x\).
+        This precludes action at a distance.
+        This requirement ensures causality in quantum theory.
+        
+        \item \textit{Unitarity}: We assume the action, and by extension the Lagrangian, is real, this guarantees probability conservation in quantum theories.
+        
+        \item \textit{Causality}: We require that \(S\) leads to classical equations of motion which obey causality.
+        In practice it can be shown that this requires that \(\lagrangianDensity\) depends only on the field and first or second order derivatives.
+        
+        \item \textit{Symmetry}: We assume that the action is Poincar\'e invariant.
+        Since \(\dl{^4x}\) is Poincar\'e invariant this means that \(\lagrangianDensity\) must be a Lorentz invariant function of the fields.
+        Translation invariance is not required, since by integrating over a region we can recover translation invariance from a non-translation invariant object.
+        
+        We also impose further symmetries depending on the system under consideration.
+        These may include reflection symmetry, rotational symmetry, gauge symmetries, such as \(\unitary(1)\), and so on.
+        
+        \item \textit{Renormalisability}: Terms in the action with dimension \([\text{energy}]^{-n}\) for some \(n > 0\) generally cause the quantum theory to lose all predictive power at energies on the order of one energy unit.
+        We either require that such terms don't appear or are negligibly small.
+        This gives another reason for neglecting higher order derivatives.
+    \end{itemize}
+    
+    \section{Classical Equations of Motion}
+    In a theory described by an action principle the classical equations of motion are equivalent to the requirement that the action is extremised, typically we minimise the action.
+    This can be compactly stated as
+    \begin{equation}
+        \delta S = 0,
+    \end{equation}
+    which is Hamilton's principle.
+    Here \(\delta S = S[\Phi + \delta \Phi] - S[\Phi]\) where \(\delta \Phi\) is some small variation in the field \(\Phi\).
+    
+    It is possible to go from the definition of \(S\) and calculate \(\delta S\) each time and set it to zero to obtain the classical equations of motion.
+    However, this will result in us repeating the same steps over and over.
+    It is often useful to make an assumption about the form of \(\lagrangianDensity\) and then derive equations which hold for all \(\lagrangianDensity\) of this form.
+    
+    Suppose that \(\lagrangianDensity\) is a function of the field, \(\Phi\), and its derivative, \(\partial_\mu \Phi\).
+    Then we have
+    \begin{align}
+        \delta S &= \delta \int \dl{^4x} \,v\lagrangianDensity(\Phi, \partial_\mu \Phi)\\
+        &= \int \dl{^4x} \, \lagrangianDensity(\Phi + \delta\Phi, \partial_\mu(\Phi + \delta \Phi)) - \int \dl{^4x} \, \lagrangianDensity(\Phi, \partial_\mu \Phi)\\
+        &= \int \dl{^4x} \, [\lagrangianDensity(\Phi + \delta\Phi, \partial_\mu(\Phi + \delta\Phi)) - \lagrangianDensity(\Phi, \partial_\mu \Phi)]\\
+        &= \int \dl{^4x} \, \delta\lagrangianDensity.
+    \end{align}
+    We can work out the variation in \(\lagrangianDensity\) by expanding to first order:
+    \begin{equation}
+        \lagrangianDensity(\Phi + \delta \Phi, \partial_\mu (\Phi + \delta \Phi)) = \lagrangianDensity(\Phi, \partial_\mu \Phi) + \diffp{\lagrangianDensity}{\Phi} \delta \Phi + \diffp{\lagrangianDensity}{(\partial_\mu \Phi)} \delta(\partial_\mu \Phi).
+    \end{equation}
+    So, the variation in \(\lagrangianDensity\) is
+    \begin{equation}
+        \delta\lagrangianDensity = \diffp{\lagrangianDensity}{\Phi} \delta \Phi + \diffp{\lagrangianDensity}{(\partial_\mu \Phi)} \delta(\partial_\mu \Phi).
+    \end{equation}
+    Now consider the \(\delta(\partial_\mu \Phi)\) term, we have \begin{equation}
+        \partial_\mu(\delta \Phi) = \partial_\mu(\Phi + \delta \Phi - \Phi) = \partial_\mu (\Phi + \delta \Phi) - \partial_\mu(\Phi) = \delta(\partial_\mu \Phi).
+    \end{equation}
+    So, \(\delta(\partial_\mu \Phi) = \partial_\mu(\delta \Phi)\).
+    Hence, the variation in \(\lagrangianDensity\) is
+    \begin{equation}
+        \delta\lagrangianDensity = \diffp{\lagrangianDensity}{\Phi} \delta \Phi + \diffp{\lagrangianDensity}{(\partial_\mu \Phi)} \partial_\mu(\delta\Phi).
+    \end{equation}
+    
+    The variation in \(S\) is then
+    \begin{align}
+        \delta S &= \int_V \dl{^4x} \, \left( \diffp{\lagrangianDensity}{\Phi} \delta \Phi + \diffp{\lagrangianDensity}{(\partial_\mu \Phi)} \partial_\mu(\delta \Phi) \right)\\
+        &= \int_V \dl{^4x} \, \left( \diffp{\lagrangianDensity}{\Phi} \delta \Phi + \partial_\mu\left( \diffp{\lagrangianDensity}{(\partial_\mu \Phi)} \delta \Phi \right) - \partial_\mu\left( \diffp{\lagrangianDensity}{(\partial_\mu \Phi)} \right) \delta \Phi \right)\\
+        &= \int_V \dl{^4x} \left( \diffp{\lagrangianDensity}{\Phi} - \partial_\mu \left( \diffp{\lagrangianDensity}{\Phi} \right) \right) \delta\Phi - \int_V \dl{^4x} \, \partial_\mu \left( \diffp{\lagrangianDensity}{(\partial_\mu \Phi)} \delta \Phi \right)\\
+        &= \int_V \dl{^4x} \left( \diffp{\lagrangianDensity}{\Phi} - \partial_\mu \left( \diffp{\lagrangianDensity}{\Phi} \right) \right) \delta\Phi - \int_{\partial V} \dl{\Sigma} \, n_\mu \diffp{\lagrangianDensity}{(\partial_\mu \Phi)} \delta\Phi.
+    \end{align}
+    Here we've used the chain rule to rewrite the second term in the first line.
+    We then use the divergence theorem in the last line to turn the integral into an integral over the boundary, \(\partial V\).
+    Here \(\Sigma\) is a surface element, and \(n_\mu\) is normal to the surface.
+    
+    If we require that \(\delta S = 0\) then for any variation, \(\delta\Phi\), chosen such that \(\delta\Phi\) vanishes on \(\partial V\) we must have that the integrand in the first integral vanishes, that is
+    \begin{equation}
+        \diffp{\lagrangianDensity}{\Phi} = \partial_\mu \left( \diffp{\lagrangianDensity}{(\partial_\mu\lagrangianDensity)} \right).
+    \end{equation}
+    These are the \defineindex{Euler--Lagrange equations} for a Lagrangian depending only on the field \(\Phi\) and its derivative, \(\partial_\mu \Phi\).
+    
+    \section{Examples}
+    In this section we'll give some examples of Lagrangians and the classical equations of motion we derive from them.
+    For details about the solutions and where the Lagrangians come from see \course{Quantum Field Theory}.
+    
+    \subsection{Scalar Field}
+    The Lagrangian for a free scalar field, \(\varphi\), is
+    \begin{equation}
+        \lagrangianDensity = \frac{1}{2}(\partial_\mu \varphi)(\partial^\mu \varphi) - \frac{1}{2}m^2\varphi^2
+    \end{equation}
+    where \(m\) is a constant with units of mass.
+    We have
+    \begin{equation}
+        \diffp{\lagrangianDensity}{\varphi} = -m^2\varphi
+    \end{equation}
+    and
+    \begin{align}
+        \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} &= \diffp{}{(\partial_\mu \varphi)} \frac{1}{2} \minkowskiMetric^{\nu\rho}(\partial_\nu \varphi)(\partial_\rho \varphi)\\
+        &= \frac{1}{2}\minkowskiMetric^{\nu\rho} \left[ \diffp{(\partial_\nu \varphi)}{(\partial_\mu \varphi)} (\partial_\rho \varphi) + (\partial_\nu \varphi) \diffp{(\partial_\rho \varphi)}{(\partial_\mu \varphi)} \right]\\
+        &= \frac{1}{2}\minkowskiMetric^{\nu\rho} [\tensor{\delta}{^\mu_\nu} (\partial_\rho \varphi) + (\partial_\nu \varphi) \tensor{\delta}{^\mu_\rho}]\\
+        &= \frac{1}{2}[\minkowskiMetric^{\mu\rho} (\partial_\rho \varphi) + (\partial_\nu \varphi) \minkowskiMetric^{\nu\mu}]\\
+        &= \frac{1}{2}[(\partial^\mu\varphi) + (\partial^\mu\varphi)]\\
+        &= \partial^\mu\varphi
+    \end{align}
+    Hence,
+    \begin{equation}
+        \partial_\mu\left( \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \right) = \partial_\mu \partial^\mu \varphi = \dalembertian\varphi.
+    \end{equation}
+    For most calculations like this we can just proceed as if \((\partial_\mu \varphi)(\partial^\mu \varphi)\) was \((\partial_\mu\varphi)^2\), and then work out whether we need upper or lower indices to match what we start with.
+    
+    
+    The classical equations of motion are thus
+    \begin{equation}
+        -m^2\varphi = \dalembertian\varphi \implies (\dalembertian + m^2)\varphi = 0.
+    \end{equation}
+    This is the \defineindex{Klein--Gordon equation}.
+    
+    \subsection{Fermion Field}
+    For fermions the field, \(\psi\), is a spinor.
+    We treat \(\psi\) and its conjugate, \(\psi^\hermit\), as independent variables.
+    The Lagrangian for a free spin \(1/2\) fermion field is then
+    \begin{equation}
+        \lagrangianDensity = \diracadjoint{\psi} (i\slashed{\partial} - m)\psi
+    \end{equation}
+    where \(\diracadjoint{\psi} = \psi^\hermit\gamma^0\) and \(\slashed{\partial} = \gamma^\mu \partial_\mu\).
+    We then have
+    \begin{equation}
+        \diffp{\lagrangianDensity}{\psi^\hermit} = \gamma^0(i\slashed{\partial} - m)\psi, \qqand \diffp{\lagrangianDensity}{(\partial_\mu \psi^\hermit)} = 0.
+    \end{equation}
+    Since \((\gamma^0)^2 = \ident\) we can multiply by \(\gamma^0\) and we get the classical equations of motion
+    \begin{equation}
+        (i\slashed{\partial} - m)\psi = 0.
+    \end{equation}
+    This is the \defineindex{Dirac equation}.
+    
+    We can also derive an equation of motion by varying \(\psi\).
+    This can be done using the Euler--Lagrange equations, but here we'll do it by varying the action,
+    \begin{equation}
+        S = \int \dl{^4x} \, \diracadjoint{\psi}(i\slashed{\partial} - m)\psi.
+    \end{equation}
+    We then have
+    \begin{equation}
+        \delta \lagrangianDensity = \diracadjoint{\psi}(i\slashed{\partial} - m)(\psi + \delta\psi) - \diracadjoint{\psi}(i\slashed{\partial} - m)\psi = -\diracadjoint{\psi}(i\slashed{\partial} - m)\delta\psi
+    \end{equation}
+    and so
+    \begin{equation}
+        \delta S = \int \dl{^4x} \, \diracadjoint{\psi}(i\slashed{\partial} - m)\delta\psi.
+    \end{equation}
+    We have \(\diracadjoint{\psi}\slashed{\partial} \delta \psi\), we can rewrite this as \(\slashed{\partial}(\diracadjoint{\psi}\delta\psi) - (\slashed{\partial}\diracadjoint{\psi})\delta\psi\).
+    The first term gives a surface term which doesn't effect the action if we choose \(\delta\psi = 0\) on the boundary of the integration region, and so we have
+    \begin{equation}
+        \delta S = \int \dl{^4x} \, (-i\slashed{\partial}\diracadjoint{\psi} - m\diracadjoint{\psi})\delta\psi.
+    \end{equation}
+    Demanding this vanishes for all variations \(\delta \psi\) vanishing on the boundary we have the equation of motion
+    \begin{equation}
+        -i\slashed{\partial}\diracadjoint{\psi} - m\diracadjoint{\psi} = 0.
+    \end{equation}
+    This isn't actually a new equation, it's just the Hermitian conjugate of the Dirac equation:
+    \begin{align}
+        [-i\slashed{\partial}\diracadjoint{\psi} - m\diracadjoint{\psi}]^\hermit &= [-i\gamma^\mu \partial_\mu \psi^\hermit \gamma^0 - m\psi^\hermit \gamma^0]^\hermit\\
+        &= i\partial_\mu \gamma^0 \psi \gamma^\mu - m \gamma^0 \psi
+    \end{align}
+    which is \(\gamma^0\) times the left hand side of the Dirac equation.
+    
+    \subsection{Gauge Fields}
+    The Lagrangian for a free gauge field, \(A^\mu\), is
+    \begin{equation}
+        \lagrangianDensity = -\frac{1}{4} F^{\mu\nu}F_{\mu\nu}, \qqwhere F^{\mu\nu} = \partial^\mu A^\nu - \partial^\nu A^\mu.
+    \end{equation}
+    This gives the Maxwell equations with no sources, \(\partial_\mu F^{\mu\nu} = 0\), or generalises to give the equations of motion for a Yang--Mills theory.
+    
+    \section{Surface Terms}
+    The classical equations of motion arise by setting the coefficient of the bulk variation to zero.
+    This is just a fancy way to say we demand that the variation in the action vanishes, apart from a possible surface term.
+    We call this the variation in the action the bulk variation, as opposed to the local variation of a field, since the action is defined as an integral over spacetime.
+    
+    In terms of the Lagrangian this means that the transformation
+    \begin{equation}
+        \lagrangianDensity \mapsto \lagrangianDensity + \partial_\mu K^\mu
+    \end{equation}
+    doesn't change the bulk variation, and hence doesn't change the equations of motion.
+    Such a change of \(\lagrangianDensity\) is called a \defineindex{canonical transformation}.
+    
+    It is possible that such a transformation does result in a change of boundary conditions on \(\delta \Phi\), such as changing from \(\delta\Phi = 0\) on the boundary to \(\partial_t \delta\Phi = 0\) on the boundary.
+    
+    \section{Noether's Theorem}
+    Consider a variation \(\Phi \mapsto \Phi + \delta \Phi\) where
+    \begin{equation}
+        \delta \Phi = \alpha \diffp{\Phi}{\alpha} \bigg|_{\alpha = 0}.
+    \end{equation}
+    Note the similarity to how we define the generators of a Lie algebra from the Lie group.
+    This variation could come from a translation, \(x \mapsto x + a\), in which case we have
+    \begin{equation}
+        \Phi(\alpha) = \Phi(0) + \diffp{\Phi}{\alpha} \bigg|_{\alpha = 0} \alpha + \dotsb.
+    \end{equation}
+    Here \(\alpha\) is the parameter of some continuous symmetry, and \(\alpha\) is constant in spacetime.
+    We call this a \defineindex{global symmetry}, where we do he same thing to \(\Phi\) at every point in spacetime.
+    
+    If the integration measure, \(\dl{^4x}\), is invariant for a global symmetry, which it is for Lorentz boosts and translations, then the symmetry will be a symmetry of the equations of motion, provided that \(\lagrangianDensity\) transforms as
+    \begin{equation}
+        \lagrangianDensity \mapsto \lagrangianDensity + \alpha\partial_\mu K^\mu
+    \end{equation}
+    to first order in \(\alpha\) for some differentiable \(K^\mu\), which may simply be zero.
+    
+    Then the variation in \(\delta\lagrangianDensity\) under this symmetry is
+    \begin{align}
+        \delta\lagrangianDensity &= \diffp{\lagrangianDensity}{\Phi} \delta\Phi + \diffp{\lagrangianDensity}{(\partial_\mu \Phi)}\partial_\mu(\delta\Phi)\\
+        &= \diffp{\lagrangianDensity}{\Phi} \alpha \diffp{\Phi}{\alpha} + \diffp{\lagrangianDensity}{(\partial_\mu \Phi)} \partial_\mu\left( \alpha\diffp{\Phi}{\alpha} \right)\\
+        &= \alpha \diffp{\lagrangianDensity}{\Phi} \diffp{\Phi}{\alpha} + \partial_\mu\left( \diffp{\lagrangianDensity}{(\partial_\mu \Phi)} \alpha \diffp{\Phi}{\alpha} \right) - \partial_\mu\left( \diffp{\lagrangianDensity}{(\partial_\mu \Phi)} \right) \alpha\diffp{\Phi}{\alpha}\\
+        &= \alpha\diffp{\lagrangianDensity}{\Phi} \diffp{\Phi}{\alpha} + \alpha \partial_\mu\left( \diffp{\lagrangianDensity}{(\partial_\mu \Phi)} \diffp{\Phi}{\alpha} \right) - \diffp{\lagrangianDensity}{\Phi} \alpha \diffp{\Phi}{\alpha}\\
+        &= \alpha\partial_\mu \left( \diffp{\lagrangianDensity}{(\partial_\mu \Phi)} \diffp{\Phi}{\alpha} \right)
+    \end{align}
+    where all derivatives with respect to \(\alpha\) are evaluated at \(\alpha = 0\).
+    We then used the Euler--Lagrange equations in the penultimate line to replace the \(\partial_\mu(\diffp{\lagrangianDensity}/{(\partial_\mu \Phi)})\) term with \(\diffp{\lagrangianDensity}/{\Phi}\).
+    If the Lagrangian does vary as \(\lagrangianDensity \mapsto \lagrangianDensity + \alpha\partial_\mu K^\mu\) then we have \(\delta\lagrangianDensity = \alpha\partial_\mu K^\mu\), and so we must have
+    \begin{equation}
+        \partial_\mu \left( \diffp{\lagrangianDensity}{(\partial_\mu\Phi)} \diffp{\Phi}{\alpha} - K^\mu \right) = 0.
+    \end{equation}
+    Defining
+    \begin{equation}
+        J^\mu \coloneqq \diffp{\lagrangianDensity}{(\partial_\mu\Phi)} \diffp{\Phi}{\alpha} - K^\mu
+    \end{equation}
+    we see that we have
+    \begin{equation}
+        \partial_\mu J^\mu = 0,
+    \end{equation}
+    and so we can interpret \(J^\mu\) as a conserved current.
+    We call \(J^\mu\) the \defineindex{Noether current} associated with the symmetry generated by \(\alpha\).
+    
+    Something similar can also be done for a \defineindex{local symmetry}, where \(\alpha\) is a function of \(x\).
+    
+    We can define a conserved quantity, \(Q\), which we call a charge in general, according to
+    \begin{equation}
+        Q \coloneqq \int \dl{^3x} \, J^0(x).
+    \end{equation}
+    This is conserved since we have \(\partial_t J^0 = -\div\vv{J}\), since \(\partial_{\mu}J^\mu = 0\), and so
+    \begin{align}
+        \diff{}{t}Q &= \diff{}{t} \int_V \dl{^3x} \, J^0(x)\\
+        &= \int_V \dl{^3x} \, \diffp{}{t}J^0(x)\\
+        &= -\int_V \dl{^3x} \, \div\vv{J}(x)\\
+        &= - \int_{\partial V} \dl{\vv{S}} \cdot \vv{J}
+    \end{align}
+    so if \(\vv{J}\) vanishes on the boundary, or if \(V\) has no boundary, such as if we have periodic boundary conditions, or a region like a sphere, then \(Q\) is conserved.
+    
+    \begin{exm}{}{}
+        Suppose \(\lagrangianDensity\) doesn't depend explicitly on \(x\).
+        Then the theory is translation invariant, that is the transformation \(x \mapsto x + a\) doesn't change anything.
+        We then have
+        \begin{equation}
+            \Phi(x) \mapsto \Phi(x + a) = \Phi(x) + a^\mu \partial_\mu \Phi(x) + \order(\alpha^2).
+        \end{equation}
+        We also have
+        \begin{equation}
+            \lagrangianDensity \mapsto \lagrangianDensity + a^\mu \partial_\mu \lagrangianDensity = \lagrangianDensity + a^\nu \partial_\mu (\tensor{\delta}{_\mu^\nu}\lagrangianDensity)
+        \end{equation}
+        and we can then take \(\tensor{K}{_\nu^\mu} = \tensor{\delta}{_\mu^\nu} \lagrangianDensity\).
+        We use the Kronecker delta to separate the parameters, \(\alpha^\nu\), of which we actually have four, from the variation, \(\tensor{K}{_\nu^\mu}\), which we also have four of, one for each \(\alpha^\nu\), hence the second index.
+        
+        We will then have four conserved currents, one for each \(\alpha^\nu\), which we package up into a single object, \(\tensor{T}{_\nu^\mu}\), given by
+        \begin{equation}
+            \tensor{T}{_\nu^\mu} = \diffp{\lagrangianDensity}{(\partial_\mu \Phi)} \partial_\nu \Phi - \tensor{\delta}{_\nu^\mu} \lagrangianDensity.
+        \end{equation}
+        This is conserved, by which we mean
+        \begin{equation}
+            \partial_\mu \tensor{T}{_\nu^\mu} = 0.
+        \end{equation}
+        We call \(\tensor{T}{_\nu^\mu}\) the \defineindex{energy-momentum tensor}, and for translation invariance we call the conserved quantities
+        \begin{equation}
+            P^\mu = \int \dl{^3x} \tensor{T}{_0^\mu}
+        \end{equation}
+        the energy, \(P^0\), and momentum, \(\vv{P}\).
+        Of course, they exactly coincide with what we would normally call the energy and momentum, although they generally don't coincide with the \emph{canonical} momentum, \(p = \diffp{\lagrangianDensity}/{(\partial_0 \Phi)}\).
+    \end{exm}
+    
     
     \backmatter
 %    \renewcommand{\glossaryname}{Acronyms}
