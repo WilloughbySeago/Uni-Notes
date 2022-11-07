@@ -6961,7 +6961,7 @@ noabbrev
         &= -\frac{i}{2} \left( \delta^{ij} - \frac{\grad^i\grad^j}{\laplacian} \right) \int \frac{\dl{^4k}}{(2\pi)^4} \e^{i\vv{k} \cdot(\vv{x} - \vv{y})}\\
         &= -\frac{i}{2} \left( \delta^{ij} - \frac{\grad^i\grad^j}{\laplacian} \right) \delta(\vv{x} - \vv{y})
     \end{align}
-    \textcolor{red}{shouldn't have factor of 1/2, also should get overall -ve}
+    \textcolor{red}{shouldn't have factor of i/2}
     Here we've used \(k^0 = \omega(\vv{k})\), which follows since \(\omega(\vv{k}) = \sqrt{\abs{\vv{k}}^2} = \abs{\vv{k}}\), as \(m = 0\), and \(k^2 = (k^0)^2 - \abs{\vv{k}}^2 = 0\), so \(k^0 = \abs{\vv{k}} = \omega(\vv{k})\).
     
     This result is not very nice, its not even a real function, but a distribution.
@@ -7076,6 +7076,245 @@ noabbrev
     Note that despite having rewritten everything in a covariant way we are still in the Coulomb gauge.
     The choice of \(n^\mu\) or \(\overbar{k}^\mu\) picks out a particular direction, so we still need to know about the initial frame in order to transform \(n^\mu\) and \(\overbar{k}^\mu\) into the new frame.
     We will look for physical results independent of this specific direction, and hence independent of the choice of gauge.
+    
+    \section{General Linear Gauge}
+    \epigraph{The only thing that's changed is that \(\overbar{k}\), which I don't know what it is, is now an \(\alpha\), which I don't know what it is. But it is pretty general.}{Richard Ball}
+    When we have results in a particular gauge we can move to a different gauge by a gauge transformation \(A_\mu(x) \mapsto A'_\mu(x) = A_\mu(x) - \partial_\mu \chi(x)\).
+    We now consider moving from the Coulomb gauge to a general linear gauge, that is a gauge defined by linear gauge fixing coefficients, i.e., we define the gauge by \(L_\mu A^\mu = 0\) where \(L_\mu\) is some linear operator.
+    For example, the Coulomb gauge is a linear gauge as we can define it by requiring \(n_\mu A^\mu = 0\) and \(\partial_\mu A^\mu = 0\).
+    In the new gauge we have the gauge condition \(L'_\mu A'^\mu = 0\).
+    Substituting in the transformation law we have
+    \begin{equation}
+        0 = L'_\mu A'^\mu = L'_\mu (A^\mu - \partial^\mu \chi) \implies L'_\mu \partial^\mu \chi = L'_\mu A^\mu.
+    \end{equation}
+    This means that \(\chi\) is always some linear function of \(A\).
+    
+    With this knowledge we can expand \(\chi\) in a mode expansion in a similar way to \(A\):
+    \begin{equation}
+        \chi(x) = \sum_{r=1,2} \int \invariantmeasure{k} \, [c_r(\vv{k}) a_r(\vv{k}) \e^{-ik\cdot x} + c_r^*(\vv{k}) a_r^\hermit(\vv{k}) \e^{ik \cdot x}]
+    \end{equation}
+    for some, potentially complex, function \(c_r\).
+    Then the mode expansion for the gauge transformed field is
+    \begin{align}
+        A'^\mu(x) &= A^\mu(x) - \partial^\mu\chi(x)\\
+        &= \sum_{r=1,2} \int \invariantmeasure{k} \, [(\varepsilon_r^\mu(\vv{k}) + ik^\mu c_r(\vv{k}))a_r(\vv{k}) \e^{-ik\cdot x}\\
+        &\qquad \qquad \qquad + (\varepsilon_r^\mu(\vv{k})^* - ik^\mu c_r^*(\vv{k})) a_r^\hermit(\vv{k}) \e^{ik \cdot x}]
+    \end{align}
+    where the factors of \(\pm ik^\mu\) come from performing the derivatives.
+    
+    We can interpret this as the gauge transformation acting on the polarisation vectors according to
+    \begin{equation}
+        \varepsilon_r^\mu(\vv{k}) \mapsto \varepsilon_r^\mu(\vv{k}) + ik^\mu c_r(\vv{k}).
+    \end{equation}
+    This extends to a transformation of the projection operators,
+    \begin{align}
+        P^{\mu\nu}(k) = \sum_r \varepsilon_r^\mu \varepsilon_r^{\nu*} &\mapsto P^{\mu\nu}(k) + ik^\mu \sum_r c_r\varepsilon_r^{\nu*} - ik^\nu \sum_r c_r^* \varepsilon_r^\mu + k^\mu k^\nu \sum_r c_r c_r^* \notag\\
+        &= -\minkowskiMetric^{\mu\nu} + k^\mu\alpha^\nu + \alpha^{\mu*}k^\nu
+    \end{align}
+    where
+    \begin{equation}
+        \alpha^\mu = \frac{\overbar{k}^\mu}{k \cdot \overbar{k}} + i \sum_r c_r \varepsilon_r^{\mu*} + \frac{1}{2}k^\mu \sum_r \abs{c_r}^2.
+    \end{equation}
+    So, in a general linear gauge \(P^{\mu\nu}\) changes from the Coulomb gauge by replacing \(\overbar{k}^\mu/(k \cdot \overbar{k})\) with \(\alpha^\mu\).
+    
+    In general \(\alpha\) is complex.
+    For on-shell photons, \(k^2 = 0\), we have \(\alpha \cdot k = 1\) and \(\abs{\alpha}^2 = 2\sum)r \abs{c_r}^2 \ge 0\), so \(\alpha\) is time-like or light-like.
+    We still have \(P^{\mu\nu}k_\nu = 0\), but \(P^{\mu\nu}\alpha_\nu \ne 0\) in general.
+    In these more general gauges \(P^{\mu\nu}\) is actually no longer a projection operator, although we still call it a projection operator.
+    
+    The physics must still work in these general gauges, yet we have these extra unphysical modes for \(\alpha\).
+    We will soon see how it is that this can all work out.
+    
+    \chapter{Feynman Rules for Photons}
+    \epigraph{It's the projection operator that isn't a projection operator!}{Richard Ball}
+    \section{The Feynman Rules}
+    We consider an external, and hence on-shell, photon with momentum \(\vv{k}\) and polarisation \(r\).
+    This corresponds to the state
+    \begin{equation}
+        \ket{\vv{k}, r} = a_r^\hermit(\vv{k})\ket{0}.
+    \end{equation}
+    We can then compute \(A_+^\mu(x) \ket{\vv{k}, r}\), where
+    \begin{equation}
+        A_+^\mu(x) = \sum_{r=1,2} \int \invariantmeasure{k} \, \varepsilon_r^\mu(\vv{k}) a_r(\vv{k}) \e^{-ik\cdot x}
+    \end{equation}
+    is the positive energy part of the field \(A^\mu\).
+    We then have
+    \begin{align}
+        A_+^\mu(x) \ket{\vv{k}, r} &= \sum_{r'=1,2} \int \invariantmeasure{k'} \, \varepsilon_r^\mu(\vv{k}) a_{r'}(\vv{k}') \e^{-ik'\cdot x} a_r^\hermit(\vv{k}) \ket{0}\\
+        &= \sum_{r'=1,2} \int \invariantmeasure{k'} \, \varepsilon_r^\mu(\vv{k}) \{\commutator{a_{r'}(\vv{k})}{a_r^\hermit(\vv{k})} + a_r^{\hermit}(\vv{k}) a_{r'}(\vv{k})\} \e^{-ik'\cdot x} \ket{0}\\
+        &= \sum_{r'=1,2} \int \invariantmeasure{k'} \, \varepsilon_r^\mu(\vv{k}) \delta_{rr'}\bardelta(\vv{k} - \vv{k}') \e^{-ik'\cdot x} \ket{0}\\
+        &= \varepsilon_r^\mu(\vv{k}) \e^{-ik\cdot x} \ket{0}
+    \end{align}
+    where we've used \(a_{r'}(\vv{k}) \ket{0} = 0\).
+    This is similar to the results for the scalar field and spinor field, but we have a polarisation vector where we had a spinor for the spinor field and nothing for the scalar field.
+    
+    The \define{Wick contraction}\index{Wick contraction!of photons} for the photon field is then given by
+    \begin{align}
+        \wick{\c{A}^\mu(x) \c{A}^\nu(y)} &= \bra{0} \timeOrdering[A^\mu(x) A^\nu(y)] \ket{0}\\
+        &= i D_{\feynman}^{\mu\nu}(x - y)\\
+        &= \int \frac{\dl{^4k}}{(2\pi)^4} \frac{iP^{\mu\nu}(k)}{k^2 + i\varepsilon} \e^{-ik \cdot (x - y)}.
+    \end{align}
+    
+    The Feynman rules for photons are then
+    \begin{itemize}
+        \item External incoming photons get a factor of \(\varepsilon_r^\mu(\vv{k})\): \(r \, \tikzsetnextfilename{fd-photon-external-incoming} \feynmandiagram[small, horizontal=i to o]{i -- [photon, momentum=$k$] o [dot]}; \, \mu\).
+        \item External outgoing photons get a factor of \(\varepsilon_r^\mu(\vv{k})^*\): \(\mu \, \tikzsetnextfilename{fd-photon-external-outgoing} \feynmandiagram[small, horizontal=i to o]{i [dot] -- [photon, momentum=$k$] o}; \, r\).
+        \item Internal photons get a factor of \(iP^{\mu\nu}(k)/(k^2 + i\varepsilon)\): \(\mu \, \tikzsetnextfilename{fd-internal-photon} \feynmandiagram[small, horizontal=i to o]{i [dot] -- [photon, edge label=$k$] o [dot]}; \, \nu\).
+    \end{itemize}
+    Note that \(P^{\mu\nu}(k) = -\minkowskiMetric^{\mu\nu} + k^\mu \alpha^\nu + \alpha^{\mu*}k^\nu\) and \(\varepsilon_r^\mu(\vv{k})\) and \(\alpha^\mu\) are gauge dependent.
+    However, this gauge dependence must fall out before we compute the final amplitude, since the physics cannot depend on the gauge.
+    
+    \section{Ward Identities}
+    The interaction Hamiltonian is \(A^\mu J_\mu\).
+    For gauge invariance \(J_\mu\) must be a conserved current.
+    And gauge invariance is needed to reduce the four degrees of freedom in \(A^\mu\) to the two physical degrees of freedom.
+    Note that any instance of \(J_\mu\) must be contracted with \(A^\mu\) in order to have a gauge invariant action.
+    
+    In momentum space the conserved current is
+    \begin{equation}
+        \tilde{J}_\mu(k) = \int \dl{^4x} \, J_\mu(x) \, \e^{ik \cdot x}.
+    \end{equation}
+    We then have
+    \begin{align}
+        0 &= \int \dl{^4x} \, [\partial^\mu J_\mu(x)] \e^{ik \cdot x}\\
+        &= \int \dl{^4x} \, \partial^\mu [J_\mu(x) \e^{ik \cdot x}] - \int \dl{^4x} \, J_\mu(x) \partial^\mu \e^{ik \cdot x}\\
+        &= \text{surface term} - \int \dl{^4x} \, ik^\mu J_\mu(x) \e^{ik\cdot x}\\
+        &= -ik^\mu \tilde{J}_\mu(x)
+    \end{align}
+    since the surface term doesn't contribute.
+    So, the condition for conservation of \(J^\mu(x)\) becomes \(k^\mu\tilde{J}_\mu = 0\) in momentum space.
+    
+    Now consider some amplitude we wish to calculate which happens to have a single photon in the initial state.
+    This amplitude is given by
+    \begin{equation}
+        \amplitude = \bra{\cdots} \timeOrdering\left[ \cdots (-i){\textstyle \int} \dl{^4x} J_\mu(x) A^\mu(x) \right] \ket{k, r; \cdots}
+    \end{equation}
+    where \(\cdots\) represent all the other particles in the initial and final states, and the terms in the time ordering corresponding to them, including contractions of internal particles.
+    The only term we need explicitly in the time ordered product is the term destroying the incoming photon.
+    The \(A^\mu(x)\) in this term will \emph{not} be Wick contracted, since it corresponds to an external state.
+    
+    We can rewrite this with the Feynman rules for an incoming photon:
+    \begin{align}
+        \amplitude &= \bra{\cdots} \timeOrdering\left[ \cdots (-i){\textstyle \int} \dl{^4x} J_\mu(x) \varepsilon_r^\mu(\vv{k}) \e^{-i k \cdot x} \right] \ket{k, r; \cdots}\\
+        &= \bra{\cdots} \timeOrdering\left[ \cdots (-i) \tilde{J}_\mu(k) \varepsilon_r^\mu(\vv{k}) \right] \ket{k, r; \cdots}.
+    \end{align}
+    Under a gauge transformation we have \(\varepsilon_r^\mu(\vv{k}) \mapsto \varepsilon_r^\mu(\vv{k}) + ik^\mu c_r(\vv{k})\), but we know that \(k^\mu \tilde{J}_\mu = 0\) for a conserved current, so this gauge transformation doesn't actually change the amplitude.
+    So the amplitude is gauge independent for an external incoming photon.
+    The same argument also shows that the amplitude is gauge independent for an external outgoing photon.
+    
+    Often we want to factor out the gauge dependent term, writing
+    \begin{equation}
+        \amplitude = \varepsilon_r^\mu(\vv{k}) \amplitude_\mu,
+    \end{equation}
+    where \(\amplitude_\mu\) is the \defineindex{reduced amplitude}.
+    Gauge independence then can be written in the form
+    \begin{equation}
+        k^\mu \amplitude_\mu = 0,
+    \end{equation}
+    which is called the \defineindex{Ward identity}.
+    
+    \section{Polarisation Sums}
+    Often we don't measure the polarisation of the incoming or outgoing photons.
+    In this case we average over incoming photons and sum over outgoing photons.
+    Suppose we have a single external photon.
+    Then we can write the amplitude as \(\amplitude = \varepsilon_r^\mu(\vv{k}) \amplitude_\mu\).
+    Then we have
+    \begin{align}
+        \sum_{r=1,2} \abs{\amplitude}^2 &= \amplitude^\mu \amplitude^{\nu*} \sum_{r=1,2} \varepsilon_\mu^r \varepsilon_\nu^{r*}\\
+        &= \amplitude^\mu\amplitude^{\nu*}P_{\mu\nu}(k)\\
+        &= \amplitude^\mu\amplitude^{\nu*}(-\minkowskiMetric_{\mu\nu} + k_\mu\alpha_\nu + \alpha_\mu^*k_\nu)\\
+        &= -\amplitude^\mu \amplitude_\mu^*
+    \end{align}
+    where we've used \(\amplitude^\mu k_\mu = 0\) in the last line.
+    
+    What this means is that in practice we can use the rule
+    \begin{equation}
+        \sum_{r=1,2} \varepsilon_\mu^r \varepsilon_\nu^{r*} \to -\minkowskiMetric_{\mu\nu}
+    \end{equation}
+    to evaluate polarisation sums.
+    
+    Now consider
+    \begin{equation}
+        -\abs{\amplitude}^2 = -\amplitude^\mu\amplitude_\mu^* = -\abs{\amplitude^0}^2 + \abs{\amplitude^1}^2 + \abs{\amplitude^2}^2 + \abs{\amplitude^3}^2.
+    \end{equation}
+    Despite the minus sign this quantity is actually positive definite.
+    We can show this by taking \(k^\mu = (k, 0, 0, k)\), and then ew have
+    \begin{equation}
+        0 = \amplitude^\mu k_\mu = \amplitude^0k - \amplitude^3 k \implies \amplitude^0 = \amplitude^3.
+    \end{equation}
+    This means that the contribution of the nonphysical longitudinal and time-like polarisations cancel out and we are left with just \(\amplitude^1\) and \(\amplitude^2\) terms, corresponding to the physical, transverse, polarisation states.
+    
+    \section{Internal Photons}
+    Consider a process with a single internal photon.
+    This photon must be created and then destroyed, so we expect a contraction in the time ordered product between the fields creating and annihilating the photon.
+    This means the amplitude will be of the form
+    \begin{equation}
+        \amplitude = \bra{\cdots} \timeOrdering\big[ \cdots {\textstyle \int} \dl{^4x} \, \wick{\c{A}^\mu(x) J_\mu(x) {\textstyle \int} \dl{^4y} \, \c{A}}^\nu(y) J_\nu(y) \big] \ket{\cdots}
+    \end{equation}
+    where the dots represent the external particles, the fields creating and annihilating them, and any other contractions of fields corresponding to internal particles.
+    
+    We can replace the contraction with the propagator, giving
+    \begin{align}
+        \amplitude &= \bra{\cdots} \timeOrdering\left[ \cdots {\textstyle \int} \dl{^4x} {\textstyle \int} \dl{^4y} \,  i D_{\feynman}^{\mu\nu}(x - y) J_\mu(x) J_\nu(y) \right] \ket{\cdots}\\
+        &= \bra{\cdots} \timeOrdering\left[ \cdots \int \!\! \dl{^4x} \int \!\! \dl{^4y} \int \! \frac{\dl{^4k}}{(2\pi)^4} \,  \frac{iP^{\mu\nu}(k)}{k^2 + i\varepsilon} \e^{-ik\cdot (x - y)} J_\mu(x) J_\nu(y) \right] \ket{\cdots} \notag\\
+        &= \bra{\cdots} \timeOrdering\left[ \cdots \int \! \frac{\dl{^4k}}{(2\pi)^4} \,  \frac{iP^{\mu\nu}(k)}{k^2 + i\varepsilon} \tilde{J}_\mu(-k) \tilde{J}_\nu(k) \right] \ket{\cdots}.
+    \end{align}
+    Notice that \(P^{\mu\nu}\) is gauge dependent.
+    
+    We have that
+    \begin{align}
+        P^{\mu\nu}(k) \tilde{J}_\mu(-k)\tilde{J}_\nu(k) &= (-\minkowskiMetric^{\mu\nu} + k^\mu \alpha^\nu + \alpha^{\mu*}k^\nu) \tilde{J}_\mu(k) \tilde{J}_\nu(-k)\\
+        &= -\tilde{J}^\mu(k) \tilde{J}_\mu(-k)
+    \end{align}
+    where we've used \(k^\mu \tilde{J}_\mu(k) = 0\), and so
+    \begin{equation}
+        \amplitude = \bra{\cdots} \timeOrdering\left[ \cdots \int \! \frac{\dl{^4k}}{(2\pi)^4} \,  \frac{i}{k^2 + i\varepsilon} \tilde{J}_\mu(-k) \tilde{J}_\nu(k) \right] \ket{\cdots},
+    \end{equation}
+    so the gauge dependence drops out, as it must.
+    
+    However, this \enquote{proof} only holds when \(k\) is on-shell, which is required for the \(k^\mu\tilde{J}_\mu = 0\) step.
+    This isn't too much of a problem as in the integral the only contribution is from the pole at \(k^2 = -i\varepsilon\), where the photon is pretty much on-shell.
+    In fact, one can show that the gauge dependence will always drop out.
+    However, this requires us to consider the renormalisation of the divergences and makes use of the Ward--Takahashi identities which are beyond the scope of this course\footnote{See \course{Gauge Theories in Particle Physics}}.
+    
+    In practice we don't need to use the full projection operators, and we can just simplify the Feynman rule for internal photons to a factor of
+    \begin{equation}
+        \mu \, \includegraphics{tikz-external/fd-internal-photon} \, \nu = \frac{-i\minkowskiMetric_{\mu\nu}}{k^2 + i\varepsilon}.
+    \end{equation}
+    There is a gauge where this holds exactly, i.e., \(\alpha = 0\).
+    This is called the \defineindex{Feynman gauge}.
+    
+    \section{Covariant Gauges}
+    It is possible to do the gauge fixing such that \(\partial_\mu A^\mu = 0\) in multiple ways.
+    We get a family of gauges.
+    These gauges are more restricted than a general linear gauge.
+    In these gauges the Feynman propagator is
+    \begin{equation}
+        iD^{\mu\nu}_{\feynman}(x - y) = \frac{i P^{\mu\nu}(k)}{k^2 + i\varepsilon}
+    \end{equation}
+    with
+    \begin{equation}
+        P^{\mu\nu}(k) = -\minkowskiMetric^{\mu\nu} + (1 - \xi) \frac{k^\mu k^\nu}{k^2 + i\varepsilon},
+    \end{equation}
+    where \(\xi\) is the gauge parameter, which parametrises the gauges in this family.
+    This corresponds to choosing to take \(\alpha^\mu\) to be proportional to \(k^\mu/(k^2 + i\varepsilon)\).
+    
+    Looking for gauge independent results is then as simply as looking for our final results to be independent of \(\xi\).
+    Often people work in this general family of gauges, leaving \(\xi\) as a free parameter, and then use the lack of \(\xi\) dependence at the end of a calculation as a check that nothing's gone wrong.
+    The two gauges we have mentioned so far by name are part of this gauge family, in particular \(\xi = 1\) gives the Feynman gauge and \(\xi = 0\) gives the Lorenz gauge.
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
