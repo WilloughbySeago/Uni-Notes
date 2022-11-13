@@ -14,6 +14,7 @@
 \declareslashed{}{\not}{.05}{.5}{p}
 \declareslashed{}{\not}{.1}{.5}{\partial}
 \declareslashed{}{\not}{-.1}{.5}{a}
+\declareslashed{}{\not}{.05}{.5}{D}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -60,11 +61,16 @@ noabbrev
 
 % Commands
 % Particles
-\newcommand{\Pe}{\ensuremath{\symrm{e}^{-}}}
-\newcommand{\Pmu}{\ensuremath{\text{\normalfont μ}^{-}}}
+\makeatletter
+\newcommand{\@particlefont}{\symrm}
+\newcommand{\@greekparticlefont}[1]{\text{\textup{#1}}}
+\newcommand{\Pe}{\ensuremath{\@particlefont{e}^{-}}}
+\newcommand{\Pmu}{\ensuremath{\@greekparticlefont{μ}^{-}}}
+\newcommand{\Pphoton}{\ensuremath{\@greekparticlefont{γ}}}
 
-\newcommand{\APe}{\ensuremath{\symrm{e}^{+}}}
-\newcommand{\APmu}{\ensuremath{\text{\normalfont μ}^{-}}}
+\newcommand{\APe}{\ensuremath{\@particlefont{e}^{+}}}
+\newcommand{\APmu}{\ensuremath{\@greekparticlefont{μ}^{-}}}
+\makeatother
 
 % Text
 \newcommand*{\course}[1]{\textit{#1}}
@@ -117,6 +123,7 @@ noabbrev
 \newcommand{\DD}[1]{\,\symcal{D}#1}
 \newcommand{\diracadjoint}[1]{\overbar{#1}}
 \newcommand{\phys}{\symup{phys}}
+\newcommand{\covariantDerivative}{D}
 
 \includeonly{parts/prelim, parts/hamiltonian-calculation, parts/grassmann-variables}
 
@@ -3851,7 +3858,7 @@ noabbrev
     \begin{equation}
         p_1 = (E_1, \vv{p}), \qqand p_2 = (E_2, -\vv{p}).
     \end{equation}
-    Define \([ = \abs{\vv{p}}]\), and so
+    Define \(p = \abs{\vv{p}}\), and so
     \begin{equation}
         \vv{p_1} \cdot \vv{p_2} = E_1E_2 + \vv{p}^2 \implies (p_1 \cdot p_2)^2 - m_1^2 m_2^2 = p^2W^2,
     \end{equation}
@@ -5398,7 +5405,7 @@ noabbrev
     
     Hence, we have
     \begin{equation}
-        (E - m)\varphi = \frac{\vv{p}^2}{E + m}\varphi \implies \varphi = \frac{\vv{p}}{E^2 - m^2}\varphi = \varphi.
+        (E - m)\varphi = \frac{\vv{p}^2}{E + m}\varphi \implies \varphi = \frac{\vv{p}}{E^2 - m^2}\varphi.
     \end{equation}
     since \(E^2 - m^2 = \vv{p}^2\) for an on-shell particle.
     This means that \(\varphi\) is not fixed by the Dirac equation, only its relation to \(\chi\) is fixed.
@@ -7303,18 +7310,552 @@ noabbrev
     Often people work in this general family of gauges, leaving \(\xi\) as a free parameter, and then use the lack of \(\xi\) dependence at the end of a calculation as a check that nothing's gone wrong.
     The two gauges we have mentioned so far by name are part of this gauge family, in particular \(\xi = 1\) gives the Feynman gauge and \(\xi = 0\) gives the Lorenz gauge.
     
+    \part{Quantum Electrodynamics}
+    \chapter{Quantum Electrodynamics}
+    \epigraph{We mean that in a precise mathematical sense, not in a physicist sense where it's just kind of mostly true.}{Richard Ball}
+    \section{Electromagnetic Interactions}
+    For photons we require two degrees of freedom.
+    We get this by using gauge invariance to reduce the four degrees of freedom of a vector to two degrees of freedom.
+    Gauge invariance requires a conserved current.
+    We've seen that for electrons we have a conserved current due to the \(\unitary(1)\) symmetry, \(\psi \mapsto \e^{i\alpha}\psi\) for some constant \(\alpha\).
+    The conserved current in this case is \(J^\mu = \diracadjoint{\psi}\gamma^\mu\psi\).
+    We would expect this to couple to the photon field, \(A_\mu\).
     
+    The simplest way to include photons and electrons is by defining the following Lagrangian:
+    \begin{equation}
+        \lagrangianDensity_{\symrm{CED}} = -\frac{1}{4} F^{\mu\nu}F_{\mu\nu} + \diracadjoint{\psi}(i \slashed{\partial} - m) \psi - q \diracadjoint{\psi} \slashed{A} \psi.
+    \end{equation}
+    The first term is the kinetic term for photons, giving Maxwell's equations, the second is the kinetic and mass term for electrons, giving the Dirac equation, the final term is the interaction, which is simply \(j^\mu A_\mu\).
+    The quantity \(q = -e\) is the charge of the electron, and it measures how strongly the photon and electron are coupled, which is to say how strongly the electron \enquote{feels} the electromagnetic force.
+    Notice that this is a three point interaction, much like the \(\varphi^3\) or \(\diracadjoint{\psi}\psi\varphi\) examples we've seen so far in the course.
     
+    We can write this Lagrangian more compactly as
+    \begin{equation}
+        \lagrangianDensity_{\symrm{CED}} = -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} + \diracadjoint{\psi}(i\slashed{\covariantDerivative} - m)\psi
+    \end{equation}
+    Here
+    \begin{equation}
+        \covariantDerivative_\mu = \partial_\mu +iqA_\mu \psi
+    \end{equation}
+    is the \defineindex{covariant derivative}.
+    Noting that \(i\slashed{\covariantDerivative} = i\slashed{\partial} - q\slashed{A}\) it is clear that this is an equivalent way of writing the Lagrangian.
     
+    \subsection{Gauge Symmetry}
+    Notice that this Lagrangian maintains the \defineindex{global symmetry} \(\psi \mapsto \e^{i\alpha}\psi\).
+    By global here we mean that the symmetry is the same at all positions, that is \(\alpha\) is a constant.
+    In fact, we can promote this to a \defineindex{local symmetry}, \(\psi \mapsto \e^{i\alpha(x)}\psi\), where we now have \(\alpha\) depending on position.
+    This works because we have have constructed the Lagrangian so that the resulting change cancels out, provided that the gauge field, \(A_\mu\), transforms as
+    \begin{equation}
+        A_\mu \mapsto A_\mu - \frac{1}{q}\partial_\mu \alpha,
+    \end{equation}
+    which is just the usual gauge transformation with \(\chi(x) = \alpha(x)/q\).
     
+    We can readily check this is a symmetry of the Lagrangian.
+    We've already shown that such a transformation of \(A\) doesn't change \(F^{\mu\nu}\), and so we need only consider the electron and interaction terms.
+    First consider the electron term, we have
+    \begin{align}
+        \diracadjoint{\psi}i\slashed{\partial}\psi &\mapsto \e^{-i\alpha}\diracadjoint{\psi}i\slashed{\partial}(\e^{i\alpha}\psi)\\
+        &= \e^{-i\alpha}\diracadjoint{\psi}\e^{i\alpha}i\slashed{\partial}\psi + \e^{-i\alpha}\diracadjoint{\psi}i(-i\slashed{\partial}\alpha)\e^{i\alpha}\psi\\
+        &= \diracadjoint{\psi}i\slashed{\partial}\psi + \diracadjoint{\psi}(\slashed{\partial}\alpha)\psi.
+    \end{align}
+    Now consider the interaction term:
+    \begin{align}
+        q\diracadjoint{\psi}\slashed{A}\psi &\mapsto q\e^{-i\alpha}\diracadjoint{\psi}\left( \slashed{A} - \frac{1}{q} \slashed{\partial}\alpha \right)\e^{i\alpha}\psi\\
+        &= q\diracadjoint{\psi}\slashed{A}\psi - \diracadjoint{\psi}(\slashed{\partial}\alpha)\psi
+    \end{align}
+    and we see that these two extra terms after transformation exactly cancel, leaving the whole Lagrangian invariant under this transformation.
     
+    In terms of the covariant derivative we have the transformation
+    \begin{equation}
+        \covariantDerivative_\mu = \partial_\mu + iqA_\mu \mapsto \partial_\mu + iqA_\mu + i\partial_\mu \alpha
+    \end{equation}
+    and we see that this extra term exactly cancels the term we get from the derivative of \(\exp[i\alpha]\).
     
+    Note that this symmetry, called a \(\unitary(1)\) gauge symmetry, is exact, it is required to fix the number of degrees of freedom.
+    It is not like the global symmetry which may be broken.
     
+    \subsection{Equations of Motion}
+    The field equations can be derived fairly easily from the Lagrangian.
+    They are just slight modifications of the free photon and free electron equations of motion, in fact they differ only by the fact that we now have a term with \(A_\mu\) and an extra \(\diracadjoint{\psi}\) term.
+    First, we have
+    \begin{equation}
+        \diffp{\lagrangianDensity}{A_\mu} = q\diracadjoint{\psi}\gamma^\mu\psi
+    \end{equation}
+    giving the equation of motion
+    \begin{equation}
+        \partial_\mu F^{\mu\nu} = q\diracadjoint{\psi}\gamma^\nu \psi.
+    \end{equation}
+    Second, we have
+    \begin{equation}
+        \diffp{\lagrangianDensity}{\diracadjoint{\psi}} = q\slashed{A}\psi
+    \end{equation}
+    giving the equation of motion
+    \begin{equation}
+        (i\slashed{\partial} - m)\psi = q\slashed{A}\psi.
+    \end{equation}
+    Compare these to the free terms, which we can recover by setting \(q = 0\):
+    \begin{equation}
+        \partial_\mu F^{\mu\nu} = 0, \qqand (i\slashed{\partial} - m)\psi = 0.
+    \end{equation}
+    Notice that we can interpret \(\psi\gamma^\nu\psi\) as the fermion current, and so \(q\psi\gamma^\nu\psi\) is the charge current, which is gives the expected Maxwell equation with sources,
+    \begin{equation}
+        \partial_\mu F^{\mu\nu} = J^\nu
+    \end{equation}.
     
+    These equations are nonlinear and, in general, somewhere between very difficult and impossible to solve, even classically.
+    Fortunately the coupling is weak.
+    The fine structure constant is
+    \begin{equation}
+        \alpha = \frac{e^2}{4\pi} = \frac{q^2}{4\pi} \approx \frac{1}{137} \approx 0.0073 \ll 1.
+    \end{equation}
+    This means that we can do perturbation theory in \(q\).
     
+    When we do perturbation theory the next to leading order (NLO)\glossary[acronym]{NLO}{next to leading order} term is a correction on the order of \qty{1}{\percent}, since \(\alpha\) is on the order of \qty{1}{\percent} and every extra vertex contributes a factor of \(q\) to the amplitude, and so a factor of \(q^2 \sim \alpha\) to the cross section or decay rate, or whatever we're calculating.
+    The next to next to leading order (NNLO)\glossary[acronym]{NNLO}{next to next to leading order} term is then on the order of \qty{0.01}{\percent}.
     
+    \subsection{Other Symmetries}
+    Notice that under parity \(j^\mu \mapsto j_\mu\) and \(A^\mu \mapsto A_\mu\), under time reversal \(j^\mu \mapsto -j_\mu\) and \(A^\mu \mapsto -A_\mu\), and under charge conjugation \(j^\mu \mapsto -j^\mu\) and \(A^\mu \mapsto -A^\mu\).
+    Hence the Lagrangian is invariant under charge conjugation, parity, and time reversal separately, and so is also invariant under any combination of these, including CPT, the application of all three.
     
+    \subsection{Quantising}
+    The Lagrangian for quantum electrodynamics is exactly the same as for classical electrodynamics, we just interpret the fields as operators and normal order:
+    \begin{equation}
+        \lagrangianDensity_{\symrm{QED}} = -\frac{1}{4} \normalordering{F^{\mu\nu}F_{\mu\nu}} + \normalordering{\diracadjoint{\psi}(i\slashed{\covariantDerivative} - m)\psi}.
+    \end{equation}
     
+    \section{QED Perturbation Theory}
+    As discussed previously we must resort to a perturbative approach.
+    We start with the \(S\) matrix, and the previously derived perturbation expansion
+    \begin{equation}
+        S = \sum_{n=1}^{\infty}S^{(n)} = \sum_{n=0}^{\infty} \frac{(-i)^n}{n!} \int \dl{^4x_1} \dotsm \int \dl{^4x_n} \, \timeOrdering[\hamiltonianDensity_{\interaction}(x_1) \dotsm \hamiltonianDensity_{\interaction}(x_n)]
+    \end{equation}
+    where
+    \begin{equation}
+        \hamiltonianDensity_{\interaction} = -\lagrangianDensity_{\interaction} = -e\normalordering{\diracadjoint{\psi}(x)\slashed{A}(x)\psi(x)}.
+    \end{equation}
+    
+    \subsection{First Order}
+    We can write the fields in terms of positive and negative energy parts, giving
+    \begin{align}
+        \hamiltonianDensity_{\interaction} &= -e\normalordering{(\diracadjoint{\psi}^+ + \diracadjoint{\psi}^-)(\slashed{A}^+ + \slashed{A}^-)(\psi^+ + \psi^-)}\\
+        &= -e{\vcentcolon}[\diracadjoint{\psi}^+\slashed{A}^+\psi^+ + \diracadjoint{\psi}^+\slashed{A}^+\psi^- + \diracadjoint{\psi}^-\slashed{A}^+\psi^+ + \diracadjoint{\psi}^-\slashed{A}^+\psi^-\\
+        &\qquad + \diracadjoint{\psi}^+\slashed{A}^-\psi^+ + \diracadjoint{\psi}^+\slashed{A}^-\psi^- + \diracadjoint{\psi}^-\slashed{A}^-\psi^+ + \diracadjoint{\psi}^-\slashed{A}^-\psi^-]{\vcentcolon}
+    \end{align}
+    Each term here corresponds to a vertex involving a photon and either two electrons, two positrons, or an electron and a positron, conserving charge.
+    None of these  processes are valid on their own.
+    They are forbidden by conservation of momentum.
+    It is not possible to have any of these processes if all three particles are on-shell.
+    There are really only two distinct possibilities
+    First, we could have an initial photon and final electron and positron, or initial electron and positron and final photon.
+    Second, we could have an electron (or positron) and photon in the initial (or final) state and an electron (or positron) in the final (or initial) state.
+    If this was the case then denoting the momentum of the initial electron by \(p\), the initial photon by \(k\) and the final electron by \(p'\) we have \(p + k = p'\), so \((p + k)^2 = p^2 + k^2 + 2p\cdot k = m^2 + 2p \cdot k\) and also \((p + k)^2 = p'^2 = m^2\), so we have \(p \cdot k = 0\), which is only possible if \(k = 0\), since in the rest frame of the initial electron we have \(p^\mu = (E, \vv{0})\) and \(k^\mu = (\abs{\vv{k}}, \vv{k})\), so \(p \cdot k = E\abs{\vv{k}} = 0\) and \(E \ge m > 0\) so we have \(\abs{\vv{k}} = 0\) meaning \(\vv{k} = \vv{0}\) and so \(k = 0\), but a photon without momentum isn't really anything.
+    
+    Hence, we must have
+    \begin{equation}
+        \bra{f} S^{(1)} \ket{i} = 0.
+    \end{equation}
+    As with the scalar case we can show that this is the case with an explicit, but lengthy, calculation, but this isn't particularly enlightening and doesn't give us new physics beyond the observation that these processes cannot occur.
+    
+    \subsection{Second Order}
+    The second order term is
+    \begin{equation}
+        S^{(2)} = -\frac{e^2}{2} \int \dl{^4x} \int \dl{^4y} \, \timeOrdering[\normalordering{\diracadjoint{\psi}(x)\slashed{A}(x)\psi(x)} \normalordering{\diracadjoint{\psi}(y)\slashed{A}(y)\psi(y)}].
+    \end{equation}
+    With Wick's theorem we can further specify the number of contractions contributing to a second order term.
+    
+    \subsubsection{Zero Contractions}
+    The zero contraction case is simply the first order case squared, and hence gives zero.
+    In terms of diagrams we have two disconnected single vertex diagrams, and these diagrams are just zero for the reasons discussed above.
+    That is, we have
+    \begin{equation}
+        S_A^{(2)} = -\frac{e^2}{2} \int \dl{^4x} \int \dl{^4y} \, \normalordering{\diracadjoint{\psi}(x)\slashed{A}(x)\psi(x) \diracadjoint{\psi}(y)\slashed{A}(y)\psi(y)}
+    \end{equation}
+    and
+    \begin{equation}
+        \bra{f} S_A^{(2)}\ket{i} = 0.
+    \end{equation}
+    
+    \subsubsection{One Contraction}
+    We can further specify whether the contraction is between electron fields or photon fields.
+    Note that for a nonzero result we must contract either \(A\) with another \(A\) or \(\psi\) with \(\diracadjoint{\psi}\).
+    The contraction must occur between fields at different positions.
+    
+    \paragraph{Electron Fields}
+    In this case the we consider the term
+    \begin{multline}
+        S^{(2)}_B = -\frac{e^2}{2} \int \dl{^4x} \int \dl{^4y} \, [\normalordering{\diracadjoint{\psi}(x)\slashed{A}(x)\wick{\c{\psi}(x) \c{\diracadjoint{\psi}}}(y) \slashed{A}(y)\psi(y)}\\
+        + \normalordering{\wick{\c{\diracadjoint{\psi}}(x)\slashed{A}(x)\psi(x) \diracadjoint{\psi}(y) \slashed{A}(y)\c{\psi}(y)}}].
+    \end{multline}
+    Actually, the two terms here are the same.
+    It can be shown that
+    \begin{equation}
+        \normalordering{\wick{\c{\diracadjoint{\psi}}(x)\slashed{A}(x)\psi(x)\diracadjoint{\psi}(y)\slashed{A}(y)\c{ps}(y)}} = \normalordering{\diracadjoint{\psi}(y)\slashed{A}\wick{\c{\psi}(x) \c{\diracadjoint{\psi}}(y)} \slashed{A}(y)\psi(y)}.
+    \end{equation}
+    After a change of variables \(x \leftrightarrow y\) in the second term this then gives
+    \begin{equation}
+        S^{(2)}_B = -e^2 \int \dl{^4x} \int \dl{^4y} \, \normalordering{\diracadjoint{\psi}(x)\slashed{A}(x)\wick{\c{\psi}(x) \c{\diracadjoint{\psi}}}(y) \slashed{A}(y)\psi(y)}
+    \end{equation}
+    
+    This contains a single electron propagator.
+    There are then two photons and two electrons/positrons to place in the initial and final states.
+    To conserve momentum we must have two particles in the initial state and two in the final state.
+    This leads to two processes.
+    
+    \subparagraph{Compton Scattering}
+    This is the process
+    \begin{equation}
+        \Pe\Pphoton \to \Pe\Pphoton,
+    \end{equation}
+    or equivalently \(\APe\Pphoton \to \APe\Pphoton\).
+    This corresponds to the term in \(S^{(2)}_B\) where we have \(\psi^+(y)\) to annihilate the initial electron and \(\diracadjoint{\psi}^-(x)\) to create the final electron.
+    We can then annihilate the initial photon with either \(\slashed{A}^+(x)\) or \(\slashed{A}(y)\), and then the corresponding \(\slashed{A}^-(y)\) or \(\slashed{A}^-(x)\) creates the final photon.
+    
+    There are therefore two terms contributing to this process,
+    \begin{equation}
+        S_{\text{Compton}}^{(2)} = S_a^{(2)} + S_b^{(2)},
+    \end{equation}
+    with
+    \begin{align}
+        S_a^{(2)} &= -e^2 \int \dl{^4x} \int \dl{^4y} \, \diracadjoint{\psi}^-(x) \gamma^\mu iS_{\feynman}(x - y) \gamma^\nu A_\mu^-(x)A_\nu^+(y)\psi^+(y),\\
+        S_b^{(2)} &= -e^2 \int \dl{^4x} \int \dl{^4y} \, \diracadjoint{\psi}^-(x)\gamma^\mu iS_{\feynman}(x - y) \gamma^\nu A_\nu^-(y) A_\mu^+(x) \psi^+(y).
+    \end{align}
+    In terms of diagrams these correspond to
+    \begin{equation}\label{eqn:fd compton scattering}
+        \tikzsetnextfilename{fd-compton-scattering}
+        \begin{tikzpicture}[
+            photon/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate},
+            >={Latex[width=1.5mm]},
+            baseline=(plus.base)
+            ]
+            \draw (-1, -1) -- (0, 0);
+            \draw[->] (-1, -1) -- (-0.5, -0.5);
+            \draw[photon] (-1, 1) -- (0, 0);
+            \draw (0, 0) -- (2, 0);
+            \draw[->] (0, 0) -- (1, 0);
+            \draw (2, 0) -- (3, -1);
+            \draw[->] (2, 0) -- (2.5, -0.5);
+            \draw[photon] (2, 0) -- (3, 1);
+            \node[below] at (0, 0) {\(x\)};
+            \node[below] at (2, 0) {\(y\)};
+            \node (plus) at (4, 0) {\(+\)};
+            \draw (5, 1) -- (6, 0.5);
+            \draw[->] (5, 1) -- (5.5, 0.75);
+            \draw[photon] (6, 0.5) -- (7, 1);
+            \draw (6, 0.5) -- (6, -0.5);
+            \draw[->] (6, 0.5) -- (6, 0);
+            \draw[photon] (5, -1) -- (6, -0.5);
+            \draw (6, -0.5) -- (7, -1);
+            \draw[->] (6, -0.5) -- (6.5, -0.75);
+            \node[above] at (6, 0.5) {\(x\)};
+            \node[below] at (6, -0.5) {\(y\)};
+        \end{tikzpicture}
+    \end{equation}
+    
+    \subparagraph{Diphoton Process}
+    A diphoton process, as the name suggests, is a process in which there are two photons in either the final or initial state.
+    To second order there are two such processes:
+    \begin{equation}
+        \Pe\APe \to \Pphoton\Pphoton, \qqand \Pphoton \Pphoton \to \Pe\APe.
+    \end{equation}
+    These correspond to the same terms in the Dyson expansion integral as Compton scattering, but with different initial and final states.
+    The Feynman diagrams for these processes are
+    \begin{equation}
+        \tikzsetnextfilename{fd-diphoton-process}
+        \begin{tikzpicture}[
+            photon/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate},
+            >={Latex[width=1.5mm]},
+            baseline=(and.base)
+            ]
+            \draw (0, 1) -- (1, 0.5);
+            \draw[->] (0, 1) -- (0.5, 0.75);
+            \draw[photon] (1, 0.5) -- (2, 1);
+            \draw (1, 0.5) -- (1, -0.5);
+            \draw[->] (1, 0.5) -- (1, 0);
+            \draw (0, -1) -- (1, -0.5);
+            \draw[->] (1, -0.5) -- (0.5, -0.75);
+            \draw[photon] (1, -0.5) -- (2, -1);
+            \node (and) at (3, 0) {and};
+            \draw[photon] (4, 1) -- (5, 0.5);
+            \draw[photon] (4, -1) -- (5, -0.5);
+            \draw (6, 1) -- (5, 0.5) -- (5, -0.5) -- (6, -1);
+            \draw[->] (6, 1) -- (5.5, 0.75);
+            \draw[->] (5, 0.5) -- (5, 0);
+            \draw[->] (5, -0.5) -- (5.5, -0.75);
+        \end{tikzpicture}
+    \end{equation}
+    This is an inelastic process, the particles in the final state are different to the particles in the initial state.
+    Notice that these diagrams are both rotated versions of the first diagram in \cref{eqn:fd compton scattering}.
+    This sort of observation can save a lot of work when evaluating diagrams, as we'll see later.
+    As well as these two diagrams we also have the same diagrams with the photons crossed.
+    
+    \paragraph{Photon Fields}
+    In this case we consider the term
+    \begin{equation}
+        S_C^{(2)} = -\frac{e^2}{2} \int \dl{^4x} \int \dl{^4y} \, \normalordering{\diracadjoint{\psi}(x)\wick{\c{\slashed{A}}(x) \psi(x) \diracadjoint{\psi}(y) \c{\slashed{A}}(y) \psi(y)}}.
+    \end{equation}
+    This term corresponds to all processes with a single photon propagator.
+    There are two classes of such a process.
+    
+    \subparagraph{M\o ller Scattering}
+    The first, \define{M\o ller scattering}\index{Moller scattering@M\o ller scattering}, is the process
+    \begin{equation}
+        \Pe\Pe \to \Pe\Pe,
+    \end{equation}
+    as well as the equivalent process with all positrons.
+    We can select the term in the \(S\) matrix which gives this process when sandwiched between two electron states as initial and final states:
+    \begin{equation}
+        S_{\text{M\o eller}}^{(2)} = -\frac{e^2}{2} \int \dl{^4x} \int \dl{^4y} \, \normalordering{\diracadjoint{\psi}^-(x) \gamma^\mu \psi^+(x) \diracadjoint{\psi}^-(y) \gamma^\nu \diracadjoint{\psi}^+(y)} iD^{\feynman}_{\mu\nu}(x - y).
+    \end{equation}
+    This corresponds to the diagrams
+    \begin{equation}
+        \tikzsetnextfilename{fd-moeller-scattering}
+        \begin{tikzpicture}[
+            photon/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate},
+            >={Latex[width=1.5mm]},
+            baseline=(minus.base)
+            ]
+            \draw (0, 1) -- (4, 1);
+            \draw (0, -1) -- (4, -1);
+            \draw[photon] (2, 1) -- (2, -1);
+            \draw[->] (0, 1) -- (1, 1);
+            \draw[->] (2, 1) -- (3, 1);
+            \draw[->] (0, -1) -- (1, -1);
+            \draw[->] (2, -1) -- (3, -1);
+            \node (minus) at (5, 0) {\(-\)};
+            \draw (6, 1) -- (8, 1);
+            \draw (6, -1) -- (8, -1);
+            \draw (8, 1) -- (10, -1);
+            \draw[->] (8, 1) -- (9.5, -0.5);
+            \draw[line width=1mm, white] (8, -1) -- (10, 1);
+            \draw (8, -1) -- (10, 1);
+            \draw[photon] (8, 1) -- (8, -1);
+            \draw[->] (6, 1) -- (7, 1);
+            \draw[->] (6, -1) -- (7, -1);
+            \draw[->] (8, -1) -- (9.5, 0.5);
+        \end{tikzpicture}
+    \end{equation}
+    The relative minus sign comes from crossing the fermion lines.
+    
+    \subparagraph{Bhabha Scattering}
+    The second, is the very similar process of \defineindex{Bhabha scattering},
+    \begin{equation}
+        \APe\Pe \to \APe\Pe.
+    \end{equation}
+    This corresponds to the diagrams
+    \begin{equation}
+        \tikzsetnextfilename{fd-bhabha-scattering}
+        \begin{tikzpicture}[
+            photon/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate},
+            >={Latex[width=1.5mm]},
+            baseline=(plus.base)
+            ]
+            \draw (0, 1) -- (4, 1);
+            \draw (0, -1) -- (4, -1);
+            \draw[photon] (2, 1) -- (2, -1);
+            \draw[->] (0, 1) -- (1.1, 1);
+            \draw[->] (2, 1) -- (3.1, 1);
+            \draw[->] (2, -1) -- (0.9, -1);
+            \draw[->] (4, -1) -- (2.9, -1);
+            \node (plus) at (5, 0) {\(+\)};
+            \draw (6, 1) -- (7, 0) -- (6, -1);
+            \draw (9.5, 1) -- (8.5, 0) -- (9.5, -1);
+            \draw[photon] (7, 0) -- (8.5, 0);
+            \draw[->] (6, 1) -- (6.6, 0.4);
+            \draw[->] (7, 0) -- (6.4, -0.6);
+            \draw[->] (8.5, 0) -- (9.1, 0.6);
+            \draw[->] (9.5, -1) -- (8.9, -0.4);
+        \end{tikzpicture}
+    \end{equation}
+    Note that the second diagram here is the first diagram in M\o ller scattering.
+    
+    \subsubsection{Two Contractions}
+    We can also have two contractions.
+    One contraction must always be between electron fields, the second can be either between electron fields or photon fields.
+    
+    \paragraph{Electron Fields}
+    The term corresponding to two contractions between electron fields is
+    \begin{equation}
+        S_E^{(2)} = -\frac{e^2}{2} \int \dl{^4x} \int \dl{^4y} \, \normalordering{\wick{\c2{\diracadjoint{\psi}}(x) \slashed{A}(x) \c1{\psi}(x) \c1{\diracadjoint{\psi}}(y) \slashed{A}(y) \c2{\psi}(y)}}.
+    \end{equation}
+    This corresponds to the diagram
+    \begin{equation}
+        \tikzsetnextfilename{fd-vacuum-polarisation}
+        \begin{tikzpicture}[
+            photon/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate},
+            >={Latex[width=1.5mm]},
+            baseline=(current bounding box)
+            ]
+            \draw[photon] (-3, 0) -- (-1, 0);
+            \draw[photon] (1, 0) -- (3, 0);
+            \draw (0, 0) circle [radius = 1cm];
+            \draw[->] (0.1, 1) -- ++ (0.0001, 0);
+            \draw[->] (-0.1, -1) -- ++ (-0.0001, 0);
+        \end{tikzpicture}
+    \end{equation}
+    This is called the \defineindex{vacuum polarisation diagram} or the \defineindex{photon self energy}.
+    This diagram is important when considering the renormalisation of the \(A\) field\footnote{See \course{Gauge Theories in Particle Physics}.}.
+    
+    \paragraph{Photon Field}
+    The term corresponding to a contraction between electron fields and a contraction between photon fields is
+    \begin{equation}
+        S_D^{(2)} = -\frac{e^2}{2} \int \dl{^4x} \int \dl{^4y} {\vcentcolon}[ \diracadjoint{\psi} \wick{ \c2{\slashed{A}}(x) \c1{\psi}(x) \c1{\diracadjoint{\psi}}(y) \c2{\slashed{A}}(y) \psi(x) } + \wick{ \c2{\diracadjoint{\psi}}(x) \c1{\slashed{A}}(x) \psi(x) \diracadjoint{\psi}(y) \c1{\slashed{A}}(y) \c1{\psi}(y)  } ]{\vcentcolon}.
+    \end{equation}
+    This corresponds to the diagram
+    \begin{equation}
+        \tikzsetnextfilename{fd-electron-self-energy}
+        \begin{tikzpicture}[
+            photon/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate},
+            >={Latex[width=1.5mm]},
+            baseline=(current bounding box)
+            ]
+            \draw (-2.5, 0) -- (2.5, 0);
+            \draw[->] (-2, 0) -- (-1.8, 0);
+            \draw[->] (-1, 0) -- (0.1, 0);
+            \draw[->] (1, 0) -- (1.9, 0);
+            \draw[photon] (-1, 0) arc(180:0:1);
+        \end{tikzpicture}
+    \end{equation}
+    This is called the \defineindex{electron self energy}.
+    This diagram is important when considering the renormalisation of the \(\psi\) field\footnote{See \course{Gauge Theories in Particle Physics}.}.
+    
+    \subsubsection{Three Contractions}
+    Finally, there is one way to have three contractions:
+    \begin{equation}
+        S_F^{(2)} = -\frac{e^2}{2} \int \dl{^4x} \int \dl{^4y} \, \normalordering{\wick{ \c3{\diracadjoint{\psi}}(x) \c2{\slashed{A}}(x) \c1{\psi}(x) \c1{\diracadjoint{\psi}}(y) \c2{\slashed{A}}(y) \c3{\psi}(y) }}.
+    \end{equation}
+    This corresponds to the diagram
+    \begin{equation}
+        \tikzsetnextfilename{fd-vacuum-bubble}
+        \begin{tikzpicture}[
+            photon/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate},
+            >={Latex[width=1.5mm]},
+            baseline=(current bounding box)
+            ]
+            \draw (0, 0) circle [x radius = 2, y radius = 1];
+            \draw[photon] (-2, 0) -- (2, 0);
+            \draw[->] (0.1, 1) -- ++ (0.001, 0);
+            \draw[->] (-0.1, -1) -- ++ (-0.001, 0);
+        \end{tikzpicture}
+    \end{equation}
+    
+    \subsection{Third Order}
+    There are a lot of third order terms, too many to cover all of them, so we just give examples here.
+    Essentially there are two ways to increase the order of a term.
+    The first is to add another external particle, which in this case must be a single photon to conserve charge, such as in the following diagrams:
+    \begin{equation}
+        \tikzsetnextfilename{fd-bremsstrahlung}
+        \begin{tikzpicture}[
+            photon/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate},
+            >={Latex[width=1.5mm]},
+            baseline=(and)
+            ]
+            \draw[photon] (0, 1) -- (1, 0.5);
+            \draw[photon] (0, -1) -- (1, -0.5);
+            \draw (2, 1) -- (1, 0.5) -- (1, -0.5) -- (2, -1);
+            \draw[->] (2, 1) -- (1.5, 0.75);
+            \draw[->] (1, 0.5) -- (1, 0.15);
+            \draw[->] (1, 0) -- (1, -0.35);
+            \draw[photon] (1, 0) -- ++ (1, 0);
+            \draw[->] (1, -0.5) -- (1.5, -0.75);
+            \node (and) at (3, 0) {and};
+            \draw (4, 1) -- (5, 0) -- (4, -1);
+            \draw (7.5, 1) -- (6.5, 0) -- (7.5, -1);
+            \draw[photon] (5, 0) -- (6.5, 0);
+            \draw[->] (4, 1) -- (4.6, 0.4);
+            \draw[->] (5, 0) -- (4.4, -0.6);
+            \draw[->] (6.5, 0) -- (6.8, 0.3);
+            \draw[->] (7, 0.5) -- (7.3, 0.8);
+            \draw[->] (7.5, -1) -- (6.9, -0.4);
+            \draw[photon] (7, 0.5) -- ++ (0.5, -0.5);
+        \end{tikzpicture}
+    \end{equation}
+    The extra photon being emitted corresponds to the previously discussed processes but with \defineindex{bremsstrahlung}, the process of emitting a radiation as an electron slows down\footnote{bremsstrahlung comes from the German \textit{bremsen} meaning to break and \textit{Strahlung} meaning radiation.}.
+    
+    The second way to increase the order is to add an extra loop to an existing process.
+    For example, we can consider one of the vertices with an electron and photon in the initial state and a single electron in the final state, which doesn't occur on its own due to momentum conservation.
+    We can a loop to this to get the diagram
+    \begin{equation}
+        \begin{tikzpicture}[
+            photon/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate},
+            >={Latex[width=1.5mm]},
+            baseline=(current bounding box)
+            ]
+            \draw (120:2) -- (0, 0);
+            \draw[photon] (240:2) -- (0, 0);
+            \draw (0, 0) -- (2, 0);
+            \draw[photon] (120:1) to[bend left=60] (1, 0);
+            \draw[->] (120:2) -- (120:1.4);
+            \draw[->] (120:1) -- (120:0.4);
+            \draw[->] (0, 0) -- (0.6, 0);
+            \draw[->] (1, 0) -- (1.6, 0);
+        \end{tikzpicture}
+    \end{equation}
+    This process can happen since we've now got a virtual particle, actually three of them, since we actually annihilate the incoming electron, producing a virtual electron and a virtual photon, then annihilate this virtual electron and the incoming photon, and produce a virtual electron, which we then annihilate along with the virtual photon, producing a real electron.
+    
+    \section{Feynman Rules for QED}
+    The only new rule for QED, in addition to the rules we've seen already for fermion fields and gauge fields is the vertex term, corresponding to the interaction,
+    \begin{equation}
+        \lagrangianDensity_{\interaction} = e\diracadjoint{\psi} \slashed{A} \psi.
+    \end{equation}
+    Each vertex term gives a factor of \(ie\gamma^\mu\).
+    Notice that \(\gamma^\mu\) has both (implicit) spinor indices and (explicit) Lorentz indices.
+    It is the interaction of these indices that conveys information about the spin of an electron and the polarisation of a photon in a way that allows for the total angular momentum to be conserved.
+    
+    We now list the Feynman rules for QED.
+    First we have the rules for external spin \(1/2\) (anti)particles with momentum \(p\) and spin \(s\), note that \tikzsetnextfilename{fd-dot-vertex-1}\feynmandiagram{a [dot]}; corresponds to a vertex, whereas a lack of a \tikzsetnextfilename{fd-dot-vertex-2}\feynmandiagram{a [dot]}; corresponds to an external particle:
+    \begin{equation}
+        \begin{array}{rrr}
+            \text{Incoming particle} & u(\vv{p}, s) & \tikzsetnextfilename{fd-QED-rules-incoming-fermion}\feynmandiagram[horizontal=a to b]{a -- [fermion] b [dot]}; \\
+            \text{Outgoing particle} & \diracadjoint{u}(\vv{p}, s) & \tikzsetnextfilename{fd-QED-rules-outgoing-fermion}\feynmandiagram[horizontal=a to b]{a [dot] -- [fermion] b}; \\
+            \text{Incoming antiparticle} & \diracadjoint{v}(\vv{p}, s) & \tikzsetnextfilename{fd-QED-rules-incoming-antifermion}\feynmandiagram[horizontal=a to b]{a -- [anti fermion] b [dot]}; \\
+            \text{Outgoing antiparticle} & v(\vv{p}, s) & \tikzsetnextfilename{fd-QED-rules-outgoing-antifermion}\feynmandiagram[horizontal=a to b]{a [dot] -- [anti fermion] b};
+        \end{array}
+    \end{equation}
+    Next, we have the rules for spin 1 external particles, which in QED is just photons.
+    For a photon with momentum \(p\) and polarisation \(r\) the rules are as follows:
+    \begin{equation}
+        \begin{array}{rrr}
+            \text{Incoming photon} & \varepsilon_\mu^r(p) & \tikzsetnextfilename{fd-QED-rules-incoming-photon}\feynmandiagram[horizontal=a to b]{a -- [photon] b [dot]}; \, \mu \\
+            \text{Outgoing photon} & \varepsilon_\mu^r(p)^* & \mu \, \tikzsetnextfilename{fd-QED-rules-outgoing-photon}\feynmandiagram[horizontal=a to b]{a [dot] -- [photon] b};
+        \end{array}
+    \end{equation}
+    Then there are internal lines, for a photon propagator of momentum \(k\) we have
+    \begin{equation}
+        \begin{array}{rrr}
+            \text{Photon propagator} & \displaystyle\frac{iP^{\mu\nu}(k)}{k^2 + i\varepsilon} \to -\frac{i\minkowskiMetric^{\mu\nu}}{k^2 + i\varepsilon} & \mu \, \tikzsetnextfilename{fd-QED-rules-internal-photon}\feynmandiagram[horizontal=a to b]{a [dot] -- [photon] b [dot]}; \, \nu
+        \end{array}
+    \end{equation}
+    For a spin \(1/2\) fermion propagator of mass \(m\) and momentum \(p\) we have
+    \begin{equation}
+        \begin{array}{rrr}
+            \text{Photon propagator} & \displaystyle-\frac{i(\slashed{p} + m)}{p^2 - m^2 + i\varepsilon} & \tikzsetnextfilename{fd-QED-rules-internal-fermion}\feynmandiagram[horizontal=a to b]{a [dot] -- b [dot]};
+        \end{array}
+    \end{equation}
+    Finally, for each QED vertex we have
+    \begin{equation}
+        \begin{array}{rrr}
+            \text{Vertex} & ie\gamma^\mu & \mu \, \tikzsetnextfilename{fd-QED-rules-veretx}\feynmandiagram{a [dot]};
+        \end{array}
+    \end{equation}
+    
+    In addition we have the usual rules for Feynman diagrams:
+    \begin{itemize}
+        \item Impose four-momentum conservation at each vertex.
+        \item Integrate over any unfixed four momenta.
+        \item Go along an arrow and write the corresponding terms with spinor indics from right to left as you encounter them.
+        \item For every closed fermion loop take a trace and include a minus sign.
+        \item For every crossed pair of external fermions include a minus sign.
+    \end{itemize}
+    
+    In order to evaluate the resulting amplitudes we need the spin sums:
+    \begin{align}
+        \sum_s u(\vv{p}, s) \diracadjoint{u}(\vv{p}, s) &= \slashed{p} + m,\\
+        \sum_s v(\vv{p}, s) \diracadjoint{v}(\vv{p}, s) &= \slashed{p} - m,
+    \end{align}
+    and also the polarisation sums
+    \begin{equation}
+        \sum_{r=1,2} \varepsilon^{\mu}_r(k) \varepsilon^\nu_r(k) = P^{\mu\nu} \to -\minkowskiMetric^{\mu\nu}.
+    \end{equation}
     
     
     
@@ -9013,7 +9554,7 @@ noabbrev
     
     \subsubsection{The Second Diagram}
     The other diagram with two vertices, four propagators\footnote{This time the circle is just a single propagator connecting the vertex to itself.}, and two sources is
-    \begin{equation}
+    \begin{equation}\label{eqn:one particle reduicible second order diagram}
         \tikzsetnextfilename{fd-phi-cubed-two-point-two-verticex-b}
         \begin{tikzpicture}[baseline=(current bounding box)]
             \draw (-1, 0) node [below] {\scriptsize\(z_1\)} -- (1, 0) node [below] {\scriptsize\(z_2\)};
@@ -9549,9 +10090,10 @@ noabbrev
         &\qquad = \int \frac{\dl{^Dp}}{(2\pi)^D} \e^{-ip\cdot(x - y)} \left[ \frac{i}{p^2 - m_{\phys}^2 + i\varepsilon} + \int_{4m_{\phys}^2}^{\infty} \!\! \dl{s} \, \rho(s) \frac{i}{p^2 - s + i\varepsilon} \right]. \notag
     \end{align}
     The propagator in momentum space is then given by
-    \begin{equation}
+    \begin{equation}\label{eqn:kallen-lehmann representation}
         \tilde{\Delta}_{\feynman}(p) = \frac{i}{p^2 - m_{\phys}^2 + i\varepsilon} + \int_{4m_{\phys}^2}^{\infty} \!\! \dl{s} \, \rho(s) \frac{i}{p^2 - s + i\varepsilon}.
     \end{equation}
+    This is called the \defineindex{K\"all\'en--Lehmann representation}.
     
     \chapter{LSZ, Optical Theorem, and Ward Identities}
     \section{The \texorpdfstring{\(S\)}{S} Matrix}
@@ -10157,6 +10699,461 @@ noabbrev
         y
     \end{align}
     is the \defineindex{photon propagator}.
+    
+    \part{Renormalisation}
+    \chapter{Dimensional Regularisation}
+    \epigraph{I will probably regret this choice, but that's OK.}{Luigi Del Debbio}
+    So far we've encountered many expressions with divergent integrals, usually these are of the form \(\int\dl{^Dk}\).
+    Our goal now is to find a way of modifying our theories to somehow constrain these infinities.
+    This is called \defineindex{regularisation}.
+    We will then try to understand the structure of these divergences and see what they tell us about physics.
+    
+    \section{Setup}
+    We will start with an extended example, for the two-point correlator for a scalar field, \(\varphi\), with a \(\varphi^3\) interaction in \(D\) dimensions.
+    We work in momentum space, where this correlator is \(\tilde{G}^{(2)}(p_1, p_2)\).
+    As usual the correlator is of the form
+    \begin{equation}
+        \tilde{G}^{(2)}(p_1, p_2) = (2\pi)^D \delta(p_1 + p_2) i \tilde{\Delta}_{\feynman}(p^2)
+    \end{equation}
+    where the Dirac delta conserves overall momentum, the \((2\pi)^D\) is just part of the normalisation, and \(\tilde{\Delta}_{\feynman}\) is the Feynman propagator for the scalar particles in momentum space.
+    We write it as a function of \(p^2\), the momentum of the propagating particle.
+    We've seen that in general \(n\)-point correlators depend on \(n-1\) momenta, which justifies this choice, and we've seen that momentum only enters scalar correlators as its square.
+    
+    If we consider one incoming particle and one outgoing particle then this process can be drawn as the Feynman diagram
+    \begin{equation}
+        \tikzsetnextfilename{fd-generic-1-to-1-scattering-scalar}
+        \begin{tikzpicture}[baseline=-2.5]
+            \draw (-3, 0) -- (-1, 0);
+            \draw (1, 0) -- (3, 0);
+            \draw [pattern=north east lines] (0, 0) circle [radius=1cm];
+            \draw [-{Latex[width=1.5mm]}] (-2.5, 0.25) -- ++ (1, 0) node [above, midway] {\(p\)};
+            \draw [-{Latex[width=1.5mm]}] (1.5, 0.25) -- ++ (1, 0) node [above, midway] {\(p\)};
+        \end{tikzpicture}
+    \end{equation}
+    where the blob represents all possible processes with a single initial and final particle.
+    
+    We assume that \(\tilde{G}^{(2)}\) is analytic, and so can be expressed as
+    \begin{equation}
+        \tilde{G}^{(2)}(p_1, p_2) = (2\pi)^D \delta(p_1 + p_2) \sum_k g^k i \mkern2mu \tilde{\Delta}_{\feynman}^{(k)}(p^2)
+    \end{equation}
+    where \(g\) is the coupling constant appearing in the interaction Lagrangian, \(\lagrangianDensity_{\interaction} = -g\varphi^3/3!\), and \(\tilde{\Delta}_{\feynman}^{(k)}\) is the contribution of the \(k\)th order term to the total propagator.
+    
+    We will focus on the second order term, in particular we will ignore the \((2\pi)^D\delta(p_1 + p_2)\) factor and just compute
+    \begin{equation}
+        g^2 i \mkern2mu \tilde{\Delta}_{\feynman}^{(2)}(p^2).
+    \end{equation}
+    As a second order term we have two vertices, each connected to three lines.
+    With two external particles, one incoming and one outgoing, this corresponds to the diagram
+    \begin{equation}\label{eqn:fd scalar self energy}
+        \tikzsetnextfilename{fd-divergent-diagram-example}
+        \begin{tikzpicture}[baseline=-2.5]
+            \draw (-3, 0) -- (-1, 0);
+            \draw (1, 0) -- (3, 0);
+            \draw (0, 0) circle [radius=1cm];
+            \draw [-{Latex[width=1.5mm]}] (-2.5, 0.25) -- ++ (1, 0) node [above, midway] {\(p\)};
+            \draw [-{Latex[width=1.5mm]}] (1.5, 0.25) -- ++ (1, 0) node [above, midway] {\(p\)};
+            \draw [-{Latex[width=1.5mm]}] (120:1.2) arc(120:60:1.2) node [above, midway] {\(\ell\)};
+            \draw [-{Latex[width=1.5mm]}] (-60:1.2) arc(-60:-120:1.2) node [below, midway] {\(\ell - p\)};
+        \end{tikzpicture}
+    \end{equation}
+    
+    Using the Feynman rules for \(\varphi^3\) theory we can write down the term corresponding to this diagram.
+    First, we have a symmetry factor of \(2\), recalling that in momentum space we fix the two ends of the diagram, so the only symmetry is the horizontal mirror symmetry.
+    We then have a factor of \((ig)^2\), since there are two vertices.
+    As shown in the picture momentum conservation at each vertex leaves one momentum unfixed, \(\ell\), and so we have an integral over \(\ell\), this will give us a divergent result.
+    We also have four propagators, with momenta \(p\), \(\ell\), \(\ell - p\), and \(p\) again.
+    This gives the result
+    \begin{multline}
+        g^2 i \mkern2mu \tilde{\Delta}_{\feynman}^{(2)}(p^2) = \frac{1}{2} (ig)^2 \frac{i}{p^2 - m^2 + i\varepsilon}\\
+        \times \left[ \int \frac{\dl{^D\ell}}{(2\pi)^D} \frac{i}{\ell^2 - m^2 + i\varepsilon} \frac{i}{(\ell - p)^2 - m^2 + i\varepsilon} \right] \frac{i}{p^2 - m^2 + i\varepsilon}.
+    \end{multline}
+    Write
+    \begin{equation}
+        i \mkern2mu \tilde{\Delta}(p^2) = \frac{i}{p^2 - m^2 + i\varepsilon}
+    \end{equation}
+    for the free propagators and
+    \begin{equation}
+        i\Pi(p^2) = \frac{g^2}{2} \int \frac{\dl{^D\ell}}{(2\pi)^D} \frac{1}{\ell^2 - m^2 + i\varepsilon} \frac{1}{(\ell - p)^2 - m^2 + i\varepsilon}
+    \end{equation}
+    for the rest.
+    We then want to compute
+    \begin{equation}
+        g^2 i \mkern3mu \tilde{\Delta}_{\feynman}^{(2)}(p^2) = i \mkern2mu \tilde{\Delta}(p^2) i\Pi(p^2) \mkern1mu i \mkern1mu \tilde{\Delta}(p^2).
+    \end{equation}
+    Specifically, we want to compute \(\Pi(p^2)\), which is a divergent integral.
+    
+    \section{Feynman Parametrisation}
+    To proceed we use an identity relating the a product of reciprocals to a product of integrals of the reciprocal of a sum, which should hopefully be easier to compute.
+    This identity, known as \defineindex{Feynman parametrisation} is
+    \begin{equation}
+        \begin{multlined}[t][\displaywidth]
+            \frac{1}{A_1^{\alpha_1} \dotsm A_n^{\alpha_n}} = \frac{\Gamma(\alpha_1 + \dotsb + \alpha_n)}{\Gamma(\alpha_1) \dotsm \Gamma_{\alpha_n}} \\
+            \times \int_{0}^{1} \dl{x_1} \, x_1^{\alpha_1 - 1} \dotsm \int_0^1 \dl{x_n} \, x_n^{\alpha_n-1} \delta\left( 1 - \sum_{j=1}^{n} x_j \right) \frac{1}{(x_1 A_1 + \dotsb + x_n A_n)^{\alpha_1 + \dotsb + \alpha_n}}.
+        \end{multlined}
+    \end{equation}
+    This is valid so long as zero is  not contained in the convex hull\footnote{the convex hull of some points is the smallest convex shape containing alll of the points, essentially imagine shrink wrapping the points.} of the complex numbers \(A_i\) and \(\Re(\alpha_i) \ge 0\).
+    
+    Here
+    \begin{equation}
+        \Gamma(z) = \int_{0}^{\infty} \dl{t} \, t^{z-1} \e^{-t}
+    \end{equation}
+    is the gamma function.
+    Note that \(\Gamma(n) = (n - 1)!\) for \(n \in \naturals\setminus\{0\}\) and \(\Gamma\) has poles at all nonpositive integers (i.e., negative integers and zero).
+    
+    In our case we want to use this identity to aid in computing the integral, we therefore have
+    \begin{equation}
+        A_1 = \ell^2 - m^2 + i\varepsilon, \quad A_2 = (\ell - p)^2 - m^2 + i\varepsilon, \qand \alpha_1 = \alpha_2 = 1.
+    \end{equation}
+    Since both \(A_1\) and \(A_2\) have the same imaginary part their \enquote{convex hull}, in this case the line joining them, is parallel to, and above, the real axis, so doesn't contain zero.
+    Hence, we have
+    \begin{align}
+        i\Pi(p^2) &= \frac{g^2}{2} \int \frac{\dl{^D\ell}}{(2\pi)^D} \frac{1}{\ell^2 - m^2 + i\varepsilon} \frac{1}{(\ell - p)^2 - m^2 + i\varepsilon}\\
+        &= \frac{\Gamma(2)}{\Gamma(1)\Gamma(1)} \int \frac{\dl{^D\ell}}{(2\pi)^D} \int_0^1 \dl{x_1} \int_0^1 \dl{x_2} \, \delta(1 - x_1 - x_2)\\
+        &\qquad \qquad \times \frac{1}{[x_1\ell^2 + x_2(\ell - p)^2 + (x_1 + x_2)(-m^2 + i\varepsilon)]^2}\notag
+    \end{align}
+    now notice that \(\Gamma(2) = 1! = 1\) and \(\Gamma(1) = 0! = 1\), and using the Dirac delta we can perform the \(x_2\) integral, replacing \(x_2\) with \(1 - x_1\), and renaming \(x_1 = x\), giving
+    \begin{equation}
+        i\Pi(p^2) = \int \frac{\dl{^D\ell}}{(2\pi)^D} \int_0^1 \dl{x} \, \frac{1}{[x\ell^2 + (1 - x)(\ell - p)^2 - m^2 + i\varepsilon]^2}.
+    \end{equation}
+    
+    \textcolor{red}{Somehow we then get the following, suggested substitution is \(M^2 = m^2 - x(1 - x)p^2\) and \(q = \ell - xp\), but \(q = \ell + xp\) seems to get closer???}
+    \begin{equation}
+        i\Pi(p^2) = \frac{g^2}{2} \int_0^1 \dl{x} \int \frac{\dl{^Dq}}{(2\pi)} \frac{1}{(q^2 - M^2 + i\varepsilon)^2}.
+    \end{equation}
+    
+    Suppose \(D = 6\), then we expect this integral to go as \(q^6/q^4 = q^2\), so we expect quadratic divergence.
+    This naive dimension counting only works in Euclidean space however.
+    
+    \section{Wick Rotation}
+    In computing \(\Pi(p^2)\) we have the time integral
+    \begin{equation}
+        \int \frac{\dl{q^0}}{2\pi} \frac{1}{(q^2 - M^2 + i\varepsilon)^2}.
+    \end{equation}
+    Consider the contour shown in \cref{fig:wick rotation contour}.
+    This contains no poles, and so the integral around the contour is zero.
+    The integral along the two quarter circles also vanishes as we take them to infinity, since we can bound it by \(1/(q^0)^2\).
+    So the integral along the real axis is the negative of the integral from \(+i\infty\) to \(-i\infty\).
+    
+    \begin{figure}
+        \tikzsetnextfilename{wick-rotation-contour}
+        \begin{tikzpicture}
+            \draw [very thick, ->] (-3.5, 0) -- (3.5, 0) node [right] {\(\Re q^0\)};
+            \draw [very thick, ->] (0, -3.5) -- (0, 3.5) node [above] {\(\Im q^0\)};
+            \draw [very thick, Blue] (-3, 0) -- (3, 0) arc (0:90:3) -- (0, -3) arc (270:180:3) -- cycle;
+            \draw [very thick, Blue, ->] (1.5, 0) -- ++ (0.01, 0);
+            \draw [very thick, Blue, ->] (-1.5, 0) -- ++ (0.01, 0);
+            \draw [very thick, Blue, ->] (0, 1.5) -- ++ (0, -0.01);
+            \draw [very thick, Blue, ->] (0, -1.5) -- ++ (0, -0.01);
+            \draw [very thick, Blue, ->] (45:3) -- ++ (-0.01, 0.01);
+            \draw [very thick, Blue, ->] (225:3) -- ++ (0.01, -0.01);
+            \fill [Red] (-1.5, 0.2) circle [radius=0.05];
+            \fill [Red] (1.5, -0.2) circle [radius=0.05];
+        \end{tikzpicture}
+        \caption{The contour used to justify the Wick rotation.}
+        \label{fig:wick rotation contour}
+    \end{figure}
+    
+    This means we can make the transformation of variables \(q^0 = iq_{\symrm{E}}^0\) and \(\vv{q} = \vv{q}_{\symrm{E}}\).
+    Then with the usual Euclidean metric, the factor of \(i\), and the additional overall minus sign we get the required metric.
+    We also have \(q^2 - M^2 = (iq_{\symrm{E}}^0)^2 + \vv{q}_{\symrm{E}} \cdot \vv{q}_{\symrm{E}} - M^2\)
+    So we can instead compute
+    \begin{equation}
+        \Pi(p^2) = \frac{g^2}{2} \int_0^1 \dl{x} \int \frac{\dl{^Dq_{\symrm{E}}}}{(2\pi)^D} \frac{1}{(q_{\symrm{E}}^2 + M^2 + i\varepsilon)^2}.
+    \end{equation}
+    
+    Now we can make a dimension counting argument.
+    The denominator goes as \(q_{\symrm{E}}^4\), and the measure goes as \(q_{\symrm{E}}^D\), so for \(D \ge 4\) we expect the integral to be divergent.
+    Suppose then that \(D = 6\).
+    This integral will them be quadratically divergent.
+    We call this a \defineindex{UV divergence}, since the divergence occurs due to unbounded (and therefore high) energies, as opposed to an IR divergence, which occurs due to very small energies.
+    
+    We can decrease this divergence by considering the derivative with respect to \(p^2\).
+    We have to be careful computing this since \(M^2 = m^2 - x(1 - x)p^2\) has \(p^2\) dependence:
+    \begin{equation}
+        \diff{}{p^2} \Pi(p^2) = -g^2 \int_0^1 \dl{x} \int \frac{\dl{^Dq_{\symrm{E}}}}{(2\pi)^D} \diff{M^2}{p^2} \frac{1}{(q_{\symrm{E}}^2 + M^2 + i\varepsilon)^3}.
+    \end{equation}
+    In \(D = 6\) the integrand and measure together go as \(1/q_{\symrm{E}}\), so we expect a logarithmic divergence, a great improvement on quadratic, but still divergent.
+    We can take another derivative.
+    Notice that \(\diff{M^2}/{p^2} = -x(1 - x)\) does not have \(p^2\) dependence.
+    Thus,
+    \begin{equation}
+        \diff[2]{}{(p^2)} \Pi(p^2) = 3g^2 \int_0^1 \dl{x} \, [x(1 - x)]^2 \int \frac{\dl{^Dq_{\symrm{E}}}}{(2\pi)^D} \frac{1}{(q_{\symrm{E}}^2 + M^2 + i\varepsilon)^4}.
+    \end{equation}
+    This is now convergent if \(D = 6\).
+    
+    We can start with \(\Pi''(p^2)\) and use this finite value to reconstruct \(\Pi(p^2)\) by integrating twice, giving
+    \begin{equation}
+        \Pi(p^2) = \Pi(\mu_1^2) + \Pi'(\mu_2^2) (p^2 - \mu_1^2) + \int_{\mu_1^2}^{p^2} \dl{s'} \int_{\mu_2^2}^{s'} \dl{s} \, \Pi''(s).
+    \end{equation}
+    Here \(\mu_1\) and \(\mu_2\) are some energy/momentum scales at which the values of \(\Pi\) and \(\Pi'\) are known and fixed, these arise as constants of integration.
+    The quadratic divergence is still present, in the \(\Pi(\mu_1^2)\) factor, as is the logarithmic divergence, in the \(\Pi'(\mu_2^2)\) term.
+    The final integral though is finite, so we've managed to isolate the divergences to needing to fix the value of the function and its derivative at some arbitrary values.
+    
+    \section{Regularisation}
+    UV divergences appear at high momenta.
+    We therefore modify our theory at high energies, or equivalently at low distances, such that the divergences disappear.
+    There are multiple ways to do this, some of the most common are listed here:
+    \begin{itemize}
+        \item Sharp cut-off in Euclidean momenta at some value \(\Lambda^2\), essentially picking a large, finite, number to replace infinity in the integral bounds.
+        \item Pauli--Villars regulator: we modify the propagators to be less divergent at large values of the momentum:
+        \begin{equation}
+            \frac{1}{p^2 - m^2 + i\varepsilon} \to \frac{1}{p^2 - m^2 + i\varepsilon} - \frac{1}{p^2 - M^2 + i\varepsilon}.
+        \end{equation}
+        Here \(M\) is a mass scale.
+        \item Schwinger-time regularisation: rewrite the integral in such a way that it is exponentially suppressed for large values of some parameter, introducing a divergence at 0 in the process, and then introduce a cut-off at low values of the parameter.
+        \item Dimensional regularisation: work in generic dimension, \(D\), and define the integrals by analytically continuation from a region where they converge.
+    \end{itemize}
+    It is this last approach which we shall take here.
+    
+    \subsection{Dimensional Regularisation}
+    \define{Dimensional regularisation}\index{dimensional regularisation}, or \define{dim reg}, is the process by which we treat \(D\) as an arbitrary parameter which we can vary.
+    We then compute the integrals for convergent values of \(D\), then extend these results by analytic continuation.
+    Consider the quantity
+    \begin{equation}
+        I_D = \int \frac{\dl{^D q_{\symrm{E}}}}{(2\pi)^D} \frac{1}{(q_{\symrm{E}}^2 + M^2)^2}.
+    \end{equation}
+    We can move to polar coordinates by considering \(q_{\symrm{E}}^2\) as the radial coordinate squared, and using the angular measure \(\dl{\Omega_D}\).
+    We then have
+    \begin{equation}
+        I_D = \int \frac{\dl{\Omega_D}}{(2\pi)^D} \frac{1}{2} \int_{0}^{\infty} \dl{q_{\symrm{E}}^2} \, (q_{\symrm{E}}^2)^{D/2 - 1} \frac{1}{(q_{\symrm{E}}^2 + M^2)^2}.
+    \end{equation}
+    Now we make this integral dimensionless:
+    \begin{equation}
+        I_D = \int \frac{\dl{\Omega_D}}{(2\pi)^D} \frac{1}{2} \left( \frac{1}{M^2} \right)^{2 - D/2} \int_0^{\infty} \dl{\left( \frac{q_{\symrm{E}}^2}{M^2} \right)} \, \left( \frac{q_{\symrm{E}}^2}{M^2} \right)^{D/2 - 1} \frac{1}{(1 + q_{\symrm{E}}^2/M^2)^2}.
+    \end{equation}
+    Notice how this separates the angular dependence, the dimensions, and then a dimensionless integral.
+    Define \(\xi = 1/(1 + q_{\symrm{E}}^2/M^2)\), we then have
+    \begin{equation}
+        I_D = \frac{1}{(2\pi)^D} \frac{2\pi^{D/2}}{\Gamma(D/2)} \frac{1}{2} \left( \frac{1}{M^2} \right)^{2 - D/2} \int_0^1 \dl{\xi} \, \xi^{1 - D/2}(1 - \xi)^{D/2 - 1}.
+    \end{equation}
+    Here we've made a change of variables and also used the solid angle in \(D\) dimensions,
+    \begin{equation}
+        \Omega_D = \int \dl{\Omega_D} = \frac{2\pi^{D/2}}{\Gamma(D/2)},
+    \end{equation}
+    note that if \(D = 3\) we get \(2\pi^{3/2}/\Gamma(3/2) = 4\pi\), which is what we would expect.
+    Here
+    \begin{equation}
+        \Gamma(z) \coloneqq \int_0^{\infty} \dl{t} \, t^{z - 1} \e^{-t}
+    \end{equation}
+    is the \defineindex{gamma function}.
+    
+    The integral here can be identified as the \defineindex{beta function}
+    \begin{equation}
+        \Beta(w, z) = \frac{\Gamma(w)\Gamma(z)}{\Gamma(w + z)} = \int_0^{1} \dl{\xi} \, \xi^{w - 1} (1 - \xi)^{z - 1}.
+    \end{equation}
+    Hence, we can write the integral as
+    \begin{equation}
+        \int_0^1 \dl{\xi} \, \xi^{1 - D/2}(1 - \xi)^{D/2 - 1} = \Beta\left( 2 - \frac{D}{2}, \frac{D}{2} \right) = \frac{\Gamma(2 - D/2)\Gamma(D/2)}{\Gamma(2)}.
+    \end{equation}
+    Note that \(\Gamma(2) = 1! = 1\).
+    Then we have
+    \begin{align}
+        I_D &= \frac{2}{(4\pi)^{D/2}} \frac{1}{\Gamma(D/2)} \frac{1}{2} \left( \frac{1}{M^2} \right)^{2-D/2} \Beta\left( 2 - \frac{D}{2}, \frac{D}{2} \right)\\
+        &= \frac{1}{(4\pi)^{D/2}} \Gamma\left( 2 - \frac{D}{2} \right) \left( \frac{1}{M^2} \right)^{2 - D/2}.
+    \end{align}
+    The \(1/(4\pi)^{D/2}\) factor is characteristic of one loop integrals.
+    The \((1/M^2)^{2 - D/2}\) factor carries all of the dimensions of this value.
+    The divergence is constrained to the \(\Gamma(2 - D/2)\) term, since \(\Gamma\) has poles at nonpositive integers, that is at 0 and at negative integers.
+    This means we have divergences when \(D = 4, 6, 8, \dotsc\).
+    
+    We then have
+    \begin{equation}
+        \Pi(p^2) = \frac{g^2}{2} \int_0^1 \dl{x} \, \frac{1}{(4\pi)^{D/2}} \Gamma\left( 2 - \frac{D}{2} \right) \left( \frac{1}{M^2} \right)^{2 - D/2}.
+    \end{equation}
+    Remember that \(M^2\) has \(x\) dependence.
+    
+    \chapter{Structure of the Divergences}
+    Now that we have manipulated our expression into a more manageable form we can begin to investigate the structure of the divergences.
+    To do so we start with some dimensional analysis.
+    
+    \section{Dimensions}
+    If a quantity has dimensions of mass to some power we call this power the mass dimension.
+    For example, momentum has mass dimension 1, and lengths have mass dimension \(-1\).
+    Denote by \([-]\) the mass dimension of some quantity, so if \(E\) is an energy then \([E] = 1\).
+    Note that since mass dimension is an exponentiated quantity we have \([ab] = [a] + [b]\).
+    
+    Consider Lagrangian
+    \begin{equation}
+        \lagrangianDensity = \frac{1}{2}(\partial_\mu \varphi)(\partial^\mu \varphi) + \frac{1}{2}m^2 \varphi^2 + \frac{1}{3!}g^3\varphi^3.
+    \end{equation}
+    We know that the action,
+    \begin{equation}
+        S = \int\dl{^Dx} \, \lagrangianDensity,
+    \end{equation}
+    is dimensionless, and since \([\dl{^Dx}] = -D\) we must have \([\lagrangianDensity] = D\).
+    Taking the first term of the Lagrangian we know that \([\partial_\mu] = [\partial^\mu] = [1/x] = 1\), and so we must have \([\varphi] = (D - 2)/2\), so that \([(\partial_\mu \varphi)(\partial^\mu \varphi)] = D\).
+    
+    we must also have \([g\varphi^3] = [g] + [\varphi^3] = [\lagrangianDensity]\), and so we have
+    \begin{equation}
+        [g] = [\lagrangianDensity] - [\varphi^3] = [\lagrangianDensity] - 3[\varphi] = D - 3\frac{D - 2}{2} = \frac{6 - D}{2}.
+    \end{equation}
+    Notice that in \(D = 6\) this means the coupling constant is dimensionless.
+    This is the motivation for working in \(D = 6\), it's the only dimension in which we have a dimensionless coupling constant allowing us to do perturbation theory.
+    
+    As previously mentioned in dimensional regularisation we take \(D\) to be a variable.
+    In particular we can take \(D = 6 - 2\varepsilon\) for some \(\varepsilon > 0\).
+    Note that this \(\varepsilon\) is not the same as the \(\varepsilon\) appearing in the \(i\varepsilon\) prescription.
+    Then we have
+    \begin{equation}
+        [\varphi] = \frac{D - 2}{2} = \frac{6 - 2\varepsilon - 2}{2} = 2 - \varepsilon,
+    \end{equation}
+    and
+    \begin{equation}
+        [g] = [\lagrangianDensity] + 3[\varphi] = 6 - 2\varepsilon - 6 + 3\varepsilon = \varepsilon.
+    \end{equation}
+    So, as expected, away from \(D = 6\) we have a dimensionful coupling.
+    We can fix this by rescaling \(g \mapsto g \tilde{\mu}^{\varepsilon}\), where \(g\) is again dimensionless and \(\tilde{\mu}\) has dimensions of energy, and so we still have \([g\tilde{\mu}^{\varepsilon}] = \varepsilon\).
+    
+    \section{Computing the Integral}
+    Now consider \(\Pi(p^2)\) again.
+    We can now write it as
+    \begin{equation}
+        \Pi(p^2) = \frac{g^2}{2} \tilde{\mu}^{2\varepsilon} \int_0^1 \dl{x} \, \frac{1}{(4\pi)^{3-\varepsilon}} \Gamma(\varepsilon - 1) \left( \frac{1}{M^2} \right)^{\varepsilon - 1}.
+    \end{equation}
+    Collecting together the terms without \(\varepsilon\) or \(x\) dependence into a single parameter, \(\alpha\), this becomes
+    \begin{equation}
+        \Pi(p^2) = \frac{\alpha}{2} \int_0^1 \dl{x} \, \Gamma(\varepsilon - 1) M^2 \left( \frac{4\pi \tilde{\mu}^2}{M^2} \right)^{\varepsilon}
+    \end{equation}
+    where
+    \begin{equation}
+        \alpha = \frac{g^2}{(4\pi)^3}.
+    \end{equation}
+    
+    Suppose that \(n\) is a positive integer, then there exists an expansion for the gamma function for small \(\varepsilon\):
+    \begin{equation}
+        \Gamma(\varepsilon - n) = \frac{(-1)^{n}}{n!} \left[ \frac{1}{\varepsilon} - \gamma + \sum_{k=1}^{n} \frac{1}{k} + \order(\varepsilon) \right].
+    \end{equation}
+    Here \(\gamma \approx 0.577216\)\index{\(\gamma\)|see{Euler--Mascheroni constant}} is the \defineindex{Euler--Mascheroni constant}.
+    Using this we have
+    \begin{equation}
+        \Gamma(\varepsilon - 1) = -\left[ \frac{1}{\varepsilon} - \gamma + 1 + \order(\varepsilon) \right].
+    \end{equation}
+    It's fine to work to constant order, \(\order(\varepsilon^0)\), since we'll be taking \(\varepsilon \to 0\).
+    
+    Notice that we can rewrite the term with \(\varepsilon\) as an exponent as the exponential of a log, and then expand the log:
+    \begin{align}
+        \left( \frac{4\pi\tilde{\mu}^2}{M^2} \right)^{\varepsilon} &= \exp\left\{ \varepsilon \log\left( \frac{4\pi\tilde{\mu}^2}{M^2} \right) \right\}\\
+        &= 1 + \varepsilon \log\left( \frac{4\pi\tilde{\mu}^2}{M^2} \right) + \order(\varepsilon^2).
+    \end{align}
+    Note that we have to go to order \(\varepsilon\) here since in the product with \(\Gamma(\varepsilon - 1)\) we'll have a \(1/\varepsilon\) term, so the overall order is \(\varepsilon^0\).
+    
+    Hence, we have
+    \begin{align}
+        \Pi(p^2) &= -\frac{\alpha}{2} \int_0^1 \dl{x} \, \left[ \frac{1}{\varepsilon} - \gamma + 1 + \order(\varepsilon) \right] M^2 \left[ 1 + \varepsilon \log\left( \frac{4\pi\tilde{\mu}^2}{M^2} \right) + \order(\varepsilon^2) \right] \notag\\
+        &= -\frac{\alpha}{2} \int_0^1 \dl{x} \, M^2 \left[ \frac{1}{\varepsilon} - \gamma + 1 + \log\left( \frac{4\pi\tilde{\mu}^2}{M^2} \right) + \order(\varepsilon) \right].
+    \end{align}
+    Note the divergence in the first term when \(\varepsilon \to 0\).
+    Now write out \(M^2\) in full, we have
+    \begin{equation}
+        \Pi(p^2) = -\frac{\alpha}{2} \int_0^1 \dl{x} \, [M^2 - x(1 - x)p^2] \left[ \frac{1}{\varepsilon} - \gamma + 1 + \log\left( \frac{4\pi\tilde{\mu}^2}{M^2} \right) + \order(\varepsilon) \right].
+    \end{equation}
+    We can compute the integral for the \(M^2(1/\varepsilon + 1)\) term, giving
+    \begin{equation}
+        \Pi(p^2) = \frac{\alpha}{2} \left[ \left( \frac{1}{\varepsilon} + 1 \right)\left( \frac{1}{6}p^2 - m^2 \right) + \int_0^1 \dl{x} \, M^2 \left( \gamma + \log\left( \frac{M^2}{4\pi\tilde{\mu}^2} \right) \right) \right]
+    \end{equation}
+    where the argument of the log is flipped as we absorb the minus sign.
+    Now define
+    \begin{equation}
+        \mu^2 = \frac{4\pi\tilde{\mu}^2}{e^\gamma},
+    \end{equation}
+    and this becomes
+    \begin{equation}
+        \Pi(p^2) = \frac{\alpha}{2} \left[ \left( \frac{1}{\varepsilon} + 1 \right)\left( \frac{1}{6}p^2 - m^2 \right) + \int_0^1 \dl{x} \, M^2(x, p^2) \log\left( \frac{M^2(x, p^2)}{\mu^2} \right) \right].
+    \end{equation}
+    
+    Recall that before we had divergences in the \(\Pi(\mu_1^2)\) and \(\Pi'(\mu_2^2)\) terms, but not in the \(\Pi''(s)\) term, so the divergences appeared in the constant and linear terms.
+    This is what we see here with the constant term \(-m^2/\varepsilon\) and the linear (in \(p^2\)) term \(p^2/(6\varepsilon)\), which are the only places this diverges.
+    
+    Notice that the results depends on an arbitrary energy scale, \(\mu\).
+    This is an unavoidable part of regularisation, however we do it we must introduce some energy scale in such a way that our final expressions depend on the value at this energy scale.
+    
+    \section{One Particle Irreducible Diagrams}
+    We've considered only the diagram in \cref{eqn:fd scalar self energy} for second order contributions.
+    We also saw that the diagram in \cref{eqn:one particle reduicible second order diagram} contributes at second order.
+    The reason we don't have to consider this diagram is that it is not \defineindex{one particle irreducible}, or 1PI\glossary[acronym]{1PI}{One Particle Irreducible}, meaning that by removing a single propagator we get a disconnected diagram.
+    Such diagrams can always be constructed as a sum of one particle irreducible diagrams connected with additional propagators.
+    
+    In particular, we can evaluate \(\tilde{\Delta}_{\feynman}(p^2)\) to all orders by considering the series of diagrams of the form of \cref{eqn:fd scalar self energy} connected by propagators:
+    \begin{align}
+        i \tilde{\Delta}_{\feynman}(p^2) &= 
+        \tikzsetnextfilename{fd-sum-1PI-diagrams}
+        \begin{tikzpicture}[
+            photon/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate},
+            >={Latex[width=1.5mm]},
+            baseline=(plus.base)
+            ]
+            \draw (0, 0) -- (1, 0);
+            \node (plus) at (1.25, 0) {\(+\)};
+            \draw (1.5, 0) -- (2, 0);
+            \draw (2.5, 0) circle [radius = 0.5];
+            \draw (3, 0) -- (3.5, 0);
+            \node at (3.75, 0) {\(+\)};
+            \draw (4, 0) -- (4.5, 0);
+            \draw (5, 0) circle [radius = 0.5];
+            \draw (5.5, 0) -- (6, 0);
+            \draw (6.5, 0) circle [radius =  0.5];
+            \draw (7, 0) -- (7.5, 0);
+            \node at (7.75, 0) {\({} + \mathrlap{\dotsb}\)};
+        \end{tikzpicture}
+        \\
+        &= i \tilde{\Delta}(p^2) + i\tilde{\Delta}(p^2)(-i\Pi(p^2))i\tilde{\Delta}(p^2) + i\tilde{\Delta}(p^2)(-i\Pi(p^2))i\tilde{\Delta}(p^2)(-i\Pi(p^2))i\tilde{\Delta}(p^2) + \dotsb\\
+        &= i\tilde{\Delta}(p^2) + i\tilde{\Delta}(p^2) [(-i\Pi(p^2))i\tilde{\Delta}(p^2)] + i\tilde{\Delta}(p^2)[(-i\Pi(p^2))i\tilde{\Delta}(p^2)]^2 + \dotsb\\
+        &= i\tilde{\Delta}(p^2) \sum_{k = 0}^{\infty} [\Pi(p^2)\tilde{\Delta}(p^2)]^k\\
+        &= i\tilde{\Delta}(p^2) \frac{1}{\Pi(p^2)\tilde{\Delta}(p^2)},
+    \end{align}
+    where we've identified the geometric series in the last step and applied the known result
+    \begin{equation}
+        \sum_{k=0}^{\infty} z^k = \frac{1}{1 - z}
+    \end{equation}
+    for all \(z \in \complex\) with \(\abs{z} < 1\).
+    
+    As a result, assuming convergence, we have
+    \begin{equation}
+        i\tilde{\Delta}_{\feynman}(p^2) = \frac{i}{p^2 - m^2 - \Pi(p^2) + i\varepsilon}
+    \end{equation}
+    where we reintroduce the \(i\varepsilon\) prescription, note that this \(\varepsilon\) is different to the \(\varepsilon\) of dimensional regularisation.
+    
+    \section{Comparison with K\"all\'en--Lehmann}
+    Recall the result
+    \begin{equation}
+        \tilde{\Delta}_{\feynman}(p^2) = \frac{1}{p^2 - m_{\phys}^2} \int_{4m_{\phys}^2}^{\infty} \dl{s} \, \rho(s) \frac{1}{p^2 - s}
+    \end{equation}
+    from \cref{eqn:kallen-lehmann representation}, replacing \(p\) as a parameter with \(p^2\).
+    This has a pole at the square of the physical mass of the particle, and the residue at this pole is 1.
+    This is because we chose the normalisation
+    \begin{equation}
+        \bra{\vv{p}} \varphi(0) \ket{0} = 1.
+    \end{equation}
+    Compare this to the result we just derived here:
+    \begin{equation}
+        \tilde{\Delta}_{\feynman}(p^2) = \frac{1}{p^2 - m^2 - \Pi(p^2)}.
+    \end{equation}
+    This has a pole when \(p^2 - m^2 - \Pi(p^2) = 0\).
+    So, we must have that
+    \begin{equation}
+        m_{\phys}^2 - m^2 = \Pi(m_{\phys}^2).
+    \end{equation}
+    Notice that \(m \ne m_{\phys}\) most of the time, in fact we only have \(m = m_{\phys}\) if there is no interaction term.
+    
+    Consider the denominator \(p^2 - m^2 - \Pi(p^2)\), and expand about \(p^2 = m_{\phys}^2\):
+    \begin{equation}
+        p^2 - m^2 - \Pi(p^2) = (p^2 - m_{\phys}^2) [1 - \Pi'(m_{\phys}^2)] + \order([p^2 - m_{\phys}^2]^2).
+    \end{equation}
+    Then we can calculate the residue:
+    \begin{align}
+        \Res\left( \tilde{\Delta}_{\feynman}(p^2), p^2 = m_{\phys}^2 \right) &\coloneqq \lim_{p^2 \to m_{\phys}^2} (p^2 - m_{\phys}^2) \tilde{\Delta}_{\feynman}(p^2)\\
+        &= \lim_{p^2 \to m_{\phys}^2} \frac{(p^2 - m_{\phys}^2)}{(p^2 - m_{\phys}^2)[1 - \Pi'(m_{\phys}^2)] + \order([p^2 - m_{\phys}^2]^2)}\\
+        &= \frac{1}{1 - \Pi'(m_{\phys}^2)}.
+    \end{align}
+    So, in general the residue is not 1.
+    This means that the field \(\varphi\) as appearing in this section does not have the required normalisation to agree with the K\"all\'en--Lehmann representation.
+    We must therefore \emph{renormalise}.
+    Note that in the free theory \(\Pi'(m_{\phys}^2) = 0\) and so the field is properly normalised.
+    
+    The general idea that we develop from this observation is that for an interacting theory the fields and constants appearing in the Lagrangian, called the \define{bare fields}\index{bare!field} and \define{bare couplings}\index{bare!coupling}, are not physical.
+    The physical variables are then defined in terms of these by some well-specified prescription, a process called renormalisation.
+    
+    
     
     
     %   Appdendix
