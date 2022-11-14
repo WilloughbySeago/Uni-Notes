@@ -94,7 +94,7 @@ As the main source of this material I would like to thank the following people w
 * [Dr John Loveday](https://www.ph.ed.uk/people/john-loveday)
 * [Dr Kristel Torokoff](https://www.ph.ed.uk/people/kristel-torokoff)
 * [Dr Joe Zuntz](https://www.ph.ed.uk/people/joe-zuntz)
-* [Prof Victorial Martin](https://www.ph.ed.uk/people/victoria-martin)
+* [Prof Victoria Martin](https://www.ph.ed.uk/people/victoria-martin)
 * [Prof Alex Murphy](https://www.ph.ed.uk/people/alex-murphy)
 * [Prof Philip Clark](https://www.ph.ed.uk/people/philip-clark)
 * [Prof Judy Hardy](https://www.ph.ed.uk/people/judy-hardy)
