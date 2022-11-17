@@ -69,7 +69,7 @@ noabbrev
 \newcommand{\Pphoton}{\ensuremath{\@greekparticlefont{γ}}}
 
 \newcommand{\APe}{\ensuremath{\@particlefont{e}^{+}}}
-\newcommand{\APmu}{\ensuremath{\@greekparticlefont{μ}^{-}}}
+\newcommand{\APmu}{\ensuremath{\@greekparticlefont{μ}^{+}}}
 \makeatother
 
 % Text
@@ -124,6 +124,7 @@ noabbrev
 \newcommand{\diracadjoint}[1]{\overbar{#1}}
 \newcommand{\phys}{\symup{phys}}
 \newcommand{\covariantDerivative}{D}
+\newcommand{\renormalised}{\symrm{R}}
 
 \includeonly{parts/prelim, parts/hamiltonian-calculation, parts/grassmann-variables}
 
@@ -6020,7 +6021,7 @@ noabbrev
     \end{align}
     Similarly,
     \begin{align}
-        \diracadjoint{\psi}^-(x) \ket{\APe, \vv{p}, s} &= \diracadjoint{v}(\vv{p}, s) \e^{-ip\cdot x} \ket{0},\\
+        \diracadjoint{\psi}^+(x) \ket{\APe, \vv{p}, s} &= \diracadjoint{v}(\vv{p}, s) \e^{-ip\cdot x} \ket{0},\\
         \bra{\Pe, \vv{p}, s}\psi^-(x) &= \bra{0} \diracadjoint{u}(\vv{p}, s) \e^{ip\cdot x},\\
         \bra{\APe, \vv{p}, s}\diracadjoint{\psi}^-(x) &= \bra{0} v(\vv{p}, s) \e^{ip\cdot x}.
     \end{align}
@@ -8130,7 +8131,7 @@ noabbrev
     The solid angle element is \(\dl{\Omega} = 2\pi \dd{(\cos\vartheta)}\), where the \(2\pi\) comes from the \(\varphi\) integral, which will always be \(2\pi\) since there is no \(\varphi\) dependence.
     We can then write the cross section as
     \begin{equation}
-        \diffp{\sigma}{(\cos\vartheta)} = \frac{\pi\alpha^2}{4E^2} \frac{1 + \cos^4(\vartheta/2)}{\sin^4(\vartheta/2)}.
+        \diff{\sigma}{(\cos\vartheta)} = \frac{\pi\alpha^2}{4E^2} \frac{1 + \cos^4(\vartheta/2)}{\sin^4(\vartheta/2)}.
     \end{equation}
     
     Notice that this goes as \(1/E^2\).
@@ -8150,7 +8151,7 @@ noabbrev
     \begin{figure}
         \tikzsetnextfilename{electron-muon-scattering-cross-section}
         \begin{tikzpicture}
-            \draw[very thick, <->] (0, 5) node [left] {\(\displaystyle \diff{\sigma}{\Omega}\)} -- (0, 0) -- (7, 0) node [below] {\(\vartheta\)};
+            \draw[very thick, <->] (0, 5) node [left] {\(\displaystyle \diff{\sigma}{(\cos\vartheta)}\)} -- (0, 0) -- (7, 0) node [below] {\(\vartheta\)};
             \begin{scope}
                 \clip (0, 0) rectangle (7, 5);
                 \draw[highlight, ultra thick, domain=1.5:6.28, samples=500] plot (\x, {(1 + (cos(\x/4 r))^4)/(1.7*sin(\x/4 r))^4});
@@ -8160,6 +8161,256 @@ noabbrev
         \caption[Electron-muon scattering cross section]{The cross section for electron-muon scattering plotted as a function of the scattering angle. Note that the divergence at zero vanishes if we properly account for the masses of the particles.}
         \label{fig:electron muon scattering cross section}
     \end{figure}
+    
+    \chapter{Electron-Positron Annihilation}
+    \section{Amplitude}
+    We want to compute the cross section for inelastic electron-positron annihilation,
+    \begin{equation}
+        \Pe\APe \to \Pmu\APmu.
+    \end{equation}
+    We choose the final state to be \(\Pmu\APmu\), rather than \(\Pe\APe\), since this reduces the number of diagrams.
+    The only tree level diagram is
+    \begin{equation}
+        \tikzsetnextfilename{fd-electron-positron-annihilate-to-muons}
+        \feynmandiagram[horizontal'=v1 to v2]{
+            i1 [particle=\Pe] -- [fermion, edge label={\(p, s\)}] v1,
+            i2 [particle=\APe] -- [anti fermion, edge label'={\(q, r\)}] v1,
+            v1 -- [photon, edge label=\(k\)] v2,
+            v2 -- [anti fermion, edge label'={\(q', r'\)}] o2 [particle=\APmu],
+            v2 -- [fermion, edge label={\(p', s'\)}] o1 [particle=\Pmu]
+        };
+    \end{equation}
+    Conservation of momentum at each vertex tells us that \(k = p + q = p' + q'\).
+    Starting with the electron arrow we have a incoming electron, \(u(p, s)\), then a QED vertex, \(ie\gamma_\mu\), and then an incoming positron, \(\diracadjoint{v}(q, r)\), we write these in the reverse order to which they were encountered: \(ie \diracadjoint{v}(q, r) \gamma_\mu u(p, s)\).
+    Similarly for the muon arrow we have an outgoing antimuon, \(v(q', r')\), a QED vertex, \(ie\gamma_\nu\), and then an outgoing muon, \(\diracadjoint{u}(p', s')\), and again we write these in the reverse order to which they were encountered: \(ie \diracadjoint{u}(p', s') \gamma_\nu v(q', r')\).
+    Finally, we have a propagator, \(iP^{\mu\nu}(k)/(k^2 + i\varepsilon)\).
+    The full amplitude is then
+    \begin{equation}
+        \amplitude = (ie)^2 \diracadjoint{v}(q, r) \gamma_\mu u(p, s) \diracadjoint{u}(p', s') \gamma_\nu v(q', r') \frac{P^{\mu\nu}(k)}{k^2 + i\varepsilon}.
+    \end{equation}
+    
+    To show that this is gauge independent consider
+    \begin{equation}
+        \diracadjoint{v}(q, r) \slashed{k} u(p, s) = \diracadjoint{v}(q, r)(\slashed{p} + \slashed{q})u(p, s) = \diracadjoint{v}(q, r)(m_{\symrm{e}} - m_{\symrm{e}})\diracadjoint{u}(p, s) = 0,
+    \end{equation}
+    where we've used \((\slashed{p} + m_{\symrm{e}})u(p, s) = 0\) and \(\diracadjoint{v}(\slashed{p} - m_{\symrm{e}}) = 0\).
+    Similarly
+    \begin{equation*}
+        \diracadjoint{u}(p', s') \slashed{k} v(q', r') = \diracadjoint{u}(p', s') (\slashed{p}' + \slashed{q}') v(q', r') = \diracadjoint{u}(p', s')(-m_{\upmu} + m_{\upmu}) v(q', r') = 0.
+    \end{equation*}
+    This means that the terms in \(P^{\mu\nu}\) proportional to \(k\) vanish, and so the \(\alpha\) dependence drops out.
+    We can then replace \(P^{\mu\nu}\) with \(-\minkowskiMetric^{\mu\nu}\), giving
+    \begin{equation}
+        \amplitude = (ie)^2 \diracadjoint{u}(q, r) \gamma_\mu u(p, s) \diracadjoint{u}(p', s') \gamma^\mu v(q', r').
+    \end{equation}
+    
+    We can also drop the \(i\varepsilon\) term since the photon cannot go on-shell, if it did then this diagram would factorise into two vertices, both of which give zero.
+    
+    We can then average over the initial spins and sum over final spins to get the spin averaged amplitude squared
+    \begin{align}
+        \mean{\abs{\amplitude}^2} &= \frac{e^4}{k^4} \frac{1}{4} \left( \sum_{s, r} \diracadjoint{u}(p, s) \gamma_\mu v(q, r) \diracadjoint{v}(q, r) \gamma_\nu u(p) \right) \notag\\
+        &\qquad\qquad \times \left( \sum_{s', r'} \diracadjoint{v}(q', r') \gamma^\mu u(p', s') \diracadjoint{u}(p', s') \gamma^\nu v(q', r') \right)\\
+        &= \frac{e^4}{k^4} \frac{1}{4} \tr[u(p, s)\diracadjoint{u}(p, s) \gamma_\mu v(q, r)\diracadjoint{v}(q, r) \gamma_\nu] \notag\\
+        &\qquad\qquad \times \tr[v(q', r')\diracadjoint{v}(q', r') \gamma^\mu u(p', s')\diracadjoint{u}(p', s') \gamma^\nu]\\
+        &= \frac{e^4}{k^4} \frac{1}{4} \tr[(\slashed{p} + m_{\symrm{e}})\gamma_\mu(\slashed{q} - m_{\symrm{e}})\gamma_\nu] \tr[(\slashed{q}' - m_{\upmu})\gamma^\mu(\slashed{p}' + m_{\upmu})\gamma^\nu]\\
+        &= \frac{e^4}{k^4} \frac{1}{4} \tr[\slashed{p}\slashed{q}\gamma_\mu\gamma_\nu - m_{\symrm{e}}^2\gamma_\mu\gamma_\nu] \tr[\slashed{q}'\slashed{p}'\gamma^\mu\gamma^\nu - m_{\upmu}\gamma^\mu\gamma^\nu]\\
+        &= 4\frac{e^4}{k^4} (p_\mu q_\nu + q_\mu p_\nu - (p \cdot q + m_{\symrm{e}}^2) \minkowskiMetric_{\mu\nu}) \notag\\
+        &\qquad\qquad \times (p'_\mu q'_\nu + q'_\mu p'_\nu - (p' \cdot q' + m_{\upmu}^2)\minkowskiMetric^{\mu\nu})\\
+        &= 4\frac{e^4}{k^4} \left( p_\mu q_\nu + q_\mu p_\nu - \frac{k^2}{2} \minkowskiMetric_{\mu\nu} \right) \left( p'_\mu q'_\nu + q'_\mu p'_\nu - \frac{k^2}{2}\minkowskiMetric^{\mu\nu} \right)\\
+        &= 4\frac{e^4}{k^4} \left[ 1 - \frac{p \cdot q + p' \cdot q'}{k^2} + 2 \frac{(p \cdot p')^2 + (p \cdot q')^2}{k^4} \right].
+    \end{align}
+    Here we've used trace identities derived in a very similar way to the previous calculation, as well as \((p + q)^2 = k^2\) which gives \(k^2 = 2(m_{\symrm{e}}^2 + p \cdot q)\), and other similar identities derived in this way.
+    
+    In the high energy limit\footnote{There is no low energy limit, since we need the excess energy in order to form the heavy muon from the light electrons.} we have
+    \begin{equation*}
+        s = (p + q)^2 = k^2 \approx 2p \cdot q, \quad t = (p - p')^2 \approx -2p \cdot p', \qand u = (p - q')^2 \approx -2p\cdot q'.
+    \end{equation*}
+    The average squared amplitude is then simply
+    \begin{equation}
+        \mean{\abs{\amplitude}^2} \approx 2e^4\frac{t^2 + u^2}{s^2}.
+    \end{equation}
+    
+    The cross section is then
+    \begin{equation}
+        \diff{\sigma}{\cos\vartheta} = \frac{\pi \alpha^2}{4E^2} \left( \cos^4 \frac{\vartheta}{2} + \sin^4\frac{\vartheta}{2} \right)
+    \end{equation}
+    where \(\vartheta\) is the scattering angle.
+    This uses identities relating the Mandelstam variables and the scattering angle derived in the previous calculation.
+    
+    \begin{figure}
+        \tikzsetnextfilename{electron-positron-annihilation-cross-section}
+        \begin{tikzpicture}
+            \draw[very thick, <->] (0, 5) node [left] {\(\displaystyle \diff{\sigma}{(\cos\vartheta)}\)} -- (0, 0) -- (7, 0) node [below] {\(\vartheta\)};
+            \begin{scope}
+                \clip (0, 0) rectangle (7, 5);
+                \draw[highlight, ultra thick, domain=0:2*pi, samples=500] plot (\x, {5*(cos(\x/4 r))^4 + 5*(sin(\x/4 r))^4 - 1});
+            \end{scope}
+            \node[below] at (2*pi, 0) {\(\pi\)};
+        \end{tikzpicture}
+        \caption[Electron-positron annihilation cross section.]{The cross section for electron-positron annihilation producing muons as a function of \(\vartheta\), the scattering angle.}
+        \label{fig:electron positron annihilation cross section}
+    \end{figure}
+    
+    \Cref{fig:electron positron annihilation cross section} shows the cross section for an electron and positron to annihilate into a pair of muons.
+    Notice that it is symmetric about \(\pi/2\), where it is also minimised.
+    This corresponds to the fact that in the centre of mass frame the muon is equally likely to go in either the direction of the electron or the positron.
+    We can think or the electron as \enquote{turning into} a muon and continuing on, for \(\vartheta = 0\), or the positron \enquote{turning into} a muon and continuing on, for \(\vartheta = \pi\), and both are equally likely (even though the latter doesn't conserve charge, since this isn't really what's happening it's fine).
+    
+    \section{Crossing Symmetry}
+    Consider the two QED calculation's we've done so far,
+    \begin{equation}
+        \Pe\Pmu \to \Pe\Pmu, \qqand \Pe\APe \to \Pmu\APmu.
+    \end{equation}
+    For these processes we find the following results in the high energy limit:
+    \begin{equation}
+        \mean{\abs{\amplitude}^2} = 2e^4 \frac{s^2 + u^2}{t^2}, \qqand \mean{\abs{\amplitude}^2} = 2e^4 \frac{t^2 + u^2}{s^2}.
+    \end{equation}
+    These are very similar.
+    Notice that the first process is an \(t\)-channel process, meaning the virtual photon has momentum squared \(t\), and so we would get a pole if the virtual photon were to go on shell, although as previously discussed this is not possible.
+    Similarly the second process is an \(s\)-channel process, and so the virtual photon has momentum squared \(s\), and so we would get a pole if the virtual photon were to go on shell.
+    
+    
+    The similarities between these two results are not a coincidence.
+    They are due to something called \defineindex{crossing symmetry}.
+    Consider the tree level diagrams for these processes:
+    \begin{equation}
+        \tikzsetnextfilename{fd-crossing-symmetry}
+        \begin{tikzpicture}[
+            photon/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate},
+            >={Latex[width=1.5mm]},
+            baseline=(current bounding box)
+            ]
+            \draw (0, 0) node [left] {\Pmu} -- (2, 1) node [below, midway] {\(q\)} -- (4, 0);
+            \draw (0, 4) -- (2, 3) -- (4, 4) node [right] {\Pe} node [above, midway] {\(p'\)};
+            \draw[photon] (2, 1) -- (2, 3);
+            \draw[->] (0, 0) -- (1, 0.5);
+            \draw[->] (0, 4) -- (1, 3.5);
+            \draw[->] (2, 1) -- (3.2, 0.4);
+            \draw[->] (2, 3) -- (3.2, 3.6);
+            \node at (2, 0) {\(t\)-channel};
+            
+            \begin{scope}[xshift=5.75cm]
+                \draw (0, 0) node [left] {\APe} -- (1, 2) node [midway, below] {\(q\)} -- (0, 4);
+                \draw (4, 0) -- (3, 2) -- (4, 4) node [right] {\Pmu} node [midway, above] {\(p'\)};
+                \draw[photon] (1, 2) -- (3, 2);
+                \draw[->] (1, 2) -- (0.5, 1);
+                \draw[->] (0, 4) -- (0.5, 3);
+                \draw[->] (3, 2) -- (3.5, 3);
+                \draw[->] (4, 0) -- (3.5, 1);
+                \node at (2, 0) {\(s\)-channel};
+            \end{scope}
+        \end{tikzpicture}
+    \end{equation}
+    Here we limit the number of labels to make the following discussion clearer.
+    Ignore what's happening in the diagram, just focus on the external particles.
+    On the left we have an incoming muon with momentum \(q\), and on the right we have an outgoing muon with momentum \(p'\).
+    On the left we have an outgoing electron with momentum \(p'\), on the right we have an incoming \emph{positron} with momentum \(q\).
+    
+    If we swap these legs of the diagrams, picking up a minus sign to have the electron's direction in spacetime reversed (so it becomes a positron) then these diagrams transform into each other.
+    That is, to go from the amplitude for electron muon scattering to the amplitude for electron-positron annihilation we can just make the swap \(p' \leftrightarrow q\).
+    In terms of the Mandelstam variables this corresponds to \(t \leftrightarrow s\), which we can see clearly transforms one amplitude into the other.
+    This is the so-called crossing symmetry for this pair of diagrams.
+    
+    Crossing symmetry is a general property of \(S\) matrix elements in any theory, and follows from unitarity and the CPT theorem.
+    The crossing symmetry applies to the elements of the \(S\) matrix, and by extension total amplitudes up to some order.
+    It does not apply to individual diagrams.
+    It just so happened that in the preceding example we only had one diagram for each process to tree level.
+    
+    Consider the following diagrams:
+    \begin{equation}
+        \tikzsetnextfilename{cross-symmetry-example-2}
+        \begin{tikzpicture}[
+            photon/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate},
+            >={Latex[width=1.5mm]},
+            baseline=(current bounding box)
+            ]
+            \draw (0, 0) -- (4, 0);
+            \draw (0, 2) -- (4, 2);
+            \draw[photon] (2, 0) -- (2, 2);
+            \draw[->] (0, 0) -- (1, 0);
+            \draw[->] (0, 2) -- (1, 2);
+            \draw[->] (2, 0) -- (3, 0);
+            \draw[->] (2, 2) -- (3, 2);
+            \fill[Red] (2, 0) circle [radius=0.075];
+            \fill[Yellow] (2, 2) circle [radius=0.075];
+            
+            \begin{scope}[xshift=5cm]
+                \draw (0, 0) -- (2, 0);
+                \draw (0, 2) -- (2, 2);
+                \draw (2, 2) -- (4, 0);
+                \draw[->] (2, 2) -- (3.5, 0.5);
+                \draw[line width=1.5mm, white] (2, 0) -- (4, 2);
+                \draw (2, 0) -- (4, 2);
+                \draw[photon] (2, 0) -- (2, 2);
+                \draw[->] (0, 0) -- (1, 0);
+                \draw[->] (0, 2) -- (1, 2);
+                \draw[->] (2, 0) -- (3.5, 1.5);
+                \fill[Blue] (2, 0) circle [radius=0.075];
+                \fill[Purple] (2, 2) circle [radius=0.075];
+            \end{scope}
+            
+            \begin{scope}[yshift=-3cm]
+                \draw (0, 0) -- (4, 0);
+                \draw (0, 2) -- (4, 2);
+                \draw[photon] (2, 0) -- (2, 2);
+                \draw[->] (0, 0) -- (1, 0);
+                \draw[-<] (0, 2) -- (1, 2);
+                \draw[->] (2, 0) -- (3, 0);
+                \draw[-<] (2, 2) -- (3, 2);
+                \fill[Red] (2, 0) circle [radius=0.075];
+                \fill[Yellow] (2, 2) circle [radius=0.075];
+            \end{scope}
+            
+            \begin{scope}[xshift=5cm, yshift=-3cm]
+                \draw (0, 0) -- (1, 1) -- (0, 2);
+                \draw (4, 0) -- (3, 1) -- (4, 2);
+                \draw[photon] (1, 1) -- (3, 1);
+                \draw[-<] (0, 0) -- (0.5, 0.5);
+                \draw[->] (0, 2) -- (0.5, 1.5);
+                \draw[-<] (3, 1) -- (3.5, 0.5);
+                \draw[->] (3, 1) -- (3.5, 1.5);
+                \fill[Blue] (1, 1) circle [radius=0.075];
+                \fill[Purple] (3, 1) circle [radius=0.075];
+            \end{scope}
+        \end{tikzpicture}
+    \end{equation}
+    The top two contribute to M\o eller scattering, \(\Pe\Pe \to \Pe\Pe\), and the bottom two contribute to Bhabha scattering, \(\Pe\APe \to \Pe\APe\).
+    Notice the coloured vertices.
+    One can go from M\o eller scattering to Bhabha scattering if one takes each coloured vertex in the top line to the corresponding vertex in the bottom line.
+    After reorienting the lines going into the vertex it is then possible to manipulate the M\o eller diagrams to give the Bhabha diagrams and vice versa.
+    To do so notice that in the \(u\)-channel M\o eller diagram the outgoing particle line at the bottom left, the one we usually label as momentum \(q'\), becomes an incoming \emph{anti}particle in the \(s\)-channel Bhabha diagram, in the position we usually label \(q\).
+    Similarly the incoming and outgoing particles with momenta \(q\) and \(q'\) in the \(t\)-channel M\o eller process become outgoing and incoming \emph{anti}particles with momenta \(q'\) and \(q\) in the \(t\)-channel Bhabha process.
+    
+    So, these two processes are related by \(q \leftrightarrow -q'\), with the negative coming from turning a particle into an antiparticle or vice versa.
+    In terms of Mandelstam variables we have \(s \leftrightarrow u\).
+    If we were to compute the amplitudes for each diagram we would see that these operations do not map them onto each other.
+    However, in the high energy limit, it can be shown that the amplitude for M\o eller scattering is
+    \begin{equation}
+        \mean{\abs{\amplitude}^2} = 2e^4\left( \frac{u - s}{t} + \frac{t - s}{u} \right)^2,
+    \end{equation}
+    and the amplitude for Bhabha scattering is
+    \begin{equation}
+        \mean{\abs{\amplitude}^2} = 2e^4\left( \frac{s - u}{t} + \frac{t - u}{s} \right)^2,
+    \end{equation}
+    and these do transform into each other under \(s \leftrightarrow u\).
+    This is what we mean by the crossing symmetry being a property of the \(S\) matrix element rather than individual diagrams.
+    
+    \section{Properties of the \texorpdfstring{\(S\)}{S} matrix}
+    It is possible to get quite a long way just considering properties of the \(S\) matrix.
+    We've already come across the three most important:
+    \begin{itemize}
+        \item Unitarity, this is required for conservation of probability.
+        \item Crossing symmetry, this corresponds to turning some particles into antiparticles and vice versa (i.e., the CPT theorem) and rearranging the kinematics.
+        \item Analyticity in \(s\), \(t\), and \(u\).
+    \end{itemize}
+    This last property, meaning that elements of the \(S\) matrix are analytic functions of \(s\), \(t\), and \(u\), has not been mentioned explicitly so far, but we have discussed analytic continuation of certain related functions.
+    For an analytic function to have nontrivial structure, i.e., be more than just a constant, it must have poles, this is Liouville's theorem\footnote{See the \course{Complex Analysis} part of \course{Methods of Theoretical Physics}}.
+    
+    \chapter{Compton Scattering}
+    \section{Amplitude}
+    \epigraph{They're dam clever these particles, they know what's going on.}
+    
+    
     
     
     
@@ -11367,9 +11618,13 @@ noabbrev
     Note the divergence in the first term when \(\varepsilon \to 0\).
     Now write out \(M^2\) in full, we have
     \begin{equation}
-        \Pi(p^2) = -\frac{\alpha}{2} \int_0^1 \dl{x} \, [M^2 - x(1 - x)p^2] \left[ \frac{1}{\varepsilon} - \gamma + 1 + \log\left( \frac{4\pi\tilde{\mu}^2}{M^2} \right) + \order(\varepsilon) \right].
+        \Pi(p^2) = -\frac{\alpha}{2} \int_0^1 \dl{x} \, M^2 \left[ \frac{1}{\varepsilon} - \gamma + 1 + \log\left( \frac{4\pi\tilde{\mu}^2}{M^2} \right) + \order(\varepsilon) \right].
     \end{equation}
-    We can compute the integral for the \(M^2(1/\varepsilon + 1)\) term, giving
+    We can compute the integral for the \(M^2(1/\varepsilon + 1)\) term since \(1/\varepsilon + 1\) has no \(x\) dependence and \(M^2 = m^2 - x(1 - x)p^2\), so using
+    \begin{equation}
+            \int_0^1 \dl{x} \, M^2 = \int_0^1 \dl{x} \, [m_{\renormalised}^2 - x(1 - x)p^2] = m_{\renormalised}^2 - \frac{1}{6}p^2.
+    \end{equation}
+    we have
     \begin{equation}
         \Pi(p^2) = \frac{\alpha}{2} \left[ \left( \frac{1}{\varepsilon} + 1 \right)\left( \frac{1}{6}p^2 - m^2 \right) + \int_0^1 \dl{x} \, M^2 \left( \gamma + \log\left( \frac{M^2}{4\pi\tilde{\mu}^2} \right) \right) \right]
     \end{equation}
@@ -11396,6 +11651,8 @@ noabbrev
     Such diagrams can always be constructed as a sum of one particle irreducible diagrams connected with additional propagators.
     
     In particular, we can evaluate \(\tilde{\Delta}_{\feynman}(p^2)\) to all orders by considering the series of diagrams of the form of \cref{eqn:fd scalar self energy} connected by propagators:
+    \begingroup
+    \allowdisplaybreaks
     \begin{align}
         i \tilde{\Delta}_{\feynman}(p^2) &= 
         \tikzsetnextfilename{fd-sum-1PI-diagrams}
@@ -11415,14 +11672,18 @@ noabbrev
             \draw (5.5, 0) -- (6, 0);
             \draw (6.5, 0) circle [radius =  0.5];
             \draw (7, 0) -- (7.5, 0);
-            \node at (7.75, 0) {\({} + \mathrlap{\dotsb}\)};
+%            \node at (7.75, 0) {\({} + \mathrlap{\dotsb}\)};
         \end{tikzpicture}
+        + \dotsb
         \\
-        &= i \tilde{\Delta}(p^2) + i\tilde{\Delta}(p^2)(-i\Pi(p^2))i\tilde{\Delta}(p^2) + i\tilde{\Delta}(p^2)(-i\Pi(p^2))i\tilde{\Delta}(p^2)(-i\Pi(p^2))i\tilde{\Delta}(p^2) + \dotsb\\
-        &= i\tilde{\Delta}(p^2) + i\tilde{\Delta}(p^2) [(-i\Pi(p^2))i\tilde{\Delta}(p^2)] + i\tilde{\Delta}(p^2)[(-i\Pi(p^2))i\tilde{\Delta}(p^2)]^2 + \dotsb\\
+        &= i \tilde{\Delta}(p^2) + i\tilde{\Delta}(p^2)(-i\Pi(p^2))i\tilde{\Delta}(p^2)\\
+        &\qquad\qquad + i\tilde{\Delta}(p^2)(-i\Pi(p^2))i\tilde{\Delta}(p^2)(-i\Pi(p^2))i\tilde{\Delta}(p^2) + \dotsb \displaybreak\\
+        &= i\tilde{\Delta}(p^2) + i\tilde{\Delta}(p^2) [(-i\Pi(p^2))i\tilde{\Delta}(p^2)]\\
+        &\qquad\qquad + i\tilde{\Delta}(p^2)[(-i\Pi(p^2))i\tilde{\Delta}(p^2)]^2 + \dotsb\\
         &= i\tilde{\Delta}(p^2) \sum_{k = 0}^{\infty} [\Pi(p^2)\tilde{\Delta}(p^2)]^k\\
         &= i\tilde{\Delta}(p^2) \frac{1}{\Pi(p^2)\tilde{\Delta}(p^2)},
     \end{align}
+    \endgroup
     where we've identified the geometric series in the last step and applied the known result
     \begin{equation}
         \sum_{k=0}^{\infty} z^k = \frac{1}{1 - z}
@@ -11475,8 +11736,156 @@ noabbrev
     The general idea that we develop from this observation is that for an interacting theory the fields and constants appearing in the Lagrangian, called the \define{bare fields}\index{bare!field} and \define{bare couplings}\index{bare!coupling}, are not physical.
     The physical variables are then defined in terms of these by some well-specified prescription, a process called renormalisation.
     
+    \chapter{Renormalisation}
+    \section{Renormalising}
+    The Lagrangian for a \(\varphi^3\) scalar field theory is
+    \begin{equation}
+        \lagrangianDensity = \frac{1}{2}(\partial_\mu \varphi)(\partial^\mu \varphi) - \frac{1}{2}m^2 \varphi^2 + \frac{1}{3!} g \varphi^3.
+    \end{equation}
+    Define the renormalised field, \(\varphi_{\renormalised}\), according to
+    \begin{equation}
+        \varphi = Z^{1/2} \varphi_{\renormalised}
+    \end{equation}
+    where \(Z\) is some finite constant to be defined later.
+    The Lagrangian in terms of the renormalised field is
+    \begin{equation}
+        \lagrangianDensity = \frac{1}{2} Z(\partial_\mu \varphi_{\renormalised}) (\partial^\mu \varphi_{\renormalised}) - \frac{1}{2}m^2Z\varphi_{\renormalised}^2 + \frac{1}{3!} g Z^{3/2} \varphi_{\renormalised}^3.
+    \end{equation}
+    Now define
+    \begin{equation}
+        m^2Z = Z_{m^2}m_{\renormalised}^2, \qqand gZ^{3/2} = Z_g g_{\renormalised}
+    \end{equation}
+    where \(Z_{m^2}\) and \(Z_g\) are finite constants to be defined later.
+    Then we can write the Lagrangian as
+    \begin{equation}
+        \lagrangianDensity = \frac{1}{2} Z(\partial_\mu \varphi_{\renormalised}) (\partial^\mu \varphi_{\renormalised}) - \frac{1}{2} Z_{m^2}m_{\renormalised}^2 \varphi_{\renormalised}^2 + \frac{1}{3!} Z_g g_{\renormalised} \varphi_{\renormalised}^3.
+    \end{equation}
     
+    We can rewrite the Lagrangian as
+    \begin{multline}
+        \lagrangianDensity = \frac{1}{2}(\partial_\mu \varphi_{\renormalised})(\partial^\mu \varphi_{\renormalised}) - \frac{1}{2}m_{\renormalised}^2\varphi_{\renormalised}^2 + \frac{1}{3!} g_{\renormalised} \varphi_{\renormalised}^3\\
+        + \frac{1}{2}\delta_Z(\partial_\mu \varphi_{\renormalised})(\partial^\mu \varphi_{\renormalised}) - \frac{1}{2}\delta_{m^2} m_{\renormalised}^2 \varphi_{\renormalised}^2 + \frac{1}{3!}\delta_g g_{\renormalised} \varphi_{\renormalised}^3.
+    \end{multline}
+    Here \(\delta_Z \coloneqq Z - 1\), \(\delta_{m^2} \coloneqq Z_{m^2} - 1\), and \(\delta_{g} \coloneqq Z_g - 1\).
+    We can fix \(\delta_Z\), \(\delta_{m^2}\) and \(\delta_g\) to fix the values of \(Z\), \(Z_{m^2}\) and \(Z_g\).
+    Notice that the Lagrangian now takes the form of the initial Lagrangian, called the \define{bare Lagrangian}\index{bare!Lagrangian}, now with extra subscripts \(\renormalised\), plus some extra terms, with factors of \(\delta_Z\), \(\delta_{m^2}\), and \(\delta_g\), which are called the \define{counter terms}\index{counter term}.
     
+    We can interpret these extra terms as more interactions, and therefore they give us more vertices in our Feynman rules.
+    We can then recalculate \(\Pi(p^2)\) again in renormalised perturbation theory.
+    The result is the same as before, plus contributions from the counter terms:
+    \begin{multline}
+        \Pi(p^2) = \frac{\alpha}{2}\left[ \left( \frac{1}{\varepsilon} + 1 \right) \left( \frac{1}{6}p^2 - m_{\renormalised}^2 \right) + \int_0^1 \dl{x} \, M^2 \log\left( \frac{M^2}{\mu^2} \right) \right]\\
+        + \delta_{Z} p^2 - \delta_{m^2}m_{\renormalised}^2 + \order(\alpha^2)
+    \end{multline}
+    Note that \(M^2\) is now taken as a function of \(m_{\renormalised}^2\), \(M^2 = m_{\renormalised}^2 - x(1 - x)p^2\).
+    Similarly in principle \(\alpha\) depends on the renormalised value of \(g\), \(g_{\renormalised}\), but it turns out not to matter for this particular calculation.
+    The form of the counter terms here comes from expanding the generating functional, now defined as the exponential of the action with the counter terms in it.
+    Expanding to first order in \(g_{\renormalised}\) as we did to find \(\Pi(p^2)\) initially we get extra factors with \((\partial_\mu \varphi_{\renormalised})(\partial^\mu \varphi_{\renormalised})\) and \(m_{\renormalised}^2 \varphi_{\renormalised}^2\), which we can act on with functional derivatives.
+    Moving to Fourier space turns the \(\partial_\mu\) into \(p_\mu\), giving the \(p^2\) factor seen above.
+    
+    We can write this diagrammatically as
+    \begin{equation}
+        \Pi(p^2) = 
+        \tikzsetnextfilename{fd-renormalised-two-point-second-order}
+        \begin{tikzpicture}[baseline = (plus.base)]
+            \draw (-1.5, 0) -- (-0.5, 0);
+            \draw (0, 0) circle [radius = 0.5];
+            \draw (0.5, 0) -- (1.5, 0);
+            \node (plus) at (1.75, 0) {\(+\)};
+            \draw (2, 0) -- (4, 0);
+            \node (plus) at (4.25, 0) {\(+\)};
+            \draw (4.5, 0) -- (6.5, 0);
+            \fill (3, 0) circle [radius = 0.08] node [below] {\(\delta_Z\)};
+            \fill (5.5, 0) circle [radius = 0.08] node [below] {\(\delta_{m^2}\)};
+        \end{tikzpicture}
+    \end{equation}
+    Where we've introduced two new vertices connecting two particles for each of the second order counter terms.
+    
+    Consider the integral in \(\Pi(p^2)\).
+    We can rewrite this as
+    \begin{equation}
+        \int_0^1 \dl{x} \, M^2 \log\left( \frac{M^2}{\mu^2} \right) = \int_0^1 \dl{x} \, M^2\left[ \log \left( \frac{M^2}{m_{\renormalised}^2} \right) - \log\left( \frac{\mu^2}{m_{\renormalised}^2} \right) \right]
+    \end{equation}
+    having used \(m_{\renormalised}\) to keep the arguments of the logarithms dimensionless.
+    This is a useful thing to do because the second logarithm doesn't have any \(x\) dependence, meaning we can easily do the integral as the only \(x\) dependence appears through the factor of \(M^2 = m_{\renormalised}^2 - x(1 - x)p^2\), which is easy to integrate:
+    \begin{equation}
+        \int_0^1 \dl{x} \, M^2 = \int_0^1 \dl{x} \, (m_{\renormalised}^2 - x(1 - x)p^2) = m_{\renormalised}^2 - \frac{1}{6}p^2.
+    \end{equation}
+    Hence, we have
+    \begin{equation}
+        \int_0^1 \!\! \dl{x} \, M^2 \log \frac{M^2}{\mu^2} = \int_0^1 \!\! \dl{x} \, M^2 \log \left( \frac{M^2}{m_{\renormalised}^2} \right)  + \left( \frac{1}{6}p^2 - m_{\renormalised}^2 \right) \log \left( \frac{\mu^2}{m_{\renormalised}^2} \right).
+    \end{equation}
+    Then we have
+    \begin{align}
+        \Pi(p^2) &= \frac{\alpha}{2}\bigg[ \left( \frac{1}{\varepsilon} + 1 \right)\left( \frac{1}{6} p^2 - m_{\renormalised}^2 \right) + \int_0^1 \dl{x} \, M^2 \log\left( \frac{M^2}{m_{\renormalised}^2} \right)\\
+        &\qquad+ \left( \frac{1}{6}p^2 - m_{\renormalised}^2 \right) \log\left( \frac{\mu^2}{m_{\renormalised}^2} \right) \bigg] + \delta_Z p^2 - \delta_{m^2} m_{\renormalised}^2 + \order(\alpha^2) \notag \displaybreak\\
+        &= \frac{\alpha}{2} \left[ \left( \frac{1}{\varepsilon} + \log\left( \frac{\mu^2}{m_{\renormalised}^2} \right) + 1 \right) \left( \frac{1}{6}p^2 - m_{\renormalised}^2 \right) + \int_0^1 \dl{x} \, M^2 \log\left( \frac{M^2}{m_{\renormalised}^2} \right) \right] \notag\\
+        &\qquad + \delta_Z p^2 - \delta_{m^2}m_{\renormalised}^2 + \order(\alpha^2)\\
+        &= \left[ \frac{\alpha}{6}\left( \frac{1}{2\varepsilon} + \log\left( \frac{\mu}{m_{\renormalised}} \right) + \frac{1}{2} \right) + \delta_Z \right] p^2\\
+        &\qquad- \left[ \alpha\left( \frac{1}{2\varepsilon} + \log\left( \frac{\mu}{m_{\renormalised}} \right) + \frac{1}{2} \right) + \delta_{m^2} \right] m_{\renormalised}^2\\
+        &\qquad+ \frac{\alpha}{2} \int_0^1 \dl{x} \, M^2 \log\left( \frac{M^2}{m_{\renormalised}^2} \right) + \order(\alpha^2)
+    \end{align}
+    where we've used \(\log z^2 = 2\log z\) to remove the square in the logarithm's argument.
+    
+    As mentioned earlier since \(Z\) and \(Z_{m^2}\) are free parameters we can fix them by choosing values for \(\delta_Z = Z - 1\) and \(\delta_{m^2} = Z_{m^2} - 1\).
+    We do this here, defining
+    \begin{align}
+        \delta_Z &= -\frac{\alpha}{6}\left[ \frac{1}{2\varepsilon} + \log\left( \frac{\mu}{m_{\renormalised}} \right) + \frac{1}{2} \right] + \mathrlap{\kappa_{Z}}\hphantom{\kappa_{m^2}} + \order(\alpha^2),\\
+        \delta_{m^2} &= \mathrlap{-\alpha}\hphantom{-\frac{\alpha}{6}}\left[ \frac{1}{2\varepsilon} + \log\left( \frac{\mu}{m_{\renormalised}} \right) + \frac{1}{2} \right] + \kappa_{m^2} + \order(\alpha^2),
+    \end{align}
+    where \(\kappa_Z\) and \(\kappa_{m^2}\) are finite constants.
+    This is a sensible choice since it cancels the dependence of \(\Pi(p^2)\) on the regulator, \(\varepsilon\), and the scale, \(\mu\).
+    There is some dependence on \(\varepsilon\) still through the \(\order(\varepsilon)\) terms which we've dropped, but in the limit of \(\varepsilon \to 0\) this dependence also vanishes.
+    We are left with
+    \begin{equation}
+        \Pi(p^2) = \frac{\alpha}{2} \int_0^1 \dl{x} \, M^2 \log\left( \frac{M^2}{m_{\renormalised}^2} \right) + \order(\alpha^2)
+    \end{equation}
+    
+    \section{Renormalisation Scheme}
+    A \define{renormalisation scheme}\index{renormalisation!scheme} is a prescription for defining the finite parts of these divergent integrals.
+    A renormalisation scheme consists of a collection of \define{renormalisation conditions}\index{renormalisatio!condition}, which are values we define with some extra input not coming just from the Lagrangian.
+    We need as many renormalisation conditions as there are renormalised variables, so in our case we need three renormalisation conditions.
+    However, in this section we'll only give two because the two point function we have dealt with so far just happens not to depend on \(g_{\renormalised}\).
+    
+    We will use the \defineindex{on-shell scheme}, where we fix the renormalised mass parameter appearing in the renormalised Lagrangian to be exactly the physical mass, \(m_{\renormalised}^2 = m_{\phys}^2\).
+    This is a physical input, we need the measured mass of the particle.
+    This gives the first renormalisation condition: \(\Pi(m_{\renormalised}^2) = 0\) \textcolor{red}{WHY?}.
+    
+    The second condition we use is that the residue at the pole must be 1, as in the K\"all\'en--Lehmann representation.
+    This can be achieved by noticing that the pole has the form
+    \begin{equation}
+        \frac{1}{1 - \Pi'(m_{\phys}^2)} = \frac{1}{1 - \Pi'(m_{\renormalised}^2)}
+    \end{equation}
+    and this is 1 if \(\Pi'(m_{\renormalised}^2) = 1\), giving us the second renormalisation condition.
+    
+    We can use these renormalisation conditions to rewrite \(\Pi(p^2)\) as follows:
+    \begin{equation}
+        \Pi(p^2) = \frac{\alpha}{2} \int_0^1 \dl{x} \, M^2 \log\left( \frac{M^2}{M_0^2} \right) + A(p^2 - m_{\renormalised}^2)
+    \end{equation}
+    where \(M_0^2(x) \coloneqq M^2(x, m_{\renormalised}^2) = m_{\renormalised}(1 - x + x^2)\) and \(A\) is some constant to be determined.
+    The first term vanishes when \(p^2 = m_{\renormalised}^2\) since we get \(\log 1 = 0\).
+    The second term also clearly vanishes in this case.
+    
+    Now consider the derivative of \(\Pi'(p^2)\):
+    \begin{align}
+        \Pi'(p^2) = \frac{\alpha}{2} \int_0^2 \dl{x} \, \left[ \diff{M^2}{p^2} \log\left( \frac{M^2}{M_0^2} \right) + M^2 \frac{M_0^2}{M^2} \diff{}{p^2} \left( \frac{M^2}{M_0^2} \right) \right] + A.
+    \end{align}
+    The first term, with the \(\log\), vanishes when \(p^2 = m_{\renormalised}^2\) since we again have \(\log 1 = 0\).
+    The second term simplifies to \(\diffp{M^2}/{p^2} = -x(1 - x)\), and so we have
+    \begin{equation}
+        \Pi'(m_{\renormalised}^2) = \frac{\alpha}{2} \int_0^1 \dl{x} \, (x - 1)x + A.
+    \end{equation}
+    Demanding that this is zero we see that we must have
+    \begin{equation}
+        A = \frac{\alpha}{12}.
+    \end{equation}
+    So, 
+    \begin{equation}
+        \Pi(p^2) = \frac{\alpha}{2} \int_0^1 \dl{x} \, M^2(x, p^2) \log\left( \frac{M^2(x, p^2)}{M_0^2(x)} \right) + \frac{\alpha}{12}(p^2 - m_{\renormalised}^2) + \order(\alpha^2).
+    \end{equation}
+    
+   Notice that this has no dependence on \(\mu\), which is good, and also no dependence on the renormalised mass, since \(m_{\renormalised} = m_{\phys}\).
+   Note that any renormalisation of parameters in \(\alpha\) has an effect on the order of \(\alpha^2\), so for this one-loop calculation to first order in \(\alpha\) it doesn't matter if we use \(\alpha = g^2/(4\pi)^3\) or \(\alpha = g_{\renormalised}^2/(4\pi)^3\).
     
     %   Appdendix
     \appendixpage
