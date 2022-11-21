@@ -10,6 +10,10 @@
 \usepackage{slashed}
 \declareslashed{}{\not}{.1}{.5}{\partial}
 
+\usepackage{subcaption}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
 % Tikz stuff
 \usepackage{tikz}
 %\tikzset{>=latex}
@@ -116,6 +120,8 @@ noabbrev
 \DeclareMathOperator{\ISO}{ISO}
 \newcommand{\dalembertian}{\partial^2}
 \newcommand{\lagrangianDensity}{\symcal{L}}
+\newcommand{\hamiltonianDensity}{\symcal{H}}
+\DeclareMathOperator{\rank}{rank}
 
 \hyphenation{poin-car\'e}
 
@@ -4041,6 +4047,618 @@ noabbrev
         the energy, \(P^0\), and momentum, \(\vv{P}\).
         Of course, they exactly coincide with what we would normally call the energy and momentum, although they generally don't coincide with the \emph{canonical} momentum, \(p = \diffp{\lagrangianDensity}/{(\partial_0 \Phi)}\).
     \end{exm}
+    
+    \subsection{Symmetry of the Energy-Momentum Tensor}
+    In general the energy-momentum tensor, as defined here, is not symmetric.
+    In particular for fields with spin the first term fails to be symmetric.
+    This is a problem if we want to do general relativity, since the Einstein field equations\footnote{See \course{General Relativity} for details.},
+    \begin{equation}
+        G^{\mu\nu} = 8\pi G T^{\mu\nu},
+    \end{equation}
+    relate the symmetric Einstein tensor, \(G^{\mu\nu}\), to the energy-momentum tensor, \(T^{\mu\nu}\).
+    So, in order to couple our fields to gravity we need the energy-momentum tensor to be symmetric.
+    
+    The solution is to symmetrise the energy-momentum tensor by adding a term given by a divergence, which is automatically conserved.
+    Define the \defineindex{Belinfante energy-momentum tensor}
+    \begin{equation}
+        \Theta_{\mu\nu} = T_{\mu\nu} + \partial^\alpha L_{\alpha\mu\nu}
+    \end{equation}
+    where \(L_{\alpha\mu\nu}\) is a three index tensor antisymmetric under exchange of \(\alpha\) and \(\mu\) or \(\alpha\) and \(\nu\).
+    Then we have
+    \begin{equation}
+        \partial^\mu \partial^\alpha L_{\alpha\mu\nu} = 0
+    \end{equation}
+    as this is the product of a symmetric (\(\partial^\mu \partial^\alpha\)) and antisymmetric (\(L_{\alpha\mu\nu}\)) tensors.
+    Thus, the divergence of the Belinfante energy-momentum tensor is
+    \begin{equation}
+        \partial \Theta_{\mu\nu} = \partial^\mu T_{\mu\nu} + \partial^\mu \partial^\alpha L_{\alpha\mu\nu} = 0
+    \end{equation}
+    with the first term vanishing by the conservation of \(T_{\mu\nu}\).
+    We can simply choose \(L_{\alpha\mu\nu}\) to cancel the antisymmetric part of \(T_{\mu\nu}\).
+    
+    Note that in GR we can construct the energy-momentum tensor directly by varying the matter action, given by the Lagrangian
+    \begin{equation}
+        \lagrangianDensity = \frac{1}{2\kappa} R \sqrt{-g} + \lagrangianDensity_{\symrm{M}} \sqrt{-g}
+    \end{equation}
+    where \(\kappa = 8\pi G/c^4\), \(R\) is the Ricci scalar, \(g = \det g_{\mu\nu}\) is the determinant of the metric (which is negative in our sign convention), and \(\lagrangianDensity_{\symrm{M}}\) is the Lagrangian for any matter fields in the theory.
+    Varying the corresponding action with respect to the metric gives the Einstein field equations, and the energy-momentum tensor
+    \begin{equation}
+        \Theta^{\mu\nu} = \frac{2}{\sqrt{-g}} \diffd{S}{g_{\mu\nu}},
+    \end{equation}
+    which automatically inherits symmetry from the symmetric metric tensor, \(g_{\mu\nu}\).
+    
+    \chapter{Field Theory}
+    \section{Real Scalar Fields}
+    A generic action for a real scalar field, \(\varphi\), can be written as
+    \begin{equation}
+        S = \int \dl{^4x} \left[ \frac{1}{2} (\partial_\mu \varphi)(\partial^\mu) - V(\varphi) \right]
+    \end{equation}
+    where the first term is the kinetic term and the second is a potential.
+    In units where \(\hbar = 1\) the action is dimensionless, \([S] = 1\).
+    The measure has dimensions \([\dl{^4x}] = [\text{length}]^4 = [\text{mass}]^{-4}\).
+    This means the Lagrangian must have units of \([\lagrangianDensity] = [\text{mass}]^4\).
+    Since the dimensions of the derivatives are \([\partial_\mu] = [\text{length}]^{-1} = [\text{mass}]\) we must have
+    \begin{equation}
+        1 = [\dl{^4 x} \, (\partial_\mu \varphi) (\partial^\mu \varphi)] = [\text{mass}]^{-4} [\text{mass}]^2 [\varphi]^2 \implies [\varphi] = [\text{mass}].
+    \end{equation}
+    
+    Using this dimensional analysis we can construct a more general Lagrangian, subject to the dimensions working out and the result being a Lorentz invariant scalar:
+    \begin{equation}
+        \lagrangianDensity = \frac{1}{2}(\partial_\mu \varphi)(\partial^\mu \varphi) - V(\varphi) +  \frac{(\dalembertian \varphi)^2}{\Lambda^2} +  \frac{[(\partial_\mu \varphi) (\partial^\mu \varphi)]^2}{\Lambda_2^4} + \dotsb
+    \end{equation}
+    where \(\Lambda_i\) are arbitrary scales with dimensions \([\Lambda_i] = [\text{mass}] = [\text{length}]^{-1}\).
+    
+    At low energies, \(E\), we expect that \(\abs{\partial_\mu \varphi}\) scales with \(E^2\), from dimensional analysis, meaning that higher derivative terms are suppressed by powers of \(E/\Lambda_i\).
+    This justifies neglecting these extra terms to get the equations of motion for \(\varphi\), which we do using the Euler--Lagrange equations:
+    \begin{equation}
+        \partial_\mu\left( \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \right) = \diffp{\lagrangianDensity}{\varphi}.
+    \end{equation}
+    For the Lagrangian
+    \begin{equation}
+        \lagrangianDensity = \frac{1}{2}(\partial_\mu \varphi)(\partial^\mu \varphi) - V(\varphi)
+    \end{equation}
+    we have
+    \begin{equation}
+        \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} = \partial^\mu \varphi \implies \partial_\mu \left( \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \right) = \dalembertian \varphi
+    \end{equation}
+    and
+    \begin{equation}
+        \diffp{\lagrangianDensity}{\varphi} = -\diffp{V}{\varphi}.
+    \end{equation}
+    Hence, the equations of motion are
+    \begin{equation}
+        \dalembertian \varphi = - \diffp{V}{\varphi}.
+    \end{equation}
+    
+    For a renormalisable theory it we require that couplings do not have negative mass dimensions.
+    If we consider a polynomial potential, \(V\), then this restricts us to powers of \(\varphi\) up to fourth order in four dimensions:
+    \begin{equation}
+        V(\varphi) = \frac{1}{2}m^2\varphi^2 + \frac{g}{3!}\varphi^3 + \frac{\lambda}{4!}\varphi^4,
+    \end{equation}
+    where the \(1/n!\) coefficients are conventional to make the final results nicer.
+    
+    The first term is called the \defineindex{mass term} and the last two terms represent interactions.
+    
+    Note that the dimensions of the couplings, \(g\) and \(\lambda\), are \([g] = [\text{mass}]\) and \([\lambda] = 1\), so in four-dimensions \(\lambda\) is dimensionless, meaning \enquote{\(\varphi^4\) theory}, with this potential and \(g = 0\), is a popular toy model since we can do perturbation theory if \(\lambda\) is small.
+    If we wanted a \(\varphi^6\) term the coefficient would need to have dimensions of \([\text{mass}]^{-2}\), so the theory would not be renormalisable.
+    
+    If \(g = \lambda = 0\) then the equations of motion are simply
+    \begin{equation}
+        (\dalembertian + m^2)\varphi = 0,
+    \end{equation}
+    which is the Klein--Gordon equation.
+    The solutions are plane waves, \(\varphi(x) = \exp[-ip \cdot x]\), with \(p^\mu = (E, \vv{p})\) the four-momentum.
+    Substituting this into the equation of motion we get
+    \begin{equation}
+        (p^2 + m^2)\e^{-ip \cdot x} = 0 \implies p^2 = m^2 \implies E^2 = \abs{\vv{p}}^2 + m^2,
+    \end{equation}
+    which is the relativistic energy-momentum relation.
+    
+    The energy-momentum tensor for a general renormalisable potential is
+    \begin{align}
+        T_{\mu\nu} &= (\partial_\mu \varphi)(\partial_\nu \varphi) - \minkowskiMetric_{\mu\nu}\lagrangianDensity\\
+        &= (\partial_\mu \varphi)(\psi_\nu \varphi) - \minkowskiMetric_{\mu\nu} \left[ \frac{1}{2} (\partial_\rho \varphi)(\partial^\rho \varphi) - V \right].
+    \end{align}
+    We can explicitly show that this is conserved:
+    \begin{align}
+        \partial_\mu T^{\mu\nu} &= (\dalembertian \varphi)(\partial^\nu \varphi) + (\partial_\mu \varphi) (\partial^\mu \partial^\nu \varphi) - \frac{1}{2} \partial^\nu ((\partial^\mu \varphi)(\partial_\mu \varphi)) + \partial^\nu V\\
+        &= \left[  \dalembertian \varphi + \diffp{V}{\varphi}  \right] \partial^\nu \varphi\\
+        &= 0
+    \end{align}
+    where step we used the chain rule to write
+    \begin{equation}
+        \partial^\nu V = \diffp{V}{\varphi} \partial^\nu \varphi
+    \end{equation}
+    and then recognised the result as vanishing by the equations of motion.
+    
+    The energy density is
+    \begin{equation}
+        \hamiltonianDensity = T_{00} = \frac{1}{2}\dot{\varphi}^2 + \frac{1}{2}(\grad\varphi)^2 + V(\varphi),
+    \end{equation}
+    which is nonnegative so long as \(V(\varphi) \ge 0\).
+    The momentum density is
+    \begin{equation}
+        T_{0i} = P_i = \dot{\varphi} \partial_i \varphi.
+    \end{equation}
+
+    \subsection{Spontaneous Symmetry Breaking}
+    Consider the potential
+    \begin{equation}
+        V(\varphi) = \frac{1}{2}m^2 \varphi^2 + \frac{\lambda}{4!}\varphi^4.
+    \end{equation}
+    This has a \(\cyclicGroupZ[2]\) symmetry, sending \(\varphi \mapsto -\varphi\) doesn't change anything.
+    
+    \begin{figure}
+        \subcaptionbox{Quadratic Potential}[0.45\textwidth]{
+            \tikzsetnextfilename{quadratic-potential}
+            \begin{tikzpicture}
+                \draw[very thick, ->] (-3, 0) -- (3, 0) node [right] {\(\varphi\)};
+                \draw[very thick, ->] (0, 0) -- (0, 3) node [above] {\(V\)};
+                \clip (-3, 0) rectangle (3, 3);
+                \draw[ultra thick, highlight, domain=-3:3] plot (\x, \x*\x/3);
+            \end{tikzpicture}
+        }
+        \subcaptionbox{Quartic Potential}[0.45\textwidth]{
+            \tikzsetnextfilename{quartic-potential}
+            \begin{tikzpicture}
+                \draw[very thick, ->] (-3, 0) -- (3, 0) node [right] {\(\varphi\)};
+                \draw[very thick, ->] (0, 0) -- (0, 3) node [above] {\(V\)};
+                \clip (-3, 0) rectangle (3, 3);
+                \draw[ultra thick, highlight, domain=-3:3, samples=1000] plot (\x, {0.6*\x*\x*\x*\x - 1.6*\x*\x + 1.067});
+            \end{tikzpicture}
+        }
+        \caption[Potentials and their symmetries]{The potentials \(V(\varphi) = m^2\varphi^2/2\) and \(V(\varphi) = m^2\varphi^2/2 + \lambda \varphi^4/4!\) with \(m^2 < 0\) and \(\lambda > 0\). Notice that the quadratic potential has one minimum and the quartic two, related by \(\varphi \mapsto -\varphi\).}
+        \label{fig:potentials}
+    \end{figure}
+    
+    \Cref{fig:potentials} shows \(V(\varphi)\) with \(\lambda = 0\) and with \(\lambda > 0\).
+    In the first case we have a single minimum at \(\varphi = 0\), in the second we have two minima at \(\pm\varphi^*\).
+    
+    This demonstrates an important idea called \defineindex{spontaneous symmetry breaking}, where the \(\cyclicGroupZ[2]\) symmetry is spontaneously broken by introducing two non-equivalent minima when we take \(\lambda \ne 0\).
+    
+    \section{Complex Scalar Field}
+    If \(\varphi\) is instead a complex scalar field then we can write it as
+    \begin{equation}
+        \varphi = \frac{1}{\sqrt{2}} (\varphi_1 + i\varphi_2)
+    \end{equation}
+    where \(\varphi_i\) are real scalar fields.
+    We can then treat these as two independent real scalar fields with the Lagrangian
+    \begin{equation}
+        \lagrangianDensity = \frac{1}{2} (\partial_\mu \varphi_1) (\partial^\mu \varphi_2) - V((\varphi_1^2 + \varphi_2^2)/2),
+    \end{equation}
+    where we assume that the potential depends only on the magnitude of \(\varphi\) for simplicity.
+    We can rewrite this Lagrangian as
+    \begin{equation}
+        \lagrangianDensity = (\partial_\mu \varphi^*)(\partial^\mu \varphi) - V(\varphi^*\varphi),
+    \end{equation}
+    which looks very similar to the Lagrangian for a real field.
+    Note that we treat \(\varphi\) and \(\varphi^*\) as independent fields here.
+    
+    Notice that, regardless of the form \(V(\varphi^*\varphi)\), we have a global \(\unitary(1)\) symmetry, sending \(\varphi \mapsto \e^{i\vartheta}\varphi\) for \(\vartheta \in [0, 2\pi)\) doesn't change anything, since in doing so we send \(\varphi^* \mapsto (\e^{i\vartheta}\varphi)^* = \e^{-i\vartheta}\varphi^*\).
+    
+    If \(V(\varphi^*\varphi) = m^2 \varphi^*\varphi + \lambda(\varphi^*\varphi)^2/2\) then the field equations are
+    \begin{equation}
+        (\dalembertian + m^2)\varphi = -\lambda \varphi(\varphi^* \varphi), \qqand (\dalembertian + m^2) \varphi^* = -\lambda \varphi^*(\varphi\varphi^*).
+    \end{equation}
+    This is the famous \enquote{sombrero potential}, plotted in \cref{fig:sombrero potential}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{sombrero-potential}
+        \begin{tikzpicture}
+            \begin{axis}[
+                hide axis,
+                samples=50,
+                domain=0:360,
+                y domain=0:1.25
+                ]
+                \addplot3 [surf, shader=flat, draw=highlight, fill=highlight!20, z buffer=sort] ({sin(x)*y}, {cos(x)*y}, {(y^2-1)^2});
+            \end{axis}
+        \end{tikzpicture}
+        \caption{The \enquote{sombrero potential}, \(V(\varphi^*\varphi) = m^2\varphi^*\varphi + \lambda(\varphi^*\varphi)^2/2\) for \(m^2 < 0\) and \(\lambda > 0\).}
+        \label{fig:sombrero potential}
+    \end{figure}
+    
+    The \(\unitary(1)\) symmetry corresponds to rotating around the origin.
+    This symmetry is spontaneously broken by a quartic term with \(\lambda \ne 0\), since we now have a continuum of ground states lying in a circle.
+    
+    The Noether current for a complex field is simply the sum of the Noether currents for the two independent parts, either \(\varphi_1\) and \(\varphi_2\) or \(\varphi\) and \(\varphi^*\).
+    The symmetry under which this current is conserved is the \(\unitary(1)\) symmetry, and so \(\varphi \mapsto \e^{i\vartheta}\varphi \approx (1 + i\vartheta)\varphi\), so \(\delta\varphi = i\vartheta \varphi\), and similarly \(\delta\varphi^* = -i\vartheta\varphi\).
+    Thus, the Noether current is, up to an unimportant overall constant factor,
+    \begin{align}
+        J^\mu &= \diffp{\lagrangianDensity}{(\partial_\mu \varphi)} \delta\varphi + \diffp{\lagrangianDensity}{(\partial_\mu\varphi^*)}\delta\varphi^*\\
+        &\propto i\varphi\partial^\mu \varphi^* - i\varphi^*\partial^\mu \varphi,
+    \end{align}
+    where we scale out the factor of \(\vartheta\).
+    Notice that \(J^\mu\) is real, since \((i\varphi\partial^\mu \varphi^*)^* = -i\varphi^*\partial^\mu\varphi\).
+    
+    We can directly connect this conserved current to the conserved current of electromagnetism\footnote{See \course{Quantum Field Theory}.}.
+    The complex scalar field then represents a electrically charged scalar particle.
+    This has many interesting applications, such as the existence of antiparticles, and of course all of electromagnetism, if you like that sort of thing.
+    
+    \section{Spinor Fields}
+    Consider a spinor, \(\psi(x)\).
+    The action in this case is
+    \begin{equation}
+        S = \int \dl{^4x} \, \diracadjoint{\psi}(i\slashed{\partial} - m)\psi.
+    \end{equation}
+    We must have \([m\diracadjoint{\psi}\psi] = [\text{mass}]^4\), so \([\diracadjoint{\psi}] = [\psi] = [\text{mass}]^{3/2}\).
+    
+    The equation of motion for the spinor field is the Dirac equation:
+    \begin{equation}
+        (i\slashed{\partial} - m)\psi = 0.
+    \end{equation}
+    
+    Classically spinors are defined to be anticommuting variables, known as Grassmann variables, meaning \(\psi(x)\psi(y) = -\psi(y)\psi(x)\).
+    An important question is how we take the complex conjugate of such variables, there are two options.
+    We could treat it as a normal complex conjugate, not changing the order, or we could treat it as more like a Hermitian conjugate, where the order of the terms flips.
+    Both choices are valid, but distinct.
+    We follow the more common option of having the complex conjugate swap the order of the terms, so \([\psi(x)\psi(y)]^* = \psi(y)^* \psi(x)^*\).
+    We will also sometimes write \(\dagger\) in the place of \(*\) for this reason.
+    
+    The Dirac spinor representation of the Lorentz algebra, \((\slashfrac{1}{2}, 0) \oplus (0, \slashfrac{1}{2})\), splits into two irreducible representations, left handed, \((\slashfrac{1}{2}, 0)\), and right handed, \((0, \slashfrac{1}{2})\).
+    This is done using the fifth gamma matrix, \(\gamma^5 = i\gamma^0\gamma^1\gamma^2\gamma^3\), which anticommutes with \(\gamma^\mu\), and hence with the generators of the spinor representations of the Lorentz algebra.
+    If \(\gamma^5\) has eigenvalue \(+1\) we call the spinor left handed and if it has eigenvalue \(-1\) we call it right handed.
+    A four component spinor, \(\psi \in (\slashfrac{1}{2}, 0) \oplus (0, \slashfrac{1}{2})\) can then be written as
+    \begin{equation}
+        \psi = 
+        \begin{pmatrix}
+            \psi_{\Left}\\ \psi_{\Right}
+        \end{pmatrix}
+    \end{equation}
+    where \(\psi_{\Left} \in (\slashfrac{1}{2}, 0)\) and \(\psi_{\Right} \in (0, \slashfrac{1}{2})\).
+    From now on we work only with Dirac spinors, with the two component Weyl spinors becoming four component Dirac spinors with two zero components:
+    \begin{equation}
+        \psi_{\Left} \to 
+        \begin{pmatrix}
+            \psi_{\Left}\\ 0
+        \end{pmatrix}
+        , \qqand \psi_{\Right} \to 
+        \begin{pmatrix}
+            0\\ \psi_{\Right}
+        \end{pmatrix}
+        .
+    \end{equation}
+    
+    We can write an action for a left or right-handed fermion:
+    \begin{equation}
+        S_{\Left} = \int \dl{^4x} \, \diracadjoint{\psi}_{\Left} i\slashed{\partial} \psi_{\Left}, \qqand S_{\Right} = \int \dl{^4x} \, \diracadjoint{\psi}_{\Right} i\slashed{\partial} \psi_{\Right}
+    \end{equation}
+    For a single left handed fermion we cannot have a mass term since we can't form a (nonzero) scalar from \(\diracadjoint{\psi}_{\Left}\) and \(\psi_{\Left}\):
+    \begin{align}
+        \diracadjoint{\psi}_{\Left}\psi_{\Left} &= \psi_{\Left}^* \gamma^0 \frac{1}{2}(1 + \gamma^5) \psi\\
+        &= \psi_{\Left}^*\frac{1}{2}(1 - \gamma^5)\gamma^0\\
+        &= 0
+    \end{align}
+    since
+    \begin{equation}
+        \frac{1}{2}(1 - \gamma^5)\psi_{\Left} = P_{\Right}\psi_{\Left} = 0 \implies \psi_{\Left}^* \frac{1}{2}(1 - \gamma^5) = 0.
+    \end{equation}
+    
+    This is why fermions in the standard model are so light.
+    To first approximation they should be massless.
+    While \(\diracadjoint{\psi}_{\Left}\psi_{\Right} \ne 0\), which could allow for a mass term, this term is not gauge invariant in the standard model, so we can't include it in the Lagrangian.
+    The solution is to introduce a new scalar field, \(H\), such that we get a gauge invariant interaction \(\diracadjoint{\psi}_{\Left} \psi_{\Right} H\), which we can interpret as a mass term.
+    This \(H\) is the \defineindex{Higgs field}.
+    
+    \subsection{Conserved Currents}
+    The action
+    \begin{equation}
+        S = \int \dl{^4x} \, \diracadjoint{\psi} i\slashed{\partial}\psi
+    \end{equation}
+    has a \(\unitary(1)\) symmetry, \(\psi \mapsto \e^{i\alpha}\psi\).
+    The conserved current is
+    \begin{equation}
+        J^\mu = \diffp{\lagrangianDensity}{(\partial_\mu \psi)}\delta\psi + \diffp{\lagrangianDensity}{(\partial_\mu \psi^*)}\delta\psi^*.
+    \end{equation}
+    Expanding the exponentials gives \(\delta\psi = i\alpha\psi\) and \(\delta\psi^* = -i\alpha\psi\).
+    The derivatives are
+    \begin{equation}
+        \diffp{\lagrangianDensity}{(\partial_\mu \psi)} = \diracadjoint{\psi}\gamma^\mu, \qqand \diffp{\lagrangianDensity}{(\partial_\mu \psi^*)} = 0,
+    \end{equation}
+    so the conserved current is, up to an overall factor
+    \begin{equation}
+        J^\mu = \diracadjoint{\psi} \gamma^\mu \psi = \diracadjoint{\psi}_{\Left} \gamma^\mu \psi_{\Left} + \diracadjoint{\psi}_{\Right}\gamma^\mu \psi_{\Right}.
+    \end{equation}
+    This symmetry becomes the \(\unitary(1)\) of electromagnetism giving us charged fermions.
+    
+    There is another \(\unitary(1)\) symmetry, given by \(\psi \mapsto \e^{i\alpha \gamma^5}\psi\) and so \(\psi^* \mapsto (\e^{i\alpha \gamma^5}\psi)^* = \psi^* \e^{-i\alpha\gamma^5}\), this is a symmetry since
+    \begin{align}
+        \diracadjoint{\psi} i \slashed{\partial} \psi &\mapsto \psi^* \e^{-i\alpha \gamma^5} \gamma^0 i\slashed{\partial} \e^{i\alpha\gamma^5} \psi\\
+        &= -\psi^* \gamma^0 \e^{-i\alpha \gamma^5} i\slashed{\partial} \e^{i\alpha\gamma^5} \psi\\
+        &= \diracadjoint{\psi} i\slashed{\partial} \e^{-i\alpha\gamma^5} \e^{i\alpha\gamma^5}\psi\\
+        &= \diracadjoint{\psi} i\slashed{\partial} \psi.
+    \end{align}
+    This symmetry has a conserved axial vector current
+    \begin{equation}
+        j_5^\mu = \diracadjoint{\psi} \gamma^5 \gamma^\mu \psi = \diracadjoint{\psi}_{\Left}\gamma^\mu \psi_{\Left} - \diracadjoint{\psi}_{\Right} \gamma^\mu \psi_{\Right}.
+    \end{equation}
+    
+    Notice that including a mass term, \(m\diracadjoint{\psi}\psi\) preserves the original \(\unitary(1)\) symmetry, however the second \(\unitary(1)\) symmetry is nor preserved in this case since
+    \begin{equation}
+        \diracadjoint{\psi} \psi \mapsto \psi^* \e^{-i\alpha\gamma^5} \gamma^0 \e^{i\alpha\gamma^5} \psi = -\psi^* \gamma^0 \e^{-i\alpha\gamma^5} \e^{i\alpha\gamma^5} \psi = -\diracadjoint{\psi}\psi
+    \end{equation}
+    This means that for massive fermions \(j_5\) is not a conserved current, and instead it can be shown that
+    \begin{equation}
+        \partial_\mu j_5^\mu = -2im\diracadjoint{\psi} \gamma^5 \psi \ne 0.
+    \end{equation}
+    We say that the axial symmetry is \define{softly broken}\index{softly broken symmetry} since in the high energy regime, where \(E \gg m\), the symmetry breaking is a very small effect.
+    
+    There is no renormalisable self-interaction between spinors in 4 dimensions.
+    It is possible to have a renormalisable interaction with two scalar fields, \(\sigma\) and \(\pi\), with the interaction term
+    \begin{equation}
+        g \sigma \diracadjoint{\psi}\diracadjoint{\psi} + ig' \pi \diracadjoint{\psi} \gamma^5 \psi
+    \end{equation}
+    for some dimensionless constants \(g\) and \(g'\).
+    This interaction can be used to define an effective Lagrangian for an effective field theory corresponding to interactions within protons and neutrons.
+    If \(g = g'\) then chiral symmetry is preserved so long as the fields transform as
+    \begin{equation}
+        \delta\psi = i\beta\gamma^5\psi, \qquad \delta \sigma = 2\beta \pi, \qqand \delta \pi = -2\beta \sigma
+    \end{equation}
+    for some infinitesimal \(\beta\).
+    The second two transformation laws can be interpreted as the chiral symmetry acting as \(\specialOrthogonal(2)\) on
+    \begin{equation}
+        \begin{pmatrix}
+            \sigma\\ \pi
+        \end{pmatrix}
+    \end{equation}
+    rotating \(\sigma\) into \(\pi\) and vice versa while preserving \(\sigma^2 + \pi^2\).
+    This is a continuous symmetry of this action, and has interesting consequences in nuclear physics.
+    It arises from the symmetries in QCD when quark masses are small.
+    
+    \part{Compact Lie Groups}
+    \chapter{Compact Lie Groups}
+    \section{Cartan Decomposition}
+    Let \(\lie{g}\) be a Lie algebra which isn't simple, let \(\lie{s} \subset \lie{g}\) be a proper invariant subalgebra of \(\lie{g}\).
+    Using the metric \(g_{ab}\) we can define a subspace, \(\lie{p}\), orthogonal to \(\lie{s}\).
+    Using indices \(i\), and \(j\) for elements of \(\lie{s}\) and indices \(p\) and \(q\) for elements of \(\lie{p}\) we have, by definition
+    \begin{equation}
+        g_{ip} = \tr(A_iA_p) = 0
+    \end{equation}
+    for all \(A_i \in \lie{s}\) and \(A_p \in \lie{p}\) in the adjoint representation.
+    We also have \(\tr(A_i \commutator{A_j}{A_p}) = \tr(\commutator{A_i}{A_j} A_p) = 0\) since as an invariant subalgebra we have \(\commutator{A_i}{A_j} \in \lie{s}\) for all \(A_i, A_j \in \lie{s}\).
+    This means that \(\commutator{A_j}{A_p} \in \lie{p}\), for all \(A_j \in \lie{s}\) and \(A_p \in \lie{p}\).
+    That is, \(\commutator{\lie{s}}{\lie{p}} \subseteq \lie{p}\).
+    Since \(\lie{s}\) is an invariant subalgebra by definition \(\commutator{\lie{s}}{\lie{p}} \subseteq \lie{s}\).
+    By construction \(\lie{s} \cap \lie{p} = \{0\}\), and so \(\commutator{\lie{s}}{\lie{p}} = \{0\}\), that is \(\commutator{A_i}{A_p} = 0\) for all \(A_i \in \lie{s}\) and \(A_p \in \lie{p}\).
+    So all elements of \(\lie{s}\) commute with all elements of \(\lie{p}\).
+    
+    We say that \(\lie{g}\) decomposes into a \defineindex{direct sum}: \(\lie{g} = \lie{s} \oplus \lie{p}\).
+    We can show that \(\lie{p}\) is also a subalgebra of \(\lie{g}\) (so far we have only assumed it is a subspace, we now show it's closed under the Lie bracket).
+    We know that \(\tr(\commutator{A_p}{A_q}A_i) = \tr(A_p\commutator{A_q}{A_i}) = 0\) since \(\commutator{A_q}{A_i} = 0\) and so we have \(\commutator{\lie{p}}{\lie{p}} = \lie{p}\).
+    We can now prove the following theorem.
+    
+    \begin{thm}{}{thm:semisimple lie algebra is direct sum of simple lie algebras}
+        Let \(\lie{g}\) be a semisimple Lie algebra.
+        Then \(\lie{g}\) is a direct sum of mutually commuting\footnote{mutually commuting is just what it means to be combined through a direct sum} simple Lie algebras \(\lie{g}_i\):
+        \begin{equation}
+            \lie{g} = \lie{g}_1 \oplus \lie{g}_2 \oplus \dotsb \oplus \lie{g}_n = \bigoplus_{i=1}^n \lie{g}_i.
+        \end{equation}
+        \begin{proof}
+            If \(\lie{g}\) is simple then it is trivially a sum of simple Lie algebras, so suppose \(\lie{g}\) is not simple.
+            Then by definition it has a proper invariant subalgebra, \(\lie{s}\), and the construction above allows us to construct an orthogonal subalgebra, \(\lie{p}\), such that \(\lie{g} = \lie{s} \oplus \lie{p}\).
+            Both \(\lie{s}\) and \(\lie{p}\) must be semisimple, since any subalgebra of \(\lie{s}\) or \(\lie{p}\) is also a subalgebra of \(\lie{g}\), which is assumed to be semisimple.
+            If either \(\lie{s}\) or \(\lie{p}\) is not simple simply repeat the procedure, decomposing it into a sum of two invariant subalgebras.
+            Since \(\lie{g}\) is finite dimensional this procedure must eventually terminate since the dimension of a direct sum is the sum of the dimension of the terms in the sum.
+        \end{proof}
+    \end{thm}
+    
+    We've seen direct sums already, but this is a more formal treatment.
+    This is called the internal definition of the direct sum, we start with some Lie algebra, \(\lie{g}\), and work entirely inside of \(\lie{g}\).
+    The external definition on the other hand starts with \(\lie{s}\) and \(\lie{p}\) and details a construction for combining elements of \(\lie{s}\) and \(\lie{p}\) to form a new Lie algebra, which we call \(\lie{g}\).
+    
+    Such a decomposition of a Lie algebra induces a decomposition of a semisimple group, if \(G\) is a Lie group with semisimple Lie algebra \(\lie{g} = \lie{g}_1 \oplus \dotsb \oplus \lie{g}_n\) then
+    \begin{equation}
+        G \isomorphic (G_1 \otimes G_2 \otimes \dotsb \otimes G_n) / Z(G)
+    \end{equation}
+    where \(G_i\) are Lie groups with Lie algebras \(\lie{g}_i\) and
+    \begin{equation}
+        Z(G) \coloneqq \{h \mid hg = gh \forall g \in G\}
+    \end{equation}
+    is the \defineindex{centre} of \(G\), defined as the set of all elements commuting with all other elements of \(G\).
+    Note that \(Z(G)\) must be discrete, otherwise it could be used to define an Abelian subalgebra of \(\lie{g}\), but \(\lie{g}\) is semismiple.
+    
+    We can think of the exponential map \(\exp \colon \lie{g} \to G\) as turning addition into multiplication, just as it does for numbers, but we have to account for the elements which commute and therefore get double counted.
+    
+    \begin{exm}{}{}
+        On the Lie algebra level
+        \begin{equation}
+            \specialOrthogonalLie(4) \isomorphic \specialUnitaryLie(2) \oplus \specialUnitaryLie(2),
+        \end{equation}
+        and on the Lie group level
+        \begin{equation}
+            \specialOrthogonal(4) \isomorphic (\specialUnitary(2) \otimes \specialUnitary(2)) / \cyclicGroupZ[2].
+        \end{equation}
+    \end{exm}
+    
+    \section{Compact Groups}
+    Let \(G\) be a compact Lie group.
+    Then by Maschke's theorem (\cref{thm:maschke}) any representation is equivalent to a unitary representation, so we may choose to work solely with unitary representations.
+    In terms of Lie algebras this means we can assume that the generators are all Hermitian.
+    
+    Consider the generators in the adjoint representation, which we assume are Hermitian, \(A_a = A_a^\hermit\).
+    Then \(\tensor{(A_a)}{^b_c} = \tensor{(A_a^*)}{^c_b}\), and so we have
+    \begin{equation}
+        \tensor{(A_a)}{^b_c} = i\tensor{c}{^b_{ac}} = -i\tensor{c}{^c_{ab}} = (i\tensor{c}{^c_{ab}})^* = \tensor{(A_a^*)}{^c_b}.
+    \end{equation}
+    We then have
+    \begin{equation}
+        g_{ab} = \tr(A_a A_b) = \tensor{(A_a)}{^d_c} \tensor{(A_b)}{^c_d} = (-i\tensor{c}{^c_{ad}}) i\tensor{c}{^c_{bd}} = \tensor{c}{^c_{ad}} \tensor{c}{^c_{bd}}.
+    \end{equation}
+    
+    \begin{thm}{}{}
+        If \(G\) is a compact Lie group then its Lie algebra, \(\lie{g}\), can be decomposed as
+        \begin{equation}
+            \lie{g} = \lie{g}_0 \oplus \lie{g}_1 \oplus \dotsb \lie{g}_n
+        \end{equation}
+        where \(\lie{g}_0\) is Abelian, and hence \(\lie{g}_0 \isomorphic \unitaryLie(1) \oplus \dotsb \oplus \unitaryLie(1)\), \(\lie{g}_i\) for \(i \ne 0\) are simple.
+        \begin{proof}
+            If \(\lie{g}\) is not semisimple then it has a proper Abelian invariant subalgebra, \(\lie{s} \subset \lie{g}\), and \(g_{ia} = \tr(A_i A_a) = 0\) for all \(A_i \in \lie{s}\) and \(A_a \in \lie{l}\), as we've seen previously.
+            
+            We've shown that for Hermitian \(A_a\) we have \(g_{ia} = \tensor{c}{^b_{ic}} \tensor{c}{^b_{ac}}\), and so \(g_{ii} = (\tensor{c}{^b_{ic}}^2) = 0\) (no sum on \(i\)).
+            Hence, \(\tensor{c}{^b_{ic}} = 0\) for all \(i\), \(b\) and \(c\), meaning \(\commutator{\lie{s}}{\lie{g}} = \{0\}\).
+            It then follows that \(\lie{g} = \lie{g}_0 \oplus \lie{g}'\) where \(\lie{g}_0 = \lie{s}\) is Abelian and \(\lie{g}'\) is semisimple.
+            Then by \cref{thm:semisimple lie algebra is direct sum of simple lie algebras} we can decompose \(\lie{g}'\) into a direct sum of simple Lie algebras completing the proof.
+        \end{proof}
+    \end{thm}
+    
+    This means that we can restrict ourselves to studying only semisimple, or even simple, compact groups, since we can always decompose a compact Lie group into a product of semisimple or simple Lie groups.
+    Note that this decomposition fails in the general case as it relies on the Hermiticity of the generators, which is not guaranteed.
+    
+    \begin{thm}{}{}
+        If \(G\) is a compact Lie group then the Killing form, \(g_{ab}\), is positive semidefinite (has nonnegative eigenvalues).
+        If \(\lie{g}\), the Lie algebra of \(G\), is semisimple we can choose a basis in which \(g_{ab} = \delta_{ab}\) and we can then ignore the distinction between upper and lower indices.
+        \begin{proof}
+            Take some real vector, \(x^a\), then
+            \begin{equation}
+                g_{ab}x^a x^b = \tensor{c}{^c_{ad}} \tensor{c}{^c_{bd}} x^a x^b = (\tensor{c}{^c_{ad}}x^a)^2 \ge 0.
+            \end{equation}
+            Hence all eigenvalues of \(g_{ab}\) are nonnegative, so by reordering and rescaling the generators we can write \(g_{ab}\) as \(g_{ab} = \diag(1, \dotsc, 1, 0, \dotsc, 0)\).
+            
+            If \(\lie{g}\) is semisimple then \(\det g_{ab} \ne 0\) and so \(g_{ab} x^a x^b \ge 0\) for all real nonzero vectors, \(x^a\), hence all eigenvalues are strictly positive.
+            We can rescale the generators such that \(g_{ab} = \diag(1, \dotsc, 1)\).
+        \end{proof}
+    \end{thm}
+    
+    \chapter{Cartan Subalgebra}
+    \section{The Cartan Subalgebra}
+    \begin{dfn}{Cartan Subalgebra}{}
+        Let \(\lie{g}\) be a semisimple Lie group.
+        The \defineindex{Cartan subalgebra}, \(\lie{c} \subseteq \lie{g}\), is the subalgebra generated by the maximal set of commuting generators.
+    \end{dfn}
+    
+    \begin{rmk}
+        The definition of a Cartan subalgebra does not uniquely define \emph{a} Cartan subalgebra, instead we may have multiple Cartan subalgebras, however for a finite dimensional Lie algebra over an algebraically closed field of characteristic zero (such as \(\complex\)) all Cartan subalgebras are isomorphic.
+    \end{rmk}
+    
+    Denote by \(H_i\) the generators of the Cartan subalgebra, \(\lie{c}\).
+    These are also generators of \(\lie{g}\).
+    Denote by \(E_m\) the generators of \(\lie{g}\) which are not in \(\lie{c}\) such that \(\{H_i, E_m\}\) generates \(\lie{g}\).
+    If \(r = \rank \lie{g}\) is the rank of \(\lie{g}\) and \(d = \dim \lie{g}\) is the dimension of \(\lie{g}\) then there are \(d \) linearly indepenent commuting generators, so \(\dim\lie{c} = r\), and there are \(d - r\) generators \(E_m\).
+    
+    Since \(H_i, E_m \in \lie{g}\) we can take their commutator, getting another element of \(\lie{g}\), which we can expand as usual in terms of the structure constants:
+    \begin{equation}
+        \commutator{H_i}{E_m} = ic_{kim}T_k
+    \end{equation}
+    where we use the fact that \(\lie{g}\) is semisimple to lower all indices.
+    We can then write this as
+    \begin{equation}
+        \commutator{H_i}{E_m} = ic_{jim}H_j + ic_{nim}E_n
+    \end{equation}
+    where \(j\) runs from 1 to \(r\) indexing the generators of \(\lie{c}\), and \(n\) runs from \(r + 1\) to \(d\) indexing the generators of \(\lie{g}\) not in \(\lie{c}\).
+    We then have
+    \begin{equation}
+        c_{jim} = c_{mji} \propto \commutator{H_j}{H_i} = 0
+    \end{equation}
+    and so we have
+    \begin{equation}
+        \commutator{H_i}{E_m} = ic_{jim}E_j.
+    \end{equation}
+    
+    We've proved that \(c_{nim}\) is totally antisymmetric.
+    Then \((A_i)_{nm} = ic_{nim}\) defines a Hermitian matrix, \(A_i\).
+    These Hermitian matrices are just the generators \(H_i\) in the adjoint representation, and so all commute by the definition of the Cartan subalgebra\footnote{depending on what values we allow \(n\) and \(m\) to take these are either the \((d-r)\)-dimensional representation of \(\lie{c}\) (\(1 \le n, m \le d - r\)) or the \(d\)-dimensional representation of \(\lie{g}\) (\(1 \le n, m \le d\)).}.
+    This means that we can simultaneously diagonalise all of these matrices.
+    Let \(\lambda_i^\alpha \eqqcolon \alpha_i\) be the eigenvalues of \(A_i\).
+    The associated eigenvector is \(E_\alpha\), which is one of these generators of \(\lie{g}\) not in the generators of \(\lie{c}\).
+    That is, \(\alpha_i\) is the \(\alpha\)th eigenvalue of the \(i\)th mutually commuting generator.
+    We can then interpret \(\alpha\) as vectors in \(\reals^r\).
+    We call them the \define{root vectors}\index{root vector} of the Lie algebra, or simply the roots.
+    
+    In this diagonalised basis
+    \begin{equation}
+        \commutator{H_i}{E_\alpha} = \alpha_i E_\alpha.
+    \end{equation}
+    Note that \(\abs{\alpha} \ne 0\) since \(E_\alpha\) doesn't commute with \(H_i\), else it would be in the Cartan subalgebra.
+    We call \(E_\alpha\) the step operator for the root \(\alpha\).
+    
+    The \(E_\alpha\) are not Hermitian.
+    Taking the Hermitian conjugate of the above equation we have
+    \begin{equation}
+        \commutator{H_i}{E_\alpha}^\hermit = -\commutator{H_i}{E_\alpha^\hermit} = \alpha_iE_\alpha^\hermit.
+    \end{equation}
+    Hence, \(E_\alpha^\hermit = E_{-\alpha}\).
+    This implies that \(d - r\) is even, since the generators of \(\lie{g}\) not in \(\lie{c}\) must pair up into \(E_{\pm \alpha}\), and \(\alpha \ne 0\).
+    
+    For example, consider \(\specialUnitaryLie(2)\).
+    Here the Cartan subalgebra can be taken as the span of \(T_3 = H\), and \(T_{\pm} = E_{\pm \alpha}\) are the remaining generators, and we know that \((T_+)^\hermit = T_-\).
+    
+    Consider the following commutator, but note that \(E_\alpha E_\beta\) is not (necessarily) an element of the Lie algebra, since it involves a matrix product of generators rather than a Lie bracket:
+    \begin{align}
+        \commutator{H_i}{E_\alpha E_\beta} &= \commutator{H_i}{E_\alpha}E_\beta + E_\alpha \commutator{H_i}{E_\beta}\\
+        &= \alpha_i E_\alpha E_\beta + \beta_i E_\alpha E_\beta\\
+        &= (\alpha_i + \beta_i) E_\alpha E_\beta.
+    \end{align}
+    Take the trace of this equation using the fact that the trace of any commutator vanishes we have
+    \begin{equation}
+        (\alpha_i + \beta_i)\tr(E_\alpha E_\beta) = 0,
+    \end{equation}
+    and so either \(\alpha + \beta = 0\) or \(\tr(E_\alpha E_\beta) = 0\).
+    If \(\alpha + \beta = 0\) then
+    \begin{equation*}
+        \tr(E_\alpha E_\beta) = \tr(E_\alpha E_{-\alpha}) = \tr(E_\alpha E_\alpha^\hermit) = (E_\alpha)_{ij} (E_\alpha^\hermit)_{ji} = (E_\alpha)_{ij}(E_\alpha^*)_{ij} = \sum_{i,j} \abs{(E_\alpha)_{ij}}^2 > 0
+    \end{equation*}
+    so the trace is nonvanishing.
+    We can rescale the generators such that \(\tr(E_\alpha E_{-\alpha}) = 1\) for all roots \(\alpha\).
+    We can likewise choose to have \(\tr(H_iH_j) = \delta_{ij}\).
+    Finally, \(\tr(H_i E_\alpha) = 0\) since \(\tr(H_i\commutator{H_j}{E_\alpha}) = \alpha_j\tr(H_iE_\alpha)\) and \(\tr(H_i\commutator{H_j}{E_\alpha}) = \tr(\commutator{H_i}{H_j}E_\alpha) = 0\).
+    
+    So if \(\alpha + \beta \ne 0\) then \(\commutator{E_\alpha}{E_\beta}\) is proportional to \(E_{\alpha + \beta}\), and if \(\alpha + \beta = 0\) then \(\commutator{E_\alpha}{E_\beta} = x_i H_i\) for some \(x\) since we must have \(\commutator{E_\alpha}{E_\beta}\) commute with all \(H_i\) and so \(\commutator{E_\alpha}{E_\beta}\) is a linear combination of \(H_i\).
+    
+    From this we define the \defineindex{Cartan--Weyl basis} for a semisimple Lie algebra, \(\lie{g}\), as the basis \(\{H_i, E_\alpha\}\) such that
+    \begin{align}
+        \commutator{H_i}{H_j} = 0, \qquad \commutator{H_i}{E_{\pm\alpha}} = \pm \alpha_i E_{\pm \alpha}, \qquad \commutator{E_\alpha}{E_{-\alpha}} = \alpha_i H_i,
+    \end{align}
+    and
+    \begin{equation}
+        \commutator{E_\alpha}{E_\beta} = 
+        \begin{cases}
+            N_{\alpha\beta} E_{\alpha + \beta} & \text{if } \alpha + \beta \text{ is a root},\\
+            0 & \text{otherwise},
+        \end{cases}
+    \end{equation}
+    where \(N_{\alpha\beta}\) is some constant, and we choose to normalise these generators such that
+    \begin{equation}
+        \tr(H_i H_j) = \delta_{ij}, \quad \tr(E_\alpha E_\beta) = \delta_{\alpha + \beta, 0}, \qand \tr(H_i E_\alpha) = 0.
+    \end{equation}
+    
+    \section{Chevalley Basis}
+    Define the coroots
+    \begin{equation}
+        \alpha_i^{\vee} \coloneqq \frac{2\alpha_i}{\alpha^2}
+    \end{equation}
+    where \(\alpha^2 = \alpha \cdot \alpha\) is the usual Euclidean inner product of \(\alpha\) with itself.
+    Then the \defineindex{Chevalley basis} is defined as
+    \begin{align}
+        H_\alpha^{\symrm{C}} &= \alpha_i^{\vee} H_i^{\symrm{CW}} = \frac{2\alpha_i H_i^{\symrm{CW}}}{\alpha^2},\\
+        E_\alpha^{\symrm{C}} &= \sqrt{\frac{2}{\alpha^2}} E_\alpha^{\symrm{CW}}
+    \end{align}
+    where \(\symrm{C}\) stands for the Chevalley basis and \(\symrm{CW}\) the Cartan--Weyl basis.
+    
+    From this definition it follows that
+    \begin{equation}
+        \tr(E_\alpha^{\symrm{C}} E_{-\alpha}^{\symrm{C}}) = \frac{2}{\alpha^2}, \quad \commutator{H_\alpha^{\symrm{C}}}{E_{\pm\alpha}^{\symrm{C}}} = \pm 2 E_{\pm \alpha}^{\symrm{C}}, \qand \commutator{E_{\alpha}^{\symrm{C}}}{E_{-\alpha}^{\symrm{C}}} = H_\alpha^{\symrm{C}}.
+    \end{equation}
+    
+    For example, consider \(\specialUnitaryLie(2)\), in the Chevalley basis \(H^{\symrm{C}} = 2T_3\) and \(E_{\pm}^{\symrm{C}} = T_{\pm}\) since we have \(\commutator{2T_3}{T_{\pm}} = \pm 2 T_{\pm}\) and \(\commutator{T_{+}}{T_{-}} = 2T_3\).
+    
+    Recall that \(2T_3\) has integer eigenvalues (since \(T_3\) has half integer eigenvalues), and so we expect that \(H_\alpha^{\symrm{C}}\) has integer eigenvalues also, and we call these the \define{weights}\index{weight}.
+    This holds in any irreducible representation.
+    
+    In any representation we have \(H_i^{\symrm{CW}} \ket{\lambda} = \lambda_i \ket{\lambda}\) and hence
+    \begin{equation}
+        H_\alpha^{\symrm{C}} \ket{\lambda} = \frac{2 \alpha \cdot \lambda}{\alpha^2} \ket{\lambda}.
+    \end{equation}
+    This implies that
+    \begin{equation}
+        \frac{2\alpha \cdot \lambda}{\alpha^2} \in \integers
+    \end{equation}
+    for all roots \(\alpha\) and weights \(\lambda\) in any representation.
+    
+    \section{Angles Between Roots}
+    \begin{rmk}
+        We now drop the \(\symrm{C}\) superscript and we work exclusively in the Chevalley basis.
+    \end{rmk}
+    
     
     
     \backmatter
