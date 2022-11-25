@@ -11662,7 +11662,7 @@ noabbrev
     \section{One Particle Irreducible Diagrams}
     We've considered only the diagram in \cref{eqn:fd scalar self energy} for second order contributions.
     We also saw that the diagram in \cref{eqn:one particle reduicible second order diagram} contributes at second order.
-    The reason we don't have to consider this diagram is that it is not \defineindex{one particle irreducible}, or 1PI\glossary[acronym]{1PI}{One Particle Irreducible}, meaning that by removing a single propagator we get a disconnected diagram.
+    The reason we don't have to consider this diagram is that it is not \defineindex{one particle irreducible}, or \define{1PI|see{one particle irreducible}}\glossary[acronym]{1PI}{One Particle Irreducible}, meaning that by removing a single propagator we get a disconnected diagram.
     Such diagrams can always be constructed as a sum of one particle irreducible diagrams connected with additional propagators.
     
     In particular, we can evaluate \(\tilde{\Delta}_{\feynman}(p^2)\) to all orders by considering the series of diagrams of the form of \cref{eqn:fd scalar self energy} connected by propagators:
@@ -12174,6 +12174,286 @@ noabbrev
             \end{tikzpicture}
             + \text{counterterms}}_{=0} = ig_{\renormalised}.
     \end{equation}
+    
+    \chapter{Systematic Approach to Divergences}
+    \section{Degree of Divergence}
+    Consider the \(n\) point correlator:
+    \begin{equation}
+        \tikzsetnextfilename{fd-n-point-correlator}
+        \begin{tikzpicture}[
+            baseline={(0, 0)},
+            >={Latex[width=1.5mm]}
+            ]
+            \draw [pattern=north east lines] (0, 0) circle [radius=0.5cm];
+            \foreach \a in {0, 30, ..., 300} {
+                \draw (\a:0.5) -- (\a:1);
+            }
+            \draw[dotted] (310:0.75) arc (310:350:0.75);
+        \end{tikzpicture}
+    \end{equation}
+    This will always take the form
+    \begin{equation}
+        \tilde{G}^{(n)}(p_1, \dotsc, p_n) = (2\pi)^D \delta(p_1+ \dotsb + p_n) \int \dl{^D\ell_1} \dotsm \dl{^D\ell_m} \frac{\ell_1^{\alpha_1} \dotsm \ell_m^{\alpha_m}}{\ell_1^2 \dotsm \ell_m^2}
+    \end{equation}
+    where we neglect terms in the numerator and denominator not maximising the power of the integration variables, \(\ell_i\).
+    The \defineindex{superficial degree of divergence}, or simply the \define{degree of divergence}, for a particular diagram, \(\gamma\), is defined as
+    \begin{equation*}
+        \delta_{\gamma} \coloneqq (\text{power of \(\ell\) in numerator, including \(\dl{^D\ell}\)}) - (\text{power of \(\ell\) in denominator}).
+    \end{equation*}
+    If \(\delta_\gamma > 0\) then we expect that the diagram is divergent.
+    However, this isn't a hard and fast rule, since there can be other effects that this naive power counting approach doesn't account for, this is what the \enquote{superficial} part of superficial degree of divergence is for.
+    
+    We have already seen that the superficial degree of divergence for \(\Pi(p^2)\) predicts a quadratic divergence, and this is indeed the case.
+    It is possible for the superficial degree of divergence to both under and over count the actual degree of divergence.
+    For example, the QED diagram
+    \begin{equation}
+        \tikzsetnextfilename{fd-undercounting-divergence}
+        \begin{tikzpicture}[
+            photon/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate},
+            >={Latex[width=1.5mm]},
+            baseline=(current bounding box)
+            ]
+            \draw (0, 0) circle [radius = 0.5];
+            \draw[photon] (0.5, 0) -- (1.5, 0);
+            \draw[photon] (-0.5, 0) -- (-1.5, 0);
+            \draw (1.5, -0.5) -- (1.5, 0.5);
+            \draw (-1.5, -0.5) -- (-1.5, 0.5);
+        \end{tikzpicture}
+    \end{equation}
+    in \(D = 4\) dimensions has degree of divergence \(4 - 6 = -2\), since the two internal photons give a factor of \(1/\ell^2\) each and the two two electrons in the loop give \(1/\ell\) each for a total of \(1/\ell^6\), and then the \(\dl{^4\ell}\) factor gives \(\ell^4\).
+    So the superficial degree of divergence predicts it converges.
+    However, it is actually logarithmically divergent.
+    This is due to the presence of the divergent subdiagram
+    \begin{equation}
+        \tikzsetnextfilename{fd-divergent-subdiagram}
+        \begin{tikzpicture}[
+            photon/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate},
+            >={Latex[width=1.5mm]},
+            baseline=(current bounding box)
+            ]
+            \draw (0, 0) circle [radius = 0.5];
+            \draw[photon] (0.5, 0) -- (1.5, 0);
+            \draw[photon] (-0.5, 0) -- (-1.5, 0);
+        \end{tikzpicture}
+    \end{equation}
+    which has superficial degree of divergence \(4 - 2 = 2\), having only two internal electrons, but is actually only logarithmically divergent as the Ward identities can be used to cancel some of the powers of \(\ell\).
+    
+    \section{Degree of Divergence in \texorpdfstring{\(\varphi^3\)}{Phi Cubed} Theory}
+    Consider a diagram with \(E\) external lines, \(P\) propagators, \(L\) loops, \(I\) internal lines, and \(V\) vertices.
+    Immediately from this we see that \(P = E + I\), and we've already seen that in \(\varphi^3\) theory \(E = 2P - 3V\), which we can rewrite as \(E = 3V - 2I\).
+    
+    The number of loops, \(L\), gives the total number of integrals appearing in the final result.
+    The number of internal lines, \(I\), gives the number of integrals appearing in the expression before we compute the integrals we can do.
+    The number of vertices, \(V\), gives the number of Dirac deltas appearing in the expression, and since we want a final result with one Dirac delta, \(\delta(p_1 + \dotsb + p_n)\), we can use these to do \(V - 1\) integrals, and so we have
+    \begin{equation}
+        L = I - V + 1.
+    \end{equation}
+    
+    The superficial degree of divergence in \(\varphi^3\) theory in \(D\) dimensions is
+    \begin{equation}
+        \delta_\gamma = DL - 2I,
+    \end{equation}
+    with \(DL\) being the number of powers coming from \(L\) integrals with measure \(\dl{^D\ell}\).
+    In \(\varphi^3\) theory there can be no other terms appearing in the numerator
+    Then \(I\) is the number of factors of \(1/\ell^2\) coming from each internal propagator, which is the only way for terms to enter the denominator.
+    Using the formulae we've seen so far we can rewrite this as
+    \begin{align}
+        \delta_\gamma &= D(I - V + 1) - 2I\\
+        &= I(D - 2) - VD + D\\
+        &= (D - 2)\left( \frac{3V}{2} - \frac{E}{2} \right) - VD + D\\
+        &= D - V\left( 3 \frac{D - 2}{2} - D \right) - \frac{D - 2}{2}E.
+    \end{align}
+    So far this holds in \(\varphi^3\) theory, and any other theory in which there is no momentum dependence for the vertices, we can now specialise to \(\varphi^3\) theory.
+    In \(\varphi^3\) theory the field has mass dimension \([\varphi] = (D - 2)/2\) and the coupling constant has mass dimension \([g] = 3(D-2)/2 - D\), which is such that in \(D = 6\) we have \([g] = 0\).
+    Hence
+    \begin{equation}
+        \delta_\gamma = D - [g] V + [\varphi] E.
+    \end{equation}
+    Specialising further to \(D = 6\) we have
+    \begin{equation}
+        \delta_\gamma = 6 - 2E.
+    \end{equation}
+    
+    Notice that this depends only on the number of external particles.
+    So we can add internal propagators without changing the superficial degree of divergence.
+    For example, consider the diagram
+    \begin{equation}
+        \tikzsetnextfilename{fd-four-point-convergent}
+        \begin{tikzpicture}[
+            baseline=(current bounding box)
+            ]
+            \draw (-0.5, -0.5) rectangle (0.5, 0.5);
+            \draw (0.5, 0.5) -- (1, 1);
+            \draw (0.5, -0.5) -- (1, -1);
+            \draw (-0.5, 0.5) -- (-1, 1);
+            \draw (-0.5, -0.5) -- (-1, -1);
+        \end{tikzpicture}
+    \end{equation}
+    which has degree of divergence \(\delta_\gamma = 6 - 2\cdot 4 = -2\), and does indeed converge as this suggests.
+    However, by adding a loop we get the diagram
+    \begin{equation}
+        \tikzsetnextfilename{fd-four-point-divergent}
+        \begin{tikzpicture}[
+            baseline=(current bounding box)
+            ]
+            \draw (-0.25, 0.5) -- (-0.5, 0.5) -- (-0.5, -0.5) -- (0.5, -0.5) -- (0.5, 0.5) -- (0.25, 0.5);
+            \draw (0, 0.5) circle [radius = 0.25];
+            \draw (0.5, 0.5) -- (1, 1);
+            \draw (0.5, -0.5) -- (1, -1);
+            \draw (-0.5, 0.5) -- (-1, 1);
+            \draw (-0.5, -0.5) -- (-1, -1);
+        \end{tikzpicture}
+    \end{equation}
+    which also has degree of divergence \(\delta_\gamma = 6 - 2 \cdot 4 = -2\), however it has a divergent subdiagram,
+    \begin{equation}
+        \tikzsetnextfilename{fd-divergent-subdiagram-2}
+        \begin{tikzpicture}[
+            baseline=(current bounding box)
+            ]
+            \draw (0, 0) circle [radius=0.25];
+            \draw (0.25, 0) -- (0.5, 0);
+            \draw (-0.25, 0) -- (-0.5, 0);
+        \end{tikzpicture}
+    \end{equation}
+    and so this diagram actually diverges.
+    This divergence vanishes after renormalising as then this subdiagram is convergent.
+    
+    Notice that in general dimension increasing \(E\) while keeping \(V\) fixed reduces the degree of divergence.
+    
+    If \([g] > 0\) then there are only a finite number of diagrams with positive degree of divergence.
+    Theories with only a finite number of divergent diagrams are called \defineindex{super-renormalisable}.
+    
+    If \([g] = 0\) then at every order in perturbation theory the same correlators are divergent.
+    For example in \(\varphi^3\) theory with \(D = 6\) only the 2 and 3 point correlators are divergent.
+    These divergent diagrams can occur as subdiagrams, meaning that every divergent diagram is either a 2 or 3 point correlator or contains a 2 or 3 point correlator as a subdiagram.
+    In this case all divergences can be reabsorbed by imposing a finite number of of renormalisation conditions, 3 in the case of \(\varphi^3\) theory renormalising \(\varphi\), \(m\), and \(g\).
+    Theories in which this is possible are called \defineindex{renormalisable}.
+    
+    If \([g] < 0\) then all correlators have divergences for sufficiently large \(V\) and we call the theory \defineindex{non-renormalisable}.
+    
+    \section{1PI Vertices}
+    A \defineindex{1PI vertex} is a 1PI diagram without external propagators or the usual momentum conserving factor \((2\pi)^D\delta(p_1 + \dotsb p_n)\).
+    Define \(iV^{(n)}(p_1, \dotsc, p_n)\) to be the sum of all 1PI diagrams with \(n = E\) external lines after removing the external propagators and the Dirac delta.
+    
+    In \(\varphi^3\) theory the only tree level contribution is \(V^{(3)}\), formed from the diagram
+    \begin{equation}
+        \tikzsetnextfilename{fd-tree-level-1PI-diagram-phi-cubed}
+        \begin{tikzpicture}[
+            baseline=(current bounding box)
+            ]
+            \draw (0, 0) -- (0, 0.75);
+            \draw (0, 0) -- (-30:0.75);
+            \draw (0, 0) -- (210:0.75);
+        \end{tikzpicture}
+    \end{equation}
+    Any other combination of vertices at tree level will produce a diagram which is not 1PI.
+    
+    At one loop in \(\varphi^3\) theory we have \(L = 1\), and \(L = I - V + 1\), so \(I = V\), giving \(E = 3V - 2I = V = I\).
+    With two vertices, two external lines, and two internal lines we have
+    \begin{equation}
+        iV^{(2)} =
+        \tikzsetnextfilename{fd-one-loop-two-point-1PI-diagram-phi-cubed}
+        \begin{tikzpicture}[
+            baseline=(current bounding box)
+            ]
+            \draw (0, 0) circle [radius=0.25];
+            \draw (0.25, 0) -- (0.5, 0);
+            \draw (-0.25, 0) -- (-0.5, 0);
+        \end{tikzpicture}
+    \end{equation}
+    and with three vertices, three external lines, and three internal lines we have
+    \begin{equation}
+        iV^{(2)} =
+        \tikzsetnextfilename{fd-one-loop-three-point-1PI-diagram-phi-cubed}
+        \begin{tikzpicture}[
+            baseline={(0, 0)}
+            ]
+            \draw (0, 0) circle [radius=0.25];
+            \draw (0, 0.25) -- (0, 0.5);
+            \draw (-30:0.25) -- (-30:0.5);
+            \draw (210:0.25) -- (210:0.5);
+        \end{tikzpicture}
+    \end{equation}
+    These have degree of divergence \(\delta_\gamma = D - 2E\), in \(D = 6\) we have \(\delta_{\gamma} \ge 0\) only for \(E = 2, 3\), and all other 1PI diagrams are \enquote{finite} in the sense that the superficial degree of divergence is less than zero.
+    
+    For \(n = 4\) the first 1PI diagram is
+    \begin{equation}
+        \label{eqn:four point one loop 1PI}
+        \tikzsetnextfilename{fd-one-loop-four-point-1PI-diagram-phi-cubed}
+        \begin{tikzpicture}[
+            >={Latex[width=1.5mm]},
+            baseline=(current bounding box)
+            ]
+            \draw (-0.5, -0.5) rectangle (0.5, 0.5);
+            \draw (0.5, 0.5) -- (1, 1);
+            \draw (0.5, -0.5) -- (1, -1);
+            \draw (-0.5, 0.5) -- (-1, 1);
+            \draw (-0.5, -0.5) -- (-1, -1);
+            \draw[->, shift={(0.1, -0.1)}] (0.9, 0.9) -- (0.6, 0.6) node [midway, below right] {\scriptsize\(p_3\)};
+            \draw[->, shift={(0.1, 0.1)}] (-0.9, 0.9) -- (-0.6, 0.6) node [midway, above right] {\scriptsize\(p_1\)};
+            \draw[->, shift={(-0.1, -0.1)}] (0.9, -0.9) -- (0.6, -0.6) node [midway, below left] {\scriptsize\(p_4\)};
+            \draw[->, shift={(-0.1, 0.1)}] (-0.9, -0.9) -- (-0.6, -0.6) node [midway, above left] {\scriptsize\(p_2\)};
+            \draw[->] (-0.6, 0.3) -- (-0.6, -0.3) node [midway, left] {\scriptsize\(\ell\)};
+        \end{tikzpicture}
+    \end{equation}
+    Then \(iV^{(4)}\), to leading order, is given by the contribution of this diagram, plus the contribution of this diagram with \(p_2\) and \(p_4\) exchanged, plus the contribution of this diagram with \(p_3\) and \(p_4\) exchanged:
+    \begin{align}
+        iV^{(4)} &= (ig_{\renormalised})^4 \int \frac{\dl{^D\ell}}{(2\pi)^D} \frac{i}{\ell - m_{\renormalised}^2} \frac{i}{(\ell + p_2)^2 - m_{\renormalised}^2} \frac{i}{(\ell + p_2 + p_4)^2 - m_{\renormalised}^2} \notag\\
+        &\qquad\qquad \times \frac{i}{(\ell - p_1)^2 - m_{\renormalised}^2} + (p_2 \leftrightarrow p_4) + (p_3 \leftrightarrow p_4) + \order(g^6).
+    \end{align}
+    Here we've dropped the \(Z_g\) in the \((iZ_g g_{\renormalised})^4\) as it contributes at a higher order.
+    We've also used \(p_2 + p_3 + p_4 = -p_1\), which follows from momentum conservation, to simplify the denominator in the final fraction.
+    
+    Going through the process of doing the Feynman parametrisation and Wick transformation we get terms of the form
+    \begin{align}
+        \int \frac{\dl{^Dq_{\symrm{E}}}}{(2\pi)^D} \frac{1}{(q_{\symrm{E}}^2 + M^2)^4} &= \frac{1}{(2\pi)^D} \frac{2\pi^{D/2}}{\Gamma(D/2)} \int_0^{\infty} \dl{q_{\symrm{E}}} \, \frac{q_{\symrm{E}}^5}{(q_{\symrm{E}}^2 + M^2)^4}\\
+        &\stackrel{\mathclap{D = 6}}{=} \frac{1}{6(4\pi)^3} \frac{1}{M^2},
+    \end{align}
+    which is finite.
+    
+    \section{Correlator Dimensions}
+    The \(n\) point correlator in position space has mass dimension
+    \begin{equation}
+        [G^{(n)}(x_1, \dotsc, x_n)] = [\expected{\varphi(x_1) \dotsm \varphi(x_n)}] = n[\varphi].
+    \end{equation}
+    In momentum space the mass dimension is then
+    \begin{equation}
+        [\tilde{G}^{(n)}(p_1, \dotsc, p_n)] = \left[ \int \dl{^Dx_1} \dotsm \dl{^Dx_n} \, G^{(n)} \right] = n([\varphi] - D).
+    \end{equation}
+    The \(n\) point 1PI vertex has mass dimension
+    \begin{equation}
+        [V^{(n)}(p_1, \dotsc, p_n)] = n[\varphi] - nD + D + 2n = D - n[\varphi],
+    \end{equation}
+    this comes from taking the \(n\) point correlator, with mass dimension \(n[\varphi] - nD\), and cancelling the external propagators, each proportional to \(1/p^2\), and the last equality follows using \([\varphi] = (D - 2)/2\).
+    
+    Now consider a theory with \(n\) particle interactions with coupling \(g_n\).
+    Then \([g_n] + n[\varphi] = D\) and \([g_n] = [V^{(n)}]\).
+    We also have
+    \begin{equation}
+        [V^{(n)}] = DL - 2I + \sum_m V_m[g_m] = \delta_\gamma + \sum_m V_m[g_m]
+    \end{equation}
+    where \(V_m\) is the number of \(m\) point vertices.
+    Rearranging this the superficial degree of divergence is
+    \begin{equation}
+        \delta_\gamma = [V^{(n)}] - \sum_{m} V_m[g_m].
+    \end{equation}
+    
+    For example, consider \(V^{(4)}\), two contributions to this come from
+    \begin{equation}
+        \tikzsetnextfilename{fd-general-phi-n-theory-4-point-interaction}
+        \begin{tikzpicture}[
+            baseline={(0, 0)}
+            ]
+            \draw (-0.5, -0.5) -- (0.5, 0.5);
+            \draw (0.5, -0.5) -- (-0.5, 0.5);
+        \end{tikzpicture}
+    \end{equation}
+    and the diagram in \cref{eqn:four point one loop 1PI}.
+    We have \([g_4] = 4 = D = -2\) in \(D = 6\), and \([g_3] = 0\) as usual in \(\varphi^3\) theory.
+    The diagram in \cref{eqn:four point one loop 1PI} then has degree of divergence \(4 - D - 4(3 - D/2) = -2\) in \(D = 6\).
+    So this diagram is superficially convergent.
+    
+    
     
     %   Appdendix
     \appendixpage
