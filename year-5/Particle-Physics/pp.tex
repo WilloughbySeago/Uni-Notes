@@ -39,6 +39,9 @@
 
 \usepackage[compat=1.1.0]{tikz-feynman}
 
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
 % References, should be last things loaded
 \usepackage[pdfauthor={Willoughby Seago},pdftitle={Particle Physics},pdfkeywords={particle physics, Feynman diagrams, scattering, Dirac equation, QED, QCD, weak interactions},pdfsubject={particle physics}]{hyperref}  % Should be loaded second last (cleveref last)
 \colorlet{hyperrefcolor}{blue!60!black}
@@ -180,6 +183,7 @@ crefname={Open Question}{Open Questions}]%
 \newcommand{\PBzerostrange}{\ensuremath{\Pparticle{B}^0_{\Ps}}}
 \newcommand{\PB}{\ensuremath{\Pparticle{B}}}
 \newcommand{\PDzero}{\ensuremath{\Pparticle{D}^0}}
+\newcommand{\Phiggs}{\ensuremath{\Pparticle{H}}}
 
 
 \newcommand{\APantiparticle}[1]{\overbar{#1}}
@@ -248,6 +252,7 @@ crefname={Open Question}{Open Questions}]%
 \newcommand{\cabibboAngle}{\vartheta_{\symrm{c}}}
 \newcommand{\boltzmann}{k_{\symrm{B}}}
 \newcommand{\rep}[1]{\symbf{#1}}
+\newcommand{\lagrangian}{L}
 
 \includeonly{parts/appParticleData, parts/appFermiGoldenRule, parts/appPolarisation, parts/appFeynCalc}
 
@@ -4362,10 +4367,705 @@ crefname={Open Question}{Open Questions}]%
     \end{equation}
     This is independent of the angle \(\vartheta\), which it must be since a \PW{} boson initially at rest has no preferred direction to decay in, so we would have to arbitrarily define an axis, \(z\), to take the angle \(\vartheta\) to, and a physical observable, such as the decay rate, cannot depend on this choice.
     
+    \section{\texorpdfstring{\PZ}{Z} Boson Decays}
+    The \PZ{} boson couples to both left and right handed chiral states.
+    The spin averaged amplitude squared for a decay such as \(\PZ \to \Pe\APe\) is then
+    \begin{equation}
+        \expected{\abs{\amplitude}^2} = \frac{2}{3}g_{\PZ}^2 m_{\PZ}^2 (c_{\Left}^2 + c_{\Right}^2),
+    \end{equation}
+    where the factor of \(1/3\) comes from averaging over the three polarisation states the \PZ{} boson can be in
+    The differential decay rate is
+    \begin{equation}
+        \diffp{\Gamma}{\Omega} = \frac{\abs{\vv{p}^*}}{32\pi^2m_{\PZ}^2} \abs{\amplitude}^2
+    \end{equation}
+    where \(\abs{\vv{p}^*}\) is the momentum of the decay products in the centre of mass state, so \(\abs{\vv{p}^*} = m_{\PZ}/2\).
+    Integrating this gives
+    \begin{equation}
+        \Gamma(\PZ \to \Pe \APe) = \frac{g_{\PZ}^2 m_{\PZ}}{48\pi}(c_{\symup{V}}^2 + c_{\symup{A}}^2)
+    \end{equation}
+    where we've used \(2(c_{\Left}^2 + c_{\Right}^2) = c_{\symup{V}}^2 + c_{\symup{A}}^2\).
     
+    If we neglect the fermion mass then the same result holds regardless of the decay products:
+    \begin{equation}
+        \Gamma(\PZ \to \Pf \APf) = \frac{g_{\PZ}^2 m_{\PZ}}{48 \pi}(c_{\symup{V}}^2 + c_{\symup{A}}^2).
+    \end{equation}
+    Putting in values for \(c_{\symup{V}}\) and \(c_{\symup{A}}\) for different fermions we can compare these results and normalise by the total decay rate to get the branching ratios:
+    \begin{alignat}{4}
+        \BR(\PZ \to \Pe\APe) = & \BR(\PZ \to \Pmu\APmu) &&= \BR(\PZ \to \Ptau\APtau) &&\approx \qty{3.5}{\percent}\\
+        \BR(\PZ \to \Pnue\APnue) = & \BR(\PZ \to \Pnumu\APnumu) &&= \BR(\PZ \to \Pnutau\APnutau) &&\approx \qty{6.9}{\percent}\\
+        \BR(\PZ \to \Pd\APd) = & \BR(\PZ \to \Ps\APs) &&= \BR(\PZ \to \Pb\APb) &&\approx \qty{15}{\percent}\\
+        & \BR(\PZ \to \Pu\APu) &&= \BR(\PZ \to \Pc\APc) &&\approx \qty{12}{\percent}
+    \end{alignat}
+    Note that there is no decay \(\PZ \to \Pt\APt\) since the top quark has mass more than half that of the \PZ{} boson.
     
+    From this we can see that the \PZ{} boson decays predominantly to quarks, and since these then go on to form jets it's often hard to distinguish which quarks, so we just consider
+    \begin{equation}
+        \BR(\PZ \to \text{hadrons}) \approx \qty{69}{\percent}.
+    \end{equation}
     
+    Using these results we can predict the total decay rate
+    \begin{equation}
+        \Gamma_{\PZ} = \sum_{\Pf\APf} \Gamma(\PZ \to \Pf\APf) \approx \qty{2.5}{\giga\electronvolt}.
+    \end{equation}
+    This agrees well with the experimental result
+    \begin{equation}
+        \Gamma_{\PZ} = \qty{2.4952(23)}{\giga\electronvolt}.
+    \end{equation}
     
+    \section{\texorpdfstring{\PZ}{Z} Boson Resonance}
+    Experiments on \PZ{} bosons are usually performed on \PZ{} bosons produced through interactions like \(\Pe\APe \to \PZ\), of course this \PZ{} boson must then go on to decay for this to be a valid process, so maybe something like \(\Pe\APe \to \PZ \to \Pmu\APmu\).
+    This occurs at tree level through an \(s\)-channel process.
+    The amplitude for this is
+    \begin{equation}
+        \amplitude = -\frac{g_{\PZ}^2}{q^2 - m_{\PZ}^2} \minkowskiMetric_{\mu\nu} \diracadjoint{v}(p_2) \gamma^\mu \frac{1}{2}(c_{\symup{V}}^{\Penominus} - c_{\symup{A}}^{\Penominus}) u(p_1) \diracadjoint{u}(p_3) \gamma^\nu \frac{1}{2} (c_{\symup{V}}^{\upmu} - c_{\symup{A}}^{\upmu}) v(p_4),
+    \end{equation}
+    This can be rewritten in terms of left and right handed couplings:
+    \begin{align}
+        \amplitude &= - \frac{g_{\PZ}^2}{q^2 - m_{\PZ}^2} \minkowskiMetric_{\mu\nu} \left[ c_{\Left}^{\Penominus} \diracadjoint{v}(p_2) \gamma^\mu \frac{1}{2} (1 - \gamma^5) u(p_1) + c_{\Right}^{\Penominus} \diracadjoint{v}(p_2) \gamma^\mu \frac{1}{2} (1 + \gamma^5) u(p_1) \right] \notag\\
+        &\qquad \times \left[ c_{\Left}^{\upmu} \diracadjoint{u}(p_3) \gamma^\nu \frac{1}{2} v(p_4) + c_{\Right}^{\upmu} \gamma^\nu \frac{1}{2} (1 + \gamma^5) v(p_4) \right].
+    \end{align}
+    
+    In the ultra relativistic limit we can write this in terms of the helicity spinors using the identities
+    \begin{equation}
+        \frac{1}{2}(1 - \gamma^5) u = u_{\downarrow}, \quad \frac{1}{2}(1 + \gamma^5)u = u_{\uparrow}, \quad \frac{1}{2}(1 - \gamma^5)v = v_{\uparrow}, \qand \frac{1}{2}(1 + \gamma^5)v = v_{\downarrow}.
+    \end{equation}
+    Then we have
+    \begin{align}
+        \amplitude &= - \frac{g_{\PZ}^2}{q^2 - m_{\PZ}^2} \minkowskiMetric_{\mu\nu} [c_{\Left}^{\Penominus} \diracadjoint{v}(p_2) \gamma^\mu u_{\downarrow}(p_1) + c_{\Right}^{\Penominus} \diracadjoint{v}(p_2) \gamma^\mu u_{\uparrow}(p_1)]\\
+        &\qquad \times [c_{\Left}^{\Penominus} \diracadjoint{u}(p_3) \gamma^\nu v_{\uparrow}(p_4) + c_{\Right}^{\upmu} \diracadjoint{u}(p_3) \gamma^\nu v_{\downarrow}(p_4)]
+    \end{align}
+    Each spinor here can be written as a sum of helicity spinors, and most of the products vanish, except for
+    \begin{align}
+        \amplitude_{\Right\Right} &= -\frac{g_{\PZ}^2}{q^2 - m_{\PZ}^2} c_{\Right}^{\Penominus} c_{\Right}^{\upmu} \minkowskiMetric_{\mu\nu} [\diracadjoint{v}_{\downarrow}(p_2) \gamma^\mu u_{\uparrow}(p_1)] [\diracadjoint{u}_{\uparrow}(p_3) \gamma^\nu v_{\downarrow}(p_4)],\\
+        \amplitude_{\Right\Left} &= -\frac{g_{\PZ}^2}{q^2 - m_{\PZ}^2} c_{\Right}^{\Penominus} c_{\Left}^{\upmu} \minkowskiMetric_{\mu\nu} [\diracadjoint{v}_{\downarrow}(p_2) \gamma^\mu u_{\uparrow}(p_1)] [\diracadjoint{u}_{\downarrow}(p_3) \gamma^\nu v_{\uparrow}(p_4)],\\
+        \amplitude_{\Left\Right} &= -\frac{g_{\PZ}^2}{q^2 - m_{\PZ}^2} c_{\Left}^{\Penominus} c_{\Right}^{\upmu} \minkowskiMetric_{\mu\nu} [\diracadjoint{v}_{\uparrow}(p_2) \gamma^\mu u_{\downarrow}(p_1)] [\diracadjoint{u}_{\uparrow}(p_3) \gamma^\nu v_{\downarrow}(p_4)],\\
+        \amplitude_{\Left\Left} &= -\frac{g_{\PZ}^2}{q^2 - m_{\PZ}^2} c_{\Left}^{\Penominus} c_{\Left}^{\upmu} \minkowskiMetric_{\mu\nu} [\diracadjoint{v}_{\uparrow}(p_2) \gamma^\mu u_{\downarrow}(p_1)] [\diracadjoint{u}_{\downarrow}(p_3) \gamma^\nu v_{\uparrow}(p_4)].
+    \end{align}
+    Some kinematics then gives
+    \begin{align}
+        \abs{\amplitude_{\Right\Right}}^2 &= s^2 \abs*{\frac{g_{\PZ}^2}{s - m_{\PZ}^2}}^2 (c_{\Right}^{\Penominus})^2 (c_{\Right}^{\upmu})^2 (1 + \cos\vartheta)^2,\\
+        \abs{\amplitude_{\Right\Left}}^2 &= s^2 \abs*{\frac{g_{\PZ}^2}{s - m_{\PZ}^2}}^2 (c_{\Right}^{\Penominus})^2 (c_{\Left}^{\upmu})^2 (1 - \cos\vartheta)^2,\\
+        \abs{\amplitude_{\Left\Right}}^2 &= s^2 \abs*{\frac{g_{\PZ}^2}{s - m_{\PZ}^2}}^2 (c_{\Left}^{\Penominus})^2 (c_{\Right}^{\upmu})^2 (1 - \cos\vartheta)^2,\\
+        \abs{\amplitude_{\Left\Left}}^2 &= s^2 \abs*{\frac{g_{\PZ}^2}{s - m_{\PZ}^2}}^2 (c_{\Left}^{\Penominus})^2 (c_{\Left}^{\upmu})^2 (1 + \cos\vartheta)^2.
+    \end{align}
+    Since the coupling constants are different in each case the resulting total amplitude is not symmetric, as shown in \cref{fig:Z boson decay amplitude}.
+    This is another example of parity violation.
+    It is more likely that this process produces a muon moving in the initial direction of the electron than in the initial direction of the positron.
+    
+    \begin{figure}
+        \tikzsetnextfilename{Z-boson-decay-amplitude}
+        \begin{tikzpicture}
+            \draw[thick, ->] (-3, 0) -- (3, 0) node [right] {\(\cos\vartheta\)};
+            \draw[thick, ->] (0, 0) -- (0, 3.5);
+            \draw[thick, Teal, domain=-2.8:2.8, samples=300] plot (\x, {0.3*(2.8 + \x)^2 / 4});
+            \draw[thick, Blue, domain=-2.8:2.8, samples=300] plot (\x, {0.4*(2.8 - \x)^2 / 4});
+            \draw[thick, highlight, domain=-2.8:2.8, samples=300] plot (\x, {0.3*(2.8 + \x)^2 / 2.8 + 0.4*(2.8 - \x)^2 / 4});
+            \draw[dashed] (2.8, 0) node [below] {1} -- (2.8, 3.5);
+            \draw[dashed] (-2.8, 0) node [below] {\(\mathllap{-}1\)} -- (-2.8, 3.5);
+            \draw[thick, Teal, text=black] (-1.93, -0.5) -- ++ (0.5, 0) node [right] {\(\abs{\amplitude_{\Right\Left}}^2 + \abs{\amplitude_{\Left\Right}}^2\)};
+            \draw[thick, Blue, text=black] (-1.93, -1) -- ++ (0.5, 0) node [right] {\(\abs{\amplitude_{\Right\Right}}^2 + \abs{\amplitude_{\Left\Left}}^2\)};
+            \draw[thick, highlight, text=black] (-1.93, -1.5) -- ++ (0.5, 0) node [right] {\(\abs{\amplitude}^2\)};
+        \end{tikzpicture}
+        \caption[\PZ{} boson decay amplitude]{The \PZ{} boson decay amplitude as a function of \(\cos\vartheta\) where \(\vartheta\) is the scattering angle. Notice that it is not symmetric since the left and right couplings are not the same.}
+        \label{fig:Z boson decay amplitude}
+    \end{figure}
+    
+    So far we have been using the propagator term for bosons with denominator \(q^2 - m_{\PZ}^2\),
+    This doesn't account for the instability of the \PZ{} boson.
+    To correct for this we substitute \(m \mapsto m - i\Gamma_{\PZ}/2\).
+    The justification for this is that the time dependence of the wave function is given by \(\psi \propto \e^{-imt}\), and so after this substitution the time dependence of the wave function is \(\psi \propto \e^{-imt}\e^{\Gamma_{\PZ}t/2}\).
+    We then have \(\abs{\psi}^2 \propto \e^{-\Gamma_{\PZ}t}\), so the probability of measuring the \PZ{} boson decays exponentially with time.
+    
+    The propagator denominator is then
+    \begin{equation}
+        m_{\PZ}^2 \mapsto (m_{\PZ} - i\Gamma_{\PZ}/2)^2 = m_{\PZ}^2 - im_{\PZ}\Gamma_{\PZ} - \frac{1}{4}\Gamma_{\PZ}^2 \approx m_{\PZ}^2 - im_{\PZ}\Gamma_{\PZ}.
+    \end{equation}
+    Dropping the \(\Gamma_{\PZ}^2\) term is justified as \(\Gamma_{\PZ} = \qty{2.5}{\giga\electronvolt}\) whereas \(m_{\PZ} = \qty{91}{\giga\electronvolt}\).
+    This gives the \defineindex{Breit--Wigner propagator} proportional to
+    \begin{equation}
+        \frac{1}{(s - m_{\PZ}^2)^2 + m_{\PZ}^2\Gamma_{\PZ}^2}.
+    \end{equation}
+    
+    The result is that
+    \begin{equation}
+        \abs{\amplitude}^2 \propto \abs*{\frac{1}{s - m_{\PZ}^2 + im_{\PZ}\Gamma_{\PZ}}}^2 = \frac{1}{(s - m_{\PZ})^2 + m_{\PZ}^2\Gamma_{\PZ}^2}.
+    \end{equation}
+    
+    A full calculation of the cross section for \(\Pe\APe \to \PZ \to \Pmu\APmu\) gives
+    \begin{equation*}
+        \sigma(\Pe\APe \to \PZ \to \Pmu\APmu) = \frac{1}{192\pi} \frac{g_{\PZ}^2 s}{(s - m_{\PZ}^2)^2 + m_{\PZ}\Gamma_{\PZ}^2} [(c_{\symup{V}}^{\Penominus})^2 + (c_{\symup{A}}^{\Penominus})^2] [(c_{\symup{V}}^{\upmu})^2 + (c_{\symup{A}}^{\upmu})^2].
+    \end{equation*}
+    We can simply this by considering the partial widths
+    \begin{align}
+        \Gamma(\PZ \to \Pe\APe) &= \frac{g_{\PZ}^2 m_{\PZ}}{48\pi} [(c_{\symup{V}}^{\Penominus})^2 + (c_{\symup{A}}^{\Penominus})^2],\\
+        \Gamma(\PZ \to \Pmu\APmu) &= \frac{g_{\PZ}^2m_{\PZ}}{48\pi} [(c_{\symup{V}}^{\upmu})^2 + (c_{\symup{A}}^{\upmu})^2]
+    \end{align}
+    and then we get
+    \begin{equation}
+        \sigma = \frac{12\pi}{m_{\PZ}^2} \frac{s}{(s - m_{\PZ}^2)^2 + m_{\PZ}^2 \Gamma_{\PZ}^2} \Gamma(\PZ \to \Pe\APe) \Gamma(\PZ \to \Pmu\APmu).
+    \end{equation}
+    This same result holds for any final state fermion instead of muons.
+    
+    The cross section of the \PZ{} boson production as a function of the collision energy, \(\sqrt{s}\), is called the \define{\PZ{} boson line shape}\index{Z boson line shape@\PZ{} boson line shape}.
+    It can be measured in experiments.
+    However, we have to account for second order processes, involving the initial electrons which change the energy of the \PZ{} boson, such as the electron or positron emitting a photon before annihilating into a \PZ{} boson.
+    We call accounting for these effects \enquote{unfolding} the data to get just the data we care about for the \PZ{} boson.
+    We can use the width of this unfolded data to find the decay rate of the \PZ{} boson and the maximum of the plot should give the mass of the \PZ{} boson as well.
+    
+    \chapter{Higgs}
+    \section{Lagrangians in Quantum Field Theory}
+    \subsection{Lagrangians in Classical Mechanics}
+    \begin{rmk}
+        See \course{Lagrangian Dynamics} for details.
+    \end{rmk}
+    Consider a system of particles described by coordinates \(q_i\).
+    If the kinetic energy is \(T\) and the potential energy is \(V\) then we can define the \defineindex{Lagrangian}
+    \begin{equation}
+        \lagrangian = T - V,
+    \end{equation}
+    which is typically a function of the coordinates, \(q_i\), and their time derivatives, \(\dot{q}_i\).
+    The equations of motion for the system can be found from the \defineindex{Euler--Lagrange equations}
+    \begin{equation}
+        \diff{}{t}\left( \diffp{\lagrangian}{\dot{q}_i} \right) = \diffp{\lagrangian}{q_i}.
+    \end{equation}
+    
+    \subsection{Lagrangians in Quantum Field Theory}
+    \begin{rmk}
+        See \course{Classical Electrodynamics} for Lagrangians in classical field theories and \course{Quantum Field Theory} for Lagrangians in quantum field theories.
+    \end{rmk}
+    
+    If a system can be described by the fields \(\varphi_i\) then the equations of motion for the system can be found by defining the \defineindex{Lagrangian density} (henceforth referred to as the Lagrangian) \(\lagrangianDensity\), which is a function of the fields, \(\varphi_i\), and derivatives of the fields, \(\partial_\mu \varphi_i\), and using the Euler--Lagrange equations for a Lagrangian density:
+    \begin{equation}
+        \partial_\mu \left( \diffp{\lagrangianDensity}{(\partial_\mu \varphi_i)} \right) = \diffp{\lagrangianDensity}{\varphi_i}.
+    \end{equation}
+    
+    \subsection{Examples}
+    A scalar field, \(\varphi\), corresponding to a spin 0 boson of mass \(m\) has the Lagrangian
+    \begin{equation}
+        \lagrangianDensity = \frac{1}{2}(\partial_\mu \varphi)(\partial^\mu \varphi) - \frac{1}{2}m^2 \varphi^2.
+    \end{equation}
+    The Euler--Lagrange equations give the Klein--Gordon equation as the equation of motion.
+    
+    A spinor field, \(\psi\), corresponding to a spin \(1/2\) boson of mass \(m\) has the Lagrangian
+    \begin{equation}
+        \lagrangianDensity = \diracadjoint{\psi}(i\slashed{\partial} - m)\psi.
+    \end{equation}
+    The Euler--Lagrange equations give the Dirac equation as the equation of motion.
+    Note that we treat \(\psi\) and \(\diracadjoint{\psi}\) as independent fields.
+    
+    A vector field, \(A_\mu\), corresponding to a spin 1 boson of mass \(m\) has the Lagrangian
+    \begin{equation}
+        \lagrangianDensity = -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} + \frac{1}{2}m^2 A^\mu A_\mu
+    \end{equation}
+    where
+    \begin{equation}
+        F^{\mu\nu} \coloneqq \partial^\mu A^\nu - \partial^\nu A^\mu.
+    \end{equation}
+    The Euler--Lagrange equations give one Klein--Gordon equation for each component of \(A_\mu\).
+    
+    In general Lagrangians typically have a kinetic term, with derivatives of the field, a mass term, proportional to the square of the field with constant of proportionality \(m^2/2\), and interaction terms, which are any terms of order more than 2 in the field.
+    
+    \subsection{Symmetries of the Lagrangian}
+    Gauge symmetries are encoded in the Lagrangian by being such as to leave the Lagrangian invariant\footnote{or at least, they leave the action, \(S = \int \lagrangianDensity \dd{^4x}\), invariant, meaning they change the Lagrangian by at most a total derivative term, \(\partial_\mu K\).}
+    
+    To do this we replace the derivatives with the relevant covariant derivative such that when the fields change according to
+    \begin{equation}
+        \psi \mapsto \e^{i g \alpha^a T_a} \psi
+    \end{equation}
+    the Lagrangian is unchanged.
+    This is the case if we use the gauge derivative 
+    \begin{equation}
+        D_\mu = \partial_\mu + igA_\mu
+    \end{equation}
+    where \(A_\mu\) is some field transforming in such a way as to cancel the extra term that arises from the derivative of the phase factor.
+    
+    For QED the transformation of interest is the \(\unitary(1)\) transformation
+    \begin{equation}
+        \psi \mapsto \e^{iq\chi}\psi
+    \end{equation}
+    and the covariant derivative is
+    \begin{equation}
+        D_\mu = \partial_\mu + iqA_\mu.
+    \end{equation}
+    For QCD the transformation of interest is the \(\specialUnitary(3)\) transformation
+    \begin{equation}
+        \psi \mapsto \e^{i\strongCoupling \alpha^a\lambda_a} \psi
+    \end{equation}
+    and the covariant derivative is
+    \begin{equation}
+        D_\mu = \partial_\mu + i\strongCoupling \frac{1}{2} \lambda_a G^a_\mu.
+    \end{equation}
+    
+    For charged current weak interactions the transformation of interest is the \(\specialUnitary(2)\) transformation
+    \begin{equation}
+        \psi \mapsto \e^{ig_{\PW} \alpha_i\sigma^i/2}\psi
+    \end{equation}
+    and the covariant derivative is
+    \begin{equation}
+        D_\mu = \partial_\mu + ig_{\PW} \frac{1}{2}\sigma_i W^i_{\mu}.
+    \end{equation}
+    
+    \section{The Problem with Mass}
+    Consider a slight variation of QED where the photon is massive, with mass \(m_{\Pphoton}\), and the electron has mass \(m_{\Penominus}\).
+    This theory can be described by the Lagrangian
+    \begin{equation}
+        \lagrangianDensity = \diracadjoint{\psi} (i\slashed{\partial} - m_{\Penominus})\psi e\diracadjoint{\psi}\slashed{A}\psi - \frac{1}{4} F_{\mu\nu}F^{\mu\nu} + \frac{1}{2}m_{\Pphoton}^2 A_\mu A^\mu.
+    \end{equation}
+    The problem is that under a \(\unitary(1)\) transformation this extra mass term for the photon breaks the symmetry:
+    \begin{equation}
+        \frac{1}{2}m_{\Pphoton}^2 A_\mu A^\mu \mapsto \frac{1}{2}m_{\Pphoton}^2(A_\mu - \partial_\mu \chi)(A^\mu - \partial^\mu \chi) \ne \frac{1}{2}m_{\Pphoton}^2 A_\mu A^\mu.
+    \end{equation}
+    
+    So, if we want a \(\unitary(1)\) symmetry then the photon cannot be massive.
+    Of course, the photon isn't massive, so this is fine.
+    The problem is that \(\specialUnitary(2)\) and \(\specialUnitary(3)\) gauge symmetries similarly prevent the gluons, \PZ, and \PW{} bosons from having mass, and we know that the \PZ{} and \PW{} bosons have mass.
+    
+    Even more problematic is that as we have set things up so far it is not possible for fermions to have mass either.
+    For example, an electron mass term would have the form
+    \begin{equation}
+        -m_{\Penominus}\diracadjoint{\Penominus}\Penominus = -m_{\Penominus}\diracadjoint{\Penominus} \left[ \frac{1}{2} (1 - \gamma^5) + \frac{1}{2} (1 + \gamma^5) \right]	 \Penominus = -m_{\Penominus} (\diracadjoint{\Penominus}_{\Right}\Penominus_{\Left} + \diracadjoint{\Penominus}_{\Left}\Penominus_{\Right}),
+    \end{equation}
+    which is not Lorentz invariant, but we require the Lagrangian to be Lorentz invariant in order to get Lorentz invariant results.
+    
+    \section{The Brout--Englert--Higgs Mechanism}
+    The solution to the above problem is to introduce a complex scalar field, \(\varphi\), satisfying the Lagrangian
+    \begin{equation}
+        \lagrangianDensity = (\partial_\mu\varphi)^\hermit (\partial^\mu \varphi) - V(\varphi)
+    \end{equation}
+    with potential
+    \begin{equation}
+        V(\varphi) = \mu^2 \varphi^\hermit \varphi + \lambda(\varphi^\hermit \varphi)^2
+    \end{equation}
+    where \(\mu^2 < 0\) and \(\lambda > 0\).
+    This potential is plotted in \cref{fig:sombrero potential}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{sombrero-potential}
+        \begin{tikzpicture}
+            \begin{axis}[
+                hide axis,
+                samples=50,
+                domain=0:360,
+                y domain=0:1.25
+                ]
+                \addplot3 [surf, shader=flat, draw=highlight, fill=highlight!20, z buffer=sort] ({sin(x)*y}, {cos(x)*y}, {(y^2-1)^2});
+            \end{axis}
+        \end{tikzpicture}
+        \caption{The \enquote{sombrero potential}, \(V(\varphi) = \mu^2\varphi^\hermit\varphi + \lambda(\varphi^\hermit\varphi)^2\) for \(\mu^2 < 0\) and \(\lambda > 0\).}
+        \label{fig:sombrero potential}
+    \end{figure}
+    
+    This potential is minimised when \(\varphi = \varphi_0\) with \(\abs{\varphi_0} = \sqrt{-\mu^2/(2\lambda)}\) and \(\arg \varphi \in [0, 2\pi)\).
+    This gives a circle of minima.
+    We define \(v\), the \defineindex{vacuum expectation value} to be \(v = \sqrt{-\mu^2/\lambda}\), and so the potential is minimised when \(\abs{\varphi_0} = v/\sqrt{2}\).
+    
+    The \defineindex{Higgs field}, \(\varphi\), is a weak isospin doublet,
+    \begin{equation}
+        \varphi = 
+        \begin{pmatrix}
+            \varphi^+\\ \varphi^0
+        \end{pmatrix}
+        = \frac{1}{\sqrt{2}}
+        \begin{pmatrix}
+            \varphi_1 + i\varphi_2\\ \varphi_3 + i\varphi_4
+        \end{pmatrix}
+        .
+    \end{equation}
+    As with all weak isospin doublets this means that the total weak isospin is \(I = 1/2\).
+    Both components also have weak hypercharge \(Y = 1\).
+    The top element, \(\varphi^+\), has charge \(Q = +1\) and weak isospin \(I_{\PW}^{(3)} = 1/2\), whereas the bottom element, \(\varphi^0\), has charge \(Q = 0\) and weak isospin \(I_{\PW}^{(3)} = -1/2\).
+    
+    The minimum, \(\varphi\), must be such that
+    \begin{equation}
+        \varphi^\hermit \varphi = -\frac{\mu^2}{2\lambda} = \frac{1}{2}v,
+    \end{equation}
+    or in terms of the real components \(\varphi_i\):
+    \begin{equation}
+        \varphi^\hermit \varphi = \frac{1}{2}(\varphi_1^2 + \varphi_2^2 + \varphi_3^2 + \varphi_4^2) = \frac{1}{2}v^2.
+    \end{equation}
+    With this as the only requirement placed on \(\varphi\) we can can assume that the field is in its ground state and only experiences small perturbations away from this state.
+    We are also free to choose any particular vacuum state, and so we choose
+    \begin{equation}
+        \varphi_0 = \frac{1}{\sqrt{2}}
+        \begin{pmatrix}
+            0\\ v
+        \end{pmatrix}
+        ,
+    \end{equation}
+    so \(\varphi^\hermit \varphi = v^2/2\) as required.
+    We can then construct a new field, \(h\), such that \(\varphi\) is perturbed by \(h\):
+    \begin{equation}
+        \varphi(x) = \frac{1}{\sqrt{2}} 
+        \begin{pmatrix}
+            0\\ v + h(x)
+        \end{pmatrix}
+        .
+    \end{equation}
+    
+    We then have
+    \begin{equation}
+        \varphi^\hermit \varphi = \frac{1}{2}(v + h)^2
+    \end{equation}
+    which we can substitute into \(V(\varphi)\) to get
+    \begin{equation}
+        V(\varphi) = \mu^2 \frac{1}{2}(v + h)^2 + \lambda\frac{1}{4}(v + h)^4 = -\frac{1}{4}\lambda v^4 + \lambda v^2 h^2 + \lambda v h^3 + \frac{1}{4}\lambda h^4.
+    \end{equation}
+    Here we've used \(\mu^2 = -\lambda v^2\), which follows from the definition of \(v\).
+    
+    The Lagrangian is then
+    \begin{equation}
+        \lagrangianDensity = (\partial_\mu h)^\hermit (\partial^\mu h) + \frac{1}{4}\lambda v^4 - \lambda v^2 h^2 - \lambda v h^3 - \frac{1}{4}\lambda h^4.
+    \end{equation}
+    We can then interpret this as the Lagrangian for a real scalar field, \(h\), corresponding to a neutral scalar particle, the \defineindex{Higgs boson}, \(\Phiggs\).
+    With some practice\footnote{for example, take the \course{Quantum Field Theory} course} it is possible to read off exactly what terms in the Lagrangian correspond to in terms of the particles.
+    In this case the terms have the following meaning:
+    \begin{description}
+        \item[\((\partial_\mu h)^\hermit (\partial^\mu h)\)] This is the kinetic term.
+        \item[\(\lambda v^4/4\)] This is a constant, and therefore doesn't effect the physics and can be dropped from the Lagrangian, much like we can always redefine a potential to decide where zero is.
+        \item[\(-\lambda v^2 h^2\)] This term is quadratic in the field, and so is a mass term.
+        In particular the Higgs boson has mass \(m = \sqrt{2\lambda} v\), which follows by comparison with the expected form of the mass term \(-m^2 h^2/2\).
+        \item[\(-\lambda v h^3\)] This is an interaction term corresponding to a vertex with three Higgs bosons.
+        The coupling constant is \(\lambda v\), and since this is a scalar field this means that the entire vertex term is simply \(\lambda v\).
+        \item[\(-\lambda h^4/4\)] This is an interaction term corresponding to a vertex with four Higgs bosons.
+        The coupling constant is \(\lambda/4\), and since this is a scalar field this means that the entire vertex term is simply \(\lambda/4\).
+    \end{description}
+    
+    To summarise, the Higgs boson is a spin zero particle with mass \(m = \sqrt{2\lambda}v\) which can interact with itself in two different ways:
+    \begin{equation}
+        \tikzsetnextfilename{fd-higgs-interactions}
+        \begin{tikzpicture}[
+            scalar/.style={dash pattern=on 2pt off 1pt},
+            baseline = {(0, 0)}
+            ]
+            \draw[scalar] (0, 0) -- (-30:0.75);
+            \draw[scalar] (0, 0) -- (210:0.75);
+            \draw[scalar] (0, 0) -- (90:0.75);
+            \node [below] at (0, 0) {\scriptsize \(\lambda v\)};
+            \draw[scalar] (2, 0) -- ++ (45:0.75);
+            \draw[scalar] (2, 0) -- ++ (135:0.75);
+            \draw[scalar] (2, 0) -- ++ (225:0.75);
+            \draw[scalar] (2, 0) -- ++ (315:0.75);
+            \node [right] at (2.1, 0) {\scriptsize \(\tfrac{1}{4}\lambda\)};
+        \end{tikzpicture}
+    \end{equation}
+    
+    \subsection{\texorpdfstring{\PW}{W} and \texorpdfstring{\PZ}{Z} Boson Mass}
+    For the electroweak interaction the covariant derivative is
+    \begin{equation}
+        D_\mu = \partial_\mu + ig_{\PW} \frac{1}{2}\sigma_i W_\mu^i + ig' \frac{Y}{2}B_\mu.
+    \end{equation}
+    We can replace the derivative in the Higgs Lagrangian with this giving
+    \begin{equation}
+        \lagrangianDensity = (D_\mu \varphi)^\hermit (D^\mu \varphi)^\hermit - V(\varphi).
+    \end{equation}
+    Doing so two of the terms we get are
+    \begin{gather}
+        \frac{1}{8} v^2 g_{\PW}^2 (W_\mu^1 W^{1\mu} + W_\mu^2 W^{2\mu}),\\
+        \frac{1}{8}v^2(g_{\PW}W_\mu^3 - g'B_\mu)(g_{\PW} W^{3\mu} - g' B^\mu).
+    \end{gather}
+    
+    Consider the first of these terms.
+    We can interpret this as two mass terms, one for \(\PW^1\) bosons and one for \(\PW^2\) bosons.
+    Comparing to the expected mass term,
+    \begin{equation}
+        \frac{1}{2} m_{\PW^{1,2}} W^{1,2}_\mu W^{1,2 \, \mu}
+    \end{equation}
+    we can see that the \(\PW^{1,2}\) bosons have mass
+    \begin{equation}
+        m_{\PW^{1,2}} = \frac{1}{2}vg_{\PW}.
+    \end{equation}
+    Since the \(\PWpm\) boson are given by \(\PWpm = \PW^{1} \pm i\PW^{2}\), so an equal weighting of two equal mass states, the \(\PWpm\) bosons must also have mass
+    \begin{equation}
+        m_{\PW} = \frac{1}{2}vg_{\PW}.
+    \end{equation}
+    Since \(m_{\PW}\) and \(g_{\PW}\) can be measured through various weak processes this gives us a way to compute \(v\).
+    Putting in known values we get \(v = \qty{246}{\giga\electronvolt}\).
+    
+    The second term can be interpreted as a mass term also, but with slightly more work.
+    We can rewrite this term as
+    \begin{align}
+        \frac{1}{8} v^2(g_{\PW}W^3_\mu - g'B_\mu) &(g_{\PW}W^{3\mu} - g'B^\mu)\\
+        &= \frac{1}{8} v^2
+        \begin{pmatrix}
+            W^3_{\mu} & B_\mu
+        \end{pmatrix}
+        \begin{pmatrix}
+            g_{\PW}^2 & -g_{\PW}g'\\
+            -g_{\PW}g' & g'^2
+        \end{pmatrix}
+        \begin{pmatrix}
+            W^{3\mu}\\ B^\mu
+        \end{pmatrix}
+        \\
+        &= \frac{1}{8}v^2
+        \begin{pmatrix}
+            A_\mu & Z_\mu
+        \end{pmatrix}
+        \begin{pmatrix}
+            0 & 0\\
+            0 & g_{\PW}^2 + g'^2
+        \end{pmatrix}
+        \begin{pmatrix}
+           A^\mu\\ Z^\mu
+        \end{pmatrix}
+        \\
+        &= \frac{1}{8}v^2 (g_{\PW}^2 + g'^2) Z_\mu Z^\mu.
+    \end{align}
+    Here we've made a change of basis from \(W^3\) and \(B\) to \(A\) and \(Z\), which are by construction an orthonormal basis, as well as corresponding to physical particles.
+    We can identify this as two mass terms, the obvious one being
+    \begin{equation}
+        \frac{1}{2}m_{\PZ}^2 = \frac{1}{8} v^2 (g_{\PW}^2 + g'^2) \implies m_{\PZ} = \frac{1}{2}v\sqrt{g_{\PW}^2 + g'^2},
+    \end{equation}
+    and the second less obvious being
+    \begin{equation}
+        \frac{1}{2}m_{\Pphoton}^2 = 0 \implies m_{\Pphoton} = 0.
+    \end{equation}
+    So we get the \PZ{} boson mass and as expected the photon is massless.
+    
+    Recall the definition of \(A_\mu\) and \(Z_\mu\):
+    \begin{align}
+        A_\mu &= +B_\mu \cos\vartheta_{\PW} + W_\mu^3\sin\vartheta_{\PW},\\
+        Z_\mu &= -B_\mu \sin\vartheta_{\PW} + W_\mu^3\cos\vartheta_{\PW}.
+    \end{align}
+    Using the matrix above we also see that
+    \begin{align}
+        A_\mu &= \frac{1}{\sqrt{g_{\PW}^2 + g'^2}} (g_{\PW} B_\mu + g'W_\mu^3),\\
+        Z_\mu &= \frac{1}{\sqrt{g_{\PW}^2 + g'^2}} (-g'B_\mu + g_{\PW}W_\mu^3).
+    \end{align}
+    Hence, we can identify
+    \begin{equation}
+        \cos\vartheta_{\PW} = \frac{g_{\PW}}{\sqrt{g_{\PW}^2 + g'^2}}, \qqand \sin\vartheta_{\PW} = \frac{g'}{\sqrt{g_{\PW}^2 + g'^2}}.
+    \end{equation}
+    
+    Extra terms in the Lagrangian which we haven't accounted for here give interactions between the Higgs boson and the \PW{} or \PZ{} bosons:
+    \begin{equation}
+        \tikzsetnextfilename{fd-higgs-WZ-interactions}
+        \begin{tikzpicture}[
+            photon/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate},
+            scalar/.style={dash pattern=on 2pt off 1pt},
+            baseline = {(0, 0)}
+            ]
+            \draw[scalar] (-1, 0) node [left] {\Phiggs} -- (0, 0);
+            \draw[photon] (0, 0) -- (60:1) node [right] {\PW};
+            \draw[photon] (0, 0) -- (-60:1) node [right] {\PW};
+            \node [right] at (0, 0) {\(g_{\PW} m_{\PW}\)};
+            \begin{scope}[xshift=3.5cm]
+                \draw[scalar] (-1, 0) node [left] {\Phiggs} -- (0, 0);
+                \draw[photon] (0, 0) -- (60:1) node [right] {\PZ};
+                \draw[photon] (0, 0) -- (-60:1) node [right] {\PZ};
+                \node [right] at (0, 0) {\(g_{\PZ} m_{\PZ}\)};
+            \end{scope}
+        \end{tikzpicture}
+    \end{equation}
+    
+    \subsection{Fermion Mass}
+    It is possible for the Higgs field to interact with massive fermions.
+    We can do this by introducing an interaction term.
+    For an electron this term might take the form
+    \begin{equation}
+        \lagrangianDensity_{\Penominus} = -\frac{g_{\Penominus}}{\sqrt{2}} v(\diracadjoint{\Penominus}_{\Left}e_{\Right} + \diracadjoint{\Penominus}_{\Right}\Penominus_{\Left}) - \frac{g_{\Penominus}}{\sqrt{2}} h(\diracadjoint{\Penominus}_{\Left}e_{\Right} + \diracadjoint{\Penominus}_{\Right}\Penominus_{\Left})
+    \end{equation}
+    for some coupling, \(g_{\Penominus}\) between the Higgs boson and the electron.
+    This can be Lorentz invariant as we now have an extra field, \(h\), which transforms in just the right way to undo the changes of a Lorentz transformation.
+    
+    If we take \(g_{\Penominus} = m_{\Penominus}\sqrt{2}/v\) then this term becomes
+    \begin{align}
+        \lagrangianDensity_{\Penominus} &= -m_{\Penominus} (\diracadjoint{\Penominus}_{\Left}e_{\Right} + \diracadjoint{\Penominus}_{\Right}\Penominus_{\Left}) - \frac{m_{\Penominus}}{v} h(\diracadjoint{\Penominus}_{\Left}e_{\Right} + \diracadjoint{\Penominus}_{\Right}\Penominus_{\Left})\\
+        &= m_{\Pe}(\diracadjoint{\Penominus}\Penominus) - \frac{m_{\Pe}}{v}(\diracadjoint{\Penominus}\Penominus).
+    \end{align}
+    We can interpret this as a mass term for the electron as well as an interaction between two electrons and the Higgs with vertex term \(m_{\Penominus}/v\):
+    \begin{equation}
+        \tikzsetnextfilename{fd-higgs-electron-interactions}
+        \begin{tikzpicture}[
+            >={Latex[width=1.5mm]},
+            scalar/.style={dash pattern=on 2pt off 1pt},
+            baseline = {(0, 0)}
+            ]
+            \draw[scalar] (-1, 0) node [left] {\Phiggs} -- (0, 0);
+            \draw (0, 0) -- (60:1) node [right] {\Pe};
+            \draw (0, 0) -- (-60:1) node [right] {\APe};
+            \draw[->] (0, 0) -- (60:0.5);
+            \draw[-<] (0, 0) -- (-60:0.5);
+            \node [right] at (0, 0) {\(m_{\Penominus}/v\)};
+        \end{tikzpicture}
+    \end{equation}
+    
+    Exactly the same logic applies to any of the other massive fermions.
+    The coupling to the Higgs boson is proportional to the mass of the fermion.
+    
+    \section{Higgs Boson Decay}
+    The Higgs boson has mass \(m_{\Phiggs} = \qty{125.4(4)}{\giga\electronvolt}\).
+    Since it couples to any massive fermion it can decay into any massive fermion except the top quark, since the top quark is too massive for this decay to occur.
+    The heavier the fermion is the more likely it as the result of a Higgs decay.
+    
+    The \PZ{} and \PW{} bosons are also too massive for the Higgs to decay into them.
+    However, the Higgs can decay into a real \PW{} or \PZ{} and a virtual \PW{} or \PZ{} boson, which we denote \(\PW^*\) or \(\PZ^*\).
+    Since the coupling is also proportional to mass for the \PW{} and \PZ{} bosons these decays are quite common.
+    
+    In addition to these direct decays the Higgs can also decay into massless particles via an intermediary virtual particle triangle, such as
+    \begin{equation}
+        \tikzsetnextfilename{fd-higgs-decay-to-massless}
+        \begin{tikzpicture}[
+            >={Latex[width=1.5mm]},
+            photon/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate},
+            scalar/.style={dash pattern=on 2pt off 1pt},
+            gluon/.style={decoration={coil, amplitude=1mm, segment length=1mm}, decorate},
+            baseline = {(0, 0)}
+            ]
+            \draw[scalar] (-1, 0) node [left] {\Phiggs} -- (0, 0);
+            \draw (0, 0) -- (30:1);
+            \draw (0, 0) -- (-30:1);
+            \draw (30:1) -- (-30:1);
+            \draw[->] (0, 0) -- (30:0.6) node [above left] {\Pt};
+            \draw[-<] (0, 0) -- (-30:0.6) node [below left] {\Pt};
+            \draw[->] (30:1) -- (0.866, -0.1) node [right, yshift=0.1cm] {\Pt};
+            \draw[photon] (30:1) -- ++ (1, 0) node [right] {\Pphoton};
+            \draw[photon] (-30:1) -- ++ (1, 0) node [right] {\Pphoton};
+            
+            \begin{scope}[xshift=4cm]
+                \draw[scalar] (-1, 0) node [left] {\Phiggs} -- (0, 0);
+                \draw (0, 0) -- (30:1);
+                \draw (0, 0) -- (-30:1);
+                \draw (30:1) -- (-30:1);
+                \draw[->] (0, 0) -- (30:0.6) node [above left] {\Pt};
+                \draw[-<] (0, 0) -- (-30:0.6) node [below left] {\Pt};
+                \draw[->] (30:1) -- (0.866, -0.1) node [right, yshift=0.1cm] {\Pt};
+                \draw[gluon] (30:1) -- ++ (1, 0) node [right] {\Pg};
+                \draw[gluon] (-30:1) -- ++ (1, 0) node [right] {\Pg};
+            \end{scope}
+            
+            \begin{scope}[xshift=2cm, yshift=-2cm]
+                \draw[scalar] (-1, 0) node [left] {\Phiggs} -- (0, 0);
+                \draw[photon] (0, 0) -- (30:1);
+                \draw[photon] (0, 0) -- (-30:1);
+                \draw[photon] (30:1) -- (-30:1);
+                \node[above left] at (30:0.6) {\PW};
+                \node[below left] at (-30:0.6) {\PW};
+                \node[right] at (0.866, 0) {\PW};
+                \draw[photon] (30:1) -- ++ (1, 0) node [right] {\Pphoton};
+                \draw[photon] (-30:1) -- ++ (1, 0) node [right] {\Pphoton};
+            \end{scope}
+        \end{tikzpicture}
+    \end{equation}
+    
+    Consider the decay
+    \tikzsetnextfilename{fd-higgs-bottom-decay}
+    \begin{tikzpicture}[
+        >={Latex[width=1.5mm]},
+        scalar/.style={dash pattern=on 2pt off 1pt},
+        baseline = {(0, 0)}
+        ]
+        \draw[scalar] (-1, 0) node [left] {\Phiggs} -- (0, 0);
+        \draw (0, 0) -- (60:1) node [right] {\Pb};
+        \draw (0, 0) -- (-60:1) node [right] {\APb};
+        \draw[->] (0, 0) -- (60:0.5);
+        \draw[-<] (0, 0) -- (-60:0.5);
+        \node [right] at (0, 0) {\(m_{\Pb}/v\)};
+    \end{tikzpicture}
+    We pick bottom quarks as the most likely decay product since they are the most massive fermions to which a Higgs boson can decay.
+    The amplitude for this decay is
+    \begin{equation}
+        \amplitude = \frac{m_{\Pb}}{v} \diracadjoint{u}(p_2) v(p_3)
+    \end{equation}
+    where \(p_2\) is the momentum of the \(\Pb\) quark and \(p_3\) the momentum of the \(\APb\) antiquark.
+    If we account for the helicities of the quarks there are two nonzero amplitudes:
+    \begin{equation}
+        \amplitude_{\uparrow\uparrow} = -\amplitude_{\downarrow\downarrow} = \frac{m_{\Pb}}{v}2E.
+    \end{equation}
+    Both fermions must have the same helicity as the Higgs boson is spin 0 and the momenta of the fermions are equal and opposite, and their spins must be anti-aligned to conserve angular momentum, meaning either both have their momentum and spin aligned, or both have their momentum and spin anti-aligned.
+    
+    The total amplitude squared for decay to bottom quarks (at tree level) is thus
+    \begin{equation}
+        \amplitude^2 = \abs{\amplitude_{\uparrow\uparrow}}^2 + \abs{\amplitude_{\downarrow\downarrow}}^2 = \frac{2m_{\Pb}^2m_{\Phiggs}^2}{v^2}
+    \end{equation}
+    having used \(2E = m_{\Phiggs}\) as the energy of each fermion.
+    The total decay rate for this particular decay channel is
+    \begin{equation}
+        \Gamma(\Phiggs \to \Pb \APb) = \numberofcolors \frac{m_{\Pb}^2 m_{\Phiggs}}{8\pi v^2}.
+    \end{equation}
+    So the decay rate is proportional to the mass of the fermion squared, justifying our earlier statement that decay to bottom quarks is more likely.
+    
+    \section{Higgs Bosons at the LHC}
+    \epigraph{Astronomers get pictures of the galaxy. Particle physicists get histograms.}{}
+    \Cref{fig:higgs production} shows some processes creating Higgs bosons common at the LHC.
+    We've also seen common decays, including decays to \PW{}/\PZ{} bosons, with one being virtual, and decays to photons or photons and \PZ{} bosons, via a triangle of massive particles.
+    Another useful decay is decay to a muon and antimuon or tau and antitau.
+    These are more common than decays to electrons, because the fermions are more massive, but not as common as decay to some of the heavier quarks.
+    However, it's easier to detect muons and taus.
+    
+    \begin{figure}
+        \tikzsetnextfilename{fd-higgs-production-LHC}
+        \begin{tikzpicture}[
+            >={Latex[width=1.5mm]},
+            boson/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate},
+            scalar/.style={dash pattern=on 2pt off 1pt},
+            gluon/.style={decoration={coil, amplitude=1mm, segment length=1mm}, decorate},
+            font=\scriptsize
+            ]
+            \draw[gluon] (0, 0) node [left] {\Pg} -- (1, 0);
+            \draw[gluon] (0, 2) node [left] {\Pg} -- (1, 2);
+            \draw (1, 0) -- (1, 2) -- (2, 1) -- cycle;
+            \draw[scalar] (2, 1) -- (3, 1) node [right] {\Phiggs};
+            \draw[->] (1, 0) -- (1, 1.1) node [left, yshift=-0.1cm] {\Pt/\Pb/\Pc};
+            \draw[->] (1, 2) -- (1.6, 1.4) node [above right, xshift=-0.1cm, yshift=-0.1cm] {\Pt/\Pb/\Pc};
+            \draw[-<] (1, 0) -- (1.6, 0.6) node [below right, xshift=-0.1cm, yshift=-0.1cm] {\Pt/\Pb/\Pc};
+            
+            \begin{scope}[xshift=4.5cm]
+                \draw (0, 0) node [left] {\Pq} -- (3, 0) node [right] {\Pq};
+                \draw[->] (0, 0) -- (0.65, 0);
+                \draw[->] (1.75, 0) -- (2.4, 0);
+                \draw (0, 2) node [left] {\Pq} -- (3, 2) node [right] {\Pq};
+                \draw[->] (0, 2) -- (0.65, 2);
+                \draw[->] (1.75, 2) -- (2.4, 2);
+                \draw[boson] (1.25, 0) -- (1.75, 1) node [midway, left] {\PW/\PZ};
+                \draw[boson] (1.25, 2) -- (1.75, 1) node [midway, left] {\PW/\PZ};
+                \draw[scalar] (1.75, 1) -- (3, 1) node [right] {\Phiggs};
+            \end{scope}
+            
+            \begin{scope}[yshift=-2.75cm]
+                \draw (0, 0) node [left] {\Pq} -- (1, 1);
+                \draw (0, 2) node [left] {\Pq} -- (1, 1);
+                \draw[-<] (0, 0) -- (0.5, 0.5);
+                \draw[->] (0, 2) -- (0.5, 1.5);
+                \draw[boson] (1, 1) -- (2, 1) node [midway, above] {\PW/\PZ};
+                \draw[scalar] (2, 1) -- (3, 0) node [right] {\Phiggs};
+                \draw[boson] (2, 1) -- (3, 2) node [right] {\PW/\PZ};
+            \end{scope}
+            
+            \begin{scope}[xshift=4.5cm, yshift=-2.75cm]
+                \draw[gluon] (0, 0) node [left] {\Pg} -- (1.25, 0);
+                \draw[gluon] (0, 2) node [left] {\Pg} -- (1.25, 2);
+                \draw (1.25, 0) -- (3, 0) node [right] {\Pt/\Pb};
+                \draw (1.25, 2) -- (3, 2) node [right] {\Pt/\Pb};
+                \draw (1.25, 0) -- (1.75, 1);
+                \draw (1.25, 2) -- (1.75, 1);
+                \draw[scalar] (1.75, 1) -- (3, 1) node [right] {\Phiggs};
+            \end{scope}
+            
+            \begin{scope}[yshift=-5.5cm, xshift=2.5cm]
+                \draw (0, 0) node [left] {\Pq} -- (3, 0) node [right] {\Pq'};
+                \draw (0, 2) node [left] {\Pb} -- (3, 2) node [right] {\Pt};
+                \draw[->] (0, 0) -- (0.5, 0);
+                \draw[->] (1, 0) -- (2, 0);
+                \draw[->] (0, 2) -- (0.5, 2);
+                \draw[->] (1, 2) -- (1.5, 2);
+                \draw[->] (2, 2) -- (2.5, 2);
+                \draw[boson] (1, 0) -- (1, 2) node [midway, left] {\PW};
+                \draw[scalar] (2, 2) -- (3, 1) node [right] {\Phiggs};
+            \end{scope}
+        \end{tikzpicture}
+        \caption{Common processes creating Higgs bosons at the LHC.}
+        \label{fig:higgs production}
+    \end{figure}
+    
+    \Cref{fig:higgs discovery} shows one of the plots CERN used to announce the discovery of the Higgs boson in 2012.
+    A slight peak at \qty{126.5}{\giga\electronvolt} corresponds to a resonance for creating the Higgs boson.
+    
+    \begin{figure}
+        \includegraphics[width=0.8\textwidth]{images/higgs-discovery}
+        \caption{One of the plots used when CERN announced the discovery of the Higgs boson. The peak at \qty{126.5}{\giga\electronvolt} is due to the Higgs boson, although later measurements bring the mass down to \qty{125.4}{\giga\electronvolt}. Image taken from \cite{higgsDiscovery}}
+        \label{fig:higgs discovery}
+    \end{figure}
     
     % Appdendix
     \appendixpage
@@ -4382,6 +5082,7 @@ crefname={Open Question}{Open Questions}]%
         \bibitem{bartel} Bartel, W.\@ et al.\@ \textit{New Results on \(\APe\Pe\to\APmu\Pmu\) from the {JADE} Detector at {PETRA}}, Z.\@ Phys.\@ C, \textbf{26} December 1985 \href{https://doi.org/10.1007/BF01551792}{10.1007/BF01551792}
         \bibitem{bacino} Bacino, W.\@ et al.\@ \textit{Measurement of the Threshold Behavior of \(\APtau\Ptau\) Production in \(\APe\Pe\) Annihilation}, Phys.\@ Rev.\@ Lett., \textbf{41} 1 July 1938 \href{https://www.doi.org/10.1103/PhysRevLett.41.13}{10.1103/PhysRevLett.41.13}
         \bibitem{ball} Ball, R.\@ et al.\@ \textit{The Path to Proton Structure at One-Percent Accuracy}, Eur.\@ Phys.\@ J.\@ C \textbf{82} 428 11 May 2022 \href{https://doi.org/10.1140/epjc/s10052-022-10328-7}{10.1140/epjc/s10052-022-10328-7}
+        \bibitem{higgsDiscovery} ATLAS experiment at CERN \url{https://cds.cern.ch/record/1459545} (Accessed 2022-11-26)
     \end{thebibliography}
     \renewcommand{\glossaryname}{Acronyms}
     \printglossary[acronym]
