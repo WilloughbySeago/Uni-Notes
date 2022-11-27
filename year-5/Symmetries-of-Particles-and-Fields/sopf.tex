@@ -6,6 +6,7 @@
 %% Packages
 \usepackage{tensor}
 \usepackage{csquotes}
+\usepackage{siunitx}
 
 \usepackage{slashed}
 \declareslashed{}{\not}{.1}{.5}{\partial}
@@ -13,6 +14,9 @@
 \usepackage{subcaption}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
+
+\usepackage{ytableau}
+\ytableausetup{centertableaux}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -135,6 +139,8 @@ noabbrev
 \newcommand{\hamiltonianDensity}{\symcal{H}}
 \DeclareMathOperator{\rank}{rank}
 \newcommand{\symplecticLie}{\lie{sp}}
+\newcommand{\rep}[1]{\symbf{#1}}
+\DeclareMathOperator{\hook}{hook}
 
 \hyphenation{poin-car\'e}
 
@@ -4870,6 +4876,12 @@ noabbrev
         \max\left\{ \abs*{\frac{2\alpha_n \cdot \alpha_m}{\alpha_n^2}}, \abs*{\frac{2\alpha_n \cdot \alpha_m}{\alpha_m^2}} \right\}
     \end{equation}
     lines, which is to say by 0, 1, 2, or 3 lines.
+    We define the \defineindex{Cartan matrix}, \(K_{\alpha\beta}\), for simple positive roots \(\alpha\) and \(\beta\), to have elements
+    \begin{equation}
+        K_{\alpha\beta} = \frac{2\alpha \cdot \beta}{\alpha^2}.
+    \end{equation}
+    
+    
     In the case where the two roots are not the same length, we add an arrow pointing from the longest to the shortest root, alternatively this can be read as \(>\) symbol telling us which root has the greater length.
     
     For example, the rank one root system from before, \(A_1\), has a single root, so its Dynkin diagram consists of a single node:
@@ -5194,6 +5206,545 @@ noabbrev
     
     Note that these isomorphisms are only on the level of the Lie algebras, the Lie groups are not necessarily isomorphic.
     For example we actually have \(\specialUnitary(2) \otimes \specialUnitary(2) \isomorphic \operatorname{Spin}(4)\), where \(\operatorname{Spin}(4)\) is the universal cover of \(\specialOrthogonal(4)\), which is connected where \(\specialOrthogonal(4)\) is not.
+    
+    \chapter{Representations of \texorpdfstring{\(\specialUnitaryLie(3)\)}{su(3)}}
+    \section{The Gell-Mann Matrices}
+    The Lie algebra \(\specialUnitaryLie(3)\) has a defining representation consisting of \(3 \times 3\) complex traceless Hermitian matrices.
+    A basis for this vector space is given by the \defineindex{Gell-Mann matrices}:
+    \begin{alignat}{3}
+        \lambda_1 &= 
+        \begin{pmatrix}
+            0 & 1 & 0\\
+            1 & 0 & 0\\
+            0 & 0 & 0
+        \end{pmatrix}
+        , \quad & \lambda_2 &= \left(
+        \begin{array}{@{}c@{\hskip 11pt}cc@{}}
+            0 & \mathllap{-}i & 0\\
+            i & 0 & 0\\
+            0 & 0 & 0
+        \end{array}
+        \right)
+        , \quad & \lambda_3 &= \left(
+        \begin{array}{@{}c@{\hskip 11pt}cc@{}}
+            1 & 0 & 0\\
+            0 & \mathllap{-}1 & 0\\
+            0 & 0 & 0
+        \end{array}
+        \right)
+        \\
+        \lambda_4 &= 
+        \begin{pmatrix}
+            0 & 0 & 1\\
+            0 & 0 & 0\\
+            1 & 0 & 0
+        \end{pmatrix}
+        , \quad & \lambda_5 &= \left(
+        \begin{array}{@{}cc@{\hskip 11pt}c@{}}
+            0 & 0 & \mathllap{-}i\\
+            0 & 0 & 0\\
+            i & 0 & 0
+        \end{array}
+        \right)
+        , \quad & \lambda_6 &= 
+        \begin{pmatrix}
+            0 & 0 & 0\\
+            0 & 0 & 1\\
+            0 & 1 & 0
+        \end{pmatrix}
+        \\
+        \lambda_7 &= \left(
+        \begin{array}{@{}cc@{\hskip 11pt}c@{}}
+            0 & 0 & 0\\
+            0 & 0 & \mathllap{-}i\\
+            0 & i & 0
+        \end{array}
+        \right)
+        , \quad & \lambda_8 &= \frac{1}{\sqrt{3}} \left(
+        \begin{array}{@{}cc@{\hskip 11pt}c@{}}
+            1 & 0 & 0\\
+            0 & 1 & 0\\
+            0 & 0 & \mathllap{-}2
+        \end{array}
+        \right) .
+    \end{alignat}
+    We can immediately see that \(\specialUnitaryLie(3)\) is an 8-dimensional Lie algebra and since there are two diagonal, and therefore commuting, matrices the rank of \(\specialUnitaryLie(3)\) is at least 2, and it turns out that we can't simultaneously diagonalise more than two matrices in this basis, so the rank is exactly 2.
+    
+    Notice that \(\lambda_1\), \(\lambda_2\), and \(\lambda_3\) are just the Pauli matrices, \(\sigma_1\), \(\sigma_2\), and \(\sigma_3\), padded with an extra row and column.
+    This corresponds to an \(\specialUnitaryLie(2)\) subalgebra.
+    Similarly \(\lambda_4\) and \(\lambda_5\), as well as \(\lambda_6\) and \(\lambda_7\) are \(\sigma_1\) and \(\sigma_2\) padded with another row and column of zeros.
+    
+    These matrices are defined such that \(\tr(\lambda_i \lambda_j) = 2\delta_{ij}\).
+    For this reason it's common to take the basis \(T_a = \lambda_a/2\).
+    
+    As a rank 2 Lie algebra we expect that there are two invariant tensors, and there are, they are \(\delta_{ij}\) and \(d_{ijk} = \tr(\lambda_i \anticommutator{\lambda_j}{\lambda_k})/4\).
+    
+    \section{A different Basis}
+    Define a new basis
+    \begingroup
+    \allowdisplaybreaks
+    \begin{alignat}{3}
+        I_1 &= \frac{1}{2}\lambda_1, \quad & I_2 &= \frac{1}{2}\lambda_2, \quad & I_3 &= \frac{1}{2}\lambda_3,\\
+        U_1 &= \frac{1}{2}\lambda_6, \quad & U_2 &= \frac{1}{2}\lambda_7, \quad & U_3 &= \frac{1}{2}\left( -\frac{1}{2}\lambda_3 + \frac{\sqrt{3}}{2}\lambda_8 \right),\\
+        V_1 &= \frac{1}{2}\lambda_4, \quad & V_2 &= \frac{1}{2}\lambda_5, \quad & V_3 &= \frac{1}{2}\left( \frac{1}{2}\lambda_3 + \frac{\sqrt{3}}{2} \lambda_8 \right).
+    \end{alignat}
+    \endgroup
+    So we have 
+    \begin{equation}
+        \lambda_3 = 2(V_3 - U_3), \qqand \lambda_8 = \frac{2}{\sqrt{3}}(U_3 + V_3).
+    \end{equation}
+    These linear combinations of \(\lambda_3\) and \(\lambda_8\) are chosen so that \(U_3\) and \(V_3\) look like \(\sigma_3/2\) with a row and column of zero padding.
+    
+    If we work out the commutation relations we find that
+    \begin{align}
+        \commutator{I_1}{I_j} &= i\varepsilon_{ijk}I_k,\\
+        \commutator{U_1}{U_j} &= i\varepsilon_{ijk}U_k,\\
+        \commutator{V_1}{V_j} &= i\varepsilon_{ijk}V_k.
+    \end{align}
+    From this we can see that there are actually three copies of \(\specialUnitaryLie(2)\) as a subalgebra of \(\specialUnitaryLie(3)\).
+    
+    We can define step operators for each copy of \(\specialUnitaryLie(2)\), \(I_{\pm} = I_1 \pm iI_2\), \(U_{\pm} = U_1 \pm iU_2\), and \(V_{\pm} = V_1 \pm iV_2\).
+    These then give us the commutation relations
+    \begin{equation}
+        \commutator{I_+}{I_-} = 2I_3, \qquad \commutator{U_+}{U_-} = 2U_3, \qqand \commutator{V_+}{V_-} = 2V_3.
+    \end{equation}
+    
+    The Cartan subalgebra of \(\specialUnitaryLie(3)\) is generated by \(\{\lambda_3, \lambda_8\}\).
+    By definition we have \(\commutator{E_\alpha}{E_{-\alpha}} = \alpha_i H_i\) where \(H_i\) are the generators of the Cartan subalgebra and \(E_{\pm\alpha}\) are the step operators associated with the root \(\alpha\).
+    Writing \(I_3\), \(U_3\), and \(V_3\) in terms of \(\lambda_3\) and \(\lambda_8\) we see that the positive root vectors in the \(\{\lambda_3, \lambda_8\}\) basis are
+    \begin{equation}
+        (2, 0), \qquad (-1, \sqrt{3}), \qqand (1, \sqrt{3}).
+    \end{equation}
+    Note that the last root vector is the sum of the first two, so there are two simple positive root vectors.
+    We have already seen the root system for \(\specialUnitaryLie(3)\), which is \(A_2\), in terms of this basis it is
+    \begin{equation}
+        \tikzsetnextfilename{root-systsem-su3}
+        \begin{tikzpicture}[
+            baseline = (Iplus.base),
+            >={Latex[width=1.5mm]}
+            ]
+            \draw[highlight!50] (1, 0) -- (60:1) -- (120:1) -- (180:1) -- (240:1) -- (300:1) -- cycle;
+            \draw[->] (0, 0) -- (1, 0) node (Iplus) [right] {\(I_+\)};
+            \draw[->] (0, 0) -- (-1, 0) node [left] {\(I_-\)};
+            \draw[->] (0, 0) -- (60:1) node [above, xshift=0.2cm] {\(V_+\)};
+            \draw[->] (0, 0) -- (-60:1) node [below, xshift=0.2cm] {\(U_-\)};
+            \draw[->] (0, 0) -- (120:1) node [above] {\(U_+\)};
+            \draw[->] (0, 0) -- (-120:1) node [below] {\(V_-\)};
+            \fill (0, 0) circle [radius = 0.05];
+        \end{tikzpicture}
+    \end{equation}
+    where the \(\lambda_3\) eigenvalue increases to the right and the \(\lambda_8\) eigenvalue increases upwards.
+    
+    There are also commutation relations between these copies of \(\specialUnitaryLie(2)\), which lead to the relations
+    \begin{alignat}{3}
+        \commutator{I_{\pm}}{U_{\pm}} &= \pm V_{\pm}, \qquad & \commutator{I_{\pm}}{V_{\pm}} &= 0, \qquad & \commutator{U_{\pm}}{V_{\pm}} &= 0,\\
+        \commutator{I_{\pm}}{U_{\mp}} &= 0, \qquad & \commutator{I_{\pm}}{V_{\mp}} &= \mp U_{\mp}, \qquad & \commutator{U_{\pm}}{\mp} &= \pm I_{\mp}.
+    \end{alignat}
+    
+    \section{Representations of \texorpdfstring{\(\specialUnitaryLie(3)\)}{su(3)}}
+    Consider some representation with states \(\ket{\psi}\).
+    Define the highest weight state, \(\ket{\psi_{\symrm{m}}}\), to be the one annihilated by all raising operators:
+    \begin{equation}
+        I_{+} \ket{\psi_{\symrm{m}}} = U_{+} \ket{\psi_{\symrm{m}}} = V_{+} \ket{\psi_{\symrm{m}}} = 0.
+    \end{equation}
+    We can find new states by acting on \(\ket{\psi_{\symrm{m}}}\) with the lowering operators \(I_-\), \(U_-\), and \(V_-\).
+    The sequences of states \((I_-)^k \ket{\psi_{\symrm{m}}}\) for \(k = 1, 2, \dotsc, p\) and \((U_-)^n \ket{\psi_{\symrm{m}}}\) for \(n = 1, 2, \dotsc, q\) are non-degenerate, the sequences don't overlap or double back on themselves.
+    We can map this out diagrammatically as
+    \begin{equation}
+        \tikzsetnextfilename{su3-rep-I-U-minus}
+        \begin{tikzpicture}[
+            >={Latex[width=1.5mm]},
+            baseline = (current bounding box)
+            ]
+            \draw[->] (0, 0) node [above right] {\(\ket{\psi_{\symrm{m}}}\)} -- (-2, 0) node [left] {\((I_-)^k \ket{\psi_{\symrm{m}}}\)};
+            \draw[->] (0, 0) -- (-60:2) node [right] {\((U_-)^n \ket{\psi_{\symrm{m}}}\)};
+        \end{tikzpicture}
+    \end{equation}
+    
+    We can use the commutation relations to rewrite these sequences, for example,
+    \begin{equation}
+        I_- \ket{\psi_{\symrm{m}}} = \commutator{U_+}{V_-} \ket{\psi_{\symrm{m}}} = (U_+ V_- - V_- U_+) \ket{\psi_{\symrm{m}}} = U_+ V_- \ket{\psi_{\symrm{m}}} + 0.
+    \end{equation}
+    So \(I_-\) and \(U_+ V_-\) produce the same state when acting on \(\ket{\psi_{\symrm{m}}}\).
+    Diagrammatically we can write this as
+    \begin{equation}
+        \tikzsetnextfilename{su3-rep-I-UV-triangle}
+        \begin{tikzpicture}[
+            >={Latex[width=1.5mm]},
+            baseline = (current bounding box)
+            ]
+            \draw[->] (0, 0) -- (-2, 0) node [midway, above] {\(I_-\)};
+            \draw[->] (0, 0) -- (-1, -1.3) node [midway, below right] {\(V_-\)};
+            \draw[->] (-1, -1.3) -- (-2, 0) node [midway, below left] {\(U_-\)};
+        \end{tikzpicture}
+    \end{equation}
+    
+    Repeatedly using \(\commutator{I_-}{U_+} = 0\) and \(\commutator{V_+}{I_-} = -U_+\) we find that
+    \begin{equation}
+        U_+(I_-)^k \ket{\psi_{\symrm{m}}} = V_+(I_-)^k \ket{\psi_{\symrm{m}}} = 0.
+    \end{equation}
+    Similarly using \(\commutator{I_+}{U_-} = 0\) and \(\commutator{V_+}{U_-} = I_+\) we find that
+    \begin{equation}
+        I_+ (U_-)^k \ket{\psi_{\symrm{m}}} = V_{+}(U_-)^k \ket{\psi_{\symrm{m}}} = 0.
+    \end{equation}
+    This tells us that the states \((I_-)^n\ket{\psi_{\symrm{m}}}\) and \((U_-)^n\ket{\psi_{\symrm{m}}}\) lie on the boundary of the representation, in the sense that in these diagrams there are no states to the right or above of these states.
+    
+    For a finite dimensional representation both sequences terminate after a finite number of steps.
+    This means there are some states \(\ket{\psi_I}\) and \(\ket{\psi_U}\) such that \(I_-\ket{\psi_I} = U_-\ket{\psi_U} = 0\).
+    We can generate new sequences, \((V_-)^k\ket{\psi_I}\) and \((V_-)^n\ket{\psi_U}\) from these by operating repeatedly with \(V_-\).
+    This generates further states on the boundary.
+    For a finite dimensional representation this process eventually closes and we get all boundary states.
+    The result will be a hexagonal shape of the form
+    \begin{equation}
+        \tikzsetnextfilename{su3-rep-general-diagram}
+        \begin{tikzpicture}[
+            >={Latex[width=1.5mm]},
+            baseline = (current bounding box)
+            ]
+            \draw (-2, 2) node [above left] {\(I\)} -- (2, 2) node [above right] {\(M\)} -- (3, 0.5) node [right] {\(U\)} -- (1, -2.5) -- (-1, -2.5) -- (-3, 0.5) -- cycle;
+            \draw[->] (-3.5, 0) -- (3.5, 0) node [right] {\(\lambda_3\)};
+            \draw[->] (0, -3) -- (0, 3) node [above] {\(\lambda_8\)};
+        \end{tikzpicture}
+    \end{equation}
+    There are \(p + 1\) states between \(M\) and \(I\) and \(q + 1\) states between \(M\) and \(U\).
+    This allows us to characterise each representation by a pair of non-negative integers, \((p, q)\).
+    If either of these integers is zero then the hexagon is actually a triangle and we say the representation is triangular.
+    There are three symmetry axes as each boundary \(MI\) and \(MU\) forms a complete \(I\)-spin or \(U\)-spin representation of \(\specialUnitaryLie(2)\) respectively, and so do the boundaries parallel to these.
+    
+    We can fill in the states in the middle using \((V_-)^k\ket{\psi_{\symrm{m}}}\).
+    Doing so the next layer in is doubly degenerate as there are two ways to reach each state.
+    For example, we can reach \(V_-\ket{\psi_{\symrm{m}}}\) as \(V_-\ket{\psi_{\symrm{m}}}\), \(U_- I_- \ket{\psi_{\symrm{m}}}\), or \(I_- U_- \ket{\psi_{\symrm{m}}}\).
+    But we also have \(V_-\ket{\psi_{\symrm{m}}} \commutator{U_-}{I_-}\ket{\psi_{\symrm{m}}}\) and so only two of these states are linearly independent.
+    Diagrammatically:
+    \begin{equation}
+        \tikzsetnextfilename{su3-rep-double-triangle}
+        \begin{tikzpicture}[
+            >={Latex[width=1.5mm]},
+            baseline = (current bounding box)
+            ]
+            \draw[->] (0, 0) node [above right] {\(\ket{\psi_{\symrm{m}}}\)} -- (-2, 0) node [midway, above] {\(I_-\)};
+            \draw[->] (0, 0) -- (-1, -1.3) node [midway, below right] {\(V_-\)};
+            \draw[->] (-1, -1.3) -- (-2, 0) node [midway, below left] {\(U_-\)};
+            \draw[->] (1, -1.3) -- (-1, -1.3) node [midway, below] {\(I_-\)};
+            \draw[->] (0, 0) -- (1, -1.3) node [midway, right] {\(U_-\)};
+        \end{tikzpicture}
+    \end{equation}
+    
+    We can continue by defining some \(\ket{\psi_{\symrm{m}}'}\) orthogonal to \(V_-\ket{\psi_{\symrm{m}}}\) and starting the next layer.
+    Carrying on this way we can generate all states.
+    The degeneracy of the states increases at each layer.
+    
+    \section{Irreducible Representations of \texorpdfstring{\(\specialUnitaryLie(3)\)}{su(3)}}
+    So far we have labelled states in a representation by the eigenvalues of \(\lambda_3\) and \(\lambda_8\).
+    Now instead label them by the eigenvalues of the rescaled generators \(I_3 = \lambda_3/2\) and \(Y = \lambda_8/\sqrt{3}\).
+    Notice that \(Y = 2(U_3 + V_3)/3\).
+    Then we have the commutators
+    \begin{alignat}{2}
+        \commutator{I_3}{I_{\pm}} &= \pm I_{\pm}, \qquad & \commutator{Y}{I_{\pm}} = 0,\\
+        \commutator{I_3}{U_{\pm}} &= \mp \frac{1}{2} U_{\pm}, \qquad & \commutator{Y}{U_{\pm}} = \pm U_{\pm},\\
+        \commutator{I_3}{V_{\pm}} &= \pm \frac{1}{2} V_{\pm}, \qquad & \commutator{Y}{V_{\pm}} = \pm V_{\pm}.\\
+    \end{alignat}
+    Notice that the commutators of \(I_3\) with \(U_{\pm}\) and \(V_{\pm}\) produce a half step.
+    The smallest irreducible representations are
+    \begin{enumerate}
+        \item The singlet, \(\rep{1}\), corresponding to \((p, q) = (0, 0)\), \(\lambda_3 = \lambda_8 = 0\), \(I_3 = Y = 0\).
+        
+        \item The triplet, \(\rep{3}\), corresponding to \((p, q) = (1, 0)\).
+        There are three states, \((I_3, Y) = (1/2, 1/3), (-1/2, 1/3), (0, -2/3)\).
+        We interpret these as an \(I\)-spin doublet (\(I_3 = \pm 1/2\)) with \(Y = 1/3\), and an \(I\)-spin singlet (\(I_3 = 0\)) with \(Y = -2/3\).
+        \begin{equation}
+            \tikzsetnextfilename{su3-triplet}
+            \begin{tikzpicture}[
+                >={Latex[width=1.5mm]},
+                baseline = (current bounding box)
+                ]
+                \draw (30:1) node [above right] {\scriptsize\((1/2, 1/3)\)} -- (150:1) node [above left] {\scriptsize\((-1/2, 1/3)\)} -- (0, -1) node [below right] {\scriptsize\((0, -2/3)\)} -- cycle;
+                \draw[->] (-1.5, 0) -- (1.5, 0) node [right] {\(I_3\)};
+                \draw[->] (0, -1.5) -- (0, 1.5) node [left] {\(Y\)};
+            \end{tikzpicture}
+        \end{equation}
+        
+        \item The antitriplet, \(\rep{3}^*\), corresponding to \((p, q) = (0, 1)\).
+        Notice that under complex conjugation \(\lambda_3 \mapsto -\lambda_3\) and \(\lambda_8 \mapsto -\lambda_8\), as \(\exp\{i\alpha^a \lambda_a/2\} \mapsto \exp\{-i\alpha^a \lambda_a/2\}\).
+        So the three states are \((I_3, Y) = (-1/2, -1/3), (1/2, -1/3), (0, 2/3)\).
+        So we have an \(I\)-spin doublet with \(Y = -1/3\) and an \(I\)-spin singlet with \(Y = 2/3\).
+        \begin{equation}
+            \tikzsetnextfilename{su3-antitriplet}
+            \begin{tikzpicture}[
+                >={Latex[width=1.5mm]},
+                baseline = (current bounding box)
+                ]
+                \draw (-30:1) node [below right] {\scriptsize\((1/2, -1/3)\)} -- (-150:1) node [below left] {\scriptsize\((-1/2, -1/3)\)} -- (0, 1) node [right] {\scriptsize\((0, 2/3)\)} -- cycle;
+                \draw[->] (-1.5, 0) -- (1.5, 0) node [right] {\(I_3\)};
+                \draw[->] (0, -1.5) -- (0, 1.5) node [left] {\(Y\)};
+            \end{tikzpicture}
+        \end{equation}
+        
+        \item The sextet, \(\rep{6}\), corresponding to \((p, q) = (0, 2)\), and antisextet, \(\rep{6}^*\), corresponding to \((p, q) = (0, 2)\).
+        These are triangular representations.
+        The \(\rep{6}\) representation contains an \(I\)-spin triplet (\(I_3 = 0, \pm 1\)) with \(Y = 2/3\), an \(I\)-spin doublet with \(Y = -1/3\), and an \(I\)-spin singlet with \(Y = -4/3\).
+        The \(\rep{6}^*\) states are given by negating the eigenvalues of the \(\rep{6}\) states.
+        \begin{equation}
+            \tikzsetnextfilename{su3-sextet}
+            \begin{tikzpicture}[
+                >={Latex[width=1.5mm]},
+                baseline = (current bounding box)
+                ]
+                \node[below right] at (-1.7, 1.7) {\(\rep{6}\)};
+                \draw (1, 2/3) -- (-1, 2/3) -- (0, -4/3) -- cycle;
+                \draw (1/2, -1/3) -- (0, 2/3) -- (-1/2, -1/3) -- cycle;
+                \draw[->] (-1.7, 0) -- (1.7, 0) node [right] {\(I_3\)};
+                \draw[->] (0, -1.7) -- (0, 1.7) node [left] {\(I_3\)};
+                
+                \begin{scope}[xshift=4cm]
+                    \node[below right] at (-1.7, 1.7) {\(\rep{6}^*\)};
+                    \draw (1, -2/3) -- (-1, -2/3) -- (0, 4/3) -- cycle;
+                    \draw (1/2, 1/3) -- (0, -2/3) -- (-1/2, 1/3) -- cycle;
+                    \draw[->] (-1.7, 0) -- (1.7, 0) node [right] {\(I_3\)};
+                    \draw[->] (0, -1.7) -- (0, 1.7) node [left] {\(I_3\)};
+                \end{scope}
+            \end{tikzpicture}
+        \end{equation}
+        
+        \item The octet, \(\rep{8}\), corresponding to \((p, q) = (1, 1)\).
+        This is the adjoint representation.
+        This is a real representation, \(\rep{8} \isomorphic \rep{8}^*\).
+        As such the diagram is invariant under \(\lambda_3 \mapsto -\lambda_3\) and \(\lambda_8 \mapsto \lambda_8\).
+        There are two \(I\)-spin doublets, with \(Y = 1\) and \(Y = -1\), and one \(I\)-spin triplet, with \(Y = 0\), and one \(I\)-spin singlet with \(Y = 0\).
+        Notice that this means there are two states with \((I_3, Y) = (0, 0)\), one from the triplet and one from the singlet.
+        \begin{equation}
+            \tikzsetnextfilename{su3-octet}
+            \begin{tikzpicture}[
+                >={Latex[width=1.5mm]},
+                baseline = (current bounding box)
+                ]
+                \draw (1/2, 1) -- (1, 0) -- (1/2, -1) -- (-1/2, -1) -- (-1, 0) -- (-1/2, 1) -- cycle;
+                \draw (1/2, 1) -- (-1/2, -1);
+                \draw (-1/2, 1) -- (1/2, -1);
+                \draw[->] (-1.5, 0) -- (1.5, 0) node [right] {\(I_3\)};
+                \draw[->] (0, -1.5) -- (0, 1.5) node [left] {\(Y\)};
+            \end{tikzpicture}
+        \end{equation}
+        \item The decuplet, \(\rep{10}\), corresponding to \((p, q) = (3, 0)\), and antidecuplet, \(\rep{10}^*\), corresponding to \((p, q) = (0, 3)\).
+        These consist of an \(I\)-spin quadruplet, (\(I = \pm 1/2, \pm 3/2\)) with \(Y = 1\), an \(I\)-spin triplet with \(Y = 0\), an \(I\)-spin doublet with \(Y = -1\), and an \(I\)-spin singlet with \(Y = -2\).
+        \begin{equation}
+            \tikzsetnextfilename{su3-decuplet}
+            \begin{tikzpicture}[
+                >={Latex[width=1.5mm]},
+                baseline = (current bounding box)
+                ]
+                \node[below right] at (-1.7, 2.2) {\(\rep{10}\)};
+                \draw (-3/2, 1) -- (3/2, 1) -- (0, -2) -- cycle;
+                \draw (-1, 0) -- (-1/2, 1) -- (0, 0) -- (1/2, 1) -- (1, 0);
+                \draw (-1/2, -1) -- (0, 0) -- (1/2, -1) -- cycle;
+                \draw[->] (-1.7, 0) -- (1.7, 0) node [right] {\(I_3\)};
+                \draw[->] (0, -2.2) -- (0, 2.2) node [left] {\(Y\)};
+                
+                \begin{scope}[xshift=4.5cm]
+                    \node[below right] at (-1.7, 2.2) {\(\rep{10}^*\)};
+                    \draw (-3/2, -1) -- (3/2, -1) -- (0, 2) -- cycle;
+                    \draw (-1, 0) -- (-1/2, -1) -- (0, 0) -- (1/2, -1) -- (1, 0);
+                    \draw (-1/2, 1) -- (0, 0) -- (1/2, 1) -- cycle;
+                    \draw[->] (-1.7, 0) -- (1.7, 0) node [right] {\(I_3\)};
+                    \draw[->] (0, -2.2) -- (0, 2.2) node [left] {\(Y\)};
+                \end{scope}
+            \end{tikzpicture}
+        \end{equation}
+    \end{enumerate}
+    
+    \section{Young Tableaux}
+    Consider \(\specialUnitary(N)\).
+    Let \(V\) be a representation space for \(\specialUnitary(N)\).
+    Then take \(U\colon V \to V\) as a representation of some particular group element of \(\specialUnitary(N)\).
+    We can consider a three index tensor, \(T_{ijk}\), as an element of \(V \otimes V \otimes V = V^{\otimes 3}\).
+    Then \(T\) transforms as
+    \begin{equation}
+        T_{ijk} \mapsto U_{il} U_{jm} U_{kn} T_{lmn}.
+    \end{equation}
+    
+    We can use \define{Young diagrams}\index{Young diagram} to express the symmetries of \(T_{ijk}\).
+    If \(T_{ijk}\) is symmetric in all of its indices then we denote this with as many boxes as indices in a row:
+    \begin{equation}
+        T_{(ijk)} \text{ totally symmetric} \longrightsquigarrow \ydiagram{3}.
+    \end{equation}
+    If \(T_{ijk}\) is antisymmetric in all of its indices then we denote this with as many boxes as indices in a column:
+    \begin{equation}
+        T_{[ijk]} \text{ totally antisymmetric} \longrightsquigarrow \ydiagram{1,1,1}.
+    \end{equation}
+    If \(T_{ijk}\) is antisymmetric in its first two indices and symmetric in the first and third indices then we represent this as
+    \begin{equation}
+        T_{ijk} = -T_{jik} = T_{kji} \longrightsquigarrow \ydiagram{2,1}.
+    \end{equation}
+    In general a row is symmetrised and a column antisymmetrised.
+    
+    For example, the electromagnetic field strength tensor is antisymmetric, so may be thought of as
+    \begin{equation}
+        F_{\mu\nu} \longrightsquigarrow \ydiagram{1,1}.
+    \end{equation}
+    The metric tensor is symmetric, so can be thought of as
+    \begin{equation}
+        g_{\mu\nu} \longrightsquigarrow \ydiagram{2}.
+    \end{equation}
+    
+    It can be shown that each Young diagram with at most \(N - 1\) rows labels a irreducible representation of \(\specialUnitary(N)\).
+    Further we can calculate the dimension of the representation labelled by the Young diagram \(Y\) with the following formula:
+    \begin{equation}
+        \frac{f_Y(d)}{\hook(Y)}
+    \end{equation}
+    where \(d\) is the dimension of the vector space \(V\).
+    There are two components to this.
+    
+    The first is \(f_Y\), which is a polynomial given by taking \(Y\), putting \(d\) in the top left box, then increasing the number to the right and decreasing downwards.
+    Then \(f_Y(d)\) is the product of all the numbers.
+    Notice that when done correctly the leading diagonal of the Young tableau\footnote{a \defineindex{Young tableau} is a Young diagram with numbers written in the boxes.}
+    For example, if \(Y\) is
+    \begin{equation}
+        Y = \ydiagram{3,2,1}
+    \end{equation}
+    then the numbered tableau is
+    \begin{equation}
+        \ytableaushort{d{d+1}{d+2},{d-1}d,{d-2}}
+    \end{equation}
+    and
+    \begin{equation}
+        f_Y(d) = d(d+1)(d+2)(d-1)d(d-2).
+    \end{equation}
+    
+    The second component is the \defineindex{hook number}, which is defined as the product of the \define{hook lengths}\index{hook length}.
+    The hook length of a box is the number of boxes to the right, plus the number of boxes below, plus one, it is the length of the \enquote{hook} such as
+    \begin{equation}
+        \ytableaushort{\none,\none,\none}*{3,2,1}*[*(highlight)]{0,2,1}
+    \end{equation}
+    which has length 3, and so the hook length of the first box in the second row is 3.
+    The hook lengths of all boxes of \(Y\) are given below:
+    \begin{equation}
+        \ytableaushort{531,31,1}.
+    \end{equation}
+    The hook number is then
+    \begin{equation}
+        \hook(Y) = 5\cdot 3 \cdot 3 = 45.
+    \end{equation}
+    
+    Consider the electromagnetic field strength tensor, \(F_{\mu\nu}\), in four spacetime dimensions, so \(d = 4\).
+    Then we have
+    \begin{equation}
+        F_{\mu\nu} \longrightsquigarrow \ytableaushort{4,3} \implies \frac{4\cdot 3}{2} = 6,
+    \end{equation}
+    so \(F_{\mu\nu}\) is six dimensional, which is exactly what we would expect for a four by four real antisymmetric matrix.
+    Similarly
+    \begin{equation}
+        g_{\mu\nu} \longrightsquigarrow \ytableaushort{45} \implies \frac{4 \cdot 5}{2} = 10,
+    \end{equation}
+    so \(g_{\mu\nu}\) is ten dimensional, which is exactly what we would expect for a four by four real symmetric matrix.
+    
+    Now specifically consider \(\specialUnitaryLie(3)\), so \(d = 3\).
+    The defining representation, \(\rep{3}\), is three dimensional and is given by
+    \begin{equation}
+        \rep{3} \longrightsquigarrow \ydiagram{1}.
+    \end{equation}
+    Similarly the complex conjugate of this representation is given by
+    \begin{equation}
+        \rep{3}^* \longrightsquigarrow \ydiagram{1,1}.
+    \end{equation}
+    
+    We want to compute tensor products of representations.
+    We'll restrict ourselves to the case where one of the representations is the single box representation, in the case of \(\specialUnitaryLie(3)\), \(\rep{3}\).
+    The tensor product of a diagram, \(Y\), with a single box is the sum of the diagrams given by attaching the single box to \(Y\) in such a way that each row of the resulting diagram has at most as many boxes as the row above, and the boxes remain left and top justified.
+    For example,
+    \begin{equation}
+        \rep{3} \otimes \rep{3}^* = \ytableaushort{\none}*{1}*[*(highlight)]{1} \otimes \ydiagram{1,1} = \ytableaushort{\none,\none,\none}*{1,1,1}*[*(highlight)]{0,0,1} \oplus \ytableaushort{\none,\none}*{2,1}*[*(highlight)]{1+1,0} = \rep{1} \oplus \rep{8}
+    \end{equation}
+    where we've used
+    \begin{equation}
+        \dim \ydiagram{1,1,1} = \ytableausetup{smalltableaux} \frac{\ytableaushort{3,2,1}}{\ytableaushort{3,2,1}} \ytableausetup{nosmalltableaux} = \frac{3 \cdot 2}{3 \cdot 2} = 1,
+    \end{equation}
+    and
+    \begin{equation}
+        \dim \ydiagram{2,1} = \ytableausetup{smalltableaux} \frac{\ytableaushort{34,2}}{\ytableaushort{31,1}} \ytableausetup{nosmalltableaux} = \frac{3 \cdot 4 \cdot 2}{3} = 8.
+    \end{equation}
+    Since there's only one irreducible representation of dimension 1 and only one irreducible representation of dimension 8 we can identify these as \(\rep{1}\) and \(\rep{8}\) respectively.
+    
+    A term like \(\rep{3} \otimes \rep{3}^*\) corresponds to a meson, with \(\rep{3}\) being a quark and \(\rep{3}^*\) an antiquark, which we'll see more later.
+    
+    Another case we may want to consider is \(\rep{3} \otimes \rep{3} \otimes \rep{3}\), which corresponds to a baryon, with three quarks.
+    This is given by
+    \begin{align}
+        \rep{3} \otimes \rep{3} \otimes \rep{3} &= \ytableaushort{\none}*{1}*[*(highlight)]{1} \otimes \ytableaushort{\none}*{1}*[*(my blue)]{1} \otimes \ydiagram{1}\\
+        &= \ytableaushort{\none}*{1}*[*(highlight)]{1} \otimes \left( \ytableaushort{\none,\none}*{1,1}*[*(my blue)]{0,1} \oplus \ytableaushort{\none}*{2}*[*(my blue)]{1+1} \right)\\
+        &= \ytableaushort{\none}*{1}*[*(highlight)]{1} \otimes \ytableaushort{\none,\none}*{1,1}*[*(my blue)]{0,1} \oplus \ytableaushort{\none}*{1}*[*(highlight)]{1} \otimes \ytableaushort{\none}*{2}*[*(my blue)]{1+1}\\
+        &= \ytableaushort{\none,\none,\none}*{1,1,1}*[*(my blue)]{0,1,0}*[*(highlight)]{0,0,1} \oplus \ytableaushort{\none,\none}*{2,1}*[*(my blue)]{0,1}*[*(highlight)]{1+1,0} \oplus \ytableaushort{\none}*{3}*[*(my blue)]{1+1}*[*(highlight)]{2+1} \oplus \ytableaushort{\none,\none}*{2,1}*[*(my blue)]{1+1,0}*[*(highlight)]{0,1}\\
+        &= \rep{1} \oplus \rep{8} \oplus \rep{10} \oplus \rep{8}\\
+        &\isomorphic \rep{10} \oplus \rep{8} \oplus \rep{8} \oplus \rep{1}.
+    \end{align}
+    Here we've used
+    \begin{equation}
+        \dim \ydiagram{3} = \ytableausetup{smalltableaux} \frac{\ytableaushort{345}}{\ytableaushort{321}} \ytableausetup{nosmalltableaux} = \frac{5 \cdot 4 \cdot 3}{3 \cdot 2 \cdot 1} = 10.
+    \end{equation}
+    
+    \subsection{General Case}
+    Suppose we want to take the tensor product of two irreducible representations where one of the representations is \emph{not} \(\rep{3}\).
+    We need a slightly more general method.
+    Draw the two Young diagrams out.
+    In the second place the label \(a_i\) in all boxes in the \(i\)th row, so all the boxes in the first row are labelled \(a_1\), all the boxes in the second row are labelled \(a_2\) etc.
+    Then take the boxes of the second diagram and add them to the first such that the following rules are satisfied:
+    \begin{itemize}
+        \item The resulting diagram must be a valid Young diagram, meaning each row has at most as many boxes as the row above and the boxes are left and top justified.
+        \item The number of boxes in the new diagram is equal to the sum of the number of boxes in the two initial diagrams.
+        \item For \(\unitary(n)\) no diagram can have more than \(n\) rows, for \(\specialUnitary(n)\) no diagram can have more than \(n - 1\) rows.
+        \item If we read the diagram top to bottom \emph{right} to \emph{left} then at any point the number of \(a_i\)s encountered must not exceed the number of \(a_{i-1}\)s encountered at that point.
+        \item The numbers must not increase when reading from left to right along a row.
+        \item The numbers must decrease when reading a column from top to bottom.
+    \end{itemize}
+    
+    For example, if \(n \ge 3\) then we have
+    \begin{equation}
+        \ytableausetup{smalltableaux}
+        \ydiagram{3} \otimes \ytableaushort{{a_1}{a_1},{a_2}} = \ytableaushort{{}{}{}{a_1}{a_1},{a_2}}
+        \oplus \ytableaushort{{}{}{}{a_1},{a_1}{a_2}} \oplus \ytableaushort{{}{}{}{a_1},{a_1},{a_2}} \oplus \ytableaushort{{}{}{},{a_1}{a_1},{a_2}}
+        \ytableausetup{nosmalltableaux}
+    \end{equation}
+    For \(n = 2\) we have
+    \begin{equation}
+        \ytableausetup{smalltableaux}
+        \ydiagram{3} \otimes \ytableaushort{{a_1}{a_1},{a_2}} = \ytableaushort{{}{}{}{a_1}{a_1},{a_2}}
+        \oplus \ytableaushort{{}{}{}{a_1},{a_1}{a_2}}
+        \ytableausetup{nosmalltableaux}
+    \end{equation}
+    
+    \subsection{Conjugate Diagrams}
+    If we know the diagram corresponding to a particular representation, \(\rho\), then the diagram corresponding to \(\rho^*\) is the \defineindex{conjugate diagram}.
+    This is given by the Young diagram required to complete an \(n \times r\) rectangle, where \(r\) is the number of boxes in the first row.
+    Rotating this by \ang{180} then gives the conjugate diagram.
+    For example, we've seen that
+    \begin{equation}
+        \rep{3} = \ydiagram{1} \longrightarrow \ytableaushort{\none,\none,\none}*{1,1,1}*[*(highlight)]{0,1,1}
+    \end{equation}
+    and we needed to add two blocks below this to get a \(3 \times 1\) rectangle, so
+    \begin{equation}
+        \rep{3}^* = \ydiagram{1,1}.
+    \end{equation}
+    As another example consider
+    \begin{equation}
+        \rep{6} = \ydiagram{2} \longrightarrow \ytableaushort{\none,\none,\none}*{2,2,2}*[*(highlight)]{0,2,2}.
+    \end{equation}
+    We needed a \(2 \times 2\) block to fill this out to a \(3 \times 2\) rectangle, so
+    \begin{equation}
+        \rep{6}^* = \ydiagram{2,2}.
+    \end{equation}
+    Finally, consider
+    \begin{equation}
+        \rep{8} = \ydiagram{2,1} \longrightarrow \ytableaushort{\none,\none,\none}*{2,2,2}*[*(highlight)]{0,1+1,2}.
+    \end{equation}
+    We needed another diagram of the same shape to form a \(3\times 2\) rectangle, so
+    \begin{equation}
+        \rep{8}^* = \ydiagram{2,1} = \rep{8},
+    \end{equation}
+    which is what we expect as \(\rep{8}\) is a real representation.
+    
+    
+    
+    
+    
     
     
     \backmatter
