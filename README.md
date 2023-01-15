@@ -26,6 +26,10 @@ Here are all the courses I took.
 * [Quantum Field Theory](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-5/Quantum-Field-Theory) (s1) (see also another student's notes [here](https://github.com/mathias-driesse/Quantum-Field-Theory))
 * [Symmetries of Particles and Fields](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-5/Symmetries-of-Particles-and-Fields) (s1)
 * [Particle Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-5/Particle-Physics) (s1)
+* [Gauge Theories in Particle Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-5/gauge-theories) (s2)
+
+As well as these courses I also took the following course with the School of Informatics:
+* [Categories and Quantum Information](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-5/categories) (s2)
 
 ### Year 4
 * [Introduction to Condensed Matter Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Introduction-to-Condensed-Matter-Physics) (s1)
@@ -127,6 +131,7 @@ As the main source of this material I would like to thank the following people w
 * [Prof Donal O'Connell](https://www.ph.ed.ac.uk/people/donal-oconnell)
 * [Prof Neil Turok](https://www.ph.ed.ac.uk/people/neil-turok)
 * [Prof Richard Ball](https://www.ph.ed.ac.uk/people/richard-ball)
+* [Dr Chris Heunen](https://www.inf.ed.ac.uk/people/staff/Chris_Heunen.html)
 
 ### Bibliography
 Some of the books I have used to help write these notes:
@@ -141,3 +146,4 @@ Some of the books I have used to help write these notes:
 * Tomson, M. _Modern Particle Physics_, First edition (Cambridge University Press, Cambridge, 2013)
 * Allanach, B. _Symmetries, Particles, and Fields_, (Museum of Wrong, Cambridge, 2022)
 * Peskin, M. _An Introduction to Quantum Field Theory_, (CRC Press, Boca Raton, 1995)
+* Heunen, C. et al. _Categories for Quantum Theory_, (Cambridge University Press, Cambridge, 2019)
