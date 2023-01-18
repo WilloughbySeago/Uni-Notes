@@ -4,7 +4,7 @@
 \strictpagecheck
 
 %% Packages
-
+\usepackage{xfrac}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -13,6 +13,13 @@
 \usetikzlibrary{external}
 \tikzexternalize[prefix=tikz-external/]
 % Other libraries
+\undef{\eth}
+\undef{\digamma}
+\undef{\backepsilon}
+\usetikzlibrary{zx-calculus}
+
+\tikzset{Z spider/.style={fill=Green!50, draw=Green, text=black, circle, minimum width=1mm, inner sep=2pt, thick}}
+\tikzset{X spider/.style={fill=Red!50, draw=Red, text=black, circle, minimum width=1mm, inner sep=2pt, thick}}
 
 % References, should be last things loaded
 \usepackage[pdfauthor={Willoughby Seago},pdftitle={Categories and Quantum Information},pdfkeywords={category theory, quantum information, quantum computing, monoidal category},pdfsubject={Gauge Theories}]{hyperref}  % Should be loaded second last (cleveref last)
@@ -51,6 +58,8 @@ noabbrev
 \newcommand*{\course}[1]{\textit{#1}}
 
 % Maths
+\newcommand{\e}{\symrm{e}}
+\DeclarePairedDelimiter{\denotes}{\lBrack}{\rBrack}
 
 
 \includeonly{}
@@ -63,7 +72,893 @@ noabbrev
     \listoffigures
     \mainmatter
     
-    \chapter{Introduction}
+    \chapter{ZX Calculus}
+    In this chapter we will introduce \defineindex{ZX calculus}.
+    This is a diagramatic notation for performing calculations.
+    ZX calculus is mathematically rigorous, and developing the maths explaining this is a large part of this course.
+    ZX calculus provides a higher level of abstraction that a quantum circuit, focusing less on implementation and more on what the circuit is doing.
+    ZX calculus is built from a relatively small number of building blocks.
+    It is the freedom we have in combining these that makes ZX calculus so powerful.
+    
+    We'll introduce ZX calculus in a seemingly backwards manner, first introducing which sorts of diagrams we can have, then how to manipulate the diagrams then what the diagrams mean.
+    
+    \section{Types of Diagrams}
+    A diagram in ZX calculus is somewhat like a flowchart.
+    The playing field is the two-dimensional page.
+    We imagine that time goes upwards and space extends to the left and right.
+    This means that a process described by a ZX calculus starts by entering the bottom of the diagram and ends when we leave the top of the diagram.
+    Qubits are represented by wires, which are just lines.
+    Processes are represented by boxes, for now we won't focus on what the process might be.
+    The following diagram represents a process which takes in three qubits and produces two qubits:
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-example-process}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw (0, 0) -- ++ (1.5, 0) -- ++ (-0.25, 0.75) -- ++ (-1.25, 0) -- cycle;
+            \draw (0.3, 0) -- ++ (0, -1);
+            \draw (0.75, 0) -- ++ (0, -1);
+            \draw (1.2, 0) -- ++ (0, -1);
+            \draw (0.4, 0.75) -- ++ (0, 1);
+            \draw (0.85, 0.75) -- ++ (0, 1);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    In diagrams it isn't important exactly how we draw the wires, so long as they are connected in the same way, so in the same order both on the box and along the top and bottom, the diagram corresponds to the same equation.
+    For example, the following is equivalent to the previous diagram
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-example-process-with-weird-wires}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw (0, 0) -- ++ (1.5, 0) -- ++ (-0.25, 0.75) -- ++ (-1.25, 0) -- cycle;
+            \draw (0.3, 0) -- ++ (0, -0.25) arc (0:-180:0.3) arc (0:180:0.3) -- ++ (0, -0.75);
+            \draw[rounded corners] (0.75, 0) -- ++ (0, -0.15) -- ++ (0.5, -0.2) -- ++ (0, -0.35) -- ++ (-0.5, -0.2) -- ++ (0, -0.15);
+            \draw[rounded corners] (1.2, 0) -- ++ (0, -0.15) -- ++ (-0.5, -0.2) -- ++ (0, -0.35) -- ++ (0.5, -0.2) -- ++ (0, -0.15);
+            \draw[rounded corners] (0.4, 0.75) -- ++ (0, 0.2) -- ++ (-1, 0.6) -- ++ (0, 0.2);
+            \draw[rounded corners] (0.85, 0.75) -- ++ (0, 0.1) -- ++ (0.2, 0.2) -- ++ (0, 0.1) coordinate (A);
+            \draw (A) arc (0:330:0.3) coordinate (B);
+            \draw[rounded corners] (B) -- ++ (0.15, 0.25) -- ++ (0, 0.5);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    We are also free to change the orientation of the box, so long as the the connectivity stays the same.
+    This is why we draw the box as a trapezium without rotational symmetry.
+    For example, the following diagram is equivalent to both of the previous diagrams.
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-example-process-with-rotated-box}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw (0, 0) -- ++ (-0.25, 0.75) -- ++ (1.5, 0) -- ++ (0, -0.75) -- cycle;
+            \draw (0.05, 0.75) -- ++ (0, 0.3) arc (0:180:0.3) -- ++ (0, -1.15) arc (180:270:0.3) -- ++ (1.5, 0) arc (90:0:0.3) -- ++ (0, -0.3);
+            \draw (0.5, 0.75) -- ++ (0, 0.3) arc (180:90:0.3) -- ++ (1, 0) arc (90:0:0.3) -- ++ (0, -1.4) arc (0:-90:0.3) -- ++ (-0.6, 0) arc (90:180:0.3) -- ++ (0, -0.05);
+            \draw (0.95, 0.75) -- ++ (0, 0.1) arc (180:0:0.3) -- ++ (0, -1.1) arc (0:-90:0.3) -- ++ (-0.5, 0) arc (90:180:0.3) -- ++ (0, -0.15);
+            \draw (0.4, 0) -- ++ (0, -0.1) arc (0:-90:0.2) -- ++ (-0.3, 0) arc (270:180:0.2) -- ++ (0, 1.45) arc (180:90:0.2) -- ++ (0.7, 0) arc (-90:0:0.2);
+            \draw (0.85, 0) -- ++ (0, -0.1) arc (180:270:0.2) -- ++ (0.5, 0) arc (-90:0:0.2) -- ++ (0, 1.45) arc (0:90:0.2) -- ++ (-0.7, 0) arc (270:180:0.2);
+        \end{tikzpicture}
+        .
+    \end{equation}
+
+    A sensible question to ask now is what process does this box represent.
+    We'll get to this.
+    For now we'll just say that the process can be built up of fundamental process.
+    There are four processes which we use to build any diagram in ZX calculus.
+    They are
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-building-blocks}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \node[Z spider] (A) at (0, 0) {\(\alpha\)};
+            \draw (A) -- ++ (0, 1);
+            \node[Z spider] (B) at (1.5, 0) {\(\alpha\)};
+            \draw (B) -- ++ (0, 1);
+            \draw[rounded corners=7pt] (B) -- ++ (-0.5, 0) -- ++ (0, -0.75);
+            \draw[rounded corners=7pt] (B) -- ++ (0.5, 0) -- ++ (0, -0.75);
+            \node[X spider] (C) at (3, 0) {\(\alpha\)};
+            \draw (C) -- ++ (0, 1);
+            \node[X spider] (D) at (4.5, 0) {\(\alpha\)};
+            \draw (D) -- ++ (0, 1);
+            \draw[rounded corners=7pt] (D) -- ++ (-0.5, 0) -- ++ (0, -0.75);
+            \draw[rounded corners=7pt] (D) -- ++ (0.5, 0) -- ++ (0, -0.75);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    Actually, \(\alpha\) can take any value in \([0, 2\pi)\), so there are really an uncountable number of these building blocks.
+    For short if the phase is zero then we omit the label:
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-zero-phase-1}
+        \begin{tikzpicture}[baseline=(A.base)]
+            \node[X spider] (A) at (0, 0) {\(0\)};
+        \end{tikzpicture}
+        =
+        \tikzsetnextfilename{ZXcalculus-zero-phase-2}
+        \begin{tikzpicture}
+            \node[X spider] at (0, 0) {};
+        \end{tikzpicture}
+        , \qqand
+        \tikzsetnextfilename{ZXcalculus-zero-phase-3}
+        \begin{tikzpicture}[baseline=(A.base)]
+            \node[Z spider] (A) at (0, 0) {\(0\)};
+        \end{tikzpicture}
+        =
+        \tikzsetnextfilename{ZXcalculus-zero-phase-4}
+        \begin{tikzpicture}
+            \node[Z spider] at (0, 0) {};
+        \end{tikzpicture}
+    \end{equation}
+    
+    We call these \define{spiders}\index{spider}.
+    In particular, the green is a \(Z\) spider and the red is an \(X\) spider.
+    
+    Combining these pieces we can quickly build up fairly complex diagrams.
+    For example, the diagram in \cref{fig:example ZX diagram} is a process which takes in two qubits and outputs two qubits.
+    
+    \begin{figure}
+        \tikzsetnextfilename{ZXcalculus-example-using-building-blocks}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \node[X spider] (A) at (0, 0) {};
+            \node[X spider, above=of A] (B) {\(\tfrac{\pi}{2}\)};
+            \node[Z spider, below right=of A] (C) {\(\tfrac{\pi}{3}\)};
+            \node[Z spider, below=of C] (D) {\(\pi\)};
+            \node[Z spider, above right=of C] (E) {\(\pi\)};
+            \node[Z spider, above=of E] (F) {\(\tfrac{\pi}{3}\)};
+            \node[X spider, below right=of E] (G) {};
+            \node[Z spider, below=of G] (H) {};
+            \node[X spider, above right=of G] (I) {\(\tfrac{\pi}{4}\)};
+            \node[Z spider, above right=of I] (J) {\(\tfrac{\pi}{2}\)};
+            \node[Z spider, below right=of H] (K) {\(\tfrac{\pi}{4}\)};
+            \node[Z spider, below=of K] (L) {\(\tfrac{\pi}{2}\)};
+            
+            \draw (A) -- (B);
+            \draw (A) -- (C);
+            \draw (C) -- (D);
+            \draw (C) -- (E);
+            \draw (E) -- (F);
+            \draw (E) -- (G);
+            \draw (G) -- (H);
+            \draw (G) -- (I);
+            \draw (I) -- (J);
+            \draw (H) -- (K);
+            \draw (K) -- (L);
+            \draw[rounded corners] (K) -- ++ (2.5, 0) -- ++ (0, 5.55) -- (J);
+            \draw[rounded corners] (I) -- ++ (-0.75, 0.75) -- ++ (0, 2) coordinate (M);
+            \draw (J) -- (J |- M);
+            \draw[rounded corners] (A) -- ++ (-1, -1) -- ++ (0, -2) -- ++ (2.5, -2.5) -- ++ (0, -1) coordinate (N);
+            \draw[rounded corners] (G) -- ++ (-1, -1) -- ++ (0, -2) -- ++ (-3.5, 0) coordinate (O) -- (O |- N);
+        \end{tikzpicture}
+        \caption{A diagram in ZX calculus taking two qubits to two qubits.}
+        \label{fig:example ZX diagram}
+    \end{figure}
+    
+    \section{Simplifying Diagrams}
+    There are two types of rules by which we might manipulate diagrams.
+    The first, which we've already seen, are \define{graphical rules}\index{graphical rule} which allow us to move different pieces around so long as we don't change the connectivity.
+    More formally two diagrams are equivalent if the are isotopic as graphs, a concept we'll make precise later, but for now two diagrams are isotopic if fixing all of the inputs and outputs as well as the points at which they connect it is possible to continuously morph one into the other.
+    We allow the wires to pass through each other in this process.
+    
+    The second type of rule corresponds to specific properties of the basic building blocks.
+    There are quite a few of these, and for now we'll just list them without much explanation.
+    First we have the \define{monoid rules}\index{monoid rule} which are
+    \begin{equation*}
+        \tikzsetnextfilename{ZXcalculus-monoid-rules-X}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw (-0.5, -0.5) coordinate (B) arc (180:0:0.5) coordinate (C);
+            \node[Z spider] (A) {};
+            \draw (A) -- ++ (0, 0.5);
+            \draw (B) -- (-0.5, -1);
+            \draw (0.2, -0.8) coordinate (E) arc (180:0:0.3) coordinate (F);
+            \node[Z spider] (D) at (C) {};
+            \draw (E) -- (E |- 0, -1);
+            \draw (F) -- (F |- 0, -1);
+            \node at (1.1, 0) {\(=\)};
+            \begin{scope}[xshift=2.2cm, xscale=-1]
+                \draw (-0.5, -0.5) coordinate (B) arc (180:0:0.5) coordinate (C);
+                \node[Z spider] (A) {};
+                \draw (A) -- ++ (0, 0.5);
+                \draw (B) -- (-0.5, -1);
+                \draw (0.2, -0.8) coordinate (E) arc (180:0:0.3) coordinate (F);
+                \node[Z spider] (D) at (C) {};
+                \draw (E) -- (E |- 0, -1);
+                \draw (F) -- (F |- 0, -1);
+            \end{scope}
+            
+            \begin{scope}[xshift=3.89cm]
+                \draw (-0.5, -0.5) coordinate (B) arc (180:0:0.5) coordinate (C);
+                \node[Z spider] (A) {};
+                \draw (A) -- ++ (0, 0.5);
+                \draw (B) -- ++ (0, -0.5);
+                \draw (C) -- ++ (0, -0.5);
+                \node at (0.8, 0) {\(=\)};
+                \begin{scope}[xshift=1.6cm]
+                    \draw (-0.5, -0.5) coordinate (B) arc (180:0:0.5) coordinate (C);
+                    \node[Z spider] (A) {};
+                    \draw (A) -- ++ (0, 0.5);
+                    \draw[rounded corners] (B) -- ++ (0, -0.15) -- ++ (1, -0.2) -- ++ (0, -0.15);
+                    \draw[rounded corners] (C) -- ++ (0, -0.15) -- ++ (-1, -0.2) -- ++ (0, -0.15);
+                \end{scope}
+            \end{scope}
+            
+            \begin{scope}[xshift=7.4cm]
+                \draw (-0.5, -0.5) coordinate (B) arc (180:0:0.5) coordinate (C);
+                \node[Z spider] (A) {};
+                \draw (A) -- ++ (0, 0.5);
+                \node[Z spider] at (B) {};
+                \draw (C) -- ++ (0, -0.5);
+                \node at (0.75, 0) {\(=\)};
+                \draw (1.125, -1) -- (1.125, 0.5);
+                \node at (1.5, 0) {\(=\)};
+                \node[Z spider] (C) at (2.1, -0.6) {};
+                \node[Z spider] (D) at (2.1, 0.1) {};
+                \draw (D) -- ++ (0, 0.4);
+                \draw (C) -- ++ (0, -0.4);
+                \draw (D) to[out=-45, in=45] (C);
+                \draw (D) to[out=-135, in=135] (C);
+            \end{scope}
+        \end{tikzpicture}
+        ,
+    \end{equation*}
+    and the same for the other colour:
+    \begin{equation*}
+        \tikzsetnextfilename{ZXcalculus-monoid-rules-Z}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw (-0.5, -0.5) coordinate (B) arc (180:0:0.5) coordinate (C);
+            \node[X spider] (A) {};
+            \draw (A) -- ++ (0, 0.5);
+            \draw (B) -- (-0.5, -1);
+            \draw (0.2, -0.8) coordinate (E) arc (180:0:0.3) coordinate (F);
+            \node[X spider] (D) at (C) {};
+            \draw (E) -- (E |- 0, -1);
+            \draw (F) -- (F |- 0, -1);
+            \node at (1.1, 0) {\(=\)};
+            \begin{scope}[xshift=2.2cm, xscale=-1]
+                \draw (-0.5, -0.5) coordinate (B) arc (180:0:0.5) coordinate (C);
+                \node[X spider] (A) {};
+                \draw (A) -- ++ (0, 0.5);
+                \draw (B) -- (-0.5, -1);
+                \draw (0.2, -0.8) coordinate (E) arc (180:0:0.3) coordinate (F);
+                \node[X spider] (D) at (C) {};
+                \draw (E) -- (E |- 0, -1);
+                \draw (F) -- (F |- 0, -1);
+            \end{scope}
+            
+            \begin{scope}[xshift=3.89cm]
+                \draw (-0.5, -0.5) coordinate (B) arc (180:0:0.5) coordinate (C);
+                \node[X spider] (A) {};
+                \draw (A) -- ++ (0, 0.5);
+                \draw (B) -- ++ (0, -0.5);
+                \draw (C) -- ++ (0, -0.5);
+                \node at (0.8, 0) {\(=\)};
+                \begin{scope}[xshift=1.6cm]
+                    \draw (-0.5, -0.5) coordinate (B) arc (180:0:0.5) coordinate (C);
+                    \node[X spider] (A) {};
+                    \draw (A) -- ++ (0, 0.5);
+                    \draw[rounded corners] (B) -- ++ (0, -0.15) -- ++ (1, -0.2) -- ++ (0, -0.15);
+                    \draw[rounded corners] (C) -- ++ (0, -0.15) -- ++ (-1, -0.2) -- ++ (0, -0.15);
+                \end{scope}
+            \end{scope}
+            
+            \begin{scope}[xshift=7.4cm]
+                \draw (-0.5, -0.5) coordinate (B) arc (180:0:0.5) coordinate (C);
+                \node[X spider] (A) {};
+                \draw (A) -- ++ (0, 0.5);
+                \node[X spider] at (B) {};
+                \draw (C) -- ++ (0, -0.5);
+                \node at (0.75, 0) {\(=\)};
+                \draw (1.125, -1) -- (1.125, 0.5);
+                \node at (1.5, 0) {\(=\)};
+                \node[X spider] (C) at (2.1, -0.6) {};
+                \node[X spider] (D) at (2.1, 0.1) {};
+                \draw (D) -- ++ (0, 0.4);
+                \draw (C) -- ++ (0, -0.4);
+                \draw (D) to[out=-45, in=45] (C);
+                \draw (D) to[out=-135, in=135] (C);
+            \end{scope}
+        \end{tikzpicture}
+        .
+    \end{equation*}
+    
+    The next set of rules are called the \define{Frobenius rules}\index{Frobenius rule}, they are
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-Frobenius-rules}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw (0, -0.2) -- ++ (0, 0.7) arc (180:0:0.3) arc (-180:0:0.3) -- ++ (0, 0.7);
+            \node[Z spider] (A) at (0.3, 0.8) {};
+            \node[Z spider] (B) at (0.9, 0.2) {};
+            \draw (A) -- ++ (0, 0.4);
+            \draw (B) -- ++ (0, -0.4);
+            \node at (1.5, 0.5) {\(=\)};
+            \draw (1.8, 1.2) -- ++ (0, -0.7) arc (-180:0:0.3) arc (180:0:0.3) -- ++ (0, -0.7);
+            \node[Z spider] (C) at (2.1, 0.2) {};
+            \node[Z spider] (D) at (2.7, 0.8) {};
+            \draw (D) -- ++ (0, 0.4);
+            \draw (C) -- ++ (0, -0.4);
+            
+            \begin{scope}[xshift=4.5cm]
+                \draw (0, -0.2) -- ++ (0, 0.7) arc (180:0:0.3) arc (-180:0:0.3) -- ++ (0, 0.7);
+                \node[X spider] (A) at (0.3, 0.8) {};
+                \node[X spider] (B) at (0.9, 0.2) {};
+                \draw (A) -- ++ (0, 0.4);
+                \draw (B) -- ++ (0, -0.4);
+                \node at (1.5, 0.5) {\(=\)};
+                \draw (1.8, 1.2) -- ++ (0, -0.7) arc (-180:0:0.3) arc (180:0:0.3) -- ++ (0, -0.7);
+                \node[X spider] (C) at (2.1, 0.2) {};
+                \node[X spider] (D) at (2.7, 0.8) {};
+                \draw (D) -- ++ (0, 0.4);
+                \draw (C) -- ++ (0, -0.4);
+            \end{scope}
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    The \define{fusion rules}\index{fusion rule} allows us to combine multiple nodes of the same colour in some circumstances:
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-fusion-rule}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \draw (-0.5, -0.5) coordinate (A) arc (180:0:0.5) coordinate (B);
+            \node[Z spider] (C) at (-0.5, -0.9) {\(\smash{\mathrlap{\alpha}}\phantom{\beta}\)};
+            \node[Z spider] (D) at (0.5, -0.9) {\(\beta\)};
+            \node[Z spider] (E) at (0, 0) {};
+            \draw (C) -- (A);
+            \draw (D) -- (B);
+            \draw (E) -- ++ (0, 0.5);
+            \node (equals) at (1, -0.2) {\(=\)};
+            \node[Z spider] (F) at (2, -0.75) {\(\alpha + \beta\)};
+            \draw (F.north) -- (F |- 0, 0.5);
+            \begin{scope}[xshift=4.5cm]
+                \draw (-0.5, -0.5) coordinate (A) arc (180:0:0.5) coordinate (B);
+                \node[X spider] (C) at (-0.5, -0.9) {\(\smash{\mathrlap{\alpha}}\phantom{\beta}\)};
+                \node[X spider] (D) at (0.5, -0.9) {\(\beta\)};
+                \node[X spider] (E) at (0, 0) {};
+                \draw (C) -- (A);
+                \draw (D) -- (B);
+                \draw (E) -- ++ (0, 0.5);
+                \node at (1, -0.2) {\(=\)};
+                \node[X spider] (F) at (2, -0.75) {\(\alpha + \beta\)};
+                \draw (F.north) -- (F |- 0, 0.5);
+            \end{scope}
+        \end{tikzpicture}
+        ,
+    \end{equation}
+    where addition is taken modulo \(2\pi\).
+    
+    Before introducing the next set of rules we introduce some shorthand notation:
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-2-parity-spiders}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \node[Z spider] (A) {\(\alpha\)};
+            \draw (A) -- ++ (0, 0.75);
+            \draw (A) -- ++ (0, -0.75);
+            \node (equals) at (0.5, 0) {\(\coloneqq\)};
+            \draw (1, -0.2) coordinate (B) arc (180:0:0.5) coordinate (C);
+            \node[Z spider] (D) at (1.5, 0.3) {};
+            \node[Z spider] at (B) {\(\alpha\)};
+            \draw (C) -- ++ (0, -0.5);
+            \draw (D) -- ++ (0, 0.45);
+            \begin{scope}[xshift=3.25cm]
+                \node[X spider] (A) {\(\alpha\)};
+                \draw (A) -- ++ (0, 0.75);
+                \draw (A) -- ++ (0, -0.75);
+                \node (equals) at (0.5, 0) {\(\coloneqq\)};
+                \draw (1, -0.2) coordinate (B) arc (180:0:0.5) coordinate (C);
+                \node[X spider] (D) at (1.5, 0.3) {};
+                \node[X spider] at (B) {\(\alpha\)};
+                \draw (C) -- ++ (0, -0.5);
+                \draw (D) -- ++ (0, 0.45);
+            \end{scope}
+        \end{tikzpicture}
+        .
+    \end{equation}
+    We also define the \defineindex{Hadamard}:
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-hadamard}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \node[draw] (H) {\(H\)};
+            \node (equals) at (0.7, 0) {\(\coloneqq\)};
+            \node[Z spider] (A) at (1.5, 1) {\(\scriptstyle\frac{\pi}{2}\)};
+            \node[X spider] (B) at (1.5, 0) {\(\scriptstyle\frac{\pi}{2}\)};
+            \node[Z spider] (C) at (1.5, -1) {\(\scriptstyle\frac{\pi}{2}\)};
+            \draw (A) -- (B);
+            \draw (B) -- (C);
+            \draw (A) -- ++ (0, 0.65) coordinate (D);
+            \draw (C) -- ++ (0, -0.65) coordinate (E);
+            \draw (H) -- (H |- D);
+            \draw (H) -- (H |- E);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    It's safe to give this a square symbol, with rotational symmetry, since we can see from the definition that it is rotationally symmetric.
+    
+    We then have two \define{identity rules}\index{identity rule}, the first is just a repeat of one of the monoid rules, but now in this new shorthand, the second is new:
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-identity-rules}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \node[Z spider] (A) {};
+            \node[X spider] (B) at (1.5, 0) {};
+            \draw (A) -- ++ (0, 0.5);
+            \draw (A) -- ++ (0, -0.5);
+            \draw (B) -- ++ (0, 0.5);
+            \draw (B) -- ++ (0, -0.5);
+            \draw (0.75, -0.5) -- (0.75, 0.5);
+            \node (equals) at (0.4, 0) {\(=\)};
+            \node at (1.1, 0) {\(=\)};
+            
+            \begin{scope}[xshift=3cm]
+                \draw (-0.5, -0.5) arc (180:0:0.5);
+                \node[Z spider] (A) at (0, 0) {};
+                \node[Z spider] (B) at (0, 0.5) {};
+                \draw (A) -- (B);
+                \begin{scope}[xshift=1.4cm]
+                    \draw (-0.5, -0.5) arc (180:0:0.5);
+                    \node[X spider] (A) at (0, 0) {};
+                    \node[X spider] (B) at (0, 0.5) {};
+                    \draw (A) -- (B);
+                \end{scope}
+                \node at (0.7, 0) {\(=\)};
+            \end{scope}
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    The next rule allows us to change the colour of a node, at the cost of some Hadamards, it is appropriately called the \defineindex{colour change rule}:
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-colour-change-rule}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \draw (-0.5, -0.5) coordinate (A) arc (180:0:0.5) coordinate (B);
+            \node[X spider] (C) {};
+            \node (equals) at (1, 0) {\(=\)};
+            \draw (1.6, -0.5) coordinate (D) arc (180:0:0.5) coordinate (E);
+            \node[Z spider] (F) at (2.1, 0) {};
+            \node[above = 0.35cm of F, draw] (H1) {\(H\)};
+            \node[below, draw] (H2) at (D) {\(H\)};
+            \node[below, draw] (H3) at (E) {\(H\)};
+            \draw (F) -- (H1);
+            \draw (H1) -- ++ (0, 0.7) coordinate (G);
+            \draw (H2) -- ++ (0, -0.5);
+            \draw (H3) -- ++ (0, -0.5) coordinate (I);
+            \draw (C) -- (C |- G);
+            \draw (A) -- (A |- I);
+            \draw (B) -- (B |- I);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    The next rule is called the \defineindex{copy rule}, since it allows us to make two diagrams out of one:
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-copy-rule}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \draw (-0.5, -0.5) arc (180:0:0.5);
+            \node[Z spider] (A) at (0, 0) {};
+            \node[X spider] (B) at (0, 0.75) {};
+            \draw (A) -- (B);
+            \node (equals) at (1, 0) {\(=\)};
+            \node[X spider] (C) at (1.5, 0.75) {};
+            \node[X spider] (D) at (2, 0.75) {};
+            \draw (C) -- ++ (0, -1.25);
+            \draw (D) -- ++ (0, -1.25);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    Our next rule allows for an \(X\) spider with a phase of \(\pi\) to be copied pulling it through a \(Z\) spider.
+    It is called the \define{\(\symbf{\pi}\)-copy rule}\index{\(\pi\)-copy rule}:
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-pi-copy-rule}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \draw (-0.5, -0.5) coordinate (C) arc (180:0:0.5) coordinate (D);
+            \node[Z spider] (A) at (0, 0) {\(\alpha\)};
+            \node[X spider] (B) at (0, 0.75) {\(\pi\)};
+            \draw (A) -- (B);
+            \draw (B) -- ++ (0, 0.75);
+            \node (equals) at (1, 0) {\(=\)};
+            \draw (C) -- ++ (0, -0.5);
+            \draw (D) -- ++ (0, -0.5);
+            \draw (1.7, -0.3) coordinate (E) -- ++ (0, 0.3) arc (180:0:0.5) -- ++ (0, -0.3) coordinate (F);
+            \node[Z spider] (G) at (2.2, 0.5) {\(\alpha\)};
+            \node[X spider] (H) at (E) {\(\pi\)};
+            \node[X spider] (I) at (F) {\(\pi\)};
+            \draw (G) -- (G |- 0, 1.5);
+            \draw (H) -- (H |- 0, -1);
+            \draw (I) -- (I |- 0, -1);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    The next rule is called the \defineindex{bialgebra rule}:
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-bialgebra-rule}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \draw (-0.5, 1) arc (-180:0:0.5);
+            \draw (-0.5, -1) arc (180:0:0.5);
+            \node[Z spider] (A) at (0, 0.5) {};
+            \node[X spider] (B) at (0, -0.5) {};
+            \draw (A) -- (B);
+            \node (equals) at (1, 0) {\(=\)};
+            \draw (2, 0.5) arc (90:270:0.5);
+            \draw (3, 0.5) arc (90:-90:0.5);
+            \node[X spider] (C) at (2, 0.5) {};
+            \node[X spider] (D) at (3, 0.5) {};
+            \node[Z spider] (E) at (2, -0.5) {};
+            \node[Z spider] (F) at (3, -0.5) {};
+            \draw (C) -- ++ (0, 0.5);
+            \draw (D) -- ++ (0, 0.5);
+            \draw (E) -- ++ (0, -0.5);
+            \draw (F) -- ++ (0, -0.5);
+            \draw[rounded corners] (C) -- ++ (0.25, 0) -- ++ (0.5, -1) -- (F);
+            \draw[rounded corners] (E) -- ++ (0.25, 0) -- ++ (0.5, 1) -- (D);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    The final rule is rather simple, it's simply that we can ignore overall phases, called the \defineindex{scalar rule}, it corresponds to the following:
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-scalar-rule}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \node[Z spider] (A) {\(\phantom{\beta}\smash{\mathllap{\alpha}}\)};
+            \node[X spider, above=1cm of A] (B) {\(\beta\)};
+            \draw (A) -- (B);
+            \node (equals) at (0.7, 0.7) {\(=\)};
+            \draw[dashed, thick, Navy] (1.2, 0) rectangle (2.5, 1.6);
+            \node at (3, 0.7) {\(=\)};
+            \node at (4.3, 0) {};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    Here the dashed box as well as the empty space both represent the empty diagram, which is simply the trivial identity process taking in no qubits, doing nothing, and outputting no qubits.
+    
+    \section{Interpretation}
+    We'll see in more detail what these rules mean, where they come from, and why they have the names they do.
+    For now it is enough to know that combined the monoid rules, Frobenius rules, fusion rules, and identity rules tell us that it doesn't matter how the dots of the same colour are connected, so long as the phases in the dots add to the same value modulo \(2\pi\).
+    
+    We can represent a qubit as an element of \(\complex^2\).
+    Then the rules about \(Z\) spiders tell us how to multiply matrices which are diagonal in the computational basis, \(\{\ket{0}, \ket{1}\}\), with eigenvalues \(\e^{i\alpha}\), and the rules about \(X\) spiders tell us how to multiply matrices which are diagonal in the Hadamard transformed basis formed from
+    \begin{equation}
+        \ket{+} = H\ket{0} = \frac{1}{\sqrt{2}}(\ket{0} + \ket{1}), \qqand \ket{-} = H\ket{1} = \frac{1}{\sqrt{2}}(\ket{0} - \ket{1}).
+    \end{equation}
+    The colour change rule tells us how to convert one basis to the other.
+    The bialgebra rule tells us that these bases are complimentary, that they are at the maximal angle to each other.
+    The copy and \(\pi\)-copy rules are just artefacts of nicely chosen bases.
+    
+    Using this we can develop the \defineindex{standard model} of ZX calculus, which represents each diagram as a matrix acting on the input qubits.
+    More formally we can define a map
+    \begin{equation}
+        \denotes{-} \colon (n\text{-to-}m \text{ qubit ZX diagram}) \to (2^n \times 2^m \text{ complex matrices}).
+    \end{equation}
+    Then a process which takes a single qubit, does nothing to it, and immediately outputs it is represented as
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-denotates-identity}
+        \begin{tikzpicture}[baseline=0.4cm]
+            \draw (0, 0) -- (0, 1);
+        \end{tikzpicture}
+        \longmapsto
+        \begin{pmatrix}
+            1 & 0\\
+            0 & 1
+        \end{pmatrix}
+        .
+    \end{equation}
+    Unsurprisingly doing nothing to a qubit gives the identity.
+    
+    The following diagram takes in two qubits, swaps them, and then returns them:
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-denotates-swap}
+        \begin{tikzpicture}[baseline=0.4cm]
+            \draw[rounded corners] (0, 0) -- ++ (0, 0.2) -- ++ (0.5, 0.6) -- ++ (0, 0.2);
+            \draw[rounded corners] (0.5, 0) -- ++ (0, 0.2) -- ++ (-0.5, 0.6) -- ++ (0, 0.2);
+        \end{tikzpicture}
+        \longmapsto 
+        \begin{pmatrix}
+            1 & 0 & 0 & 0\\
+            0 & 0 & 1 & 0\\
+            0 & 1 & 0 & 0\\
+            0 & 0 & 0 & 1
+        \end{pmatrix}
+        .
+    \end{equation}
+    In terms of matrices this acts as follows:
+    \begin{equation}
+        \begin{pmatrix}
+            1 & 0 & 0 & 0\\
+            0 & 0 & 1 & 0\\
+            0 & 1 & 0 & 0\\
+            0 & 0 & 0 & 1
+        \end{pmatrix}
+        \left[
+            \begin{pmatrix}
+                a\\ b
+            \end{pmatrix}
+            \otimes
+            \begin{pmatrix}
+                c\\ d
+            \end{pmatrix}
+        \right]
+        =
+        \begin{pmatrix}
+            1 & 0 & 0 & 0\\
+            0 & 0 & 1 & 0\\
+            0 & 1 & 0 & 0\\
+            0 & 0 & 0 & 1
+        \end{pmatrix}
+        \begin{pmatrix}
+            ac\\ ad\\ bc\\ bd
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            ac\\ bc\\ ad\\ bd
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            c\\ d
+        \end{pmatrix}
+        \otimes
+        \begin{pmatrix}
+            a\\ b
+        \end{pmatrix}
+        .
+    \end{equation}
+    
+    It is possible to have diagrams which create qubits from nothing.
+    In this case we should take the input to simply be 1.
+    The following diagram creates a pair of qubits:
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-denotates-create-qubits}
+        \begin{tikzpicture}[baseline=-0.35cm]
+            \draw (0, 0) arc (-180:0:0.5);
+        \end{tikzpicture}
+        \longmapsto
+        \begin{pmatrix}
+            1\\ 0\\ 0\\ 1
+        \end{pmatrix}
+        .
+    \end{equation}
+    Similarly we can destroy qubits:
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-denotates-destroy-qubits}
+        \begin{tikzpicture}[baseline=0.15cm]
+            \draw (0, 0) arc (180:0:0.5);
+        \end{tikzpicture}
+        \longmapsto
+        \begin{pmatrix}
+            1 & 0 & 0 & 1
+        \end{pmatrix}
+        .
+    \end{equation}
+    The Hadamard gives the \define{Hadamard matrix}\index{Hadamard!matrix}, note that we're ignoring an overall scalar, there's usually a factor of \(1/\sqrt{2}\):
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-denotates-hadamard}
+        \begin{tikzpicture}[baseline=(H.base)]
+            \node[draw] (H) {\(H\)};
+            \draw (H) -- ++ (0, 0.5);
+            \draw (H) -- ++ (0, -0.5);
+        \end{tikzpicture}
+        \longmapsto
+        \begin{pmatrix}
+            1 & 1\\
+            1 & -1
+        \end{pmatrix}
+        .
+    \end{equation}
+    We can create a single qubit:
+    \begin{equation}
+         \tikzsetnextfilename{ZXcalculus-denotates-identity-one-arity-Z}
+        \begin{tikzpicture}[baseline=(A.base)]
+            \node[Z spider] (A) {\(\alpha\)};
+            \draw (A) -- ++ (0, 0.5);
+        \end{tikzpicture}
+        \longmapsto
+        \begin{pmatrix}
+            1\\ \e^{i\alpha}
+        \end{pmatrix}
+        , \qqand
+        \tikzsetnextfilename{ZXcalculus-denotes-one-arity-X}
+        \begin{tikzpicture}[baseline=(A.base)]
+            \node[X spider] (A) {\(\alpha\)};
+            \draw (A) -- ++ (0, 0.5);
+        \end{tikzpicture}
+        \longmapsto
+        \begin{pmatrix}
+            1 + \e^{i\alpha}\\ 1 - \e^{i\alpha}
+        \end{pmatrix}
+    \end{equation}
+    The three-arity spiders give the following matrices
+    \begin{align}
+        \tikzsetnextfilename{ZXcalculus-denotates-3-arity-Z}
+        \begin{tikzpicture}[baseline=(A.base)]
+            \draw (-0.5, -0.5) arc (180:0:0.5);
+            \node[Z spider] (A) {\(\alpha\)};
+            \draw (A) -- ++ (0, 0.5);
+        \end{tikzpicture}
+        &\longmapsto
+        \begin{pmatrix}
+            1 & 0 & 0 & 0\\
+            0 & 0 & 0 & \e^{i\alpha}
+        \end{pmatrix}
+        ,\\ 
+        \tikzsetnextfilename{ZXcalculus-denotes-three-arity-X}
+        \begin{tikzpicture}[baseline=(A.base)]
+            \draw (-0.5, -0.5) arc (180:0:0.5);
+            \node[X spider] (A) {\(\alpha\)};
+            \draw (A) -- ++ (0, 0.5);
+        \end{tikzpicture}
+        &\longmapsto
+        \begin{pmatrix}
+            1 + \e^{i\alpha} & 1 - \e^{i\alpha} & 1 - \e^{i\alpha} & 1 + \e^{i\alpha}\\
+            1 - \e^{i\alpha} & 1 + \e^{i\alpha} & 1 + \e^{i\alpha} & 1 - \e^{i\alpha}
+        \end{pmatrix}
+    \end{align}
+    
+    Writing two processes next to each other gives their tensor product:
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-denotates-tensor-product}
+        \begin{tikzpicture}[baseline=(f.base)]
+            \draw (0, 0) -- ++ (1, 0) -- ++ (-0.25, 0.75) -- ++ (-0.75, 0) -- cycle;
+            \node (f) at (0.4, 0.375) {\(f\)};
+            \draw (0.375, 0) -- ++ (0, -0.5);
+            \draw (0.375, 0.75) -- ++ (0, 0.5);
+            \begin{scope}[xshift=1.5cm]
+                \draw (0, 0) -- ++ (1, 0) -- ++ (-0.25, 0.75) -- ++ (-0.75, 0) -- cycle;
+                \node at (0.4, 0.375) {\(g\)};
+                \draw (0.375, 0) -- ++ (0, -0.5);
+                \draw (0.375, 0.75) -- ++ (0, 0.5);
+            \end{scope}
+        \end{tikzpicture}
+        \longmapsto f \otimes g
+    \end{equation}
+    Writing two processes one after the other connected up represents doing them in the order they are connected from bottom to top, which is composition:
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-denotates-composition}
+        \begin{tikzpicture}[baseline=1cm]
+            \draw (0, 0) -- ++ (1, 0) -- ++ (-0.25, 0.75) -- ++ (-0.75, 0) -- cycle;
+            \node (f) at (0.4, 0.375) {\(f\)};
+            \draw (0.375, 0) -- ++ (0, -0.5);
+            \draw (0.375, 0.75) -- ++ (0, 0.75);
+            \begin{scope}[yshift=1.5cm]
+                \draw (0, 0) -- ++ (1, 0) -- ++ (-0.25, 0.75) -- ++ (-0.75, 0) -- cycle;
+                \node at (0.4, 0.375) {\(g\)};
+                \draw (0.375, 0.75) -- ++ (0, 0.5);
+            \end{scope}
+        \end{tikzpicture}
+        \longmapsto g \circ f
+    \end{equation}
+    Note that for processes represented by matrices composition is just matrix multiplication.
+    
+    This mapping makes precise what any one ZX diagram represents.
+    What is important is that this isn't changed when we apply the rules of ZX calculus.
+    This is the crux of the following theorem.
+    
+    \begin{thm}{ZX Calculus is Sound}{}
+        Let \(D_1\) and \(D_2\) be diagrams in ZX calculus.
+        If \(D_1 = D_2\) according to the rules of ZX calculus then \(\denotes{D_1} = \denotes{D_2}\).
+    \end{thm}
+    
+    As well as being a rigorous way to manipulate objects ZX calculus can also approximate any process from \(m\) qubits to \(n\) qubits to arbitrary precision.
+    \begin{thm}{ZX Calculus is Approximately Universal}{}
+        For any \(2^m \times 2^n\) matrix, \(f\), and any error margin, \(\varepsilon > 0\), there exists a diagram, \(D\), in ZX calculus built only from terms with phases an integer multiple of \(\pi/4\) such that \(\norm{\denotes{D} - f} < \varepsilon\) for some appropriate matrix norm \(\norm{-}\).
+    \end{thm}
+    This is one of the reasons that ZX calculus is so powerful.
+    
+    Another desirable quality for a notation like ZX calculus is that it be complete.
+    By this we mean that if two matrices are equal and both given by some ZX diagram then there should be a graphical proof of this using only the rules of ZX calculus.
+    This is the case if we assume the following two axioms, which are sound under the standard interpretation:
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-extra-completeness-rule-1-lhs}
+        \begin{tikzpicture}[font=\scriptsize, baseline=2cm]
+            \draw (-1, 1) arc (-180:0:1);
+            \node[Z spider] (A) at (0, 0) {};
+            \node[X spider] (B) at (-1, 1) {};
+            \node[X spider] (C) at (1, 1) {};
+            \node[Z spider] (D) at (-2, 1) {\(\varphi\)};
+            \node[Z spider] (E) at (-1, 2) {\(\varphi\)};
+            \node[X spider] (F) at (0, 2) {\(\vartheta\)};
+            \node[Z spider] (G) at (2, 1) {\(\psi\)};
+            \node[Z spider] (H) at (1, 2) {\(\psi\)};
+            \node[X spider] (I) at (-1, 3) {\(-\vartheta\)};
+            \node[Z spider] (J) at (0, 3) {};
+            
+            \draw (0, -0.5) -- (A);
+            \draw (B) -- (D);
+            \draw (B) -- (E);
+            \draw (C) -- (G);
+            \draw (C) -- (H);
+            \draw (E) -- (F);
+            \draw (F) -- (H);
+            \draw (E) -- (I);
+            \draw (I) -- (J);
+            \draw (J) -- (F);
+            \draw (H) -- (1, 4);
+            \draw (I) -- (-1, 4);
+            \draw (J) -- (0, 4);
+        \end{tikzpicture}
+        =
+        \tikzsetnextfilename{ZXcalculus-extra-completeness-rule-1-rhs}
+        \begin{tikzpicture}[font=\scriptsize, baseline=2cm]
+            \draw (-1, 1) arc (-180:0:1);
+            \node[Z spider] (A) at (0, 0) {};
+            \node[X spider] (B) at (-1, 1) {};
+            \node[X spider] (C) at (1, 1) {};
+            \node[Z spider] (D) at (-2, 1) {\(\varphi\)};
+            \node[Z spider] (E) at (-1, 2) {\(\varphi\)};
+            \node[X spider] (F) at (0, 2) {\(-\vartheta\)};
+            \node[Z spider] (G) at (2, 1) {\(\psi\)};
+            \node[Z spider] (H) at (1, 2) {\(\psi\)};
+            \node[X spider] (I) at (1, 3) {\(\vartheta\)};
+            \node[Z spider] (J) at (0, 3) {};
+            
+            \draw (0, -0.5) -- (A);
+            \draw (B) -- (D);
+            \draw (B) -- (E);
+            \draw (C) -- (G);
+            \draw (C) -- (H);
+            \draw (E) -- (F);
+            \draw (F) -- (H);
+            \draw (H) -- (I);
+            \draw (F) -- (J);
+            \draw (J) -- (I);
+            \draw (E) -- (-1, 4);
+            \draw (J) -- (0, 4);
+            \draw (I) -- (1, 4);
+        \end{tikzpicture}
+    \end{equation}
+    for any phases \(\varphi\), \(\psi\), and \(\vartheta\) which are integer multiples of \(\pi/4\), and the second axiom
+    \begin{equation}
+        \tikzsetnextfilename{ZXcalculus-extra-completeness-rule-2-lhs}
+        \begin{tikzpicture}[baseline=3cm]
+            \draw (0, -0.5) -- (0, 6.5);
+            \draw (2, 6) arc (90:270:1);
+            \draw (2, 2) arc (90:270:1);
+            \node[Z spider] (E) at (0, 1) {};
+            \node[X spider] (A) at (0, 2) {};
+            \node[Z spider] at (0, 3) {\(-\sfrac{\pi}{2}\)};
+            \node[X spider] (B) at (0, 4) {};
+            \node[Z spider] (F) at (0, 5) {};
+            \node[Z spider] (C) at (-1, 2) {\(\sfrac{\pi}{4}\)};
+            \node[Z spider] (D) at (-1, 4) {\(\tfrac{\pi}{4}\)};
+            \node[X spider] (G) at (1, 1) {};
+            \node[X spider] (H) at (1, 5) {};
+            \node[Z spider] at (2, 2) {\(\sfrac{\pi}{4}\)};
+            \node[Z spider] at (2, 0) {\(\sfrac{\pi}{4}\)};
+            \node[Z spider] at (2, 4) {\(\sfrac{\pi}{4}\)};
+            \node[Z spider] at (2, 6) {\(\sfrac{\pi}{4}\)};
+            
+            \draw (A) -- (C);
+            \draw (B) -- (D);
+            \draw (E) -- (G);
+            \draw (F) -- (H);
+        \end{tikzpicture}
+        \quad = \quad
+        \tikzsetnextfilename{ZXcalculus-extra-completeness-rule-2-rhs}
+        \begin{tikzpicture}[baseline=3cm]
+            \draw (0, -0.5) -- (0, 6.5);
+            \draw (2, 5) arc (90:270:1);
+            \node[X spider] at (0, 1) {\(\sfrac{\pi}{2}\)};
+            \node[Z spider] at (0, 2) {\(\sfrac{\pi}{4}\)};
+            \node[X spider] (A) at (0, 3) {\(\pi\)};
+            \node[Z spider] (C) at (0, 4) {};
+            \node[Z spider] (B) at (-1, 3) {\(\sfrac{\pi}{4}\)};
+            \node[X spider] (D) at (1, 4) {\(\pi\)};
+            \node[Z spider] at (2, 5) {\(\sfrac{\pi}{4}\)};
+            \node[Z spider] at (2, 3) {\(\sfrac{\pi}{4}\)};
+            
+            \draw (A) -- (B);
+            \draw (C) -- (D);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    Call ZX calculus with these rules added \define{\(\symbf{\pi/4}\)-ZX calculus}\index{\(\pi/4\)-ZX calculus}.
+    
+    \begin{thm}{\(\pi/4\)-ZX Calculus is Complete}{}
+        Let \(D_1\) and \(D_2\) be diagrams in \(\pi/4\)-ZX calculus.
+        If \(\denotes{D_1} = \denotes{D_2}\) then \(D_1 = D_2\) under the axioms of \(\pi/4\)-ZX calculus.
+    \end{thm}
+    
+    The third thing making ZX calculus powerful is how well it can be automated.
+    All a ZX calculation is is a finite labelled graph.
+    Once you've implemented a way of applying the rules this can then be done very efficiently on a computer.
+    
+    A common use of ZX calculus is in quantum circuit optimisation.
+    Given some quantum algorithm as a quantum circuit it is often possible to optimise the circuit.
+    For example, the \(T\) gate,
+    \begin{equation}
+        T = 
+        \begin{pmatrix}
+            1 & 0\\
+            0 & \e^{-i\pi/4}
+        \end{pmatrix}
+        ,
+    \end{equation}
+    is typically expensive to implement, so reducing the number of \(T\) gates in a circuit is usually desirable.
+    Given some circuit making use of \(T\) gates we can use the universality of ZX calculus to convert the circuit into a ZX diagram, then manipulate the ZX diagram and then convert it back to a, hopefully, more optimised circuit with fewer \(T\) gates.
     
     
     %   Appdendix
