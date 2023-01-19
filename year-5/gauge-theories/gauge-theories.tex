@@ -16,6 +16,9 @@
 \declareslashed{}{\not}{-.1}{.5}{a}
 \declareslashed{}{\not}{.05}{.5}{D}
 
+\let\widetildeOLD\widetilde
+\AtBeginDocument{\let\widetilde\widetildeOLD}
+
 % Tikz stuff
 \usepackage{tikz}
 %\tikzset{>=latex}
@@ -23,7 +26,15 @@
 \usetikzlibrary{external}
 \tikzexternalize[prefix=tikz-external/]
 % Other libraries
-\usetikzlibrary{calc}
+\usetikzlibrary{decorations.markings, decorations.pathmorphing}
+
+% Feynman diagram styles
+\tikzset{scalar/.style={dashed}}
+\tikzset{photon/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate}}
+\tikzset{electron/.style={postaction={decorate, decoration={markings, mark=at position #1 with {\arrow{Latex[width=1.5mm]}}}}}}
+\tikzset{electron/.default=0.5}
+\tikzset{positron/.style={postaction={decorate, decoration={markings, mark=at position #1 with {\arrowreversed{Latex[width=1.5mm]}}}}}}
+\tikzset{positron/.default=0.5}
 
 \usepackage[compat=1.1.0]{tikz-feynman}
 
@@ -62,9 +73,26 @@ noabbrev
 % Commands
 % Text
 \newcommand*{\course}[1]{\textit{#1}}
-
+\newcommand{\MSbar}{\ensuremath{\overline{\symrm{MS}}}}
+    
 % Maths
-
+\newcommand{\e}{\symrm{e}}
+\newcommand{\diracadjoint}[1]{\overbar{#1}}
+\newcommand{\covariantDerivative}{D}
+\newcommand{\hermit}{\dagger}
+\newcommand{\lagrangianDensity}{\symcal{L}}
+\newcommand{\amplitude}{\symcal{A}}
+\newcommand{\interaction}{{\symrm{int}}}
+\DeclareMathOperator{\timeOrdering}{T}
+\newcommand{\DL}[1]{\symcal{D}{#1}}
+\newcommand{\DD}[1]{\,\symcal{D}{#1}}
+\DeclarePairedDelimiter{\correlator}{\langle}{\rangle}
+\newcommand{\dhat}[1]{\hat{\symrm{d}}{#1}}
+\newcommand{\dalembertian}{\partial^2}
+\newcommand{\bare}{\symrm{B}}
+\newcommand{\order}{\symcal{O}}
+\newcommand{\minkowskiMetric}{\eta}
+\DeclareMathOperator{\tr}{tr}
 
 \includeonly{}
 
@@ -77,8 +105,901 @@ noabbrev
     \mainmatter
     
     \chapter{Introduction}
+    \section{Other Relevant Courses}
     This course follows on directly from the \course{Quantum Field Theory} course, so much of the relevant background is contained in those notes.
+    A lot of the notation is also taken from this course.
     It is also expected that students on this course will have taken \course{Symmetries of Particles and Fields}, and the prerequisite for that course, \course{Symmetries of Quantum Mechanics}, so for any group theory related topics see the notes of one of these courses.
+    Other relevant courses will be flagged throughout the notes.
+    
+    \section{Conventions}
+    \begin{itemize}
+        \item We will mostly work in natural units, where \(c = \hbar = 1\).
+        \item We use the mostly-minuses metric, \(({+}{-}{-}{-})\), or \(({+}{-}\dotsb{-})\) in \(D\) spacetime dimensions.
+        \item We will use the Einstein summation convention where repeated indices are summed over.
+        In \(d + 1\) dimensions Greek letters, \(\mu, \nu, \rho, \dotsc\), run from 0 to \(d\) and Latin letters, \(i, j, k, \dotsc\), run from \(1\) to \(d\).
+        \item We use the Fourier transform
+        \begin{equation}
+            \tilde{f}(p) = \int_{-\infty}^{\infty} \dl{x} \, \e^{ipx}f(x), \qqand f(x) = \int_{-\infty}^{\infty} \frac{\dl{p}}{2\pi} \e^{-ipx}\tilde{f}(p).
+        \end{equation}
+        \item Feynman diagrams are drawn with time increasing to the right.
+        \item The electric charge, \(e\), is taken to be positive, so an electron has charge \(-e\).
+    \end{itemize}
+    
+    \part{Quantum Electrodynamics}
+    \chapter{Classical Electrodynamics}
+    Quantum electrodynamics (QED)\glossary[acronym]{QED}{Quantum Electrodynamics} is the quantum field theory (QFT)\glossary[acronym]{QFT}{Quantum Field Theory} of electromagnetism.
+    It supersedes classical electrodynamics (CED)\glossary[acronym]{CED}{Classical Electrodynamics} as a theory for predicting what happens to electric charges, as well as electromagnetic radiation, light.
+    We'll start this section by discussing CED and some of its short comings which necessitate the development of QED.
+    For more details on CED see the \course{Classical Electrodynamics} course.
+    
+    \section{Classical Action}
+    Classical electrodynamics follows from the action
+    \begin{equation}
+        S = \int \dl{^4x} \, \left[ -\frac{1}{4} F^{\mu\nu}F_{\mu\nu} - J_\mu A^\mu \right]
+    \end{equation}
+    where \(A_\mu\) is the electromagnetic field (also called the electromagnetic potential), \(J_\mu\) is the current, and \(F_{\mu\nu} = \partial_\mu A_\nu - \partial_\nu A_\mu\) is the electromagnetic field strength (confusingly also called the electromagnetic field in some contexts).
+    
+    The first term in the action tells us how the electromagnetic field evolves and the second term encodes interactions.
+    One common case is a current made of particles of charge \(q_i\).
+    The current due to the \(i\)th particle is \(J^\mu = q_i u_i^\mu = q_i \diff{x_i^\mu}/{\tau_i}\) (no sum on \(i\)).
+    In this case we can write the interaction term as a sum over particles and the action from each particle is given by an integral over the particle's world line.
+    Thus the action can be written as
+    \begin{equation}
+        S = \int \dl{^4x} \, \left[ -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} \right] - \sum_{i} \int \dl{\tau_i} \, q_i A_\mu(x_i(\tau_i)) \diff{x_i^\mu(\tau_i)}{\tau_i} + \dotsb.
+    \end{equation}
+    The \enquote{\(\dotsb\)} here accounts for other effects not already covered, such as spin corrections.
+    These terms are suppressed by factors of \(1/m_i\) or more, \(m_i\) being the mass of the \(i\)th particle.
+    
+    \section{Problems with CED}
+    The theory of point-like electric charges developed as above is not entirely satisfactory.
+    Recall that the Lorentz force on a particle with charge \(q_i\) and four-velocity \(u_i^\mu\) in an electromagnetic field with field strength tensor \(F^{\mu\nu}\) is
+    \begin{equation}
+        \diff{p_i^\mu}{\tau} = q_i F^{\mu\nu}(x_i(\tau)) u_{i\nu}(x_i(\tau))
+    \end{equation}
+    where \(p_i = m_i u_i = m_i \diff{x_i}/{\tau}\) is the four-momentum of the particle, with \(m_i\) being the mass of the \(i\)th particle.
+    This law follows from conservation of energy, so it's pretty fundamental.
+    
+    Now consider the Coulomb field of particle \(1\) in particle 1's rest frame.
+    At a point \(x\) a distance \(r\) from particle 1, which has position \(x_1\), the Coulomb field is
+    \begin{equation}
+        A^0(x) = \frac{q_i}{4\pi r} = \frac{q_i}{4\pi} \frac{1}{\sqrt{(x^1 - x_1^1)^2 + (x^2 - x_1^2)^2 + (x^3 - x_1^3)^2}}.
+    \end{equation}
+    If we can write this in a covariant way then it will apply in all frames.
+    We can do this using \(u_1 = (1, \vv{0})\), which is the four-velocity of the particle in it's rest frame in units where \(c = 1\).
+    We then have
+    \begin{equation}
+        [u_1 \cdot (x - x_1)]^2 - (x - x_1)^2 = (x^0 - x_1^0)^2 - (x^0 - x_1^0)^2 + (x^i - x_1^i)^2.
+    \end{equation}
+    Using \(u_1^\mu\) to get a \(\mu\) index we have
+    \begin{equation}
+        A^\mu(x) = \frac{q_i}{4\pi} \frac{u_1^\mu}{\sqrt{[u_1 \cdot (x - x_1)]^2 - (x - x_1)^2}}.
+    \end{equation}
+    This is covariant and so holds in any inertial frame.
+    
+    Now suppose that particles 1 and 2 interact.
+    The force on particle one is
+    \begin{equation}
+        \diff{p_1^\mu}{\tau} = q_1 F^{\mu\nu}(x_1(\tau))u_{1\nu}(\tau).
+    \end{equation}
+    The \(F^{\mu\nu}\) appearing here is the total electromagnetic field strength.
+    This proves to be a problem because part of \(F^{\mu\nu}\) is the Coulomb field of particle 1, \(A^\mu\).
+    We can see from the expression above that this is singular when \(x = x_1\), which is exactly the case when we try to compute the force above.
+    So we get a divergent result which we have to somehow make sense of.
+    
+    The standard solution in CED to avoid this problem is to just use the electromagnetic field strength due to particle 2, and ignore the field from particle 1.
+    Then, so long as the two particles can't have the same position, \(F^{\mu\nu}\) is nonsingular and we avoid the problem with infinity.
+    This workaround works well at low energies (small velocities).
+    
+    The problem is that this workaround is not consistent with conservation of energy.
+    For example, consider a classical atom, formed from a nucleus of charge \(Ze\), which we take to have infinite mass, and an electron of charge \(-e\).
+    The Lorentz force applied to the electron, calculated using the electric field only from the nucleus, is consistent with stable circular orbits.
+    The problem is that as the electron is orbiting it is changing direction, and so accelerating, and therefore must radiate.
+    There is only one possible source for this energy, the potential, and so the orbit must decay.
+    
+    Since the orbit decays there must be some force we have not accounted for causing this decay.
+    It is possible to account for this force only if we include the electron's own field in the calculation of the force upon the electron.
+    This means we have to account for interactions of particles with their own fields.
+    The correction that we get when doing so is suppressed by inverse powers of \(c\), which is why removing the electron's electromagnetic field works well enough for many purposes at low energies.
+    
+    Once we accept that particles interact with their own fields there is another problem.
+    The Coulomb field of a point-like particle contains an infinite electrostatic energy.
+    The energy density of an electromagnetic field is \((E^2 + B^2)/2\), meaning that the energy contained in the Coulomb field outside of a spherical region of radius \(r_{\min}\) centred on the electron is given by
+    \begin{equation}
+        \int \dl{^3x} \, \frac{1}{2}E^2 = \frac{1}{2}\frac{e^2}{(4\pi)^2} \int_{S^2} \dl{\Omega} \int_{r_{\min}}^{\infty} \dl{r} \, r^2 \frac{1}{r^4} = \frac{1}{8\pi} \frac{1}{r_{\min}}.
+    \end{equation}
+    Taking \(r_{\min} \to \infty\) the energy diverges.
+    
+    The classical physics solution to this is to say that the electron isn't point-like.
+    Then if we choose \(r_{\min}\) to be the size of the electron so long as
+    \begin{equation}
+        mc^2 \gtrsim \frac{1}{2} \frac{e^2}{4\pi r_{\min}},
+    \end{equation}
+    so the energy of the field is less than the total energy available from the electron, things are fine.
+    Setting \(c = 1\) again gives
+    \begin{equation}
+        r_{\min} \gtrsim \frac{1}{2} \frac{e^2}{4\pi} \frac{1}{m} = \alpha \ell_{\mathrm{Compton}}
+    \end{equation}
+    where \(\alpha = e^2/(4\pi)\) is the fine structure constant and \(\ell_{\mathrm{Compton}}\) is the Compton wavelength, which is the wavelength of a photon with the same energy as the rest mass of the particle.
+    What this tells us is that scales at which quantum mechanical effects become important become important before the size of the electron becomes a problem classically, so if we're only interested in classical computations we don't need to worry about treating the electron as point-like.
+    
+    However, we know from experiments that the electron is point-like at least up to the \qty{1}{\tera\electronvolt} scale, which is about one millionth of the limit above.
+    These point-like particles lead to divergences in classical theories, and also in quantum theories, like the ones above.
+    Interestingly the divergence is actually not as bad in the quantum theory, being log divergent instead of going as \(1/r_{\min}\).
+    In the quantum theory we can deal with these infinities by absorbing them into a finite number of measured parameters, such as \(e\) and \(m\), and we get a very powerful and predictive theory, QED.
+    
+    \chapter{QFT Recap}
+    \epigraph{It's part of my job to give you problems}{Donal O'Connell}
+    \section{QED Lagrangian}
+    In QFT, in particular in QED, we replace the classical action with the \define{QED action}\index{QED Lagrangian}:
+    \begin{equation}
+        S = \int \dl{^Dx} \, \left[ -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} + \diracadjoint{\psi} (i\slashed{\covariantDerivative} - m)\psi \right].
+    \end{equation}
+    Here \(F^{\mu\nu} = \partial^\mu A^\nu - \partial^\nu A^\mu\) as before.
+    The change comes in the interaction term, where we now have the spinor field \(\psi\), which is acted on by the covariant derivative, which in QED is given by \(\covariantDerivative_\mu \coloneqq \partial_\mu -ieA_\mu\).
+    Recall that \(\slashed{a} \coloneqq \gamma^\mu a_\mu\) where \(\gamma^\mu\) are the Dirac gamma matrices.
+    Note that we leave the dimension as a variable, in preparation for dimensional regularisation later.
+    
+    Notice that there are no world lines appearing in the action now.
+    This reflects the fact that we've replaced the particles with definite position with fields, which aren't localised in the same way.
+    One of the biggest changes upon moving to a \emph{quantum} field theory is that we have a the new phenomenon of pair production.
+    This creates new world lines, which is part of the reason we have to move away from actions involving sums over world lines.
+    
+    We use the Dirac Lagrangian in QED since we are mostly interested in electrons, which are spin \(1/2\) particles.
+    If instead we have a spin 0 particle with complex scalar field \(\Phi\) then we can use the \defineindex{scalar QED} Lagrangian
+    \begin{equation}
+        S = \int \dl{^Dx} \, \left[ -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} + (\covariantDerivative_\mu \Phi)^\hermit (\covariantDerivative^\mu \Phi) - m^2 \Phi^\hermit \Phi - V(\Phi) \right]
+    \end{equation}
+    where \(V\) is some potential.
+    
+    If we neglect spin corrections in QED, often a valid thing to do since the spin is on the order of \(\hbar\), then we get similar results in both normal and scalar QED, and these results are similar to those we get in classical electrodynamics.
+    In this way scalar QED is more similar to classical electrodynamics, and we will make use of scalar QED as an example while focusing on normal QED for applications.
+    In some ways normal QED is actually simpler than scalar QED, there is no potential in normal QED and in normal QED the largest number of fields comes from the \(-ie\diracadjoint{\psi}\slashed{A}\psi\) term, with three fields, whereas scalar QED has a four field term, \(-\diracadjoint{\psi}A_\mu^\hermit A_\mu \psi\).
+    
+    The main objects of physical interest in QFT are scattering amplitudes.
+    We will make use of both canonical quantisation and path integral methods to compute these and other quantities.
+    
+    \section{Canonical Quantisation}
+    We'll compute one term of a tree-level amplitude using the canonical quantisation approach.
+    For more details and similar calculations see the first half of the \course{Quantum Field Theory} course.
+    We'll consider a real scalar field with a cubic interaction
+    \begin{equation}
+        \lagrangianDensity_{\interaction} = -\frac{g}{3!}\varphi^3.
+    \end{equation}
+    The two-to-two amplitude\footnote{two changes here from \course{Quantum Field Theory}, in that course we called the amplitude \(\symcal{M}\) and the factor of \(i\) was missing, this phase doesn't effect the final physics which always depend on \(\abs{\amplitude}^2\)}, \(\amplitude\), is given by
+    \begin{equation}
+        i\amplitude  = \bra{p_1', p_2'} S \ket{p_1, p_2}
+    \end{equation}
+    where \(p_i\) are the momenta of the incoming particles and \(p_i'\) the momenta of the outgoing particles.
+    The \(S\)-matrix, \(S\), is given by the Dyson expansion:
+    \begin{align}
+        S &= \sum_{n = 0}^{\infty} \frac{(-i)^n}{n!} \timeOrdering \int \dl{t_1} \dotsm \int \dl{t_n} \, H_{\interaction}(t_1) \dotsm H_{\interaction}(t_n)\\
+        &= \sum_{n = 0}^{\infty} \frac{i^n}{n!} \timeOrdering \int \dl{^Dx_1} \dotsm \int \dl{x_n} \, \lagrangianDensity_{\interaction}(x_1) \dotsm \lagrangianDensity_{\interaction}(x_n)\\
+        &= \timeOrdering \exp\left\{ i \int \dl{^Dx} \, \lagrangianDensity_{\interaction} \right\}\\
+        &= \timeOrdering \exp\{ i S_{\interaction} \}
+    \end{align}
+    where \(\timeOrdering\) is the time ordering operator, acting on everything to its right, \(H_{\interaction}\) is the interaction Hamiltonian, related to the interaction Lagrangian by
+    \begin{equation}
+        \int \! \dl{^{D-1}x} \, \lagrangianDensity_{\interaction} = -H_{\interaction}
+    \end{equation}
+    and \(S_{\interaction}\) is the interaction action, given by
+    \begin{equation}
+        S_{\interaction} \coloneqq \int \dl{^Dx} \, \lagrangianDensity_{\interaction}.
+    \end{equation}
+    Note that the exponential is just a short hand for the expansion above based on the similarity with the Taylor series of the exponential.
+    
+    Suppose we are interested in \(i\amplitude\) at order \(g^2\).
+    Then we consider the following term:
+    \begin{multline*}
+        i\amplitude^{(2)} =\\
+        \bra{p_1', p_2'} \frac{i^2}{2} \left( -\frac{g}{3!} \right)^2 \int \dl{^Dx_1} \int \dl{^Dx_2} \, \timeOrdering \varphi(x_1) \varphi(x_1) \varphi(x_1) \varphi(x_2) \varphi(x_2) \varphi(x_2) \ket{p_1, p_2}.
+    \end{multline*}
+    We compute this using contractions.
+    One particular set of contractions is
+    \begin{equation*}
+        \wick{\bra{\c4{p}_1', \c3{p}_2'} \frac{i^2}{2} \left( -\frac{g}{3!} \right)^2 \int \dl{^Dx_1} \int \dl{^Dx_2} \, \timeOrdering \c3{\varphi}(x_1) \c4{\varphi}(x_1) \c1{\varphi}(x_1) \c1{\varphi}(x_2) \c2{\varphi}(x_2) \c1{\varphi}(x_2) \ket{\c1{p}_1, \c2{p}_2}}.
+    \end{equation*}
+    We can interpret this in terms of creation and annihilation of particles.
+    The fields at \(x_2\) contracted with the incoming particles annihilate them and then the fields at \(x_1\) contracted with the outgoing particles create the outgoing particles.
+    The contraction between the fields at \(x_1\) and \(x_2\) gives a propagator between these points.
+    This is best seen in a Feynman diagram,
+    \begin{equation}
+        \tikzsetnextfilename{qft-recap-canonical-quantisation-example}
+        \begin{tikzpicture}[baseline=(A)]
+            \draw[scalar] (0, 0) node [below right, xshift=-0.2cm] {\(x_1\)} coordinate (A) -- (1, 0) node [below left, xshift=0.2cm] {\(x_2\)};
+            \draw[scalar] (0, 0) -- (120:1) node [left] {\(p_1\)};
+            \draw[scalar] (0, 0) -- (240:1) node [left] {\(p_2\)};
+            \draw[scalar] (1, 0) -- ++ (60:1) node [right] {\(p_1'\)};
+            \draw[scalar] (1, 0) -- ++ (300:1) node [right] {\(p_2'\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    The initial particles enter on the left, annihilate at \(x_1\), where there is a propagator to \(x_2\), where two new particles are created.
+    
+    \section{Path Integral}
+    In the path integral formulation we don't compute amplitudes directly.
+    Instead we compute correlators, which we can extract the amplitude from later.
+    For more details and similar calculations see the second half of the \course{Quantum Field Theory} course.
+    The starting point for using the path integral formalism is to define the generating functional, which for QED is
+    \begin{equation}
+        Z[J] = \int \DL{\varphi} \exp\left\{ i\int \dl{^Dx} \, [\lagrangianDensity(\varphi) + J(x)\varphi(x)] \right\}.
+    \end{equation}
+    We then define the \(n\) point \defineindex{correlator}
+    \begin{align}
+        G^{(n)}(x_1, \dotsc, x_n) &\coloneqq \bra{0} \timeOrdering \varphi(x_1) \dotsm \varphi(x_n) \ket{0}\\
+        &\eqqcolon \correlator{\varphi(x_1) \dotsm \varphi(x_n)}\\
+        &= \frac{1}{Z[0]} \left( \frac{1}{i} \diffd{}{J(x_1)} \right) \dotsm \left( \frac{1}{i} \diffd{}{J(x_n)} \right) Z[J] \bigg|_{J = 0}\\
+        &= \int \DL{\varphi} \, \varphi(x_1) \dotsm \varphi(x_n) \exp\left\{ i \int \dl{^Dx} \, (\lagrangianDensity_{\symrm{free}} + \lagrangianDensity_{\interaction}) \right\}.\notag
+    \end{align}
+    The factor of \(1/Z[0]\) is just normalisation and we typically don't worry about it.
+    The source is just there to allow us to pull down factors of \(\varphi\) by differentiating, which is why we set it to zero at the end.
+    
+    As the first example of the path integral we'll compute the three-point correlator to first order in \(g\).
+    We'll choose our normalisation such that \(Z[0] = 1\).
+    Then
+    \begin{equation}
+        G^{(3)}(x_1, x_2, x_3) = \int \DL{\varphi} \, \varphi(x_1) \varphi(x_2) \varphi(x_3) \e^{iS_{\symrm{free}} + iS_{\interaction}}.
+    \end{equation}
+    Expanding the interaction exponential to first order we get
+    \begin{equation}
+        G^{(3)}(x_1, x_2, x_3) \approx \int \DL{\varphi} \, \varphi(x_1) \varphi(x_2) \varphi(x_3) \left[ 1 - \frac{ig}{3!} \int \dl{^Dx} \varphi(x)^3 \right] \e^{iS_{\symrm{free}}}.
+    \end{equation}
+    We have now reduced this to a Gaussian path integral which can be computed with contractions.
+    One set of contractions gives the result
+    \begin{equation}
+        C(x_1, x_2, x_3) = -ig \int \DL{\varphi} \, \wick{\c4{\varphi}(x_1) \c3{\varphi}(x_2) \c2{\varphi}(x_3) \int \dl{^Dx} \, \c2{\varphi}(x) \c3{\varphi}(x) \c4{\varphi}(x)} \e^{iS_{\symrm{free}}}.
+    \end{equation}
+    The contraction of two fields is given by the \defineindex{Feynman propagator}:
+    \begin{equation}
+        \wick{\c{\varphi}(x)\c{\varphi}(y)} = i\Delta(x - y) = \int \frac{\dl{^Dp}}{(2\pi)} \frac{i}{p^2 - m^2 + i\varepsilon} \e^{ip \cdot (x_1 - x_2)}.
+    \end{equation}
+    Here \(\varepsilon\) is a small positive real number included to make expressions converge.
+    Note that \(\Delta(x - y) = \Delta(y - x)\).
+    At this point we introduce the short hand notation \(\dhat{p} = \dl{p}/(2\pi)\).
+    
+    Using this result the contraction above can be calculated as
+    \begin{equation}
+        C(x_1, x_2, x_3) = -ig \int \dl{^Dx} \, i\Delta(x_1 - x) \, i\Delta(x_2 - x) \, i\Delta(x_3 - x).
+    \end{equation}
+    We can again summarise this in a diagram
+    \begin{equation}
+        \tikzsetnextfilename{qft-recap-path-integral-example-1}
+        \begin{tikzpicture}[baseline=(A)]
+            \draw[scalar] (0, 0) node [below] {\(x\)} coordinate (A) -- (330:1) node [above] {\(x_1\)};
+            \draw[scalar] (0, 0) -- (90:1) node [right] {\(x_2\)};
+            \draw[scalar] (0, 0) -- (210:1) node [left] {\(x_3\)};
+        \end{tikzpicture}
+    \end{equation}
+    In fact, given a diagram we can read off the corresponding expression for a correlator through the following prescription:
+    \begin{itemize}
+        \item Each line, \tikzsetnextfilename{qft-recap-scalar-propagator}\tikz[baseline=(x.base)]{\draw[scalar] (0, 0) node [left] (x) {\(x\)} -- (1, 0) node [right] {\(y\)};}, is a factor of \(i\Delta(x - y)\).
+        \item Each vertex, \tikzsetnextfilename{qft-recap-phi-cubed-vertex}\tikz[baseline=-0.15cm]{\foreach \angle in {90, 210, 330} \draw[scalar] (0, 0) coordinate (A) -- (\angle:0.3); \node at (A) [below] {\(x\)};}, is a factor of \(-ig \int \symrm{d}^Dx\).
+        \item Conserve momentum at each vertex.
+    \end{itemize}
+    
+    There are other possible contractions, one such contraction contributing to \(\correlator{\varphi(x_1)\varphi(x_2)\varphi(x_3)}\) is
+    \begin{align}
+        &\hphantom{=} -ig \int \DL{\varphi} \, \wick{\c3{\varphi}(x_1) \c1{\varphi}(x_2) \c1{\varphi}(x_3) \int \dl{^Dx} \, \c3{\varphi}(x) \c1{\varphi}(x) \c1{\varphi}(x)} \e^{iS_{\symrm{free}}}\\
+        &= -ig \int \dl{^D x} \, i\Delta(x_1 - x) \, i\Delta(x - x) \, i\Delta(x_2 - x_3)\\
+        &= \tikzsetnextfilename{qft-recap-path-integral-example-2}
+        \begin{tikzpicture}[baseline=-0.3cm]
+            \draw[scalar] (0, 0) node [left] {\(x_1\)} -- (0.75, 0) node [above left, xshift=0.1cm] {\(x\)};
+            \draw[scalar] (1, 0) circle [radius = 0.25];
+            \draw[scalar] (0, -0.5) node [left] {\(x_2\)} -- (1, -0.5) node [right] {\(x_3\)};
+        \end{tikzpicture}
+        .
+    \end{align}
+    
+    This diagram is disconnected.
+    Often we are only interested in correlators involving connected diagrams, since these are the only diagrams that contribute to quantities such as \(\log(Z[J])\), as we saw in \course{Quantum Field Theory}.
+    
+    For another example consider the four-point correlator
+    \begin{align}
+        G^{(4)}(y_1, y_2, z_1, z_2) &= \bra{0} \timeOrdering \varphi(y_1) \varphi(y_2) \varphi(z_1) \varphi(z_2) \ket{0}\\
+        &= \int \DL{\varphi} \, \varphi(y_1) \varphi(y_2) \varphi(z_1) \varphi(z_2) \exp\left\{ i \int \dl{^Dx} (\lagrangianDensity_{\symrm{free}} + \lagrangianDensity_{\interaction}) \right\}.
+    \end{align}
+    If we want to evaluate the order \(g^2\) contribution to this correlator then we can do so by considering the quadratic term after expanding \(\exp\{iS_{\interaction}\}\):
+    \begin{multline*}
+        \int \DL{\varphi} \varphi(y_1) \varphi(y_2) \varphi(z_1) \varphi(z_2)\\
+        \times\left[ \frac{1}{2}\left( -\frac{ig}{3!} \right)^2 \int \dl{^Dx_1} \int \dl{^Dx_2} \, \varphi(x_1) \varphi(x_1) \varphi(x_1) \varphi(x_2) \varphi(x_2) \varphi(x_2) \right] \e^{iS_{\symrm{free}}}
+    \end{multline*}
+    Again this is a Gaussian integral and can be computed using contractions.
+    One particular contraction we may want to consider is
+    \begin{equation}
+        \wick{\c4\varphi(y_1) \c3\varphi(y_2) \c2\varphi(z_1) \c1\varphi(z_2) \ \c1\varphi(x_1) \c2\varphi(x_1) \c1\varphi(x_1) \c1\varphi(x_2) \c3\varphi(x_2) \c4\varphi(x_2)}
+    \end{equation}
+    where we've only written the fields, not any of the integrals, constants, or exponentials, to fit it all on one line.
+    This corresponds to the diagram
+    \begin{equation}
+        \tikzsetnextfilename{qft-recap-path-integral-example-3}
+        D = 
+        \begin{tikzpicture}[baseline=(A)]
+            \draw[scalar] (0, 0) node [below right, xshift=-0.2cm] {\(x_1\)} coordinate (A) -- (1, 0) node [below left, xshift=0.2cm] {\(x_2\)};
+            \draw[scalar] (0, 0) -- (120:1) node [left] {\(y_1\)};
+            \draw[scalar] (0, 0) -- (240:1) node [left] {\(y_2\)};
+            \draw[scalar] (1, 0) -- ++ (60:1) node [right] {\(z_1\)};
+            \draw[scalar] (1, 0) -- ++ (300:1) node [right] {\(z_2\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    There are multiple different contractions which all give the same diagram, and so the same contribution to the correlator.
+    We combine these into one, including a \defineindex{symmetry factor} counting the number of such diagrams.
+    The factor of \(1/3!\) has been chosen to cancel out this symmetry factor, in this case because we can permute the three \(\varphi(x_1)\) fields and the three \(\varphi(x_2)\) fields without changing anything, giving \((3!)^2\) as a symmetry factor, which cancels the \((3!)^2\) from expanding the exponential at second order.
+    The result of evaluating all contractions giving diagram \(D\) is
+    \begin{equation*}
+        D = \int \dl{^Dx_1} \int \dl{^Dx_2} \, (-ig)^2 \, i\Delta(y_1 - x_2) \, i\Delta(y_2 - x_3) \, i\Delta(x_2 - x_1) \, i\Delta(x_1 - z_1) \, iD(x_1 - z_2).
+    \end{equation*}
+    
+    Usually we prefer to work in momentum space.
+    The simplest way to move to momentum space here is to replace each propagator with the inverse Fourier transform of the Fourier transform:
+    \begin{equation}
+        \Delta(x - y) = \int \dhat{p} \e^{ip \cdot (x - y)} \underbrace{\frac{1}{p^2 - m^2 + i\varepsilon}}_{= \widetilde{\Delta}(p)}.
+    \end{equation}
+    We can then manipulate the result until it is of the form \(D = \inverseFourierTransform\{\widetilde{D}\}\) and then identify \(\widetilde{D} = \fourierTransform\{D\}\).
+    Making this replacement of propagators we get the somewhat unwieldy
+    \begin{align}
+        D &= (-ig)^2 \int \dl{^Dx_1} \, \dl{^Dx_2} \int \dhat{p_1} \, \dhat{p_2} \, \dhat{p_2} \, \dhat{p_3} \, \dhat{p_4} \, \dhat{q} \notag\\
+        &\quad\times i\e^{ip_1 \cdot (y_1 - x_2)} i\e^{ip_2 \cdot (y_2 - x_2)} i\e^{ip_3 \cdot (x_1 - z_1)} i\e^{ip_4 \cdot (x_1 - z_2)} i\e^{iq \cdot (x_2 - x_1)} \notag\\
+        &\quad\times \frac{1}{q^2 - m^2 + i\varepsilon} \prod_{j=1}^{4} \frac{1}{p_j^2 - m^2 + i\varepsilon}.
+    \end{align}
+    We use \(q\) for the momentum of the internal propagator to distinguish it from the external propagators.
+    We can perform the integrals over \(x_i\) using the identity
+    \begin{equation}
+        \int \dl{^Dx} \, \e^{ip \cdot x} = (2\pi)^D\delta(p).
+    \end{equation}
+    Rewriting the exponentials slightly we get
+    \begin{equation}
+        \e^{-i(p_1 + p_2 - q) \cdot x_2} i\e^{ip_1 \cdot y_1} i\e^{ip_2 \cdot y_2} \e^{i(p_3 + p_4 - q) \cdot x_1} i\e^{-ip_3 \cdot z_1} i\e^{-ip_4 \cdot z_2} i
+    \end{equation}
+    so we'll get two Dirac deltas:
+    \begin{align}
+        D &= (-ig)^2 \int \dhat{p_1} \, \dhat{p_2} \, \dhat{p_2} \, \dhat{p_3} \, \dhat{p_4} \, \dhat{q} \, (2\pi)^D \delta(p_1 + p_2 - q) \notag\\
+        &\quad\times  (2\pi)^D \delta(p_3 + p_4 - q) \e^{ip_1 \cdot y_1} \e^{ip_2 \cdot y_2}  \e^{-ip_3 \cdot z_1} \e^{-ip_4 \cdot z_2} \notag\\
+        &\quad\times \frac{i}{q^2 - m^2 + i\varepsilon} \prod_{j=1}^{4} \frac{i}{p_j^2 - m^2 + i\varepsilon}.
+    \end{align}
+    We can then perform the \(q\) integral using the second Dirac delta to set \(q = p_3 + p_4\), giving
+    \begin{align}
+        D &= (-ig)^2 \int \dhat{p_1} \, \dhat{p_2} \, \dhat{p_2} \, \dhat{p_3} \, \dhat{p_4} \, \dhat{q} \, (2\pi)^D \delta(p_1 + p_2 - p_3 - p_4) \notag\\
+        &\quad\times \e^{ip_1 \cdot y_1} \e^{ip_2 \cdot y_2}  \e^{-ip_3 \cdot z_1} \e^{-ip_4 \cdot z_2} \notag\\
+        &\quad\times \frac{i}{(p_3 + p_4)^2 - m^2 + i\varepsilon} \prod_{j=1}^{4} \frac{i}{p_j^2 - m^2 + i\varepsilon}.
+    \end{align}
+    Note that the factor of \((2\pi)^D\) in front of the Dirac delta cancels with the hidden factor of \(1/(2\pi)^D\) in \(\dhat{p}\).
+    This is now of the form \(D = \inverseFourierTransform\{\widetilde{D}\}\), so we can identify \(\widetilde{D} = \fourierTransform\{D\}\) as
+    \begin{equation}
+        \widetilde{D}(p_1, p_2, p_3, p_4) = (2\pi)^D\delta(p_1 + p_2 - p_3 - p_4) \frac{i}{(p_3 + p_4)^2 - m^2 + i\varepsilon} \prod_{j=1}^{4} \frac{i}{p_j^2 - m^2 + i\varepsilon}.
+    \end{equation}
+    Notice that the signs of \(p_i\) in the Dirac delta reflect a sign choice where \(p_1\) and \(p_2\) are incoming momenta and \(p_3\) and \(p_4\) are outgoing momenta.
+    If all momenta are chosen to be incoming, as is sometimes the case, then all of the signs would be \(+\).
+    This Dirac delta is simply telling us that the total momentum is conserved, so it's not that interesting and is not considered to be part of the amplitude.
+    
+    Similarly, the external line factors, the product above, don't carry any information, beyond the number of external lines, and aren't present in the amplitude.
+    For this reason we consider \define{amputated correlators}\index{amputated correlator}, which are given by omitting this term in momentum space.
+    In position space it's slightly more work to amputate a correlator, but it can be done by using
+    \begin{equation}
+        (\dalembertian_x + m^2) \, i\Delta(x - y) = i \int \dhat{^Dp} (-p^2 + m^2) \frac{\e^{-ip \cdot (x - y)}}{p^2 - m^2 + i\varepsilon} = -i\delta(x - y),
+    \end{equation}
+    where \(\dalembertian_x\) is the d'Alembert operator with respect to \(x\), rather than \(\diffp{}/{x}\) squared.
+    This statement is simply that the propagator is a Green's function of the Klein--Gordon operator, which should be familiar from \course{Quantum Field Theory}.
+    We also see from this that the \enquote{inverse} of \(\dalembertian + m^2\) is \(1/(p^2 - m^2 + i\varepsilon)\), another fact we saw in the previous course.
+    Using this we can amputate a correlator in position space by acting on it with
+    \begin{equation}
+        \prod_{j=1}^{n} (+i)(\dalembertian_j + m_j^2)
+    \end{equation}
+    where \(\dalembertian_j\) is the d'Alembert with respect to \(x_j\) and \(m_j\) is the mass of the \(j\)th particle.
+    
+    \chapter{Quantum Electrodynamics}
+    \epigraph{If you don't use dim reg you'll be shot.}{Donal O'Connell}
+    \section{The QED Lagrangian}
+    The QED Lagrangian is
+    \begin{equation}
+        \lagrangianDensity = -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} + \diracadjoint{\psi} (i\slashed{\covariantDerivative} - m)\psi
+    \end{equation}
+    where \(F_{\mu\nu} = \partial_\mu A_\nu - \partial_\nu A_\mu\) and \(\covariantDerivative_\mu = \partial_\mu - ieA_\mu\).
+    One important property of this Lagrangian is the presence of a \(\unitary(1)\) gauge symmetry, given by
+    \begin{equation*}
+        \psi(x) \mapsto \psi(x)\e^{i\alpha(x)}, \quad \diracadjoint{\psi}(x) \mapsto \diracadjoint{\psi}(x) \e^{-i\alpha(x)}, \qand A_\mu(x) \mapsto A_\mu(x) + \frac{1}{e}\partial_\mu \alpha(x)
+    \end{equation*}
+    where \(\alpha\) is some function of spacetime taking values in \([0, 2\pi)\) (with continuous second derivatives).
+    We can see that this leaves the Lagrangian invariant by considering how each term transforms.
+    First,
+    \begin{align}
+        F_{\mu\nu} &= \partial_\mu A_\nu - \partial_\nu A_\mu\\
+        &\mapsto \partial_\mu \left( A_\nu + \frac{1}{e}\partial_\nu \alpha \right) - \partial_\nu \left( A_\mu + \frac{1}{e}\partial_\mu \alpha \right)\\
+        &= \partial_\mu A_\nu + \frac{1}{e} \partial_\mu \partial_\nu \alpha - \partial_\nu A_\mu - \frac{1}{e} \partial_\mu \alpha\\
+        &= F_{\mu\nu}.
+    \end{align}
+    Second,
+    \begin{align}
+        \diracadjoint{\psi}(i\slashed{\covariantDerivative} - m)\psi &= \diracadjoint{\psi}(i\slashed{\partial} + e\slashed{A})\psi\\
+        &\mapsto \diracadjoint{\psi}\e^{-i\alpha}\left( i\slashed{\partial} + e\left( \slashed{A} + \frac{1}{e}\slashed{\partial}\alpha \right) - m \right)\psi\e^{i\alpha}\\
+        &= \diracadjoint{\psi}\e^{-i\alpha} (i\slashed{\partial} + e\slashed{A} + \slashed{\partial}\alpha - m) \psi\e^{i\alpha}\\
+        &= \diracadjoint{\psi}\e^{-i\alpha}\e^{i\alpha}(i\slashed{\partial}(i\alpha) + i\slashed{\partial} + e\slashed{A} + \slashed{\partial}\alpha - m)\psi\\
+        &= \diracadjoint{\psi}(\slashed{\partial} + e\slashed{A} - m)\psi\\
+        &= \diracadjoint{\psi}(i\slashed{\covariantDerivative} - m)\psi.
+    \end{align}
+    
+    \section{Divergences}
+    \epigraph{Personally I detest dim reg. It's weird, but it's easy. It's detestable.}{Donal O'Connell}
+    Our focus in the first part of this course will be on renormalisation of divergences in QED.
+    We will mainly look at correlators and how we can extract physics from renormalised correlators.
+    We will do this through the process of renormalised perturbation theory.
+    
+    Loop diagrams, such as
+    \begin{equation}
+        \tikzsetnextfilename{qed-divergent-diagram-example}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[photon] (0, 0) -- (1, 0);
+            \draw[electron=0.53] (1, 0) arc (180:0:0.5);
+            \draw[positron=0.47] (1, 0) arc (-180:0:0.5);
+            \draw[photon] (2, 0) -- (3, 0);
+        \end{tikzpicture}
+    \end{equation}
+    are often divergent.
+    We can absorb these divergences into a finite (in QED) set of measured parameters.
+    
+    To do this we distinguish between the fields and parameters appearing in the original Lagrangian, which we call \defineindex{bare} fields and parameters, and the renormalised fields and parameters.
+    Add a label \(\bare\) to each bare quantity so the Lagrangian is
+    \begin{equation}
+        \lagrangianDensity = -\frac{1}{4}F_{\bare \mu\nu} F_{\bare}^{\mu\nu} + \diracadjoint{\psi}_{\bare} (i\slashed{\covariantDerivative}_{\bare} - m_{\bare})\psi_{\bare}
+    \end{equation}
+    where \(F_{\bare \mu\nu} = \partial_\mu A_{\bare \nu} - \partial_\nu A_{\bare \mu}\) and \(\covariantDerivative_{\bare \mu} = \partial_\mu - ie_{\bare} A_{\bare \mu}\).
+    We can think of the original Lagrangian and the bare quantities as being \enquote{true}, corresponding to some high energy theory.
+    Then the renormalised quantities are from the low energy limit of this theory.
+    We define the following renormalised quantities in terms of the bare quantities:
+    \begin{align}
+        A_{\bare\mu} &= \sqrt{Z_3}A_\mu,\\
+        \psi_{\bare} &= \sqrt{Z_2}\psi,\\
+        m_{\bare} &= m + \delta m,\\
+        e_{\bare} &= Z_e e.
+    \end{align}
+    
+    We fix the values of the unknown parameters introduced in these definitions by requiring that correlators of renormalised fields are finite and choosing these unknown parameters in such a way that this is enforced.
+
+    In \course{Quantum Field Theory} we didn't give a special notation for the bare quantities, and instead labelled the renormalised quantities, for example, \(\varphi_{\symrm{R}}\) was the renormalised scalar field and \(\varphi\) was the bare scalar field.
+    This was because we didn't cover renormalisation until the end of the course, so the extra \(\bare\) labels would have been a nuisance.
+    In this course we start with renormalisation, so we will work with the renormalised quantities more, so we don't give them a special label and instead label the bare quantities.
+    
+    The parameters \(Z_2\) and \(Z_3\) are called the \define{wave function renormalisation constants}\index{wave function renormalisation constant}.
+    The labels 2 and 3 are convention, and we'll introduce \(Z_1\) shortly.
+    The square roots are chosen as these fields appear squared in the Lagrangian.
+    
+    The definition of the renormalised mass above doesn't fit the pattern.
+    We've chosen to think of the renormalised mass, \(m\), as simply being shifted by \(\delta m\) from the bare mass, \(m_{\bare}\).
+    We could have followed the pattern and written \(m_{\bare} = Z_mm\) with \(Z_m = 1 + \delta m/m\).
+    This is nice in QED where if \(m_{\bare} = 0\) then \(m = 0\).
+    However in other theories, such as scalar QED this isn't the case, it is possible for the bare field to be massless but the renormalised field has a mass.
+    This can work with \(m_{\bare} = Z_mm\), we just have to choose \(Z_m\) so that it diverges when \(m_{\bare} = 0\).
+    The reason that we don't define \(A_\mu\) and \(\psi\) in the same way, i.e.\@ \(A_{\bare\mu} = A_{\mu} + \delta A_\mu\) and \(\psi_{\bare} = \psi + \delta \psi\), is because we don't have any other vectors or spinors in our theory to give us \(\delta A_\mu\) or \(\delta \psi\).
+    The reason we don't define \(e\) in this way is that when \(e_{\bare} = 0\) the theory is non-interacting, and thus we should also have \(e = 0\).
+    Later we will expand \(Z_i\) as \(1 + \delta_i\), which corresponds to \(\delta_m = \delta m/m\).
+    
+    To make the \(Z_i\) and \(\delta m\) well defined we need to pick a regulator.
+    We'll use \defineindex{dimensional regularisation}, or \defineindex{dim reg}\index{dim reg|see{dimensional regularisation}}.
+    We also need to pick a renormalisation scheme.
+    We'll use \defineindex{modified minimal subtraction}, or \define{\MSbar}\index{MS@\MSbar}.
+    
+    In dim reg it is actually better to set
+    \begin{equation}
+        e_{\bare} = Z_e e \mu^\varepsilon
+    \end{equation}
+    since \(e_{\bare}\) is dimensionless in \(D = 4\), but in \(D = 4 - 2\varepsilon\) dimensions \(e_{\bare}\) has mass dimension \(\varepsilon\).
+    We choose \(\mu\) to be a mass scale so that \(e\) is dimensionless in \(D = 4 - 2\varepsilon\) dimensions.
+    Importantly \(\mu\) is not a parameter of the bare theory.
+    This means that no physics can depend on \(\mu\) so \(\mu\) must cancel out in any computation giving a measurable result.
+    The choice of \(\mu\) can effect how quickly perturbation theory converges, for terms of the form \(\log(m/\mu)\) are common, and if we choose \(\mu \approx m\) then this value will be small, whereas if \(\mu \gg m\) we'll get large logs, which we usually want to avoid.
+    The parameter \(\mu\) is called the \defineindex{renormalisation point} or occasionally the \defineindex{'t Hooft scale}.
+    
+    The Lagrangian can the be rewritten in terms of the renormalised quantities.
+    First,
+    \begin{equation}
+        F_{\bare \mu\nu} = \partial_\mu A_{\bare \nu} - \partial_\nu A_{\bare \mu} = \partial_\mu (\sqrt{Z_3} A_\mu) - \partial_\nu (\sqrt{Z_3} A_\nu) = \sqrt{Z_3}F_{\mu\nu},
+    \end{equation}
+    and so
+    \begin{equation}
+        F_{\bare\mu\nu}F_{\bare}^{\mu\nu} = Z_3F_{\mu\nu}F^{\mu\nu}.
+    \end{equation}
+    We also have
+    \begin{equation}
+        i\slashed{\covariantDerivative}_{\bare} = i\slashed{\partial} + e_{\bare}\slashed{A}_{\bare} = i\slashed{\partial} + Z_e\sqrt{Z_3} e\mu^{\varepsilon} \slashed{A}
+    \end{equation}
+    so \(\diracadjoint{\psi}_{\bare} i\slashed{\covariantDerivative}_{\bare} \psi_{\bare} = Z_eZ_2\sqrt{Z_3}\).
+    We define \(Z_1 = Z_e Z_2 \sqrt{Z_3}\) for notational compactness.
+    One imagines that this process was followed in the reverse when \(Z_i\) were named.
+    The mass term gives
+    \begin{equation}
+        \diracadjoint{\psi}_{\bare}m_{\bare}\psi_{\bare} = Z_2m\diracadjoint{\psi}\psi + Z_2\delta m\diracadjoint{\psi}\psi.
+    \end{equation}
+    So the Lagrangian in terms of the renormalised quantities is
+    \begin{equation}
+        \lagrangianDensity = -\frac{1}{4}Z_3F^{\mu\nu}F_{\mu\nu} + Z_2\diracadjoint{\psi}(i\slashed{\partial} - m)\psi + Z_1 e\mu^{\varepsilon} \diracadjoint{\psi}\slashed{A}\psi - Z_2 \delta m \diracadjoint{\psi} \psi.
+    \end{equation}
+    
+    It is not immediately clear that this Lagrangian has a gauge symmetry, but of course it does, since it inherits the gauge symmetry of the bare theory.
+    This will be made more clear later when we show that \(Z_1 = Z_2\), which allows us to write this with a covariant derivative again.
+    
+    To make sense of this we define \(Z_i = 1 + \delta_i\) and then the Lagrangian is
+    \begin{multline}
+        \lagrangianDensity = -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} + \diracadjoint{\psi}(i\slashed{\partial} - m)\psi\\
+        - \frac{1}{4}\delta_3 F^{\mu\nu} F_{\mu\nu} + \delta_2 \diracadjoint{\psi}(i\slashed{\partial} - m)\psi + \delta_1 e\mu^{\varepsilon}\diracadjoint{\psi}\slashed{A}\psi - \delta m\diracadjoint{\psi} \psi - \delta m \delta_2 \diracadjoint{\psi} \psi.
+    \end{multline}
+    This is of the form
+    \begin{equation}
+        \lagrangianDensity = \lagrangianDensity_{\symrm{classical}} + \lagrangianDensity_{\symrm{ct}}
+    \end{equation}
+    where
+    \begin{equation}
+        \lagrangianDensity_{\symrm{classical}} = -\frac{1}{4}F^{\mu\nu}F_{\mu\nu} + \diracadjoint{\psi}(i\slashed{\partial} - m)\psi
+    \end{equation}
+    is the \enquote{classical} Lagrangian, being of the same form as the Lagrangian in terms of the bare parameters and
+    \begin{equation}
+        \lagrangianDensity_{\symrm{ct}} = -\frac{1}{4}\delta_3 F^{\mu\nu} F_{\mu\nu} + \delta_2 \diracadjoint{\psi}(i\slashed{\covariantDerivative} - m)\psi + \delta_1 e\mu^{\varepsilon}\diracadjoint{\psi}\slashed{A}\psi - \delta m\diracadjoint{\psi} \psi - \delta m \delta_2 \diracadjoint{\psi} \psi
+    \end{equation}
+    are the \define{counterterms}\index{counterterm}, which we choose in such a way that the divergences cancel out.
+    
+    Note that in this expression \(\covariantDerivative_\mu = \partial_\mu - ie\mu^{\varepsilon}A_\mu\), with the factor of \(\mu^\varepsilon\).
+    It is common to miss out writing in \(\mu^\varepsilon\) both here and in the Lagrangian since it can always be inserted by dimensional analysis and disappears in final results.
+    For tree diagrams we can take \(\varepsilon \to 0\) anyway since there are no divergences, making it even more common to leave \(\mu^\varepsilon\) out.
+    
+    In QED divergences first appear at one loop, and since a single loop with external particles has at least two vertices these divergences are \(\order(e^2)\).
+    Since we choose the renormalisation parameters to cancel these divergences they must be of the form \(Z_i = 1 + \order(e^2)\), with the \(1\) giving us the bare theory and the \(\order(e^2)\) cancelling the divergences.
+    This means that \(\delta m \delta_2\) is \(\order(e^4)\), so it is only important if we are doing a next-to-next-to leading order (NNLO)\glossary[acronym]{NNLO}{Next-to-Next-to Leading Order} calculation or working with two or more loops.
+    We'll only be doing leading order computations with one loop, so we'll neglect the final term of the Lagrangian.
+    
+    \section{Feynman Rules}
+    The Feynman rules tell us how a diagram translates into an equation.
+    For a given term involving a product of fields, such as \(\diracadjoint{\psi}\slashed{A}\psi\), the Feynman rules can be derived by considering the tree level correlator \(\correlator{\diracadjoint{\psi} \slashed{A} \psi}\).
+    Since this is at tree level the terms just add linearly allowing us to consider them one at a time.
+    We then amputate the correlator, working in momentum space, and drop the overall momentum conservation Dirac delta.
+    What is left is the Feynman rule for this term.
+    
+    \subsection{\texorpdfstring{\(\diracadjoint{\psi}\psi\)}{psi-bar psi} Term}
+    First we'll consider the \(\diracadjoint{\psi}\psi\) terms in the Lagrangian.
+    These correspond to an interaction with the action
+    \begin{equation}
+        S_{\interaction} = \int \dl{^Dx} \left[ i\delta_2 \diracadjoint{\psi} \slashed{\partial} \psi - (\delta_2 m + \delta m) \diracadjoint{\psi} \psi \right].
+    \end{equation}
+    Diagrammatically this corresponds to the correlator
+    \begin{equation}
+        \tikzsetnextfilename{qed-psibar-psi-counterterm-correlator}
+        \begin{tikzpicture}
+            \draw[electron=0.6] (0, 0) -- (0.85, 0);
+            \draw[electron=0.6] (1.15, 0) -- (2, 0);
+            \draw (1, 0) circle [radius = 0.15];
+            \foreach \angle in {45, 135, 225, 315} {
+                \draw (1, 0) -- ++ (\angle:0.15);
+            }
+            \draw[->] (0.2, 0.2) -- (0.65, 0.2) node [midway, above] {\(p\)};
+            \draw[->] (1.35, 0.2) -- (1.8, 0.2) node [midway, above] {\(p'\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    The symbol \(\otimes\) is used to signify a counter term, since these are often 1-to-1 scattering processes which would otherwise look like just a propagator.
+    
+    Recall that in the canonical quantisation formalism we can expand \(\psi\) in terms of the electron annihilation operator, \(a_s(p)\), and the positron creation operator, \(b_s^\hermit(p)\):
+    \begin{equation}
+        \psi(x) = \sum_s \int \frac{\dhat{p}}{2E_p} \left[ a_s(p) u(p, s) \e^{-ip \cdot x} + b_s^\hermit(p) v(p, s) \e^{ip\cdot x} \right].
+    \end{equation}
+    Then we have
+    \begin{equation}
+        \slashed{\partial}\psi(x) = \sum_s \int \frac{\dhat{p}}{2E_p} \left[ -i\slashed{p} a_s(p) u(p, s) \e^{-ip \cdot x} + i \slashed{p} b_s^\hermit(p) v(p, s) \e^{ip\cdot x} \right].
+    \end{equation}
+    
+    We want to calculate \(\correlator{\diracadjoint{\psi}\slashed{A}\psi}\) to tree level.
+    To do this we expand \(\e^{iS} = 1 + iS + \dotsb\) to first order and consider the first order term, which corresponds to tree level processes (zeroth order corresponds to no interaction occurring).
+    So for an incoming particle with momentum \(p\) and outgoing particle with momentum \(p'\) we need to calculate
+    \begin{equation}
+        \bra{p'} i \int \dl{^Dx} \left[ i \delta_2 \diracadjoint{\psi}\slashed{\partial}\psi - (\delta_2 m + \delta m) \diracadjoint{\psi}\psi \right] \ket{p}.
+    \end{equation}
+    To do this we need to contract the fields.
+    We have an incoming and outgoing electron, which need to be created and destroyed and this can only be done one way.
+    The field \(\psi\) can annihilate the incoming electron and the adjoint \(\diracadjoint{\psi}\) can create the outgoing electron.
+    Thus we must contract as follows:
+    \begin{equation}
+        \wick{\bra{\c2{p}'} i \int \dl{^Dx} \, i\delta_2\c2{\diracadjoint{\psi}}\slashed{\partial}\c2{\psi} \ket{\c2{p}}} - \wick{\bra{\c2{p}'} i \int \dl{^Dx} \, (\delta_2 m + \delta m) \c2{\diracadjoint{\psi}}\c2{\psi} \ket{\c2{p}}}.
+    \end{equation}
+    Completing this contraction, and including the factor of \(i\slashed{p}\) we get from acting with the derivative we get the result
+    \begin{equation}
+        i \int \dl{^D x} \left[ \delta_2 (\slashed{p} - m) - \delta m \right] \diracadjoint{u}u \e^{-i(p - p') \cdot x}.
+    \end{equation}
+    Performing this integral we get
+    \begin{equation}
+        i (2\pi)^D \delta(p - p') \left[ \delta_2 (\slashed{p} - m) - \delta m \right] \diracadjoint{u}u.
+    \end{equation}
+    To get the Feynman rule we strip off the factors corresponding to external legs, since these are dealt with by other Feynman rules, so we remove \(\diracadjoint{u}u\), and we strip off the overall momentum conserving Dirac delta \((2\pi)^D\delta(p - p')\), since this is enforced by conserving momentum at each vertex, which in this case just corresponds to setting \(p = p'\).
+    The resulting Feynman rule is
+    \begin{equation}
+        \tikzsetnextfilename{qed-psibar-psi-counterterm-correlator-feynman-rule}
+        \begin{tikzpicture}[baseline=-0.05cm]
+            \draw[electron=0.6] (0, 0) -- (0.85, 0);
+            \draw[electron=0.6] (1.15, 0) -- (2, 0);
+            \draw (1, 0) circle [radius = 0.15];
+            \foreach \angle in {45, 135, 225, 315} {
+                \draw (1, 0) -- ++ (\angle:0.15);
+            }
+            \draw[->] (0.2, 0.2) -- (0.65, 0.2) node [midway, above] {\(p\)};
+            \draw[->] (1.35, 0.2) -- (1.8, 0.2) node [midway, above] {\(p\)};
+        \end{tikzpicture}
+        = i[\delta_2(\slashed{p} - m) - \delta m].
+    \end{equation}
+    
+    \subsection{\texorpdfstring{\(F^{\mu\nu}F_{\mu\nu}\)}{Fmunu Fmunu} Term}
+    \epigraph{Well you can't stop me. No one said we were going to use sane notation, just consistent notation.}{Donal O'Connell}
+    Now consider the \(F^{\mu\nu}F_{\mu\nu}\) counterterm, which corresponds to the interaction action
+    \begin{equation}
+        S_{\interaction} = \int \dl{^Dx} \left[ -\frac{1}{4} \delta_3 F^{\mu\nu} F_{\mu\nu} \right].
+    \end{equation}
+    To calculate the Feynman rule associated with this interaction consider the diagram
+    \begin{equation}
+        \tikzsetnextfilename{qed-Fmunu-Fmunu-counterterm-correlator}
+        \begin{tikzpicture}
+            \draw[photon] (0, 0) -- (0.85, 0);
+            \draw[photon] (1.15, 0) -- (2, 0);
+            \draw (1, 0) circle [radius = 0.15];
+            \foreach \angle in {45, 135, 225, 315} {
+                \draw (1, 0) -- ++ (\angle:0.15);
+            }
+            \draw[->] (0.2, 0.2) -- (0.65, 0.2) node [midway, above] {\(k, \varepsilon\)};
+            \draw[->] (1.35, 0.2) -- (1.8, 0.2) node [midway, above] {\(k', \varepsilon'\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    Here \(k\) and \(k'\) are momenta and \(\varepsilon\) and \(\varepsilon'\) are polarisation vectors.
+    To first order this diagram gives
+    \begin{equation}
+        \bra{k', \varepsilon'} i \int \dl{^Dx} \left[ -\frac{1}{4} \delta_3 F^{\mu\nu}F_{\mu\nu} \right] \ket{k, \varepsilon}.
+    \end{equation}
+    There are two possible ways to perform contractions on this:
+    \begin{gather}
+        \wick{\bra{\c2{k}', \varepsilon'} i \int \dl{^Dx} \left[ -\frac{1}{4} \delta_3 \c2{F}^{\mu\nu}\c2{F}_{\mu\nu} \right] \ket{\c2{k}, \varepsilon}},\\
+        \wick{\bra{\c3{k}', \varepsilon'} i \int \dl{^Dx} \bigg[-\frac{1}{4} \delta_3 \c2{F}^{\mu\nu}\c3{F}_{\mu\nu} \bigg] \ket{\c2{k}, \varepsilon}}.
+    \end{gather}
+    Since we can freely commute \(F\) with itself and raise and lower the paired indices these two contractions are actually exactly the same.
+    So we include a symmetry factor of 2 and only consider one of these contractions.
+    We'll take the first contraction and compute
+    \begin{equation}
+        -i \frac{\delta_3}{2} \wick{\bra{\c2{k}', \varepsilon'} \int \dl{^Dx} \, \c2{F}^{\mu\nu} \c2{F}_{\mu\nu} \ket{\c2{k}, \varepsilon}}.
+    \end{equation}
+    The next simplification is that for any two index tensor \(X\) we have
+    \begin{align}
+        (X^{\mu\nu} - X^{\nu\mu})(X_{\mu\nu} - X_{\nu\mu}) &= X^{\mu\nu}(X_{\mu\nu} - X_{\nu\mu}) - X^{\nu\mu}(X_{\mu\nu} - X_{\nu\mu})\\
+        \shortintertext{exchanging \(\mu\) and \(\nu\) in the second term}
+        (X^{\mu\nu} - X^{\nu\mu})(X_{\mu\nu} - X_{\nu\mu}) &= X^{\mu\nu}(X_{\mu\nu} - X_{\nu\mu}) - X^{\mu\nu}(X_{\nu\mu} - X_{\mu\nu})\\
+        &= 2X^{\mu\nu}(X_{\mu\nu} - X_{\nu\mu})
+    \end{align}
+    so, taking \(X^{\mu\nu} = \partial^\mu A^\nu\), we have
+    \begin{equation}
+        F^{\mu\nu}F_{\mu\nu} = 2(\partial^\mu A^\nu)(\partial_\mu A_\nu - \partial_\nu A_\mu).
+    \end{equation}
+    Hence the correlator is
+    \begin{equation}
+        -i \delta_3 \wick{\bra{\c2{k}', \varepsilon'} \int \dl{^Dx} \partial^\mu \c2{A}^\nu\c3{\overbrace{(\partial_\mu A_\nu - \partial_\nu A_\mu)}} \ket{\c3{k}, \varepsilon}}.
+    \end{equation}
+    As with the \(\psi\) case the derivatives act on the mode expansion to bring down a factor of \(\pm ik_\mu\) from terms like \(\varepsilon^\mu(k)a_s(k)\e^{-ik\cdot x}\).
+    The result of performing the contractions is
+    \begin{equation}
+        -i\delta_3 \int \dl{^Dx} \, k'^\mu \varepsilon'^\nu (k_\mu \varepsilon_\nu - k_\nu \varepsilon_\mu) \e^{-ik\cdot x} \e^{ik' \cdot x}.
+    \end{equation}
+    Performing the integral gives a Dirac delta, and we'll also expand the bracket in terms of inner products while we're at it
+    \begin{equation}
+        -i\delta_3(2\pi)^D\delta(k - k')[(k \cdot k')(\varepsilon \cdot \varepsilon') - (k \cdot \varepsilon)(k' \cdot \varepsilon')].
+    \end{equation}
+    As before to get the Feynman rule we strip of terms corresponding to external legs and the momentum conservation Dirac delta, setting \(k = k'\), to get the Feynman rule
+    \begin{equation}
+        \tikzsetnextfilename{qed-Fmunu-Fmunu-counterterm-correlator-feynman-rule}
+        \begin{tikzpicture}[baseline=(mu.base)]
+            \draw[photon] (0, 0) node [left] (mu) {\(\mu\)} -- (0.85, 0);
+            \draw[photon] (1.15, 0) -- (2, 0) node [right] {\(\nu\)};
+            \draw (1, 0) circle [radius = 0.15];
+            \foreach \angle in {45, 135, 225, 315} {
+                \draw (1, 0) -- ++ (\angle:0.15);
+            }
+            \draw[->] (0.2, 0.2) -- (0.65, 0.2) node [midway, above] {\(k\)};
+            \draw[->] (1.35, 0.2) -- (1.8, 0.2) node [midway, above] {\(k\)};
+        \end{tikzpicture}
+        = -i\delta_3(k^2 \minkowskiMetric_{\mu\nu} - k_\mu k_\nu).
+    \end{equation}
+    Notice that we have to include the metric from \(\varepsilon' \cdot \varepsilon = \minkowskiMetric_{\mu\nu}\varepsilon'^\mu \varepsilon^\nu\) in order for the indices to match up.
+    
+    \section{Vacuum Polarisation}
+    In this section we will compute the vacuum polarisation, which is a correction to an internal photon propagator.
+    Before we proceed we'll recap the Feynman rules for QED, including the two counterterms we've just computed.
+    \index{QED Feynman rules}
+    \begin{itemize}
+        \item The \defineindex{QED vertex}:
+        \begin{equation}
+            \tikzsetnextfilename{qed-qed-vertex}
+            \begin{tikzpicture}[baseline=(mu.base)]
+                \draw[photon] (-1, 0) node [left] (mu) {\(\mu\)} -- (0, 0);
+                \draw[electron=0.6] (0, 0) -- (45:1);
+                \draw[positron=0.4] (0, 0) -- (-45:1);
+            \end{tikzpicture}
+            = ie\mu^{\varepsilon}\gamma^\mu.
+        \end{equation}
+        Note the factor of \(\mu^\varepsilon\) which we had not previously included as at tree level we were taking \(\varepsilon = 0\).
+        \item The QED propagators:
+        \begin{itemize}
+            \item \define{Electron propagator}\index{electron propagator}:
+            \begin{equation}
+                \tikzsetnextfilename{qed-electron-propagator}
+                \begin{tikzpicture}[baseline=-0.05cm]
+                    \draw[electron=0.6] (0, 0) -- (1, 0);
+                    \draw[->] (0.2, 0.3) -- (0.7, 0.3) node [midway, above] {\(p\)};
+                \end{tikzpicture}
+                = \frac{i(\slashed{p} + m)}{p^2 - m^2 + i\varepsilon}.
+            \end{equation}
+            \item \define{Photon propagator}\index{photon propagator}:
+            \begin{equation}
+                \tikzsetnextfilename{qed-photon-propagator}
+                \begin{tikzpicture}[baseline=(mu.base)]
+                    \draw[photon] (0, 0) node [left] (mu) {\(\mu\)} -- (1, 0) node [right] {\(\nu\)};
+                    \draw[->] (0.2, 0.3) -- (0.7, 0.3) node [midway, above] {\(k\)};
+                \end{tikzpicture}
+                = \frac{-i}{k^2 + i\varepsilon} \left( \minkowskiMetric^{\mu\nu} - (1 - \xi) \frac{k^\mu k^\nu}{k^2} \right).
+            \end{equation}
+            Here \(\xi\) is a gauge parameter.
+            The choice of \(\xi = 1\) is the \defineindex{Feynman gauge}, giving the propagator
+            \begin{equation}
+                \frac{-i\minkowskiMetric_{\mu\nu}}{k^2 + i\varepsilon},
+            \end{equation}
+            which is nice since the second term vanishes.
+            The choice of \(\xi = 0\) is the \defineindex{Landau gauge} or \defineindex{Lorenz gauge}, giving the propagator
+            \begin{equation}
+                \frac{i}{k^2 + i\varepsilon}\left( \minkowskiMetric^{\mu\nu} - \frac{k^\mu k^\nu}{k^2} \right),
+            \end{equation}
+            which is nice because when we multiply by \(k_\mu\) this vanishes.
+        \end{itemize}
+        \item Conserve momentum at each vertex.
+        \item Integrate over internal momenta which aren't fixed by momentum conservation, giving an integral
+        \begin{equation}
+            \int \dhat{^D\ell} = \int \frac{\dl{^D\ell}}{(2\pi)}.
+        \end{equation}
+        \item Each closed fermion loop gives a factor of \(-1\).
+        \item Counterterms:
+        \begin{itemize}
+            \item electron counter term:
+            \begin{equation}
+                \vcenter{\hbox{\includegraphics{tikz-external/qed-psibar-psi-counterterm-correlator-feynman-rule}}} = i(\delta_2(\slashed{p} - m) + \delta m).
+            \end{equation}
+            \item photon counter term:
+            \begin{equation}
+                \vcenter{\hbox{\includegraphics{tikz-external/qed-Fmunu-Fmunu-counterterm-correlator-feynman-rule}}} = -i\delta_3(k^2\minkowskiMetric_{\mu\nu} - k_\mu k_\nu).
+            \end{equation}
+        \end{itemize}
+        \item For an amputated correlator each external line simply gives a factor of 1.
+    \end{itemize}
+    
+    Consider the correlator
+    \begin{equation}
+        \correlator{A_\mu(x) A_\nu(y)} = \int \DL{A} \DD{\psi} \DD{\diracadjoint{\psi}} \, A_\mu(x) A_\nu(y) \e^{iS}.
+    \end{equation}
+    At order \(e^0\) there is no interaction so the photon just propagates freely giving
+    \begin{equation}
+        \correlator{A_\mu(x) A_\nu(y)}_{\order(e^0)} = iD_{\mu\nu}(x - y)
+    \end{equation}
+    where \(D_{\mu\nu}\) is the free photon propagator.
+    
+    At order \(e^1\) if we expand \(\e^{iS}\) to get \(1 + \order(e)\) we get three \(A\) fields and two \(\psi\) fields with no way to contract them all.
+    This means that there is no \(\order(e)\) contribution.
+    
+    At order \(e^2\) expanding \(\e^{iS}\) we get
+    \begin{equation}
+        \int \DL{A} \DD{\psi} \DD{\diracadjoint{\psi}} \, A_\mu(x) A_\nu(y) \frac{(ie)^2}{2} \int \dl{^Dx_1} \dd{^Dx_2} \, (\diracadjoint{\psi}\slashed{A}\psi)_{x_1} (\diracadjoint{\psi}\slashed{A}\psi)_{x_2} + \text{counterterm}
+    \end{equation}
+    where \((-)_{x}\) means that all the fields in the brackets are evaluated at \(x\).
+    Diagrammatically this is
+    \begin{equation}
+        \tikzsetnextfilename{qed-AA-correlator-order-e-squared}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[photon] (-1.5, 0) node [above] {\(\mu\)} -- (-0.5, 0);
+            \draw[photon] (0.5, 0) -- (1.5, 0) node [above] {\(\nu\)};
+            \draw[electron=0.55] (-0.5, 0) arc (180:0:0.5);
+            \draw[positron=0.45] (-0.5, 0) arc (-180:0:0.5);
+            \node at (1.8, 0) {\(+\)};
+            \draw[photon] (2.1, 0) node [above] {\(\mu\)} -- (2.95, 0);
+            \draw[photon] (3.25, 0) -- (4.1, 0) node [above] {\(\nu\)};
+            \draw (3.1, 0) circle [radius = 0.15];
+            \foreach \angle in {45, 135, 225, 315} {
+                \draw (3.1, 0) -- ++ (\angle:0.15);
+            }
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    The interesting part of the correlator is the loop, so define
+    \begin{equation}
+        i\Pi_{\mu\nu}(x - y) \coloneqq \correlator{A_\mu(x)A_\nu(y)}|_{\text{1 loop, amputated}}
+    \end{equation}
+    to be just the loop without the counter term or external photon propagators.
+    We want to work in momentum space so define
+    \begin{equation}
+        \widetilde{\Pi}_{\mu\nu}(k) = \int \dl{^Dx} \, \e^{ik \cdot x} \Pi_{\mu\nu}(x).
+    \end{equation}
+    Then, enforcing momentum conservation, we have
+    \begin{equation}
+        i\widetilde{\Pi}_{\mu\nu}(k) = 
+        \tikzsetnextfilename{qed-AA-correlator-momentum-space}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[photon] (-1.5, 0) node [above] {\(\mu\)} -- (-0.5, 0);
+            \draw[photon] (0.5, 0) -- (1.5, 0) node [above] {\(\nu\)};
+            \draw[electron=0.55] (-0.5, 0) arc (180:0:0.5);
+            \draw[positron=0.45] (-0.5, 0) arc (-180:0:0.5);
+            \node at (1.8, 0) {\(+\)};
+            \draw[photon] (2.1, 0) node [above] {\(\mu\)} -- (2.95, 0);
+            \draw[photon] (3.25, 0) -- (4.1, 0) node [above] {\(\nu\)};
+            \draw (3.1, 0) circle [radius = 0.15];
+            \foreach \angle in {45, 135, 225, 315} {
+                \draw (3.1, 0) -- ++ (\angle:0.15);
+            }
+            \draw[->] (-1.3, -0.3) -- (-0.8, -0.3) node [midway, below] {\(k\)};
+            \draw[->] (0.8, -0.3) -- (1.3, -0.3) node [midway, below] {\(k\)};
+            \draw[->] (110:0.7) arc (110:70:0.7) node [midway, above] {\(q\)};
+            \draw[->] (-70:0.7) arc (-70:-110:0.7) node [midway, below] {\(q - k\)};
+            \draw[->] (2.3, -0.3) -- (2.75, -0.3) node [midway, below] {\(k\)};
+            \draw[->] (3.45, -0.3) -- (3.9, -0.3) node [midway, below] {\(k\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    To evaluate this we use the Feynman rules, which give
+    \begin{itemize}
+        \item A factor of \(-1\) from the fermion loop.
+        \item An integral \(\int \dhat{^Dq}\) for the undetermined momentum.
+        \item Entering on the left we first come to a photon propagator, but this is external and we're considering an amputated correlator so it gives a factor of 1.
+        \item Next we reach a QED vertex giving a factor of \(ie\mu^\varepsilon \gamma^\mu\).
+        \item We then proceed \emph{backwards} along the fermion line, which is an electron propagator with momentum \(q - k\), giving a factor of
+        \begin{equation}
+            \frac{i(\slashed{q} - \slashed{k} + m)}{(q - k)^2 - m^2 + i\varepsilon}.
+        \end{equation}
+        \item Another QED vertex giving a factor of \(ie\mu^\varepsilon \gamma^\nu\).
+        \item Continuing backwards along the fermion propagator with momentum \(q\) we get
+        \begin{equation}
+            \frac{i(\slashed{q} + m)}{q^2 - m^2 + i\varepsilon}.
+        \end{equation}
+    \end{itemize}
+    Call these electron propagators \(S(q - k)\) and \(S(q)\) and write in the spinor indices.
+    We then have a factor of
+    \begin{align}
+        \gamma^\mu_{ab} S_{bc}(q - k)\gamma^\nu_{cd}S_{da}(q) &= S_{da}(q)\gamma^\mu_{ab} S_{bc}(q - k)\gamma^\nu_{cd}\\
+        &= \tr(S(q)\gamma^\mu S(q - k)\gamma^\nu)\\
+        &= \tr(\gamma^\mu S(q - k)\gamma^\nu S(q)).
+    \end{align}
+    Putting this all together we get
+    \begin{equation*}
+        -\int \dhat{^Dq} (ie\mu^\varepsilon)^2 \tr\left[ \gamma^\mu \frac{i(\slashed{q} - \slashed{k} + m)}{(q - k)^2 - m^2 + i\varepsilon} \gamma^\nu \frac{i(\slashed{q} + m)}{q^2 - m^2 + i\varepsilon} \right] - i\delta_3(k^2\minkowskiMetric^{\mu\nu} - k^\mu k^\nu).
+    \end{equation*}
+    
+    This integral, and other one loop integrals, can be computed using the following method\footnote{for examples using this method see the second half of \course{Quantum Field Theory}}
+    \begin{enumerate}
+        \item Use Feynman parametrisation to rewrite the denominators.
+        The simple case is
+        \begin{equation}
+            \frac{1}{AB} = \int_0^1 \dl{x} \, \frac{1}{[xA + (1 - x)B]^2}
+        \end{equation}
+        and the more general case is
+        \begin{multline*}
+            \frac{1}{A^{\alpha_1} \dotsm A^{\alpha_n}} = \int_0^1 \dl{x_1} \, x^{\alpha_1 - 1} \dotsm \int_0^1 \dl{x_n} \, x^{\alpha_n - 1}\\
+            \times \frac{\delta(1 - \sum_i \alpha_i)}{[\alpha_1 A_1 + \dotsb + \alpha_n A_n]^{\sum_i \alpha_i}} \frac{\Gamma(\sum_i \alpha_i)}{\Gamma(\alpha_1) \dotsm \Gamma(\alpha_n)}.
+        \end{multline*}
+        \item Shift the loop momentum to get the integral in the form
+        \begin{equation}
+            \int \dhat{^D\ell} \frac{N}{(\ell^2 - \Delta)^n}.
+        \end{equation}
+        \item Simplify the numerator. This step is new to QED since for scalar \(\varphi^3\) theory as seen in \course{Quantum Field Theory} the numerator is always one.
+        We'll see several tricks for performing this simplification later.
+        \item Wick rotate defining \(\ell^0 = i\ell^0_{\symrm{E}}\) and \(\ell^2 = -(\ell_{\symrm{E}})^2 - \vv{\ell}^2 = -\ell_{\symrm{E}}^2\) where \(\ell_{\symrm{E}}^2\) is the Euclidean inner product, \(\ell_{\symrm{E}}^2 = \ell_{\symrm{E}}^2 + \vv{\ell}^2\).
+        \item Use the identity
+        \begin{equation}
+            \int \dhat{^D\ell_{\symrm{E}}} \, \frac{(\ell_{\symrm{E}}^2)^p}{(\ell_{\symrm{E}} + \Delta)^n} = \frac{\Gamma(n - p - D/2)\Gamma(p + D/2)}{(4\pi)^{D/2}\Gamma(n)\Gamma(D/2)} \Delta^{D/2 + p - n}.
+        \end{equation}
+    \end{enumerate}
+    
+    We can combine the fourth and fifth steps into one to get the identity
+    \begin{equation*}
+        \int \dhat{^D\ell} \, \frac{(\ell^2)^p}{(\ell^2 - \Delta)^n} = \frac{i}{(4\pi)^{D/2}} \frac{(-1)^{p + n} \Gamma(n - p - D/2)\Gamma(p + D/2)}{\Gamma(n)\Gamma(D/2)} \Delta^{p/2 + p - n}.
+    \end{equation*}
+    Note that the \(\Delta\) term can be found from dimensional analysis.
+    We know from the \(\ell^2 - \Delta\) term that\footnote{\([X]\) is the mass dimension of \(X\), that is the power of mass (or energy or momentum) appearing in the dimensions} \([\Delta] = 2\).
+    Then looking at the integral on the left we have \([\dhat{^D\ell}] = D\), \([(\ell^2)^p] = 2p\), and \([(\ell^2 - \Delta)^n] = 2n\), so the integral has mass dimension \(D + 2p - 2n\).
+    Dimensions can only enter the right hand side as \(\Delta^x\), since we are integrating out \(\ell\), so we must have \([\Delta^x] = 2x = D + 2p - 2n\), so \(x = D/2 + p - n\).
     
     %   Appdendix
 %    \appendixpage
