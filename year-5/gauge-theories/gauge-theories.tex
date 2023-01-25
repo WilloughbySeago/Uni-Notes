@@ -30,6 +30,8 @@
 
 % Feynman diagram styles
 \tikzset{scalar/.style={dashed}}
+\tikzset{charged scalar/.style={dashed, postaction={decorate, decoration={markings, mark=at position #1 with {\arrow{Latex[width=1.5mm]}}}}}}
+\tikzset{charged scalar/.default=0.5}
 \tikzset{photon/.style={decoration={snake, amplitude=1.25, segment length=6}, decorate}}
 \tikzset{electron/.style={postaction={decorate, decoration={markings, mark=at position #1 with {\arrow{Latex[width=1.5mm]}}}}}}
 \tikzset{electron/.default=0.5}
@@ -93,6 +95,8 @@ noabbrev
 \newcommand{\order}{\symcal{O}}
 \newcommand{\minkowskiMetric}{\eta}
 \DeclareMathOperator{\tr}{tr}
+\newcommand{\measured}{\symrm{meas}}
+\newcommand{\strongCoupling}{\alpha_{\symrm{S}}}
 
 \includeonly{}
 
@@ -799,6 +803,39 @@ noabbrev
     \end{equation}
     Notice that we have to include the metric from \(\varepsilon' \cdot \varepsilon = \minkowskiMetric_{\mu\nu}\varepsilon'^\mu \varepsilon^\nu\) in order for the indices to match up.
     
+    \subsection{\texorpdfstring{\(\diracadjoint{\psi}\slashed{A}\psi\)}{psi-bar A-slashed psi} Term}
+    The final counterterm to compute is the one from the \( \diracadjoint{\psi}\slashed{A}\psi\) term.
+    The corresponding action is
+    \begin{equation}
+        S_{\interaction} = \int \dl{^Dx} [e\mu^\varepsilon\delta_1 \diracadjoint{\psi}\slashed{A}\psi].
+    \end{equation}
+    This has three fields, so contributes as a three point vertex.
+    To compute the counterterm in this case we consider the correlator \(\correlator{\diracadjoint{\psi}(x_1)\psi(x_2) A^\mu(x_3)}\).
+    Expanding the exponential to first order in the interaction we want to compute
+    \begin{equation}
+        \int \DL{A} \DD{\psi} \DD{\diracadjoint{\psi}} \, \diracadjoint{\psi}(x_1)\psi(x_2)A^\mu(x_3) \int \dl{^Dx} \, e\mu^\varepsilon \delta_1 \diracadjoint{\psi}(x)\slashed{A}^\nu(x) \psi(x) \e^{i S[\psi, \diracadjoint{\psi}, A]}
+    \end{equation}
+    where \(S[\psi, \diracadjoint{\psi}, A]\) is the free action.
+    There is only one contraction not giving zero:
+    \begin{equation}
+        \int \DL{A} \DD{\psi} \DD{\diracadjoint{\psi}} \, \wick{\c4{\diracadjoint{\psi}}(x_1)\c3{\psi}(x_2)\c2{A}^\mu(x_3) \int \dl{^Dx} \, e\mu^\varepsilon \delta_1 \c3{\diracadjoint{\psi}}(x)\c2{\slashed{A}}^\nu(x) \c4{\psi}(x)}\e^{i S[\psi, \diracadjoint{\psi}, A]}.
+    \end{equation}
+    Computing the contractions we are left with external propagators, which we can drop, and then we get the amputated correlator \(ie\mu^{\varepsilon}\delta_1 \gamma^\mu\).
+    This gives the Feynman rule
+    \begin{equation}
+        \tikzsetnextfilename{qed-psibar-A-psi-counterterm-correlator}
+        \begin{tikzpicture}[baseline=(mu.base)]
+            \draw[electron=0.6] (210:1) -- (210:0.15);
+            \draw[positron=0.4] (150:1) -- (150:0.15);
+            \draw[photon] (0.15, 0) -- (1, 0) node [right] (mu) {\(\mu\)};
+            \draw (0, 0) circle [radius = 0.15];
+            \foreach \angle in {45, 135, 225, 315} {
+                \draw (0, 0) -- (\angle:0.15);
+            }
+        \end{tikzpicture}
+        = ie\delta_1 \gamma^\mu \mu^\varepsilon
+    \end{equation}
+    
     \section{Vacuum Polarisation}
     In this section we will compute the vacuum polarisation, which is a correction to an internal photon propagator.
     Before we proceed we'll recap the Feynman rules for QED, including the two counterterms we've just computed.
@@ -967,7 +1004,8 @@ noabbrev
         -\int \dhat{^Dq} (ie\mu^\varepsilon)^2 \tr\left[ \gamma^\mu \frac{i(\slashed{q} - \slashed{k} + m)}{(q - k)^2 - m^2 + i\varepsilon} \gamma^\nu \frac{i(\slashed{q} + m)}{q^2 - m^2 + i\varepsilon} \right] - i\delta_3(k^2\minkowskiMetric^{\mu\nu} - k^\mu k^\nu).
     \end{equation*}
     
-    This integral, and other one loop integrals, can be computed using the following method\footnote{for examples using this method see the second half of \course{Quantum Field Theory}}
+    \chapter{Evaluating Loop Integrals}
+    One loop integrals can be computed using the following algorithm\footnote{for examples using this method see the second half of \course{Quantum Field Theory}}
     \begin{enumerate}
         \item Use Feynman parametrisation to rewrite the denominators.
         The simple case is
@@ -1000,6 +1038,598 @@ noabbrev
     We know from the \(\ell^2 - \Delta\) term that\footnote{\([X]\) is the mass dimension of \(X\), that is the power of mass (or energy or momentum) appearing in the dimensions} \([\Delta] = 2\).
     Then looking at the integral on the left we have \([\dhat{^D\ell}] = D\), \([(\ell^2)^p] = 2p\), and \([(\ell^2 - \Delta)^n] = 2n\), so the integral has mass dimension \(D + 2p - 2n\).
     Dimensions can only enter the right hand side as \(\Delta^x\), since we are integrating out \(\ell\), so we must have \([\Delta^x] = 2x = D + 2p - 2n\), so \(x = D/2 + p - n\).
+    
+    In QED we often encounter \define{tensor integrals}\index{tensor integral} such as
+    \begin{equation}
+        I^{\mu_1 \dotso \mu_r} \coloneqq \int \dhat{^D\ell} \frac{\ell^{\mu_1} \dotsm \ell^{\mu_r}}{(\ell^2 - \Delta)^n}.
+    \end{equation}
+    First consider the \(r = 1\) case:
+    \begin{equation}
+        I^\mu = \int \dhat{^D\ell} \frac{\ell^\mu}{(\ell^2 - \Delta)^n}.
+    \end{equation}
+    A change of variables from \(\ell\) to \(-\ell\) gives an overall negative from \(\dl{\ell} \to -\dl{\ell}\) as well as exchanging the limits from \((-\infty, \infty)\) to \((\infty, -\infty)\).
+    We can change the limits back at the cost of another overall negative.
+    We also get an overall negative from \(\ell^\mu \to \ell^\mu\) so
+    \begin{equation}
+        I^\mu = \int \dhat{^D\ell} \frac{-\ell^\mu}{(\ell^2 - \Delta)^n} = -I^\mu
+    \end{equation}
+    and so we must have \(I^\mu = 0\).
+    This same logic can be applied whenever \(r\) is odd, so \(I^{\mu_1 \dotso \mu_r} = 0\) for all odd \(r\).
+    
+    Now consider the \(r = 2\) case:
+    \begin{equation}
+        I^{\mu\nu} = \int \dhat{^D\ell} \frac{\ell^\mu \ell^\nu}{(\ell^2 - \Delta)^n}.
+    \end{equation}
+    The result must also be a rank two tensor.
+    Since we are integrating over \(\ell\) the result can only depend on \(\Delta\), which is just a scalar.
+    The only other dependence in this integral is on the metric, \(\minkowskiMetric^{\mu\nu}\), so this must be where the indices come from.
+    We make the ansatz that
+    \begin{equation}
+        I^{\mu\nu} = \minkowskiMetric^{\mu\nu} X(\Delta)
+    \end{equation}
+    where \(X\) is some function to be determined.
+    Now notice that
+    \begin{equation}
+        \minkowskiMetric_{\mu\nu}I^{\mu\nu} = \tensor{I}{^\mu_\mu} = \minkowskiMetric_{\mu\nu}\minkowskiMetric^{\mu\nu}X(\Delta) = DX(\Delta) = \int \dhat{^D\ell} \frac{\ell^2}{(\ell^2 - \Delta)^n},
+    \end{equation}
+    and we know what this result integral is so we have
+    \begin{equation}
+        I^{\mu\nu} = \frac{1}{D} \int \dhat{^D\ell} \frac{\minkowskiMetric^{\mu\nu}\ell^2}{(\ell^2 - \Delta)^n}.
+    \end{equation}
+    To conclude, in a loop integral we can replace \(\ell^\mu \ell^\nu\) with \(\minkowskiMetric^{\mu\nu}\ell^2/D\) so long as the denominator is of the form \((\ell^2 - \Delta)^n\).
+    Other even \(r\) cases can be worked out in a similar manor.
+    
+    \section{Vacuum Polarisation}
+    Let's return to the problem of computing the vacuum polarisation.
+    Define a function corresponding to just the loop part of the vacuum polarisation:
+    \begin{equation}
+        i\widetilde{\Pi}^{\mu\nu}_{\symrm{L}}(k) = 
+        \tikzsetnextfilename{loop-integrals-vacuum-polarisation-loop}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[photon] (-1.5, 0) node [above] {\(\mu\)} -- (-0.5, 0);
+            \draw[photon] (0.5, 0) -- (1.5, 0) node [above] {\(\nu\)};
+            \draw[electron=0.55] (-0.5, 0) arc (180:0:0.5);
+            \draw[positron=0.45] (-0.5, 0) arc (-180:0:0.5);
+            \draw[->] (-1.3, -0.3) -- (-0.8, -0.3) node [midway, below] {\(k\)};
+            \draw[->] (0.8, -0.3) -- (1.3, -0.3) node [midway, below] {\(k\)};
+            \draw[->] (110:0.7) arc (110:70:0.7) node [midway, above] {\(q\)};
+            \draw[->] (-70:0.7) arc (-70:-110:0.7) node [midway, below] {\(q - k\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    As we computed before using the Feynman rules gives the result
+    \begin{equation}
+        i\widetilde{\Pi}^{\mu\nu}_{\symrm{L}}(k) = - (ie\mu^\varepsilon)^2 \int \dhat{^Dq} \frac{\tr[\gamma^\mu i(\slashed{q} - \slashed{k} + m)\gamma^\nu i(\slashed{q} + m)]}{[(q - k)^2 - m^2 + i\varepsilon][q^2 - m^2 + i\varepsilon]}.
+    \end{equation}
+    
+    The first step of the algorithm is to use Feynman parametrisation.
+    In this case we have two denominators, \((q - k)^2 - m^2 + i\varepsilon\) and \(q^2 - m^2 + i\varepsilon\).
+    We have to decide which one goes with \(x\) and which goes with \(1 - x\) in
+    \begin{equation}
+        \frac{1}{AB} = \int_0^1 \dl{x} \, \frac{1}{[xA + (1 - x)B]^2}.
+    \end{equation}
+    A good idea is to put the more complicated factor with \(x\), so that we don't increase the complexity.
+    This gives
+    \begin{align}
+        A &= x[(q - k)^2 - m^2 + i\varepsilon] = xq^2 - 2xq \cdot k + xk^2 - xm^2 + ix\varepsilon,\\
+        B &= (1 - x)[q^2 - m^2 + i\varepsilon] = q^2 - xq^2 - m^2 + xm^2 + i\varepsilon - ix\varepsilon.
+    \end{align}
+    Hence, we have
+    \begin{equation}
+        xA + (1 - x)B = q^2 - 2xq \cdot k + xk^2 - m^2 + i\varepsilon.
+    \end{equation}
+    This allows us to rewrite the loop integral as
+    \begin{equation}
+        i\widetilde{\Pi}^{\mu\nu}_{\symrm{L}}(k) = e^2 \mu^{2\varepsilon} \int_0^1 \dl{x} \int \dhat{^Dq} \frac{\tr[(\gamma^\mu(\slashed{q} - \slashed{k} + m)\gamma^\nu(\slashed{q} + m))]}{q^2 - 2xq \cdot k + xk^2 - m^2 + i\varepsilon}.
+    \end{equation}
+    
+    The next step of the algorithm is to shift the integration variable to get a denominator of the form \((\ell^2 - \Delta)^n\).
+    To do this we choose \(\ell = q - xk\), then we have \(\ell^2 = q^2 - 2xq \cdot k + x^2 k^2\) and so
+    \begin{equation}
+        q^2 - 2xq \cdot k + xk^2 - m^2 + i\varepsilon = \ell^2 - m^2 + x(1 - x)k^2 + i\varepsilon = \ell^2 - \Delta
+    \end{equation}
+    with
+    \begin{equation}
+        \Delta \coloneqq m^2 - x(1 - x)k^2 - i\varepsilon.
+    \end{equation}
+    Then the loop integral is
+    \begin{equation}
+        i\widetilde{\Pi}^{\mu\nu}_{\symrm{L}}(k) = -e^2\mu^{2\varepsilon} \int_0^1 \dl{x} \int \dhat{^D\ell} \frac{N^{\mu\nu}}{(\ell^2 - \Delta)^2}
+    \end{equation}
+    with
+    \begin{equation}
+        N^{\mu\nu} = \tr[\gamma^\mu(\slashed{q} - \slashed{k} + m)\gamma^\nu (\slashed{q} + m)].
+    \end{equation}
+    
+    The next step in the algorithm is to simplify the numerator.
+    The first step is to write the numerator in terms of \(\ell\) which can be done by inverting \(\ell = q - xk\) to get \(q = \ell + xk\).
+    We also have \(q - k = \ell + xk - k = \ell - (1 - x)k\).
+    Thus the numerator is
+    \begin{equation}
+        N^{\mu\nu} = \tr[\gamma^\mu(\slashed{\ell} - (1 - x)\slashed{k} + m)\gamma^\nu(\slashed{\ell} + x\slashed{k} + m)].
+    \end{equation}
+    We can now expand the product in the trace.
+    In doing so we keep only terms with an even power of gamma matrices, since the trace of an odd number of gamma matrices vanishes.
+    We also keep only terms with an even power of \(\ell\), since under the integral any odd power of \(\ell\) vanishes.
+    Note that this is only true under the integral, not in general, so rather than using equality we'll use the symbol \(\rightsquigarrow\):
+    \begin{equation}
+        N^{\mu\nu} \rightsquigarrow \tr[\gamma^\mu \slashed{\ell}\gamma^\nu\slashed{\ell} - x(1 - x)\gamma^\mu\slashed{k}\gamma^\nu\slashed{k} + m^2\gamma^\mu\gamma^\nu].
+    \end{equation}
+    To proceed we need the following two identities for traces of gamma matrices:
+    \begin{align}
+        \tr[\gamma^\mu \gamma^\nu] &= 4\minkowskiMetric^{\mu\nu},\\
+        \tr[\gamma^\mu \gamma^\nu \gamma^\rho \gamma^\sigma] &= 4(\minkowskiMetric^{\mu\nu}\minkowskiMetric^{\rho\sigma} + \minkowskiMetric^{\sigma\mu}\minkowskiMetric^{\nu\rho} - \minkowskiMetric^{\mu\rho}\minkowskiMetric^{\nu\sigma}).
+    \end{align}
+    Note that the factor of 4 is the dimension of the spinors.
+    It is possible to define the spinors in such a way that they are four component objects even in dimensional regularisation where the spacetime dimension is \(D = 4 - 2\varepsilon\).
+    Consider the first term in the trace, we have
+    \begin{align}
+        \tr[\gamma^\mu \slashed{\ell} \gamma^\nu \slashed{\ell}] &= \ell_\rho \ell_\sigma \tr[\gamma^\mu \gamma^\rho \gamma^\nu \gamma^\sigma]\\
+        &= 4 \ell_\rho \ell_\sigma [\minkowskiMetric^{\mu\rho} \minkowskiMetric^{\nu\sigma} + \minkowskiMetric^{\rho\nu} \minkowskiMetric^{\sigma\mu} - \minkowskiMetric^{\mu\nu}\minkowskiMetric^{\rho\sigma}]\\
+        &= 4 [\ell^\mu \ell^\nu + \ell^\nu \ell^\mu - \minkowskiMetric^{\mu\nu}\ell^2]\\
+        &= 4 [2 \ell^\mu \ell^\nu - \minkowskiMetric^{\mu\nu}\ell^2].
+    \end{align}
+    In general in traces like this if we have \(\gamma^\mu \slashed{\ell}\) then we the index \(\mu\) in the identity for traces of \(\gamma^\mu \gamma^\nu\) will be attached to the \(\ell\) in the final result.
+    The second term in the numerator is the same but with \(k\)s in place of the \(\ell\)s, and an extra scalar factor.
+    The last term in the trace is simply \(4m^2\minkowskiMetric^{\mu\nu}\).
+    Combined we have
+    \begin{equation}
+        N^{\mu\nu} \rightsquigarrow 4[2\ell^\mu \ell^\nu - \minkowskiMetric^{\mu\nu}\ell^2 - x(1 - x)(2k^\mu k^\nu - \minkowskiMetric^{\mu\nu} k^2) + m^2\minkowskiMetric^{\mu\nu}].
+    \end{equation}
+    We can further simplify this by using \(\Delta = m^2 - x(1 - x)k^2 - i\varepsilon\) and so \(m^2 = \Delta + x(1 - x)k^2 + i\varepsilon\) giving
+    \begin{equation}
+        N^{\mu\nu} \rightsquigarrow 4[2\ell^\mu \ell^\nu - \minkowskiMetric^{\mu\nu}\ell^2 -2x(1 - x)(k^\mu k^\nu - \minkowskiMetric^{\mu\nu}k^2) + \Delta\minkowskiMetric^{\mu\nu}].
+    \end{equation}
+    The final simplification we can make is to use our earlier discovery that we can replace \(\ell^\mu\ell^\nu\) with \(\minkowskiMetric^{\mu\nu}\ell^2/D\) under a one loop integral with denominator \((\ell^2 - \Delta)^n\).
+    This gives
+    \begin{align}
+        N^{\mu\nu} &\rightsquigarrow 4\left[ \frac{2}{D}\minkowskiMetric^{\mu\nu}\ell^2 - \minkowskiMetric^{\mu\nu}\ell^2 - 2x(1 - x)(k^\mu k^\nu - \minkowskiMetric^{\mu\nu}k^2) + \Delta\minkowskiMetric^{\mu\nu} \right]\\
+        &= 4\left[ \left( \frac{2}{D} - 1 \right)\minkowskiMetric^{\mu\nu}\ell^2 - 2x(1 - x)(k^\mu k^\nu - \minkowskiMetric^{\mu\nu}) + \Delta \minkowskiMetric^{\mu\nu} \right].
+    \end{align}
+    
+    We can now use the two following integrals, first
+    \begin{equation}
+        \int \dhat{^D\ell} \frac{1}{(\ell^2 - \Delta)^2} = \frac{i}{(4\pi)^{D/2}} \Delta^{D/2 - 2}\Gamma(2 - D/2)
+    \end{equation}
+    which follows by setting \(p = 0\) and \(n = 2\) in the general formula and using \(\Gamma(1) = 1\).
+    Second, we need
+    \begin{equation}
+        \int \dhat{^D\ell} \frac{\ell^2}{(\ell^2 - \Delta)^2} = -\frac{i}{(4\pi)^{D/2}}\Delta^{D/2 - 1} \frac{\Gamma(1 - D/2)\Gamma(1 + D/2)}{\Gamma(D/2)}.
+    \end{equation}
+    This can be simplified using the identity \(\Gamma(1 + z) = z\Gamma(z)\), which is just the factorial recursive definition extended to the \(\Gamma\) function.
+    With this we have
+    \begin{equation}
+        \Gamma(1 + D/2) = \frac{D}{2}\Gamma(D/2)
+    \end{equation}
+    and so
+    \begin{equation}
+        \int \dhat{^D\ell} \frac{\ell^2}{(\ell^2 - \Delta)^2} = -\frac{i}{(4\pi)^{D/2}}\Delta^{D/2 - 1} \frac{D}{2} \Gamma(1 - D/2).
+    \end{equation}
+    
+    Using these integrals for each term of the full integral we get the result
+    \begin{align}
+        i\widetilde{\Pi}^{\mu\nu}_{\symrm{L}}(k) = -&4e^2\mu^{2\varepsilon} \int_0^1 \dl{x} \frac{i}{(4\pi)^{D/2}} \\
+        &\times\bigg[ \frac{D}{2}\left( \frac{2}{D} - 1 \right)\Gamma(1 - D/2) \Delta^{D/2 - 1} \minkowskiMetric^{\mu\nu} \notag\\
+        &\qquad - 2x(1 - x)\Gamma(2 - D/2)\Delta^{D/2 - 2}(k^\mu k^\nu - \minkowskiMetric^{\mu\nu}k^2) \notag\\
+        &\qquad + \Gamma(2 - D/2)\Delta^{D/2 - 1}\minkowskiMetric^{\mu\nu} \bigg]. \notag
+    \end{align}
+    Now we can use
+    \begin{equation}
+        \frac{D}{2}\left( \frac{2}{D} - 1 \right)\Gamma(1 - D/2) = \left( 1 - \frac{D}{2} \right)\Gamma(1 - D/2) = \Gamma(2 - D/2),
+    \end{equation}
+    which is just another application of \(z\Gamma(z) = \Gamma(1 + z)\).
+    Doing this the first and last term above are the same and so cancel out giving the final result
+    \begin{equation}
+        i\widetilde{\Pi}^{\mu\nu}_{\symrm{L}}(k) = \frac{8e^2\mu^{2\varepsilon}}{(4\pi)^{D/2}} (k^\mu k^\nu - \minkowskiMetric^{\mu\nu} k^2)\Gamma(2 - D/2) \int_0^1 \dl{x} \, x(1 - x) \Delta^{D/2 - 2}.
+    \end{equation}
+    Note that \(\Delta\) depends on \(x\) so we can't pull it outside of the integral.
+    
+    \subsection{Regularisation}
+    We will use dimensional regularisation, setting the number of dimensions to \(D = 4 - 2\varepsilon\) for some \(\varepsilon \in \reals\) which we will later take to zero.
+    This means that we can neglect terms on the order of \(\varepsilon\), although these terms may be important for two loop diagrams.
+    We keep the poles, terms like \(1/\varepsilon\), and finite\footnote{finite here meaning finite and nonzero} terms, \(\order(\varepsilon^0)\).
+    
+    The gamma function appearing in the vacuum polarisation loop becomes
+    \begin{equation}
+        \Gamma(2 - D/2) = \Gamma(\varepsilon).
+    \end{equation}
+    We can then use the expansion of the gamma function about zero:
+    \begin{equation}
+        \Gamma(\varepsilon) \approx \frac{1}{\varepsilon} - \gamma + \order(\varepsilon)
+    \end{equation}
+    where
+    \begin{equation}
+        \gamma \approx 0.57721566
+    \end{equation}
+    is the \defineindex{Euler--Mascheroni constant}\index{\(\gamma\)|see{Euler--Mascheroni constant}}.
+    It is actually more useful to write this expansion as
+    \begin{equation}
+        \frac{1}{\varepsilon}\e^{-\varepsilon \gamma} + \order(\varepsilon) \approx \frac{1}{\varepsilon}(1 - \varepsilon\gamma) + \order(\varepsilon) = \frac{1}{\varepsilon} - \gamma + \order(\varepsilon) \approx \Gamma(\varepsilon).
+    \end{equation}
+    
+    Using this, and factoring out a minus sign from the tensor structure, we can write the vacuum polarisation loop as
+    \begin{equation}
+        i\widetilde{\Pi}_{\symrm{L}}^{\mu\nu}(k) = -\frac{8ie^2}{16\pi^2}(4\pi \mu^2 \e^{-\gamma})^{\varepsilon}(k^2 \minkowskiMetric^{\mu\nu} - k^\mu k^\nu) \frac{1}{\varepsilon} \int_0^1 \dl{x} \, x(1 - x) \Delta^{-\varepsilon}.
+    \end{equation}
+    The integral here is over a finite region, \([0, 1]\), and so diverges only if the integrand diverges.
+    In dimensional regularisation we always get factors of \(4\pi \mu^2\e^{-\gamma}\), so it helps to define
+    \begin{equation}
+        \tilde{\mu}^2 = 4\pi\mu^2\e^{-\gamma} \approx 7.0555 \mu^2.
+    \end{equation}
+    
+    Now write
+    \begin{align}
+        \tilde{\mu}^{2\varepsilon} \Delta^{-\varepsilon} &= \left( \frac{\Delta}{\tilde{\mu}^2} \right)^{-\varepsilon}\\
+        &= \exp\left\{ \log \left( \frac{\Delta}{\tilde{\mu}^2} \right)^{-\varepsilon} \right\}\\
+        &= \exp\left\{ -\varepsilon\log \frac{\Delta}{\tilde{\mu}^2} \right\}\\
+        &\approx 1 - \varepsilon \log \frac{\Delta}{\tilde{\mu}^2} + \order(\varepsilon^2).
+    \end{align}
+    Then we have
+    \begin{equation}
+        i\widetilde{\Pi}_{\symrm{L}}^{\mu\nu}(k) = -\frac{ie^2}{2\pi^2} (k^2 \minkowskiMetric^{\mu\nu} - k^\mu k^\nu) \int_0^1 \dl{x} \, x(1 - x) \left[ \frac{1}{\varepsilon} - \log \frac{\Delta}{\tilde{\mu}^2} \right].
+    \end{equation}
+    This is now perfectly finite so long as \(\varepsilon \ne 0\) (and \(\Delta/\tilde{\mu}^2\) > 0).
+    
+    \subsection{Renormalisation}
+    We require that correlators of renormalised fields are finite.
+    Recall that the counter term appearing in the vacuum polarisation is
+    \begin{equation}
+        \vcenter{\hbox{\includegraphics{tikz-external/qed-Fmunu-Fmunu-counterterm-correlator-feynman-rule}}} = -i\delta_3(k^2\minkowskiMetric^{\mu\nu} - k^\mu k^\nu).
+    \end{equation}
+    Fortunately this has the same tensor structure, \(k^2 \minkowskiMetric^{\mu\nu} - k^\mu k^\nu\), as the loop part of the vacuum polarisation.
+    This is important as it allows us to choose \(\delta_3\) to cancel the infinities which occur in the loop integral to get a finite result.
+    This is not always the case.
+    For example, if we use an ultraviolet cut-off, \(\Lambda\), then the cancellation earlier in the calculation doesn't occur and we don't have matching tensor structures.
+    The reason for this is that dimensional regularisation respects gauge symmetry, but an ultraviolet cut-off doesn't, since, for example, a gauge transformation \(p_\mu \mapsto p_\mu + eA_\mu\) could result in a momentum with \(p^2 > \Lambda^2\).
+    
+    We can write the full one-loop vacuum polarisation as
+    \begin{align}
+        \widetilde{\Pi}^{\mu\nu}(k) &= 
+        \vcenter{\hbox{\includegraphics{tikz-external/qed-AA-correlator-momentum-space}}}\\
+        &= (k^2 \minkowskiMetric^{\mu\nu} - k^\mu k^\nu) \left[ -\delta_3 - \frac{e^2}{2\pi^2} \int_0^1 \dl{x} \, x(1 - x)\left[ \frac{1}{\varepsilon} - \log \frac{\Delta}{\tilde{\mu}^2} \right] \right].
+    \end{align}
+    We can compute the first term in the integral,
+    \begin{equation}
+        \frac{1}{\varepsilon} \int_0^1 \dl{x} \, x(1 - x) = \frac{1}{6\varepsilon},
+    \end{equation}
+    giving
+    \begin{align}
+        \widetilde{\Pi}^{\mu\nu}(k) &= (k^2 \minkowskiMetric^{\mu\nu} - k^\mu k^\nu) \left[ -\delta_3 - \frac{e^2}{12\pi^2\varepsilon} - \frac{e^2}{2\pi^2} \int_0^1 \dl{x} \, x(1 - x) \log\frac{\Delta}{\tilde{\mu}^2} \right]\\
+        &= (k^2 \minkowskiMetric^{\mu\nu} - k^\mu k^\nu) \Pi(k^2)
+    \end{align}
+    where we define \(\Pi(k^2)\) to contain the scalar structure of the vacuum polarisation.
+    
+    We demand that this scalar structure is finite, however currently we have a pole at \(\varepsilon = 0\) from the \(1/\varepsilon\) term.
+    The solution is to choose \(\delta_3\) to be of the form
+    \begin{equation}
+        \delta_3 = -\frac{e^2}{12\pi^2 \varepsilon} + \text{finite terms}
+    \end{equation}
+    so that the \(1/\varepsilon\) terms cancel out and we are left only with the finite terms.
+    
+    \subsubsection{Choice of Renormalisation Scheme}
+    Clearly in the above prescription for \(\delta_3\) we have some freedom in the choice of finite terms.
+    In general we can add terms \(\order(\varepsilon^0)\) to \(\delta_3\) and the result will still be finite.
+    This freedom is the freedom in choosing a \defineindex{renormalisation scheme}.
+    We'll discuss two renormalisation schemes here.
+    
+    \paragraph{\MSbar{} Scheme}
+    The \define{\MSbar}\index{MS@\MSbar} scheme, standing for \defineindex{modified minimal subtraction}, is defined by two requirements:
+    \begin{itemize}
+        \item We use
+        \begin{equation}
+            \tilde{\mu}^2 = 4\pi \mu^2 e^{-\gamma}
+        \end{equation}
+        as a parameter.
+        This is the \enquote{modified} part of modified minimal subtraction, and simply reduces the number of \(4\pi\)s and \(\e^{-\gamma}\)s that we have to deal with.
+        \item We require counterterms to contain only poles, so no finite terms, this is the \enquote{minimal subtraction} part of modified minimal subtraction.
+        This means that all counterterms are of the form
+        \begin{equation}
+            \delta_i = \sum_{n = 1}^{\infty} \frac{a_n}{\varepsilon^n}
+        \end{equation}
+        for some finite quantities \(a_n\).
+    \end{itemize}
+    Thus in \MSbar{} the counterterm for the vacuum polarisation term is
+    \begin{equation}
+        \delta_3 = \frac{e^2}{12\pi^2\varepsilon} + \order\left( \frac{e^4}{\varepsilon^2} \right).
+    \end{equation}
+    The factor in front of any higher order term is just a number, it has no dependence on momentum, since it can be traced back to the Lagrangian where all momenta are explicitly accounted for.
+    
+    We will almost entirely use the \MSbar{} scheme, but it isn't the only choice.
+    For the rest of this section we'll briefly discuss an alternative.
+    
+    \paragraph{On-shell Scheme}
+    The \defineindex{on-shell scheme} is imposed by the normalisation condition \(\Pi(0) = 0\).
+    If we write out \(\Pi(k^2)\) in full\footnote{we use \(\varepsilon\) here for the parameter of dimensional regularisation and \(\epsilon\) for the parameter of the \(i\epsilon\) prescription.},
+    \begin{equation}
+        \Pi(k^2) = -\left[ \delta_3 + \frac{e^2}{12\pi^2\varepsilon} - \frac{e^2}{2\pi^2} \int_0^1 \dl{x} \, x(1 - x) \log\left( \frac{m^2 - x(1 - x)k^2 - i\epsilon}{\tilde{\mu}^2} \right) \right]
+    \end{equation}
+    then we see that at \(k^2 = 0\) we can take \(\epsilon \to 0\) since \(m^2 > 0\).
+    The integral is then easy to do, again giving \(1/6\), and so
+    \begin{equation}
+        \Pi(0) = -\left[ \delta_3 + \frac{e^2}{12\pi^2\varepsilon} - \frac{e^2}{12\pi^2} \log \frac{m^2}{\tilde{\mu}^2} \right].
+    \end{equation}
+    Demanding \(\Pi(0) = 0\) we get
+    \begin{equation}
+        \delta_3 = -\frac{e^2}{12\pi^2\varepsilon} + \frac{e^2}{12\pi^2} \log \frac{m^2}{\tilde{\mu}^2}.
+    \end{equation}
+    
+    A sensible question is why we impose \(\Pi(0) = 0\) as a condition.
+    There are at least two reasons for this.
+    First, doing so ensures that the photon propagator takes on its tree form,
+    \begin{equation}
+        \frac{i\minkowskiMetric^{\mu\nu}}{k^2 + i\varepsilon}.
+    \end{equation}
+    Essentially, this means that the photon remains massless, since the propagator has a pole at the physical mass.
+    
+    The second reason can be demonstrated by considering \(2 \to 2\) scattering.
+    For simplicity we'll consider scalars scattering, which just allows us to drop the spinors that would normally occur.
+    Consider the process
+    \begin{equation}
+        \tikzsetnextfilename{loop-integrals-2-to-2-scattering-tree-level-on-shell}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[charged scalar] (0, 0) -- (2, 0.5);
+            \draw[charged scalar] (2, 0.5) -- (4, 0);
+            \draw[charged scalar] (0, 3) -- (2, 2.5);
+            \draw[charged scalar] (2, 2.5) -- (4, 3);
+            \draw[photon] (2, 0.5) -- (2, 2.5);
+            \draw[->] (2.2, 1) -- (2.2, 2) node [midway, right] {\(k\)};
+            \draw[->, yshift=-0.2cm] (0.4, 0.1) -- (1.6, 0.4) node [midway, below] {\(p_2\)};
+            \draw[->, yshift=-0.2cm] (2.4, 0.4) -- (3.6, 0.1) node [midway, below, xshift=-0.1cm] {\(p_2 - k\)};
+            \draw[->, yshift=0.2cm] (0.4, 2.9) -- (1.6, 2.6) node [midway, above] {\(p_1\)};
+            \draw[->, yshift=0.2cm] (2.4, 2.6) -- (3.6, 2.9) node [midway, above, xshift=-0.1cm] {\(p_1 + k\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    The amplitude for this at tree level is
+    \begin{equation}
+        i\amplitude_{\symrm{tree}} = \frac{ie^2}{k^2}(4p_1 \cdot p_2 - k^2).
+    \end{equation}
+    At large distances \(k^2\) is small, so
+    \begin{equation}
+        i\amplitude_{\symrm{tree}} \approx \frac{ie^2}{k^2}4p_1 \cdot p_2.
+    \end{equation}
+    
+    At one loop we encounter diagrams like
+    \begin{equation}
+        \tikzsetnextfilename{loop-integrals-2-to-2-scattering-one-loop-level-on-shell}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[charged scalar] (0, 0) -- (2, 0.5);
+            \draw[charged scalar] (2, 0.5) -- (4, 0);
+            \draw[charged scalar] (0, 3) -- (2, 2.5);
+            \draw[charged scalar] (2, 2.5) -- (4, 3);
+            \draw[electron=0.55] (2, 1) arc (-90:90:0.5);
+            \draw[positron=0.45] (2, 1) arc (270:90:0.5);
+            \draw[photon] (2, 0.5) -- (2, 1);
+            \draw[photon] (2, 2.5) -- (2, 2);
+            \draw[->] (2.7, 1) -- (2.7, 2) node [midway, right] {\(k\)};
+            \draw[->, yshift=-0.2cm] (0.4, 0.1) -- (1.6, 0.4) node [midway, below] {\(p_2\)};
+            \draw[->, yshift=-0.2cm] (2.4, 0.4) -- (3.6, 0.1) node [midway, below, xshift=-0.1cm] {\(p_2 - k\)};
+            \draw[->, yshift=0.2cm] (0.4, 2.9) -- (1.6, 2.6) node [midway, above] {\(p_1\)};
+            \draw[->, yshift=0.2cm] (2.4, 2.6) -- (3.6, 2.9) node [midway, above, xshift=-0.1cm] {\(p_1 + k\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    In fact, we can carefully choose our theory so that this is the dominant diagram at one-loop.
+    Diagrams such as
+    \begin{equation}
+        \tikzsetnextfilename{loop-integrals-2-to-2-scattering-one-loop-level-on-shell-2}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[charged scalar] (0, 0) -- (1.5, 0.5);
+            \draw[charged scalar] (1.5, 0.5) -- (3, 0);
+            \draw[charged scalar] (0, 2) -- (1.5, 1.5);
+            \draw[charged scalar] (1.5, 1.5) -- (3, 2);
+            \draw[photon] (1.5, 0.5) -- (1.5, 1.5);
+            \draw[photon] (0.3, 1.9) to[bend left] (2.7, 1.9);
+        \end{tikzpicture}
+    \end{equation}
+    are suppressed by powers of \(1/m\), with \(m\) the mass of the external particles.
+    By choosing a theory with lots of fermions we can also make the fermion loop the dominant loop.
+    
+    Notice that the diagram contains the loop diagram in the vacuum polarisation as a subdiagram.
+    This means that we can just replace the normal photon propagator with this term, which we've already computed.
+    This gives
+    \begin{align}
+        i\amplitude_{\symrm{loop}} &= (ie)^2(2p_1 + k)^\mu(2p_2 - k)^\nu \left( -\frac{i}{k^2} \right)(k^2\minkowskiMetric_{\mu\nu} - k_\mu k_\nu)\Pi(k^2)\\
+        &= (ie)^24(k^2 (p_1 \cdot p_2) - (p_1 \cdot k)(p_2 \cdot k)) \frac{1}{k^4}\Pi(k^2)
+    \end{align}
+    where in the second line we've used \(k^\mu(k^2\minkowskiMetric_{\mu\nu} - k_\mu k_\nu) = 0\).
+    At large distances we then have
+    \begin{equation}
+        \label{eqn:vacuum-polarisation-2-to-2-scattering}
+        i(\amplitude_{\symrm{tree}} + \amplitude_{\symrm{loop}}) \approx \frac{i}{k^2}4 p_1 \cdot p_2 e^2 (1 + \Pi(k^2)).
+    \end{equation}
+    
+    One way to measure the charge of a particle is to perform scattering experiments like this one.
+    These are typically done at low momentum.
+    What we actually measure in these experiments is the factor \(e^2(1 + \Pi(k^2))\), plus any higher order corrections.
+    Choosing \(\Pi(0) = 0\) then means that the value we are measuring is the renormalised charge, which is the charge appearing in the Lagrangian after regularisation.
+    
+    \chapter{Interpreting The Vacuum Polarisation}
+    Recall that in the last chapter we computed the vacuum polarisation
+    \begin{align}
+        \Pi^{\mu\nu}(k) &= \vcenter{\hbox{\includegraphics{tikz-external/qed-AA-correlator-momentum-space}}}\\
+        &= (k^\mu k^\nu - \minkowskiMetric k^2)\Pi(k^2)
+    \end{align}
+    where
+    \begin{equation}
+        \Pi(k^2) =
+        \begin{cases}
+            \displaystyle \frac{e^2}{2\pi^2} \int_0^1 \dl{x} \, x(1 - x) \log \frac{\Delta}{\tilde{\mu}^2} & \MSbar,\\
+            \displaystyle \frac{e^2}{2\pi^2} \int_0^1 \dl{x} \, x(1 - x) \log \frac{\Delta}{m^2} & \text{on-shell},
+        \end{cases}
+    \end{equation}
+    where
+    \begin{equation}
+        \Delta = m^2 - x(1 - x)k^2 - i\epsilon.
+    \end{equation}
+    Now we're going to try to extract some physics from this result and discuss the effects of the two different renormalisation scales.
+    
+    \section{Scale Dependence of Charge}
+    Previously (\cref{eqn:vacuum-polarisation-2-to-2-scattering}) we saw that the amplitude for \(2 \to 2\) scattering process between scalar particles exchanging a photon has
+    \begin{equation}
+        i\amplitude = \frac{4i}{k^2} p_1 \cdot p_2 e^2(1 + \Pi(k^2)).
+    \end{equation}
+    This includes the tree level process and a single fermion loop in the photon propagator, and it is assumed that \(k^2\) is small.
+    
+    We can use this process to measure the charge of the particle in scattering process with zero, or very little, momentum.
+    We find that measured charge squared, at one loop accuracy, is then
+    \begin{align}
+        e_{\measured}^2 &= e^2(1 + \Pi(0))\\
+        &= 
+        \begin{cases}
+            \displaystyle e^2\left( 1 + \frac{e^2}{12\pi^2} \log \frac{m^2}{\tilde{\mu}^2} \right) & \MSbar,\\
+            e^2 & \text{on-shell}.
+        \end{cases}
+    \end{align}
+    We can see that the relation between the Lagrangian parameters and the physical observables is scheme dependent.
+    This isn't too much of a problem because in QED we can make a finite number of measurements to determine these parameters and from there we can use them to make scheme independent predictions.
+    
+    For example, at nonzero momentum there is a correction to the measured charge squared:
+    \begin{align}
+        e_{\measured}^2(k^2) - e_{\measured}^2(0) &= e^2(1 + \Pi(k^2)) - e^2(1 + \Pi(0))\\
+        &= e^2(\Pi(k^2) - \Pi(0))\\
+        &= \frac{e^4}{2\pi^2} \int_0^1 \dl{x} \, x(1 - x) \log \frac{\Delta}{m^2}
+    \end{align}
+    in the \MSbar{} scheme.
+    This \(\order(e^4)\) correction to the measured charge is a physical prediction of QED.
+    
+    \section{Non-Relativistic Limit}
+    We can take the non-relativistic limit in QFT to compare results to results from non-relativistic quantum mechanics.
+    Recall that in quantum mechanics the Born approximation gives the scattering amplitude
+    \begin{equation}
+        \amplitude = -4m_1m_2 \int \dl{^3x} \, \e^{-i\vv{k} \cdot \vv{x}} V(\vv{x})
+    \end{equation}
+    where \(m_i\) are the masses of the two particles scattering and \(V(\vv{x})\) is the potential they are scattering in, with \(\vv{x}\) being the vector between the two particles.
+    
+    Note that this differs by a factor of \(2m\) from the amplitudes we have been calculating.
+    This is due to a difference in normalisation, where in quantum mechanics
+    \begin{equation}
+        \braket{\vv{p}}{\vv{p}'} = \delta(\vv{p} - \vv{p}')
+    \end{equation}
+    and in QFT
+    \begin{equation}
+        \braket{p}{p'} = \frac{1}{2E_p}\delta(p - p')
+    \end{equation}
+    with \(2E_p \approx 2m\) in the non-relativistic limit.
+    
+    Consider Coulomb scattering, the amplitude calculated in quantum mechanics is then
+    \begin{align}
+        \amplitude &= -4m_1m_2 \int \dl{^3x} \, \e^{-i\vv{k} \cdot \vv{x}} \frac{e_1e_2}{4\pi\abs{\vv{x}}}\\
+        &= -4m_1m_2\frac{e_1e_2}{\abs{\vv{k}}^2}.
+    \end{align}
+    
+    For the non-relativistic QFT result we take \(k^2\) to be small.
+    Note that \(p_1 \cdot p_2 \approx m_1 m_2\).
+    There is an incoming (and hence on-shell) particle with momentum \(p_1\), so \(p_1^2 = m_1^2\).
+    There is an outgoing (and hence on-shell) particle with momentum \(p_1 + k\), so
+    \begin{equation}
+        (p_1 + k)^2 = m_1^2 = m_1^2 + 2p_1 \cdot k + k^2.
+    \end{equation}
+    From this, neglecting \(k^2\) terms, we see that \(2p_1 \cdot k \approx 0\).
+    Since \(p_1^0 \approx m_1\), which can be large, we must have \(k^0 \approx 0\), and so \(k^2 \approx -\vv{k}^2\).
+    Then the amplitude calculated in QFT is
+    \begin{equation}
+        \amplitude = -\frac{4m_1m_2}{\abs{\vv{k}}^2} e_1e_2(1 + \Pi(-\vv{k}^2)).
+    \end{equation}
+    
+    We can interpret this as having a one-loop correction to the potential, given in momentum space by
+    \begin{equation}
+        \Delta\tilde{V}(\vv{k}) = \frac{e_1e_2}{\vv{k}^2}\Pi(-\vv{k}^2)
+    \end{equation}
+    and in real space by
+    \begin{equation}
+        \Delta V(\vv{r}) = e_1 e_2 \int \dhat{^3k} \, \e^{-i\vv{k} \cdot \vv{r}} \frac{\Pi(-\vv{k}^2)}{\vv{k}^2}.
+    \end{equation}
+    This corrected potential is called the \defineindex{Uehling potential}.
+    
+    In the on-shell scheme for \(k^2 \ll m^2\) we can expand
+    \begin{align}
+        \Pi(k^2) &= \frac{e^2}{2\pi^2} \int_0^1 \dl{x} \, x(1 - x) \log\left( 1 - x(1 - x)\frac{k^2}{m^2} \right)\\
+        &\approx \frac{e^2}{2\pi^2} \int_0^1 \dl{x} \, x(1 - x) \left[ -x(1 - x)\frac{k^2}{m^2} \right]\\
+        &= \frac{e^2}{60\pi^2} \frac{\vv{k}^2}{m^2}.
+    \end{align}
+    Here we've used the expansion \(\log(1 + \alpha) \approx \alpha\) and we've set \(\epsilon = 0\) since the term in the logarithm is positive as \(k^2 < m^2\) and \(0 < x(1 - x) < 1/4\).
+    
+    Hence, the correction to the potential is
+    \begin{equation}
+        \Delta V(\vv{r}) = \frac{e_1 e_2 e^2}{60\pi^2m^2} \delta(\vv{r}).
+    \end{equation}
+    
+    If we consider one of the particles to be a nucleus with \(Z\) protons then \(e_1 = -Ze\), taking the other particle to be an electron, \(e_2 = e\), we can interpret this as a shift in the energy levels of the atom.
+    Note that since we're considering scalar particles scattering we are essentially ignoring spin-orbit effects, however these are subdominant terms since there is no direct spin-dependence in the potential.
+    The energy shift is given by
+    \begin{equation}
+        \Delta E = \int \dl{^3x} \, \psi^*(\vv{x}) \Delta V(\vv{x}) \psi(\vv{x})
+    \end{equation}
+    where \(\psi\) is the wave function of the electron in the atom.
+    Since we have a factor of \(\delta(\vv{r})\) this shift only applies to wave functions which are nonzero at the origin, meaning it only applies to \(\symrm{s}\) states.
+    The energy shift to these states is
+    \begin{equation}
+        \Delta E = -\abs{\psi(0)}^2 \frac{4Z\alpha^2}{15m^2}
+    \end{equation}
+    with \(\alpha = e^2/(4\pi)\) being the \defineindex{fine structure constant}.
+    
+    This shift is one contribution to the Lamb shift, the difference between the energy levels \(\tensor[^2]{\symrm{S}}{_{1/2}}\) and \(\tensor[^2]{\symrm{P}}{_{1/2}}\) which is  not predicted by the Dirac equation alone.
+    It is not the dominant contribution to the Lamb shift.
+    This shift is more important for muonic atoms, where the electron is replaced by a muon, since heavier external particles make the one-fermion-loop diagram more dominant, as opposed to diagrams with, say, photon loops, since these are suppressed by factors of \(1/m\), with \(m\) the mass of the external particles.
+    
+    \section{Effective Charge Distribution}
+    We can write the corrected potential as
+    \begin{equation}
+        V(\vv{r}) = e_1e_2 \int \dl{^3x} \dd{^3y} \, \frac{\eta(\vv{x})\eta(\vv{y})}{4\pi\abs{\vv{x} - \vv{y} + \vv{r}}}
+    \end{equation}
+    where
+    \begin{equation}
+        \eta(\vv{r}) = \delta(\vv{r}) + \frac{1}{2} \dhat{^3k} \, \Pi(-\vv{k}^2) \e^{i\vv{k} \cdot \vv{r}}.
+    \end{equation}
+    Note that we are implicitly dropping the \(\Pi^2\) term appearing in the product \(\eta(\vv{x})\eta(\vv{y})\) since this term is \(\order(e^6)\), which is of a higher order than the one loop calculations we have been doing, and so is not physically meaningful if we don't also include two loop calculations.
+    To see how this works expand this form of the potential, dropping the \(\Pi^2\) term, giving
+    \begin{align}
+        V(\vv{r}) &= e_1e_2 \int \dl{^3x} \dd{^3y} \, \frac{1}{4\pi\abs{\vv{x} - \vv{y} + \vv{r}}} \left[ \delta(\vv{x}) + \frac{1}{2} \int \dhat{^3k} \, \Pi(-\vv{k}^2)\e^{i\vv{k} \cdot \vv{x}} \right] \notag\\
+        &\qquad\qquad\times \left[ \delta(\vv{y}) + \frac{1}{2} \int \dhat{^3k} \, \Pi(-\vv{k}^2)\e^{i\vv{k} \cdot \vv{y}} \right]\\
+        &= e_1e_2 \int \dl{^3x} \dd{^3y} \frac{1}{4\pi\abs{\vv{x} - \vv{y} + \vv{r}}} \bigg[ \delta(\vv{x})\delta(\vv{y})\\
+        &\qquad + \frac{1}{2} \delta(\vv{x}) \int \dhat{^3k} \, \Pi(-\vv{k}^2)\e^{-i\vv{k}\cdot\vv{y}} + \frac{1}{2}\delta(\vv{y})\int\dhat{^3k} \, \Pi(-\vv{k}^2)\e^{-i\vv{k}\cdot\vv{x}} \bigg] \notag\\
+        &= \frac{e_1e_2}{4\pi\abs{\vv{\vv{r}}}} + \frac{1}{2} \int \dl{^3y} \frac{e_1e_2}{4\pi\abs{-\vv{y} + \vv{r}}} \int \dhat{^3k} \, \Pi(-\vv{k}^2)\e^{-i\vv{k}\cdot\vv{y}}\notag\\
+        &\qquad\qquad+ \frac{1}{2} \int \dl{^3y} \frac{e_1e_2}{4\pi\abs{\vv{x} + \vv{r}}} \int \dhat{^3k} \, \Pi(-\vv{k}^2)\e^{-i\vv{k}\cdot\vv{x}}\\
+        &= \frac{e_1e_2}{4\pi\abs{\vv{r}}} + \int \dl{^3x} \, \frac{e_1e_2}{4\pi\abs{\vv{x} + \vv{r}}} \int \dhat{^3k} \, \Pi(-\vv{k}^2) \e^{-i\vv{k}\cdot\vv{x}}.
+    \end{align}
+    In the last step we make the transformation of variables \(\vv{y} \mapsto -\vv{x}\) and identify that both integrals are the same.
+    Now recognise that we can write the first factor in the integral as the inverse Fourier transform of it's Fourier transform:
+    \begin{equation}
+        \frac{1}{4\pi\abs{\vv{x} + \vv{r}}} = \int \dhat{^3k} \, \frac{1}{\abs{\vv{k}}^2} \e^{-i\vv{k} \cdot (\vv{x} + \vv{r})}
+    \end{equation}
+    and so we get
+    \begin{equation}
+        V(\vv{r}) = \frac{e_1e_2}{4\pi\abs{\vv{r}}} + \int \dhat{^3k} \, \frac{1}{\abs{\vv{k}}^2} \Pi(-\vv{k}^2) \e^{-i\vv{k} \cdot \vv{r}}.
+    \end{equation}
+    This takes the form we had in the previous section of a Coulomb potential plus the correction from one loop diagrams.
+    
+    The interpretation of this rewriting of the potential is that the electron's charge distribution is a superposition of a point charge, given by the \(1/\abs{\vv{r}}\) Coulomb part of the potential, but also has some spatial distribution coming from this extra one loop term.
+    The intuition is that this is similar to a point charge in a medium causing that medium to become polarised around it.
+    The electron polarises the sea of virtual particles around it.
+    This is why we call this term the vacuum polarisation, since it occurs outside of any medium.
+    
+    \section{Large Logs}
+    In the on-shell scheme we have
+    \begin{equation}
+        \Pi(k^2) = \frac{e^2}{2\pi^2} \int_0^1 \dl{x} \, x(1 - x) \log\left[ 1 - \frac{x(1 - x)k^2 + i\epsilon}{m^2}. \right]
+    \end{equation}
+    In perturbation theory we expect that the one loop diagrams are small corrections to the tree level amplitude.
+    Since \(e^2 = 4\pi \alpha \approx 4\pi/137 \approx 0.09\) is small many one loop corrections are small.
+    However this isn't enough on its own.
+    If \(k^2\) is large enough then the logarithm can become large.
+    This is the problem of \defineindex{large logs}.
+    
+    This is a very real worry, for example, the LHC operates at \(\sqrt{s} = \qty{13}{\tera\electronvolt}\), meaning that \(k^2 \approx s = (\qty{13}{\tera\electronvolt})^2\), so an electron created in this process will have \(k^2/m^2 \sim 10^{14}\), so \(\log(k^2/m^2) \sim 34\), which is large enough to require higher order terms to achieve the desired accuracy.
+    We also run into this issue if we try to take the \(m \to 0\) limit, which can be a useful thing to do.
+    
+    This problem of large logs is worse in QCD where \(\strongCoupling \approx 1/10\), so the coupling doesn't provide as much suppression of higher order terms.
+    
+    The way we get around this is to instead work in the \MSbar{} scheme, where this can still be an issue.
+    We know that \(\tilde{\mu}\) is non-physical, and so can't appear in an amplitude calculated to all orders, however \(\tilde{\mu}\) does appear in truncated calculations.
+    By carefully choosing the value of \(\tilde{\mu}\) we can avoid large logs.
+    This leads to the somewhat unsettling observation that while \(\tilde{\mu}\) is non-physical it does affect the rate of \enquote{convergence} of our perturbative series, which certainly feels like it is a physical result.
+    
     
     %   Appdendix
 %    \appendixpage
