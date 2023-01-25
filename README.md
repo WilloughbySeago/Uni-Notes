@@ -24,7 +24,7 @@ Here are all the courses I took.
 
 ### Year 5
 * [Quantum Field Theory](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-5/Quantum-Field-Theory) (s1) (see also another student's notes [here](https://github.com/mathias-driesse/Quantum-Field-Theory))
-* [Symmetries of Particles and Fields](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-5/Symmetries-of-Particles-and-Fields) (s1)
+* [Symmetries of Particles and Fields (SoPF)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-5/Symmetries-of-Particles-and-Fields) (s1)
 * [Particle Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-5/Particle-Physics) (s1)
 * [Gauge Theories in Particle Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-5/gauge-theories) (s2)
 
@@ -32,29 +32,29 @@ As well as these courses I also took the following course with the School of Inf
 * [Categories and Quantum Information](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-5/categories) (s2)
 
 ### Year 4
-* [Introduction to Condensed Matter Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Introduction-to-Condensed-Matter-Physics) (s1)
-* [Relativity, Nuclear, and Particle Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Relativity-Nuclear-and-Particle-Physics) (s1) - composed of three parts:
+* [Introduction to Condensed Matter Physics (ICMP)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Introduction-to-Condensed-Matter-Physics) (s1)
+* [Relativity, Nuclear, and Particle Physics (RNPP)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Relativity-Nuclear-and-Particle-Physics) (s1) - composed of three parts:
     * [Relativity](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Relativity-Nuclear-and-Particle-Physics/Relativity)
     * [Nuclear Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Relativity-Nuclear-and-Particle-Physics/Nuclear-Physics)
     * [Particle Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Relativity-Nuclear-and-Particle-Physics/Particle-Physics)
 * [Methods of Mathematical Physics (MoMP)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Methods-of-Mathematical-Physics) (s1)
 * [Lagrangian Dynamics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Lagrangian-Dynamics) (s1)
 * [Quantum Theory](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Quantum-Theory)  (s1) (see also another student's notes [here](https://github.com/penguinoneshaw/PHYS11019-quantum-theory))
-* [Symmetries of Quantum Mechanics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Symmetries-of-Quantum-Mechanics) (s2)
-* [General Relativity](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/General-Relativity) (s2)
+* [Symmetries of Quantum Mechanics (SoQM)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Symmetries-of-Quantum-Mechanics) (s2)
+* [General Relativity (GR)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/General-Relativity) (s2)
 * [Statistical Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Statistical-Physics) (s2)
-* [Modelling and Visualisation in Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Modelling-and-Visualisation-in-Physics) (s2)
-* [Classical Electrodynamics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Classical-Electrodynamics) (s2) - I took this class over the summer as course only
+* [Modelling and Visualisation in Physics (MVP)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Modelling-and-Visualisation-in-Physics) (s2)
+* [Classical Electrodynamics (CED)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-4/Classical-Electrodynamics) (s2) - I took this class over the summer as course only
 
 ### Year 3
-* [Electromagnetism](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Electromagnetism) (y)
-* [Principles of Quantum Mechanics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Principles-of-Quantum-Mechanics) (y)
+* [Electromagnetism (EM)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Electromagnetism) (y)
+* [Principles of Quantum Mechanics (PoQM)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Principles-of-Quantum-Mechanics) (y)
 * [Thermal Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Thermal-Physics) (y)
 * [Fourier Analysis and Statistics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Fourier-Analysis-and-Statistics) (s1) - Composed of two parts:
     * [Fourier Analysis](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Fourier-Analysis-and-Statistics/Fourier-Analysis)
     * [Statistics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Fourier-Analysis-and-Statistics/Statistics)
 * [Numerical Recipes](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Numerical-Recipes) (s1)
-* [Methods of Theoretical Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Methods-of-Theoretical-Physics) (s2) - Composed of two parts:
+* [Methods of Theoretical Physics (MoTP)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Methods-of-Theoretical-Physics) (s2) - Composed of two parts:
     * [Vectors, Tensors, and Continuum Mechanics (VTCM)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Methods-of-Theoretical-Physics/Vectors-Tensors-and-Continuum-Mechanics)
     * [Complex Analysis (CA)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Methods-of-Theoretical-Physics/Complex-Analysis)
 
@@ -62,7 +62,7 @@ As well as these courses I also took the following course with the School of Inf
 ### Year 2
 * [Linear Algebra and Several Variable Calculus (LASVC)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-2/LASVC) (s1)
 * [Modern Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-2/Modern-Physics) (s1)
-* [Dynamics and Vector Calculus](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-2/Dynamics-and-Vector-Calculus) (s2) - Composed of two parts:
+* [Dynamics and Vector Calculus (DVC)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-2/Dynamics-and-Vector-Calculus) (s2) - Composed of two parts:
     * [Dynamics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-2/Dynamics-and-Vector-Calculus/Dynamics)
     * [Vector Calculus](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-2/Dynamics-and-Vector-Calculus/Vector-Calculus)
 * [Physics of Fields and Matter](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-2/Physics-of-Fields-and-Matter) (s2) - Composed of two parts:
@@ -93,45 +93,46 @@ Any mistakes in these notes are my own, as are any views expressed within.
 
 ### Lecturers
 As the main source of this material I would like to thank the following people who lectured for at least one course, in no particular order:
-* [Dr Ross Galloway](https://www.ph.ed.uk/people/ross-galloway)
-* [Dr Will Hossack](https://www.ph.ed.uk/people/will-hossack)
-* [Dr John Loveday](https://www.ph.ed.uk/people/john-loveday)
-* [Dr Kristel Torokoff](https://www.ph.ed.uk/people/kristel-torokoff)
-* [Dr Joe Zuntz](https://www.ph.ed.uk/people/joe-zuntz)
-* [Prof Victoria Martin](https://www.ph.ed.uk/people/victoria-martin)
-* [Prof Alex Murphy](https://www.ph.ed.uk/people/alex-murphy)
-* [Prof Philip Clark](https://www.ph.ed.uk/people/philip-clark)
-* [Prof Judy Hardy](https://www.ph.ed.uk/people/judy-hardy)
-* [Prof Tom Bruce](https://www.eng.ed.ac.uk/about/people/prof-tom-bruce)
-* [Dr David Laurenson](https://www.eng.ed.ac.uk/about/people/dr-david-laurenson)
-* [Prof Rebecca Cheung](https://www.eng.ed.ac.uk/about/people/prof-rebecca-cheung)
-* [Prof Romeel Dave](https://www.ph.ed.uk/people/romeel-dave)
-* [Prof Roman Zwicky](https://www.ph.ed.uk/people/roman-zwicky)
-* [Dr Stewart Williams](https://www.ph.ed.uk/people/stewart-williams)
-* [Dr Simon Titmuss](https://www.ph.ed.uk/people/simon-titmuss)
-* [Dr Andreas Hermann](https://www.ph.ed.uk/people/andreas-hermann)
-* [Dr Jamie Cole](https://www.ph.ed.uk/people/jamie-cole)
-* [Prof Jorge Peñarrubia](https://www.ph.ed.uk/people/jorge-penarrubia)
-* [Prof Andy Lawrence](https://www.ph.ed.uk/people/andy-lawrence)
-* [Dr Bartlomiej Waclaw](https://www.ph.ed.uk/people/bartlomiej-waclaw)
-* [Dr Britton Smith](https://www.ph.ed.uk/people/britton=smith)
-* [Prof Luigi Del Debio](https://www.ph.ed.uk/people/luigi-del-debio)
-* [Prof Arjun Berera](https://www.ph.ed.uk/people/arjun-berera)
-* [Prof Graeme Ackland](https://www.ph.ed.uk/people/graeme-ackland)
-* [Prof Alexander Morozov](https://www.ph.ed.uk/people/ross-galloway)
-* [Dr Miguel Martinez-Canales](https://www.ph.ed.ac.uk/people/miguel-martinez-canales)
-* [Dr Mehdi Bouzid](https://mehdibouzid.com/)
-* [Prof Phil Woods](https://www.ph.ed.ac.uk/people/phil-woods)
-* [Dr Ingo Loa](https://www.ph.ed.ac.uk/people/ingo-loa)
-* [Dr Jenni Smillie](https://www.ph.ed.ac.uk/people/jenni-smillie)
-* [Dr Roger Horsley](https://www.ph.ed.ac.uk/people/roger-horsley)
-* [Prof John Peacock](https://www.ph.ed.ac.uk/people/john-peacock)
-* [Prof Martin Evans](https://www.ph.ed.ac.uk/people/martin-evans)
-* [Prof Davide Marenduzzo](https://www.ph.ed.ac.uk/people/davide-marenduzzo)
-* [Prof Donal O'Connell](https://www.ph.ed.ac.uk/people/donal-oconnell)
-* [Prof Neil Turok](https://www.ph.ed.ac.uk/people/neil-turok)
-* [Prof Richard Ball](https://www.ph.ed.ac.uk/people/richard-ball)
-* [Dr Chris Heunen](https://www.inf.ed.ac.uk/people/staff/Chris_Heunen.html)
+* [Dr Ross Galloway](https://www.ph.ed.uk/people/ross-galloway) (Physics 1A and Physics of Fields and Matter (Fields))
+* [Dr Will Hossack](https://www.ph.ed.uk/people/will-hossack) (Physics 1A)
+* [Dr John Loveday](https://www.ph.ed.uk/people/john-loveday) (Physics 1A)
+* [Dr Kristel Torokoff](https://www.ph.ed.uk/people/kristel-torokoff) (MFP1, MFP2 and MoMP)
+* [Dr Joe Zuntz](https://www.ph.ed.uk/people/joe-zuntz) (Physics 1B)
+* [Prof Victoria Martin](https://www.ph.ed.uk/people/victoria-martin) (Physics 1B and Particle Physics)
+* [Prof Alex Murphy](https://www.ph.ed.uk/people/alex-murphy) (Physics 1B and Modern Physics)
+* [Prof Phil Clark](https://www.ph.ed.uk/people/philip-clark) (LASVC and RNPP (relativity))
+* [Prof Judy Hardy](https://www.ph.ed.uk/people/judy-hardy) (Modern Physics and Computer Simulation)
+* [Prof Tom Bruce](https://www.eng.ed.ac.uk/about/people/prof-tom-bruce) (Fluid Mechanics 2)
+* [Dr David Laurenson](https://www.eng.ed.ac.uk/about/people/dr-david-laurenson) (Analogue Circuits 2)
+* [Prof Rebecca Cheung](https://www.eng.ed.ac.uk/about/people/prof-rebecca-cheung) (Analogue Circuits 2)
+* [Prof Romeel Dave](https://www.ph.ed.uk/people/romeel-dave) (DVC (dynamics))
+* [Prof Roman Zwicky](https://www.ph.ed.uk/people/roman-zwicky) (DVC (vector calculus) and SoQM)
+* [Dr Stewart Williams](https://www.ph.ed.uk/people/stewart-williams) (Physics of Fields and Matter (Matter))
+* [Dr Simon Titmuss](https://www.ph.ed.uk/people/simon-titmuss) (Physics of Fields and Matter (Matter))
+* [Dr Andreas Hermann](https://www.ph.ed.uk/people/andreas-hermann) (Electromagnetism (s1))
+* [Dr Jamie Cole](https://www.ph.ed.uk/people/jamie-cole) (Electromagnetism (s2))
+* [Prof Jorge Peñarrubia](https://www.ph.ed.uk/people/jorge-penarrubia) (Statistics and Fourier Analysis (Fourier))
+* [Prof Andy Lawrence](https://www.ph.ed.uk/people/andy-lawrence) (Statistics and Fourier Analysis (Statistics))
+* [Dr Bartlomiej Waclaw](https://www.ph.ed.uk/people/bartlomiej-waclaw) (Numerical Recipes)
+* [Dr Britton Smith](https://www.ph.ed.uk/people/britton=smith) (Numerical Recipes)
+* [Prof Luigi Del Debio](https://www.ph.ed.uk/people/luigi-del-debio) (PoQM (s1) and QFT (path integrals))
+* [Prof Arjun Berera](https://www.ph.ed.uk/people/arjun-berera) (PoQM (s2) aka Quantum Physics)
+* [Prof Graeme Ackland](https://www.ph.ed.uk/people/graeme-ackland) (Thermal Physics (thermodynamics))
+* [Prof Alexander Morozov](https://www.ph.ed.ac.uk/people/alexander-morozov) (Thermal Physics (statistical mechanics) and MoTP (VTC)))
+* [Dr Miguel Martinez-Canales](https://www.ph.ed.ac.uk/people/miguel-martinez-canales) (MoTP (complex analysis))
+* [Dr Mehdi Bouzid](https://mehdibouzid.com/) (MoTP (VTC))
+* [Prof Phil Woods](https://www.ph.ed.ac.uk/people/phil-woods) (RNPP (nuclear))
+* [Dr Matt Needham](https://www.ph.ed.ac.uk/people/matthew-needham) (RNPP (particle))
+* [Dr Ingo Loa](https://www.ph.ed.ac.uk/people/ingo-loa) (ICMP)
+* [Dr Jenni Smillie](https://www.ph.ed.ac.uk/people/jenni-smillie) (Lagrangian dynamics)
+* [Dr Roger Horsley](https://www.ph.ed.ac.uk/people/roger-horsley) (quantum theory)
+* [Prof John Peacock](https://www.ph.ed.ac.uk/people/john-peacock) (GR)
+* [Prof Martin Evans](https://www.ph.ed.ac.uk/people/martin-evans) (statistical physics)
+* [Prof Davide Marenduzzo](https://www.ph.ed.ac.uk/people/davide-marenduzzo) (MVP)
+* [Prof Donal O'Connell](https://www.ph.ed.ac.uk/people/donal-oconnell) (CED and gauge theories (QED and QCD))
+* [Prof Neil Turok](https://www.ph.ed.ac.uk/people/neil-turok) (SoPF)
+* [Prof Richard Ball](https://www.ph.ed.ac.uk/people/richard-ball) (QFT (canonical quantisation) and gauge theories (EW))
+* [Dr Chris Heunen](https://www.inf.ed.ac.uk/people/staff/Chris_Heunen.html) (categories and quantum informatics)
 
 ### Bibliography
 Some of the books I have used to help write these notes:
