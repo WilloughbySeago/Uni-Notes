@@ -48,7 +48,7 @@ As well as these courses I also took the following course with the School of Inf
 
 ### Year 3
 * [Electromagnetism (EM)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Electromagnetism) (y)
-* [Principles of Quantum Mechanics (PoQM)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Principles-of-Quantum-Mechanics) (y)
+* [Principles of Quantum Mechanics (PoQM)](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Principles-of-Quantum-Mechanics) (y) Note that semester 2 of this course can be taken as a stand alone course called Quantum Physics
 * [Thermal Physics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Thermal-Physics) (y)
 * [Fourier Analysis and Statistics](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Fourier-Analysis-and-Statistics) (s1) - Composed of two parts:
     * [Fourier Analysis](https://github.com/WilloughbySeago/Uni-Notes/tree/main/year-3/Fourier-Analysis-and-Statistics/Fourier-Analysis)
