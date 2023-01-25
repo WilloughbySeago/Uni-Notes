@@ -5,6 +5,7 @@
 
 %% Packages
 \usepackage{xfrac}
+\usepackage{csquotes}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -17,6 +18,10 @@
 \undef{\digamma}
 \undef{\backepsilon}
 \usetikzlibrary{zx-calculus}
+\usepackage{tikz-cd}
+
+\BeforeBeginEnvironment{tikzcd}{\tikzexternaldisable}
+\AfterEndEnvironment{tikzcd}{\tikzexternalenable}
 
 \tikzset{Z spider/.style={fill=Green!50, draw=Green, text=black, circle, minimum width=1mm, inner sep=2pt, thick}}
 \tikzset{X spider/.style={fill=Red!50, draw=Red, text=black, circle, minimum width=1mm, inner sep=2pt, thick}}
@@ -46,6 +51,8 @@ noabbrev
 
 \colorlet{highlight}{Green}
 
+\colorlet{codeTextColor}{Navy}
+
 % Title page info
 \title{Gauge Theories in Particle Physics}
 \author{Willoughby Seago}
@@ -54,13 +61,44 @@ noabbrev
 % \subsubtitle{}
 
 % Commands
+\lstdefinestyle{haskell}{
+    language=haskell,
+    literate=
+        {->}{$\to$}{1}
+        {=>}{$\Rightarrow$}{1}
+}
+
 % Text
 \newcommand*{\course}[1]{\textit{#1}}
+\newcommand{\Haskell}{\textit{Haskell}}
 
 % Maths
 \newcommand{\e}{\symrm{e}}
 \DeclarePairedDelimiter{\denotes}{\lBrack}{\rBrack}
-
+\newcommand{\cat}[1]{\symbfup{#1}}
+\newcommand{\category}[1]{\symbfup{#1}}
+\newcommand{\Set}{\category{Set}}
+\newcommand{\Rel}{\category{Rel}}
+\renewcommand{\field}{\symbb{k}}
+\newcommand{\Mat}[1][\field]{{\category{Mat}_{#1}}}
+\newcommand{\Vect}[1][\field]{{\category{Vect}_{#1}}}
+\newcommand{\FVect}[1][\field]{{\category{FVect}_{#1}}}
+\newcommand{\Hilb}{\category{Hilb}}
+\newcommand{\FHilb}{\category{FHilb}}
+\newcommand{\Mon}{\category{Mon}}
+\newcommand{\Grp}{\category{Grp}}
+\newcommand{\Ring}{\category{Ring}}
+\newcommand{\CRing}{\category{CRing}}
+\newcommand{\Field}{\category{Field}}
+\newcommand{\RMod}[1][R]{#1{-}\category{Mod}}
+\newcommand{\Top}{\category{Top}}
+\newcommand{\pointedTop}{\category{Top}_{\bullet}}
+\DeclareMathOperator{\Ob}{Ob}
+\DeclareMathOperator{\id}{id}
+\newcommand{\isomorphic}{\cong}
+\renewcommand{\ve}[1]{e_{#1}}
+\newcommand{\topology}{\symcal{T}}
+\newcommand{\powerset}{\symcal{P}}
 
 \includeonly{}
 
@@ -960,12 +998,1112 @@ noabbrev
     is typically expensive to implement, so reducing the number of \(T\) gates in a circuit is usually desirable.
     Given some circuit making use of \(T\) gates we can use the universality of ZX calculus to convert the circuit into a ZX diagram, then manipulate the ZX diagram and then convert it back to a, hopefully, more optimised circuit with fewer \(T\) gates.
     
+    \chapter{Semantics}
+    \section{Types of Semantics}
+    Consider the two following pseudocode fragments:
+    \begin{align}
+        P &= \lstinline|if 1 = 1 then F else G|,\\
+        Q &= \lstinline|if 1 = 0 then F else F|.
+    \end{align}
+    Are \(P\) and \(Q\) the same program?
+    There are two schools of thought:
+    \begin{itemize}
+        \item No. Clearly looking at them both programs are implemented differently, \(P\) makes reference to \lstinline|G|, \(Q\) makes reference to 0.
+        \item Yes. Both programs take no input and output \lstinline|F|.
+    \end{itemize}
+    Whether or not we count these as the same program depends on what we are interested in.
+    
+    To aid in our analysis we assign the code fragments their meanings, encoded in some appropriate mathematical object.
+    This gives a mapping
+    \begin{equation}
+        \denotes{-} \colon \text{Programs} \to \text{Mathematical Objects}.
+    \end{equation}
+    For now we'll leave the details of exactly what mathematical objects alone.
+    If we are interested in implementation details then we assign \(P\) and \(Q\) to objects encoding these details.
+    This is called \defineindex{operational semantics}.
+    If we aren't interested in implementation details then we assign \(P\) and \(Q\) to objects which treat them as black boxes with inputs and outputs.
+    This is called \defineindex{denotational semantics}.
+    If this is what we do then we find that \(\denotes{P} = \denotes{Q} = \denotes{\lstinline|F|}\).
+    
+    We want this mapping to preserve the structure of our programs.
+    For example, suppose that we have two processes, \lstinline|F| and \lstinline|G|, which can be composed by running them one after another.
+    We might write this as \(\lstinline|F; G|\) in a language using semicolons to terminate a line.
+    In order to reason about our program, regardless of which type of semantics we are interested in, we want the result to be the same if we compose the programs and then look at the semantics or look at the semantics and then compose the programs.
+    That is we want
+    \begin{equation}
+        \denotes{\lstinline|F; G|} = \denotes{\lstinline|F|} \circ \denotes{\lstinline|G|}.
+    \end{equation}
+    Here \(\circ\) is some method of composing the semantics of two programs.
+    Another structure which we may want to preserve is the ability to compute things in parallel, for example
+    \begin{equation}
+        \denotes{\lstinline|paralell(F, G)|} = \denotes{\lstinline|F|} \otimes \denotes{\lstinline|G|}.
+    \end{equation}
+    
+    \section{Motivation}
+    Why might we care about this sort of analysis?
+    This reasoning can be used to ground assumptions and correct erroneous assumptions.
+    We can also use semantics to justify transformations of programs, for example, to demonstrate that a compiled program does the same thing as the original program.
+    It is also often the case that it is easier to reason about the mathematical objects encoding the programs, rather than the programs themselves, in fact sometimes it isn't possible to reason directly about the programs, such as in quantum computing where many operations are like black boxes, even if we can't look at the operational semantics we can still consider the denotational semantics and the flow of information through the program to compare programs.
+    
+    Choosing different semantics also allows us to focus on different details.
+    Operational semantics focus on implementation details, such as memory usage and running time, which is useful if we want to improve the efficiency of our programs.
+    Denotational semantics focus on results, which is useful if we want to check that our program does what we want.
+    
+    \section{Mathematical Objects}
+    There are many possible mathematical objects to encode programs.
+    Simple programs can be modelled as set theoretical functions from some set of possible inputs to some set of possible outputs.
+    More specifically we can use something like \(\lambda\)-calculus to represent programs.
+    In this way we can represent both operational semantics, by writing our functions as expressions in the input variables, and denotational semantics, by focussing on the input and output values.
+    
+    In quantum computing operational semantics are often not an option.
+    So we will mostly stick to denotational semantics.
+    The objects we choose to represent programs are categories.
+    Category theory supports combing programs as we saw in the examples above and gives us a powerful graphical language for computations.
+    
+    \chapter{Categories}
+    \section{Motivation}
+    We want an abstract mathematical formalism in which the meaning of a program lives, allowing us to abstract away implementation details and reason about computations.
+    Such a formalism provides a map
+    \begin{equation}
+        \denotes{-} \colon \text{programs} \to \text{mathematical objects}.
+    \end{equation}
+    There are several features which are desirable of such a formalism, including but not limited to,
+    \begin{itemize}
+        \item a notion of composition, if \lstinline|F| and \lstinline|G| are programs and \lstinline|F; G| is running \lstinline|F| then \lstinline|G| then we should have \(\denotes{\lstinline|F; G|} = \denotes{\lstinline|G|} \circ \denotes{\lstinline|F|}\) where \(\circ\) represents composition in this mathematical formalism;
+        \item a notion of concurrency, if \lstinline|F par G| corresponds to running \lstinline|F| and \lstinline|G| at the same time then we should have \(\denotes{\lstinline|F par G|} = \denotes{\lstinline|F|} \otimes \denotes{\lstinline|G|}\);
+        \item a notion of calling programs recursively, if \lstinline|X| is some code calling \lstinline|F| then we should be able to compute \lstinline|F(X)|, and this requires our mathematical formalism to have structures of the form \(\denotes{\lstinline|F(X)|} = \denotes{\lstinline|F|}(\denotes{\lstinline|X|})\).
+    \end{itemize}
+    More concisely, our formalism should preserve composition, concurrency, and function application.
+    
+    The question we have to ask is what sort of mathematical objects we're considering.
+    There are multiple options, each with their own advantages and disadvantages.
+    Some common options are
+    \begin{itemize}
+        \item \(\lambda\)-calculus is an algebraic notation for functions. It is similar in syntax to \Haskell{}.
+        It works with anonymous functions, or lambda functions, such as the function \lstinline[literate={lambda}{$\lambda$}{1}, mathescape]|lambda x. * 2 x| which takes an argument, \lstinline|x|, and multiplies it by 2, using prefix notation.
+        Compare this to the \Haskell{} function
+        \begin{lstlisting}[language=haskell, gobble=12]
+            timesThree x = (*) 2 x
+        \end{lstlisting}
+        This choice is good for analysing implementation details and is simply a precise notation for applying functions, a common mathematical operation.
+        \item Partially ordered sets, or posets, where the elements of the poset are partially completed calculations, any two elements are comparable if they are the same calculation at, potentially, different levels of completion, and the more complete calculation is greater.
+        This choice is good for analysing computations step by step without worrying about how each step is implemented.
+        \item Categories, which is what we'll use.
+        This option subsumes both \(\lambda\)-calculus, as a method of defining functions, and posets, which can be regarded as a special case of a category.
+    \end{itemize}
+    
+    Our goal will be to work in a general category to develop theory, imposing only the required restrictions for things to work out.
+    Then we can pick a particular category to analyse our work in, with the interpretation depending on the category we pick.
+    Often we can work in a generic category and then specialise the result to a category to perform either classical or quantum computations.
+    
+    \section{Categories: The Idea}
+    A category consists of two pieces of data:
+    \begin{itemize}
+        \item Objects, \(A, B, C, \dotsc\);
+        \item Morphisms, \(f \colon A \to B\), between objects.
+    \end{itemize}
+
+    Given some specific category there are various ways to think of computations occurring in this category.
+    Some examples are given here:
+    \begin{itemize}
+        \item We can think of the objects as physical systems and the morphisms as processes.
+        For example,
+        \begin{itemize}
+            \item Two objects may be a full cup and an empty cup and a process may be drinking the drink or making a new drink.
+            \item Two objects might be a plate and pieces of broken pottery and a process may be dropping the plate on the floor.
+        \end{itemize}
+        \item We can think of objects as data types, and morphisms as functions between these types.
+        Borrowing \Haskell{} notation some examples are
+        \begin{itemize}
+            \item One object might be \lstinline|Int|, and a morphism \lstinline[style=haskell]|f :: Int -> Int| defined by \lstinline|f n = 2 * n|.
+            \item Another object might be \lstinline|String|, and a morphism \lstinline|len :: String -> Int| defined by
+            \begin{lstlisting}[style=haskell, gobble=16]
+                len [] = 0
+                len (x : xs) = 1 + len xs
+            \end{lstlisting}
+            \item Another object might be \lstinline[style=haskell]|Num a => [a]|, and a morphism
+            \begin{lstlisting}[style=haskell, gobble=16]
+                mySum :: (Num a) => [a] -> a
+                mySum [] = 0
+                mySum (x : xs) = x + mySum xs
+            \end{lstlisting}
+        \end{itemize}
+        \item Objects are algebraic structures and morphisms are structure preserving maps.
+        For example,
+        \begin{itemize}
+            \item Objects are sets and morphisms are functions.
+            \item Objects are groups and morphisms are homomorphisms.
+            \item Objects are topological spaces and morphisms are continuous functions.
+            \item Objects are vector spaces and morphisms are linear maps.
+        \end{itemize}
+        \item Objects are logical propositions and morphisms are implications between them.
+        For example, we could take the objects \enquote{it rains} and \enquote{I get wet} and then we might have a morphism \(\text{\enquote{it rains}} \implies \text{\enquote{I get wet}}\).
+        But what if we're indoors?
+        We might introduce another object, \enquote{I am outside}, and then we may have a morphism \(\text{\enquote{it rains}} \land \text{\enquote{I am outside}} \implies \text{\enquote{I get wet}}\).
+        Here we've implicitly defined another object \(\text{\enquote{it rains}} \land \text{\enquote{I am outside}}\) using logical conjunction, \(\land\).
+        This is actually an example of a product in this category, we'll see what this means later.
+    \end{itemize}
+    
+    It turns out that the second and fourth examples, programs/algorithms and propositions/implications are actually the same!
+    This is known as the Curry--Howard isomorphism, and allows us to write proofs as programs and vice versa.
+    
+    The mindset that one should have when doing category theory is
+    \begin{important}
+        Morphisms are more important than objects.
+    \end{important}
+    \noindent This might seem backwards at first, for example we spend a lot of time thinking about groups, and homomorphisms are only one aspect that we consider, but it turns out that we can learn a lot about groups by studying how they relate to other groups, and this is done through homomorphisms.
+    This mindset is particularly useful for cases such as quantum computing where we \emph{can't} look at internal structure, and can only look at how systems relate to each other.
+    
+    \section{Categories: The Definition}
+    Categories are objects and morphisms.
+    The definition of a category simply states what we mean by this and the properties that morphisms are expected to have.
+    
+    \begin{dfn}{Category}{}
+        A \defineindex{category}, \(\cat{C}\), consists of the following data
+        \begin{itemize}
+            \item a collection of \define{objects}\index{object}, \(\Ob(\cat{C})\) (often denoted \(\mathop{\operatorname{Obj}}(\cat{C})\) or simply \(\cat{C}\));
+            \item for every pair of objects, \(A, B \in \Ob(\cat{C})\) a collection of \define{morphisms}\index{morphism} (also known as \define{maps}\index{map|see{morphism}} or \define{arrows}\index{arrow|see{morphism}}), \(\cat{C}(A, B)\) (often denoted \(\hom_{\cat{C}}(A, B)\), \(\mathop{\operatorname{Mor}}_{\cat{C}}(A, B)\), possibly without the subscript \(\cat{C}\) when the category is clear, this collection is often called a \defineindex{hom set}), where for \(f \in \cat{C}(A, B)\) we write \(f \colon A \to B\) or \(A \xrightarrow{f} B\);
+            \item a map \(\circ \colon \cat{C}(B, C) \times \cat{C}(A, B) \to \cat{C}(A, C)\) which assigns to each \(f \colon A \to B\) and \(g \colon B \to C\) some \define{composite}\index{composition} \((g \circ f) \colon A \to C\);
+            \item for every object \(A \in \Ob(\cat{C})\) a morphism \(\id_A \colon A \to A\), that is \(\id_A \in \cat{C}(A, A)\), called the \defineindex{identity morphism}.
+        \end{itemize}
+        This data is subject to the following conditions:
+        \begin{itemize}
+            \item \defineindex{associativity} of \(\circ\): for all objects \(A, B, C, D \in \Ob(\cat{C})\) and for all morphisms \(f \colon A \to B\), \(g \colon B \to C\), and \(h \colon C \to D\) we have
+            \begin{equation}
+                h \circ (g \circ f) = (h \circ g) \circ f,
+            \end{equation}
+            so we can unambiguously write \(h \circ g \circ f\) for both of these;
+            \item \defineindex{identity} law: for all objects \(A, B \in \Ob(\cat{C})\) and for all morphisms \(f \colon A \to B\) we have
+            \begin{equation}
+                f \circ \id_A = f = \id_B \circ f.
+            \end{equation}
+        \end{itemize}
+    \end{dfn}
+    
+    \subsection{Technicality}
+    Notice that in the definition we use the word \enquote{collection}.
+    It is tempting to replace this with \enquote{set}, but this can cause issues.
+    For example, the set of all sets is not a set, due to Russell's paradox.
+    However, we will shortly see that we have categories where the objects are all sets, and so \(\Ob(\cat{C})\) cannot be a set in this case.
+    We aren't going to worry too much about these types of issues, and may erroneously refer to these collections as sets.
+    A category is \define{small}\index{small category} if both \(\Ob(\cat{C})\) and the collection of all morphisms between any two objects are sets.
+    A category is \define{locally small}\index{locally small category} if for all objects \(A\) and \(B\) \(\cat{C}(A, B)\) is a set.
+    Many statements we make throughout will apply only to small, or more likely locally small categories.
+    
+    \section{Categories: The Examples}
+    \subsection{\texorpdfstring{\(\Set\)}{Set}}
+    \begin{dfn}{\(\Set\)}{}
+        The category \(\Set\)\index{Set@\(\Set\)} has sets as objects.
+        A morphism \(A \to B\) is simply a function from \(A\) to \(B\).
+        Composition of morphisms is composition of functions, defined for \(f \colon A \to B\) and \(g \colon B \to C\) by \((g \circ f) \colon A \to C\) given by \((g \circ f)(a) = g(f(a))\) for all \(a \in A\).
+        The identity morphism is the identity function, \(\id_A \colon A \to A\), given by \(\id_A(a) = a\) for all \(a \in A\).
+    \end{dfn}
+    
+    \begin{lma}{}{}
+        \(\Set\) is a category.
+        \begin{proof}
+            The collection \(\Set(A, B)\) of functions \(A \to B\) exists for all sets \(A\) and \(B\).
+            It will be empty if \(B = \emptyset\) and \(A \ne \emptyset\) which is allowed, if \(A = \emptyset\) and \(B = \emptyset\) then there is a unique function \(f \colon \emptyset \to \emptyset\) which is also the identity on the empty set.
+            Function composition is associative.
+            Take sets \(A\), \(B\), \(C\), and \(D\), and morphisms \(f \colon A \to B\), \(g \colon B \to C\), and \(h \colon C \to D\).
+            Then
+            \begin{equation}
+                (h \circ (g \circ f))(x) = h((g \circ f)(x)) = h(g(f(x))) = (h \circ g)(f(x)) = ((h \circ g) \circ f)(x)
+            \end{equation}
+            for all \(x \in A\), so \(h \circ (g \circ f) = (h \circ g) \circ f\).
+            The identity function is then such that
+            \begin{equation}
+                (f \circ \id_A)(x) = f(\id_A(x)) = f(x) = \id_B(f(x)) = (\id_B \circ f)(x)
+            \end{equation}
+            and so \(f \circ \id_A = f = \id_B \circ f\).
+        \end{proof}
+    \end{lma}
+    
+    We can think of a function \(f \colon A \to B\) as dynamically indicating how elements of \(A\) transform into elements of \(B\).
+    Pictorially, we can represent \(f \colon A \to B\) and \(g \colon B \to C\) as
+    \begin{equation}
+        \tikzsetnextfilename{categories-set-function-example}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \pgfdeclarelayer{behind}
+            \pgfsetlayers{behind, main}
+            \fill[highlight] (0, 0) coordinate (A1) circle [radius=0.075cm];
+            \fill[highlight] (0, 0.5) coordinate (A2) circle [radius=0.075cm];
+            \fill[highlight] (0, 1) coordinate (A3) circle [radius=0.075cm];
+            \fill[highlight] (0, 1.5) coordinate (A4) circle [radius=0.075cm];
+            \fill[highlight] (2, 0.25) coordinate (B1) circle [radius=0.075cm];
+            \fill[highlight] (2, 0.75) coordinate (B2) circle [radius=0.075cm];
+            \fill[highlight] (2, 1.25) coordinate (B3) circle [radius=0.075cm];
+            \draw[thick] (0, 0.75) circle [x radius=0.25cm, y radius=1cm];
+            \draw[thick] (2, 0.75) circle [x radius=0.25cm, y radius=0.75cm];
+            \node (A) at (0, 2) {\(A\)};
+            \node (B) at (2, 2) {\(B\)};
+            \draw[->] (A) -- (B) node [midway, above] {\(f\)};
+            \begin{pgfonlayer}{behind}
+                \draw (A1) -- (B1);
+                \draw (A2) -- (B2);
+                \draw (A3) -- (B2);
+                \draw (A4) -- (B3);
+            \end{pgfonlayer}
+            
+            \begin{scope}[xshift=4cm]
+                \fill[highlight] (0, 0.25) coordinate (B1) circle [radius=0.075cm];
+                \fill[highlight] (0, 0.75) coordinate (B2) circle [radius=0.075cm];
+                \fill[highlight] (0, 1.25) coordinate (B3) circle [radius=0.075cm];
+                \fill[highlight] (2, 0.25) coordinate (C1) circle [radius=0.075cm];
+                \fill[highlight] (2, 0.75) coordinate (C2) circle [radius=0.075cm];
+                \fill[highlight] (2, 1.25) coordinate (C3) circle [radius=0.075cm];
+                \draw[thick] (0, 0.75) circle [x radius=0.25cm, y radius=0.75cm];
+                \draw[thick] (2, 0.75) circle [x radius=0.25cm, y radius=0.75cm];
+                \node (B) at (0, 2) {\(B\)};
+                \node (C) at (2, 2) {\(C\)};
+                \draw[->] (B) -- (C) node [midway, above] {\(g\)};
+                \begin{pgfonlayer}{behind}
+                    \draw (B1) -- (C1);
+                    \draw (B2) -- (C3);
+                    \draw (B3) -- (C3);
+                \end{pgfonlayer}
+            \end{scope}
+        \end{tikzpicture}
+        .
+    \end{equation}
+    Then composition is just following the lines between sets:
+    \begin{equation}
+        \tikzsetnextfilename{categories-set-function-composition}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \pgfdeclarelayer{behind}
+            \pgfsetlayers{behind, main}
+            \fill[highlight] (0, 0) coordinate (A1) circle [radius=0.075cm];
+            \fill[highlight] (0, 0.5) coordinate (A2) circle [radius=0.075cm];
+            \fill[highlight] (0, 1) coordinate (A3) circle [radius=0.075cm];
+            \fill[highlight] (0, 1.5) coordinate (A4) circle [radius=0.075cm];
+            \fill[highlight] (2, 0.25) coordinate (B1) circle [radius=0.075cm];
+            \fill[highlight] (2, 0.75) coordinate (B2) circle [radius=0.075cm];
+            \fill[highlight] (2, 1.25) coordinate (B3) circle [radius=0.075cm];
+            \draw[thick] (0, 0.75) circle [x radius=0.25cm, y radius=1cm];
+            \draw[thick] (2, 0.75) circle [x radius=0.25cm, y radius=0.75cm];
+            \node (A) at (0, 2) {\(A\)};
+            \node (B) at (2, 2) {\(B\)};
+            \draw[->] (A) -- (B) node [midway, above] {\(f\)};
+            \begin{pgfonlayer}{behind}
+                \draw (A1) -- (B1);
+                \draw (A2) -- (B2);
+                \draw (A3) -- (B2);
+                \draw (A4) -- (B3);
+            \end{pgfonlayer}
+            
+            \begin{scope}[xshift=2cm]
+                \fill[highlight] (2, 0.25) coordinate (C1) circle [radius=0.075cm];
+                \fill[highlight] (2, 0.75) coordinate (C2) circle [radius=0.075cm];
+                \fill[highlight] (2, 1.25) coordinate (C3) circle [radius=0.075cm];
+                \draw[thick] (2, 0.75) circle [x radius=0.25cm, y radius=0.75cm];
+                \node (C) at (2, 2) {\(C\)};
+                \draw[->] (B) -- (C) node [midway, above] {\(g\)};
+                \begin{pgfonlayer}{behind}
+                    \draw (B1) -- (C1);
+                    \draw (B2) -- (C3);
+                    \draw (B3) -- (C3);
+                \end{pgfonlayer}
+            \end{scope}
+            
+            \begin{scope}[yshift=-3cm]
+                \fill[highlight] (0, 0) coordinate (A1) circle [radius=0.075cm];
+                \fill[highlight] (0, 0.5) coordinate (A2) circle [radius=0.075cm];
+                \fill[highlight] (0, 1) coordinate (A3) circle [radius=0.075cm];
+                \fill[highlight] (0, 1.5) coordinate (A4) circle [radius=0.075cm];
+                \draw[thick] (0, 0.75) circle [x radius=0.25cm, y radius=1cm];
+                \node (A) at (0, 2) {\(A\)};
+                
+                \begin{scope}[xshift=2cm]
+                    \fill[highlight] (2, 0.25) coordinate (C1) circle [radius=0.075cm];
+                    \fill[highlight] (2, 0.75) coordinate (C2) circle [radius=0.075cm];
+                    \fill[highlight] (2, 1.25) coordinate (C3) circle [radius=0.075cm];
+                    \draw[thick] (2, 0.75) circle [x radius=0.25cm, y radius=0.75cm];
+                    \node (C) at (2, 2) {\(C\)};
+                    \draw[->] (A) -- (C) node [midway, above] {\(g \circ f\)};
+                    \begin{pgfonlayer}{behind}
+                        \draw (A1) -- (C1);
+                        \draw (A2) -- (C1);
+                        \draw (A3) -- (C1);
+                        \draw (A4) -- (C3);
+                    \end{pgfonlayer}
+                \end{scope}
+            \end{scope}
+        \end{tikzpicture}
+        .
+    \end{equation}
+    As a process composition in set is just doing one thing and then the other.
+    
+    \(\Set\) is the prototypical category.
+    It is often tempting to think of other examples of categories, which we'll meet shortly, as simply sets with extra structure, and indeed this is often, but not always, the case.
+    A \defineindex{concrete category} is a category in which all objects can be mapped to sets and morphisms can be mapped to functions between these sets.
+    This mapping is done with something called a functor, which we'll define later.
+    % TODO: add link to functor definition
+    
+    We'll list some properties of \(\Set\) here, some of which won't make sense until later.
+    \begin{itemize}
+        \item \(\Set\) is a concrete category.
+        \item \(\Set\) has the empty set as an initial object, and the singleton as a terminal object.
+        \item \(\Set\) is complete and co-complete, in particular the product is the Cartesian product and the coproduct is the disjoint union.
+        \item \(\Set\) is a monoidal category with the monoidal product given by the Cartesian product.
+    \end{itemize}
+    
+    \subsection{\texorpdfstring{\(\Rel\)}{Rel}}
+    \begin{dfn}{Relation}{}
+        Let \(A\) and \(B\) be sets.
+        A \defineindex{relation}, \(R\), is a subset of \(A \times B\).
+        If \((a, b) \in R\) we write \(a R b\).
+    \end{dfn}
+    Relations are morphisms in a category we will defined shortly (\cref{def:Rel}), so for \(R \subset A \times B\) we write \(R \colon A \to B\).
+    In a similar manner to functions between sets being dynamic transformations we can think of relations as being non-deterministic transformations, where each element can transform into multiple objects, or possibly don't map across at all.
+    For example, if we take \(A = \{a, b, c, d\}\), \(B = \{1, 2, 3\}\), and \(C = \{\alpha, \beta, \gamma\}\) then the relations
+    \begin{align}
+        R &= \{(b, 2), (c, 2), (d, 2), (d, 3)\} \subseteq A \times B, \qquad \text{and}\\
+        S &= \{(1, \beta), (3, \beta), (3, \gamma)\} \subseteq B \times C
+    \end{align}
+    can be represented pictorially as
+    \begin{equation}
+        \tikzsetnextfilename{categories-rel-relation-example}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \pgfdeclarelayer{behind}
+            \pgfsetlayers{behind, main}
+            \fill[highlight] (0, 0) coordinate (A4) circle [radius=0.075cm];
+            \fill[highlight] (0, 0.5) coordinate (A3) circle [radius=0.075cm];
+            \fill[highlight] (0, 1) coordinate (A2) circle [radius=0.075cm];
+            \fill[highlight] (0, 1.5) coordinate (A1) circle [radius=0.075cm];
+            \fill[highlight] (2, 0.25) coordinate (B3) circle [radius=0.075cm];
+            \fill[highlight] (2, 0.75) coordinate (B2) circle [radius=0.075cm];
+            \fill[highlight] (2, 1.25) coordinate (B1) circle [radius=0.075cm];
+            \draw[thick] (0, 0.75) circle [x radius=0.25cm, y radius=1cm];
+            \draw[thick] (2, 0.75) circle [x radius=0.25cm, y radius=0.75cm];
+            \node (A) at (0, 2) {\(A\)};
+            \node (B) at (2, 2) {\(B\)};
+            \draw[->] (A) -- (B) node [midway, above] {\(R\)};
+            \begin{pgfonlayer}{behind}
+                \draw (A2) -- (B2);
+                \draw (A3) -- (B2);
+                \draw (A4) -- (B2);
+                \draw (A4) -- (B3);
+            \end{pgfonlayer}
+            
+            \begin{scope}[xshift=4cm]
+                \fill[highlight] (0, 0.25) coordinate (B3) circle [radius=0.075cm];
+                \fill[highlight] (0, 0.75) coordinate (B2) circle [radius=0.075cm];
+                \fill[highlight] (0, 1.25) coordinate (B1) circle [radius=0.075cm];
+                \fill[highlight] (2, 0.25) coordinate (C3) circle [radius=0.075cm];
+                \fill[highlight] (2, 0.75) coordinate (C2) circle [radius=0.075cm];
+                \fill[highlight] (2, 1.25) coordinate (C1) circle [radius=0.075cm];
+                \draw[thick] (0, 0.75) circle [x radius=0.25cm, y radius=0.75cm];
+                \draw[thick] (2, 0.75) circle [x radius=0.25cm, y radius=0.75cm];
+                \node (B) at (0, 2) {\(B\)};
+                \node (C) at (2, 2) {\(C\)};
+                \draw[->] (B) -- (C) node [midway, above] {\(S\)};
+                \begin{pgfonlayer}{behind}
+                    \draw (B1) -- (C2);
+                    \draw (B3) -- (C2);
+                    \draw (B3) -- (C3);
+                \end{pgfonlayer}
+            \end{scope}
+        \end{tikzpicture}
+        .
+    \end{equation}
+    As with \(\Set\) we then compose relations by joining up these lines:
+    \begin{equation}
+        \tikzsetnextfilename{categories-rel-relation-composition}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \pgfdeclarelayer{behind}
+            \pgfsetlayers{behind, main}
+            \fill[highlight] (0, 0) coordinate (A4) circle [radius=0.075cm];
+            \fill[highlight] (0, 0.5) coordinate (A3) circle [radius=0.075cm];
+            \fill[highlight] (0, 1) coordinate (A2) circle [radius=0.075cm];
+            \fill[highlight] (0, 1.5) coordinate (A1) circle [radius=0.075cm];
+            \fill[highlight] (2, 0.25) coordinate (B3) circle [radius=0.075cm];
+            \fill[highlight] (2, 0.75) coordinate (B2) circle [radius=0.075cm];
+            \fill[highlight] (2, 1.25) coordinate (B1) circle [radius=0.075cm];
+            \draw[thick] (0, 0.75) circle [x radius=0.25cm, y radius=1cm];
+            \draw[thick] (2, 0.75) circle [x radius=0.25cm, y radius=0.75cm];
+            \node (A) at (0, 2) {\(A\)};
+            \node (B) at (2, 2) {\(B\)};
+            \draw[->] (A) -- (B) node [midway, above] {\(R\)};
+            \begin{pgfonlayer}{behind}
+                \draw (A2) -- (B2);
+                \draw (A3) -- (B2);
+                \draw (A4) -- (B2);
+                \draw (A4) -- (B3);
+            \end{pgfonlayer}
+            
+            \begin{scope}[xshift=2cm]
+                \fill[highlight] (2, 0.25) coordinate (C3) circle [radius=0.075cm];
+                \fill[highlight] (2, 0.75) coordinate (C2) circle [radius=0.075cm];
+                \fill[highlight] (2, 1.25) coordinate (C1) circle [radius=0.075cm];
+                \draw[thick] (2, 0.75) circle [x radius=0.25cm, y radius=0.75cm];
+                \node (C) at (2, 2) {\(C\)};
+                \draw[->] (B) -- (C) node [midway, above] {\(S\)};
+                \begin{pgfonlayer}{behind}
+                    \draw (B1) -- (C2);
+                    \draw (B3) -- (C2);
+                    \draw (B3) -- (C3);
+                \end{pgfonlayer}
+            \end{scope}
+            
+            \begin{scope}[yshift=-3cm]
+                \fill[highlight] (0, 0) coordinate (A4) circle [radius=0.075cm];
+                \fill[highlight] (0, 0.5) coordinate (A3) circle [radius=0.075cm];
+                \fill[highlight] (0, 1) coordinate (A2) circle [radius=0.075cm];
+                \fill[highlight] (0, 1.5) coordinate (A1) circle [radius=0.075cm];
+                \draw[thick] (0, 0.75) circle [x radius=0.25cm, y radius=1cm];
+                \node (A) at (0, 2) {\(A\)};
+                
+                \begin{scope}[xshift=2cm]
+                    \fill[highlight] (2, 0.25) coordinate (C3) circle [radius=0.075cm];
+                    \fill[highlight] (2, 0.75) coordinate (C2) circle [radius=0.075cm];
+                    \fill[highlight] (2, 1.25) coordinate (C1) circle [radius=0.075cm];
+                    \draw[thick] (2, 0.75) circle [x radius=0.25cm, y radius=0.75cm];
+                    \node (C) at (2, 2) {\(C\)};
+                    \draw[->] (A) -- (C) node [midway, above] {\(S \circ R\)};
+                    \begin{pgfonlayer}{behind}
+                        \draw (A4) -- (C2);
+                        \draw (A4) -- (C3);
+                    \end{pgfonlayer}
+                \end{scope}
+            \end{scope}
+        \end{tikzpicture}
+        .
+    \end{equation}
+    That is,
+    \begin{equation}
+        S \circ R = \{(d, \beta), (d, \gamma)\} \subseteq A \times C.
+    \end{equation}
+    This leads to the following definition.
+    \begin{dfn}{Relation Composition}{}
+        Let \(A\), \(B\), and \(C\) be sets with relations \(R \subseteq A \times B\) and \(S \subseteq B \times C\).
+        Then the \define{composite relation}\index{relation composition} \(S \circ R\) is the set
+        \begin{equation*}
+            S \circ R \coloneqq \{(a, c) \in A \times C \mid \exists b \in B \text{ such that } (a, b) \in R \text{ and } (b, c) \in S\}.
+        \end{equation*}
+    \end{dfn}
+    
+    Now that we have composition we just need an identity, and after some playing around with the definition of composition one quickly comes to the identity
+    \begin{equation}
+        \id_A \coloneq \{(a, a) \in A \times A \mid a \in A\} \subseteq A \times A.
+    \end{equation}
+    Now we can define a category.
+    
+    \begin{dfn}{\(\Rel\)}{def:Rel}
+        The category \(\Rel\)\index{Rel@\(\Rel\)} has sets as objects.
+        A morphism \(R \colon A \to B\) is a relation \(R \subseteq A \times B\).
+        Composition of morphisms is composition of relations, defined for \(R \colon A \to B\) and \(g \colon B \to C\) by
+        \begin{equation}
+            S \circ R = \{(a, c) \mid \exists b \in B : aRb \land bSc\} \subseteq A \times C.
+        \end{equation}
+        The identity morphism is the identity relation, \(\id_A \colon A \to A\), given by
+        \begin{equation}
+            \id_A = \{(a, a) \mid a \in A\} \subseteq A \times A.
+        \end{equation}
+    \end{dfn}
+    
+    \begin{lma}{}{}
+        \(\Rel\) is a category.
+        \begin{proof}
+            The collection \(\Rel(A, B)\) is simply the power set of \(A \times B\).
+            Importantly the empty set is a relation on any pair of sets, including the empty set, and the empty set is the identity relation on the empty set.
+            So consider nonempty sets.
+            
+            Composition of relations is associative.
+            Let \(R \colon A \to B\), \(S \colon B \to C\), and \(T \colon C \to D\) be relations.
+            We want to show that \(T \circ (S \circ R) = (T \circ S) \circ R\).
+            To do so we will prove that each pair \((a, b) \in T \circ (S \circ R)\) is also an element of \((T \circ S) \circ R\).
+            The converse, that each pair \((a, b) \in (T \circ S) \circ R\) is an element of \(T \circ (S \circ R)\), follows by the same logic in reverse.
+            So take some \((a, b) \in T \circ (S \circ R)\).
+            By definition there exists some \(x\) such that \((x, b) \in T\) and \((a, x) \in S \circ R\).
+            Thus, there exists some \(y\) such that \((y, x) \in S\) and \((a, y) \in S\).
+            Since \((y, x) \in S\) and \((x, b) \in T\) we have that \((y, b) \in T \circ S\).
+            Since \((a, y) \in R\) we have \((a, b) \in (T \circ S) \circ R\).
+            
+            Let \(R \colon A \to B\) be a relation and \(\id_A = \{(a, a) \mid a \in A\}\) the identity relation.
+            Then for all \((a, b) \in R\) we have \((a, a) \in \id_A\), meaning that \((a, b) \in R \circ \id_A\).
+            Similarly for all \((a, b) \in R \circ \id_A\) we must have \(x\) such that \((x, b) \in R\), and \((x, a) \in \id_A\), which means that \(x = a\) and so \((a, b) \in R\).
+            Thus \(R \circ \id_A = R\).
+            Similarly \(\id_B \circ R = R\).
+            Hence the identity law is satisfied.
+        \end{proof}
+    \end{lma}
+    
+    We can represent relations as binary \(\abs{B} \times \abs{A}\) matrices with a \(1\) in the \((i, j)\) slot if \((a, b) \in R\), where \(a\) is the \(j\)th element of \(A\) and \(b\) the \(i\)th element of \(B\) in some arbitrary fixed ordering of \(A\) and \(B\).
+    Further this mapping is one-to-one, meaning each binary matrix also defines a representation.
+    For example, indexing top to bottom we have
+    \begin{equation}
+        \tikzsetnextfilename{categories-rel-relation-representation}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \pgfdeclarelayer{behind}
+            \pgfsetlayers{behind, main}
+            \fill[highlight] (0, 0) coordinate (A4) circle [radius=0.075cm];
+            \fill[highlight] (0, 0.5) coordinate (A3) circle [radius=0.075cm];
+            \fill[highlight] (0, 1) coordinate (A2) circle [radius=0.075cm];
+            \fill[highlight] (0, 1.5) coordinate (A1) circle [radius=0.075cm];
+            \fill[highlight] (2, 0.25) coordinate (B3) circle [radius=0.075cm];
+            \fill[highlight] (2, 0.75) coordinate (B2) circle [radius=0.075cm];
+            \fill[highlight] (2, 1.25) coordinate (B1) circle [radius=0.075cm];
+            \draw[thick] (0, 0.75) circle [x radius=0.25cm, y radius=1cm];
+            \draw[thick] (2, 0.75) circle [x radius=0.25cm, y radius=0.75cm];
+            \node (A) at (0, 2) {\(A\)};
+            \node (B) at (2, 2) {\(B\)};
+            \draw[->] (A) -- (B) node [midway, above] {\(R\)};
+            \begin{pgfonlayer}{behind}
+                \draw (A2) -- (B2);
+                \draw (A3) -- (B2);
+                \draw (A4) -- (B2);
+                \draw (A4) -- (B3);
+            \end{pgfonlayer}
+        \end{tikzpicture}
+        \leftrightsquigarrow
+        M(R) = 
+        \begin{pmatrix}
+            0 & 0 & 0 & 0\\
+            0 & 1 & 1 & 1\\
+            0 & 0 & 0 & 1
+        \end{pmatrix}
+        .
+    \end{equation}
+    Composition of relations is then given by matrix multiplication taking everything mod 2.
+    More formally we have a map
+    \begin{equation}
+        M \colon \powerset(A \times B) \to \matrices[\abs{B}]{\abs{A}}{\integers_2}
+    \end{equation}
+    where \(\integers_2 = \{0, 1\}\) has addition and multiplication defined mod 2.
+    
+    As an example notice that we have
+    \begin{equation}
+        \tikzsetnextfilename{categories-rel-relation-representation-2}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \pgfdeclarelayer{behind}
+            \pgfsetlayers{behind, main}
+        
+            \fill[highlight] (0, 0.25) coordinate (B3) circle [radius=0.075cm];
+            \fill[highlight] (0, 0.75) coordinate (B2) circle [radius=0.075cm];
+            \fill[highlight] (0, 1.25) coordinate (B1) circle [radius=0.075cm];
+            \fill[highlight] (2, 0.25) coordinate (C3) circle [radius=0.075cm];
+            \fill[highlight] (2, 0.75) coordinate (C2) circle [radius=0.075cm];
+            \fill[highlight] (2, 1.25) coordinate (C1) circle [radius=0.075cm];
+            \draw[thick] (0, 0.75) circle [x radius=0.25cm, y radius=0.75cm];
+            \draw[thick] (2, 0.75) circle [x radius=0.25cm, y radius=0.75cm];
+            \node (B) at (0, 2) {\(B\)};
+            \node (C) at (2, 2) {\(C\)};
+            \draw[->] (B) -- (C) node [midway, above] {\(S\)};
+            \begin{pgfonlayer}{behind}
+                \draw (B1) -- (C2);
+                \draw (B3) -- (C2);
+                \draw (B3) -- (C3);
+            \end{pgfonlayer}
+        \end{tikzpicture}
+        \leftrightsquigarrow
+        M(S) = 
+        \begin{pmatrix}
+            0 & 0 & 0\\
+            1 & 0 & 1\\
+            0 & 0 & 1
+        \end{pmatrix}
+    \end{equation}
+    and
+    \begin{equation}
+        \tikzsetnextfilename{categories-rel-relation-representation-3}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \pgfdeclarelayer{behind}
+            \pgfsetlayers{behind, main}
+            \fill[highlight] (0, 0) coordinate (A4) circle [radius=0.075cm];
+            \fill[highlight] (0, 0.5) coordinate (A3) circle [radius=0.075cm];
+            \fill[highlight] (0, 1) coordinate (A2) circle [radius=0.075cm];
+            \fill[highlight] (0, 1.5) coordinate (A1) circle [radius=0.075cm];
+            \draw[thick] (0, 0.75) circle [x radius=0.25cm, y radius=1cm];
+            \node (A) at (0, 2) {\(A\)};
+            
+            \fill[highlight] (2, 0.25) coordinate (C3) circle [radius=0.075cm];
+            \fill[highlight] (2, 0.75) coordinate (C2) circle [radius=0.075cm];
+            \fill[highlight] (2, 1.25) coordinate (C1) circle [radius=0.075cm];
+            \draw[thick] (2, 0.75) circle [x radius=0.25cm, y radius=0.75cm];
+            \node (C) at (2, 2) {\(C\)};
+            \draw[->] (A) -- (C) node [midway, above] {\(S \circ R\)};
+            \begin{pgfonlayer}{behind}
+                \draw (A4) -- (C2);
+                \draw (A4) -- (C3);
+            \end{pgfonlayer}
+        \end{tikzpicture}
+        \leftrightsquigarrow M(S \circ R) = 
+        \begin{pmatrix}
+            0 & 0 & 0 & 0\\
+            0 & 0 & 0 & 1\\
+            0 & 0 & 0 & 1
+        \end{pmatrix}
+        .
+    \end{equation}
+    The composite can then be calculated as
+    \begin{equation}
+        M(S \circ R) = M(S)M(R) = 
+        \begin{pmatrix}
+            0 & 0 & 0\\
+            1 & 0 & 1\\
+            0 & 0 & 1
+        \end{pmatrix}
+        \begin{pmatrix}
+            0 & 0 & 0 & 0\\
+            0 & 1 & 1 & 1\\
+            0 & 0 & 0 & 1
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            0 & 0 & 0 & 0\\
+            0 & 0 & 0 & 1\\
+            0 & 0 & 0 & 1
+        \end{pmatrix}
+        .
+    \end{equation}
+    
+    This map, \(M\), actually defines a functor (
+    % TODO: add reference to definition of functor
+    ) \(M \colon \Rel \to \Mat[\integers_2]\), where \(\Mat[\integers_2]\) is the category of binary matrices, whose objects are natural numbers and a morphism \(n \to m\) is an \(n \times m\) matrix.
+    The functor \(M\) then maps sets to their size, \(A \mapsto M(A) = \abs{A}\), and relations to matrices as described above.
+    
+    This is actually an example of a more general idea of a representation\footnote{see \course{Symmetries of Quantum Mechanics} or \course{Symmetries of Particles and Fields}}, where we replace objects with matrices preserving the structure of the original space.
+    These ideas can all be understood as functors \(\cat{C} \to \Mat\) for some appropriate category \(\category{C}\) and ring \(\field\).
+    This in turn is more commonly thought of as a map \(\category{C} \to \FVect\) identifying matrices with linear maps.
+    This allows for generalisations to infinite dimensional representations, \(\category{C} \to \Vect\).
+    We'll define \(\FVect\) and \(\Vect\) shortly (\cref{def:Vect,def:FVect}).
+    
+    On the surface \(\Rel\) seems quite similar to \(\Set\), after all the objects of both are the same.
+    However, it's really the morphisms which are important, and these are quite different.
+    The ability to replace relations with matrices means that \(\Rel\) is actually quite similar to another category, \(\Hilb\) (\cref{def:Hilb and FHilb}).
+    This makes \(\Rel\) a nice in between for \(\Set\) and \(\Hilb\), which turn out to be the categories in which we think of most classical and quantum computing as occurring in respectively.
+    
+    We now list some properties of \(\Rel\):
+    \begin{itemize}
+        \item \(\Rel\) is a concrete category.
+        \item \(\Rel\) is a dagger category.
+        \item \(\Rel\) has both products and coproducts given by disjoint union.
+        \item \(\Rel\) is a monoidal category with the monoidal product given by the Cartesian product.
+    \end{itemize}
+    
+    \subsection{\texorpdfstring{\(\Vect\), \(\FVect\), \(\Hilb\), and \(\FHilb\)}{Vect, FVect, Hilb, and FHilb}}
+    \subsubsection{\texorpdfstring{\(\Vect\) and \(\FVect\)}{Vect and FVect}}
+    \begin{dfn}{Vector Space}{}
+        A \defineindex{vector space}, \((V, \field, +, \cdot)\), is a set, \(V\), a field\footnote{if you don't know what this is just replace it with \(\reals\) or \(\complex\) and don't worry about it}, \(\field\), and two operations, \defineindex{vector addition}, \(+ \colon V \times V \to V\), and \defineindex{scalar multiplication}, \(\cdot \colon \field \times V \to V\), such that
+        \begin{itemize}
+            \item \((V, +)\) is an Abelian group, that is
+            \begin{itemize}
+                \item vector addition is associative: \(u + (v + w) = (u + v) + w\) for all \(u, v, w \in V\);
+                \item vector addition is commutative: \(u + v = v + u\) for all \(u, v \in V\);
+                \item additive identity: there exists \(0 \in V\) such that \(0 + v = v\) for all \(v \in V\);
+                \item additive inverse: for every \(v \in V\) there exists \(-v \in V\) such that \(v + (-v) = v - v = 0\);
+            \end{itemize}
+            \item scalar multiplication distributes over vector addition: \(\alpha \cdot (u + v) = (\alpha \cdot v) + (\alpha \cdot v)\) for all \(\alpha \in \field\) and \(u, v \in V\);
+            \item field identity acts as the identity: \(1 \cdot v = v\) for all \(v \in V\) where 1 is the multiplicative identity in \(\field\);
+            \item field addition distributes over scalar multiplication: \((\alpha + \beta) \cdot v = (\alpha \cdot v) + (\beta \cdot v)\);
+            \item compatibility of field and scalar multiplication: \(\alpha \cdot (b \cdot v) = (a \cdot_{\field} b) \cdot v\) for all \(\alpha, \beta \in \field\) and \(v \in V\) where \(\cdot_{\field}\) is multiplication in the field.
+        \end{itemize}
+    \end{dfn}
+    
+    \begin{dfn}{Linear Map}{}
+        Let \((V, \field, +_V, \cdot_V)\) and \((W, \field, +_W, \cdot_W)\) be vector spaces over the same field, \(\field\).
+        A \defineindex{linear map} between these vector spaces is a function \(T \colon V \to W\) such that
+        \begin{equation}
+            T(u +_V v) = T(u) +_W T(v), \qqand T(\alpha \cdot_V v) = \alpha \cdot_W T(v)
+        \end{equation}
+        for all \(\alpha \in \field\) and \(u, v \in V\).
+    \end{dfn}
+    
+    From now on we drop the explicit symbol for scalar multiplication, writing \(\alpha v\) for \(\alpha \cdot v\), as well as dropping labels differentiating which vector space an operation is defined on.
+    So linearity is expressed as
+    \begin{equation}
+        T(u + v) = T(u) + T(v), \qqand T(\alpha v) = \alpha T(v).
+    \end{equation}
+    We also refer to \(V\) and \(W\) as vector spaces (over \(\field\)) leaving the operations (and potentially the field) implicit.
+    
+    \begin{dfn}{\(\Vect\)}{def:Vect}
+        Fix some field \(\field\).
+        The category \(\Vect\)\index{Vect@\(\Vect\)} has vector spaces over \(\field\) as objects and linear maps as morphisms.
+        Composition of morphisms is composition of linear maps, which is composition of the underlying functions.
+        The identity morphisms are the identity linear maps, which are the underlying identity functions.
+    \end{dfn}
+    
+    \begin{lma}{}{lma:Vect is a category}
+        \(\Vect\) is a category.
+        \begin{proof}
+            Composition of linear maps inherits associativity from the underlying functions and similarly the identity laws follow from the identity laws of the underlying functions.
+            We therefore only need to show that the composite of two linear maps is again linear.
+            Let \(T \colon U \to V\) and \(S \colon V \to W\) be linear maps between vector spaces \(U\), \(V\), and \(W\) over some field \(\field\).
+            Then for all \(u, v \in V\) and \(\alpha \in \field\) we have
+            \begin{multline}
+                (S \circ T)(u + v) = S(T(u + v)) = S(T(u) + T(v))\\
+                = S(T(u)) + S(T(v)) = (S \circ T)(u) + (S \circ T)(v)
+            \end{multline}
+            using the linearity of \(T\) and then \(S\), and
+            \begin{equation}
+                (S \circ T)(\alpha v) = S(T(\alpha v)) = S(\alpha T(v)) = \alpha S(T(v)) = \alpha (S \circ T)(v)
+            \end{equation}
+            again using linearity of \(T\) and then \(S\).
+            Hence the composite of two linear maps is again a linear map.
+        \end{proof}
+    \end{lma}
+    
+    \begin{dfn}{Basis}{}
+        Let \(V\) be a vector space.
+        A subset \(\symcal{B} \subset V\) is \defineindex{linearly independent} if for every finite subset of \(\{\ve{1}, \dotsc, \ve{n}\} \subseteq \symcal{B}\) satisfies
+        \begin{equation}
+            \alpha_1 \ve{1} + \dotsb + \alpha_n \ve{n} = 0
+        \end{equation}
+        only for the trivial case of \(\alpha_i = 0\).
+        
+        A subset \(\symcal{B} \subset V\) spans \(V\) if every \(v \in V\) can be written as
+        \begin{equation}
+            v = \alpha_1\ve{1} + \dotsb + \alpha_n\ve{n}
+        \end{equation}
+        for some finite subset \(\{\ve{1}, \dotsc, \ve{n}\} \subseteq \symcal{B}\).
+        We call \(\alpha_i\) the \define{components}\index{component} of \(v\).
+        
+        If a subset \(\symcal{B} \subset V\) is linearly independent and spans \(V\) then we call it a \defineindex{basis}.
+    \end{dfn}
+    
+    Every vector space has a basis (assuming the axiom of choice).
+    It is a fact that any two bases have the same cardinality, which we call the \defineindex{dimension} of the space.
+    A vector space is \defineindex{finite-dimensional} if it's dimension is finite.
+    
+    \begin{dfn}{\(\FVect\)}{def:FVect}
+        The category \(\FVect\) has finite-dimensional vector spaces as objects and linear maps as morphisms.
+    \end{dfn}
+    
+    \begin{lma}{}{}
+        \(\FVect\) is a category.
+        \begin{proof}
+            This follows from \(\Vect\) being a category.
+        \end{proof}
+    \end{lma}
+    
+    Linear maps are often thought of as matrices, although this only works in the finite-dimensional case.
+    Take two vector spaces \(V\) and \(W\) with bases \(\{v_i\}\) and \(\{w_i\}\) respectively.
+    Then a linear map \(T \colon V \to W\) defines a matrix with components \(T_{ij}\) given by \(T(v_i)_j\), where \(T(v_i)_j\) is the \(j\)th component of \(T(v_i)\), which is what we get evaluating the linear map at the \(i\)th basis vector, \(v_i\).
+    A matrix, \(T_{ij}\), defines a linear map \(T \colon V \to W\) similarly, by defining \(T(v_i)\) to be formed from components \(T(v_i)_j = T_{ij}\), and then using linearity to extend this definition to any vector in \(V\).
+    
+    \begin{dfn}{\(\Mat\)}{def:Mat}
+        The category \(\Mat\)\index{Mat@\(\Mat\)} has natural numbers as objects with a morphism \(n \to m\) being an \(n \times m\) matrix with entries in \(\field\).
+        Composition of morphisms is matrix multiplication and the identity matrix is the identity morphism.
+    \end{dfn}
+    
+    \begin{lma}{}{}
+        \(\Mat\) is a category.
+        \begin{proof}
+            Associativity follows from associativity of matrix multiplication and the identity matrix is clearly the identity.
+            The product of an \(n \times m\) matrix and a \(m \times \ell\) matrix is an \(n \times \ell\) matrix, reflecting the fact we can compose morphisms \(n \to m\) and \(m \to \ell\) to get a morphism \(n \to \ell\).
+        \end{proof}
+    \end{lma}
+    
+    There is an equivalence (
+    % TODO: add link to definition of equivalence
+    ) \(\Mat \to \FVect\) given by sending \(n \to \field^n\) and sending a matrix to a linear map as described above.
+    This formalises the idea that linear maps and matrices are equivalent ways of doing linear algebra in finite dimensions.
+    
+    \subsubsection{\texorpdfstring{\(\Hilb\) and \(\FHilb\)}{Hilb and FHilb}}
+    \begin{dfn}{Inner Product Space}{}
+        An \defineindex{inner product space}, \((V, \braket{-}{-})\), is a vector space, \(V\), over the field \(\field = \reals, \complex\) equipped with an \defineindex{inner product} \(\braket{-}{-} \colon V \times V \to \field\) such that the inner product is
+        \begin{itemize}
+            \item conjugate symmetric: \(\braket{u}{v} = \braket{v}{u}^*\) for all \(u, v \in V\);
+            \item linear in the \emph{second} argument: \(\braket{u}{\alpha v} = \alpha\braket{u}{v}\) for all \(\alpha \in \field\) and \(u, v \in V\), this implies antilinearity in the first argument: \(\braket{\alpha u}{v} = \alpha^*\braket{u}{v}\);
+            \item positive-definite: \(\braket{v}{v} > 0\) for all \(v \in V\) with \(v \ne 0\) and \(\braket{0}{0} = 0\), note that conjugate symmetry implies \(\braket{v}{v} = \braket{v}{v}^*\) so \(\braket{v}{v}\) is real.
+        \end{itemize}
+        Note that for the \(\field = \reals\) case we can simply ignore the complex conjugates.
+    \end{dfn}
+    
+    \begin{dfn}{Hilbert Space}{}
+        A \defineindex{Hilbert space} is an inner product space \((H, \braket{-}{-})\) such that \(H\) is complete with respect to the norm \(\norm{-} \colon H \to \reals\) defined by \(\norm{v} \coloneqq \sqrt{\braket{v}{v}}\), we say that this is the norm induced by the inner product.
+        Being complete means that if the sequence \(\{v_i\} \subseteq H\) is such that
+        \begin{equation}
+            \sum_{i = 1}^{\infty} \norm{v_i}
+        \end{equation}
+        converges (as a series in \(\reals\)) then
+        \begin{equation}
+            \sum_{i = 1}^{\infty} v_i
+        \end{equation}
+        converges to some \(v \in H\), in the sense that for all \(\varepsilon > 0\) there exists some \(N \in \naturals\) such that for all \(n > N\) we have
+        \begin{equation}
+            \norm*{v - \sum_{i = 1}^{n} v_i} < \varepsilon,
+        \end{equation}
+        or equivalently,
+        \begin{equation}
+            \lim_n \norm*{v - \sum_{i = 1}^{n} v_i} = 0.
+        \end{equation}
+    \end{dfn}
+    
+    This requirement of completeness is really just a technical requirement to make things well defined in certain circumstances, and we won't ever have reason to make use of it explicitly.
+    For our purposes inner product space and Hilbert space are basically synonyms, but we're slightly safer working in Hilbert spaces due to this extra condition.
+    
+    \begin{dfn}{Bounded Linear Map}{}
+        Let \(H\) and \(K\) be Hilbert spaces with norms \(\norm{-}_H\) and \(\norm{-}_K\) respectively, both induced by the inner product.
+        A \defineindex{bounded linear map} is a map \(T \colon H \to K\) such that
+        \begin{equation}
+            \norm{T(v)}_K \le M \norm{v}_H
+        \end{equation}
+        for some \(M \in \reals\) and all \(v \in H\).
+    \end{dfn}
+    
+    \begin{dfn}{\(\Hilb\) and \(\FHilb\)}{def:Hilb and FHilb}
+        Fix some field \(\field = \reals, \complex\).
+        The category \(\Hilb\) has Hilbert spaces as objects and bounded linear maps as morphisms.
+        The category \(\FHilb\) has finite-dimensional Hilbert spaces as objects and bounded linear maps as morphisms.
+    \end{dfn}
+    
+    \begin{lma}{}{}
+        \(\Hilb\) and \(\FHilb\) are categories.
+        \begin{proof}
+            Associativity and identities follow from the underlying functions.
+            We need only show that the composite of two bounded linear maps is again a bounded linear map.
+            Let \(T \colon H \to K\) and \(S \colon K \to J\) be bounded linear maps between the Hilbert spaces \(H\), \(K\), and \(J\).
+            Then there exist some \(M, N \in \reals\) such that \(\norm{T(v)}_K \le M\norm{v}_H\) and \(\norm{S(u)}_J \le N\norm{u}\) for all \(v \in H\) and \(u \in K\).
+            Then we have \(\norm{(S \circ T)(v)}_J = \norm{S(T(v))}_J \le N\norm{T(v)}_K \le NM\norm{v}_H\) for all \(v \in V\), and \(NM \in \reals\), so the map is bounded again.
+            The composite of two linear maps is linear, as shown in \cref{lma:Vect is a category},
+            so the composite of two bounded linear maps is a bounded linear map.
+        \end{proof}
+    \end{lma}
+    
+    \subsection{More Examples}
+    \begin{exm}{Sets with Structure}{}
+        Many categories can be described as having objects formed from sets with structure, and morphisms being structure preserving functions.
+        These are all concrete categories, in the sense that we can forget the structure and just think of them as sets and functions.
+        Some examples of these sets with structure are
+        \begin{itemize}
+            
+            \item The category \(\Mon\)\index{Mon@\(\Mon\)} has monoids as objects and monoid homomorphisms as morphisms.
+            \item The category \(\Grp\)\index{Grp@\(\Grp\)} has groups as objects and group homomorphisms as morphisms.
+            \item The category \(\Ring\)\index{Ring@\(\Ring\)} has rings as objects and ring homomorphisms as morphisms.
+            \item The category \(\CRing\)\index{CRing@\(\CRing\)} has commutative rings as objects and ring homomorphisms as morphisms.
+            \item The category \(\Field\)\index{Field@\(\Field\)} has fields as objects and field homomorphisms as morphisms.
+            \item The category \(\RMod\)\index{R-Mod@\(\RMod\)} for a fixed ring \(R\) has left modules over \(R\) as objects and module homomorphisms as morphisms.
+            Note that the special case where \(R\) is a field is \(\Vect[R]\).
+            \item The category \(\Top\) has topological spaces as objects and continuos maps as morphisms.
+            \item The category \(\pointedTop\) has pointed topological spaces, \((X, \bullet)\), as objects, that is topological spaces with some special point, \(\bullet\), and based maps as morphisms, that is continuous maps preserving this special point, that is \(f \colon (X, \bullet) \to (Y, \ast)\) is continuous and \(f(\bullet) = \ast\).
+        \end{itemize}
+        See \cref{chap:maths definitions} for relevant definitions.
+    \end{exm}
+    
+    \begin{exm}{Posets}{}
+        Given a poset, \((P, \le)\), we can define a category whose objects are elements of \(P\) and there is a unique morphism \(a \to b\) if \(a \le b\).
+        Since this morphism is unique and \(a \le a\) the identity is simply the unique morphism \(a \to a\).
+        Since \(a \le b\) and \(b \le c\) implies \(a \le c\) there is a unique morphism \(a \to c\) in this case, which must then be the morphism formed by composing the morphisms \(a \to b\) and \(b \to c\).
+    \end{exm}
+    
+    \begin{exm}{Single Object Categories}{}
+        Given a monoid, \(M\), we can interpret it as a category with a single object, which we call \(\bullet\), and then the elements of \(M\) are morphisms \(\bullet \to \bullet\) with composition of morphisms given by the monoid product.
+        The identity of the monoid is the identity morphism.
+        In a sense categories just generalise monoids to have more objects.
+        The process of defining a quantity, then mapping the definition to a particular category with a single object, and then allowing there to be multiple objects is called \defineindex{oidification}, and the resulting object is suffixed with -oid.
+        So a monoidoid is a category.
+        
+        Given a group, \(G\), we can interpret it as a single object category where all morphisms are isomorphisms (\cref{def:isomorphism and others}).
+        This extra condition is simply reflecting the condition that a group has all inverses.
+        A \defineindex{groupoid} is then a category in which all morphisms are isomorphisms.
+        
+        Note that we can proceed in the opposite direction, given a category with a single object (with all morphisms being isomorphisms) this can be interpreted as a monoid (group).
+    \end{exm}
+    
+    \section{Diagrams}\index{diagram}
+    Composition of morphisms can be quite confusing.
+    There is lots of data to specify, which objects are involved, what are the morphisms called, do the morphisms have any other properties we might be interested in and so on.
+    It doesn't help that the order in which we write composition of functions is the reverse of the order in which the functions are applied.
+    The solution to this is to draw pictures with all of the objects as nodes and the morphisms as arrows between them.
+    Composition of morphisms is then given by reading the arrows backwards.
+    A simple example is
+    \begin{equation}
+        A \xrightarrow{f} B \xrightarrow{g} C
+    \end{equation}
+    which represents two morphisms, \(f \colon A \to B\) and \(g \colon B \to C\), which can be composed to give \((g \circ f) \colon A \to C\).
+    We might add this morphism to our diagram,
+    \begin{equation}
+        \begin{tikzcd}
+            A \arrow[r, "f"] \arrow[rr, bend right, "g \circ f"'] & B \arrow[r, "g"] & C
+        \end{tikzcd}
+        .
+    \end{equation}
+    although we don't have to since it's existence is ensured by the definition of a category.
+    Both paths taken in this diagram give the same result.
+    
+    In general if all paths in a diagram between two fixed objects give the same result we say that the diagram \define{commutes}\index{commute}, or is a \defineindex{commutative diagram}.
+    This can be useful to specify a lot of algebraic relations in a single commutative diagram.
+    For example, the diagram
+    \begin{equation}
+        \begin{tikzcd}
+            A \arrow[r, "f"] \arrow[d, "h"'] & B \arrow[r, "g"] \arrow[d, "i"'] & C\\
+            D \arrow[r, "k"'] & E \arrow[ur, "j"']
+        \end{tikzcd}
+    \end{equation}
+    commuting is equivalent to the following requirements:
+    \begin{equation}
+        g \circ f = j \circ k \circ h, \qquad i \circ f = k \circ h, \qqand g = j \circ i,
+    \end{equation}
+    which are given by requiring that the outer parallelogram commutes, the square commutes, and the triangle commutes respectively.
+    
+    Since the definition of a category means every object has an identity morphism and that these identity morphisms don't really affect composition we leave the identity morphisms implicit in the diagram.
+    We could write them in, for example
+    \begin{equation}
+        \begin{tikzcd}
+           A \arrow[r, "f"] \arrow[loop left, "\id_A"] & B \arrow[loop right, "\id_B"]
+        \end{tikzcd}
+    \end{equation}
+    commuting is simply the identity law, telling us that, among other things, \(f \circ \id_A = f = \id_B \circ f\).
+    We can also state the associativity law as the commutativity of the following:
+    \begin{equation}
+        \begin{tikzcd}
+            A \arrow[r, "f"] \arrow[rr, bend left, "g \circ f"] & B \arrow[r, "g"] \arrow[rr, bend right, "h \circ g"'] & C \arrow[r, "h"] & D.
+        \end{tikzcd}
+    \end{equation}
+    
+    \section{Terminology}
+    We now introduce some terminology which will be helpful.
+    \begin{dfn}{}{def:isomorphism and others}
+        For a morphisms \(f \colon A \to B\)
+        \begin{itemize}
+            \item we call \(A\) the \defineindex{domain}, or \define{source}\index{source|see{domain}}, of \(f\);
+            \item we call \(B\) the \defineindex{codomain}, or \define{target}\index{target|see{codomain}}, of \(f\);
+            \item we call \(f\) an \defineindex{endomorphism} if \(A = B\);
+            \item we call \(f\) an \defineindex{isomorphism} if there exists \(f^{-1} \colon B \to A\) such that \(f^{-1} \circ f = \id_A\) and \(f \circ f^{-1} = \id_{B}\);
+            \item we call \(f\) an \defineindex{automorphism} if it is an isomorphism and endomorphism;
+            \item we call \(A\) \defineindex{isomorphic} to \(B\) if \(f\) is an isomorphism, and write \(A \isomorphic B\);
+            \item we call \(f\) an \defineindex{epimorphism}, or \define{epic}\index{epic|see{epimorphism}}, if \(g \circ f = h \circ f\) implies \(g = h\) for all \(g, h \colon B \to C\);
+            \item we call \(f\) a \defineindex{monomorphism}, or \define{monic}\index{mono|see{monomorphism}}, if \(f \circ g = f \circ h\) implies \(g = h\) for all \(g, h \colon C \to A\).
+        \end{itemize}
+    \end{dfn}
+    
+    The most important definition here is isomorphisms.
+    Often equality is too strict a requirement for comparing two objects.
+    Instead isomorphism is usually the correct level of similarity.
+    In particular in a concrete category objects are isomorphic if there is an invertible structure preserving map between them, giving a one-to-one pairing of elements.
+    This allows for trivial differences between objects, like renaming of elements or operations, to be ignored.
+    For example, the groups \((\{0, 1\}, +_2)\) and \((\{1, -1\}, \cdot)\) are not equal, but they are isomorphic.
+    
+    \begin{lma}{}{}
+        Let \(\category{C}\) be a category with objects \(A\) and \(B\).
+        If \(f \colon A \to B\) is an isomorphism then the inverse is unique.
+        \begin{proof}
+            Suppose this wasn't the case, so \(f \colon A \to B\) has two inverses, \(g, g' \colon B \to A\), which are both such that \(g \circ f = g' \circ f = \id_A\) and \(f \circ g = f \circ g' = \id_B\).
+            Then we have
+            \begin{equation}
+                g = g \circ \id_B = g \circ (f \circ g') = (g \circ f) \circ g' = \id_A \circ g' = g'.
+            \end{equation}
+        \end{proof}
+    \end{lma}
+    
+    The condition that \(f\) and \(f^{-1}\) are inverses is equivalent to requiring that
+    \begin{equation}
+        \begin{tikzcd}
+            A \arrow[r, "f", shift left=1] & B \arrow[l, "f^{-1}", shift left=1]
+        \end{tikzcd}
+    \end{equation}
+    commutes.
+    
+    \section{Graphical Notation}
+    
+    \section{Functors}
+    
+    \section{Natural Transformations}
+    
+    % TODO: define concrete category: category w/ faithful functor C -> Set
+    % TODO: equivalence example Mat -> FVect w/ essential surj. on obj. by k^n ~= any other vector space of same dim
+    
+    
+    
     
     %   Appdendix
-    %    \appendixpage
-    %    \begin{appendices}
-        %        
-        %    \end{appendices}
+    \appendixpage
+    \begin{appendices}
+        \chapter{Maths Definitions}
+        \label{chap:maths definitions}
+        \section{Algebraic Structures}
+        \subsection{One Binary Operation}
+        \begin{dfn}{Magma}{}
+            A \defineindex{magma}, \((M, \cdot)\), is a set, \(M\), equipped with a binary operation \(\cdot \colon M \times M \to M\).
+            
+            A \define{magma homomorphism}\index{magma!homomorphism}, \((M, \cdot_M) \to (N, \cdot_N)\), is a function \(f \colon M \to N\) such that \(f(m \cdot_M m') = f(m) \cdot_N f(m')\) for all \(m, m' \in M\).
+        \end{dfn}
+        
+        \begin{dfn}{Semigroup}{}
+            A \defineindex{semigroup}, \((S, \cdot)\), is an associative magma, meaning that
+            \begin{equation}
+                a \cdot (b \cdot c) = (a \cdot b) \cdot c
+            \end{equation}
+            for all \(a, b, c \in S\).
+            
+            A \define{semigroup homomorphism}\index{semigroup!homomorphism} is a magma homomorphism between semigroups.
+        \end{dfn}
+        
+        \begin{dfn}{Monoid}{}
+            A \defineindex{monoid}, \((M, \cdot, e)\), is a semigroup with an identity element, \(e \in M\), such that \(e \cdot m = m \cdot e = m\) for all \(m \in M\).
+            
+            A \define{monoid homomorphism}\index{monoid!homomorphism}, \((M, \cdot_M, e_M) \to (N, \cdot_N, e_N)\), is a function \(f \colon M \to N\) such that \(f(m \cdot_M m') = f(m) \cdot_N f(m')\) for all \(m, m' \in M\) and \(f(e_M) = e_N\).
+        \end{dfn}
+        
+        \begin{dfn}{Group}{}
+            A \defineindex{group}, \((G, \cdot, e, {-}^{-1})\), is a monoid with inverses, meaning for each \(g \in G\) there exists \(g^{-1} \in G\) such that \(g \cdot g^{-1} = g^{-1}\cdot g = e\).
+            
+            A \define{group homomorphism}\index{group!homomorphism}, \((G, \cdot_G, e_G, {-}^{-1}) \to (H, \cdot_H, e_H, {-}^{-1})\), is a function \(f \colon G \to H\) such that \(f(g \cdot_G g') = f(g) \cdot_H f(g')\) for all \(g, g' \in G\).
+        \end{dfn}
+        Note that the definition of a group homomorphism implies that \(f(e_G) = e_H\) and \(f(g^{-1}) = f(g)^{-1}\) for all \(g \in G\), unlike in the monoid case.
+        
+        For magmas, semigroups, and monoids if \(x \cdot y = y \cdot x\) we say it is a \define{commutative} \define{magma}\index{magma!commutative}/\define{semigroup}\index{semigroup!commutative}/\define{monoid}\index{monoid!commutative}.
+        For groups we call a commutative group an \defineindex{Abelian group}\index{group!Abelian}\index{group!commutative|see{Abelian group}}.
+        
+        \subsection{Two Binary Operations}
+        \begin{dfn}{Ring}{}
+            A \defineindex{ring}, \((R, +, -, \cdot, 1, 0)\) is a set, \(R\), equipped with two binary operations, \(+ \colon R \times R \to R\) and \(\cdot \colon R \times R \to R\) such that
+            \begin{itemize}
+                \item \((R, +, 0, -)\) is an Abelian group.
+                \item \((R, \cdot, 1)\) is a monoid.
+                \item Multiplication distributes over addition:
+                \begin{equation}
+                    a \cdot (b + c) = a \cdot b + a \cdot c, \qqand (a + b) \cdot c = a \cdot c + b \cdot c
+                \end{equation}
+                where we take multiplication to have higher operator precedence than addition.
+            \end{itemize}
+        
+            A \define{ring homomorphism}\index{ring!homomorphism}, \((R, +_R, -_R, \cdot_R, 1_R, 0_R) \to (S, +_S, -_S, \cdot_S, 1_S, 0_S)\) is a function \(f \colon R \to S\) such that \(f(a +_R b) = f(a) +_S f(b)\), \(f(a \cdot_R b) = f(a) \cdot_S f(b)\), and \(f(1_R) = 1_S\).
+            
+            If \(x \cdot y = y \cdot x\) for all \(x, y \in R\) we call \(R\) a \define{commutative ring}\index{ring!commutative}.
+        \end{dfn}
+        Note that some sources only require that \((R, \cdot)\) is a semigroup, in which case what we define here is called a \define{ring with identity}\index{ring!with identity} or \define{ring with unity}\index{ring!with unity}.
+        Sometimes a ring without identity is called a \defineindex{rng}, with i taken out as there is no \textbf{i}dentity.
+        It is also common to define \defineindex{rig} or \defineindex{semiring|see{rig}} by only requiring that \((R, +)\) is a commutative monoid, meaning we drop inverses, which for an additive group would be \textbf{n}egatives, \(-g\) being the additive inverse of \(g\).
+        A \defineindex{rg} is then defined by dropping the requirements for multiplicative identities and additive inverses.
+        
+        \begin{dfn}{Integral Domain}{}
+            Let \(R\) be a ring.
+            A \defineindex{zero-divisor} is some element \(a \in R\) such that \(ab = 0\) and/or \(ba = 0\) for some \(b \in R\) with \(b \ne 0\).
+            A ring with \emph{no} zero-divisors is called a \defineindex{domain}.
+            A commutative domain is an \defineindex{integral domain}.
+        \end{dfn}
+        
+        \begin{dfn}{Field}{}
+            Let \(R\) be a ring.
+            A \defineindex{unit} is some element \(a \in R\) with \(a \ne 0\) such that there exists \(a^{-1} \in R\) with \(a \cdot a^{-1} = a^{-1} \cdot a = 1\).
+            A division ring is a ring in which all nonzero elements are units.
+            That is, \((R^{\times}, \cdot, e, {-}^{-1})\) is a group, where \(R^{\times} = R\setminus\{0\}\).
+            
+            A commutative division ring is a \defineindex{field}.
+        \end{dfn}
+        
+        \section{Topological Spaces}
+        \begin{dfn}{Topological Space}{}
+            A \defineindex{topological space}, \((X, \topology)\) is a set, \(X\), equipped with a \defineindex{topology}, \(\topology\), which is a subset of \(\powerset(X)\) such that
+            \begin{itemize}
+                \item \(\emptyset \in \topology\);
+                \item \(X \in \topology\);
+                \item an arbitrary (potentially infinite) union of elements of \(\topology\) is again an element of \(\topology\);
+                \item a finite intersection of elements of \(\topology\) is again an element of \(\topology\).
+            \end{itemize}
+            Elements of \(\topology\) are called open sets.
+        \end{dfn}
+        
+        \begin{dfn}{Continuous Function}{}
+            Let \((X, \topology_X)\) and \((Y, \topology_Y)\) be topological spaces.
+            A \defineindex{continuous function}, \((X, \topology_X) \to (Y, \topology_Y)\), is a function \(f \colon X \to Y\) such that for all \(U \in \topology_Y\) we have \(f^{-1}(U) \in \topology_X\) where
+            \begin{equation}
+                f^{-1}(U) \coloneqq \{x \in X \mid \exists y \in U \text{ such that } y = f(x)\} \subseteq X.
+            \end{equation}
+        \end{dfn}
+    \end{appendices}
     
     \backmatter
     %    \renewcommand{\glossaryname}{Acronyms}
