@@ -23,8 +23,22 @@
 \BeforeBeginEnvironment{tikzcd}{\tikzexternaldisable}
 \AfterEndEnvironment{tikzcd}{\tikzexternalenable}
 
+% ZX calculus
 \tikzset{Z spider/.style={fill=Green!50, draw=Green, text=black, circle, minimum width=1mm, inner sep=2pt, thick}}
 \tikzset{X spider/.style={fill=Red!50, draw=Red, text=black, circle, minimum width=1mm, inner sep=2pt, thick}}
+
+% Graphical calculus
+\tikzset{wire/.style={thick}}
+\tikzset{morphism/.style={thick, draw, inner sep=2pt}}
+
+\RequirePackage[%
+sorting=none,  % Don't sort the references, they will appear in the order they are first cited
+style=numeric-comp,  % citations like [1] and citing 1, 2, and 3 gives [1-3]
+giveninits=true,  % style author names as J. Doe
+language=british  % Make dates dd/mm/yyyy
+]{biblatex}
+\addbibresource{references.bib}
+\usepackage{xurl}
 
 % References, should be last things loaded
 \usepackage[pdfauthor={Willoughby Seago},pdftitle={Categories and Quantum Information},pdfkeywords={category theory, quantum information, quantum computing, monoidal category},pdfsubject={Gauge Theories}]{hyperref}  % Should be loaded second last (cleveref last)
@@ -54,9 +68,9 @@ noabbrev
 \colorlet{codeTextColor}{Navy}
 
 % Title page info
-\title{Gauge Theories in Particle Physics}
+\title{Categories and Quantum Informatics}
 \author{Willoughby Seago}
-\date{January 16, 2023}
+\date{January 17, 2023}
 % \subtitle{}
 % \subsubtitle{}
 
@@ -93,12 +107,23 @@ noabbrev
 \newcommand{\RMod}[1][R]{#1{-}\category{Mod}}
 \newcommand{\Top}{\category{Top}}
 \newcommand{\pointedTop}{\category{Top}_{\bullet}}
+\newcommand{\Cat}{\category{Cat}}
+\newcommand{\Ab}{\category{Ab}}
+\newcommand{\Pos}{\category{Pos}}
+\newcommand{\LieGrp}{\category{LieGrp}}
+\newcommand{\LieAlg}{\category{LieAlg}}
 \DeclareMathOperator{\Ob}{Ob}
 \DeclareMathOperator{\id}{id}
 \newcommand{\isomorphic}{\cong}
 \renewcommand{\ve}[1]{e_{#1}}
 \newcommand{\topology}{\symcal{T}}
 \newcommand{\powerset}{\symcal{P}}
+\newcommand{\phantomrlap}[2]{\mathrlap{#1}\phantom{#2}}
+\newcommand{\naturalTransformation}{\Rightarrow}
+\DeclarePairedDelimiterX{\functorCategory}[2]{[}{]}{#1, #2}
+\newcommand{\hermit}{\dagger}
+\undef\det
+\DeclareMathOperator{\det}{det}
 
 \includeonly{}
 
@@ -109,6 +134,21 @@ noabbrev
     \tableofcontents
     \listoffigures
     \mainmatter
+    
+    \chapter{Introduction}
+    The material delivered in the lectures is included in these notes, but so is extra material pulled from the textbook \cite{heunen}, as well as other sources, such as \cite{leinster}.
+    I include various additional examples, some which require some mathematical background to understand.
+    Some definitions are included in the appendices, but those unfamiliar with the material in these examples should feel free to just skip them.
+    I've also included pointers to notes from other courses where appropriate, particularly the courses \course{Symmetries of Quantum Mechanics} and \course{Symmetries of Particles and Fields}, which both cover the areas of representation theory and Lie theory.
+    The notes from these courses and others can be found at \url{https://github.com/WilloughbySeago/Uni-Notes}.
+    Again, any unfamiliar material from these courses can be skipped.
+    A fair few of the examples simply come from relevant Wikipedia pages, and I haven't performed detailed checks of all the facts in these cases.
+    
+    There are a few notational things which don't align with the course.
+    A big one is leaving out brackets for functors, writing \(FA\) and \(Ff\) instead of \(F(A)\) and \(F(f)\).
+    The use of \(-\) as a blank to be filled in with some object is also not used in the course.
+    
+    \part{Introduction}
     
     \chapter{ZX Calculus}
     In this chapter we will introduce \defineindex{ZX calculus}.
@@ -1060,6 +1100,7 @@ noabbrev
     The objects we choose to represent programs are categories.
     Category theory supports combing programs as we saw in the examples above and gives us a powerful graphical language for computations.
     
+    \part{Categories}
     \chapter{Categories}
     \section{Motivation}
     We want an abstract mathematical formalism in which the meaning of a program lives, allowing us to abstract away implementation details and reason about computations.
@@ -1336,8 +1377,7 @@ noabbrev
     \(\Set\) is the prototypical category.
     It is often tempting to think of other examples of categories, which we'll meet shortly, as simply sets with extra structure, and indeed this is often, but not always, the case.
     A \defineindex{concrete category} is a category in which all objects can be mapped to sets and morphisms can be mapped to functions between these sets.
-    This mapping is done with something called a functor, which we'll define later.
-    % TODO: add link to functor definition
+    This mapping is done with something called a functor, which we'll define later (\cref{def:functor}).
     
     We'll list some properties of \(\Set\) here, some of which won't make sense until later.
     \begin{itemize}
@@ -1657,9 +1697,7 @@ noabbrev
         .
     \end{equation}
     
-    This map, \(M\), actually defines a functor (
-    % TODO: add reference to definition of functor
-    ) \(M \colon \Rel \to \Mat[\integers_2]\), where \(\Mat[\integers_2]\) is the category of binary matrices, whose objects are natural numbers and a morphism \(n \to m\) is an \(n \times m\) matrix.
+    This map, \(M\), actually defines a functor (\cref{def:functor}) \(M \colon \Rel \to \Mat[\integers_2]\), where \(\Mat[\integers_2]\) is the category of binary matrices, whose objects are natural numbers and a morphism \(n \to m\) is an \(n \times m\) matrix.
     The functor \(M\) then maps sets to their size, \(A \mapsto M(A) = \abs{A}\), and relations to matrices as described above.
     
     This is actually an example of a more general idea of a representation\footnote{see \course{Symmetries of Quantum Mechanics} or \course{Symmetries of Particles and Fields}}, where we replace objects with matrices preserving the structure of the original space.
@@ -1782,21 +1820,19 @@ noabbrev
     A matrix, \(T_{ij}\), defines a linear map \(T \colon V \to W\) similarly, by defining \(T(v_i)\) to be formed from components \(T(v_i)_j = T_{ij}\), and then using linearity to extend this definition to any vector in \(V\).
     
     \begin{dfn}{\(\Mat\)}{def:Mat}
-        The category \(\Mat\)\index{Mat@\(\Mat\)} has natural numbers as objects with a morphism \(n \to m\) being an \(n \times m\) matrix with entries in \(\field\).
+        The category \(\Mat\)\index{Mat@\(\Mat\)} has natural numbers as objects with a morphism \(n \to m\) being an \(m \times n\) matrix with entries in \(\field\).
         Composition of morphisms is matrix multiplication and the identity matrix is the identity morphism.
     \end{dfn}
     
     \begin{lma}{}{}
         \(\Mat\) is a category.
         \begin{proof}
+            The product of an \(m \times n\) matrix and a \(n \times \ell\) matrix is an \(m \times \ell\) matrix, reflecting the fact we can compose morphisms \(\ell \to n\) and \(n \to m\) to get a morphism \(\ell \to m\).
             Associativity follows from associativity of matrix multiplication and the identity matrix is clearly the identity.
-            The product of an \(n \times m\) matrix and a \(m \times \ell\) matrix is an \(n \times \ell\) matrix, reflecting the fact we can compose morphisms \(n \to m\) and \(m \to \ell\) to get a morphism \(n \to \ell\).
         \end{proof}
     \end{lma}
     
-    There is an equivalence (
-    % TODO: add link to definition of equivalence
-    ) \(\Mat \to \FVect\) given by sending \(n \to \field^n\) and sending a matrix to a linear map as described above.
+    There is an equivalence (\cref{def:equivalence and others}) \(\Mat \to \FVect\) given by sending \(n \to \field^n\) and sending a matrix to a linear map as described above.
     This formalises the idea that linear maps and matrices are equivalent ways of doing linear algebra in finite dimensions.
     
     \subsubsection{\texorpdfstring{\(\Hilb\) and \(\FHilb\)}{Hilb and FHilb}}
@@ -1830,6 +1866,9 @@ noabbrev
         \end{equation}
     \end{dfn}
     
+    We will assume that Hilbert spaces are inner product spaces over \(\complex\) unless stated otherwise, although most facts will hold for real Hilbert spaces as well.
+    Complex Hilbert spaces are where all quantum mechanics takes place, so we don't lose much by making this assumption.
+    
     This requirement of completeness is really just a technical requirement to make things well defined in certain circumstances, and we won't ever have reason to make use of it explicitly.
     For our purposes inner product space and Hilbert space are basically synonyms, but we're slightly safer working in Hilbert spaces due to this extra condition.
     
@@ -1861,6 +1900,38 @@ noabbrev
         \end{proof}
     \end{lma}
     
+    We now make a few basic definitions.
+    \begin{dfn}{Orthonormal}{}
+        Let \(H\) be a Hilbert space and \(\{\ve{i}\}\) a basis of \(H\), then we say that this basis is \defineindex{orthogonal} if \(\braket{\ve{i}}{\ve{j}} = 0\) for \(i \ne j\).
+        If \(\braket{\ve{i}}{\ve{j}} = \delta_{ij}\) we say the basis is \defineindex{orthonormal}.
+    \end{dfn}
+    
+    \begin{dfn}{Adjoint}{}
+        If \(H\) and \(K\) are Hilbert spaces and \(T \colon H \to K\) is a linear map then we define the \defineindex{adjoint} to be the linear map \(T^{\hermit} \colon K \to H\) such that \(\braket{T(v)}{w} = \braket{v}{T^\hermit(w)}\).
+    \end{dfn}
+    
+    In terms of matrices representing linear maps the adjoint corresponds to the conjugate transpose matrix.
+    
+    \begin{dfn}{Bras and Kets}{}
+        Let \(H\) be a Hilbert space.
+        Given some \(v \in H\) its \defineindex{ket} is the map \(\ket{v} \colon \complex \to H\) defined by \(z \mapsto zv\) and its bra is the map \(\bra{v} \colon H \to \complex\) defined bg \(w \mapsto \braket{v}{w}\).
+    \end{dfn}
+    
+    This definition is rather formal and doesn't correspond to how we usually think about bras and kets.
+    Typically we think about elements of \(H\) as being kets.
+    This works since each linear map \(\complex \to H\) is completely defined by where it sends \(1\), so really linear maps of this form just pick out elements of \(H\), and \(\ket{v}\) is such that \(1 \mapsto 1v = v\).
+    So we often write \(\ket{v}\) when we might actually mean \(v\) by this definition.
+    We then think of bras similarly as being their own vectors in some other space, which we'll define in the next definition, and then we think of the mapping \(w \mapsto \braket{v}{w}\) as simply performing multiplication \(\bra{v} \ket{w} = \braket{v}{w}\).
+    
+    \begin{dfn}{Dual Space}{}
+        Let \(V\) be a vector space.
+        Then \(V^* \coloneqq \Vect(V, \field)\) is the \defineindex{dual space}.
+    \end{dfn}
+    
+    This definition means that \(V^*\) is the space of linear maps \(V \to \field\), which in the case of a Hilbert space we can recognise as the space of bras.
+    Note that we are equipping \(\Vect(V, \field)\) with the obvious vector space (or Hilbert space) structure given by adding and scaling linear maps pointwise.
+    
+    
     \subsection{More Examples}
     \begin{exm}{Sets with Structure}{}
         Many categories can be described as having objects formed from sets with structure, and morphisms being structure preserving functions.
@@ -1877,6 +1948,7 @@ noabbrev
             Note that the special case where \(R\) is a field is \(\Vect[R]\).
             \item The category \(\Top\) has topological spaces as objects and continuos maps as morphisms.
             \item The category \(\pointedTop\) has pointed topological spaces, \((X, \bullet)\), as objects, that is topological spaces with some special point, \(\bullet\), and based maps as morphisms, that is continuous maps preserving this special point, that is \(f \colon (X, \bullet) \to (Y, \ast)\) is continuous and \(f(\bullet) = \ast\).
+            \item The category \(\Pos\) has posets as objects and monotone functions as morphisms.
         \end{itemize}
         See \cref{chap:maths definitions} for relevant definitions.
     \end{exm}
@@ -1996,16 +2068,668 @@ noabbrev
     commutes.
     
     \section{Graphical Notation}
+    In this section we will introduce a graphical notation which can be used to reason about categories.
+    This notation treats categories as processes, taking some input and producing some output.
+    We read the notation from bottom to top, which we can imagine is the progression of \enquote{time} through the process.
+    This notation obeys the rules, and spirit, of category theory.
+    In particular, we don't write objects.
+    Instead we represent each object through it's identity morphism, so \(A\) is represented by \(\id_A\).
+    An identity morphism is then represented by a line, labelled by the object, representing a process in which nothing happens, the input at the bottom of the page, is just passed directly to the output at the top of the page:
+    \begin{equation}
+        \id_A = 
+        \tikzsetnextfilename{categories-graphical-language-identity}
+        \begin{tikzpicture}[baseline=(A.base)]
+            \draw[wire] (0, 0) -- (0, 1) node [midway, left] (A) {\(A\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    A general morphism, \(f \colon A \to B\), is represented in this graphical notation by placing a box on the wire, representing some process occurring, and labelling the wire either side with the appropriate object:
+    \begin{equation}
+        f = 
+        \tikzsetnextfilename{categories-graphical-language-morphism}
+        \begin{tikzpicture}[baseline=(f.base)]
+            \node[morphism] (f) {\(f\)};
+            \draw[wire] (f) -- ++ (0, -1) node [midway, left] {\(A\)};
+            \draw[wire] (f) -- ++ (0, 1) node [midway, left] {\(B\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    Composition of morphisms is represented by doing one process after the other, which in this notation just means writing one box after the other and joining them by a wire of the appropriate type.
+    If we introduce a second morphism \(g \colon B \to C\) then we have
+    \begin{equation}
+        g \circ f = 
+        \tikzsetnextfilename{categories-graphical-language-composition}
+        \begin{tikzpicture}[baseline=(g.base)]
+            \node[morphism] (g) {\(\phantomrlap{g}{f}\)};
+            \draw[wire] (g) -- ++ (0, -1) node [midway, left] {\(B\)};
+            \draw[wire] (g) -- ++ (0, 1) node [midway, left] {\(C\)};
+            \node at (0.5, 0) {\(\circ\)};
+            \node[morphism] (f) at (1, 0) {\(f\)};
+            \draw[wire] (f) -- ++ (0, -1) node [midway, left] {\(A\)};
+            \draw[wire] (f) -- ++ (0, 1) node [midway, left] {\(B\)};
+        \end{tikzpicture}
+        \ =
+        \tikzsetnextfilename{categories-graphical-language-composite}
+        \begin{tikzpicture}[baseline=(B.base)]
+            \node[morphism] (f) {\(f\)};
+            \node[morphism, above= 0.75cm of f] (g) {\(\phantomrlap{g}{f}\)};
+            \draw[wire] (f) -- ++ (0, -1) node [midway, left] {\(A\)};
+            \draw[wire] (f) -- (g) node [midway, left] (B) {\(B\)};
+            \draw[wire] (g) -- ++ (0, 1) node [midway, left] {\(C\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    This graphical notation makes the axioms of a category implicit.
+    For the identity law since identity morphisms are just drawn as wires clearly the following holds:
+    \begin{equation}
+        \tikzsetnextfilename{categories-graphical-language-identity-law}
+        \begin{tikzpicture}[baseline=(A.base),
+            morphism/.append style={minimum width=0.6cm}
+            ]
+            \node[morphism] (idA) at (0, 0) {\(\id_A\)};
+            \node[morphism] (f1) at (0, 1.5) {\(f\)};
+            \node[morphism] (f2) at (1.5, 0.75) {\(f\)};
+            \node[morphism] (f3) at (3, 0) {\(f\)};
+            \node[morphism] (idB) at (3, 1.5) {\(\id_B\)};
+            \draw[wire] (idA) -- (f1) node [midway, left] (A) {\(A\)};
+            \draw[wire] (idA) -- ++ (0, -1) node [midway, left] {\(A\)} coordinate (bottom);
+            \draw[wire] (f1) -- ++ (0, 1) node [midway, left] {\(B\)} coordinate (top);
+            \draw[wire] (f2) -- (f2 |- bottom) node [midway, left] {\(A\)};
+            \draw[wire] (f2) -- (f2 |- top) node [midway, left] {\(B\)};
+            \draw[wire] (f3) -- (f3 |- bottom) node [midway, left] {\(A\)};
+            \draw[wire] (idB) -- (f3) node [midway, left] {\(B\)};
+            \draw[wire] (idB) --(f3 |- top) node [midway, left] {\(B\)};
+            \node at (0.75, 0.75) {\(=\)};
+            \node at (2.25, 0.75) {\(=\)};
+        \end{tikzpicture}
+        ,
+    \end{equation}
+    and this is just the identity law
+    \begin{equation}
+        f \circ \id_A = f = \id_B \circ f.
+    \end{equation}
+    Similarly we don't bother drawing brackets around composites, since associativity makes them unnecessary.
+    If we did draw brackets then considering the objects and morphisms
+    \begin{equation}
+        A \xrightarrow{f} B \xrightarrow{g} C \xrightarrow{h} D
+    \end{equation}
+    we can write the associativity law as
+    \begin{equation}
+        \tikzsetnextfilename{categories-graphical-language-associativity-law}
+        \begin{tikzpicture}[baseline=(g.base)]
+            \node[morphism] (f) at (0, 0) {\(f\)};
+            \node[morphism] (g) at (0, 1.5) {\(\phantomrlap{g}{f}\)};
+            \node[morphism] (h) at (0, 3) {\(\phantomrlap{h}{f}\)};
+            \draw[wire] (f) -- (g) node [midway, left] {\(B\)};
+            \draw[wire] (g) -- (h) node [midway, left] {\(C\)};
+            \draw[wire] (f) -- ++ (0, -1) node [midway, left] {\(A\)};
+            \draw[wire] (h) -- ++ (0, 1) node [midway, left] {\(D\)};
+            \node[rotate=90] at (0, 1.1) {\(\Bigg(\)};
+            \node[rotate=90] at (0, 3.4) {\(\Bigg)\)};
+            
+            \node at (1, 1.5) {\(=\)};
+            \begin{scope}[xshift=2cm]
+                \node[morphism] (f) at (0, 0) {\(f\)};
+                \node[morphism] (g) at (0, 1.5) {\(\phantomrlap{g}{f}\)};
+                \node[morphism] (h) at (0, 3) {\(\phantomrlap{h}{f}\)};
+                \draw[wire] (f) -- (g) node [midway, left] {\(B\)};
+                \draw[wire] (g) -- (h) node [midway, left] {\(C\)};
+                \draw[wire] (f) -- ++ (0, -1) node [midway, left] {\(A\)};
+                \draw[wire] (h) -- ++ (0, 1) node [midway, left] {\(D\)};
+                \node[rotate=90] at (0, -0.4) {\(\Bigg(\)};
+                \node[rotate=90] at (0, 1.9) {\(\Bigg)\)};
+            \end{scope}
+        \end{tikzpicture}
+        ,
+    \end{equation}
+    which is just
+    \begin{equation}
+        (h \circ g) \circ f = h \circ (g \circ f).
+    \end{equation}
+    
+    So by manipulating this graphical notation naturally we apply the category axioms.
+    This makes this notation very powerful.
+    While this notation looks new if we were to instead draw it horizontally and replace wires with \(\circ\) and \(\id_X\) then it would just be the usual algebraic notation for morphism composition.
+    The real power of this notation comes when we introduce new concepts, such as monoidal products, which extend the graphical notation into a two-dimensional notation which works in much the same way, while the usual algebraic notation quickly becomes cluttered and hard to use.
+    
     
     \section{Functors}
+    The spirit of category theory is that it is not objects that are important but morphisms between them.
+    This suggests that whenever we see a mathematical object we should look for maps between them preserving the relevant structure.
+    Well, categories are objects, so we should look for maps between them.
+    Such maps should preserve the category's structure, which is
+    \begin{itemize}
+        \item the collection of objects;
+        \item the collections of morphisms;
+        \item the composition of morphisms;
+        \item the identity morphisms.
+    \end{itemize}
+    For example, if we have a morphism \(f \colon A \to B\) in one category then our map should send this to another morphism in the new category, and the domain and codomain of that morphism should somehow be related to \(A\) and \(B\).
+    It shouldn't matter whether we do composition of morphisms and then map, or map and the compose morphisms.
+    Identities should map to identities.
+    To this end we make the following definition of a map between categories preserving this structure.
+    
+    \begin{dfn}{Functor}{def:functor}
+        Let \(\cat{C}\) and \(\cat{D}\) be categories.
+        A \defineindex{functor}, \(F \colon \cat{C} \to \cat{D}\), is composed of two mappings:
+        \begin{itemize}
+            \item each object \(A \in \Ob(\cat{C})\) is mapped to some object \(F(A) \in \Ob(\cat{D})\);
+            \item each morphism \(f \in \cat{C}(A, B)\) is mapped to some morphism \(F(f) \in \cat{D}(F(A), F(B))\);
+        \end{itemize}
+        such that
+        \begin{itemize}
+            \item composition is preserved: \(F(g \circ f) = F(g) \circ F(f)\) for \(f \colon A \to B\) and \(g \colon B \to C\) morphisms in \(\cat{C}\);
+            \item identities are preserved: \(F(\id_A) = \id_{F(A)}\) for \(A \in \Ob(\cat{C})\).
+        \end{itemize}
+    \end{dfn}
+    
+    \begin{ntn}{}{}
+        It is common to drop the brackets when applying a functor, a bit like we may apply a linear map, \(T\), to some vector, \(v\), by writing \(Tv\) and thinking of it as matrix multiplication.
+        In this case a functor \(F \colon \cat{C} \to \cat{D}\) maps each \(A \in \Ob(\cat{C})\) to some object \(FA \in \Ob(\cat{D})\), each morphism \(f \in \cat{C}(A, B)\) to some morphism \(Ff \in \cat{D}(FA, FB)\), such that \(F(g \circ f) = Fg \circ Ff\) and \(F\id_A = \id_{FA}\).
+    \end{ntn}
+    
+    Note that what we have defined above is a \defineindex{covariant functor}.
+    It is also possible to define a \defineindex{contravariant functor} which reverses the direction of morphisms.
+    The difference in the definition is that each \(f \in \cat{C}(A, B)\) is assigned to some \(Ff \in \cat{D}(FB, FA)\) and \(F(g \circ f) = Ff \circ Fg\).
+    We'll assume that all functors are covariant.
+    
+    \begin{exm}{}{}
+        \begin{itemize}
+            \item The constant functor, \(C_X \colon \cat{C} \to \cat{D}\), maps every object of \(\cat{C}\) to \(X \in \Ob(\cat{D})\) and every morphism \(f \colon A \to B\) in \(\cat{C}\) to the identity morphism \(\id_X \colon X \to X\) in \(\cat{D}\).
+            \item The identity functor, \(\id_{\cat{C}} \colon \cat{C} \to \cat{C}\) maps every object and morphism in \(\cat{C}\) to itself.
+            \item The power set can be regarded as a functor \(\powerset\colon \Set \to \Set\), sending each set to its power set and each function \(f \colon A \to B\) to the map sending \(U \in \powerset(A)\) to its image
+            \begin{equation}
+                f(U) \coloneqq \{f(u) \mid u \in U\}.
+            \end{equation}
+            \item The map \(V \mapsto V^*\) defines a functor \(\Vect \to \Vect\).
+            \item If \(G\) is a group viewed as a one object category then a functor \(G \to \Set\) defines a group action, sending the single object of \(G\) to the set, \(S\), upon which \(G\) acts, and sending each morphism, \(g\) (recall morphisms are just elements of the group) to the mapping on that set \(s \mapsto g \mathbin{.} s\).
+            \item If \(G\) is a group viewed as a one object category then a functor \(G \to \Vect\) defines a group action on a vector space, which is to say this functor defines a representation.
+            \item If \(G\) and \(H\) are groups viewed as one object categories then a functor \(G \to H\) is simply a group homomorphism, sending the single object of \(G\) to the single object of \(H\) and preserving composition, which is the group operation.
+            \item The map sending each complex Lie group to its Lie algebra is a functor \(\LieGrp \to \LieAlg\)\footnote{See \course{Symmetries of Quantum Mechanics} or \course{Symmetries of Particles and Fields}}.
+            \item A \defineindex{forgetful functor}, \(\cat{C} \to \Set\) maps a category to \(\Set\) by \enquote{forgetting} the structure of the objects in \(\cat{C}\).
+            A category, \(\cat{C}\), is called \define{concrete}\index{concrete category} if there exists a forgetful functor \(\cat{C} \to \Set\).
+            \begin{itemize}
+                \item The forgetful functor \(U \colon \Grp \to \Set\) sends each group to its underlying set and each group homomorphism to its underlying function.
+                \item The forgetful functor \(U \colon \Vect \to \Set\) sends each vector space to its underlying set and each linear transformation to its underlying function.
+                \item The forgetful functor \(U \colon \Top \to \Set\) sends each topological space to its underlying set and each continuous function to its underlying function.
+            \end{itemize}
+            \item A partially forgetful functor \(\cat{C} \to \cat{D}\) generalises forgetful functors by forgetting some, but not necessarily all, structure of the objects in \(\cat{C}\).
+            \begin{itemize}
+                \item The partially forgetful functor \(\Grp \to \Mon\) sends each group to itself, but now viewed as a monoid, essentially forgetting that inverses exist.
+                \item The partially forgetful functor \(\Hilb \to \Vect\) sends each Hilbert space to itself, but forgets the inner product structure.
+                \item The partially forgetful functor \(\CRing \to \Ring\) sends each commutative ring to itself, forgetting that multiplication is commutative.
+                \item The partially forgetful functor \(\Ring \to \Ab\) sends each ring to its additive group, forgetting how to multiply.
+            \end{itemize}
+            \item A \defineindex{free functor} is, in a sense\footnote{This sense can be made formal through the notion of an adjoint, an important concept in category theory but one we won't explore.} the reverse of a forgetful functor, sending a set to the most general object of the appropriate type.
+            \begin{itemize}
+                \item The free functor \(\Set \to \Grp\) sends each set the free group it generates, which is the set of words generated by concatenating elements of the set and elements declared to be their inverses, with the group operation being concatenation and the identity the empty string.
+                No other relations between elements of the set exist.
+                \item The free functor \(\Set \to \Vect\) takes a set and declares that all the elements in it are linearly independent and form a basis for a vector space whose elements are formal linear combinations of these elements.
+            \end{itemize}
+        \end{itemize}
+    \end{exm}
+    
+    The next definition introduces some terminology used to talk about functors.
+    
+    \begin{dfn}{}{def:equivalence and others}
+        A functor \(F \colon \cat{C} \to \cat{D}\) is
+        \begin{itemize}
+            \item \define{full}\index{full functor} when the mapping \(f \mapsto Ff\) defines a surjection \(\cat{C}(A, B) \to \cat{D}(FA, FB)\);
+            \item \define{faithful}\index{faithful functor} when the mapping \(f \mapsto Ff\) defines an injection \(\cat{C}(A, B) \to \cat{D}(FA, FB)\);
+            \item \defineindex{essentially surjective on objects} when for each \(B \in \Ob(\cat{D})\) there is some \(A \in \Ob(\cat{C})\) such that \(FA \isomorphic B\), essentially when the mapping \(A \mapsto FA\) is surjective, but replacing equality with isomorphism in the definition of surjectivity;
+            \item an \defineindex{equivalence} when it is full, faithful, and essentially surjective on objects;
+            \item an \defineindex{endofunctor} if \(\cat{C} = \cat{D}\).
+        \end{itemize}
+    \end{dfn}
+    
+    The most important definition here is that of an equivalence.
+    Equality of categories is far too strong a condition.
+    We can also define a notion of isomorphism between categories, but this is also too strong.
+    Relaxing the requirements for isomorphism, by changing surjective on objects to essentially surjective on objects, we get the notion of equivalence, which is the sweet spot where a functor preserves enough structure for the two categories to be the same for all intents and purposes, without being too restrictive.
+    
+    It should be noted that there are multiple, equivalent, definitions of equivalence.
+    The one we've given here is probably the easiest to understand, but not always the easiest to apply.
+    
+    One example we've already seen of an equivalence is the functor \(\Mat \to \FVect\) sending \(n \mapsto \field^n\) and a matrix to the associated linear map on the vector space with some fixed basis.
+    This is an equivalence since all finite dimensional vector spaces of the same dimension are isomorphic, which means that this functor is essentially surjective on objects.
+    
+    Now that we have categories and maps between them it is natural to ask if this forms a category, and indeed it does!
+    
+    \begin{dfn}{\(\Cat\)}{}
+        The category \(\Cat\)\index{Cat@\(\Cat\)} has (small) categories as its objects and functors as its morphisms.
+        Composition of functors is composition of the two mappings \(\Ob(\cat{C}) \to \Ob(\cat{D})\) and \(\cat{C}(A, B) \to \cat{D}(FA, FB)\), and the identity is the identity functor.
+    \end{dfn}
+    
+    To be clear, if \(F \colon \cat{C} \to \cat{D}\) and \(G \colon \cat{D} \to \cat{E}\) are functors then the functor \((G \circ F) \colon \cat{C} \to \cat{E}\) sends \(A \in \Ob(\cat{C})\) to \((G \circ F)(A) = (G \circ F)A = G(F(A)) = GFA\), and sends \(f \in \cat{C}(A, B)\) to \((G \circ F)(f) = (G \circ F)f = G(F(f)) = GFf \in \cat{E}(GFA, GFB)\).
+    Associativity is guaranteed by associativity of the underlying mappings and the identity functor is clearly an identity morphism.
     
     \section{Natural Transformations}
+    We have now defined functors as mathematical objects.
+    Following the spirit of category theory we should look for maps between functors preserving their structure.
+    A map between functors should preserve the functor structure.
+    This means that it shouldn't matter if we map to a different functor and then apply the functor, or apply a functor and then map to the other functor.
+    This leads to the following definition.
     
-    % TODO: define concrete category: category w/ faithful functor C -> Set
-    % TODO: equivalence example Mat -> FVect w/ essential surj. on obj. by k^n ~= any other vector space of same dim
+    \begin{dfn}{Natural Transformation}{}
+        Let \(\cat{C}\) and \(\cat{D}\) be categories and \(F, G \colon \cat{C} \to \cat{D}\) functors.
+        For every object \(A \in \Ob(\cat{C})\) a \defineindex{natural transformation}, \(\zeta \colon F \naturalTransformation G\), assigns a morphism \(\zeta_A \colon FA \to GA\) in \(\cat{D}\) such that for every morphism \(f \colon A \to B\) in \(\cat{C}\) the following diagram commutes:
+        \begin{equation}
+            \begin{tikzcd}
+                FA \arrow[r, "\zeta_A"] \arrow[d, "Ff"'] & GA \arrow[d, "Gf"]\\
+                FB \arrow[r, "\zeta_B"'] & GB\mathrlap{.}
+            \end{tikzcd}
+        \end{equation}
+        
+        If every component, \(\zeta_A\), is an isomorphism then \(\zeta\) is called a \defineindex{natural isomorphism} and \(F\) and \(G\) are said to be \defineindex{naturally isomorphic}, written \(F \isomorphic G\).
+    \end{dfn}
     
+    This leads to an alternative, equivalent, definition of an equivalence.
+    A functor \(F \colon \cat{C} \to \cat{D}\) is an equivalence if and only if there is a functor \(G \colon \cat{D} \to \cat{C}\) and natural isomorphisms \(G \circ F \naturalTransformation \id_{\category{C}}\) and \(F \circ G \naturalTransformation \id_{\cat{D}}\).
+    Intuitively, an equivalence is a function which is invertible up to natural isomorphism.
     
+    Note that it is common to write all of the data needed to define a natural transformation as
+    \begin{equation}
+        \begin{tikzcd}[column sep=large]
+            \cat{C}
+            \arrow[r, "F"{name=F}, bend left=40]
+            \arrow[r, "G"{name=G, swap}, bend right=40]
+            & \cat{D}.
+            \arrow[Rightarrow, from=F.south, to=G.north-|F, shorten <=5pt, shorten >=5pt]
+        \end{tikzcd}
+    \end{equation}
     
+    \begin{exm}{Natural Transformations}{}
+        These examples are taken from \cite{leinster} and make use of the notation used there representing a natural transformation as a collection of morphisms indexed by objects, \((\zeta_A)_{A \in \Ob(\cat{C})}\).
+        \begin{itemize}
+            \item A \defineindex{discrete category} is a category in which the only maps are the identity maps.
+            If \(\cat{C}\) is a discrete category then a functor \(F \colon \cat{C} \to \cat{D}\) is simply a family of objects \((FA)_{A \in \Ob(\cat{C})}\).
+            In this case a natural transformation \(\zeta \colon F \naturalTransformation G\) is just a family of maps \((\zeta_A \colon FA \to GA)_{A \in \Ob(\cat{C})}\).
+            The naturality axiom is automatically fulfilled since it holds trivially for identities.
+            \item Fix some natural number \(n\).
+            For any commutative ring, \(R\), the \(n \times n\) matrices with entries in \(R\) form a monoid, \(M_n(R)\), under matrix multiplication.
+            Any ring homomorphism \(R \to S\) induces a monoid homomorphism \(M_n(R) \to M_n(S)\) by acting elementwise on the entries of the matrix with the homomorphism.
+            This defines a functor \(M_n \colon \CRing \to \Mon\).
+            
+            The elements of any ring, \(R\), form a monoid, \(U(R)\), under multiplication, this is an example of a forgetful functor \(U \colon \CRing \to \Mon\).
+            
+            Every \(n \times n\) matrix, \(X\), over a commutative ring \(R\) has a determinant \(\det_R(X) \in R\).
+            The properties
+            \begin{equation}
+                \det_R(XY) = \det_R(X)\det_R(Y), \qqand \det_R(I) = 1
+            \end{equation}
+            tell us that for each commutative ring \(R\) the function \(\det_R \colon M_n(R) \to U(R)\) is a monoid homomorphism.
+            Thus we have a family of maps
+            \begin{equation}
+                (\det_R \colon M_n(R) \to U(R))_{R \in \Ob(\CRing)}.
+            \end{equation}
+            This family of maps defines a natural transformation \(\det \colon M_n \naturalTransformation U\).
+            
+            \item Consider the category \(\FVect\).
+            The map \((-)^* \colon \FVect \to \FVect\) sending each vector space to its dual is a contravariant functor.
+            Thus the map \((-)^{**} \colon \FVect \to \FVect\) sending each vector space to its double dual is also a covariant functor.
+            For each \(V \in \Ob(\FVect)\) we have a canonical isomorphism \(\zeta_V \colon V \to V^{**}\).
+            Given \(v \in V\) the element \(\zeta_V(v) \in V^{**}\) is evaluation at \(v\), that is \(\zeta_V(v) \colon V^* \to \field\) maps \(\varphi \in V^*\) to \(\varphi(v) \in \field\).
+            This defines a natural transformation \(\zeta \colon 1_{\FVect} \naturalTransformation (-)^{**}\) meaning that each vector space is naturally isomorphic to its double dual.
+            Note that given \(F, G \colon \cat{C} \to \cat{D}\) we say that \(FA \isomorphic GA\) naturally in \(A\) if \(F\) and \(G\) are naturally isomorphic.
+            In this case \(V \isomorphic V^{**}\) naturally in \(V\).
+        \end{itemize}
+    \end{exm}
+    
+    Functors are objects, and natural transformations are maps between them, so we should try to define a category.
+    \begin{dfn}{Functor Category}{}
+        Let \(\cat{C}\) and \(\cat{D}\) be categories.
+        The \defineindex{functor category} \(\functorCategory{\cat{C}}{\cat{D}}\), also written \(\cat{D}^{\cat{C}}\), has functors \(F, G \colon \cat{C} \to \cat{D}\) as objects and natural transformations \(F \naturalTransformation G\) as morphisms.
+        Composition of natural transformations is done component wise and the identity is the identity natural transformation which assigns the to each \(A \in \Ob(\cat{C})\) the identity morphism \(\id_{FA}\) in \(\cat{D}\).
+    \end{dfn}
+    
+    An example of a functor category is the category of \(G\)-sets\footnote{that is sets upon which \(G\) acts} for some group \(G\), which is \(\functorCategory{G}{\Set}\), where \(G\) is viewed as a one object category.
+    Similarly \(\functorCategory{G}{\Vect}\) is the category of \(\field\)-linear representations of \(G\).
+    In both of these cases morphisms are so called equivariant maps.
+    Given sets (vector spaces) \(X\) and \(Y\) upon which we have a \(G\) action (representation) defined an \defineindex{equivariant map} is a function (linear map) \(f \colon X \to Y\) such that \(f(g \mathbin{.} x) = g \mathbin{.} f(x)\), that is a map which commutes with the group action, so
+    \begin{equation}
+        \begin{tikzcd}
+            X \arrow[r, "f"] \arrow[d, "g \mathbin{.} {}"'] & Y \arrow[d, "g \mathbin{.} {}"]\\
+            X \arrow[r, "f"'] & Y
+        \end{tikzcd}
+    \end{equation}
+    commutes.
+    This diagram is exactly what we get if we specialise the diagram defining a natural transformation to functors \(G \to \Set\) (\(G \to \Vect\)).
+    
+    \section{Products}
+    We want to generalise the Cartesian product of sets, which is defined as
+    \begin{equation}
+        A \times B \coloneqq \{(a, b) \mid a \in A \text{ and } b \in B\}.
+    \end{equation}
+    To do so we need to remove reference to elements, since this isn't a concept that we have in an arbitrary category.
+    Clearly this definition defines a new set, so we have a new object in \(\Set\).
+    In order to do away with reference to elements notice that we can define two functions \(p_A \colon A \times B \to A\) and \(p_B \colon A \times B \to B\) which project out the elements of a pair.
+    That is \(p_A(a, b) = a\) and \(p_B(a, b) = b\).
+    We can summarise this as
+    \begin{equation}
+        \begin{tikzcd}
+            A & A \times B \arrow[l, "p_A"'] \arrow[r, "p_B"] & B.
+        \end{tikzcd}
+    \end{equation}
+    
+    The key insight comes in requiring that \(A \times B\) is, in a sense, the most general\footnote{this concept, both for products and more general (co)limits, is explained well in \cite{milewski}, which is where I'm replicating this argument from.} set satisfying this property, since the Cartesian product doesn't add in any unnecessary restrictions.
+    Thus, if we have another set, \(X\), which is a candidate for defining the product then there must be morphisms \(f \colon X \to A\) and \(g \colon X \to B\) which are candidates for \(p_A\) and \(p_B\) respectively.
+    We can now make \enquote{most general} precise.
+    Given \(A \times B\) with \(X\), \(f\), and \(g\) we should be able to recreate \(f\) and \(g\) by first mapping to \(A \times B\) and then projecting out.
+    This map to \(A \times B\) is what we call the product of \(f\) and \(g\), written \(f \times g\), \((f, g)\), or \(\binom{f}{g}\).
+    We can summarise this definition by requiring that the following diagram commutes:
+    \begin{equation}
+        \begin{tikzcd}
+            & X \arrow[d, "f \times g"{pos=0.6}, dashed, "!"'{xshift=0.075cm}] \arrow[dl, "f"'] \arrow[dr, "g"] & \\
+            A & A \times B \arrow[l, "p_A"] \arrow[r, "p_B"'] & B.
+        \end{tikzcd}
+    \end{equation}
+    Here we use a dashed arrow to denote that this diagram is telling us that this arrow exists, and the \(!\) tells us that this arrow is unique.
+    
+    This is an example of a more general concept in category theory, called a \defineindex{limit}.
+    The general idea is that we can define some prototype, here \(A \times B\) with the maps \(p_A\) and \(p_B\).
+    Then we posit a candidate object which factors through the prototype, then we look for an object satisfying this property.
+    
+    Notice that we now have done away with all references to elements of \(A \times B\), so we can generalise this definition to arbitrary categories.
+    
+    \begin{dfn}{Product}{}
+        Let \(\cat{C}\) be a category with objects \(A\) and \(B\).
+        The product of \(A\) and \(B\), if it exists, is the object \(A \times B\) and the morphisms \(p_A \colon A \times B \to A\) and \(p_B \colon A \times B \to B\) such that
+        \begin{equation}
+            \begin{tikzcd}
+                & X \arrow[d, "f \times g"{pos=0.6}, dashed, "!"'{xshift=0.075cm}] \arrow[dl, "f"'] \arrow[dr, "g"] & \\
+                A & A \times B \arrow[l, "p_A"] \arrow[r, "p_B"'] & B
+            \end{tikzcd}
+        \end{equation}
+        commutes for all \(X\) with morphisms to \(f \colon X \to A\) and \(g \colon X \to B\).
+    \end{dfn}
+    
+    \begin{exm}{Products}{}
+        \begin{itemize}
+            \item In \(\Top\) the product of two topological spaces is the topological space formed from the Cartesian product of the two topological spaces equipped with the product topology, which is the coarsest topology for which all projections are continuous.
+            \item In \(\RMod\) the product is the Cartesian product of the modules with addition defined componentwise and multiplication defined to be distributive.
+            \item In \(\Grp\) the product is the direct product of groups, that is the Cartesian product of the underlying sets and then componentwise multiplication.
+            \item In \(\Rel\) products are disjoint unions.
+            \item In a poset viewed as a single object category the product of two elements is the greatest lower bound.
+        \end{itemize}
+    \end{exm}
+    
+    \begin{dfn}{Product Category}{}
+        Let \(\cat{C}\) and \(\cat{D}\) be categories.
+        The \defineindex{product category} \(\cat{C} \times \cat{D}\) has
+        \begin{itemize}
+            \item as objects pairs of objects \((A, B)\) with \(A \in \Ob(\cat{C})\) and \(B \in \Ob(\cat{D})\);
+            \item as morphisms \((A_1, B_1) \to (A_2, B_2)\) pairs of morphisms \((f, g)\) with \(f \colon A_1 \to A_2\) and \(g \colon B_1 \to B_2\) that is, \(f \in \cat{C}(A_1, A_2)\) and \(g \in \cat{D}(B_1, B_2)\);
+            \item as composition componentwise composition from the two categories, that is \((f_2, g_2) \circ (f_1, g_1) = (f_2 \circ f_1, g_2 \circ g_1)\);
+            \item as identities pairs of identities from the two categories, that is \(\id_{(A, B)} = (\id_A, \id_B)\).
+        \end{itemize}
+    \end{dfn}
+    
+    For the case where \(\cat{C}\) and \(\cat{D}\) are small the product category \(\cat{C} \times \cat{D}\) is exactly the categorical product of \(\cat{C}\) and \(\cat{D}\) in \(\Cat\).
+    
+    The main use of product categories is to define bifunctors, which are the generalisation of functors to two variables.
+    A \defineindex{bifunctor} is exactly a functor \(\cat{C} \times \cat{D} \to \cat{E}\), but it's usually easier to think of \(\cat{C}\) and \(\cat{D}\) as being separate, just like how we might treat the horizontal and vertical axes as being independent in a function \(\reals^2 \to \reals\).
+    
+    \chapter{Monoidal Categories}
+    \section{Tensor Products}
+    \begin{dfn}{Bilinear}{}
+        Let \(U\), \(V\) and \(W\) be vector spaces over \(\field\).
+        A \defineindex{bilinear map} is a function \(T \colon U \times V \to W\) which is linear in each variable.
+        That is, the maps \(T(-, v) \colon U \to W\) defined by \(u \mapsto T(u, v)\) and \(T(u, -) \colon V \to W\) defined by \(v \mapsto T(u, v)\) are linear.
+    \end{dfn}
+    
+    The tensor product provides a way to combine two vector spaces into a new vector space.
+    The simplest definition is that given vector spaces \(U\) and \(V\) over some field \(\field\) the tensor product \(U \otimes V\) consists of all linear combinations of elements of the form \(u \otimes v\) with \(u \in U\) and \(v \in V\).
+    This definition makes direct reference to elements of the vector spaces, so isn't compatible with the spirit of category theory.
+    The useful thing about the tensor product is it combines two vector spaces into one in such a way that we can define linear maps on the new space in terms of linear maps on the original spaces.
+    For example, the linear map sending \(u \in U\) to \(2u\) automatically extends to a linear map on \(U \otimes V\) sending \(u \otimes v\) to \(2u \otimes v = (2u) \otimes v = 2(u \otimes v)\).
+    This inspires the following definition.
+    
+    \begin{dfn}{Tensor Product}{}
+        Let \(U\), \(V\), and \(W\) be vector spaces over \(\field\).
+        The \defineindex{tensor product} of \(U\) and \(V\) is a vector space, which we call \(U \otimes V\), equipped with a bilinear map \(f \colon U \times V \to U \otimes V\) such that for all bilinear maps \(g \colon U \times V \to W\) there exists a unique linear map \(h \colon U \otimes V \to W\) such that \(g = h \circ f\).
+        That is, such that
+        \begin{equation}
+            \begin{tikzcd}[column sep=large]
+                U \times V \arrow[r, "f \text{ (bilinear)}"] \arrow[dr, "g \text{ (bilinear)}"'] & U \otimes V \arrow[d, dashed, "h \text{ (linear)}"]\\
+                & W
+            \end{tikzcd}
+        \end{equation}
+        commutes.
+    \end{dfn}
+    
+    The important idea here is that a linear map \(U \otimes V \to W\) is just as good as a bilinear map \(U \times V \to W\), and since linear maps are much nicer to work with, and since \(U \times V\) is not a vector space, we usually prefer to work with \(U \otimes V\).
+    
+    Note that not all elements of \(U \otimes V\) are of the form \(u \otimes v\).
+    For example, there is no way to write \(\ve{1} \otimes \ve{1} + \ve{2} \otimes \ve{2} \in V \otimes V\) in this form.
+    This will be important later.
+    
+    The tensor product also gives us a natural way to combine two linear maps, we simply act on the relevant part of the tensor product with the relevant function.
+    
+    \begin{dfn}{Tensor Product of Linear Maps}{}
+        Let \(U\), \(U'\), \(V\) and \(V'\) be vector spaces over \(\field\).
+        Let \(f \colon U \to U'\) and \(g \colon V \to V'\).
+        Then the \define{tensor product}\index{tensor product!of linear maps} of \(f\) and \(g\) is defined to be the map \(f \otimes g \colon U \otimes V \to U' \otimes V'\) given by defining \((f \otimes g)(u \otimes v) = f(u) \otimes g(v)\) and extending this to all of \(U \otimes V\) through linearity.
+    \end{dfn}
+    
+    The tensor product of vector spaces can be extended to any inner product space in a straight forward manner, the inner product simply factorises.
+    
+    \begin{dfn}{Tensor Product of Inner Product Spaces}{}\index{tensor product!of Hilbert spaces}
+        Let \((U, \braket{-}{-}_U)\) and \((V, \braket{-}{-}_W)\) be inner product spaces (Hilbert spaces) over \(\field\).
+        Then \((U \otimes V, \braket{-}{-}_{U \otimes V})\) is an inner product space (Hilbert space) with the inner product
+        \begin{equation}
+            \braket{u \otimes v}{u' \otimes v'}_{U \otimes V} = \braket{u}{u'}_U \braket{v}{v'}_V.
+        \end{equation}
+    \end{dfn}
+    
+    \section{Monoidal Categories: The Idea}
+    Monoidal categories generalise the tensor product to other categories.
+    The idea being that tensor products allow us to work with multiple objects at the same time, or in parallel.
+    Recall that we've seen four ways to consider categories:
+    \begin{itemize}
+        \item physical systems and the processes occurring;
+        \item data types and the algorithms manipulating them;
+        \item algebraic structures and structure preserving functions;
+        \item logical propositions and implications between them.
+    \end{itemize}
+    We can consider the idea of a monoidal category in each of these frameworks:
+    \begin{itemize}
+        \item independent systems evolving separately;
+        \item running algorithms in parallel;
+        \item products or sums of geometric structures;
+        \item using separate proofs of \(P\) and \(Q\) to prove \(P \land Q\).
+    \end{itemize}
+    
+    \section{Monoidal Categories: The Need for Specificity}
+    \label{sec:monoidal categories: the need for specificity}
+    Consider processes \(A\), \(B\), and \(C\) with some notion of parallel composition, \(\otimes\).
+    So, \(A \otimes B\) is what we get by doing both processes \(A\) and \(B\) at the same time.
+    After playing around with this idea for a while one may come upon the question of what the relationship between
+    \begin{equation}
+        (A \otimes B) \otimes C \qqand A \otimes (B \otimes C)
+    \end{equation}
+    should be.
+    It's not right for them to be equal, since this isn't the case for vector spaces with the tensor product or for sets with the Cartesian product, which is the equivalent in \(\Set\) as we'll see later.
+    
+    For example, viewed as sets we have \(((a, b), c)\) as an element of \((A \times B) \times C\), but \((a, (b, c))\) as an element of \(A \times (B \times C)\).
+    Clearly there is a map \((A \times B) \times C \to A \times (B \times C)\) given by \(((a, b), c) \mapsto (a, (b, c))\).
+    We say that this map associates these distinct objects.
+    This map is also clearly invertible, the inverse being \((a, (b, c)) \mapsto ((a, b), c)\).
+    So, we have \((A \times B) \times C \isomorphic A \times (B \times C)\).
+    
+    More questions arise when we think about what the processes \(A\), \(B\), and \(C\) are.
+    For example there is often a concept of a trivial system where we don't do anything.
+    We want it to be such that running this trivial system in parallel with another system is as if we weren't doing the trivial thing at all.
+    However this is clearly not the case in, for example, a computer running a trivial algorithm, it still has to compile and run this trivial algorithm.
+    So again we want the computation of \(A\) and the trivial system in parallel to be isomorphic to the computation of \(A\) alone.
+    
+    Another question, which we won't see an answer too until later, is does order matter?
+    That is, should we treat \(A \otimes B\) and \(B \otimes A\) as the equal?
+    What about isomorphic?
+    It is also possible that they aren't even isomorphic, although in many of the cases we're interested in they will be.
+    
+    To answer these questions we have to be careful when defining a monoidal category, the task of the next section.
+    
+    \section{Monoidal Categories: The Definition}
+    \begin{dfn}{Monoidal Category}{}
+        A \defineindex{monoidal category} is formed from the following data:
+        \begin{enumerate}
+            \item a category, \(\cat{C}\);
+            \item a \defineindex{tensor product functor}\index{tensor product}
+            \begin{equation}
+                {-} \otimes {-} \colon \cat{C} \times \cat{C} \to \cat{C},
+            \end{equation}
+            also called the \defineindex{monoidal product};
+            \item a \defineindex{unit object} \(I \in \Ob(\cat{C})\);
+            \item a natural isomorphism
+            \begin{equation}
+                \alpha \colon ({-} \otimes {-}) \otimes {-} \naturalTransformation {-} \otimes ({-} \otimes {-})
+            \end{equation}
+            called the \defineindex{associator} which has components
+            \begin{equation}
+                \alpha_{A,B,C} \colon (A \otimes B) \otimes C \to A \otimes (B \otimes C)
+            \end{equation}
+            for \(A, B, C \in \Ob(\cat{C})\);
+            \item a natural isomorphism
+            \begin{equation}
+                \lambda \colon I \otimes {-} \naturalTransformation -
+            \end{equation}
+            called the \defineindex{left unitor}\index{unitor} which has components
+            \begin{equation}
+                \lambda_A \colon I \otimes A \to A
+            \end{equation}
+            for \(A \in \Ob(\cat{C})\);
+            \item a natural isomorphism
+            \begin{equation}
+                \rho \colon {-} \otimes I \naturalTransformation -
+            \end{equation}
+            called the \defineindex{right unitor} which has components
+            \begin{equation}
+                \rho_A \colon A \otimes A \to A
+            \end{equation}
+            for \(A \in \Ob(\cat{C})\).
+        \end{enumerate}
+        This data must be such that the \defineindex{triangle equation} holds, which is that 
+        \begin{equation}
+            \begin{tikzcd}
+                (A \otimes I) \otimes B \arrow[rr, "\alpha_{A, I, B}"] \arrow[dr, "\rho_A \otimes \id_B"'] && A \otimes (I \otimes B) \arrow[dl, "\id_A \otimes \lambda_B"]\\
+                & A \otimes B &
+            \end{tikzcd}
+        \end{equation}
+        commutes for all \(A, B \in \Ob(\cat{C})\), and the \defineindex{pentagon equation} holds, which is that
+        \begin{equation}
+            \begin{tikzcd}[column sep=-1cm]
+                & (A \otimes (B \otimes C)) \otimes D \arrow[rr, "\alpha_{A, B \otimes C, D}"] && A \otimes ((B \otimes C) \otimes D) \arrow[dr, "\id_A \otimes \alpha_{B,C,D}", pos=0.6] & \\
+                ((A \otimes B) \otimes C) \otimes D \arrow[ur, "\alpha_{A,B,C} \otimes \id_D", pos=0.4] \arrow[drr, "\alpha_{A\otimes B,C,D}"'] &&&& A \otimes (B \otimes (C \otimes D)) \\
+                && (A \otimes B) \otimes (C \otimes D) \arrow[urr, "\alpha_{A,B,C\otimes D}"'] && 
+            \end{tikzcd}
+        \end{equation}
+        commutes for all \(A, B, C, D \in \Ob(\cat{C})\).
+    \end{dfn}
+    
+    This is quite a large definition so we'll break it down and hopefully this will make it less daunting.
+    First lets look at what the data of a monoidal category tells us:
+    \begin{enumerate}
+        \item the category tells us the type of objects and morphisms we are considering;
+        \item the tensor product functor tells us how to combine two objects to get a new object, and two morphisms to get a new morphism;
+        \item the unit object represents a trivial process in which nothing happens;
+        \item the associator allows us to move brackets around and only change things by an isomorphism, which means no important change occurs;
+        \item the unitors allow us to remove the unit object when it is involved in a product, again only changing things by an isomorphism.
+    \end{enumerate}
+
+    Now lets look at the triangle equation.
+    It tells us how the unitors and associator combine.
+    Starting at the top left, with \((A \otimes I) \otimes B\) there are two ways to get to \(A \otimes B\).
+    We can either remove \(I\) by applying \(\rho_A\) to the \(A \otimes I\) bit, which means applying \(\rho_A \otimes \id_B\) to \((A \otimes I) \otimes B\), or we can reassociate, by applying \(\alpha_{A,I,B}\) to get \(A \otimes (I \otimes B)\) then remove the unit by applying \(\lambda_B\) to the \(I \otimes B\) bit, which means applying \(\id_A \otimes \lambda_B\) to \(A \otimes (I \otimes B)\).
+    The triangle equality says that both of these are actually the same, that is
+    \begin{equation}
+        \rho_A \otimes \id_B = (\id_A \otimes \lambda_A) \circ \alpha_{A,I,B}.
+    \end{equation}
+
+    Finally, lets look at the pentagon equation.
+    This tells us how the associator can be applied to reassociate products of four objects, and it turns out that this is enough to completely specify how the associator reassociates products of any number of elements.
+    Starting on the left we have the completely left associated \(((A \otimes B) \otimes C) \otimes D\).
+    One path we can take to reassociate is to ignore \(D\) and reassociate \((A \otimes B) \otimes C\) to \((A \otimes (B \otimes C))\), this is done using \(\alpha_{A, B, C} \otimes \id_D\).
+    Next we can ignore the fact that \(B \otimes C\) is the product of two objects and think of it as a single object, \(X\), so we have \((A \otimes X) \otimes D\), which we can reassociate using \(\alpha_{A, X, D} = \alpha_{A, B \otimes C, D}\) to get \(A \otimes ((B \otimes C) \otimes D)\).
+    Finally we can ignore \(A\) and reassociate \((B \otimes C) \otimes D\) using \(\id_A \otimes \alpha_{B, C, D}\) to get \(A \otimes (B \otimes (C \otimes D))\).
+    Alternatively, if we start with \(((A \otimes B) \otimes C) \otimes D\) we can treat \(A \otimes B\) as a single object, \(Y\), and reassociate \((Y \otimes C) \otimes D\) with \(\alpha_{Y, C, D} = \alpha_{A \otimes B, C, D}\) to get \((A \otimes B) \otimes (C \otimes D)\).
+    Then we treat \(C \otimes D\) as a single object, \(Z\), and reassociate \((A \otimes B) \otimes Z\) using \(\alpha_{A, B, Z} = \alpha_{A, B, C \otimes D}\) to get \(A \otimes (B \otimes (C \otimes D))\).
+    The pentagon equation tells us that both of these ways of reassociating from left to right give are the same, that is
+    \begin{equation}
+        (\id_A \otimes \, \alpha_{B, C, D}) \circ (\alpha_{A, B \otimes C, D}) \circ (\alpha_{A, B, C} \otimes \id_D) = \alpha_{A, B, C\otimes D} \circ \alpha_{A\otimes B, C, D}.
+    \end{equation}
+    
+    To summarise, the triangle equation says that all ways of removing \(I\) from \((A \otimes I) \otimes B\) to get \(A \otimes B\) are the same, and the pentagon equation says that all ways of reassociating \(((A \otimes B) \otimes C) \otimes D\) to get \(A \otimes (B \otimes (C \otimes D))\) are the same.
+    
+    While these requirements seem quite complex they are incredibly powerful, and fairly easy to work with in practice, because they are so restrictive.
+    It turns out that the monoidal product works exactly how our intuition says it does, and this is the crux of the next theorem, which we shan't prove.
+    
+    \begin{thm}{Coherence Theorem for Monoidal Categories}{}
+        In a monoidal category and well-typed equation built from associators, unitors, and their inverses holds.
+    \end{thm}
+    
+    By well-typed we simply mean that both sides of the equation must be morphisms with matching domain and codomain, and that any compositions are defined, so morphisms in the composition match domain to codomain.
+    This means that we don't have to actually use the triangle and pentagon equations directly, as long as they hold we can write down pretty much anything we like as long as it makes sense and it will be true.
+    
+    \section{Monoidal Categories: The Examples}
+    \subsection{\(\Set\)}
+    The obvious choice for a monoidal product on \(\Set\) is the Cartesian product.
+    We then need to look for a unit, something which we can take a Cartesian product with but not really change anything.
+    One way we might come to an answer is to recognise that the unit behaves just like 1 in a product, hang on, 1 is something that we can represent as a set, a singleton, and there's our answer.
+    Given some set \(A\) and some singleton\footnote{Since an isomorphism in \(\Set\) is a bijection all sets of the same size are isomorphic, so all singletons are the same for the purpose of category theory.} \(\{\bullet\}\) the Cartesian product \(A \times \{\bullet\}\) consists of elements \((a, \bullet)\) with \(a \in A\), and \(\{\bullet\} \times A\) consists of elements \((\bullet, a)\).
+    From both of these we can easily recover \(A\) by just ignoring the \(\bullet\).
+    This gives us our unitors.
+    We've already seen in \cref{sec:monoidal categories: the need for specificity} how \(((a, b), c)) \mapsto (a, (b, c))\) defines the associator for the Cartesian product.
+    Thus we can make the following definition.
+    
+    \begin{dfn}{Set as a Monoidal Category}{}
+        The category \(\Set\) can be promoted to a monoidal category by defining
+        \begin{enumerate}
+            \item the monoidal product to be the Cartesian product;
+            \item the unit to be some singleton, \(I = \{\bullet\}\);
+            \item the associator to have components \(\alpha_{A, B, C} \colon (A \times B) \times C \to A \times (B \times C)\) defined by \(((a, b), c) \mapsto (a, (b, c))\);
+            \item the left unitor at \(A\) to be the function \(\lambda_A \colon \{\bullet\} \times A \to A\) defined by \((\bullet, a) \mapsto a\);
+            \item the right unitor at \(A\) to be the function \(\rho_A \colon A \times \{\bullet\} \to A\) defined by \((a, \bullet) \mapsto a\).
+        \end{enumerate}
+    \end{dfn}
+    
+    \begin{wrn}
+        This is not the only way we can make \(\Set\) into a monoidal category, but it is the only one that we'll use and it is usually what people are talking about when they say \(\Set\) is a monoidal category.
+        Another ways of making \(\Set\) into a monoidal category involve taking \(A \otimes B = A \sqcup B\) to be the disjoint union with \(I = \emptyset\).
+        Yet another choice is \(A \otimes B = A \sqcup B \sqcup (A \times B)\) with \(I = \emptyset\).
+    \end{wrn}
+    
+    This common definition of \(\Set\) as a monoidal category is an example of a more general idea.
+    In some category \(\cat{C}\) a \defineindex{terminal object}, \(T \in \Ob(\cat{C})\), is an object such that for any object \(A \in \Ob(\cat{C})\) there exists exactly one morphism \(A \to T\).
+    Similarly a \defineindex{initial object}, \(I \in \Ob(\cat{C})\), is an object such that for any object \(A \in \Ob(\cat{C})\) there exists exactly one morphism \(I \to A\).
+    Any category, \(\cat{C}\), with terminal objects and products can be made into a monoidal category by taking the monoidal product to be the categorical product and the unit to be the terminal object.
+    Similarly and category with initial objects and coproducts\footnote{A \defineindex{coproduct} is defined similarly to a categorical product, but with the arrows reversed.} can be made into a monoidal category by taking the tensor product to be the coproduct and the unit to be the initial object.
+    An example of a coproduct/initial object monoidal category is \(\Set\) with disjoint union as a monoidal product.
+    
+    \begin{lma}{}{}
+        \(\Set\) equipped with the Cartesian product is a monoidal category.
+        
+        \begin{proof}
+            We first demonstrate that the triangle equation holds.
+            To do so we modify the diagram defining the triangle equation to show the elements being mapped, instead of the objects, and commutativity should be clear from this
+            \begin{equation}
+                \begin{tikzcd}[column sep=-0.5cm]
+                    ((a, \bullet), b) \arrow[rr, "\alpha_{A,I,B}", mapsto] \arrow[dr, "\rho_A \times \id_B"', end anchor={[xshift=-1cm]}, pos=0.4, mapsto] && (a, (\bullet, b) \arrow[dl, "\id_A \times \lambda_B", end anchor={[xshift=1cm]}, pos=0.4, mapsto]\\
+                    & (\rho_A(a, \bullet), \id_B(b)) = (a, b) = (\id_A(a), \lambda_B(\bullet, b)). &
+                \end{tikzcd}
+            \end{equation}
+            Similarly, we can demonstrate the commutativity of the pentagon:
+            \begin{equation}
+                \begin{tikzcd}[row sep=large]
+                    \parbox{4cm}{\centering\((\alpha_{A,B,C}((a, b), c), \id_D(D))\) \(=((a, (b, c)), d)\)} \arrow[r, mapsto, "\alpha_{A, B\times C, D}"] & \parbox{3.5cm}{\centering\(\alpha_{A, B \times C, D}((a, (b, c)), d)\) \(=(a, ((b, c), d))\)} \arrow[dd, "\id_A \times \alpha_{B,C,D}", mapsto] \\
+                    (((a, b), c), d) \arrow[u, "\alpha_{A,B,C} \times \id_D", mapsto] \arrow[d, "\alpha_{A\times B,C,D}"', mapsto]\\
+                    \parbox{4cm}{\centering\(\alpha_{A\times B,C,D}(((a, b), c), d)\) \(=((a, b), (c, d))\)} \arrow[r, "\alpha_{A,B,C\times D}"', end anchor={[yshift=-2ex, xshift=1.2em]}, start anchor={[xshift=-1em]}, mapsto, pos=0.8] & \parbox{4cm}{\centering\((\id_A(a), \alpha_{B,C,D}((b, c), d))\) \(= (a, (b, (c, d))) =\) \(\alpha_{A,B,C\times D}((a, b), (c, d))\).}
+                \end{tikzcd}
+            \end{equation}
+        \end{proof}
+    \end{lma}
     
     %   Appdendix
     \appendixpage
@@ -2046,6 +2770,29 @@ noabbrev
         For magmas, semigroups, and monoids if \(x \cdot y = y \cdot x\) we say it is a \define{commutative} \define{magma}\index{magma!commutative}/\define{semigroup}\index{semigroup!commutative}/\define{monoid}\index{monoid!commutative}.
         For groups we call a commutative group an \defineindex{Abelian group}\index{group!Abelian}\index{group!commutative|see{Abelian group}}.
         
+        \begin{dfn}{Group Action}{}
+            Let \(G\) be a group and \(S\) a set.
+            Then a \define{left group action}\index{group action} is a map \(\varphi \colon G \times S \to S\) such that
+            \begin{itemize}
+                \item the identity acts as the identity: \(\varphi(e, s) = s\);
+                \item group multiplication is preserved: \(\varphi(g, \varphi(h, s)) = \varphi(gh, s)\).
+            \end{itemize}
+        \end{dfn}
+        
+        Often we write \(g \mathbin{.} s\) or \(gs\) in place of \(\varphi(g, s)\), in which case the axioms are \(es = s\) and \(g(hs) = (gh)s\), which look very similar to the group identity and associativity laws.
+        Note that a right action is a map \(\psi \colon S \times G \to S\) such that \(\psi(s, e) = s\) and \(\psi(\psi(s, g), h) = \psi(s, gh)\), or \(se = s\) and \((sg)h = s(gh)\).
+        
+        \begin{dfn}{Group Representation}{}
+            A \defineindex{representation} of a group \(G\) is a pair \((\rho, V)\) consisting of a vector space \(V\) and a group action \(\rho \colon G \times V \to V\).
+            Alternatively, \(\rho \colon V \to \generalLinear(V)\) is a homomorphism and \(G\) acts on \(V\) through \(g\mathbin{.}v = \rho(g)v\).
+        \end{dfn}
+        Note that
+        \begin{multline}
+            \generalLinear(V) \coloneqq \{\text{invertible linear maps on } V\}\\
+            \isomorphic \{n \times n \text{ matrices with entries in } \field\} \eqqcolon \generalLinear(n, \field)
+        \end{multline}
+        where \(n = \dim V\) and \(V\) is a vector space over \(\field\).
+        
         \subsection{Two Binary Operations}
         \begin{dfn}{Ring}{}
             A \defineindex{ring}, \((R, +, -, \cdot, 1, 0)\) is a set, \(R\), equipped with two binary operations, \(+ \colon R \times R \to R\) and \(\cdot \colon R \times R \to R\) such that
@@ -2084,6 +2831,26 @@ noabbrev
             A commutative division ring is a \defineindex{field}.
         \end{dfn}
         
+        \section{Orderings}
+        \begin{dfn}{Partial Order}{}
+            A (non-strict) \defineindex{partially ordered set}, or \defineindex{poset}, \((P, \le)\), is a set, \(P\), equipped with a (non-strict) \defineindex{partial order}, which is a reflexive, antisymmetric, transitive relation.
+            That is,
+            \begin{itemize}
+                \item \define{reflexivity}\index{reflexive}: for all \(a \in P\) we have \(a \le a\);
+                \item \defineindex{antisymmetric}: for \(a, b \in P\) if \(a \le b\) and \(b \le a\) then \(a = b\);
+                \item \define{transitivity}\index{transitive}: for \(a, b, c \in P\) if \(a \le b\) and \(b \le c\) then \(a \le c\).
+            \end{itemize}
+        \end{dfn}
+        
+        \begin{dfn}{Total Order}{}
+            A (non-strict) \defineindex{totally ordered set}, \((X, \le)\), is a poset with the added condition of totality, that is for all \(a, b \in X\) we have either \(a \le b\) or \(b \le a\) (or both, in which case \(a = b\) by antisymmetry).
+        \end{dfn}
+        
+        \begin{dfn}{Monotone Function}{}
+            Let \((P, \le_P)\) and \((Q, \le_Q)\) be partially ordered sets.
+            A \defineindex{monotone function}, or \defineindex{order-preserving function} \((P, \le_P) \to (Q, \le_Q)\), is a function \(f \colon P \to Q\) such that if \(a \le_P b\) for \(a, b \in P\) then \(f(a) \le_Q f(b)\).
+        \end{dfn}
+        
         \section{Topological Spaces}
         \begin{dfn}{Topological Space}{}
             A \defineindex{topological space}, \((X, \topology)\) is a set, \(X\), equipped with a \defineindex{topology}, \(\topology\), which is a subset of \(\powerset(X)\) such that
@@ -2106,6 +2873,7 @@ noabbrev
     \end{appendices}
     
     \backmatter
+    \printbibliography
     %    \renewcommand{\glossaryname}{Acronyms}
     %    \printglossary[acronym]
     \printindex
