@@ -6,6 +6,12 @@
 %% Packages
 \usepackage{xfrac}
 \usepackage{csquotes}
+\usepackage{multienum}
+\newenvironment{multiitem}{%
+    \multienumerate\renewcommand{\labelname}{\textbullet}%
+}{%
+    \endmultienumerate%
+}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -17,7 +23,7 @@
 \undef{\eth}
 \undef{\digamma}
 \undef{\backepsilon}
-\usetikzlibrary{zx-calculus}
+\usetikzlibrary{positioning, decorations.pathreplacing, calligraphy, calc, shapes.geometric}
 \usepackage{tikz-cd}
 
 \BeforeBeginEnvironment{tikzcd}{\tikzexternaldisable}
@@ -30,6 +36,9 @@
 % Graphical calculus
 \tikzset{wire/.style={thick}}
 \tikzset{morphism/.style={thick, draw, inner sep=2pt}}
+\tikzset{triangle/.style={regular polygon, regular polygon sides=3}}
+\tikzset{state/.style={morphism, triangle, shape border rotate=180}}
+\tikzset{effect/.style={morphism, triangle}}
 
 \RequirePackage[%
 sorting=none,  % Don't sort the references, they will appear in the order they are first cited
@@ -112,6 +121,7 @@ noabbrev
 \newcommand{\Pos}{\category{Pos}}
 \newcommand{\LieGrp}{\category{LieGrp}}
 \newcommand{\LieAlg}{\category{LieAlg}}
+\newcommand{\one}{\category{1}}
 \DeclareMathOperator{\Ob}{Ob}
 \DeclareMathOperator{\id}{id}
 \newcommand{\isomorphic}{\cong}
@@ -124,8 +134,9 @@ noabbrev
 \newcommand{\hermit}{\dagger}
 \undef\det
 \DeclareMathOperator{\det}{det}
+\AtBeginDocument{\renewcommand{\mapstochar}{\rule[0.5pt]{0.5pt}{4.3pt}\mkern-1mu}}
 
-\includeonly{}
+\includeonly{parts/maths-defs}
 
 \begin{document}
     \frontmatter
@@ -659,7 +670,7 @@ noabbrev
         \end{tikzpicture}
         .
     \end{equation}
-    The final rule is rather simple, it's simply that we can ignore overall phases, called the \defineindex{scalar rule}, it corresponds to the following:
+    The final rule is rather simple, it's simply that we can ignore overall factors, called the \defineindex{scalar rule}, it corresponds to the following:
     \begin{equation}
         \tikzsetnextfilename{ZXcalculus-scalar-rule}
         \begin{tikzpicture}[baseline=(equals.base)]
@@ -1912,7 +1923,7 @@ noabbrev
     
     In terms of matrices representing linear maps the adjoint corresponds to the conjugate transpose matrix.
     
-    \begin{dfn}{Bras and Kets}{}
+    \begin{dfn}{Bras and Kets}{def:bras and kets}
         Let \(H\) be a Hilbert space.
         Given some \(v \in H\) its \defineindex{ket} is the map \(\ket{v} \colon \complex \to H\) defined by \(z \mapsto zv\) and its bra is the map \(\bra{v} \colon H \to \complex\) defined bg \(w \mapsto \braket{v}{w}\).
     \end{dfn}
@@ -2434,7 +2445,7 @@ noabbrev
     
     Notice that we now have done away with all references to elements of \(A \times B\), so we can generalise this definition to arbitrary categories.
     
-    \begin{dfn}{Product}{}
+    \begin{dfn}{Product}{def:product}
         Let \(\cat{C}\) be a category with objects \(A\) and \(B\).
         The product of \(A\) and \(B\), if it exists, is the object \(A \times B\) and the morphisms \(p_A \colon A \times B \to A\) and \(p_B \colon A \times B \to B\) such that
         \begin{equation}
@@ -2663,6 +2674,17 @@ noabbrev
     
     To summarise, the triangle equation says that all ways of removing \(I\) from \((A \otimes I) \otimes B\) to get \(A \otimes B\) are the same, and the pentagon equation says that all ways of reassociating \(((A \otimes B) \otimes C) \otimes D\) to get \(A \otimes (B \otimes (C \otimes D))\) are the same.
     
+    Another way of viewing the definition of a monoidal category is as the (vertical\footnote{cf.\@ horizontal categorification, or oidification, in which we realise a particular structure within a single object category and then generalise to multi-object categories, e.g.\@ a group is a one object category in which all morphisms are isomorphisms, and a groupoid is a category in which all morphisms are isomorphisms. Categories are already a generalisation of monoids in this sense.}) \defineindex{categorification} of a monoid.
+    By this we mean that we generalise a structure applied to sets, here a monoid, to a structure on categories.
+    Typically this is done by replacing elements with objects, functions with functors, and equality with isomorphism.
+    Compare the definitions of a monoid, \(M\), and a monoidal category, \(\cat{C}\):
+    \begin{multiitem}
+        \mitemxx{Elements, \(a, b, c \in M\)}{Objects, \(A, B, C \in \Ob(\cat{C})\)}
+        \mitemxx{A binary function \(\cdot \colon M \times M \to M\)}{A bifunctor \(\otimes\colon \cat{C} \times \cat{C} \to \cat{C}\)}
+        \mitemxx{\((a \cdot b) \cdot c = a \cdot (b \cdot c)\)}{\((A \otimes B) \otimes C \isomorphic A \otimes (B \otimes C)\)}
+        \mitemxx{Identity \(e \in M\) such that \(e \cdot a = a = a \cdot e\)}{Unit \(I \in \Ob(\cat{C})\) such that \(I \otimes A \isomorphic A \isomorphic A \otimes I\)}
+    \end{multiitem}
+    
     While these requirements seem quite complex they are incredibly powerful, and fairly easy to work with in practice, because they are so restrictive.
     It turns out that the monoidal product works exactly how our intuition says it does, and this is the crux of the next theorem, which we shan't prove.
     
@@ -2674,7 +2696,7 @@ noabbrev
     This means that we don't have to actually use the triangle and pentagon equations directly, as long as they hold we can write down pretty much anything we like as long as it makes sense and it will be true.
     
     \section{Monoidal Categories: The Examples}
-    \subsection{\(\Set\)}
+    \subsection{\texorpdfstring{\(\Set\)}{Set}}
     The obvious choice for a monoidal product on \(\Set\) is the Cartesian product.
     We then need to look for a unit, something which we can take a Cartesian product with but not really change anything.
     One way we might come to an answer is to recognise that the unit behaves just like 1 in a product, hang on, 1 is something that we can represent as a set, a singleton, and there's our answer.
@@ -2684,8 +2706,8 @@ noabbrev
     We've already seen in \cref{sec:monoidal categories: the need for specificity} how \(((a, b), c)) \mapsto (a, (b, c))\) defines the associator for the Cartesian product.
     Thus we can make the following definition.
     
-    \begin{dfn}{Set as a Monoidal Category}{}
-        The category \(\Set\) can be promoted to a monoidal category by defining
+    \begin{dfn}{\(\Set\) as a Monoidal Category}{}
+        The category \(\Set\)\index{Set@\(\Set\)!as a monoidal category} can be promoted to a monoidal category by defining
         \begin{enumerate}
             \item the monoidal product to be the Cartesian product;
             \item the unit to be some singleton, \(I = \{\bullet\}\);
@@ -2731,145 +2753,466 @@ noabbrev
         \end{proof}
     \end{lma}
     
+    \subsection{\texorpdfstring{\(\Rel\)}{Rel}}
+    Having had success with the Cartesian product as the monoidal product we'll try the same in \(\Rel\).
+    If \(R \subseteq A \times B\) and \(S \subset C \times D\) are relations then \(R \times S \subseteq (A \times B) \times (C \times D)\) is a relation on \(A \times B\) and \(C \times D\) such that \((a, c)(R \times S)(b, d)\) if and only if \(a R b\) and \(c S d\).
+    As before the singleton, \(\{\bullet\}\), acts as the unit, since as with \(\Set\) we can easily recover \(A\) from either \(\{\bullet\} \times A\) or \(A \times \{\bullet\}\).
+    The only difference is that in \(\Rel\) our morphisms are relations, so instead of a function \(\{\bullet\} \times A \to A\) giving us \(A\) back we instead define a relation on \((\{\bullet\} \times A) \times A\) where \((\bullet, a) \sim a\), we use \(\sim\) here since this is an isomorphism in \(\Rel\), it is not an equivalence relation, since the two sets on either side of the relation are different.
+    Similarly, the associators are given by changing the function in \(\Set\) into a relation.
+    
+    \begin{dfn}{\(\Rel\) as a Monoidal Category}{}
+        The category \(\Rel\)\index{Rel@\(\Rel\)!as a monoidal category} can be promoted to a monoidal category by defining
+        \begin{itemize}
+            \item the monoidal product to be the Cartesian product;
+            \item the unit to be some singleton, \(I = \{\bullet\}\);
+            \item the associator to have components given by the relation \(\sim \subseteq [(A \times B) \times C] \times [A \times (B \times C)]\) defined by \(((a, b), c) \sim (a, (b, c))\);
+            \item the left unitor to have components given by the relation \(\sim \subseteq [I \times A] \times A\) defined by \((\bullet, a) \sim a\);
+            \item the right unitor to have components given by the relation \(\sim \subseteq [A \times I] \times A\) defined by \((a, \bullet) \sim a\).
+        \end{itemize}
+    \end{dfn}
+    
+    The proof that this makes \(\Rel\) a monoidal category is almost identical to the proof for \(\Set\), just replacing functions and equality with relations, so we won't repeat it.
+    
+    This is one of the first examples where we see that \(\Rel\) differs from \(\Set\), despite both having the Cartesian product as the monoidal product.
+    The Cartesian product is \emph{not} a categorical product (in the sense of \cref{def:product}) in \(\Rel\), and \(\emptyset\) is the terminal object of \(\Rel\), not \(\{\bullet\}\).
+    We'll see shortly that \(\Hilb\) as a monoidal category is also formed using a non-categorical product, making \(\Rel\) more like \(\Hilb\) in this sense.
+    
+    \subsection{\texorpdfstring{\(\Hilb\)}{Hilb}}
+    It should not be surprising that \(\Vect\) and \(\Hilb\), and their finite-dimensional subcategories, can be made into monoidal categories, after all these were the models for the definition of monoidal categories we used at the start of the chapter.
+    We'll define \(\Hilb\) as a monoidal category of complex Hilbert spaces, but the definition is exactly the same for \(\Vect\)\index{Vect@\(\Vect\)!as a monoidal category} as a monoidal category, just replace \(\complex\) with \(\field\) and ignore inner products.
+    
+    \begin{dfn}{\(\Hilb\) as a Monoidal Category}{}
+        The category \(\Hilb\)\index{Hilb@\(\Hilb\)!as a monoidal category} can promoted to a monoidal category by defining
+        \begin{itemize}
+            \item the monoidal product to be the tensor product;
+            \item the unit to be the one-dimensional Hilbert space\footnote{\(\complex\) is a vector space over itself, and a Hilbert space over itself with the inner product \(\braket{z}{w} = z^* w\).} \(\complex\);
+            \item the associator to have components \(\alpha_{H,J,K} \colon (H \otimes J) \otimes K \to H \otimes (J \otimes K)\) defined on vectors of the form \((u \otimes v) \otimes w\) by \((u \otimes v) \otimes w \mapsto u \otimes (v \otimes w)\) and extended to all other vectors linearly;
+            \item the left unitor to have components \(\lambda_A \colon I \otimes A \to A\) defined on vectors of the form \(1 \otimes v\) by \(1 \otimes v \mapsto v\) and extended to all other vectors linearly;
+            \item the right unitor to have components \(\rho_A \colon A \otimes I \to A\) defined on vectors of the form \(v \otimes 1\) by \(v \otimes 1 \mapsto v\) and extended to all other vectors linearly.
+        \end{itemize}
+    \end{dfn}
+    
+    As with \(\Set\) there are other ways to make \(\Hilb\) into a monoidal category, but this is the one that is most useful and is what we will mean when we say \(\Hilb\) is a monoidal category.
+    
+    It's worth taking a minute to discus how the associator and unitors are defined.
+    Recall that vectors in \(H \otimes J\) are of the form \(\sum_i u_i \otimes v_i\) with \(u_i \in H\) and \(v_i \in J\).
+    We can define a linear map \(T \colon H \otimes J \to K\) by defining \(T(u \otimes v)\) for any \(u \in H\) and \(v \in J\), requiring that this map is linear then completely defines \(T\) since we must then have
+    \begin{equation}
+        T\left( \sum_i u_i \otimes v_i \right) = \sum_i T(u_i \otimes v_i).
+    \end{equation}
+    In the specific case of the associator we have that
+    \begin{equation}
+        (u_1 \otimes v_1) \otimes w_1 + (u_2 \otimes v_2) \otimes w_2 + \dotsb \xmapsto{\alpha_{H,J,K}} u_1 \otimes (v_1 \otimes w_1) + u_2 \otimes (v_2 \otimes w_2) + \dotsb,
+    \end{equation}
+    We further have that if \(T(u \otimes v)\) is defined for some specific \(u \in H\) and any \(v \in J\) then we can extend this linearly to be defined for any vector parallel to \(u\), which we might write as \(\lambda u\), by \(T(\lambda u \otimes v) = \lambda T(u \otimes v)\).
+    Using this the left unitor is given by
+    \begin{equation}
+        \lambda_A(z \otimes u) = \lambda_A(z1 \otimes u) = z\lambda_A(1 \otimes u) = zu
+    \end{equation}
+    where we first view \(z \in \complex\) as a vector, and then as a scalar scaling the unit vector \(1 \in \complex\).
+    The right unitor is defined analogously.
+    
+    \subsection{More Examples}
+    \begin{exm}{}{}
+        \begin{itemize}
+            \item The category of (small) categories, \(\Cat\), is a monoidal category when equipped with the product of categories as the monoidal product and \(\one\), the category with a single object and only its identity morphism, as the unit.
+            This is another example of a categorical product/terminal object monoidal category.
+            \item The tensor product generalises to \(\RMod\) and makes \(\RMod\) a monoidal category with the tensor product over \(R\), \(\otimes_R\), serving as the monoidal product and \(R\), viewed as a module over itself, serving as the unit.
+            This also extends to algebras over \(R\).
+            \item The category of Abelian groups with group homomorphisms, \(\Ab\), is a monoidal category equipped with the monoidal product \(\otimes_{\integers}\), which is the product of Abelian groups viewed as \(\integers\)-modules, where \(na\) for \(n \in \integers\) and \(a \in G\) is \(a + \dotsb + a\) if \(n > 0\), \(e\) if \(n = 0\), and \(-a - \dotsb - a\) if \(n < 0\), with \(G\) viewed as an additive group and where each sum here has \(n\) terms.
+            \item Any monoid can be viewed as a monoidal category by taking the set of objects to be the set of elements, the only morphisms to be identities, and the monoid product as the tensor product of objects.
+            \item The category, \(\functorCategory{\cat{C}}{\cat{C}}\) of endofunctors on some category, \(\cat{C}\), is a monoidal category with composition of functors as the monoidal product and the identity functor as the unit.
+            This example is important in defining monads.
+            \item The category of pointed topological spaces, \(\pointedTop\), is a monoidal category with the smash product as the monoidal product and the pointed 0-sphere (that is the two point space \((\{-1, 1\}, \{\emptyset, \{-1\}, \{1\}, \{-1, 1\}\})\) with one point chosen as the base point) serving as the unit.
+            The smash product, \(\wedge\), is defined between two pointed spaces, \((X, x_\bullet)\) and \((Y, y_\bullet)\), by forming \(X \times Y\) then identifying \((x, y_\bullet) \sim (x_\bullet, y)\) for all \(x \in X\) and \(y \in Y\), and then equipping the space \((X \times Y)/\sim\) with the quotient topology.
+            \item Given any category, \(\cat{C}\), we can define a free monoidal category in an analogous way to defining a free monoid, simply take the objects to be finite sequences, \(A_1 \otimes \dotsb \otimes A_n\), of objects in \(\cat{C}\), then we have a morphism \(A_1\otimes \dotsb \otimes A_n \to B_1 \otimes \dotsb \otimes B_m\) only if \(m = n\), in which case the morphism is a finite sequence of morphisms \(f_1 \otimes \dotsb \otimes f_n\), with \(f_i \colon A_i \to B_i\) a morphism in \(\cat{C}\).
+            The monoidal product is then the concatenation of these lists, giving \((A_1 \otimes \dotsb \otimes A_n) \otimes (B_1 \otimes \dotsb \otimes B_m) = A_1 \otimes \dotsb \otimes A_n \otimes B_1 \otimes \dotsb \otimes B_m\), where now \(m\) and \(n\) may differ.
+            The unit is the empty sequence of objects.
+        \end{itemize}
+    \end{exm}
+    
+    \section{Interchange Law}
+    The interchange law allows us to swap composition and the monoidal product, and is automatically satisfied by any monoidal category.
+    
+    \begin{thm}{Interchange Law}{}
+        Let \(\cat{C}\) be a monoidal category with monoidal product \(\otimes\).
+        Consider the following objects morphisms in \(\cat{C}\):
+        \begin{equation}
+            A \xrightarrow{f} B \xrightarrow{g} C, \qqand D \xrightarrow{h} E \xrightarrow{j} F.
+        \end{equation}
+        We have
+        \begin{equation}
+            (g \circ f) \otimes (j \circ h) = (g \otimes j) \circ (f \otimes h).
+        \end{equation}
+        \begin{proof}
+            For the proof we use the notation \(\otimes(-, -) = - \otimes -\) to emphasise the functoriality of \(\otimes\).
+            This allows us to write
+            \begin{equation}
+                (g \circ f) \otimes (j \circ h) = \otimes(g \circ f, j \circ h).
+            \end{equation}
+            Now consider \(\cat{C} \times \cat{C}\), the domain of \(\otimes\).
+            We can identify that \((g \circ f, j \circ h) = (g, j) \circ (f, h)\), where composition on the left is in \(\cat{C}\) and composition on the right is in \(\cat{C} \times \cat{C}\).
+            Thus in \(\cat{C} \times \cat{C}\) we have
+            \begin{equation}
+                (A, D) \xrightarrow{(f, h)} (B, E) \xrightarrow{(g, j)} (C, F)
+            \end{equation}
+            which we can write as
+            \begin{equation}
+                X \xrightarrow{p} Y \xrightarrow{q} Z.
+            \end{equation}
+            Then we have \(\otimes(q \circ p) = (\otimes(q)) \circ (\otimes(p))\) by the functoriality of \(\otimes\).
+            That is, we have \((\otimes(g, j)) \circ (\otimes(f, h))\), which we can then write as \((g \otimes j) \circ (f \otimes h)\).
+            Putting this together we have
+            \begin{alignat}{2}
+                (g \circ f) \otimes (j \circ h) &= \otimes(g \circ f, j \circ h)\\
+                &= \otimes((g, j) \circ (f, h)) \qquad && \text{composition in } \cat{C} \times \cat{C} \notag\\
+                &= (\otimes(g, j)) \circ (\otimes(f, h)) \qquad && \text{functoriality of } \otimes \notag\\
+                &= (g \otimes j) \circ (f \otimes h). \notag \qedhere
+            \end{alignat}
+        \end{proof}
+    \end{thm}
+    
+    \section{Graphical Notation}
+    We can extend the graphical notation for categories to monoidal categories.
+    To do so we make use of the idea that the monoidal product combines processes in parallel, and so we write the monoidal product by simply writing the two processes next to each other.
+    For example, if we have objects \(A\) and \(B\) then, representing objects as identity morphisms, we write
+    \begin{equation}
+        A \otimes B = 
+        \tikzsetnextfilename{mon-cat-graphical-mon-prod-of-objects}
+        \begin{tikzpicture}[baseline=(A.base)]
+            \draw[wire] (0, 0) -- (0, 1) node [left, midway] (A) {\(A\)};
+            \draw[wire] (1, 0) -- (1, 1) node [left, midway] {\(B\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    For morphisms \(f \colon A \to B\) and \(g \colon C \to D\) we draw \((f \otimes g) \colon A \otimes C \to B \otimes D\) as
+    \begin{equation}
+        f \otimes g = 
+        \tikzsetnextfilename{mon-cat-graphical-mon-prod-of-morphisms}
+        \begin{tikzpicture}[baseline=(f.base)]
+            \node[morphism] (f) {\(f\)};
+            \node[morphism, right= 0.5cm of f] (g) {\(\phantomrlap{g}{f}\)};
+            \draw[wire] (f) -- ++ (0, -1) node [midway, left] {\(A\)};
+            \draw[wire] (f) -- ++ (0, 1) node [midway, left] {\(B\)};
+            \draw[wire] (g) -- ++ (0, -1) node [midway, right] {\(C\)};
+            \draw[wire] (g) -- ++ (0, 1) node [midway, right] {\(D\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    The unit, \(I\), is drawn as the empty diagram:
+    \begin{equation}
+        I = 
+        \tikzsetnextfilename{mon-cat-graphical-unit}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \draw[wire] (0, 0) -- (0, 1) node [midway, left] (I) {\(I\)};
+            \node at (0.5, 0.5) (equals) {\(=\)};
+            \draw[dashed, thick] (1, 0) rectangle (2, 1);
+            \node at (2.5, 0.5) {\(=\)};
+            \node at (4, 0) {};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    This means we don't have to draw left or right unitors, since their action is to simply remove the unit, and we don't draw the unit any way.
+    Similarly, we don't have to draw the associator since we're not drawing any brackets anyway.
+    This only works because of the coherence theorem, which means that we can only build a single morphism of a given type, and so the unitors and associators don't give us any information that the domain and codomain don't.
+    
+    In the graphical notation the interchange law,
+    \begin{equation}
+        (g \circ f) \otimes (j \circ h) = (g \otimes j) \circ (f \otimes h),
+    \end{equation}
+    becomes
+    \begin{equation}
+        \tikzsetnextfilename{mon-cat-graphical-interchange-law}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \node[morphism] (f) {\(f\)};
+            \node[morphism, above=of f] (g) {\(\phantomrlap{g}{f}\)};
+            \node[morphism, right=1.25cm of f] (h) {\(\phantomrlap{h}{f}\)};
+            \node[morphism, above=of h] (j) {\(\phantomrlap{j}{f}\)};
+            \draw[wire] (f) -- ++ (0, -1) node [midway, left] {\(A\)};
+            \draw[wire] (f) -- (g) node [midway, left] {\(B\)};
+            \draw[wire] (g) -- ++ (0, 1) node [midway, left] {\(C\)};
+            \draw[wire] (h) -- ++ (0, -1) node [midway, right] {\(D\)};
+            \draw[wire] (h) -- (j) node [midway, right] {\(E\)};
+            \draw[wire] (j) -- ++ (0, 1) node [midway, right] {\(F\)};
+            \draw[thick, decoration={calligraphic brace}, decorate] (-0.5, -1) -- (-0.5, 2.5);
+            \draw[thick, decoration={calligraphic brace, mirror}, decorate] (0.5, -1) -- (0.5, 2.5);
+            \draw[thick, decoration={calligraphic brace}, decorate] (1.25, -1) -- (1.25, 2.5);
+            \draw[thick, decoration={calligraphic brace, mirror}, decorate] (2.25, -1) -- (2.25, 2.5);
+            \node (equals) at (2.75, 0.75) {\(=\)};
+            \begin{scope}[xshift=3.5cm]
+                \node[morphism] (f) {\(f\)};
+                \node[morphism, above=of f] (g) {\(\phantomrlap{g}{f}\)};
+                \node[morphism, right=of f] (h) {\(\phantomrlap{h}{f}\)};
+                \node[morphism, above=of h] (j) {\(\phantomrlap{j}{f}\)};
+                \draw[wire] (f) -- ++ (0, -1) node [midway, left] {\(A\)};
+                \draw[wire] (f) -- (g) node [midway, left] {\(B\)};
+                \draw[wire] (g) -- ++ (0, 1) node [midway, left] {\(C\)};
+                \draw[wire] (h) -- ++ (0, -1) node [midway, right] {\(D\)};
+                \draw[wire] (h) -- (j) node [midway, right] {\(E\)};
+                \draw[wire] (j) -- ++ (0, 1) node [midway, right] {\(F\)};
+                \draw[thick, decoration={calligraphic brace, mirror}, decorate] (-0.5, -0.3) -- (2.25, -0.3);
+                \draw[thick, decoration={calligraphic brace}, decorate] (-0.5, 0.3) -- (2.25, 0.3);
+                \draw[thick, decoration={calligraphic brace, mirror}, decorate] (-0.5, 1.2) -- (2.25, 1.2);
+                \draw[thick, decoration={calligraphic brace}, decorate] (-0.5, 1.8) -- (2.25, 1.8);
+            \end{scope}
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    In order to proceed with calculations we need to define what it means for two diagrams to be \enquote{the same}.
+    Exact equality is too strict, since it's impossible to actually draw two identical diagrams.
+    Besides, we want to be able to move bits of the diagrams around, such as sliding morphisms along the wires, or drawing the wires in different ways.
+    This leads to the following definition.
+    
+    \begin{dfn}{Planar Isotopy}{}
+        Two diagrams are \defineindex{planar isotopic} if one can be deformed continuously into the other such that
+        \begin{itemize}
+            \item the diagrams remain confined to a rectangular region of the plane;
+            \item input and output wires terminate at the bottom and top of this region, and the order they reach the edge cannot change;
+            \item components never intersect.
+        \end{itemize}
+    \end{dfn}
+    
+    This can be made more rigorous through the idea of an isotopy, which is a homotopy between the two diagrams such that at every point the diagrams remain embedded in the rectangular region of the plane in a non-intersecting way and the inputs and outputs are fixed.
+    
+    For example, consider the following diagrams involving the morphisms \(f \colon I \to A \otimes B\), \(g \colon B \otimes C \to I\), and \(h \colon I \to I\).
+    This example is a planar isotopy
+    \begin{equation}
+        \tikzsetnextfilename{mon-cat-graphical-planar-isotopy}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \node[morphism] at (-1, 1) {\(h\)};
+            \node[morphism, minimum width=1.5cm] (f) at (0, 0) {\(f\)};
+            \node[morphism, minimum width=1.5cm] (g) at (1, 1) {\(\phantomrlap{g}{f}\)};
+            \draw[wire] ($(f.north) + (0.5, 0)$) -- ($(g.south) + (-0.5, 0)$);
+            \draw[wire] ($(g.south) + (0.5, 0)$) -- ++ (0, -1.5);
+            \draw[wire] ($(f.north) + (-0.5, 0)$) -- ++ (0, 1.5);
+            \draw[lightgray] (-1.5, -0.75) rectangle (2, 1.75);
+            \node (equals) at (2.5, 0.5) {\(\stackrel{\mathrm{iso}}{=}\)};
+            \begin{scope}[xshift=4.1cm]
+                \node[morphism] at (1, 0.5) {\(h\)};
+                \node[morphism, minimum width=1.5cm] (f) at (0, 0) {\(f\)};
+                \node[morphism, minimum width=1.5cm] (g) at (1, 1) {\(\phantomrlap{g}{f}\)};
+                \draw[wire, rounded corners] ($(f.north) + (0.5, 0)$) -- ++ (0, 0.2) -- ++ (-0.3, 0.1) -- ++ (0.3, 0.1) -- ($(g.south) + (-0.5, 0)$);
+                \draw[wire, rounded corners] ($(g.south) + (0.5, 0)$) -- ++ (0, -0.3) -- ++ (-0.4, -0.4) -- ++ (0, -0.8);
+                \draw[wire, rounded corners] ($(f.north) + (-0.5, 0)$) -- ++ (0, 0.3) -- ++ (-0.4, 0.4) -- ++ (0, 0.4) -- ++ (0.2, 0.2) -- ++ (0, 0.2);
+                \draw[lightgray] (-1.1, -0.75) rectangle (2, 1.75);
+            \end{scope}
+        \end{tikzpicture}
+    \end{equation}
+    since all that happened is the wires were bent and the \(h\) box moved under the \(f\) box and between the two wires, all of which can happen without ever crossing any wires or morphism boxes (which we treat as point like for the purposes of isotopies).
+    Note that the light grey box represents the bounding region to which the diagram is confined.
+    
+    This example is \emph{not} a planar isotopy, since it is not possible to do this deformation without the \(h\) box either leaving the bounded region or crossing over one of the wires:
+    \begin{equation}
+        \tikzsetnextfilename{mon-cat-graphical-not-a-planar-isotopy}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \node[morphism] at (-1, 1) {\(h\)};
+            \node[morphism, minimum width=1.5cm] (f) at (0, 0) {\(f\)};
+            \node[morphism, minimum width=1.5cm] (g) at (1, 1) {\(\phantomrlap{g}{f}\)};
+            \draw[wire] ($(f.north) + (0.5, 0)$) -- ($(g.south) + (-0.5, 0)$);
+            \draw[wire] ($(g.south) + (0.5, 0)$) -- ++ (0, -1.5);
+            \draw[wire] ($(f.north) + (-0.5, 0)$) -- ++ (0, 1.5);
+            \draw[lightgray] (-1.5, -0.75) rectangle (2, 1.75);
+            \node (equals) at (2.5, 0.5) {\(\stackrel{\mathrm{iso}}{\ne}\)};
+            \begin{scope}[xshift=4cm]
+                \node[morphism] at (2.3, 0.25) {\(h\)};
+                \node[morphism, minimum width=1.5cm] (f) at (0, 0) {\(f\)};
+                \node[morphism, minimum width=1.5cm] (g) at (1, 1) {\(\phantomrlap{g}{f}\)};
+                \draw[wire] ($(f.north) + (0.5, 0)$) -- ($(g.south) + (-0.5, 0)$);
+                \draw[wire] ($(g.south) + (0.5, 0)$) -- ++ (0, -1.5);
+                \draw[wire] ($(f.north) + (-0.5, 0)$) -- ++ (0, 1.5);
+                \draw[lightgray] (-1, -0.75) rectangle (2.7, 1.75);
+            \end{scope}
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    \subsection{Correctness Theorem}
+    In order for the graphical notation to be useful we need the legal moves in the graphical notation, planar isotopies, to correspond to legal moves in monoidal categories, the axioms.
+    Fortunately this is the case, leading to the following theorem, which we won't prove.
+    
+    \begin{thm}{Correctness of the Graphical Notation for Monoidal Categories}{}
+        Any well-formed equation of the form \(f = g\) for morphisms \(f\) and \(g\) in a monoidal category follows from the axioms of monoidal categories if and only if it holds in the graphical notation up to planar isotopy.
+    \end{thm}
+    
+    Note that by \enquote{well-formed} we mean that \(f\) and \(g\) have the same (co)domains.
+    
+    There are two parts to this theorem, known as soundness and completeness.
+    For morphisms \(f\) and \(g\) in some monoidal category define
+    \begin{itemize}
+        \item \(P(f, g)\) to be the proposition \enquote{under the axioms of a monoidal category \(f = g\)};
+        \item \(Q(f, g)\) to be the proposition \enquote{\(f\) and \(g\) are planar isotopic when expressed in the graphical notation}.
+    \end{itemize}
+    Then \defineindex{soundness} is the assertion that \(P(f, g) \implies Q(f, g)\) for all such \(f\) and \(g\).
+    This is relatively easy to check, we simply check that every axiom of a monoidal category when translated into the graphical notation becomes a planar isotopy, and this is pretty trivial since most aspects of a monoidal category, units, unitors, and associators, simply aren't drawn in the graphical notation.
+    The converse is \defineindex{completeness} which is the assertion that \(Q(f, g) \implies P(f, g)\) for all such \(f\) and \(g\).
+    This is harder to prove, to do so we must show that any planar isotopy can be generated by a finite set of moves, each of which obeys the axioms of a monoidal category, and that combining these moves also obeys the axioms of a monoidal category.
+    
+    \section{States}
+    \subsection{States}
+    To follow the spirit of category theory we shouldn't talk about elements of sets, or particular vectors in some vector space.
+    However, often we will have reason to want to refer to these things.
+    Fortunately it is possible to do so using morphisms.
+    
+    Consider some set, \(A\), from which we want to pick an element, \(a\).
+    We can identify this selection of a single element with a function \(f\colon\{\bullet\} \to A\) such that \(f(\bullet) = a\).
+    Similarly, consider some vector space, \(V\), over \(\field\) from which we want to pick a vector, \(v\).
+    We can identify this selection of a single element with a linear map \(T \colon \field \to V\) such that \(T(1) = v\), and then \(T(k) = T(k1) = kT(v) = kv\) for all \(k \in \field\).
+    This way of getting around talking about the substructure of objects leads to the following definition.
+    
+    \begin{dfn}{State}{}
+        Consider a monoidal category with unit \(I\) and object \(A\).
+        A \defineindex{state} of \(A\) is a morphism \(I \to A\).
+    \end{dfn}
+    
+    So the function \(f\) and the linear map \(T\) are states of \(A\) and \(V\) respectively.
+    Another example is from \(\Rel\), where a state is a relation \(R \subseteq \{\bullet\} \times A\).
+    Since this will be of the form \(R = \{(\bullet, a), (\bullet, b), \dotsc\}\) for \(a, b, \dotsc, \in A\) we see that a state picks out a subset, \(\{a, b, \dotsc\} \subseteq A\).
+    
+    Now consider a Hilbert space, \(H\).
+    A state is a linear map \(\complex \to H\).
+    We can define a state, \(T_v \colon \complex \to H\) for each \(v \in H\) through \(T_v(1) = v\), and so \(T_v(z) = T_v(z1) = zT_v(1) = zv\), but this is exactly the definition of a ket (\cref{def:bras and kets}), \(T_v = \ket{v}\), so a state of a Hilbert space is exactly a ket.
+    This is, after all, why we chose the word state, since we ultimately want to consider states of some quantum system, which are usually considered to be kets in some Hilbert space.
+    
+    Graphically a state is a morphism \(I \to A\), so since we don't draw \(I\) it looks like the morphism takes no input.
+    For this reason we change the shape of the box to be a triangle.
+    For example, the state \(a \colon I \to A\) is represented as
+    \begin{equation}
+        a = 
+        \tikzsetnextfilename{mon-cat-graphical-state}
+        \begin{tikzpicture}[baseline=(a.base)]
+            \node[state] (a) {\(a\)};
+            \draw[wire] (a) -- ++ (0, 1) node [midway, left] {\(A\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    \subsection{Effects}
+    Often in category theory after making a definition we should ask what happens if we reverse the arrows in the definition.
+    In the case of states this leads to the following definition.
+    \begin{dfn}{Effect}{}
+        Consider a monoidal category with unit \(I\) and object \(A\).
+        An \defineindex{effect} on \(A\) is a morphism \(A \to I\).
+    \end{dfn}
+    
+    Consider a Hilbert space, \(H\).
+    Then an effect is a linear map \(H \to \complex\).
+    We can define one such map for each \(v \in H\), \(T_v \colon H \to \complex\) and \(T_v(w) = \braket{v}{w}\), but this is exactly the definition of the bra (\cref{def:bras and kets}), so \(T_v = \bra{v}\).
+    Thus we can interpret an effect as an observation of a quantum system.
+    
+    An effect is drawn similarly to a state, the effect \(a \colon  A \to I\) is drawn as
+    \begin{equation}
+        a = 
+        \tikzsetnextfilename{mon-cat-graphical-effect}
+        \begin{tikzpicture}[baseline=(a.base)]
+            \node[effect] (a) {\(a\)};
+            \draw[wire] (a) -- ++ (0, -1) node [midway, left] {\(A\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    \subsection{Joint States}
+    Next we have to ask how the notion of a state combines with the monoidal product.
+    This leads to the following definition.
+    
+    \begin{dfn}{Joint State}{}
+        Consider a monoidal category with unit \(I\) and objects \(A\) and \(B\).
+        A \defineindex{joint state} of \(A\) and \(B\) is a morphism \(I \to A \otimes B\).
+    \end{dfn}
+    
+    This definition generalises to any number of objects.
+    
+    We might draw a joint effect \(c \colon I \to A \times B\) as
+    \begin{equation}
+        c = 
+        \tikzsetnextfilename{mon-cat-graphical-joint-state}
+        \begin{tikzpicture}[baseline=(c.base)]
+            \node[state] (c) {\(c\)};
+            \draw[wire] ($(c.north) + (-0.25, 0)$) -- ++ (0, 0.75) node [midway, left] {\(A\)};
+            \draw[wire] ($(c.north) + (0.25, 0)$) -- ++ (0, 0.75) node [midway, right] {\(B\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    After playing around with this definition for a while one might recognise two types of joint effect, those which factor and those which don't.
+    
+    \begin{dfn}{Product and Entangled State}{}
+        Consider a monoidal category with unit \(I\) and objects \(A\) and \(B\).
+        A joint state, \(c \colon I \to A \otimes B\), is a \defineindex{product state} if it is of the form
+        \begin{equation}
+            I \xrightarrow{\lambda_I^{-1}} I \otimes I \xrightarrow{a \otimes b} A \otimes B.
+        \end{equation}
+        That is, we can write \(c = (a \otimes b) \circ \lambda_I^{-1}\) as a product of two states, \(a \colon I \to A\) and \(b \colon I \to B\).
+        
+        A joint state which cannot be written in this form is called an \defineindex{entangled state}.
+    \end{dfn}
+    
+    \begin{rmk}
+        Note that \(\lambda_I = \rho_I\) in any monoidal category, so we could equally well have defined a product state to be of the form
+        \begin{equation}
+            I \xrightarrow{\rho_I^{-1}} I \otimes I \xrightarrow{a \otimes b} A \otimes B
+        \end{equation}
+    \end{rmk}
+    
+    Graphically if \(c\) is a product state then
+    \begin{equation} 
+        \tikzsetnextfilename{mon-cat-graphical-product-state}
+        \begin{tikzpicture}[baseline=(c.base)]
+            \node[state] (c) {\(\phantomrlap{c}{b}\)};
+            \draw[wire] ($(c.north) + (-0.25, 0)$) -- ++ (0, 0.75) node [midway, left] {\(A\)} coordinate (top);
+            \draw[wire] ($(c.north) + (0.25, 0)$) -- ++ (0, 0.75) node [midway, right] {\(B\)};
+            \node[right=0.5cm of c] {\(=\)};
+            \node[state, right=1.5cm of c] (a) {\(\phantomrlap{a}{b}\)};
+            \node[state, right=0.5cm of a] (b) {\(b\)};
+            \draw[wire] (a) -- (a |- top) node [midway, left] {\(A\)};
+            \draw[wire] (b) -- (b |- top) node [midway, right] {\(B\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    \begin{exm}{}{}
+        In \(\Set\) states are elements, so
+        \begin{itemize}
+            \item joint states of \(A\) and \(B\) are elements of \(A \times B\);
+            \item product states are elements \((a, b) \in A \times B\);
+            \item entangled states don't exist.
+        \end{itemize}
+        In \(\Rel\) states are subsets, so
+        \begin{itemize}
+            \item joint states of \(A\) and \(B\) are subsets of \(A \times B\);
+            \item product states are \enquote{square} subsets of the form \(U \times V \subseteq A \times B\) where \(U \subseteq A\) and \(V \subseteq B\), for more details see \cref{fig:square subset};
+            \item entangled states are any subsets of \(A \times B\) not of this form.
+        \end{itemize}
+        In \(\Hilb\) states are vectors, so
+        \begin{itemize}
+            \item joint states of \(H\) and \(K\) are vectors in \(H \otimes K\);
+            \item product states are factorisable states, i.e.\@ states which can be written as \(u \otimes v\) for \(u \in H\) and \(v \in K\);
+            \item entangled states are states which aren't factorisable, which are exactly the entangled states of quantum mechanics, such as\footnote{here we identify a vector with its ket, and we write implicit tensor products, meaning \(\ket{ab} = \ket{a} \otimes \ket{b} \leftrightarrow a \otimes b\), the states \(\ket{0}\) and \(\ket{1}\) can be taken as two orthonormal basis vectors in \(\complex^2\).} \(\ket{01} + \ket{10}\).
+        \end{itemize}
+    \end{exm}
+    
+    \begin{figure}
+        \tikzsetnextfilename{mon-cat-square-subset-is-product-state-in-rel}
+        \begin{tikzpicture}
+            \fill[highlight!10] (0, 0) rectangle (4, 4);
+            \draw[->] (0, 0) -- (4, 0) node [below, highlight] {\(A\)};
+            \draw[->] (0, 0) -- (0, 4) node [left, highlight] {\(B\)};
+            \draw[ultra thick, highlight] (1, 0) -- (3, 0) node [below, midway] {\(U\)};
+            \draw[ultra thick, highlight] (0, 2) -- (0, 3) node [left, midway] {\(V\)};
+            \draw[thick, highlight, fill=highlight!40] (1, 2) rectangle (3, 3) node [midway] {\(U \times V\)};
+            \node[below left, highlight] at (4, 4) {\(A \times B\)};
+        \end{tikzpicture}
+        \caption{An example of a \enquote{square} subset of \(\reals \times \reals\), identified with the plane, given \(U, V \subseteq \reals\) we get a rectangle \(U \times V\) in the plane.}
+        \label{fig:square subset}
+    \end{figure}
+    
+    This demonstrates another way in which \(\Rel\) is more like \(\Hilb\) than \(\Set\), both \(\Rel\) and \(\Hilb\) have entangled states.
+    
     %   Appdendix
     \appendixpage
     \begin{appendices}
-        \chapter{Maths Definitions}
-        \label{chap:maths definitions}
-        \section{Algebraic Structures}
-        \subsection{One Binary Operation}
-        \begin{dfn}{Magma}{}
-            A \defineindex{magma}, \((M, \cdot)\), is a set, \(M\), equipped with a binary operation \(\cdot \colon M \times M \to M\).
-            
-            A \define{magma homomorphism}\index{magma!homomorphism}, \((M, \cdot_M) \to (N, \cdot_N)\), is a function \(f \colon M \to N\) such that \(f(m \cdot_M m') = f(m) \cdot_N f(m')\) for all \(m, m' \in M\).
-        \end{dfn}
-        
-        \begin{dfn}{Semigroup}{}
-            A \defineindex{semigroup}, \((S, \cdot)\), is an associative magma, meaning that
-            \begin{equation}
-                a \cdot (b \cdot c) = (a \cdot b) \cdot c
-            \end{equation}
-            for all \(a, b, c \in S\).
-            
-            A \define{semigroup homomorphism}\index{semigroup!homomorphism} is a magma homomorphism between semigroups.
-        \end{dfn}
-        
-        \begin{dfn}{Monoid}{}
-            A \defineindex{monoid}, \((M, \cdot, e)\), is a semigroup with an identity element, \(e \in M\), such that \(e \cdot m = m \cdot e = m\) for all \(m \in M\).
-            
-            A \define{monoid homomorphism}\index{monoid!homomorphism}, \((M, \cdot_M, e_M) \to (N, \cdot_N, e_N)\), is a function \(f \colon M \to N\) such that \(f(m \cdot_M m') = f(m) \cdot_N f(m')\) for all \(m, m' \in M\) and \(f(e_M) = e_N\).
-        \end{dfn}
-        
-        \begin{dfn}{Group}{}
-            A \defineindex{group}, \((G, \cdot, e, {-}^{-1})\), is a monoid with inverses, meaning for each \(g \in G\) there exists \(g^{-1} \in G\) such that \(g \cdot g^{-1} = g^{-1}\cdot g = e\).
-            
-            A \define{group homomorphism}\index{group!homomorphism}, \((G, \cdot_G, e_G, {-}^{-1}) \to (H, \cdot_H, e_H, {-}^{-1})\), is a function \(f \colon G \to H\) such that \(f(g \cdot_G g') = f(g) \cdot_H f(g')\) for all \(g, g' \in G\).
-        \end{dfn}
-        Note that the definition of a group homomorphism implies that \(f(e_G) = e_H\) and \(f(g^{-1}) = f(g)^{-1}\) for all \(g \in G\), unlike in the monoid case.
-        
-        For magmas, semigroups, and monoids if \(x \cdot y = y \cdot x\) we say it is a \define{commutative} \define{magma}\index{magma!commutative}/\define{semigroup}\index{semigroup!commutative}/\define{monoid}\index{monoid!commutative}.
-        For groups we call a commutative group an \defineindex{Abelian group}\index{group!Abelian}\index{group!commutative|see{Abelian group}}.
-        
-        \begin{dfn}{Group Action}{}
-            Let \(G\) be a group and \(S\) a set.
-            Then a \define{left group action}\index{group action} is a map \(\varphi \colon G \times S \to S\) such that
-            \begin{itemize}
-                \item the identity acts as the identity: \(\varphi(e, s) = s\);
-                \item group multiplication is preserved: \(\varphi(g, \varphi(h, s)) = \varphi(gh, s)\).
-            \end{itemize}
-        \end{dfn}
-        
-        Often we write \(g \mathbin{.} s\) or \(gs\) in place of \(\varphi(g, s)\), in which case the axioms are \(es = s\) and \(g(hs) = (gh)s\), which look very similar to the group identity and associativity laws.
-        Note that a right action is a map \(\psi \colon S \times G \to S\) such that \(\psi(s, e) = s\) and \(\psi(\psi(s, g), h) = \psi(s, gh)\), or \(se = s\) and \((sg)h = s(gh)\).
-        
-        \begin{dfn}{Group Representation}{}
-            A \defineindex{representation} of a group \(G\) is a pair \((\rho, V)\) consisting of a vector space \(V\) and a group action \(\rho \colon G \times V \to V\).
-            Alternatively, \(\rho \colon V \to \generalLinear(V)\) is a homomorphism and \(G\) acts on \(V\) through \(g\mathbin{.}v = \rho(g)v\).
-        \end{dfn}
-        Note that
-        \begin{multline}
-            \generalLinear(V) \coloneqq \{\text{invertible linear maps on } V\}\\
-            \isomorphic \{n \times n \text{ matrices with entries in } \field\} \eqqcolon \generalLinear(n, \field)
-        \end{multline}
-        where \(n = \dim V\) and \(V\) is a vector space over \(\field\).
-        
-        \subsection{Two Binary Operations}
-        \begin{dfn}{Ring}{}
-            A \defineindex{ring}, \((R, +, -, \cdot, 1, 0)\) is a set, \(R\), equipped with two binary operations, \(+ \colon R \times R \to R\) and \(\cdot \colon R \times R \to R\) such that
-            \begin{itemize}
-                \item \((R, +, 0, -)\) is an Abelian group.
-                \item \((R, \cdot, 1)\) is a monoid.
-                \item Multiplication distributes over addition:
-                \begin{equation}
-                    a \cdot (b + c) = a \cdot b + a \cdot c, \qqand (a + b) \cdot c = a \cdot c + b \cdot c
-                \end{equation}
-                where we take multiplication to have higher operator precedence than addition.
-            \end{itemize}
-        
-            A \define{ring homomorphism}\index{ring!homomorphism}, \((R, +_R, -_R, \cdot_R, 1_R, 0_R) \to (S, +_S, -_S, \cdot_S, 1_S, 0_S)\) is a function \(f \colon R \to S\) such that \(f(a +_R b) = f(a) +_S f(b)\), \(f(a \cdot_R b) = f(a) \cdot_S f(b)\), and \(f(1_R) = 1_S\).
-            
-            If \(x \cdot y = y \cdot x\) for all \(x, y \in R\) we call \(R\) a \define{commutative ring}\index{ring!commutative}.
-        \end{dfn}
-        Note that some sources only require that \((R, \cdot)\) is a semigroup, in which case what we define here is called a \define{ring with identity}\index{ring!with identity} or \define{ring with unity}\index{ring!with unity}.
-        Sometimes a ring without identity is called a \defineindex{rng}, with i taken out as there is no \textbf{i}dentity.
-        It is also common to define \defineindex{rig} or \defineindex{semiring|see{rig}} by only requiring that \((R, +)\) is a commutative monoid, meaning we drop inverses, which for an additive group would be \textbf{n}egatives, \(-g\) being the additive inverse of \(g\).
-        A \defineindex{rg} is then defined by dropping the requirements for multiplicative identities and additive inverses.
-        
-        \begin{dfn}{Integral Domain}{}
-            Let \(R\) be a ring.
-            A \defineindex{zero-divisor} is some element \(a \in R\) such that \(ab = 0\) and/or \(ba = 0\) for some \(b \in R\) with \(b \ne 0\).
-            A ring with \emph{no} zero-divisors is called a \defineindex{domain}.
-            A commutative domain is an \defineindex{integral domain}.
-        \end{dfn}
-        
-        \begin{dfn}{Field}{}
-            Let \(R\) be a ring.
-            A \defineindex{unit} is some element \(a \in R\) with \(a \ne 0\) such that there exists \(a^{-1} \in R\) with \(a \cdot a^{-1} = a^{-1} \cdot a = 1\).
-            A division ring is a ring in which all nonzero elements are units.
-            That is, \((R^{\times}, \cdot, e, {-}^{-1})\) is a group, where \(R^{\times} = R\setminus\{0\}\).
-            
-            A commutative division ring is a \defineindex{field}.
-        \end{dfn}
-        
-        \section{Orderings}
-        \begin{dfn}{Partial Order}{}
-            A (non-strict) \defineindex{partially ordered set}, or \defineindex{poset}, \((P, \le)\), is a set, \(P\), equipped with a (non-strict) \defineindex{partial order}, which is a reflexive, antisymmetric, transitive relation.
-            That is,
-            \begin{itemize}
-                \item \define{reflexivity}\index{reflexive}: for all \(a \in P\) we have \(a \le a\);
-                \item \defineindex{antisymmetric}: for \(a, b \in P\) if \(a \le b\) and \(b \le a\) then \(a = b\);
-                \item \define{transitivity}\index{transitive}: for \(a, b, c \in P\) if \(a \le b\) and \(b \le c\) then \(a \le c\).
-            \end{itemize}
-        \end{dfn}
-        
-        \begin{dfn}{Total Order}{}
-            A (non-strict) \defineindex{totally ordered set}, \((X, \le)\), is a poset with the added condition of totality, that is for all \(a, b \in X\) we have either \(a \le b\) or \(b \le a\) (or both, in which case \(a = b\) by antisymmetry).
-        \end{dfn}
-        
-        \begin{dfn}{Monotone Function}{}
-            Let \((P, \le_P)\) and \((Q, \le_Q)\) be partially ordered sets.
-            A \defineindex{monotone function}, or \defineindex{order-preserving function} \((P, \le_P) \to (Q, \le_Q)\), is a function \(f \colon P \to Q\) such that if \(a \le_P b\) for \(a, b \in P\) then \(f(a) \le_Q f(b)\).
-        \end{dfn}
-        
-        \section{Topological Spaces}
-        \begin{dfn}{Topological Space}{}
-            A \defineindex{topological space}, \((X, \topology)\) is a set, \(X\), equipped with a \defineindex{topology}, \(\topology\), which is a subset of \(\powerset(X)\) such that
-            \begin{itemize}
-                \item \(\emptyset \in \topology\);
-                \item \(X \in \topology\);
-                \item an arbitrary (potentially infinite) union of elements of \(\topology\) is again an element of \(\topology\);
-                \item a finite intersection of elements of \(\topology\) is again an element of \(\topology\).
-            \end{itemize}
-            Elements of \(\topology\) are called open sets.
-        \end{dfn}
-        
-        \begin{dfn}{Continuous Function}{}
-            Let \((X, \topology_X)\) and \((Y, \topology_Y)\) be topological spaces.
-            A \defineindex{continuous function}, \((X, \topology_X) \to (Y, \topology_Y)\), is a function \(f \colon X \to Y\) such that for all \(U \in \topology_Y\) we have \(f^{-1}(U) \in \topology_X\) where
-            \begin{equation}
-                f^{-1}(U) \coloneqq \{x \in X \mid \exists y \in U \text{ such that } y = f(x)\} \subseteq X.
-            \end{equation}
-        \end{dfn}
+        \include{parts/maths-defs}
     \end{appendices}
     
     \backmatter
