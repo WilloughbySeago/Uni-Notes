@@ -18,6 +18,8 @@
 
 \let\widetildeOLD\widetilde
 \AtBeginDocument{\let\widetilde\widetildeOLD}
+\let\widehatOLD\widehat
+\AtBeginDocument{\let\widehat\widehatOLD}
 
 % Tikz stuff
 \usepackage{tikz}
@@ -26,7 +28,7 @@
 \usetikzlibrary{external}
 \tikzexternalize[prefix=tikz-external/]
 % Other libraries
-\usetikzlibrary{decorations.markings, decorations.pathmorphing}
+\usetikzlibrary{decorations.markings, decorations.pathmorphing, patterns.meta}
 
 % Feynman diagram styles
 \tikzset{scalar/.style={dashed}}
@@ -37,6 +39,17 @@
 \tikzset{electron/.default=0.5}
 \tikzset{positron/.style={postaction={decorate, decoration={markings, mark=at position #1 with {\arrowreversed{Latex[width=1.5mm]}}}}}}
 \tikzset{positron/.default=0.5}
+\tikzset{momentum injection/.style={->}}
+\pgfdeclarepatternformonly{south west lines}{\pgfqpoint{-0pt}{-0pt}}{\pgfqpoint{3pt}{3pt}}{\pgfqpoint{3pt}{3pt}}{
+    \pgfsetlinewidth{0.4pt}
+    \pgfpathmoveto{\pgfqpoint{0pt}{0pt}}
+    \pgfpathlineto{\pgfqpoint{3pt}{3pt}}
+    \pgfpathmoveto{\pgfqpoint{2.8pt}{-.2pt}}
+    \pgfpathlineto{\pgfqpoint{3.2pt}{.2pt}}
+    \pgfpathmoveto{\pgfqpoint{-.2pt}{2.8pt}}
+    \pgfpathlineto{\pgfqpoint{.2pt}{3.2pt}}
+    \pgfusepath{stroke}}
+\tikzset{blob/.style={thick, pattern={south west lines}}}
 
 \usepackage[compat=1.1.0]{tikz-feynman}
 
@@ -79,6 +92,7 @@ noabbrev
     
 % Particles
 \newcommand{\Pphoton}{\ensuremath{\upgamma}}
+\newcommand{\PZboson}{\ensuremath{\symrm{Z}}}
     
 % Maths
 \newcommand{\e}{\symrm{e}}
@@ -106,7 +120,7 @@ noabbrev
 \begin{document}
     \frontmatter
     \titlepage
-    \innertitlepage{}
+    \innertitlepage{tikz-external/consequences-A-psi-psibar-to-all-orders}
     \tableofcontents
     \listoffigures
     \mainmatter
@@ -621,7 +635,7 @@ noabbrev
     \end{equation}
     
     It is not immediately clear that this Lagrangian has a gauge symmetry, but of course it does, since it inherits the gauge symmetry of the bare theory.
-    This will be made more clear later when we show that \(Z_1 = Z_2\), which allows us to write this with a covariant derivative again.
+    This will be made more clear later when we show that \(Z_1 = Z_2\) (\cref{sec:charge renormalisation}), which allows us to write this with a covariant derivative again.
     
     To make sense of this we define \(Z_i = 1 + \delta_i\) and then the Lagrangian is
     \begin{multline}
@@ -897,7 +911,7 @@ noabbrev
         \begin{itemize}
             \item electron counter term:
             \begin{equation}
-                \vcenter{\hbox{\includegraphics{tikz-external/qed-psibar-psi-counterterm-correlator-feynman-rule}}} = i(\delta_2(\slashed{p} - m) + \delta m).
+                \vcenter{\hbox{\includegraphics{tikz-external/qed-psibar-psi-counterterm-correlator-feynman-rule}}} = i(\delta_2(\slashed{p} - m) - \delta m).
             \end{equation}
             \item photon counter term:
             \begin{equation}
@@ -1017,8 +1031,8 @@ noabbrev
         \end{equation}
         and the more general case is
         \begin{multline*}
-            \frac{1}{A^{\alpha_1} \dotsm A^{\alpha_n}} = \int_0^1 \dl{x_1} \, x^{\alpha_1 - 1} \dotsm \int_0^1 \dl{x_n} \, x^{\alpha_n - 1}\\
-            \times \frac{\delta(1 - \sum_i \alpha_i)}{[\alpha_1 A_1 + \dotsb + \alpha_n A_n]^{\sum_i \alpha_i}} \frac{\Gamma(\sum_i \alpha_i)}{\Gamma(\alpha_1) \dotsm \Gamma(\alpha_n)}.
+            \frac{1}{A_1^{\alpha_1} \dotsm A_n^{\alpha_n}} = \int_0^1 \dl{x_1} \, x^{\alpha_1 - 1} \dotsm \int_0^1 \dl{x_n} \, x^{\alpha_n - 1}\\
+            \times \frac{\delta(1 - \sum_i \alpha_i)}{[x_1 A_1 + \dotsb + x_n A_n]^{\sum_i \alpha_i}} \frac{\Gamma(\sum_i \alpha_i)}{\Gamma(\alpha_1) \dotsm \Gamma(\alpha_n)}.
         \end{multline*}
         \item Shift the loop momentum to get the integral in the form
         \begin{equation}
@@ -1035,7 +1049,7 @@ noabbrev
     
     We can combine the fourth and fifth steps into one to get the identity
     \begin{equation*}
-        \int \dhat{^D\ell} \, \frac{(\ell^2)^p}{(\ell^2 - \Delta)^n} = \frac{i}{(4\pi)^{D/2}} \frac{(-1)^{p + n} \Gamma(n - p - D/2)\Gamma(p + D/2)}{\Gamma(n)\Gamma(D/2)} \Delta^{p/2 + p - n}.
+        \int \dhat{^D\ell} \, \frac{(\ell^2)^p}{(\ell^2 - \Delta)^n} = \frac{i}{(4\pi)^{D/2}} \frac{(-1)^{p + n} \Gamma(n - p - D/2)\Gamma(p + D/2)}{\Gamma(n)\Gamma(D/2)} \Delta^{D/2 + p - n}.
     \end{equation*}
     Note that the \(\Delta\) term can be found from dimensional analysis.
     We know from the \(\ell^2 - \Delta\) term that\footnote{\([X]\) is the mass dimension of \(X\), that is the power of mass (or energy or momentum) appearing in the dimensions} \([\Delta] = 2\).
@@ -1634,6 +1648,14 @@ noabbrev
     This leads to the somewhat unsettling observation that while \(\tilde{\mu}\) is non-physical it does affect the rate of \enquote{convergence} of our perturbative series, which certainly feels like it is a physical result.
     
     \chapter{All Orders Properties of QED}
+    \section{Ward Identities}
+    We've seen that \(i\Pi^{\mu\nu}(k) \propto (k^\mu k^\nu - \minkowskiMetric^{\mu\nu}k^2)\), and this means that \(k_\mu \Pi^{\mu\nu}(k) = 0\) at one loop.
+    This is reminiscent of the Ward identities discussed in \course{Quantum Field Theory}.
+    For processes with an external photon the amplitude contains a factor of \(\varepsilon^\mu(k)\), so we can define \(\amplitude_\mu\) to be such that \(\amplitude = \varepsilon^\mu(k)\amplitude_\mu\).
+    It can then be shown that \(k^\mu\amplitude_\mu = 0\), this is called the \defineindex{Ward identity}, and is required for the gauge transformation of \(\varepsilon^\mu(k)\) to leave the physics invariant, since this transformation takes the form \(\varepsilon^\mu(k) \mapsto \varepsilon^\mu(k) + \alpha p^\mu\) under the gauge transformation \(\psi \mapsto \e^{i\alpha}\psi\).
+    We will generalise this identity to correlators in QED and any loop level.
+    
+    
     \section{Rewriting the Action}
     The photon action, that is the terms in the action involving only the four-potential, is given in terms of the bare fields by
     \begin{equation}
@@ -1674,6 +1696,7 @@ noabbrev
     \begin{equation}
         S_{\Pphoton} = \frac{1}{2}\int \dl{^Dx} \, A_{\bare}^\nu \dalembertian A_{\bare \nu}.
     \end{equation}
+    One way we can tell that this is correct is that in the Feynman gauge the photon propagator goes as \(1/k^2\), and \(1/k^2\) is the inverse of \(\dalembertian\) in Fourier space, and the propagator should always be the inverse of the kernel in Fourier space.
     
     After regularisation this term becomes
     \begin{equation}
@@ -1693,7 +1716,7 @@ noabbrev
          &= \int \dl{^Dx} \left[ \frac{1}{2}Z_3 \delta A_\mu \dalembertian A^\mu + \frac{1}{2}Z_3 A_\mu \dalembertian \delta A^\mu + Z_1 e\diracadjoint{\psi}\gamma^\mu \delta A_\mu \psi \right].
     \end{align}
     Integrating the second term by parts twice, and again assuming that surface terms vanish, we move both derivatives from the \(\delta A^\mu\) term to the \(A_\mu\) term, and pick up two minus signs, leaving us with exactly the first term, giving
-    \begin{equation}
+    \begin{equation}\label{eqn:change in action with A varying}
         \delta S = \int \dl{^Dx}\left[ Z_3 \dalembertian A^\mu + Z_1e\diracadjoint{\psi}\gamma^\mu \psi \right] \delta A_\mu.
     \end{equation}
     This must then vanish for all \(\delta A_\mu\) so we have
@@ -1712,7 +1735,7 @@ noabbrev
     
     In the rest of this section we'll use the action in the form derived here to derive some identities which apply to all orders in QED.
     
-    \section{Ward Identities}
+    \section{Ward--Takahashi Identity}
     The QED Lagrangian has a symmetry given by
     \begin{equation}
         \psi \mapsto \e^{i\alpha}\psi, \qqand \diracadjoint{\psi} \mapsto \e^{-i\alpha}\diracadjoint{\psi}.
@@ -1795,11 +1818,690 @@ noabbrev
     The gauge fields are just bystanders in this, and don't change anything.
     Each pair of fermion fields picks up a Dirac delta term in exactly the same way, so the \defineindex{generalised Ward--Takahashi identity} is
     \begin{multline}
-        Z_2 \partial_x^\mu \correlator*{j_\mu(x) \prod_{i = 1}^n \psi(y_i) \diracadjoint{\psi}(z_i) \prod_{j=1}^{n}A^j_{\mu_j}(w_j)}\\
-        = \sum_{k = 1}^{n} (\delta(x - z_k) - \delta(x - y_k)) \correlator*{\prod_{i=1}^{n} \psi(y_i) \diracadjoint{\psi}(z_i) \prod_{j=1}^n A^j_{\mu_j}(w_j)}.
+        Z_2 \partial_x^\mu \correlator*{j_\mu(x) \prod_{i = 1}^n \psi(y_i) \diracadjoint{\psi}(z_i) \prod_{j=1}^{n}A_{\mu_j}(w_j)}\\
+        = \sum_{k = 1}^{n} (\delta(x - z_k) - \delta(x - y_k)) \correlator*{\prod_{i=1}^{n} \psi(y_i) \diracadjoint{\psi}(z_i) \prod_{j=1}^n A_{\mu_j}(w_j)}.
     \end{multline}
     
     \section{Schwinger--Dyson Equations}
+    The Ward--Takahashi identity arose from classical symmetries.
+    The Schwinger--Dyson equations arise similarly from the classical equations of motion.
+    Consider the correlator
+    \begin{equation}
+        \correlator{A_\nu(x_1)} = \int \DL{A} \DD{\psi} \DD{\diracadjoint{\psi}} \, A_\nu(x_1) \e^{iS[A, \psi, \diracadjoint{\psi}]}.
+    \end{equation}
+    Consider the change of variables \(A_\mu(x) \mapsto A'_\mu(x) = A_\mu(x) + \zeta_\mu(x)\) where \(\zeta_\mu\) is some arbitrary vector field, not a gauge field.
+    We think of \(\zeta_\mu\) as a variation on \(A_\mu\), hence the relation to the classical equations of motion.
+    
+    The change in the action from this transformation comes from the two terms in the action in which \(A_\mu\) appears, and using the result found for the classical equations of motion (\cref{eqn:change in action with A varying}) we have
+    \begin{equation}
+        \delta S = \int \dl{^Dx} \left[ Z_3 \dalembertian A^\mu(x) + Z_1 ej^\mu(x) \right]\zeta_\mu.
+    \end{equation}
+    
+    We assume that the integration measure is invariant with respect to this change of variables, so \(\DL{A} = \DL{A'}\), or \(\DL{\zeta} = 0\), which seems reasonable.
+    Then we have
+    \begin{align}
+        \correlator{A_\nu(x_1)} &= \int \DL{A} \DD{\psi} \DD{\diracadjoint{\psi}} A_\nu(x_1) \e^{iS[A, \psi, \diracadjoint{\psi}]}\\
+        &= \int \DL{A'} \DD{\psi} \DD{\diracadjoint{\psi}} A'_\nu(x_1) \e^{iS[A', \psi, \diracadjoint{\psi}]}\\
+        &= \int \DL{A} \DD{\psi} \DD{\diracadjoint{\psi}} A'_\nu(x_1) \e^{iS[A', \psi, \diracadjoint{\psi}]}.
+    \end{align}
+    We now consider the first line minus the third line.
+    On the one hand clearly this gives zero, on the other hand we can expand the third line as
+    \begin{equation}
+        \int \DL{A} \DD{\psi} \DD{\diracadjoint{\psi}} (A_\nu(x_1) + \zeta_\nu(x_1))\e^{iS[A, \psi, \diracadjoint{\psi}] + i\delta S}
+    \end{equation}
+    which gives
+    \begin{equation}
+        \int \DL{A} \DD{\psi} \DD{\diracadjoint{\psi}} (A_\nu(x_1) + \zeta_\nu(x_1))(1 + i\delta S)\e^{iS[A, \psi, \diracadjoint{\psi}]}.
+    \end{equation}
+    Expanding the brackets we get \(A_\nu(x_1) + \zeta_\nu(x_1) + A_\nu(x_1) i\delta S + \zeta_\nu(x_1) i\delta S\).
+    The \(A_\nu(x_1)\) term cancels with the first line and we're left with
+    \begin{align}
+        0 &= \int \DL{A} \DD{\psi} \DD{\diracadjoint{\psi}} (\zeta_\nu(x_1) + A_\nu(x_1) i\delta S + \zeta_\nu(x_1) i\delta S) \e^{iS[A, \psi, \diracadjoint{\psi}]}\\
+        &= \int \DL{A} \DD{\psi} \DD{\diracadjoint{\psi}} \bigg[\zeta_\nu(x_1) \notag\\
+        &\qquad + i \int\dl{^Dx} \{Z_3 \dalembertian A^\mu(x) + Z_1 ej^\mu(x)\}\zeta_\mu(x)(A_\nu(x_1) + \zeta_\nu(x_1))\bigg] \e^{iS[A, \psi, \diracadjoint{\psi}]}.
+    \end{align}
+    Choosing \(\zeta_\mu\) to be small and neglecting the quadratic term in \(\zeta_\mu\) we get
+    \begin{multline}
+        0 = \int \DL{A} \DD{\psi} \DD{\diracadjoint{\psi}} \bigg[\zeta_\nu(x_1) \notag\\
+        + i \int\dl{^Dx} \{Z_3 \dalembertian A^\mu(x) + Z_1 ej^\mu(x)\}\zeta_\mu(x)A_\nu(x_1)\bigg] \e^{iS[A, \psi, \diracadjoint{\psi}]}.
+    \end{multline}
+    We can then write \(\zeta_\nu(x_1) = \int \dl{^Dx} \, \delta(x - x_1)\zeta_\nu(x)\) and \(\zeta_\nu(x) = \minkowskiMetric_{\mu\nu}\zeta^\mu(x)\) to give
+    \begin{multline}
+        0 = \int \dl{^Dx} \int \DL{A} \DD{\psi} \DD{\diracadjoint{\psi}} \, [ \delta(x - x_1) \minkowskiMetric_{\mu\nu}\\
+        + i\{Z_3 \dalembertian A_\mu(x) + Z_1 ej_\mu(x)\}A_\nu(x_1) ]\zeta^\mu(x) \e^{iS[A, \psi, \diracadjoint{\psi}]}.
+    \end{multline}
+    Finally we can rewrite this in terms of correlators:
+    \begin{equation}
+        0 = \int \dl{^Dx} \, [\delta(x - x_1) \minkowskiMetric_{\mu\nu} + i\{Z_3\dalembertian \correlator{A_\mu(x)A_\nu(x_1)} + eZ_1\correlator{j_\mu(x)A_\nu(x_1)}\}]\zeta^\mu(x).
+    \end{equation}
+    Since we can choose \(\zeta_\mu\) arbitrarily we must have that
+    \begin{equation}
+        \delta(x - x_1)\minkowskiMetric_{\mu\nu} + i\{Z_3\dalembertian_x \correlator{A_\mu(x)A_\nu(x_1)} + eZ_1\correlator{j_\mu(x)A_\nu(x_1)}\} = 0,
+    \end{equation}
+    which tells us that
+    \begin{equation}
+        Z_3i\dalembertian_x\correlator{A_\mu(x)A_\nu(x_1)} = -eZ_1i\correlator{j_\mu(x)A_\nu(x_1)} - \minkowskiMetric_{\mu\nu}\delta(x - x_1).
+    \end{equation}
+    This is the \defineindex{Schwinger--Dyson equation}.
+    Compare this to the classical equations of motion,
+    \begin{equation}
+        Z_3\dalembertian A^\mu = -eZ_1j^\mu,
+    \end{equation}
+    and we see that the Schwinger--Dyson equation is simply the classical equations of motion plus a contact term.
+    Intuitively this contact term only comes into effect when \(x = x_1\), so \(A_\mu(x)\) and \(A_\nu(x_1)\) are evaluated at the same point.
+    
+    We can generalise this process to arbitrary correlators of fermion and gauge fields.
+    The fermion fields have no effect, since they aren't modified by the change of variables, so we'll just consider some arbitrary product \(\psi \dotsm \diracadjoint{\psi} \dotsm\), in which every time we write this each fermion field is evaluated at some point which is the same each time we write this.
+    Then we have the \defineindex{generalised Schwinger--Dyson equation}
+    \begin{multline}
+        Z_3i\dalembertian_x\correlator{A_\mu(x) A_{\nu_1}(x_1) \dotsb A_{\nu_n}(x_n) \psi \dotsm \diracadjoint{\psi} \dotsm}\\
+        = -ieZ_1\correlator{j_\mu(x) A_{\nu_1}(x_1) \dotsm A_{\nu_n}(x_n) \psi \dotsm \diracadjoint{\psi} \dotsm}\\
+        - \sum_{i = 1}^n \minkowskiMetric_{\mu\nu_i} \delta(x - x_i) \correlator{A_{\nu_1}(x_1) \dotsm \widehat{A_{\nu_i}(x_i)} \dotsm A_{\nu_n}(x_n)}
+    \end{multline}
+    where the notation \(\widehat{x}\) means that \(x\) is left out of the product, so, for example,
+    \begin{equation}
+        5 \cdot \widehat{4} \cdot 3 \cdot 2 \cdot 1 = 5 \cdot 3 \cdot 2 \cdot 1 = 30.
+    \end{equation}
+    
+    \subsection{Schwinger--Dyson in Perturbation Theory}
+    \subsubsection{Order \texorpdfstring{\(e^0\)}{e\textasciicircum{}0}}
+    At \(\order(e^0)\) the Schwinger--Dyson equation gives
+    \begin{equation}
+        Z_3 i \dalembertian_x \correlator{A_\mu(x) A_\nu(y)} = -\minkowskiMetric_{\mu\nu}\delta(x - y).
+    \end{equation}
+    This is just the free propagator.
+    Note that \(Z_3 = 1\) at order \(e^0\).
+    
+    For a photon, since \(m = 0\), we amputate a correlator by acting on it with \(i\dalembertian\), so we can interpret this as saying that if we amputate the photon propagator then we simply get a Dirac delta, which represents a point.
+    So amputating a propagator, a line between points, gives a single point.
+    \begin{equation}
+        i\dalembertian_x (x, \mu \tikz[baseline=0.1cm]{\draw[photon] (0, 0) -- (1, 0);} y, \nu) = -\minkowskiMetric_{\mu\nu}\delta(x - y).
+    \end{equation}
+    
+    \subsubsection{Order \texorpdfstring{\(e^1\)}{e\textasciicircum{}1}}
+    At order \(e^1\) the Schwinger--Dyson equation gives
+    \begin{equation}
+        Z_3 i\dalembertian\correlator{A_\mu(x) \psi(x_1) \diracadjoint{\psi}(x_2)} = -e\correlator{j_\mu(x) \psi(x_1) \diracadjoint{\psi}(x_2)},
+    \end{equation}
+    we don't include the \(\minkowskiMetric_{\mu\nu}\delta(x)\) term since this is \(\order(e^0)\).
+    Expanding \(j_\mu\) in terms of the fermion fields we get
+    \begin{equation}
+        \correlator{j_\mu(x)\psi(x_1)\diracadjoint{\psi}(x_2)} = \correlator{\diracadjoint{\psi}(x)\gamma_\mu\psi(x)\psi(x_1)\diracadjoint{\psi}(x_2)}.
+    \end{equation}
+    The only nonzero contraction, since we must contract each \(\psi\) with a \(\diracadjoint{\psi}\) and contracting fields at the same point gives zero, is
+    \begin{equation}
+        \wick{\c1{\diracadjoint{\psi}}(x)\gamma_\mu \c2{\psi}(x) \c1{\psi}(x_1) \c2{\diracadjoint{\psi}}(x_2)}.
+    \end{equation}
+
+    The correlator \(\correlator{A_\mu(x)\psi(x_1)\diracadjoint{\psi}(x_2)}\) corresponds to the QED vertex
+    \begin{equation}
+        \tikzsetnextfilename{all-orders-qed-qed-vertex}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[photon] (-1, 0) -- (0, 0);
+            \draw[electron=0.6] (0, 0) -- (30:1);
+            \draw[positron=0.4] (0, 0) -- (-30:1);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    We are amputating the photon by acting with \(i\dalembertian\), which removes the photon, but still results in the injection of momentum from the photon.
+    We draw this as
+    \begin{equation}
+        \tikzsetnextfilename{all-orders-qed-qed-vertex-amputated}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[momentum injection] (-1, 0) -- (0, 0);
+            \draw[electron=0.6] (0, 0) -- (30:1);
+            \draw[positron=0.4] (0, 0) -- (-30:1);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    We can think of this as replacing the photon, \(A_\mu\), with a current, \(j_\mu\), of electrons and positrons, carrying momentum but no net charge.
+    
+    \subsubsection{General Order}
+    From the zeroth and first order analysis we can now deduce what happens at arbitrary order.
+    Consider some diagram
+    \begin{equation}
+        \tikzsetnextfilename{all-orders-qed-arbitrary-diagram}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[blob] (0, 0) circle [radius=0.5cm];
+            \draw[photon] (-1.5, 0) -- (-0.5, 0);
+            \draw[photon] (45:0.5) -- (45:1.5);
+            \draw[electron] (20:0.5) -- (20:1.5);
+            \draw[photon] (-20:0.5) -- (-20:1.5);
+            \draw[electron] (-45:0.5) -- (-45:1.5);
+        \end{tikzpicture}
+        ,
+    \end{equation}
+    and focus on the incoming photon in particular, note that the other particles may be incoming or outgoing, and there may be any number of them.
+    
+    Acting on this with \(i\dalembertian\) amputates this photon, and there are two things that can happen, corresponding to the two terms on the right hand side of the Schwinger--Dyson equation.
+    Either we get a propagator alone, which corresponds to the contact term, or we replace the photon with the amputated QED vertex.
+    Diagrammatically this looks like
+    \begin{equation*}
+        \tikzsetnextfilename{all-orders-qed-arbitrary-order-schwinger-dyson}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[blob] (0, 0) circle [radius=0.5cm];
+            \draw[photon] (-1.5, 0) node[left] {\(i\dalembertian\)} -- (-0.5, 0);
+            \draw[photon] (45:0.5) -- (45:1.5);
+            \draw[electron] (20:0.5) -- (20:1.5);
+            \draw[photon] (-20:0.5) -- (-20:1.5);
+            \draw[electron] (-45:0.5) -- (-45:1.5);
+            \node at (2, 0) {\(=\)};
+            \begin{scope}[xshift=3cm]
+                \draw[blob] (0, 0) circle [radius=0.5cm];
+                \draw[photon] (-0.5, -1.3) -- (1.3, -1.25);
+                \draw[photon] (45:0.5) -- (45:1.5);
+                \draw[electron] (20:0.5) -- (20:1.5);
+                \draw[photon] (-20:0.5) -- (-20:1.5);
+                \draw[electron] (-45:0.5) -- (-45:1.5);
+            \end{scope}
+            \node at (5, 0) {\(+\)};
+            \begin{scope}[xshift=7.5cm]
+                \draw[blob] (0, 0) circle [radius=0.5cm];
+                \draw[momentum injection] (-2, 0)-- (-1.3, 0);
+                \draw[electron=0.6] (-1.3, 0) -- ++ (22:1.05);
+                \draw[positron=0.4] (-1.3, 0) -- ++ (-22:1.05);
+                \draw[photon] (45:0.5) -- (45:1.5);
+                \draw[electron] (20:0.5) -- (20:1.5);
+                \draw[photon] (-20:0.5) -- (-20:1.5);
+                \draw[electron] (-45:0.5) -- (-45:1.5);
+            \end{scope}
+        \end{tikzpicture}
+        .
+    \end{equation*}
+    
+    \chapter{Consequences}
+    \section{Recap}
+    In the last chapter we derived the Schwinger--Dyson equation:
+    \begin{equation}
+        Z_3 \dalembertian \correlator{A_\mu(x) \dotsm} = -eZ_1 \correlator{j_\mu(x) \dotsm} + \text{contact terms},
+    \end{equation}
+    and the Ward--Takahashi identity:
+    \begin{equation}
+        Z_2\partial_\mu \correlator{j^\mu(x)\psi(x_1)\diracadjoint{\psi}(x_2)} = (\delta(x - x_2) - \delta(x - x_1)) \correlator{\psi(x_1) \diracadjoint{\psi}(x_2)}.
+    \end{equation}
+    These results hold to all orders in QED.
+    We will now derive and discuss several consequences of these results.
+    
+    \section{\texorpdfstring{\(k_\mu \Pi^{\mu\nu}(k) = 0\)}{k Pi = 0} to All Orders}
+    We can generalise the definition of \(\Pi^{\mu\nu}(k)\) from just the vacuum polarisation to an all orders object
+    \begin{equation}
+        i\Pi^{\mu\nu}(x - y) = \correlator{A^\mu(x)A^\nu(y)}_{\text{amputated, connected}}.
+    \end{equation}
+    That is,
+    \begin{equation}
+        i\Pi^{\mu\nu}(x - y) = 
+        \tikzsetnextfilename{consequences-pi-definition}
+        \begin{tikzpicture}[baseline=(plus.base)]
+            \draw[photon] (0, 0) -- (1, 0);
+            \draw[photon] (2, 0) -- (3, 0);
+            \draw[electron=0.55] (1, 0) arc (180:0:0.5);
+            \draw[positron=0.45] (1, 0) arc (180:360:0.5);
+            \node (plus) at (3.5, 0) {\(+\)};
+            \draw[photon] (4, 0) -- (5, 0);
+            \draw[photon] (6, 0) -- (7, 0);
+            \draw[electron=0.55] (5, 0) arc (180:90:0.5);
+            \draw[electron=0.55] (5.5, 0.5) arc (90:0:0.5);
+            \draw[electron=0.55] (6, 0) arc (0:-90:0.5);
+            \draw[electron=0.55] (5.5, -0.5) arc (270:180:0.5);
+            \draw[photon] (5.5, 0.5) -- (5.5, -0.5);
+            \node at (7.5, 0) {\(+ \dotsb\)};
+        \end{tikzpicture}
+        ,
+    \end{equation}
+    whereas before \(i\Pi^{\mu\nu}(x - y)\) was just the first term in this expansion.
+    Here the diagrams stand for the amputated correlators, so really we are acting on each photon with \(i\dalembertian\).
+    
+    Since these diagrams are amputated it follows from the Schwinger--Dyson equation, applied twice, once to each external photon, that
+    \begin{equation}
+        \Pi^{\mu\nu}(x - y) \propto \correlator{A^\mu(x)A^\nu(y)}_{\text{amputated, connected}} \propto \correlator{j^\mu(x)j^\nu(y)}.
+    \end{equation}
+    Then we have
+    \begin{align}
+        ik_\mu \Pi^{\mu\nu}(k) &= ik_\nu \int \dl{^Dx} \, \e^{-ik\cdot x}\Pi^{\mu\nu}(x)\\
+        &= \int \dl{^Dx} \, \e^{-ik\cdot x} \partial_\mu \Pi^{\mu\nu}(x)\\
+        &\propto \int \dl{^Dx} \, \e^{-ik\cdot x} \partial_\mu\correlator{j^\mu(x)j^\nu(0)}\\
+        &= 0.
+    \end{align}
+    Here we've used the fact that \(\fourierTransform\{\partial_\mu\} = ik_\mu\).
+    The last step follows using the Ward--Takahashi identity recognising that \(j^\nu(0) = \diracadjoint{\psi}(0)\gamma^\nu \psi(0)\) and so we get \(\delta(x) - \delta(x) = 0\), at least when we consider the Dirac deltas as distributions under an integral.
+    So, we have
+    \begin{equation}
+        k_\mu \Pi^{\mu\nu}(k) = 0
+    \end{equation}
+    to all orders in QED.
+    
+    We can go further in the case where the only four-vector is \(k^\mu\), then it must be that \(\Pi^{\mu\nu}(k) = \Pi_1(k^2)\minkowskiMetric^{\mu\nu} + \Pi_2(k^2)k^\mu k^\nu\) for some scalar functions \(\Pi_1\) and \(\Pi_2\).
+    Using \(k_\mu \Pi^{\mu\nu}(k) = 0\) we must then have \(\Pi_1(k^2)k_\nu + \Pi_2(k^2)k^2k_\nu = 0\), and for \(k_\nu \ne 0\) we must then have \(\Pi_1(k^2) = -\Pi_2(k^2)k^2\), so
+    \begin{equation}
+        \Pi^{\mu\nu}(k) = (k^\mu k^\nu - \minkowskiMetric^{\mu\nu}k^2)\Pi(k^2)
+    \end{equation}
+    with \(\Pi = \Pi_2\).
+    
+    It is possible to introduce another four-vector quantity through a choice of non-Lorentz invariant gauge fixing, and this four-vector can then appear in the tensor structure above, but we won't do this.
+    
+    \section{Ward Identities}
+    Any non-connected amplitude can be factored into connected amplitudes, so we'll only consider connected amplitudes.
+    Given some amplitude, \(\amplitude(k)\), with \(k\) the momentum of an external photon we can write the amplitude as \(\amplitude(k) = \varepsilon^\mu(k)\amplitude_\mu(k)\) where \(\varepsilon^\mu\) is the polarisation vector of the photon and this equation defines \(\amplitude_\mu\).
+    Then the \defineindex{Ward identity} is
+    \begin{equation}
+        k^\mu \amplitude_\mu(k) = 0.
+    \end{equation}
+    This is important as it means we have only two polarisation states and gauge invariance, both basic requirements of QED.
+    This Ward identity follows from the Ward--Takahashi identity since \(\amplitude_\mu\) is proportional to the Fourier transform of \(\correlator{j_\mu(x) \dotsm}\), and the Ward--Takahashi identity  tells us that \(\partial^\mu\correlator{j_\mu(x) \dotsb} = 0\) for connected, amputated correlators.
+    Taking the Fourier transform then turns the derivative into a \(k^\mu\) proving the identity.
+    This proof shows that the Ward identity holds to all orders in perturbation theory, not just the tree level at which we proved in in \course{Quantum Field Theory}.
+    
+    \section{Charge Renormalisation}\label{sec:charge renormalisation}
+    Consider the correlator \(\correlator{A_\mu(x) \psi(x_1) \diracadjoint{\psi}(x_2)}\).
+    This is in position space, but we can identify it with it's Fourier transform.
+    Then we can expand this as
+    \begin{equation}
+        \correlator{A_\mu(x)\psi(x_1) \diracadjoint{\psi}(x_2)} = \mkern-30mu
+        \tikzsetnextfilename{consequences-A-psi-psibar-to-all-orders}
+        \begin{tikzpicture}[baseline=(plus.base)]
+            \draw[photon] (-1, 0) -- (0, 0);
+            \draw[electron=0.6] (0, 0) -- (30:1);
+            \draw[positron=0.4] (0, 0) -- (-30:1);
+            \node (plus) at (2, 0) {\(+\)};
+            \begin{scope}[xshift=4cm]
+                \draw[photon] (-1, 0) -- (-0.15, 0);
+                \draw[electron=0.6] (30:0.15) -- (30:1);
+                \draw[positron=0.4] (-30:0.15) -- (-30:1);
+                \draw (0, 0) circle [radius = 0.15cm];
+                \foreach \angle in {45, 135, 225, 315} {
+                    \draw (0, 0) -- (\angle:0.15);
+                }
+                \node at (0, -0.35) {\(\delta_1\)};
+            \end{scope}
+            \node at (-1.5, -1.5) {\(+\)};
+            \begin{scope}[yshift=-1.5cm]
+                \draw[photon] (-1, 0) -- (0, 0);
+                \draw[electron=0.6] (0, 0) -- (30:1);
+                \draw[positron=0.4] (0, 0) -- (-30:1);
+                \draw[photon] (30:0.75) -- (-30:0.75);
+            \end{scope}
+            \node at (2, -1.5) {\(+\)};
+            \begin{scope}[yshift=-1.5cm, xshift=4cm]
+                \draw[photon] (-1, 0) -- (0, 0);
+                \foreach \angle in {45, 135, 225, 315} {
+                    \draw[shift={(30:0.5)}] (0, 0) -- (\angle:0.15);
+                }
+                \draw (30:0.5) circle [radius=0.15cm];
+                \node at ($(30:0.5) + (0, 0.35)$) {\(\delta_2\)};
+                \draw[electron=0.8] (0, 0) -- (30:0.35);
+                \draw[electron=0.8] (30:0.65) -- (30:1);
+                \draw[positron=0.4] (0, 0) -- (-30:1);
+            \end{scope}
+            \node at (-1.5, -3) {\(+\)};
+            \begin{scope}[yshift=-3cm, xshift=0.5cm]
+                \draw[photon] (-1.5, 0) -- (-1.1, 0);
+                \draw[photon] (-0.4, 0) -- (0, 0);
+                \draw[electron=0.55] (-1.1, 0) arc (180:0:0.35);
+                \draw[positron=0.45] (-1.1, 0) arc (180:360:0.35);
+                \draw[electron=0.6] (0, 0) -- (30:1);
+                \draw[positron=0.4] (0, 0) -- (-30:1);
+                \draw[photon] (30:0.75) -- (-30:0.75);
+            \end{scope}
+            \node at (2, -3) {\(+\)};
+            \begin{scope}[yshift=-3cm, xshift=4cm]
+                \draw[photon] (-1.5, 0) -- (-0.9, 0);
+                \draw[photon] (-0.6, 0) -- (0, 0);
+                \foreach \angle in {45, 135, 225, 315} {
+                    \draw[xshift=-0.75cm] (0, 0) -- (\angle:0.15);
+                }
+                \draw (-0.75, 0) circle [radius = 0.15cm];
+                \draw[electron=0.6] (0, 0) -- (30:1);
+                \draw[positron=0.4] (0, 0) -- (-30:1);
+                \draw[photon] (30:0.75) -- (-30:0.75);
+                \node at (-0.75, -0.35) {\(\delta_3\)};
+            \end{scope}
+            \node at (5.5, -3) {\(+ \dotsb\).};
+        \end{tikzpicture}
+    \end{equation}
+    We can then write this more compactly as
+    \begin{equation}
+        \correlator{A_\mu(x) \psi(x_1) \diracadjoint{\psi}(x_2)} =
+        \tikzsetnextfilename{consequences-vertex-as-1PI}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[blob] (0, 0) circle [radius=0.25cm];
+            \draw[blob] (-1.5, 0) circle [radius=0.25cm];
+            \draw[photon] (-1.25, 0) -- (-0.25, 0);
+            \draw[photon] (-2.75, 0) -- (-1.75, 0);
+            \draw[electron=0.6] (30:0.25) -- (30:1);
+            \draw[positron=0.4] (-30:0.25) -- (-30:1);
+            \draw[blob] (30:1.25) circle [radius=0.25cm];
+            \draw[blob] (-30:1.25) circle [radius=0.25cm];
+            \draw[electron=0.6] (30:1.5) -- (30:2.25);
+            \draw[positron=0.4] (-30:1.5) -- (-30:2.25);
+        \end{tikzpicture}
+    \end{equation}
+    Here each circle represents a sum over all one particle irreducible (1PI) diagrams with the matching external states.
+    
+    Now we can apply the Schwinger--Dyson equation:
+    \begin{equation}
+        Z_3 \dalembertian \correlator{A_\mu(x) \psi(x_1) \diracadjoint{\psi}(x_2)} = -eZ_1\correlator{j_\mu(x) \psi(x_1) \diracadjoint{\psi}(x_2)}.
+    \end{equation}
+    Acting with \(\dalembertian\) amputates the incoming photon, reducing this series to
+    \begin{equation}
+        i\dalembertian\langle{A_\mu(x)\psi(x_1) \overline{\psi}(x_2)} = \mkern-30mu
+        \tikzsetnextfilename{consequences-A-psi-psibar-to-all-orders-amputated}
+        \begin{tikzpicture}[baseline=(plus.base)]
+            \draw[momentum injection] (-1, 0) -- (0, 0);
+            \draw[electron=0.6] (0, 0) -- (30:1);
+            \draw[positron=0.4] (0, 0) -- (-30:1);
+            \node (plus) at (2, 0) {\(+\)};
+            \begin{scope}[xshift=4cm]
+                \draw[momentum injection] (-1, 0) -- (-0.15, 0);
+                \draw[electron=0.6] (30:0.15) -- (30:1);
+                \draw[positron=0.4] (-30:0.15) -- (-30:1);
+                \draw (0, 0) circle [radius = 0.15cm];
+                \foreach \angle in {45, 135, 225, 315} {
+                    \draw (0, 0) -- (\angle:0.15);
+                }
+                \node at (0, -0.35) {\(\delta_1\)};
+            \end{scope}
+            \node at (-1.5, -1.5) {\(+\)};
+            \begin{scope}[yshift=-1.5cm]
+                \draw[momentum injection] (-1, 0) -- (0, 0);
+                \draw[electron=0.6] (0, 0) -- (30:1);
+                \draw[positron=0.4] (0, 0) -- (-30:1);
+                \draw[photon] (30:0.75) -- (-30:0.75);
+            \end{scope}
+            \node at (2, -1.5) {\(+\)};
+            \begin{scope}[yshift=-1.5cm, xshift=4cm]
+                \draw[momentum injection] (-1, 0) -- (0, 0);
+                \foreach \angle in {45, 135, 225, 315} {
+                    \draw[shift={(30:0.5)}] (0, 0) -- (\angle:0.15);
+                }
+                \draw (30:0.5) circle [radius=0.15cm];
+                \node at ($(30:0.5) + (0, 0.35)$) {\(\delta_2\)};
+                \draw[electron=0.8] (0, 0) -- (30:0.35);
+                \draw[electron=0.8] (30:0.65) -- (30:1);
+                \draw[positron=0.4] (0, 0) -- (-30:1);
+            \end{scope}
+            \node at (-1.5, -3) {\(+\)};
+            \begin{scope}[yshift=-3cm, xshift=0.5cm]
+                \draw[momentum injection] (-1.5, 0) -- (-1.1, 0);
+                \draw[photon] (-0.4, 0) -- (0, 0);
+                \draw[electron=0.55] (-1.1, 0) arc (180:0:0.35);
+                \draw[positron=0.45] (-1.1, 0) arc (180:360:0.35);
+                \draw[electron=0.6] (0, 0) -- (30:1);
+                \draw[positron=0.4] (0, 0) -- (-30:1);
+                \draw[photon] (30:0.75) -- (-30:0.75);
+            \end{scope}
+            \node at (2, -3) {\(+\)};
+            \begin{scope}[yshift=-3cm, xshift=4cm]
+                \draw[momentum injection] (-1.5, 0) -- (-0.9, 0);
+                \draw[photon] (-0.6, 0) -- (0, 0);
+                \foreach \angle in {45, 135, 225, 315} {
+                    \draw[xshift=-0.75cm] (0, 0) -- (\angle:0.15);
+                }
+                \draw (-0.75, 0) circle [radius = 0.15cm];
+                \draw[electron=0.6] (0, 0) -- (30:1);
+                \draw[positron=0.4] (0, 0) -- (-30:1);
+                \draw[photon] (30:0.75) -- (-30:0.75);
+                \node at (-0.75, -0.35) {\(\delta_3\)};
+            \end{scope}
+            \node at (5.5, -3) {\(+ \dotsb\).};
+        \end{tikzpicture}
+    \end{equation}
+    We can write the first two terms here as \(1 + \delta_1\) times the first term, since the only difference between the QED vertex and its counter term is a factor of \(\delta_1\).
+    
+    This correlator is infinite.
+    We know that all photon-to-photon 1PI diagrams are exactly the diagrams contributing to
+    \begin{equation}
+        i\Pi^{\mu\nu}(x - y) = 
+        \tikzsetnextfilename{consequences-Pi-as-1PI}
+        \begin{tikzpicture}[baseline=-0.1cm]
+            \draw[blob] (0, 0) circle [radius=0.25cm];
+            \draw[photon] (-0.25, 0) -- (-1, 0);
+            \draw[photon] (0.25, 0) -- (1, 0);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    We also know that \(\partial_\mu \Pi^{\mu\nu}(x - y) = 0\) to all orders, so \(\partial^\mu\) kills all 1PI diagrams on a photon, that is
+    \begin{equation}
+        \partial^\mu \vcenter{\hbox{\includegraphics{tikz-external/consequences-Pi-as-1PI}}} = 0.
+    \end{equation}
+    Everything else appearing in the expansion has been renormalised, and so is finite.
+    As a consequence we know that
+    \begin{equation}
+        \partial^\mu Z_3 \dalembertian \correlator{A_\mu(x) \psi(x_1) \diracadjoint{\psi}(x_3)} = \text{finite}.
+    \end{equation}
+    Using the Schwinger--Dyson equation we can rewrite this as
+    \begin{equation}
+        Z_1 \partial^\mu \correlator{j_\mu(x) \psi(x_1) \diracadjoint{\psi}(x_2)} = \text{finite}.
+    \end{equation}
+    This correlator corresponds to the diagram
+    \begin{equation}
+        \tikzsetnextfilename{consequences-alternative-form}
+        \begin{tikzpicture}[baseline=-0.075cm]
+            \draw[blob] (0, 0) circle [radius=0.25cm];
+            \draw[photon] (-1.25, 0) -- (-0.25, 0);
+            \draw[electron=0.6] (30:0.25) -- (30:1);
+            \draw[positron=0.4] (-30:0.25) -- (-30:1);
+            \draw[blob] (30:1.25) circle [radius=0.25cm];
+            \draw[blob] (-30:1.25) circle [radius=0.25cm];
+            \draw[electron=0.6] (30:1.5) -- (30:2.25);
+            \draw[positron=0.4] (-30:1.5) -- (-30:2.25);
+        \end{tikzpicture}
+        ,
+    \end{equation}
+    which must then also be finite.
+    Recalling that \(Z_1 = 1 + \delta_1\) is the counter term for the QED vertex it is not that surprising that this is finite, assuming that the two electron propagators are properly regulated.
+    
+    We can also apply the 
+    \begin{equation}
+        Z_2\partial^\mu\correlator{j_\mu(x) \psi(x_1) \diracadjoint{\psi}(x_2)} = \text{finite}
+    \end{equation}
+    by the Ward--Takahashi identity this becomes
+    \begin{equation}
+        \correlator{\psi(x_1) \diracadjoint{\psi}(x_2)} = \text{finite},
+    \end{equation}
+    which corresponds to a fermion propagator.
+    This is surprising, by regulating the QED vertex with \(Z_2\) we've also regulated the fermion propagator.
+    
+    In the \MSbar{} scheme we have
+    \begin{equation}
+        Z_i = 1 + \sum_{n = 1}^{\infty} \frac{a_i}{\varepsilon^n},
+    \end{equation}
+    and so what we have shown here is that, in the \MSbar{} scheme \(Z_1 = Z_2\) to all orders in perturbation theory.
+    More generally the divergent parts of \(Z_1\) and \(Z_2\) are equal to all orders in perturbation theory, but they may differ by finite terms.
+    
+    Recall that the Fermion Lagrangian involves the term
+    \begin{equation}
+        \diracadjoint{\psi}_{\bare}(i\slashed{\partial})\psi_{\bare} + e_{\bare}\diracadjoint{\psi}_{\bare}\slashed{A}_{\bare}\psi_{\bare} = Z_2\diracadjoint{\psi}(i\slashed{\partial})\psi + e\mu^\varepsilon \underbrace{Z_eZ_2\sqrt{Z_3}}_{Z_1} \diracadjoint{\psi}\slashed{A}\psi.
+    \end{equation}
+    This factorises nicely if \(Z_1 = Z_2\) allowing us to rewrite this term using the covariant derivative as
+    \begin{equation}
+        Z_1\diracadjoint{\psi}(i\slashed{\covariantDerivative})\psi
+    \end{equation}
+    for \(\covariantDerivative_\mu = \partial_\mu - ie\mu^\varepsilon A_\mu\).
+    This is nice since it allows us to make gauge invariance more obvious.
+    
+    We previously found that the electric charge becomes scale dependent, with the result that
+    \begin{equation}
+        e_{\measured}^2(k^2) = e_{\measured}^2(0) + \frac{e^4}{2\pi^2} \int_0^1 \dl{x} \, x(1 - x) \log\left( \frac{x(1 - x)k^2}{\tilde{\mu}^2} \right)
+    \end{equation}
+    in the \MSbar{} scheme, neglecting the \(m^2\) term since we are interested in high energies.
+    We found this by studying the vacuum polarisation of the electron, that is, one loop corrections to the photon propagator.
+    This is a bit odd since it is the QED vertex which involves the charge, \(e\), and is used to renormalise the interaction, which is where the charge is important.
+    The link between the vacuum polarisation and the QED vertex is that \(Z_1 = Z_2\), so the counter terms of these two diagrams are related and we can study either one to learn things about the other.
+    
+    
+    \chapter{The QED \texorpdfstring{\(\beta\)}{beta} Function}
+    \section{What is the QED \texorpdfstring{\(\beta\)}{beta} Function?}
+    The bare charge, \(e_{\bare}\), is independent of \(\mu\), since we only introduce \(\mu\) in the regularisation process to hold the dimensions of \(e\) away from \(D = 4\).
+    Thus we have
+    \begin{equation}
+        \mu \diff{e_{\bare}}{\mu} = 0.
+    \end{equation}
+    Note that it is common to work with the log-derivative,
+    \begin{equation}
+        \mu \diff{}{\mu} = \diff{}{(\log \mu)},
+    \end{equation}
+    in this context, rather than just \(\diff{}/{\mu}\).
+    
+    On the other hand after regularising we have \(e_{\bare} = e\mu^\varepsilon Z_3\), which clearly has \(\mu\) dependence.
+    The solution is that \(eZ_3\) must also have \(\mu\) dependence, and this dependence must be such as to exactly cancel the dependence of the \(\mu^\varepsilon\) term.
+    We also have
+    \begin{equation}
+        Z_1 = Z_e Z_2 \sqrt{Z_3},
+    \end{equation}
+    which combined with our recent derivation that \(Z_1 = Z_2\) to all orders in the \MSbar{} scheme gives
+    \begin{equation}
+        Z_e = \frac{1}{\sqrt{Z_3}}.
+    \end{equation}
+    Hence, we are looking to solve
+    \begin{align}
+        0 &= \mu \diff{}{\mu}(e\mu^\varepsilon Z_e)\\
+        &= \mu \diff{}{\mu}\left( \frac{e\mu^\varepsilon}{\sqrt{Z_3}} \right)\\
+        &= \mu \diff{e}{\mu} \mu^\varepsilon \frac{1}{\sqrt{Z_3}} + e\varepsilon \mu^\varepsilon \frac{1}{\sqrt{Z_3}} - \frac{1}{2} e\mu^\varepsilon \frac{1}{Z_3^{3/2}} \mu \diff{Z_3}{\mu}.
+    \end{align}
+    Cancelling a common factor of \(\mu^\varepsilon / \sqrt{Z_3}\) we get
+    \begin{equation}
+        0 = \mu \diff{e}{\mu} + e\varepsilon - \frac{1}{2} \frac{e}{Z_3} \mu \diff{Z_3}{\mu}.
+    \end{equation}
+    Recall that
+    \begin{equation}
+        Z_3 = 1 + \frac{e^2}{12\pi^2\varepsilon},
+    \end{equation}
+    which allows us to write this all in terms of \(\diff{e}/{\mu}\):
+    \begin{equation}
+        0 = \mu \diff{e}{\mu} + e\varepsilon - \frac{1}{2} \frac{e}{Z_3} \mu \frac{2e}{12\pi^2\varepsilon} \diff{e}{\mu}
+    \end{equation}
+    so we have
+    \begin{align}
+        0 &= e\varepsilon + \left( 1 - \frac{1}{Z_3}\frac{e^2}{12\pi^2\varepsilon} \right) \mu \diff{e}{\mu}\\
+        &\approx e\varepsilon + \left( 1 - \frac{e^2}{12\pi^2\varepsilon} \right) \mu \diff{e}{\mu}
+    \end{align}
+    where we've used
+    \begin{equation}
+        \frac{1}{Z_3} \approx 1 - \frac{e^2}{12\pi^2\varepsilon}
+    \end{equation}
+    and dropped any terms of order \(e^3\) or higher.
+    We then have
+    \begin{align}
+        \mu \diff{e}{\mu} &\approx -\frac{e\varepsilon}{1 - e^2/(12\pi^2\varepsilon)}\\
+        &\approx -e\varepsilon\left( 1 + \frac{e^2}{12\pi^2\varepsilon} \right)\\
+        &= -e\varepsilon + \frac{e^3}{12\pi^2}.
+    \end{align}
+    
+    Finally, take the \(\varepsilon \to 0\) limit and define the \defineindex{beta function}\index{\(\beta\)}:
+    \begin{equation}
+        \beta(e) \coloneqq \mu \diff{e}{\mu} = \frac{e^3}{12\pi^2}.
+    \end{equation}
+    This is a \defineindex{renormalisation group equation}.
+    
+    \section{Solving the Renormalisation Group Equation}
+    Set \(t = \log \mu\), then we have
+    \begin{equation}
+        \beta(e) = \diff{e}{t} = \frac{e^3}{12\pi^2}.
+    \end{equation}
+    Multiplying through by\footnote{sorry to any mathematicians reading, although I doubt any have made it this far since nothing converges and we've been computing divergent integrals for about 35 pages} \(\dl{t}\) to get
+    \begin{equation}
+        \frac{\dl{e}}{e^3} = \frac{\dl{t}}{12\pi^2}.
+    \end{equation}
+    Recognising that
+    \begin{equation}
+        \diff{(1/e^2)}{e} = -2\frac{1}{e^3}
+    \end{equation}
+    we have
+    \begin{equation}
+        \frac{\dl{e}}{e^3} = -\frac{1}{2} \dl{\left( \frac{1}{e^2} \right)}
+    \end{equation}
+    and so
+    \begin{equation}
+        \dl{\left( \frac{1}{e^2} \right)} = -\frac{\dl{t}}{6\pi^2}.
+    \end{equation}
+    Integrating from some \(t_0\) to \(t\) we have
+    \begin{equation}
+        \int_{t_0}^{t} \dl{(\frac{1}{e^2})} = -\frac{1}{6\pi^2} \int_{t_0}^{t} \dl{t}
+    \end{equation}
+    which gives
+    \begin{equation}
+        \frac{1}{e^2(t)} - \frac{1}{e^2(t_0)} = - \frac{1}{6\pi^2}(t - t_0).
+    \end{equation}
+    
+    Usually we write this in terms of the fine structure constant, \(\alpha = e^2/(4\pi)\), in which case we have
+    \begin{equation}
+        \frac{1}{4\pi\alpha(t)} - \frac{1}{4\pi\alpha(t_0)} = -\frac{1}{6\pi^2}(t - t_0) \implies \frac{1}{\alpha(t)} - \frac{1}{\alpha(t_0)} = -\frac{2}{3\pi}(t - t_0).
+    \end{equation}
+    So, for fixed \(t_0\), we have found a linear relationship between \(1/\alpha(t)\) and \(t\), which is logarithmic in the energy.
+    We can plot the result as in \cref{fig:fine structure constant plot}.
+    From this we see that as \(t\), and hence the energy \(\mu\), grows \(1/\alpha(t)\) becomes smaller until it vanishes at some value \(t_*\).
+    That is, \(\alpha(t)\) becomes larger and larger and eventually at \(t = t_*\) it takes on an infinite value.
+    We call this a \defineindex{Landau pole}.
+    
+    \begin{figure}
+        \tikzsetnextfilename{qed-beta-alpha-blows-up}
+        \begin{tikzpicture}
+            \draw[thick, ->] (0, -1) -- (0, 5) node[below left] {\(1/\alpha(t)\)};
+            \draw[thick, ->] (-1, 0) -- (5, 0) node[below] {\(t\)};
+            \draw[highlight, very thick] (-1, 4) -- (4, 0) node [below, black] {\(t_*\)};
+        \end{tikzpicture}
+        \caption{A plot of \(1/\alpha(t)\) as a function of \(t\). Notice that at some value \(t_*\) we have \(1/\alpha(t_*) = 0\), meaning \(\alpha(t_*)\) must be infinite.}
+        \label{fig:fine structure constant plot}
+    \end{figure}
+    
+    The modern understanding of this result is that QED is not well defined as a quantum theory to arbitrarily high energy.
+    At some energy scale, \(\Lambda_{\symrm{QED}} = \e^{t_*}\) the theory breaks down and stops working.
+    This isn't really too much of a worry for two reasons:
+    \begin{itemize}
+        \item the approximation that \(e(\mu)\) is small breaks far below this energy scale;
+        \item \(\Lambda_{\symrm{QED}}\) is truly massive, using \(t_0 = \log m_{\PZboson}\), where measurements give \(\alpha(t_0) \approx 1/127\), we find that \(\Lambda_{\symrm{QED}} \sim 10^{270} \, \unit{\electronvolt}\).
+    \end{itemize}
+    
+    We can rearrange this equation:
+    \begin{align}
+        \frac{1}{\alpha(t)} &= \frac{1}{\alpha(t_0)} - \frac{2}{3\pi}(t - t_0)\\
+        \implies \alpha(t) &= \frac{1}{1/\alpha(t_0) - 2(t - t_0)/(3\pi)} = \frac{\alpha(t_0)}{2\alpha(t_0)(t - t_0)/(3\pi)}.
+    \end{align}
+    We can then expand this to get
+    \begin{align}
+        \alpha(t) &= \alpha(t_0) + \frac{2}{3\pi}\alpha^2(t_0)(t - t_0) + \frac{4}{9\pi}\alpha^3(t_0)(t - t_0)^2 + \dotsb\\
+        &= \alpha(t_0) + \frac{2}{3\pi}\alpha^2(t_0) \log \frac{\mu}{\mu_0} + \frac{4}{9\pi} \alpha^3(t_0) \left( \log \frac{\mu}{\mu_0} \right)^2 + \dotsb\\
+        &= 
+        \tikzsetnextfilename{qed-beta-alpha-expansion}
+        \begin{tikzpicture}[baseline=(plus.base)]
+            \draw[photon] (-1.5, 0) -- (-0.5, 0);
+            \draw[photon] (0.5, 0) -- (1.5, 0);
+            \draw[electron=0.55] (-0.5, 0) arc (180:0:0.5);
+            \draw[positron=0.45] (-0.5, 0) arc (180:360:0.5);
+            \node (plus) at (1.8, 0) {\(+\)};
+            \begin{scope}[xshift=3.6cm]
+                \draw[photon] (-1.5, 0) -- (-0.5, 0);
+                \draw[photon] (0.5, 0) -- (1.5, 0);
+                \draw[photon] (2.5, 0) -- (3.5, 0);
+                \draw[electron=0.55] (-0.5, 0) arc (180:0:0.5);
+                \draw[positron=0.45] (-0.5, 0) arc (180:360:0.5);
+                \draw[electron=0.55] (1.5, 0) arc (180:0:0.5);
+                \draw[positron=0.45] (1.5, 0) arc (180:360:0.5);
+            \end{scope}
+            \node at (7.6, 0) {\(+ \dotsb.\)};
+        \end{tikzpicture}
+        \notag
+    \end{align}
+    Here we interpret this series as a series of diagrams, each order of \(\alpha\) giving an extra loop, which each come with two vertices, accounting for the two extra powers of \(e\).
+    So we see that the divergence of the coupling constant can be understood as the result of resuming an infinite class of diagrams.
+    
+    There are other two loop corrections to this, such as
+    \begin{equation}
+        \tikzsetnextfilename{qed-beta-other-2-loop-corrections-to-alpha}
+        \begin{tikzpicture}[baseline=-0.05cm]
+            \draw[photon] (0, 0) -- (1, 0);
+            \draw[photon] (2, 0) -- (3, 0);
+            \draw[electron=0.55] (1, 0) arc (180:90:0.5);
+            \draw[electron=0.55] (1.5, 0.5) arc (90:0:0.5);
+            \draw[electron=0.55] (2, 0) arc (0:-90:0.5);
+            \draw[electron=0.55] (1.5, -0.5) arc (270:180:0.5);
+            \draw[photon] (1.5, 0.5) -- (1.5, -0.5);
+        \end{tikzpicture}
+        \sim \alpha^4(t_0) \log\left( \frac{\mu}{\mu_0} \right),
+    \end{equation}
+    but if \(\log(\mu/\mu_0)\) is large then the class of diagrams already accounted for is the most important.
+    This is called resummation of large logs.
     
     %   Appdendix
 %    \appendixpage
