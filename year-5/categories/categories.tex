@@ -39,6 +39,9 @@
 \tikzset{triangle/.style={regular polygon, regular polygon sides=3}}
 \tikzset{state/.style={morphism, triangle, shape border rotate=180}}
 \tikzset{effect/.style={morphism, triangle}}
+\tikzset{scalar/.style={draw, shape=circle, inner sep=2pt}}
+\tikzset{over wire/.style={thick, preaction={draw, background color, line width=#1}}}
+\tikzset{over wire/.default={1.5mm}}
 
 \RequirePackage[%
 sorting=none,  % Don't sort the references, they will appear in the order they are first cited
@@ -91,6 +94,17 @@ noabbrev
         {=>}{$\Rightarrow$}{1}
 }
 
+% Change tikzcd background colour in environments
+\colorlet{background color}{white}  % normal background is white
+% background in lemma
+\colorlet{lemma background}{black!5}
+\AtBeginEnvironment{lma}{\colorlet{background color}{lemma background}}
+\AtEndEnvironment{lma}{\colorlet{background color}{white}}
+\colorlet{example background}{azure(web)(azuremist)!45}
+\AtBeginEnvironment{exm}{\colorlet{background color}{example background}}
+\AtEndEnvironment{exm}{\colorlet{background color}{white}}
+\tikzcdset{background color=background color}
+
 % Text
 \newcommand*{\course}[1]{\textit{#1}}
 \newcommand{\Haskell}{\textit{Haskell}}
@@ -98,30 +112,32 @@ noabbrev
 % Maths
 \newcommand{\e}{\symrm{e}}
 \DeclarePairedDelimiter{\denotes}{\lBrack}{\rBrack}
-\newcommand{\cat}[1]{\symbfup{#1}}
-\newcommand{\category}[1]{\symbfup{#1}}
-\newcommand{\Set}{\category{Set}}
-\newcommand{\Rel}{\category{Rel}}
+\newcommand{\cat}[1]{\symbfsfup{#1}}
+\makeatletter
+\newcommand{\c@egory}[1]{\symbfsfup{#1}}
+\newcommand{\Set}{\c@egory{Set}}
+\newcommand{\Rel}{\c@egory{Rel}}
 \renewcommand{\field}{\symbb{k}}
-\newcommand{\Mat}[1][\field]{{\category{Mat}_{#1}}}
-\newcommand{\Vect}[1][\field]{{\category{Vect}_{#1}}}
-\newcommand{\FVect}[1][\field]{{\category{FVect}_{#1}}}
-\newcommand{\Hilb}{\category{Hilb}}
-\newcommand{\FHilb}{\category{FHilb}}
-\newcommand{\Mon}{\category{Mon}}
-\newcommand{\Grp}{\category{Grp}}
-\newcommand{\Ring}{\category{Ring}}
-\newcommand{\CRing}{\category{CRing}}
-\newcommand{\Field}{\category{Field}}
-\newcommand{\RMod}[1][R]{#1{-}\category{Mod}}
-\newcommand{\Top}{\category{Top}}
-\newcommand{\pointedTop}{\category{Top}_{\bullet}}
-\newcommand{\Cat}{\category{Cat}}
-\newcommand{\Ab}{\category{Ab}}
-\newcommand{\Pos}{\category{Pos}}
-\newcommand{\LieGrp}{\category{LieGrp}}
-\newcommand{\LieAlg}{\category{LieAlg}}
-\newcommand{\one}{\category{1}}
+\newcommand{\Mat}[1][\field]{{\c@egory{Mat}_{#1}}}
+\newcommand{\Vect}[1][\field]{{\c@egory{Vect}_{#1}}}
+\newcommand{\FVect}[1][\field]{{\c@egory{FVect}_{#1}}}
+\newcommand{\Hilb}{\c@egory{Hilb}}
+\newcommand{\FHilb}{\c@egory{FHilb}}
+\newcommand{\Mon}{\c@egory{Mon}}
+\newcommand{\Grp}{\c@egory{Grp}}
+\newcommand{\Ring}{\c@egory{Ring}}
+\newcommand{\CRing}{\c@egory{CRing}}
+\newcommand{\Field}{\c@egory{Field}}
+\newcommand{\RMod}[1][R]{#1{-}\c@egory{Mod}}
+\newcommand{\Top}{\c@egory{Top}}
+\newcommand{\pointedTop}{\c@egory{Top}_{\bullet}}
+\newcommand{\Cat}{\c@egory{Cat}}
+\newcommand{\Ab}{\c@egory{Ab}}
+\newcommand{\Pos}{\c@egory{Pos}}
+\newcommand{\LieGrp}{\c@egory{LieGrp}}
+\newcommand{\LieAlg}{\c@egory{LieAlg}}
+\newcommand{\one}{\c@egory{1}}
+\makeatother
 \DeclareMathOperator{\Ob}{Ob}
 \DeclareMathOperator{\id}{id}
 \newcommand{\isomorphic}{\cong}
@@ -135,6 +151,8 @@ noabbrev
 \undef\det
 \DeclareMathOperator{\det}{det}
 \AtBeginDocument{\renewcommand{\mapstochar}{\rule[0.5pt]{0.5pt}{4.3pt}\mkern-1mu}}
+\newcommand{\true}{\symtt{true}}
+\newcommand{\false}{\symtt{false}}
 
 \includeonly{parts/maths-defs}
 
@@ -1244,7 +1262,7 @@ noabbrev
     
     \section{Categories: The Examples}
     \subsection{\texorpdfstring{\(\Set\)}{Set}}
-    \begin{dfn}{\(\Set\)}{}
+    \begin{dfn}{\normalsize\(\Set\)}{}
         The category \(\Set\)\index{Set@\(\Set\)} has sets as objects.
         A morphism \(A \to B\) is simply a function from \(A\) to \(B\).
         Composition of morphisms is composition of functions, defined for \(f \colon A \to B\) and \(g \colon B \to C\) by \((g \circ f) \colon A \to C\) given by \((g \circ f)(a) = g(f(a))\) for all \(a \in A\).
@@ -1539,7 +1557,7 @@ noabbrev
     \end{equation}
     Now we can define a category.
     
-    \begin{dfn}{\(\Rel\)}{def:Rel}
+    \begin{dfn}{\normalsize\(\Rel\)}{def:Rel}
         The category \(\Rel\)\index{Rel@\(\Rel\)} has sets as objects.
         A morphism \(R \colon A \to B\) is a relation \(R \subseteq A \times B\).
         Composition of morphisms is composition of relations, defined for \(R \colon A \to B\) and \(g \colon B \to C\) by
@@ -1712,9 +1730,9 @@ noabbrev
     The functor \(M\) then maps sets to their size, \(A \mapsto M(A) = \abs{A}\), and relations to matrices as described above.
     
     This is actually an example of a more general idea of a representation\footnote{see \course{Symmetries of Quantum Mechanics} or \course{Symmetries of Particles and Fields}}, where we replace objects with matrices preserving the structure of the original space.
-    These ideas can all be understood as functors \(\cat{C} \to \Mat\) for some appropriate category \(\category{C}\) and ring \(\field\).
-    This in turn is more commonly thought of as a map \(\category{C} \to \FVect\) identifying matrices with linear maps.
-    This allows for generalisations to infinite dimensional representations, \(\category{C} \to \Vect\).
+    These ideas can all be understood as functors \(\cat{C} \to \Mat\) for some appropriate category \(\cat{C}\) and ring \(\field\).
+    This in turn is more commonly thought of as a map \(\cat{C} \to \FVect\) identifying matrices with linear maps.
+    This allows for generalisations to infinite dimensional representations, \(\cat{C} \to \Vect\).
     We'll define \(\FVect\) and \(\Vect\) shortly (\cref{def:Vect,def:FVect}).
     
     On the surface \(\Rel\) seems quite similar to \(\Set\), after all the objects of both are the same.
@@ -1765,7 +1783,7 @@ noabbrev
     \end{equation}
     We also refer to \(V\) and \(W\) as vector spaces (over \(\field\)) leaving the operations (and potentially the field) implicit.
     
-    \begin{dfn}{\(\Vect\)}{def:Vect}
+    \begin{dfn}{\normalsize\(\Vect\)}{def:Vect}
         Fix some field \(\field\).
         The category \(\Vect\)\index{Vect@\(\Vect\)} has vector spaces over \(\field\) as objects and linear maps as morphisms.
         Composition of morphisms is composition of linear maps, which is composition of the underlying functions.
@@ -1814,7 +1832,7 @@ noabbrev
     It is a fact that any two bases have the same cardinality, which we call the \defineindex{dimension} of the space.
     A vector space is \defineindex{finite-dimensional} if it's dimension is finite.
     
-    \begin{dfn}{\(\FVect\)}{def:FVect}
+    \begin{dfn}{\normalsize\(\FVect\)}{def:FVect}
         The category \(\FVect\) has finite-dimensional vector spaces as objects and linear maps as morphisms.
     \end{dfn}
     
@@ -1830,7 +1848,7 @@ noabbrev
     Then a linear map \(T \colon V \to W\) defines a matrix with components \(T_{ij}\) given by \(T(v_i)_j\), where \(T(v_i)_j\) is the \(j\)th component of \(T(v_i)\), which is what we get evaluating the linear map at the \(i\)th basis vector, \(v_i\).
     A matrix, \(T_{ij}\), defines a linear map \(T \colon V \to W\) similarly, by defining \(T(v_i)\) to be formed from components \(T(v_i)_j = T_{ij}\), and then using linearity to extend this definition to any vector in \(V\).
     
-    \begin{dfn}{\(\Mat\)}{def:Mat}
+    \begin{dfn}{\normalsize\(\Mat\)}{def:Mat}
         The category \(\Mat\)\index{Mat@\(\Mat\)} has natural numbers as objects with a morphism \(n \to m\) being an \(m \times n\) matrix with entries in \(\field\).
         Composition of morphisms is matrix multiplication and the identity matrix is the identity morphism.
     \end{dfn}
@@ -1892,7 +1910,7 @@ noabbrev
         for some \(M \in \reals\) and all \(v \in H\).
     \end{dfn}
     
-    \begin{dfn}{\(\Hilb\) and \(\FHilb\)}{def:Hilb and FHilb}
+    \begin{dfn}{{\normalsize\(\Hilb\)} and {\normalsize\(\FHilb\)}}{def:Hilb and FHilb}
         Fix some field \(\field = \reals, \complex\).
         The category \(\Hilb\) has Hilbert spaces as objects and bounded linear maps as morphisms.
         The category \(\FHilb\) has finite-dimensional Hilbert spaces as objects and bounded linear maps as morphisms.
@@ -2059,7 +2077,7 @@ noabbrev
     For example, the groups \((\{0, 1\}, +_2)\) and \((\{1, -1\}, \cdot)\) are not equal, but they are isomorphic.
     
     \begin{lma}{}{}
-        Let \(\category{C}\) be a category with objects \(A\) and \(B\).
+        Let \(\cat{C}\) be a category with objects \(A\) and \(B\).
         If \(f \colon A \to B\) is an isomorphism then the inverse is unique.
         \begin{proof}
             Suppose this wasn't the case, so \(f \colon A \to B\) has two inverses, \(g, g' \colon B \to A\), which are both such that \(g \circ f = g' \circ f = \id_A\) and \(f \circ g = f \circ g' = \id_B\).
@@ -2206,6 +2224,8 @@ noabbrev
     While this notation looks new if we were to instead draw it horizontally and replace wires with \(\circ\) and \(\id_X\) then it would just be the usual algebraic notation for morphism composition.
     The real power of this notation comes when we introduce new concepts, such as monoidal products, which extend the graphical notation into a two-dimensional notation which works in much the same way, while the usual algebraic notation quickly becomes cluttered and hard to use.
     
+    Note that while wires don't need to be vertical, sometimes it's helpful to have them not be to fit more things in, wires are not, in general, allowed to be horizontal, this is so that we can't turn a morphism \enquote{upside down}, although we'll see later that this is sometimes possible.
+    
     
     \section{Functors}
     The spirit of category theory is that it is not objects that are important but morphisms between them.
@@ -2245,9 +2265,9 @@ noabbrev
     Note that what we have defined above is a \defineindex{covariant functor}.
     It is also possible to define a \defineindex{contravariant functor} which reverses the direction of morphisms.
     The difference in the definition is that each \(f \in \cat{C}(A, B)\) is assigned to some \(Ff \in \cat{D}(FB, FA)\) and \(F(g \circ f) = Ff \circ Fg\).
-    We'll assume that all functors are covariant.
+    We'll assume that all functors are covariant unless stated otherwise.
     
-    \begin{exm}{}{}
+    \begin{exm}{Functors}{}
         \begin{itemize}
             \item The constant functor, \(C_X \colon \cat{C} \to \cat{D}\), maps every object of \(\cat{C}\) to \(X \in \Ob(\cat{D})\) and every morphism \(f \colon A \to B\) in \(\cat{C}\) to the identity morphism \(\id_X \colon X \to X\) in \(\cat{D}\).
             \item The identity functor, \(\id_{\cat{C}} \colon \cat{C} \to \cat{C}\) maps every object and morphism in \(\cat{C}\) to itself.
@@ -2309,7 +2329,7 @@ noabbrev
     
     Now that we have categories and maps between them it is natural to ask if this forms a category, and indeed it does!
     
-    \begin{dfn}{\(\Cat\)}{}
+    \begin{dfn}{\normalsize\(\Cat\)}{}
         The category \(\Cat\)\index{Cat@\(\Cat\)} has (small) categories as its objects and functors as its morphisms.
         Composition of functors is composition of the two mappings \(\Ob(\cat{C}) \to \Ob(\cat{D})\) and \(\cat{C}(A, B) \to \cat{D}(FA, FB)\), and the identity is the identity functor.
     \end{dfn}
@@ -2338,7 +2358,7 @@ noabbrev
     \end{dfn}
     
     This leads to an alternative, equivalent, definition of an equivalence.
-    A functor \(F \colon \cat{C} \to \cat{D}\) is an equivalence if and only if there is a functor \(G \colon \cat{D} \to \cat{C}\) and natural isomorphisms \(G \circ F \naturalTransformation \id_{\category{C}}\) and \(F \circ G \naturalTransformation \id_{\cat{D}}\).
+    A functor \(F \colon \cat{C} \to \cat{D}\) is an equivalence if and only if there is a functor \(G \colon \cat{D} \to \cat{C}\) and natural isomorphisms \(G \circ F \naturalTransformation \id_{\cat{C}}\) and \(F \circ G \naturalTransformation \id_{\cat{D}}\).
     Intuitively, an equivalence is a function which is invertible up to natural isomorphism.
     
     Note that it is common to write all of the data needed to define a natural transformation as
@@ -2499,7 +2519,7 @@ noabbrev
     This inspires the following definition.
     
     \begin{dfn}{Tensor Product}{}
-        Let \(U\), \(V\), and \(W\) be vector spaces over \(\field\).
+        Let \(U\), \(V\), and \(W\) be vector spaces\footnote{this definition also holds for \(R\)-modules replacing linear with \(R\)-linear.} over \(\field\).
         The \defineindex{tensor product} of \(U\) and \(V\) is a vector space, which we call \(U \otimes V\), equipped with a bilinear map \(f \colon U \times V \to U \otimes V\) such that for all bilinear maps \(g \colon U \times V \to W\) there exists a unique linear map \(h \colon U \otimes V \to W\) such that \(g = h \circ f\).
         That is, such that
         \begin{equation}
@@ -2649,6 +2669,28 @@ noabbrev
         \item the associator allows us to move brackets around and only change things by an isomorphism, which means no important change occurs;
         \item the unitors allow us to remove the unit object when it is involved in a product, again only changing things by an isomorphism.
     \end{enumerate}
+    
+    The naturality condition for \(\alpha\) gives the commuting diagram
+    \begin{equation}
+        \begin{tikzcd}
+            (A \otimes B) \otimes C \arrow[r, "\alpha_{A,B,C}"] \arrow[d, "(f \otimes g) \otimes h"'] & A \otimes (B \otimes C) \arrow[d, "f \otimes (g \otimes h)"]\\
+            (A' \otimes B') \otimes C' \arrow[r, "\alpha_{A',B',C'}"'] & A' \otimes (B' \otimes C')
+        \end{tikzcd}
+    \end{equation}
+    for all \(f \colon A \to A'\), \(g \colon B \to B'\), and \(h \colon C \to C'\).
+    In other words, it doesn't matter if we apply maps and then move brackets, or move brackets and then apply maps.
+    The naturality conditions for \(\lambda\) and \(\rho\) can be combined into the following commuting diagram
+    \begin{equation}
+        \begin{tikzcd}
+            I \otimes A \arrow[r, "\lambda_A"] \arrow[d, "\id_I \otimes f"'] & A \arrow[d, "f"'] & A \otimes I \arrow[l, "\rho_A"'] \arrow[d, "f \otimes \id_{I}"]\\
+            I \otimes B \arrow[r, "\lambda_B"] & B & B \otimes I \arrow[l, "\rho_B"]
+        \end{tikzcd}
+    \end{equation}
+    for all \(f \colon A \to B\).
+    In other words, we can remove the identity and then apply \(f\), or we can do nothing to the identity while applying \(f\) and then remove the identity.
+    Note that it is common to write \(I\) for \(\id_I\), there should be no confusion as \(I \otimes f\) can only mean \(\id_I \otimes f\), there is no way to take the tensor product of an object and a morphism.
+    Thus, we could write the naturality condition for \(\lambda\), the left square, as either \(f \circ \lambda_A = \lambda_B \circ (\id_I \otimes f)\) or the slightly more succinct \(f \circ \lambda_A = \lambda_B \circ (I \otimes f)\).
+    In fact, this is sometimes done for all objects, not just the unit.
 
     Now lets look at the triangle equation.
     It tells us how the unitors and associator combine.
@@ -2689,7 +2731,7 @@ noabbrev
     It turns out that the monoidal product works exactly how our intuition says it does, and this is the crux of the next theorem, which we shan't prove.
     
     \begin{thm}{Coherence Theorem for Monoidal Categories}{}
-        In a monoidal category and well-typed equation built from associators, unitors, and their inverses holds.
+        In a monoidal category any well-typed equation built solely from associators, unitors, and their inverses holds.
     \end{thm}
     
     By well-typed we simply mean that both sides of the equation must be morphisms with matching domain and codomain, and that any compositions are defined, so morphisms in the composition match domain to codomain.
@@ -2706,7 +2748,7 @@ noabbrev
     We've already seen in \cref{sec:monoidal categories: the need for specificity} how \(((a, b), c)) \mapsto (a, (b, c))\) defines the associator for the Cartesian product.
     Thus we can make the following definition.
     
-    \begin{dfn}{\(\Set\) as a Monoidal Category}{}
+    \begin{dfn}{{\normalsize\(\Set\)} as a Monoidal Category}{}
         The category \(\Set\)\index{Set@\(\Set\)!as a monoidal category} can be promoted to a monoidal category by defining
         \begin{enumerate}
             \item the monoidal product to be the Cartesian product;
@@ -2747,9 +2789,27 @@ noabbrev
                 \begin{tikzcd}[row sep=large]
                     \parbox{4cm}{\centering\((\alpha_{A,B,C}((a, b), c), \id_D(D))\) \(=((a, (b, c)), d)\)} \arrow[r, mapsto, "\alpha_{A, B\times C, D}"] & \parbox{3.5cm}{\centering\(\alpha_{A, B \times C, D}((a, (b, c)), d)\) \(=(a, ((b, c), d))\)} \arrow[dd, "\id_A \times \alpha_{B,C,D}", mapsto] \\
                     (((a, b), c), d) \arrow[u, "\alpha_{A,B,C} \times \id_D", mapsto] \arrow[d, "\alpha_{A\times B,C,D}"', mapsto]\\
-                    \parbox{4cm}{\centering\(\alpha_{A\times B,C,D}(((a, b), c), d)\) \(=((a, b), (c, d))\)} \arrow[r, "\alpha_{A,B,C\times D}"', end anchor={[yshift=-2ex, xshift=1.2em]}, start anchor={[xshift=-1em]}, mapsto, pos=0.8] & \parbox{4cm}{\centering\((\id_A(a), \alpha_{B,C,D}((b, c), d))\) \(= (a, (b, (c, d))) =\) \(\alpha_{A,B,C\times D}((a, b), (c, d))\).}
+                    \parbox{4cm}{\centering\(\alpha_{A\times B,C,D}(((a, b), c), d)\) \(=((a, b), (c, d))\)} \arrow[r, "\alpha_{A,B,C\times D}"', end anchor={[yshift=-2ex, xshift=1.2em]}, start anchor={[xshift=-3em, yshift=-1ex]}, mapsto, pos=0.8] & \parbox{4cm}{\centering\((\id_A(a), \alpha_{B,C,D}((b, c), d))\) \(= (a, (b, (c, d))) =\) \(\alpha_{A,B,C\times D}((a, b), (c, d))\).}
                 \end{tikzcd}
             \end{equation}
+            Finally, we need to show that the unitors and associator satisfy the naturality conditions.
+            First consider the left unitor \(\lambda\).
+            We can see from the following diagram that the relevant naturality square commutes for all \(f \colon A \to B\):
+            \begin{equation}
+                \begin{tikzcd}
+                    (\bullet, a) \arrow[r, mapsto, "\lambda_A"] \arrow[d, "\id_I \times f"'] & \lambda_A(\bullet, a) = a \arrow[d, mapsto, "f", shift left=0.8cm]\\
+                    (\id_I(\bullet), f(a)) = (\bullet, f(a)) \arrow[r, mapsto, "\lambda_B"'] & \lambda_B(\bullet, f(a)) = f(a).
+                \end{tikzcd}
+            \end{equation}
+            Naturality of \(\rho\) is demonstrated in the same way.
+            Naturality of \(\alpha\) follows from
+            \begin{equation}
+                \begin{tikzcd}
+                    ((a, b), c) \arrow[r, mapsto, "\alpha_{A,B,C}"] \arrow[d, mapsto, "(f\times g)\times h"'] & (a, (b, c)) \arrow[d, mapsto, "f\times(g\times h)"]\\
+                    ((f(a), g(b)), h(c)) \arrow[r, mapsto, "\alpha_{A',B',C'}"'] & (f(a), (g(b), h(c)))
+                \end{tikzcd}
+            \end{equation}
+            commuting for all \(f \colon A \to A'\), \(g \colon B \to B'\), and \(h \colon C \to C'\).
         \end{proof}
     \end{lma}
     
@@ -2760,7 +2820,7 @@ noabbrev
     The only difference is that in \(\Rel\) our morphisms are relations, so instead of a function \(\{\bullet\} \times A \to A\) giving us \(A\) back we instead define a relation on \((\{\bullet\} \times A) \times A\) where \((\bullet, a) \sim a\), we use \(\sim\) here since this is an isomorphism in \(\Rel\), it is not an equivalence relation, since the two sets on either side of the relation are different.
     Similarly, the associators are given by changing the function in \(\Set\) into a relation.
     
-    \begin{dfn}{\(\Rel\) as a Monoidal Category}{}
+    \begin{dfn}{{\normalsize\(\Rel\)} as a Monoidal Category}{}
         The category \(\Rel\)\index{Rel@\(\Rel\)!as a monoidal category} can be promoted to a monoidal category by defining
         \begin{itemize}
             \item the monoidal product to be the Cartesian product;
@@ -2781,7 +2841,7 @@ noabbrev
     It should not be surprising that \(\Vect\) and \(\Hilb\), and their finite-dimensional subcategories, can be made into monoidal categories, after all these were the models for the definition of monoidal categories we used at the start of the chapter.
     We'll define \(\Hilb\) as a monoidal category of complex Hilbert spaces, but the definition is exactly the same for \(\Vect\)\index{Vect@\(\Vect\)!as a monoidal category} as a monoidal category, just replace \(\complex\) with \(\field\) and ignore inner products.
     
-    \begin{dfn}{\(\Hilb\) as a Monoidal Category}{}
+    \begin{dfn}{{\normalsize\(\Hilb\)} as a Monoidal Category}{}
         The category \(\Hilb\)\index{Hilb@\(\Hilb\)!as a monoidal category} can promoted to a monoidal category by defining
         \begin{itemize}
             \item the monoidal product to be the tensor product;
@@ -2813,7 +2873,7 @@ noabbrev
     The right unitor is defined analogously.
     
     \subsection{More Examples}
-    \begin{exm}{}{}
+    \begin{exm}{Monoidal Categories}{}
         \begin{itemize}
             \item The category of (small) categories, \(\Cat\), is a monoidal category when equipped with the product of categories as the monoidal product and \(\one\), the category with a single object and only its identity morphism, as the unit.
             This is another example of a categorical product/terminal object monoidal category.
@@ -2834,7 +2894,7 @@ noabbrev
     \section{Interchange Law}
     The interchange law allows us to swap composition and the monoidal product, and is automatically satisfied by any monoidal category.
     
-    \begin{thm}{Interchange Law}{}
+    \begin{thm}{Interchange Law}{thm:interchange law}
         Let \(\cat{C}\) be a monoidal category with monoidal product \(\otimes\).
         Consider the following objects morphisms in \(\cat{C}\):
         \begin{equation}
@@ -2900,20 +2960,54 @@ noabbrev
         .
     \end{equation}
     
-    The unit, \(I\), is drawn as the empty diagram:
+    The unit, \(I\), is drawn as the empty diagram, or as a dotted line if we want to remember that it's there:
     \begin{equation}
         I = 
         \tikzsetnextfilename{mon-cat-graphical-unit}
         \begin{tikzpicture}[baseline=(equals.base)]
-            \draw[wire] (0, 0) -- (0, 1) node [midway, left] (I) {\(I\)};
-            \node at (0.5, 0.5) (equals) {\(=\)};
-            \draw[dashed, thick] (1, 0) rectangle (2, 1);
-            \node at (2.5, 0.5) {\(=\)};
+            \draw[wire] (0, 0) -- (0, 1) node [midway, left] {\(I\)};
+            \draw[wire, dashed] (1, 0) -- (1, 1) node [midway, left] {\(I\)};
+            \node at (0.4, 0.5) (equals) {\(=\)};
+            \draw[dashed, thick] (1.8, 0) rectangle (2.8, 1);
+            \node at (1.4, 0.5) {\(=\)};
             \node at (4, 0) {};
+            \node at (3.2, 0.5) {\(=\)};
         \end{tikzpicture}
         .
     \end{equation}
     This means we don't have to draw left or right unitors, since their action is to simply remove the unit, and we don't draw the unit any way.
+    If we are drawing units as dashed lines then the left and right unitors can be draw as
+    \begin{equation}
+        \tikzsetnextfilename{mon-cat-graphical-left-unitor}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \node[morphism, minimum width=1cm] (lambda) {\(\lambda\)};
+            \draw[wire, dashed] ($(lambda.south west) + (0.3, 0)$) -- ++ (0, -0.5) coordinate (bottom);
+            \draw[wire] ($(lambda.south east) - (0.3, 0)$) -- ++ (0, -0.5);
+            \draw[wire] (lambda.north) -- ++ (0, 0.5) coordinate (top);
+            \draw[wire] (2, 0 |- bottom) coordinate (A) -- (2, 0 |- top) coordinate (B);
+            \draw[wire, dashed, rounded corners] (1.5, 0 |- bottom) -- ++ (0, 0.2)  -- ($(A)!0.5!(B)$);
+            \node (equals) at (1, 0) {\(=\)};
+            \node at (2.5, 0) {\(=\)};
+            \draw[wire] (3, 0 |- bottom) -- (3, 0 |- top);
+        \end{tikzpicture}
+        ,\qand
+        \tikzsetnextfilename{mon-cat-graphical-right-unitor}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \node[morphism, minimum width=1cm] (rho) {\(\rho\)};
+            \draw[wire] ($(rho.south west) + (0.3, 0)$) -- ++ (0, -0.5) coordinate (bottom);
+            \draw[wire, dashed] ($(rho.south east) - (0.3, 0)$) -- ++ (0, -0.5);
+            \draw[wire] (rho.north) -- ++ (0, 0.5) coordinate (top);
+            \draw[wire] (1.5, 0 |- bottom) coordinate (A) -- (1.5, 0 |- top) coordinate (B);
+            \draw[wire, dashed, rounded corners] (2, 0 |- bottom) -- ++ (0, 0.2)  -- ($(A)!0.5!(B)$);
+            \node (equals) at (1, 0) {\(=\)};
+            \node at (2.5, 0) {\(=\)};
+            \draw[wire] (3, 0 |- bottom) -- (3, 0 |- top);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    respectively.
+    Here the wires joining is a morphism, \(\lambda\) or \(\rho\), we're just not labelling it.
+    
     Similarly, we don't have to draw the associator since we're not drawing any brackets anyway.
     This only works because of the coherence theorem, which means that we can only build a single morphism of a given type, and so the unitors and associators don't give us any information that the domain and codomain don't.
     
@@ -3208,6 +3302,1029 @@ noabbrev
     \end{figure}
     
     This demonstrates another way in which \(\Rel\) is more like \(\Hilb\) than \(\Set\), both \(\Rel\) and \(\Hilb\) have entangled states.
+    
+    \chapter{Scalars}
+    \section{Motivation}
+    Each vector space comes equipped, by definition, with a field of scalars.
+    Most of the time this field is either \(\reals\) or \(\complex\), and we'll consider the complex case here.
+    The scalars and the vector space come with a map, called scalar multiplication, which takes a scalar and a vector and produces a vector, \(\cdot \colon \field \times V \to V\), \((a, v) \mapsto a v\).
+    We can similarly define a map between (bounded) linear maps, given by\footnote{We use \(\hom\) here to avoid specifying exactly which category of vector spaces we are working in, it could be \(\Vect\), \(\FVect\), \(\Hilb\), or \(\FHilb\).} \(\cdot \colon \field \times \hom(V, W) \to \hom(V, W)\), \((a, f) \mapsto \lambda \cdot f\) where if \(f \colon V \to W\) is a (bounded) linear map then we define \(a \cdot f\) to be the map \((a \cdot f ) \colon V \to W\) defined by \((a \cdot f)(v) = a f(v)\) where on the right hand side multiplication is just scalar multiplication.
+    
+    This structure is very important, and indeed is part of the definition of a vector space.
+    However, as stated here this requires us to talk of individual vectors, which is not in the spirit of category theory.
+    In the next section we'll see how the field of scalars can be talked about in a categorical way, and in the section after that we'll generalise our observation to any monoidal category.
+    
+    \section{Scalars in \texorpdfstring{\(\Hilb\)}{Hilb}}
+    Lets work in \(\Hilb\) and try to discus scalars, which we'll take as elements of \(\complex\), in a categorical way.
+    We don't want to talk of individual elements of the field, or of individual vectors.
+    Instead notice that given some scalar, \(a \in \complex\), can be identified with a linear map \(\complex \to \complex\) defined by \(1 \mapsto a\), which full defines the map through linearity.
+    Let's call this map \(f_a\).
+    
+    Now consider composing these two maps of this type, if \(a, b \in \complex\), we have \((f_b \circ f_a)(1) = f_b(f_a(1)) = f_b(a1) = af_b(1) = ab\), so composition is multiplication in \(\complex\).
+    
+    What about multiplication of bounded linear maps?
+    Consider the bounded linear map \(T \colon H \to K\).
+    Given some \(a \in \complex\) we can consider
+    \begin{equation}
+        \lambda_K \circ (f_a \otimes T) \circ \lambda_H^{-1} \colon H \to K, \qquad H \xrightarrow{\lambda_H^{-1}} \complex \otimes H \xrightarrow{f_a \otimes T} \complex \otimes K \xrightarrow{\lambda_K} K,
+    \end{equation}
+    this takes in some object in \(H\), maps it to an object in \(\complex \otimes H\), applies \(f_a \otimes T\), mapping it to an object in \(\complex \otimes K\), then maps this to an object in \(K\).
+    Let's consider an example, we have
+    \begin{multline}
+        v \xmapsto{\lambda_{H}^{-1}} 1 \otimes v \xmapsto{f_a \otimes T} f_a(1) \otimes T(v) = a\otimes T(v)\\
+        = a(1 \otimes T(v)) \xmapsto{\lambda_K} \lambda_K(a(1 \otimes T(v))) = a\lambda_K(1 \otimes T(v)) = aT(v).
+    \end{multline}
+    This shows that \(\lambda_K \circ (f_a \otimes T) \circ \lambda_H^{-1}\) is \(a \cdot T\) where \(a \cdot T\) is the product of a scalar and a linear map in the normal sense.
+    Putting this all together in a diagram we can define \(a \cdot T\) to be the unique map such that the following diagram commutes
+    \begin{equation}
+        \begin{tikzcd}
+            H \arrow[r, "a \cdot T"] \arrow[d, "\lambda_A^{-1}"'] & K\\
+            \complex \otimes H \arrow[r, "f_a \otimes T"'] & \complex \otimes K. \arrow[u, "\lambda_B"']
+        \end{tikzcd}
+    \end{equation}
+    
+    We now drop the notation \(f_a\) for the map \(f_a \colon \complex \to \complex\) defined by \(f_a(1) = a\) and instead just write \(a \colon \complex \to \complex\) so \(a(1) = a\), which seems like a very natural notation.
+    Then the product of a scalar and a map, \(a \cdot T\), is the unique map such that the following diagram commutes
+    \begin{equation}
+        \begin{tikzcd}
+            H \arrow[r, "a \cdot T"] \arrow[d, "\lambda_A^{-1}"'] & K\\
+            \complex \otimes H \arrow[r, "a \otimes T"'] & \complex \otimes K. \arrow[u, "\lambda_B"']
+        \end{tikzcd}
+    \end{equation}
+    From this we can see that the tensor product with an endomorphism on \(\complex\) is pretty much the same as multiplying a scalar and a map.
+    The only difference is that for domains to match up we need to insert an extra object, and the easiest way to do this is with the unitors.
+    
+    In the next section we'll take our work here in \(\Hilb\) and generalise it to an arbitrary monoidal category.
+    
+    \section{Scalars}
+    \begin{dfn}{Scalar}{}
+        Let \(\cat{C}\) be a monoidal category with monoidal product \(\otimes\) and unit \(I\).
+        Then a \defineindex{scalar} is an endomorphism of the unit.
+        That is, a scalar is a morphism in \(\cat{C}(I, I)\), that is a morphism \(I \to I\).
+    \end{dfn}
+    
+    We know that \(wz = zw\) for \(w, z \in \complex\), and it would be good to check if this generalises to our definition of scalars, and it does.
+    
+    \begin{lma}{Scalars Commute}{}
+        Let \(\cat{C}\) be a monoidal category with unit \(I\).
+        Then given any two scalars \(a, b \colon I \to I\) we have \(a \circ b = b \circ a\), that is scalars commute.
+        \begin{proof}
+            We want to show that the following diagram commutes
+            \begin{equation}
+                \begin{tikzcd}
+                    I \arrow[r, "a"] \arrow[d, "b"'] & I \arrow[d, "b"]\\
+                    I \arrow[r, "a"'] & I.
+                \end{tikzcd}
+            \end{equation}
+            The naturality square for the left unitor, \(\lambda\), is
+            \begin{equation}
+                \begin{tikzcd}
+                    I \otimes A \arrow[r, "\lambda_A"] \arrow[d, "\id_I \otimes f"'] & A \arrow[d, "f"]\\
+                    I \otimes B \arrow[r, "\lambda_B"'] & B.
+                \end{tikzcd}
+            \end{equation}
+            This commutes for all \(f \in \cat{C}(A, B)\) by the definition of naturality.
+            Consider this square specialised to the case where \(A = B = I\):
+            \begin{equation}
+                \begin{tikzcd}
+                    I \otimes I \arrow[r, "\lambda_I"] \arrow[d, "\id_I \otimes f"'] & I \arrow[d, "f"]\\
+                    I \otimes I \arrow[r, "\lambda_I"'] & I.
+                \end{tikzcd}
+            \end{equation}
+            Now we have \(f \in \cat{C}(I, I)\), so \(f\) is some scalar.
+            The definition of a monoidal category is that \(\lambda\) is a natural isomorphism, so \(\lambda_I^{-1}\) exists.
+            We can the write this diagram as
+            \begin{equation}
+                \begin{tikzcd}
+                    I \otimes I \arrow[d, "\id_I \otimes f"'] & I \arrow[l, "\lambda_I^{-1}"'] \arrow[d, "f"]\\
+                    I \otimes I \arrow[r, "\lambda_I"'] & I.
+                \end{tikzcd}
+            \end{equation}
+            For later use it is useful to have the rotated version of this diagram:
+            \begin{equation}
+                \begin{tikzcd}
+                    I \arrow[r, "f"] \arrow[d, "\lambda_I^{-1}"'] & I\\
+                    I \otimes I \arrow[r, "\id_I \otimes f"'] & I \otimes I. \arrow[u, "\lambda_I"']
+                \end{tikzcd}
+            \end{equation}
+            Also note that by the coherence theorem we have \(\lambda_I = \rho_I\).
+            The naturality square for \(\rho_I\), rotated, gives
+            \begin{equation}
+                \begin{tikzcd}
+                    I \arrow[r, "f"] & I \\
+                    I\otimes I \arrow[r, "f \otimes \id_I"'] \arrow[u, "\rho_I"] & I\otimes I, \arrow[u, "\rho_I"']
+                \end{tikzcd}
+            \end{equation}
+            and the same logic as we applied to the left unitor case gives
+            \begin{equation}
+                \begin{tikzcd}
+                    I \arrow[r, "f"] \arrow[d, "\rho_I^{-1}"'] & I \arrow[d, "\rho_I^{-1}"]\\
+                    I \otimes I \arrow[r, "f \otimes \id_I"'] & I \otimes I.
+                \end{tikzcd}
+            \end{equation}
+            
+            Consider the following objects and morphisms in \(\cat{C}\):
+            \begin{equation}
+                A \xrightarrow{f} B \xrightarrow{g} C, \qqand D \xrightarrow{h} E \xrightarrow{j} F.
+            \end{equation}
+            Now consider the interchange law (\cref{thm:interchange law}),
+            \begin{equation}
+                (g \circ f) \otimes (j \circ h) = (g \otimes j) \circ (f \otimes h).
+            \end{equation}
+            We have here
+            \begin{gather}
+                A \xrightarrow{g \circ f} C, \quad D \xrightarrow{j \circ h} F,\\
+                A \otimes D \xrightarrow{(j \circ h) \otimes (g \circ f)} C \otimes F,\\
+                A \otimes D \xrightarrow{f \otimes h} B \otimes E \xrightarrow{g \otimes j} C \otimes F.\\
+            \end{gather}
+            This implies commutativity of the following diagram
+            \begin{equation}
+                \begin{tikzcd}
+                    A \otimes D \arrow[r, "f \otimes h"] \arrow[d, "\id_A \otimes (j \circ h)"'] & B \otimes E \arrow[d, "g \otimes j"]\\
+                    A \otimes F \arrow[r, "(g \circ f) \otimes \id_F"'] & C \otimes F.
+                \end{tikzcd}
+            \end{equation}
+            Now specialise this to the case where \(A = B = C = D = E = F = I\), \(h = g = \id_I\), then we have
+            \begin{equation}
+                \begin{tikzcd}
+                    I \otimes I \arrow[r, "f \otimes \id_I"] \arrow[d, "\id_I \otimes j"'] & I \otimes I \arrow[d, "\id_I \otimes j"]\\
+                    I \otimes I \arrow[r, "f \otimes \id_I"'] & I \otimes I.
+                \end{tikzcd}
+            \end{equation}
+            Now \(f, j \colon I \to I\) are scalars.
+            
+            We can now take the commutative diagrams we have constructed and paste them together setting \(f = a\) and \(j = b\) to get the following cube:
+            \begin{equation}\label{eqn:scalar multiplication cube}
+                \begin{tikzcd}
+                    I \arrow[rr, "a"] \arrow[dd, "\lambda_I^{-1}"', "\rho_I^{-1}"] \arrow[dr, "b"] & & I \arrow[dd, "\lambda_I^{-1}"', "\rho_I^{-1}", pos=0.75] \arrow[dr, "b"] &\\
+                    & I \arrow[rr, "a", pos=0.3, crossing over] & & I \arrow[dd, "\lambda_I"', "\rho_I", pos=0.4]\\
+                    I \otimes I \arrow[dr, "\id_I \otimes b"'] \arrow[rr, "a \otimes \id_I", pos=0.2] & & I \otimes I \arrow[dr, "\id_I \otimes b", pos=0.3] & \\
+                    & I \otimes I \arrow[uu, "\lambda_I", "\rho_I"', crossing over, pos=0.3] \arrow[rr, "a \otimes \id_I"'] & & I \otimes I.
+                \end{tikzcd}
+            \end{equation}
+            The sides of this cube all commute, since they are one of the modified naturality squares for either \(\lambda_I\) or \(\rho_I\) from the start of the proof.
+            The bottom of the cube commutes as it is the diagram we derived from the interchange law.
+            Thus, the top of the cube must commute, since any path along the top can be replaced with a path through the rest of the cube, which must necessarily all be the same.
+            The top of the cube is exactly the diagram which states
+            \begin{equation}
+                a \circ b = b \circ a
+            \end{equation}
+            for all \(a, b \in \cat{C}(I, I)\).
+        \end{proof}
+    \end{lma}
+    
+    Since a scalar is a map \(I \to I\) graphically it is represented by a box with no wires.
+    Because of this we'll represent scalars by a circle:
+    \begin{equation}
+        a = 
+        \tikzsetnextfilename{scalars-scalar}
+        \begin{tikzpicture}[baseline=(a.base)]
+            \node[scalar] (a) {\(a\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    Commutativity of scalar multiplication becomes
+    \begin{equation}
+        \tikzsetnextfilename{scalars-commutativity-of-scalars}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \node[scalar] (a1) {\(\phantomrlap{a}{b}\)};
+            \node[scalar, above= 0.5 cm of a1] (b1) {\(b\)};
+            \node[scalar, right=of a1] (b2) {\(b\)};
+            \node[scalar, above= 0.5 cm of b2] {\(\phantomrlap{a}{b}\)};
+            \node (equals) at ($(b1)!0.5!(b2)$) {\(=\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    Clearly these two diagrams are isotopic, so the correctness of the graphical notation proves commutativity of scalars, and does so much quicker than the proof above.
+    
+    \section{Scalar Multiplication}
+    \begin{dfn}{Scalar Multiplication}{}
+        Let \(\cat{C}\) be a monoidal category with unit \(I\), left unitor \(\lambda\), right unitor \(\rho\), and monoidal product \(\otimes\).
+        Given a morphism \(f \colon A \to B\), and a scalar \(a \colon I \to I\) both in \(\cat{C}\) then we define the \defineindex{left scalar multiplication} of \(f\) by \(a\), denoted \(a \cdot f \colon A \to B\), to be the morphism
+        \begin{equation}
+            \lambda_B \circ (a \otimes f) \circ \lambda_A^{-1} \colon A \to B.
+        \end{equation}
+    \end{dfn}
+    
+    Put another way, the left scalar multiplication of \(f\) by \(a\) is the unique morphism \(a \cdot f\) such that the following commutes
+    \begin{equation}
+        \begin{tikzcd}
+            A \arrow[r, "a \cdot f"] \arrow[d, "\lambda_A^{-1}"'] & B\\
+            I \otimes A \arrow[r, "f \otimes a"'] & I \otimes B. \arrow[u, "\lambda_B"']
+        \end{tikzcd}
+    \end{equation}
+    
+    Graphically, we have
+    \begin{equation}
+        a \cdot f = 
+        \tikzsetnextfilename{scalars-left-scalar-multiplication}
+        \begin{tikzpicture}[baseline=(a.base)]
+            \node[scalar] (a) {\(a\)};
+            \node[morphism, right=0.5 cm of a] (f) {\(f\)};
+            \draw[wire] (f) -- ++ (0, 1) node [midway, right] {\(B\)};
+            \draw[wire] (f) -- ++ (0, -1) node [midway, right] {\(A\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    We can similarly define right scalar multiplication, \(f \cdot a\), as
+    \begin{equation}
+        f \cdot a = \rho_B \circ (f \otimes a) \circ \rho_{A}^{-1},
+    \end{equation}
+    so that the following diagram commutes
+    \begin{equation}
+        \begin{tikzcd}
+            A \arrow[r, "f \cdot a"] \arrow[d, "\rho_A^{-1}"'] & B\\
+            A \otimes I \arrow[r, "a \otimes f"'] & B \otimes I. \arrow[u, "\rho_B"']
+        \end{tikzcd}
+    \end{equation}
+    This is then drawn as
+    \begin{equation}
+        \tikzsetnextfilename{scalars-right-scalar-multiplication}
+        \begin{tikzpicture}[baseline=(a.base)]
+            \node[scalar] (a) {\(a\)};
+            \node[morphism, left=0.5 cm of a] (f) {\(f\)};
+            \draw[wire] (f) -- ++ (0, 1) node [midway, left] {\(B\)};
+            \draw[wire] (f) -- ++ (0, -1) node [midway, left] {\(A\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    Note that, in general, left and right scalar multiplication are not the same.
+    In particular, the two diagrams are not isotopic as to move \(a\) to the other side of \(f\) we either have to cross a wire or leave the bounding box which the wires are attached to.
+    We will consider only left scalar multiplication, which we'll simply call scalar multiplication.
+    The statements we make will all transfer to right scalar multiplication in an obvious way.
+    
+    What properties should scalar multiplication have?
+    We look to \(\Hilb\) as an example.
+    In \(\Hilb\) we have \(1 \in \complex\), corresponding to the map \(1 \mapsto 1\), which is just the identity \(\id_{\complex}\).
+    So the properties of 1 in a field, i.e.\@ being a multiplicative identity, should extend to \(\id_I\) in some arbitrary monoidal category.
+    
+    \begin{lma}{}{lma:id is scalar identity}
+        Let \(\cat{C}\) be a monoidal category with unit \(I\) and \(f \colon A \to B\) a morphism of \(\cat{C}\).
+        Then \(\id_I \cdot f = f\).
+        \begin{proof}
+            The definition of scalar multiplication, \(\id_I \cdot f\), is that it makes
+            \begin{equation}
+                \begin{tikzcd}
+                    A \arrow[r, "\id_I \cdot f"] \arrow[d, "\lambda_A^{-1}"'] & B\\
+                    I \otimes A \arrow[r, "f \otimes a"'] & I \otimes B. \arrow[u, "\lambda_B"']
+                \end{tikzcd}
+            \end{equation}
+            commute.
+            The hypothesis, that \(\id_I \cdot f = f\) is then that the 
+            \begin{equation}
+                \begin{tikzcd}
+                    A \arrow[r, "f"] \arrow[d, "\lambda_A^{-1}"'] & B\\
+                    I \otimes A \arrow[r, "f \otimes a"'] & I \otimes B. \arrow[u, "\lambda_B"']
+                \end{tikzcd}
+            \end{equation}
+            commutes.
+            Replacing \(\lambda_A^{-1}\) with \(\lambda_A\) and reversing the arrow doesn't change the commutativity of the diagram.
+            Hence, the diagram above commutes exactly when
+            \begin{equation}
+                \begin{tikzcd}
+                    A \arrow[r, "a \cdot f"] & B\\
+                    I \otimes A \arrow[u, "\lambda_A"] \arrow[r, "f \otimes a"'] & I \otimes B. \arrow[u, "\lambda_B"']
+                \end{tikzcd}
+            \end{equation}
+            commutes.
+            This is just the naturality square of \(\lambda\), so commutes by definition, so the fist diagram commutes, so \(\id_I \cdot f = f\).
+        \end{proof}
+    \end{lma}
+    
+    A proof of this same fact using the graphical notation is simply
+    \begin{equation}
+        \tikzsetnextfilename{scalars-idI-is-1-proof}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \node (equals) at (0.75, 0) {\(=\)};
+            \node at (-1.75, 0) {\(=\)};
+            \node[morphism] (f0) at (-2.5, 0) {\(f\)};
+            \draw[wire] (f0) -- ++ (0, 0.75);
+            \draw[wire] (f0) -- ++ (0, -0.75);
+            \node[scalar, inner sep=1pt, left= 0.5cm of f0] {\(\id_I\)};
+            \node[morphism] (f) {\(f\)};
+            \draw[wire] (f) -- ++ (0, 0.75) coordinate (top);
+            \draw[wire] (f) -- ++ (0, -0.75) coordinate (bottom);
+            \draw[wire] (-1, 0 |- bottom) -- (-1, 0 |- top) node [midway, left] {\(I\)};
+            \node[morphism] (f2) at (1.5, 0) {\(f\)};
+            \draw[wire] (f2) -- ++ (0, 0.75);
+            \draw[wire] (f2) -- ++ (0, -0.75);
+        \end{tikzpicture}
+        ,
+    \end{equation}
+    since we draw the unit object, which corresponds to \(\id_I\) in the graphical notation, as the empty diagram.
+    
+    An obvious question we can ask is how do we multiply two scalars, since we should have some notion of multiplication in the field of scalars.
+    Well it turns out that this is quite simple.
+    
+    \begin{lma}{}{}
+        Let \(\cat{C}\) be a monoidal category with scalars \(a\) and \(b\).
+        Then \(a \cdot b = a \circ b\).
+        \begin{proof}
+            This follows by commutativity of \cref{eqn:scalar multiplication cube}, which starting at the top back left, moving forward then right gives \(a \circ b\), but going down, forward, right, and up gives
+            \begin{equation}
+                \lambda_I \circ (a \otimes \id_I) \circ (\id_I \otimes b) \circ \lambda_I^{-1}.
+            \end{equation}
+            Applying the interchange law to the middle of this morphism we have
+            \begin{equation}
+                (a \otimes \id_I) \circ (\id_I \otimes b) = (a \circ \id_I) \otimes (\id_I \circ b) = a \otimes b.
+            \end{equation}
+            Hence, we have
+            \begin{equation}
+                a \circ b = \lambda_I \circ (a \otimes b) \circ \lambda_I^{-1} = a \cdot b.
+            \end{equation}
+        \end{proof}
+    \end{lma}
+    
+    A proof of this same fact using the graphical notation is simply
+    \begin{equation}
+        \tikzsetnextfilename{scalars-adotb-is-acircb-proof}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \node (equals) at (0.5, 0) {\(=\)};
+            \node[scalar] at (-0.05, 0) {\(\phantomrlap{a}{b}\)};
+            \node[scalar] at (-0.8, 0) {\(b\)};
+            \node[scalar] at (1, 0.5) {\(\phantomrlap{a}{b}\)};
+            \node[scalar] at (1, -0.5) {\(b\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    An important property of scalar multiplication is a compatibility between scalar multiplication and field multiplication.
+    By this we mean if we want to multiply a map by two scalars we can either multiply the map individually by both scalars, or we can compute the product of the two scalars and then multiply this by the map.
+    
+    \begin{lma}{}{lma:scalar multiplication associative}
+        Let \(\cat{C}\) be a monoidal category with scalars \(a\) and \(b\) and a morphism \(f\).
+        Then \(a \cdot (b \cdot f) = (a \cdot b) \cdot f = (a \circ b) \cdot f\).
+        \begin{proof}
+            Consider \(a \cdot (b \cdot f)\).
+            Expanding the definition of \(\cdot\) we have
+            \begin{align}
+                b \cdot f &= \lambda_B \circ (b \otimes f) \circ \lambda_A^{-1},\\
+                a \cdot (b \cdot f) &= \lambda_B \circ (a \otimes (b \cdot f)) \circ \lambda_A^{-1}.
+            \end{align}
+            Hence,
+            \begin{equation}
+                a \cdot (b \cdot f) = \lambda_B \circ (a \otimes (\lambda_B \circ (b \otimes f) \circ \lambda_A^{-1})) \circ \lambda_A^{-1}.
+            \end{equation}
+            Similarly, we have
+            \begin{align}
+                a \cdot b &= \lambda_I \circ (a \otimes b) \circ \lambda_I^{-1},\\
+                (a \cdot b) \cdot f &= \lambda_B \circ ((\lambda_I \circ (a \otimes b) \circ \lambda_I^{-1}) \otimes f) \circ \lambda_A^{-1}.
+            \end{align}
+            Now, consider the following diagram, which commutes by the coherence theorem:
+            \begin{equation}
+                \begin{tikzcd}[sep=large]
+                    A \arrow[r, "\id_A", color=Green, text=black] \arrow[d, "\lambda_A^{-1}"', color=Blue, text=black] & A \arrow[r, "a \cdot (b \cdot f)"] \arrow[d, "\lambda_A^{-1}", color=Green, text=black] & B \arrow[r, "\id_B", color=Green, text=black] & B\\
+                    I \otimes A \arrow[r, "\id_{I \otimes A}"] \arrow[ddr, "\lambda_I^{-1} \otimes \id_A"', color=Blue, text=black] & I \otimes A \arrow[r, "a \otimes (b \cdot f)"] \arrow[d, "\id_I \otimes \lambda_A^{-1}", color=Green, text=black] & I \otimes B \arrow[r, "\id_{I \otimes B}"] \arrow[u, "\lambda_B", color=Green, text=black] & I \otimes B \arrow[u, "\lambda_B"', color=Blue, text=black]\\
+                    & I \otimes (I \otimes A) \arrow[r, "a \otimes (b \otimes f)", color=Green, text=black] \arrow[d, "\alpha_{I,I,A}^{-1}"] & I \otimes (I \otimes B) \arrow[u, "\id_I \otimes \lambda_B", color=Green, text=black] & \\
+                    & (I \otimes I) \otimes A \arrow[r, "(a \otimes b) \otimes f"', color=Blue, text=black] & (I \otimes I) \otimes B \arrow[u, "\alpha_{I,I,B}"] \arrow[uur, "\lambda_I \otimes \id_B"', color=Blue, text=black]
+                \end{tikzcd}
+            \end{equation}
+            The expanded form of \(a \cdot (b \cdot f)\) corresponds to starting at the top left, then applying \(\id_A\) immediately, which does nothing, going right we then apply \(\lambda_A^{-1}\), next we want to apply \(a \otimes (b \cdot f)\), which can be done be going down, right, then up using the definition of scalar multiplication, finally going up again is the last step and takes us to \(B\), to which we can apply \(\id_B\) for free to move to the far right \(B\).
+            
+            On the other hand, the expanded form of \((a \cdot b) \cdot f\) corresponds to starting at the top left, going down applying \(\lambda_A^{-1}\), then we want to apply \((\lambda_I \circ (a \otimes b) \circ \lambda_I^{-1}) \otimes f\).
+            This can be done by first applying \(\lambda_I^{-1} \otimes \id_A\) to apply the \(\lambda_{I}^{-1}\) part, then we can apply the \(a \otimes b\)  and \(f\) parts by applying \((a \otimes b) \otimes f\), next we can apply the \(\lambda_I\) part by applying \(\lambda_I \otimes \id_B\).
+            Finally we apply \(\lambda_B\) to get to the top right \(B\).
+            
+            Since both of these paths start and end at the same point they must correspond to the same morphism.
+        \end{proof}
+    \end{lma}
+    
+    The following is a proof in the graphical calculus:
+    \begin{equation}
+        \tikzsetnextfilename{scalars-abf-associativity}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \node (equals) at (2.75, 0) {\(=\)};
+            \node[scalar] {\(\phantomrlap{a}{b}\)};
+            \node[scalar] at (1, 0) {\(b\)};
+            \node[morphism] (f) at (2, 0) {\(f\)};
+            \draw[wire] (f) -- ++ (0, -0.5);
+            \draw[wire] (f) -- ++ (0, 0.5);
+            \draw[thick, decoration={calligraphic brace}, decorate] (0.65, -0.5) -- (0.65, 0.5);
+            \draw[thick, decoration={calligraphic brace, mirror}, decorate] (2.3, -0.5) -- (2.3, 0.5);
+            \begin{scope}[xshift=3.5cm]
+                \node[scalar] {\(\phantomrlap{a}{b}\)};
+                \node[scalar] at (1, 0) {\(b\)};
+                \node[morphism] (f) at (2, 0) {\(f\)};
+                \draw[wire] (f) -- ++ (0, -0.5) coordinate (bottom);
+                \draw[wire] (f) -- ++ (0, 0.5) coordinate (top);
+                \draw[thick, decoration={calligraphic brace}, decorate] (-0.35, -0.5) -- (-0.35, 0.5);
+                \draw[thick, decoration={calligraphic brace, mirror}, decorate] (1.35, -0.5) -- (1.35, 0.5);
+            \end{scope}
+        \end{tikzpicture}
+        .
+    \end{equation}
+
+    \begin{lma}{}{}
+        Let \(\cat{C}\) be a (locally small) monoidal category with unit \(I\).
+        Then \(\cat{C}(I, I)\) forms a monoid under scalar multiplication.
+        \begin{proof}
+            The product of two scalars is again a scalar.
+            The monoid identity is \(\id_I \in \cat{C}(I, I)\), since \(\id_I \cdot a = a\) for all \(a \in \cat{C}(I, I)\) by \cref{lma:id is scalar identity}.
+            \Cref{lma:scalar multiplication associative} proves that \(a \cdot (b \cdot c) = (a \cdot b) \cdot c\) for all scalars \(a, b, c \in \cat{C}(I, I)\), so scalar multiplication is associative.
+        \end{proof}
+    \end{lma}
+    
+    The final property we'll prove for now is a version of the interchange law.
+    
+    \begin{lma}{}{}
+        Let \(\cat{C}\) be a monoidal category with scalars \(a\) and \(b\) and morphisms \(f\colon A \to B\) and \(g \colon B \to C\).
+        Then \((b \cdot g) \circ (a \cdot f) = (b \circ a) \cdot (g \circ f)\).
+        \begin{proof}
+            The left hand side is
+            \begin{equation}
+                (\lambda_C \circ (b \otimes g) \circ \lambda_B^{-1}) \circ (\lambda_B \circ (a \otimes f) \circ \lambda_A^{-1}).
+            \end{equation}
+            Using associativity of composition to change around the brackets and \(\lambda_B^{-1} \circ \lambda_B = \id_B\), which we don't need to include in a chain of compositions, this becomes
+            \begin{equation}
+                \lambda_C \circ (b \otimes g) \circ (a \otimes f) \circ \lambda_A^{-1}.
+            \end{equation}
+            
+            The right hand side is
+            \begin{equation}
+                \lambda_C \circ ((b \circ a) \otimes (g \circ f)) \circ \lambda_{A}^{-1}.
+            \end{equation}
+            Applying the interchange law to this we get
+            \begin{equation}
+                \lambda_C \circ (b \otimes g) \circ (a \otimes f) \circ \lambda_{A}^{-1}.
+            \end{equation}
+            Clearly this is the same result as we got from the left hand side, so the two are equal.
+        \end{proof}
+    \end{lma}
+    
+    The following is a proof in the graphical calculus:
+    \begin{equation}
+        \tikzsetnextfilename{scalars-interchange-law}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \node (equals) at (2.5, 0.75) {\(=\)};
+            \node[scalar] (a1) {\(\phantomrlap{a}{b}\)};
+            \node[scalar, above=of a1] (b1) {\(b\)};
+            \node[morphism, right=of a1] (f1) {\(f\)};
+            \node[morphism, right=of b1] (g1) {\(\phantomrlap{g}{f}\)};
+            \draw[wire] (f1) -- (g1);
+            \draw[wire] (f1) --  ++ (0, -1);
+            \draw[wire] (g1) -- ++ (0, 1);
+            \draw[thick, decoration={calligraphic brace, mirror}, decorate] (-0.5, -0.3) -- (2, -0.3);
+            \draw[thick, decoration={calligraphic brace}, decorate] (-0.5, 0.3) -- (2, 0.3);
+            \draw[thick, decoration={calligraphic brace, mirror}, decorate] (-0.5, 1.2) -- (2, 1.2);
+            \draw[thick, decoration={calligraphic brace}, decorate] (-0.5, 1.8) -- (2, 1.8);
+            \begin{scope}[xshift=3.5cm]
+                \node (equals) at (0, 0) {};
+                \node[scalar] (a1) {\(\phantomrlap{a}{b}\)};
+                \node[scalar, above=of a1] (b1) {\(b\)};
+                \node[morphism, right=of a1] (f1) {\(f\)};
+                \node[morphism, right=of b1] (g1) {\(\phantomrlap{g}{f}\)};
+                \draw[wire] (f1) -- (g1);
+                \draw[wire] (f1) --  ++ (0, -1);
+                \draw[wire] (g1) -- ++ (0, 1);
+                \draw[thick, decoration={calligraphic brace}, decorate] (-0.3, -0.5) -- (-0.3, 2);
+                \draw[thick, decoration={calligraphic brace, mirror}, decorate] (0.3, -0.5) -- (0.3, 2);
+                \draw[thick, decoration={calligraphic brace}, decorate] (1.2, -0.5) -- (1.2, 2);
+                \draw[thick, decoration={calligraphic brace, mirror}, decorate] (1.7, -0.5) -- (1.7, 2);
+            \end{scope}
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    
+    \section{Examples}
+    In \(\Set\) scalars are functions \(\{\bullet\} \to \{\bullet\}\).
+    There is only one such function, \(\bullet \mapsto \bullet\), which is simply \(\id_{\{\bullet\}}\).
+    Thus there is a single scalar in \(\Set\), and it is the trivial \(\id_{\{\bullet\}}\) which is such that \(\id_{\{\bullet\}} \cdot f = f\) for all \(f \in \Set(A, B)\).
+    This makes sense since sets don't come equipped with a scalar structure.
+    
+    In \(\Rel\) scalars are relations \(R \subseteq \{\bullet\} \times \{\bullet\}\).
+    There are two scalars, \(\true = \{(\bullet, \bullet)\} = \id_{\{\bullet\}}\) and \(\false = \emptyset\).
+    Computing all possible products of these two scalars we see that clearly any product involving \(\false\) must necessarily just be \(\false\), since if one of the sets in the definition of relation composition is empty then the result is also empty.
+    We also have \(\{(\bullet, \bullet)\} \circ \{(\bullet, \bullet)\} = \{(\bullet, \bullet)\}\).
+    Hence, we have
+    \begin{equation}
+        \begin{array}{c|cc}
+            \cdot & \true & \false\\ \hline
+            \true & \true & \false\\
+            \false & \false & \false
+        \end{array}
+        .
+    \end{equation}
+    This is exactly the result we would get if \(\true\) and \(\false\) were booleans and \(\cdot\) was logical conjunction (and).
+    This is why we called the \(\true\) and \(\false\) in the first place.
+    Further, for any relation \(R  \subseteq A \times B\) we have \(\true \cdot R = R\) and \(\false \cdot R = \emptyset = \false\), so \(\true\) and \(\false\) behave a bit like 1 and 0 for scalar multiplication.
+    
+    In \(\Hilb\) scalars are linear maps \(\complex \to \complex\).
+    These are uniquely determined by where they send 1, so we can identify \(z \in \complex\) with the map \(1 \mapsto z\), and then scalar multiplication behaves exactly as expected, after all we did base scalars on \(\Hilb\) to start with.
+    
+    \chapter{Braided and Symmetric Monoidal Categories}
+    \section{Braided Monoidal Categories: The Idea}
+    Recall that we've seen four ways to consider monoidal categories categories:
+    \begin{itemize}
+        \item physical systems and the processes occurring with independent systems evolving separately;
+        \item data types and the algorithms with algorithms running in parallel;
+        \item algebraic structures and structure preserving functions with products or sums;
+        \item logical propositions and implications between them with separate proofs of \(P\) and \(Q\) proving \(P \land Q\).
+    \end{itemize}
+    In all of these there is a sense in which order doesn't matter, that \(A \otimes B\) and \(B \otimes A\) are, if not the same, at least similar:
+    \begin{itemize}
+        \item it doesn't matter what order we place the independent systems, they will evolve to the states so the only difference is the order we place them;
+        \item it doesn't matter if we run algorithm 1 on core 1 and algorithm 2 on core 2 or algorithm 1 on core 2 and algorithm 2 on core 1, the only difference is in how the algorithms run, the results are the same;
+        \item it often doesn't matter what order we take a product, for example, if \(V\) and \(W\) are vector spaces then \(V \otimes W\) and \(W \otimes V\) are not the same, but we can turn one into the other through the mapping \(v \otimes w \mapsto w \otimes v\);
+        \item if we prove \(P\) and \(Q\) separately then we can prove \(P \land Q\) or \(Q \land P\).
+    \end{itemize}
+    
+    The most important example here is that of the vector spaces, while, as is often the case, equality between \(A \otimes B\) and \(B \otimes A\) is too strict it is often enough to just have a map between them.
+    The only question then is what properties should this map poses?
+    Well, as usual a map replacing equality should be an isomorphism.
+    We also want the isomorphism relating \(A \otimes B\) and \(B \otimes A\) to be related to the isomorphism relating \(C \otimes D\) and \(D \otimes C\).
+    We want a family of such isomorphisms all related in some way, hang on, we have families of related isomorphisms, they're called natural isomorphisms.
+    
+    \section{Braided Monoidal Category: The Definition}
+    \begin{dfn}{Braided Monoidal Category}{}
+        A \defineindex{braided monoidal category} is a monoidal category, \(\cat{C}\) equipped with a natural isomorphism, called the \defineindex{braiding},
+        \begin{equation}
+            \sigma \colon -\otimes- \naturalTransformation -\otimes-
+        \end{equation}
+        which for objects \(A\) and \(B\) has components
+        \begin{equation}
+            \sigma_{A,B} \colon A \otimes B \to B \otimes A.
+        \end{equation}
+        These must satisfy the \defineindex{hexagon equations}, that is the braiding should make the following diagrams commute:
+        \begin{equation}
+            \begin{tikzcd}[column sep=1cm]
+                & A \otimes (B \otimes C) \arrow[r, "\sigma_{A,B\otimes C}"] \arrow[dl, "\alpha_{A,B,C}^{-1}"'] & (B \otimes C) \otimes A & \\
+                (A \otimes B) \otimes C \arrow[dr, "\sigma_{A,B} \otimes \id_C"'] \hspace{-1cm} &&& \hspace{-1cm} B \otimes (C \otimes A) \arrow[ul, "\alpha_{B,C,A}^{-1}"']\\
+                & (B \otimes A) \otimes C \arrow[r, "\alpha_{B,A,C}"'] & B \otimes (A \otimes C), \arrow[ur, "\id_B \otimes \sigma_{A,C}"']
+            \end{tikzcd}
+        \end{equation}
+        and
+        \begin{equation}
+            \begin{tikzcd}[column sep=1cm]
+                & (A \otimes B) \otimes C \arrow[r, "\sigma_{A\otimes B,C}"] \arrow[dl, "\alpha_{A,B,C}"'] & B \otimes (C \otimes A) & \\
+                A \otimes (B \otimes C) \arrow[dr, "\id_A \otimes \sigma_{B,C}"'] \hspace{-1cm} &&& \hspace{-1cm} (C \otimes A) \otimes B \arrow[ul, "\alpha_{C,A,B}"']\\
+                & A \otimes (C \otimes B) \arrow[r, "\alpha_{A,C,B}^{-1}"'] & (A \otimes C) \otimes B. \arrow[ur, "\sigma_{A,C} \otimes \id_B"']
+            \end{tikzcd}
+        \end{equation}
+    \end{dfn}
+    
+    The naturality condition for \(\sigma\) simply means that the following diagram commutes:
+    \begin{equation}
+        \begin{tikzcd}
+            A \otimes B \arrow[r, "\sigma_{A,B}"] \arrow[d, "f \otimes g"'] & B \otimes A \arrow[d, "g \otimes f"]\\
+            A' \otimes B' \arrow[r, "\sigma_{A',B'}"'] & B' \otimes A'
+        \end{tikzcd}
+    \end{equation}
+    for all \(f \colon A \to A'\) and \(g \colon B \to B'\).
+    In other words, it doesn't matter if we swap then apply a pair of maps or apply a pair of maps and then swap.
+    
+    Now consider the first hexagon equation.
+    Starting at the top left, with \(A \otimes (B \otimes C)\) we can treat \(B \otimes C\) as a single object and swap it with \(A\) to get \((B \otimes C) \otimes A\).
+    The first hexagon equation tells us that this is the same as moving the brackets, swapping \(A\) and \(B\) while doing nothing to \(C\), moving the brackets, swapping \(A\) and \(C\) while doing nothing to \(B\), and then moving the brackets.
+    More succinctly swapping \(B \otimes C\) with \(A\) is the same as swapping \(A\) with \(B\) and \(C\) individually.
+    
+    \section{Braided Monoidal Category: The Examples}
+    \subsection{\texorpdfstring{\(\Set\)}{Set}}
+    The braiding in \(\Set\) (as a monoidal category with the Cartesian product) is pretty obvious.
+    It's simply swapping the elements in a pair.
+    \begin{dfn}{{\normalsize\(\Set\)} as a Braided Monoidal Category}{}
+        The monoidal category \(\Set\), with the Cartesian product as the monoidal product, can be promoted to a braided monoidal category by defining \(\sigma_{A,B}\) to be the map \((a, b) \mapsto (b, a)\).
+    \end{dfn}
+    
+    \begin{thm}{}{}
+        \(\Set\) is a braided monoidal category.
+        \begin{proof}
+            First we should show that \(\sigma\) is natural, this follows from commutativity of the following for all \(f \colon A \to A'\) and \(g \colon B \to B'\):
+            \begin{equation}
+                \begin{tikzcd}
+                    (a, b) \arrow[r, mapsto, "\sigma_{A,B}"] \arrow[d, mapsto, "f \times g"] & (b, a) \arrow[d, mapsto, "g \times f"]\\
+                    (f(a), g(b)) \arrow[r, mapsto, "\sigma_{A', B'}"] & (g(b), f(a)).
+                \end{tikzcd}
+            \end{equation}
+            Next we need to prove the hexagon equations.
+            We'll prove only the first, which follows from commutativity of the following diagram:
+            \begin{equation*}
+                \begin{tikzcd}
+                    & (a, (b, c)) \arrow[r, mapsto, "\sigma_{A,B\otimes C}"] \arrow[dl, mapsto, "\alpha_{A,B,C}^{-1}"'] & ((b, c), a) &\\
+                    ((a, b), c) \hspace{-0.8cm} \arrow[dr, mapsto, "\sigma_{A,B} \times \id_C"'] &&& \hspace{-1cm} \parbox{2.8cm}{\centering\((b, (c, a)) = \) \((\id_B(b), \sigma_{A,C}(a, c))\)} \arrow[ul, mapsto, "\alpha_{B,C,A}^{-1}"']\\
+                    & \parbox{2.8cm}{\centering\((\sigma_{A,B}(a, b),\id_C(c))\) \(= ((b, a), c)\)} \arrow[r, mapsto, "\alpha_{B,A,C}"'] & (b, (a, c)). \arrow[ur, mapsto, "\id_B \times \sigma_{A,C}"']
+                \end{tikzcd}
+            \end{equation*}
+        \end{proof}
+    \end{thm}
+    
+    \subsection{\texorpdfstring{\(\Rel\)}{Rel}}
+    The braiding in \(\Rel\) is similar to that in \(\Set\), we just turn a function into a relation.
+    \begin{dfn}{{\normalsize\(\Rel\)} as a Braided Monoidal Category}{}
+        The monoidal category \(\Rel\) can be promoted to a braided monoidal category by defining \(\sigma_{A,B}\) to be the relation \((a, b) \sim (b, a)\).
+    \end{dfn}
+    
+    A proof that this is a valid braiding is very similar to the proof for \(\Set\).
+    
+    \subsection{\texorpdfstring{\(\Hilb\)}{Hilb}}
+    \begin{dfn}{{\normalsize\(\Hilb\)} as a Braided Monoidal Category}{}
+        The monoidal category \(\Hilb\) can be promoted to a braided monoidal category by defining \(\sigma_{H,K}\) to be the map \(v \otimes w \mapsto w \otimes v\), and extended linearly to all of \(H \otimes K\).
+    \end{dfn}
+    
+    Again, the proof that this is a valid braiding is very similar to the proof for \(\Set\).
+    
+    \subsection{More Examples}
+    \begin{exm}{}{}
+        \begin{itemize}
+            \item The category of bimodules with bimodule homomorphisms with the usual tensor product of modules is braided symmetric.
+        \end{itemize}
+    \end{exm}
+    
+    \section{Graphical Notation}
+    We can extend the graphical notation for monoidal categories to braided monoidal categories.
+    To do so we make use of the idea that the braiding allows us to swap elements.
+    For objects \(A\) and \(B\) in a braided monoidal category we denote the braiding \(\sigma_{A, B} \colon A \otimes B \to B \otimes A\) as follows
+    \begin{equation}
+        \sigma_{A,B} = 
+        \tikzsetnextfilename{braid-sym-mon-cat-braiding}
+        \begin{tikzpicture}[font=\small, baseline=0.4cm]
+            \draw[wire, rounded corners] (1, 0) -- ++ (0, 0.3) -- ++ (-1, 0.4) -- ++ (0, 0.3);
+            \draw[over wire, rounded corners] (0, 0) -- ++ (0, 0.3) -- ++ (1, 0.4) -- ++ (0, 0.3);
+            \node[left] at (0, 0.15) {\(A\)};
+            \node[right] at (1, 0.15) {\(B\)};
+            \node[left] at (0, 0.85) {\(B\)};
+            \node[right] at (1, 0.85) {\(A\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    Note that the order in which the wires cross, the starting on the bottom left wire going over the top, is important.
+    Since \(\sigma\) is a natural isomorphism \(\sigma_{A,B}^{-1} \colon B \otimes A \to A \otimes B\) exists, and we denote it by
+    \begin{equation}
+        \sigma_{A,B}^{-1} = 
+        \tikzsetnextfilename{braid-sym-mon-cat-inverse-braiding}
+        \begin{tikzpicture}[font=\small, baseline=0.4cm]
+            \draw[wire, rounded corners] (0, 0) -- ++ (0, 0.3) -- ++ (1, 0.4) -- ++ (0, 0.3);
+            \draw[over wire, rounded corners] (1, 0) -- ++ (0, 0.3) -- ++ (-1, 0.4) -- ++ (0, 0.3);
+            \node[left] at (0, 0.15) {\(B\)};
+            \node[right] at (1, 0.15) {\(A\)};
+            \node[left] at (0, 0.85) {\(A\)};
+            \node[right] at (1, 0.85) {\(B\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    Notice that now the bottom left wire goes under.
+    
+    Now that we have wires passing over each other we have clearly entered the third dimension.
+    This changes what it means for two diagrams to be the same.
+    \begin{dfn}{Spatial Isotopy}{}
+        Two diagrams are \defineindex{spatial isotopic} if one can be deformed continuously into the other such that
+        \begin{itemize}
+            \item the diagrams remain confined in a cuboidal volume of three-dimensional space;
+            \item input and output wires terminate at the bottom and top of this region;
+            \item components never intersect.
+        \end{itemize}
+    \end{dfn}
+    Note that we now drop the requirement on wires entering in the same order, since we can always cross the wires over, it doesn't really make sense as a definition anyway as we don't have an order defined on the plane, and wires now enter in the rectangle at the bottom of the cuboidal region.
+    
+    That \(\sigma_{A,B}\) and \(\sigma_{A,B}^{-1}\) are inverses, tells us that \(\sigma_{A,B}^{-1} \circ \sigma_{A,B} = \id_{A \otimes B}\), graphically\footnote{note that the right hand side here can be read as \(\id_A \otimes \id_B\), but functoriality of \(\otimes\) means that \(\id_A \otimes \id_B = \id_{A\otimes B}\), which is perhaps clearer with function notation: \(\otimes(\id_A, \id_B) = \id_{\otimes(A,B)}\).},
+    \begin{equation}
+        \tikzsetnextfilename{braid-sym-mon-cat-braid-braid-inverse}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[wire, rounded corners] (1, 0) -- ++ (0, 0.3) -- ++ (-1, 0.4) -- ++ (0, 0.6) -- ++ (1, 0.4) -- ++ (0, 0.3);
+            \draw[over wire, rounded corners] (0, 0) -- ++ (0, 0.3) -- ++ (1, 0.4) -- ++ (0, 0.6) -- ++ (-1, 0.4) -- ++ (0, 0.3);
+            \draw[wire] (2, 0) -- (2, 2);
+            \draw[wire] (3, 0) -- (3, 2);
+            \node at (1.5, 1) {\(=\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    Similarly, \(\sigma_{A,B} \circ \sigma_{A,B}^{-1} = \id_{B\otimes A}\), or graphically,
+    \begin{equation}\label{eqn:graphical braid inverse}
+        \tikzsetnextfilename{braid-sym-mon-cat-braid-inverse-braid}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[wire, rounded corners] (0, 0) -- ++ (0, 0.3) -- ++ (1, 0.4) -- ++ (0, 0.6) -- ++ (-1, 0.4) -- ++ (0, 0.3);
+            \draw[over wire, rounded corners] (1, 0) -- ++ (0, 0.3) -- ++ (-1, 0.4) -- ++ (0, 0.6) -- ++ (1, 0.4) -- ++ (0, 0.3);
+            \draw[wire] (2, 0) -- (2, 2);
+            \draw[wire] (3, 0) -- (3, 2);
+            \node at (1.5, 1) {\(=\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    In both of these it looks like if the wires were strings we could just pull them taught, this is the type of thing that is allowed in a spatial isotopy.
+    
+    We can define \(\sigma^{-1}\colon - \otimes - \naturalTransformation - \otimes -\) to be the natural transformation whose components \((\sigma^{-1})_{A,B}\) are just the inverse components of \(\sigma\), so \((\sigma^{-1})_{A,B} = (\sigma_{A,B})^{-1} = \sigma_{A,B}^{-1}\), which is necessarily also natural.
+    The naturality conditions
+    \begin{align}
+        \sigma_{A',B'} \circ (f \otimes g) &= (g \otimes f) \circ \sigma_{A,B},\\
+        \sigma_{A',B'}^{-1} \circ (f \otimes g) &= (g \otimes f) \circ \sigma_{A, B}^{-1},
+    \end{align}
+    for all \(f \colon A \to A'\) and \(g \colon B \to B'\), can be expressed in the graphical notation as
+    \begin{equation}
+        \tikzsetnextfilename{braid-sym-mon-cat-braid-naturality}
+        \begin{tikzpicture}[baseline=(equals)]
+            \node[morphism] (f1) {\(f\)};
+            \node[morphism, right=0.75cm of f1] (g1) {\(\phantomrlap{g}{f}\)};
+            \draw[wire] (f1) -- ++ (0, -0.6) coordinate (bottom);
+            \draw[wire] (g1) -- ++ (0, -0.6);
+            \draw[wire, rounded corners] (g1.north) -- ++ (0, 0.3) -- (0, 0.8 -| f1) -- ++ (0, 0.4);
+            \draw[over wire, rounded corners] (f1.north) -- ++ (0, 0.3) -- (0, 0.8 -| g1) -- ++ (0, 0.4) coordinate (top);
+            \node (equals) at (1.8, 0.3) {\(=\)};
+            \node[morphism] (f2) at (2.5, 0.6) {\(f\)};
+            \node[morphism, right=0.75cm of f2] (g2) {\(\phantomrlap{g}{f}\)};
+            \draw[wire] (f2) -- (f2 |- top);
+            \draw[wire] (g2) -- (g2 |- top);
+            \draw[wire, rounded corners] (f2.south) -- ++ (0, -0.3) -- (0, -0.2 -| g2) -- (g2 |- bottom);
+            \draw[over wire, rounded corners] (g2.south) -- ++ (0, -0.3) -- (0, -0.2 -| f2) -- (f2 |- bottom);
+        \end{tikzpicture}
+        , \qand
+        \tikzsetnextfilename{braid-sym-mon-cat-inverse-braid-naturality}
+        \begin{tikzpicture}[baseline=(equals)]
+            \node[morphism] (f1) {\(f\)};
+            \node[morphism, right=0.75cm of f1] (g1) {\(\phantomrlap{g}{f}\)};
+            \draw[wire] (f1) -- ++ (0, -0.6) coordinate (bottom);
+            \draw[wire] (g1) -- ++ (0, -0.6);
+            \draw[wire, rounded corners] (f1.north) -- ++ (0, 0.3) -- (0, 0.8 -| g1) -- ++ (0, 0.4) coordinate (top);
+            \draw[over wire, rounded corners] (g1.north) -- ++ (0, 0.3) -- (0, 0.8 -| f1) -- ++ (0, 0.4);
+            \node (equals) at (1.8, 0.3) {\(=\)};
+            \node[morphism] (f2) at (2.5, 0.6) {\(f\)};
+            \node[morphism, right=0.75cm of f2] (g2) {\(\phantomrlap{g}{f}\)};
+            \draw[wire] (f2) -- (f2 |- top);
+            \draw[wire] (g2) -- (g2 |- top);
+            \draw[wire, rounded corners] (g2.south) -- ++ (0, -0.3) -- (0, -0.2 -| f2) -- (f2 |- bottom);
+            \draw[over wire, rounded corners] (f2.south) -- ++ (0, -0.3) -- (0, -0.2 -| g2) -- (g2 |- bottom);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    So the naturality of \(\sigma\) and \(\sigma^{-1}\) means that graphically we can slide morphisms through crossings.
+    
+    The hexagon equations become trivial in the graphical notation, they just tell us that crossing two objects at once or crossing them one at a time is the same:
+    \begin{equation}
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \draw[wire, rounded corners] (0, 2) -- ++ (0, -0.5) -- ++ (1.3, -1) -- ++ (0, -0.5);
+            \draw[wire, rounded corners, xshift=0.2cm] (0, 2) -- ++ (0, -0.5) -- ++ (1.3, -1) -- ++ (0, -0.5);
+            \draw[over wire, rounded corners] (0, 0) -- ++ (0, 0.5) -- ++ (1.5, 1) -- ++ (0, 0.5);
+            \node (equals) at (2, 1) {\(=\)};
+            \begin{scope}[xshift=2.5cm]
+                \draw[wire, rounded corners] (0, 2) -- ++ (0, -0.8) -- ++ (1.3, -1) -- ++ (0, -0.2);
+                \draw[wire, rounded corners, xshift=0.2cm] (0, 2) -- ++ (0, -0.2) -- ++ (1.3, -1) -- ++ (0, -0.8);
+                \draw[over wire, rounded corners] (0, 0) -- ++ (0, 0.5) -- ++ (1.5, 1) -- ++ (0, 0.5);
+            \end{scope}
+        \end{tikzpicture}
+        , \qand
+        \begin{tikzpicture}[baseline=(equals.base)]
+            \draw[wire, rounded corners] (0, 2) -- ++ (0, -0.5) -- ++ (1.5, -1) -- ++ (0, -0.5);
+            \draw[over wire, rounded corners] (0, 0) -- ++ (0, 0.5) -- ++ (1.3, 1) -- ++ (0, 0.5);
+            \draw[over wire, rounded corners, xshift=0.2cm] (0, 0) -- ++ (0, 0.5) -- ++ (1.3, 1) -- ++ (0, 0.5);
+            \node (equals) at (2, 1) {\(=\)};
+            \begin{scope}[xshift=2.5cm]
+                \draw[wire, rounded corners] (0, 2) -- ++ (0, -0.5) -- ++ (1.5, -1) -- ++ (0, -0.5);
+                \draw[over wire, rounded corners] (0, 0) -- ++ (0, 0.8) -- ++ (1.3, 1) -- ++ (0, 0.2);
+                \draw[over wire, rounded corners, xshift=0.2cm] (0, 0) -- ++ (0, 0.2) -- ++ (1.3, 1) -- ++ (0, 0.8);
+            \end{scope}
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    \subsection{Correctness Theorem}
+    The graphical calculus for braided monoidal categories comes with a correctness theorem analogous to the correctness theorem for monoidal categories.
+    
+   \begin{thm}{Correctness of the Graphical Notation for Braided Monoidal Categories}{}
+       Any well-formed equation of the form \(f = g\) for morphisms \(f\) and \(g\) in a braided monoidal category follows from the axioms of braided monoidal categories if and only if it holds in the graphical notation up to spatial isotopy.
+   \end{thm}
+    
+    \begin{exm}{}{}
+        Consider the following equation of morphisms \(B \to A \otimes B \otimes C\):
+        \begin{equation}
+            (\sigma_{A,B} \otimes \id_B) \circ (\id_A \otimes f)  = (\id_A \otimes \sigma_{B,C}^{-1}) \circ (f \otimes \id_B)
+        \end{equation}
+        where \(f \colon I \to A \otimes C\).
+        This holds in a genera braided monoidal category as we can express this equation as the following equation of diagrams
+        \begin{equation}
+            \tikzsetnextfilename{braid-sym-mon-cat-graphical-example-1}
+            \begin{tikzpicture}[baseline=(equals.base)]
+                \node[morphism, minimum width=1cm] (f1) {\(f\)};
+                \draw[wire, rounded corners] ($(f1.north west) + (0.2, 0)$) coordinate (A) -- ++ (0, 0.2) -- ++ (-0.5, 0.3) -- ++ (0, 0.4) coordinate (top);
+                \draw[wire] ($(f1.north east) - (0.2, 0)$) coordinate (here) -- (here |- top) coordinate (top2);
+                \draw[over wire, rounded corners] ($(top)!0.5!(top2)$) -- ++ (0, -0.375) -- ++ (-0.7, -0.3) -- ++ (0, -1.3);
+                \begin{scope}[xshift=2cm]
+                    \node[morphism, minimum width=1cm] (f2) {\(f\)};
+                    \draw[wire, rounded corners] ($(f2.north east) - (0.2, 0)$) coordinate (A) -- ++ (0, 0.2) -- ++ (0.5, 0.3) -- ++ (0, 0.4) coordinate (top);
+                    \draw[wire] ($(f2.north west) + (0.2, 0)$) coordinate (here) -- (here |- top) coordinate (top2);
+                    \draw[over wire, rounded corners] ($(top)!0.5!(top2)$) -- ++ (0, -0.375) -- ++ (0.7, -0.3) -- ++ (0, -1.3);
+                \end{scope}
+                \node (equals) at ($(f1)!0.5!(f2)$) {\(=\)};
+            \end{tikzpicture}
+        \end{equation}
+        and we can see that these are spatially isotopic, we can just slide the \(B\) wire over the \(f\) morphism to the other side.
+    \end{exm}
+    
+    \begin{exm}{}{}
+        Consider the following spatial isotopy of diagrams
+        \begin{equation}
+            \tikzsetnextfilename{braid-sym-mon-cat-graphical-example-2}
+            \begin{tikzpicture}[baseline=(equals.base)]
+                \draw[wire, rounded corners] (1, 0) -- ++ (0, 1.1) -- ++ (-0.5, 0.5) -- ++ (0, 0.3) -- ++ (-0.5, 0.5) -- ++ (0, 0.3);
+                \draw[over wire, rounded corners] (0.5, 0) -- ++ (0, 0.3) -- ++ (-0.5, 0.5) -- ++ (0, 1.1) -- ++ (0.5, 0.5) -- ++ (0, 0.3);
+                \draw[over wire, rounded corners] (0, 0) -- ++ (0, 0.3) -- ++ (0.5, 0.5) -- ++ (0, 0.3) -- ++ (0.5, 0.5) -- ++ (0, 1.1);
+                \node (equals) at (1.5, 1.35) {\(=\)};
+                \draw[wire, rounded corners] (3, 0) -- ++ (0, 0.3) -- ++ (-0.5, 0.5) -- ++ (0, 0.3) -- ++ (-0.5, 0.5) -- ++ (0, 1.1);
+                \draw[over wire, rounded corners] (2.5, 0) -- ++ (0, 0.3) -- ++ (0.5, 0.5) -- ++ (0, 1.1) -- ++ (-0.5, 0.5) -- ++ (0, 0.3);
+                \draw[over wire, rounded corners] (2, 0) -- ++ (0, 1.1) -- ++ (0.5, 0.5) -- ++ (0, 0.3) -- ++ (0.5, 0.5) -- ++ (0, 0.3);
+            \end{tikzpicture}
+            .
+        \end{equation}
+        We can convert this into an algebraic equation between morphisms.
+        The first step is to work out what the source and target of these morphisms is.
+        To do this we label the wires \(A\), \(B\), and \(C\) along the bottom, so the source is \(A \otimes B \otimes C\).
+        The wires must have the same labels all the way along, so if we chase these labels up the wires we see that the target is \(C \otimes B \otimes A\).
+        Next split the diagrams horizontally into sections so that only one thing is occurring in each section, this gives
+        \begin{equation}
+            \tikzsetnextfilename{braid-sym-mon-cat-graphical-example-2-2}
+            \begin{tikzpicture}[baseline=(equals.base)]
+                \draw[wire, rounded corners] (1, 0) -- ++ (0, 1.1) -- ++ (-0.5, 0.5) -- ++ (0, 0.3) -- ++ (-0.5, 0.5) -- ++ (0, 0.3);
+                \draw[over wire, rounded corners] (0.5, 0) -- ++ (0, 0.3) -- ++ (-0.5, 0.5) -- ++ (0, 1.1) -- ++ (0.5, 0.5) -- ++ (0, 0.3);
+                \draw[over wire, rounded corners] (0, 0) -- ++ (0, 0.3) -- ++ (0.5, 0.5) -- ++ (0, 0.3) -- ++ (0.5, 0.5) -- ++ (0, 1.1);
+                \node (equals) at (1.5, 1.35) {\(=\)};
+                \draw[wire, rounded corners] (3, 0) -- ++ (0, 0.3) -- ++ (-0.5, 0.5) -- ++ (0, 0.3) -- ++ (-0.5, 0.5) -- ++ (0, 1.1);
+                \draw[over wire, rounded corners] (2.5, 0) -- ++ (0, 0.3) -- ++ (0.5, 0.5) -- ++ (0, 1.1) -- ++ (-0.5, 0.5) -- ++ (0, 0.3);
+                \draw[over wire, rounded corners] (2, 0) -- ++ (0, 1.1) -- ++ (0.5, 0.5) -- ++ (0, 0.3) -- ++ (0.5, 0.5) -- ++ (0, 0.3);
+                \foreach \y in {0.15, 0.95, 1.8, 2.6} {
+                    \foreach \xone/\xtwo in {-0.3/1.3, 1.7/3.3} {
+                        \draw[thick, Red!50] (\xone, \y) -- (\xtwo, \y);
+                    }
+                }
+                \draw[pen colour=Red!50, thick, decoration={calligraphic brace, mirror}, decorate] (3.5, 0.15) -- (3.5, 0.95) node [midway, right, font=\scriptsize\color{Red!50}] {1};
+                \draw[pen colour=Red!50, thick,  decoration={calligraphic brace, mirror}, decorate] (3.5, 0.95) -- (3.5, 1.8) node [midway, right, font=\scriptsize\color{Red!50}] {2};
+                \draw[pen colour=Red!50, thick,  decoration={calligraphic brace, mirror}, decorate] (3.5, 1.8) -- (3.5, 2.6) node [midway, right, font=\scriptsize\color{Red!50}] {3};
+            \end{tikzpicture}
+            .
+        \end{equation}
+        We can then just read from the bottom up.
+        Starting on the left region 1 is swapping \(A\) and \(B\) and leaving \(C\) alone, so it corresponds to \(\sigma_{A,B} \otimes \id_C\), region 2 then leaves \(B\) alone (which is now the left most wire) and swaps \(A\) and \(C\), so it is \(\id_B \otimes \sigma_{A,C}\), and region 3 swaps \(B\) and \(C\) leaving \(A\) alone, so it is \(\sigma_{B,C} \otimes \id_A\).
+        Doing the same for the diagram on the right we get the equation
+        \begin{multline}
+            (\sigma_{B,C} \otimes \id_A) \circ (\id_B \otimes \sigma_{A,C}) \circ (\sigma_{A,B} \otimes \id_C)\\
+            = (\id_C \otimes \sigma_{A,C}) \circ (\sigma_{A,C} \otimes \id_B) \circ (\id_A \otimes \sigma_{B,C}).
+        \end{multline}
+    \end{exm}
+    
+    \section{Symmetric Monoidal Category}
+    It is tempting to think that swapping two objects and swapping them back should do nothing.
+    However, this is not always the case, in general \(A \otimes B\) and the result of applying \(\sigma_{A,B}\) then \(\sigma_{B,A}\) will only be isomorphic.
+    Often though this isomorphism turns out to be the identity, and this leads to the following definition.
+    \begin{dfn}{Symmetric Monoidal Category}{}
+        A \defineindex{symmetric monoidal category} is a braided monoidal category with braiding \(\sigma\) such that
+        \begin{equation}
+            \sigma_{B,A} \circ \sigma_{A,B} = \id_{A \otimes B}
+        \end{equation}
+        for all objects \(A\) and \(B\).
+    \end{dfn}
+    
+    That is, a symmetric monoidal category is exactly a braided monoidal category in which we can swap and swap back without changing anything.
+    So, in a symmetric monoidal category we have \(\sigma_{A,B}^{-1} = \sigma_{B,A}\).
+    
+    In the graphical notation \(\sigma_{B,A} \circ \sigma_{A,B} = \id_{A\otimes B}\) is
+    \begin{equation}
+        \tikzsetnextfilename{braid-sym-mon-cat-sym-sym-inverse}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[wire, rounded corners] (1, 0) -- ++ (0, 0.3) -- ++ (-1, 0.4) -- ++ (0, 0.3) coordinate (A);
+            \draw[over wire, rounded corners] (0, 0) -- ++ (0, 0.3) -- ++ (1, 0.4) -- ++ (0, 0.3) coordinate (B);
+            \draw[wire, rounded corners] (B) -- ++ (0, 0.3) -- ++ (-1, 0.4) -- ++ (0, 0.3);
+            \draw[over wire, rounded corners] (A) -- ++ (0, 0.3) -- ++ (1, 0.4) -- ++ (0, 0.3);
+            \draw[wire] (2, 0) -- (2, 2);
+            \draw[wire] (3, 0) -- (3, 2);
+            \node at (1.5, 1) {\(=\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    Note the subtle difference to the identity \(\sigma_{A,B}^{-1} \circ \sigma_{A,B}\) in \cref{eqn:graphical braid inverse}, here the wires swap which one is on top.
+    One can imagine the wires being strings, pulling on them, and them passing through each other to become taught.
+    This is the type of thing that is allowed in a four-dimensional isotopy.
+    
+    \begin{dfn}{Four-Dimensional Isotopy}{}
+        Two diagrams are related by a four-dimensional isotopy if one can be deformed continuously into the other such that
+        \begin{itemize}
+            \item the diagrams remain confined in a cuboidal volume of three-dimensional space;
+            \item input and output wires terminate at the bottom and top of this region.
+        \end{itemize}
+    \end{dfn}
+    
+    The extra dimension gives us room to move wires which seem linked in three dimensions past each other in the fourth dimension, unlinking them in three dimensions.
+    This is part of a deep mathematical fact that there can be no (nontrivial) knots in four dimensions.
+    
+    Since wires can pass through each other for a symmetric monoidal category we don't need to keep track of which wire is on top, so we write
+    \begin{equation}
+        \tikzsetnextfilename{braid-sym-mon-cat-symmetric-braiding-1}
+        \begin{tikzpicture}[baseline=0.4cm]
+            \draw[wire, rounded corners] (1, 0) -- ++ (0, 0.3) -- ++ (-1, 0.4) -- ++ (0, 0.3);
+            \draw[wire, rounded corners] (0, 0) -- ++ (0, 0.3) -- ++ (1, 0.4) -- ++ (0, 0.3);
+        \end{tikzpicture}
+        =
+        \tikzsetnextfilename{braid-sym-mon-cat-symmetric-braiding-2}
+        \begin{tikzpicture}[baseline=0.4cm]
+            \draw[wire, rounded corners] (1, 0) -- ++ (0, 0.3) -- ++ (-1, 0.4) -- ++ (0, 0.3);
+            \draw[over wire, rounded corners] (0, 0) -- ++ (0, 0.3) -- ++ (1, 0.4) -- ++ (0, 0.3);
+        \end{tikzpicture}
+        =
+        \tikzsetnextfilename{braid-sym-mon-cat-symmetric-braiding-3}
+        \begin{tikzpicture}[baseline=0.4cm]
+            \draw[wire, rounded corners] (0, 0) -- ++ (0, 0.3) -- ++ (1, 0.4) -- ++ (0, 0.3);
+            \draw[over wire, rounded corners] (1, 0) -- ++ (0, 0.3) -- ++ (-1, 0.4) -- ++ (0, 0.3);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    Like (braided) monoidal categories there is a correctness theorem to go with the graphical notation.
+    
+    \begin{thm}{Correctness of the Graphical Notation for Symmetric Monoidal Categories}{}
+        Any well-formed equation of the form \(f = g\) in a symmetric monoidal category follows from the axioms of symmetric monoidal categories if and only if it holds in the graphical notation up to graphical equivalence.
+    \end{thm}
+    
+    Note that unlike the monoidal and braided monoidal cases we don't have isotopy here, this is because although graphical equivalence (a deliberately vague term essentially defined by being the thing required to make this theorem true) is almost certainly four-dimensional isotopy it has not yet been proven.
+    
+    \begin{exm}{}{}
+        \begin{itemize}
+            \item \(\Set\) equipped with the Cartesian product is a symmetric monoidal category;
+            \item \(\Rel\) equipped with the Cartesian product is a symmetric monoidal category;
+            \item \(\Hilb\) equipped with the tensor product is a symmetric monoidal category;
+            \item \(\Grp\) equipped with the Cartesian product with the trivial group as unit is a symmetric monoidal category;
+            \item the category of representations equipped with the tensor product of representations, which is a tensor product of the representation spaces and factor-wise group action on the product, so \(g \mathbin{.} (v \otimes u) = (g \mathbin{.} v) \otimes (g \mathbin{.} u)\), is a symmetric monoidal category;
+            \item \(\Cat\) equipped with the product of categories is a symmetric monoidal category;
+            \item every Cartesian category equipped with its categorical product as a monoidal product with the terminal object as the unit is a symmetric monoidal category by uniqueness of the categorical product;
+            \item A \(\integers_2\)-graded vector space\footnote{See also my notes from the \course{Quantum Field Theory} course, where a \(\integers_2\)-graded vector space equipped with a product is called a Grassmann algebra.} is a vector space, \(V\), along with a decomposition \(V = V_0 \oplus V_1\).
+            A \(\integers_2\)-graded map is a map \(f\colon V \to W\) with \(V = V_0 \oplus V_1\) and \(W = W_0 \oplus W_1\) such that if \(v \in V_0\) then \(f(v) \in W_0\) and if \(v \in V_1\) then \(f(v) \in W_1\).
+            The tensor product of vector spaces makes the category of \(\integers_2\)-graded vector spaces with grading preserving maps into a monoidal category.
+            There are two ways to make this into a symmetric monoidal category.
+            The first is to forget the grading, in which case the braiding is \(u \otimes v \mapsto v \otimes u\), the second is that if \(u, v \in V_1\) then we define the braiding to be \(u \otimes v \mapsto -v \otimes u\) and if either \(u \in V_0\) or \(v \in V_0\) (or both) then the braiding is \(u \otimes v \mapsto v \otimes u\).
+        \end{itemize}
+    \end{exm}
+    
+    \chapter{Dagger Categories}
+    \epigraph{O happy dagger!}{Juliet in Romeo and Juliet}
+    
+    \section{Dagger Categories: The Idea}
+    In the definition of \(\Hilb\), the category of Hilbert spaces, we didn't make use of the inner product, except for requiring its existence as part of the definition of a Hilbert space.
+    This leaves a hole in our categorical approach to quantum computing, since the inner product is incredibly important in quantum mechanics.
+    So, in this chapter we will demonstrate how we can introduce the important parts of an inner product to our categories.
+    
+    Rather than the inner product itself we use the fact that the inner product can define an adjoint.
+    \begin{dfn}{Adjoint}{}
+        Let \(H\) be a Hilbert spaces and consider a bounded linear map \(f \colon H \to H\).
+        We define the \defineindex{adjoint}\footnote{Not to be confused with adjoint functors.} of this map, \(f^{\dagger} \colon H \to H\), to be the unique map such that \(\braket{u}{f(v)} = \braket{f^{\hermit}(u)}{v}\) for all \(u, v \in H\).
+    \end{dfn}
+    
+    The adjoint has the following properties:
+    \begin{equation}
+        (g \circ f)^\dagger = f^\dagger \circ g^\dagger, \qquad \id_H^\dagger = \id_H, \qqand (f^\dagger)^\dagger.
+    \end{equation}
+    These may be more familiar if we consider the finite dimensional case and represent the maps as matrices, in which case \(\dagger\) is the Hermitian conjugate, that is transpose and take the complex conjugate, then we have
+    \begin{equation}
+        (AB)^{\dagger} = B^\dagger A^\dagger, \qquad I^\dagger = I, \qqand (A^\dagger)^\dagger = A.
+    \end{equation}
+    
+    We can encode this information into a functor, which is what the next definition does.
+    
+    \begin{dfn}{Dagger Functor}{}
+        The \define{dagger functor}\index{dagger!Hilb@dagger!\(\Hilb\)} on \(\Hilb\) is the contravariant endofunctor \((-)^\dagger \colon \Hilb \to \Hilb\) which takes objects to themselves and morphisms to their adjoints as bounded linear maps.
+    \end{dfn}
+    
+    Contravariance means that \(F(g \circ f) = Ff \circ Fg\), which in this case means \((g \circ f)^\dagger = f^\dagger \circ g^\dagger\), which is certainly true.
+    Since the dagger acts as an identity on objects and \(\id_H^\dagger = \id_H = \id_{H^\dagger}\), satisfying the requirement that \(F\id_A = \id_{FA}\), so we see that this is indeed a functor.
+    The dagger functor has the further property of being an \defineindex{involution}, meaning that \((f^{\dagger})^{\dagger} = f\).
+    
+    This functor captures all of the information in an inner product.
+    To see this we demonstrate how we can recover the inner product just using the dagger.
+    Consider some Hilbert space, \(H\), with states \(v, w \colon \complex \to H\), that is kets \(\ket{v}\) and \(\ket{w}\).
+    We can turn \(v\) into an effect \(v^\dagger \colon H \to \complex\).
+    Then consider the composite \(v^\hermit \circ w\).
+    As a (bounded) linear map this is completely determined by where it sends 1, so consider this map evaluated at 1, we have
+    \begin{equation}
+        (v^\dagger \circ w)(1) = v^\dagger(w(1)) = \braket{1}{v^\dagger(w(1))}
+    \end{equation}
+    where \(\braket{-}{-}\) is the inner product on \(\complex\), that is \(\braket{x}{y} = x^*y\), so \(\braket{1}{v^\dagger(w(1))} = 1^*v^\dagger(w(1)) = v^\dagger(w(1))\).
+    Then using the definition of the adjoint we have
+    \begin{equation}
+        (v^\dagger \circ w)(1) = \braket{1}{v^\dagger(w(1))} = \braket{(v^\dagger)^\dagger(1)}{w(1)} = \braket{v(1)}{w(1)} = \braket{v}{w}
+    \end{equation}
+    where the last step is to identify the state \(w\) evaluated at 1 as the ket \(\ket{w}\) and the effect \(v\) evaluated at 1 as the bra \(\bra{w}\).
+    This calculation shows that using only the dagger, and the most basic inner product on \(\complex\), we can reconstruct the inner product.
+    This suggests that we can use the dagger, a functor, to generalise the inner product to other categories.
+    
+    \section{Dagger Categories: The Definition}
+    \begin{dfn}{}{}
+        Let \(\cat{C}\) be a category.
+        A \defineindex{dagger} on \(\cat{C}\) is an involutive contravariant endofunctor \((-)^\dagger \colon \cat{C} \to \cat{C}\) which acts as the identity on objects.
+        
+        A \defineindex{dagger category} is a category equipped with a dagger.
+    \end{dfn}
+    
+    \section{Dagger Categories: The Examples}
+    \epigraph{Is this a dagger I see before me?}{Macbeth in Macbeth}
+    \subsection{\texorpdfstring{\(\Set\)}{Set}}
+    \begin{lma}{}{}
+        It is not possible to make \(\Set\) into a dagger category.
+    \end{lma}
+    
+    
+    
+    
+    % TODO: Cartesian category and terminal objects at same time as products, then later prove all Cartesian categories are monoidal
+    % TODO: Coherence theorems and strictification
+    % TODO: Adjoints
+    
     
     %   Appdendix
     \appendixpage
