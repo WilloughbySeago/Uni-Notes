@@ -42,6 +42,8 @@
 \tikzset{scalar/.style={draw, shape=circle, inner sep=2pt}}
 \tikzset{over wire/.style={thick, preaction={draw, background color, line width=#1}}}
 \tikzset{over wire/.default={1.5mm}}
+\tikzset{daggerable morphism/.style={morphism, trapezium, trapezium left angle=90, trapezium right angle=70}}
+\tikzset{daggered morphism/.style={morphism, trapezium, trapezium left angle=70, trapezium right angle=90, shape border rotate=180}}
 
 \RequirePackage[%
 sorting=none,  % Don't sort the references, they will appear in the order they are first cited
@@ -153,6 +155,7 @@ noabbrev
 \AtBeginDocument{\renewcommand{\mapstochar}{\rule[0.5pt]{0.5pt}{4.3pt}\mkern-1mu}}
 \newcommand{\true}{\symtt{true}}
 \newcommand{\false}{\symtt{false}}
+\DeclarePairedDelimiter{\cardinality}{\lvert}{\rvert}
 
 \includeonly{parts/maths-defs}
 
@@ -3883,7 +3886,7 @@ noabbrev
     
     \section{Braided Monoidal Category: The Examples}
     \subsection{\texorpdfstring{\(\Set\)}{Set}}
-    The braiding in \(\Set\) (as a monoidal category with the Cartesian product) is pretty obvious.
+    The braiding in \(\Set\)\index{Set@\(\Set\)!as a symmetric monoidal category} (as a monoidal category with the Cartesian product) is pretty obvious.
     It's simply swapping the elements in a pair.
     \begin{dfn}{{\normalsize\(\Set\)} as a Braided Monoidal Category}{}
         The monoidal category \(\Set\), with the Cartesian product as the monoidal product, can be promoted to a braided monoidal category by defining \(\sigma_{A,B}\) to be the map \((a, b) \mapsto (b, a)\).
@@ -3914,14 +3917,14 @@ noabbrev
     \subsection{\texorpdfstring{\(\Rel\)}{Rel}}
     The braiding in \(\Rel\) is similar to that in \(\Set\), we just turn a function into a relation.
     \begin{dfn}{{\normalsize\(\Rel\)} as a Braided Monoidal Category}{}
-        The monoidal category \(\Rel\) can be promoted to a braided monoidal category by defining \(\sigma_{A,B}\) to be the relation \((a, b) \sim (b, a)\).
+        The monoidal category \(\Rel\)\index{Rel@\(\Rel\)!as a symmetric monoidal category} can be promoted to a braided monoidal category by defining \(\sigma_{A,B}\) to be the relation \((a, b) \sim (b, a)\).
     \end{dfn}
     
     A proof that this is a valid braiding is very similar to the proof for \(\Set\).
     
     \subsection{\texorpdfstring{\(\Hilb\)}{Hilb}}
     \begin{dfn}{{\normalsize\(\Hilb\)} as a Braided Monoidal Category}{}
-        The monoidal category \(\Hilb\) can be promoted to a braided monoidal category by defining \(\sigma_{H,K}\) to be the map \(v \otimes w \mapsto w \otimes v\), and extended linearly to all of \(H \otimes K\).
+        The monoidal category \(\Hilb\)\index{Hilb@\(\Hilb\)!as a symmetric monoidal category} can be promoted to a braided monoidal category by defining \(\sigma_{H,K}\) to be the map \(v \otimes w \mapsto w \otimes v\), and extended linearly to all of \(H \otimes K\).
     \end{dfn}
     
     Again, the proof that this is a valid braiding is very similar to the proof for \(\Set\).
@@ -4052,6 +4055,7 @@ noabbrev
     
     The hexagon equations become trivial in the graphical notation, they just tell us that crossing two objects at once or crossing them one at a time is the same:
     \begin{equation}
+        \tikzsetnextfilename{braid-sym-mon-cat-hexagon-1}
         \begin{tikzpicture}[baseline=(equals.base)]
             \draw[wire, rounded corners] (0, 2) -- ++ (0, -0.5) -- ++ (1.3, -1) -- ++ (0, -0.5);
             \draw[wire, rounded corners, xshift=0.2cm] (0, 2) -- ++ (0, -0.5) -- ++ (1.3, -1) -- ++ (0, -0.5);
@@ -4064,6 +4068,7 @@ noabbrev
             \end{scope}
         \end{tikzpicture}
         , \qand
+        \tikzsetnextfilename{braid-sym-mon-cat-hexagon-2}
         \begin{tikzpicture}[baseline=(equals.base)]
             \draw[wire, rounded corners] (0, 2) -- ++ (0, -0.5) -- ++ (1.5, -1) -- ++ (0, -0.5);
             \draw[over wire, rounded corners] (0, 0) -- ++ (0, 0.5) -- ++ (1.3, 1) -- ++ (0, 0.5);
@@ -4316,9 +4321,258 @@ noabbrev
     \subsection{\texorpdfstring{\(\Set\)}{Set}}
     \begin{lma}{}{}
         It is not possible to make \(\Set\) into a dagger category.
+        
+        \begin{proof}
+            Suppose that \(\Set\) is a dagger category, so we have a involutive contravariant functor \((-)^{\dagger} \colon \Set \to \Set\).
+            Write \(\cardinality{A}\) for the cardinality of a set \(A\).
+            It is known that the homset \(\Set(A, B)\) contains \(\cardinality{B}^{\cardinality{A}}\) elements.
+            Similarly, \(\Set(B, A)\) has \(\cardinality{A}^{\cardinality{B}}\) elements.
+            For every \(f \in \Set(A, B)\) the dagger gives us some \(f^\dagger \in \Set(B, A)\).
+            Further, the dagger is involutive, so is its own inverse on morphisms.
+            This means that the mapping of sets \((-)^{\dagger} \colon \Set(A, B) \to \Set(B, A)\) is a bijection.
+            However, if \(A = \{1\}\) and \(B = \{1, 2\}\) then we have \(\cardinality{\Set(A, B)} = 2^1 = 2\) and \(\cardinality{\Set(B, A)} = 1^2 = 1\), so clearly these sets are not in bijection, a contradiction.
+        \end{proof}
     \end{lma}
     
+    \subsection{\texorpdfstring{\(\Rel\)}{Rel}}
+    \begin{dfn}{{\normalsize\(\Rel\)} as a Dagger Category}{}
+        The category \(\Rel\)\index{Rel@\(\Rel\)!as a dagger category} can be promoted to a dagger category by defining the dagger to be the \defineindex{converse relation}.
+        If we have a relation \(R \colon A \to B\) then the converse \(R^\dagger \colon B \to A\) is
+        \begin{equation}
+            R^{\dagger} = \{(b, a) \mid (a, b) \in R\} \subseteq B \times A.
+        \end{equation}
+    \end{dfn}
     
+    \begin{lma}{}{}
+        \(\Rel\) along with the converse relation is a dagger category.
+        \begin{proof}
+            Clearly the converse relation is an involution, we need only check then that it is a contravariant functor.
+            Consider first the identity relation, \(\id_A = \{(a, a) \mid a \in A\}\).
+            We have
+            \begin{equation}
+                \id_A^{\dagger} = \{(a, a) \mid (a, a) \in \id_A\} = \id_A = \id_{A^\dagger}
+            \end{equation}
+            where the last step uses that the dagger acts as the identity on objects.
+            Now suppose we have two relations \(R \colon A \to B\) and \(S \colon B \to C\).
+            Their composite is the relation
+            \begin{equation}
+                S \circ R = \{(a, c) \mid \exists b \in B \text{ such that } aRb \text{ and } bSc\}.
+            \end{equation}
+            The converse of this is
+            \begin{align}
+                (S \circ R)^\dagger &= \{(c, a) \mid (a, c) \in (S \circ R)\}\\
+                &= \{(c, a) \mid \exists b \in B \text{ such that } aRb \text{ and } bSc\}\\
+                &= \{(c, a) \mid \exists b \in B \text{ such that } bR^\dagger a \text{ and } cS^\dagger b\}\\
+                &= \{(c, a) \mid \exists b \in B \text{ such that } cS^\dagger b \text{ and } bR^\dagger a\}\\
+                &= R^\dagger \circ S^\dagger.
+            \end{align}
+            So the converse is indeed a contravariant functor.
+        \end{proof}
+    \end{lma}
+    
+    This is another example of \(\Rel\) being more like \(\Hilb\) than \(\Set\).
+    
+    \subsection{\texorpdfstring{\(\Hilb\)}{Hilb}}
+    \begin{dfn}{{\normalsize\(\Hilb\)} as a Dagger Category}{}
+        The category \(\Hilb\)\index{Hilb@\(\Hilb\)!as a dagger category} can be promoted to a dagger category by defining the dagger to be the adjoint.
+        That is, if \(f \colon H \to K\) is a bounded linear map between Hilbert spaces \(H\) and \(K\) with inner products \(\braket{-}{-}_H\) and \(\braket{-}{-}_K\) respectively then \(f^{\dagger}\) is the unique bounded linear operator such that
+        \begin{equation}
+            \braket{f^\dagger(k)}{h}_{H} = \braket{k}{f(h)}_{K}
+        \end{equation}
+        for all \(h \in H\) and \(k \in K\).
+    \end{dfn}
+    
+    We won't prove that this is a dagger, since this would require us to get into details like proving the uniqueness part of the definition and that the adjoint of a bounded linear map is again a bounded linear map.
+    Since \(\Hilb\) is our model category for defining the dagger in the first place the important properties of the dagger, like being involutive and contravariant, should be familiar already, although perhaps not in this language.
+    
+    Notice that the definition requires the inner product.
+    It turns out that this is one of the first times where we see something done with \(\Hilb\) which can't be done with \(\Vect\).
+    To see this we first note that for \(\Vect\) and two given vector spaces \(V\) and \(W\) the set \(\Vect(V, W)\) can be made into a vector space by defining pointwise addition, that is given \(\varphi, \psi \in \Vect(V, W)\) define \(\varphi + \psi \in \Vect(V, W)\) to be the linear map
+    \begin{equation}
+        (\varphi + \psi)(v) = \varphi(v) + \psi(v).
+    \end{equation}
+    Similarly, scalar multiplication is given pointwise, given \(z \in \field\) we define \(z\varphi \in \Vect(V, W)\) to be the linear map
+    \begin{equation}
+        (z\varphi)(v) = z\varphi(v).
+    \end{equation}
+    It is easy to check that these definitions make \(\Vect(V, W)\) a vector space.
+    
+    Now, suppose there was a dagger functor \((-)^{\dagger} \colon \Vect \to \Vect\).
+    This gives a mapping of morphisms \(\Vect(V, W) \to \Vect(W, V)\).
+    Specifically, choosing \(W = \field\) we have a mapping \(\Vect(V, \field) \to \Vect(\field, V)\).
+    However, if \(V\) is infinite dimensional then \(\Vect(\complex, V)\) has strictly smaller dimension than \(\Vect(V, \field)\), intuitively there are more ways to squash \(V\) down into \(\field\) than there are to expand \(\field\) to fill the infinite dimensions of \(V\).
+    However, this means that we cannot have a bijection \(\Vect(V, W) \to \Vect(W, V)\) for all vector spaces \(V\) and \(W\), as since \(\Vect(V, W)\) and \(\Vect(W, V)\) are vector spaces themselves such a bijection, which can also be shown to be linear, would be an isomorphism of vector spaces, and isomorphic vector spaces must have the same dimension\footnote{note that it is possible infinite dimensional vector spaces of the same dimension are not isomorphic, but being isomorphic necessitates having the same dimension. For finite dimensional vector spaces being isomorphic and having the same dimension are equivalent statements (for a fixed field).}.
+    
+    Finite dimensional vector spaces, \(\FVect\), don't have this problem, so we \emph{can} define a dagger \((-)^\dagger \colon \FVect \to \FVect\), by choosing an inner product, which can be done once we've chosen a basis, and then constructing adjoints.
+    However, there is no \enquote{canonical} way to do this, so it's not helpful.
+    A \defineindex{canonical} way to do something is, intuitively a way to do something such that we don't make any arbitrary choices, this can often be made rigorous by defining something to be the \enquote{canonical} choice if all ways of doing it end up being naturally isomorphic.
+    
+    \subsection{More Examples}
+    \begin{exm}{}{}
+        \begin{itemize}
+            \item Any monoid, \(M\), with an involutive map \(f \colon M \to M\) can be considered as a one-object dagger category by taking the dagger to be \(m^\dagger = f(m)\) for all \(m \in M\), recall that when viewing a monoid as a one-object category the elements of the monoid are the morphisms of the category.
+            \item Any groupoid (category where all morphisms are isomorphisms) is a dagger category with the dagger being the inverse.
+            \item Any discrete category is trivially a dagger category.
+            \item Let \(\cat{C}\) and \(\cat{D}\) be dagger categories and \(F, G \colon \cat{C} \to \cat{D}\) functors.
+            Then given a natural transformation \(\zeta\colon F \naturalTransformation G\) we can define a dagger componentwise by defining \(\zeta^\dagger\colon G \naturalTransformation F\) to be the natural transformation whose component at \(A \in \Ob(\cat{D})\) is \(\zeta_A^\dagger\).
+            This makes the functor category \(\functorCategory{\cat{C}}{\cat{D}}\) into a dagger category.
+        \end{itemize}
+    \end{exm}
+    
+    \section{Terminology}
+    We now introduce some terminology useful for talking about special properties of morphisms under daggers.
+    \begin{dfn}{}{}
+        A morphism \(f \colon A \to B\) in a dagger category is
+        \begin{itemize}
+            \item the \defineindex{adjoint} of \(g \colon B \to A\) if \(g = f^\dagger\);
+            \item \defineindex{self-adjoint} if \(f = f^\dagger\) (requiring \(A = B\));
+            \item a \defineindex{projection} if\footnote{sometimes the requirement of being self-adjoint is left out of this definition} \(f = f^\dagger\) and \(f \circ f = f\);
+            \item \defineindex{unitary} when \(f^\dagger \circ f = \id_A\) and \(f \circ f^\dagger = \id_B\);
+            \item an \defineindex{isometry} when \(f^\dagger \circ f = \id_A\);
+            \item a \defineindex{partial isometry} when \(f^\dagger \circ f\) is a projection;
+            \item \defineindex{positive} when \(f = g^\dagger \circ g\) for some morphism \(g \colon A \to A\) (requiring \(A = B\)).
+        \end{itemize}
+    \end{dfn}
+    Many of these should be familiar from \(\Hilb\).
+    Note that the definition of positive is inspired by \(\complex\) with the dagger being complex conjugate where \(z^*z = \abs{z}^2\) is non-negative.
+    
+    \section{Graphical Notation}
+    Since daggers swap the direction of functions we can depict them in the graphical notation as a rotation in the horizontal axis:
+    \begin{equation}
+        \tikzsetnextfilename{dagger-graphical-notation-1}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \node[morphism] (f) {\(\phantomrlap{\,f}{f^\dagger}\)};
+            \draw[wire] (f) -- ++ (0, 0.75) node [above] {\(B\)};
+            \draw[wire] (f) -- ++ (0, -0.75) node [below] {\(A\)};
+            \draw[|->] (0.5, 0) -- (1.5, 0) node [midway, above] {\((-)^\dagger\)};
+            \node[morphism] (fdagger) at (2, 0) {\(f^\dagger\)};
+            \draw[wire] (fdagger) -- ++ (0, 0.75) node [above] {\(A\)};
+            \draw[wire] (fdagger) -- ++ (0, -0.75) node [below] {\(B\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    Rather than writing daggers on every morphism that we dagger we instead use a shape which breaks the horizontal mirror symmetry, so that we can reflect it and it is clearly different without having to add in a dagger:
+    \begin{equation}
+        \tikzsetnextfilename{dagger-graphical-notation-2}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \node[daggerable morphism] (f) {\(f\)};
+            \draw[wire] (f) -- ++ (0, 0.75) node [above] {\(B\)};
+            \draw[wire] (f) -- ++ (0, -0.75) node [below] {\(A\)};
+            \draw[|->] (0.75, 0) -- (1.5, 0) node [midway, above] {\((-)^\dagger\)};
+            \node[daggered morphism] (fdagger) at (2, 0) {\(f\)};
+            \draw[wire] (fdagger) -- ++ (0, 0.75) node [above] {\(A\)};
+            \draw[wire] (fdagger) -- ++ (0, -0.75) node [below] {\(B\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    Notice that if \(a \colon I \to A\) is a state in a dagger category then \(a^\dagger \colon A \to I\) is an effect in the same category.
+    So daggers relate states and effects:
+    \begin{equation}
+        \tikzsetnextfilename{dagger-states-and-effects}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \node[state] (a state) at (0, -0.25) {\(a\)};
+            \draw[wire] (a state) -- ++ (0, 0.75) node [above] {\(A\)};
+            \draw[|->] (0.75, 0.15) -- (1.5, 0.15) node [midway, above] {\((-)^\dagger\)};
+            \draw[|->] (1.5, -0.15) -- (0.75, -0.15) node [midway, below] {\((-)^\dagger\)};
+            \node[effect] (a effect) at (2.25, 0.25) {\(a\)};
+            \draw[wire] (a effect) -- ++ (0, -0.75) node [below] {\(A\)};
+        \end{tikzpicture}
+    \end{equation}
+    
+    We can use this to generalise the inner product and bra-ket notation to any dagger category by defining
+    \begin{equation}
+        \braket{a}{b} \coloneqq \hspace{0.2cm}
+        \tikzsetnextfilename{dagger-generalise-bra-ket}
+        \begin{tikzpicture}[baseline=(equal.base)]
+            \node[effect] (a) {\(\phantomrlap{a}{b}\)};
+            \node[state, below=of a] (b) {\(b\)};
+            \draw[wire] (a) -- (b);
+            \node (equal) at ($(a)!0.5!(b) + (1, 0)$) {\(=\)};
+            \node[effect] (a2) at (2, -0.48) {\(\phantomrlap{a}{b}\)};
+            \node[state, below=-0.005cm of a2] (b2) {\(b\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    That is, for \(a \colon A \to I\) and \(b \colon I \to A\)
+    \begin{equation}
+        \braket{a}{b} \coloneqq a \circ b.
+    \end{equation}
+    
+    \section{Monoidal Dagger Categories}
+    In order to use both monoidal categories and dagger categories at the same time we want the two functors \(-\otimes-\) and \((-)^\dagger\) to play nicely together, we get this through the following definition.
+    \begin{dfn}{Monoidal Dagger Category}{}
+        A \defineindex{monoidal dagger category} is a dagger category which is also monoidal such that
+        \begin{itemize}
+            \item \((f \otimes g)^\dagger = f^\dagger \otimes g^\dagger\) for all morphisms \(f\) and \(g\);
+            \item the associator and unitors are unitary at every object.
+        \end{itemize}
+    
+        A \defineindex{braided monoidal dagger category} is a monoidal dagger category equipped with a unitary braiding.
+        
+        A \defineindex{symmetric monoidal dagger category} is a braided monoidal dagger category for which the braiding is symmetric.
+    \end{dfn}
+    
+    More compactly, a (braided or symmetric) monoidal dagger category is exactly what you would expect with the requirements that all of the natural isomorphisms involved in the definition of the (braided or symmetric) monoidal part are unitary and the dagger on the tensor product reverses the order of the morphisms: \((f\otimes g)^\dagger = f^\dagger \otimes g^\dagger\).
+    
+    \begin{lma}{}{}
+        \(\Hilb\) is a symmetric monoidal dagger category.
+        
+        \begin{proof}
+            Let \(H\), \(J\), \(K\), \(L\) be Hilbert spaces.
+            Suppose we have two morphisms \(f \colon H \to K\) and \(g \colon J \to L\).
+            Then we have a morphism \(f \otimes g \colon H \otimes J \to K \otimes L\).
+            With \(H \otimes J\) and \(K \otimes L\) Hilbert spaces with inner products \(\braket{-}{-}_{H\otimes J}\) and \(\braket{-}{-}_{K\otimes L}\).
+            The adjoint to \(f \otimes g\) is defined to be the unique linear map \((f \otimes g)^\dagger \colon K \otimes L \to H \otimes J\) satisfying
+            \begin{equation}
+                \braket{(f \otimes g)^\dagger(v' \otimes w')}{v \otimes w}_{H\otimes J} = \braket{v' \otimes w'}{(f \otimes g)(v \otimes w)}_{K \otimes L}
+            \end{equation}
+            for all \(v \in H\), \(w \in J\), \(v' \in K\), and \(w' \in L\).
+            We then have
+            \begin{align}
+                \braket{v' \otimes w'}{(f \otimes g)(v \otimes w)}_{K \otimes L} &= \braket{v' \otimes w'}{f(v) \otimes g(w)}_{K\otimes L}\\
+                &= \braket{v'}{f(v)}_K \braket{w'}{g(w)}_{L}\\
+                &= \braket{f^\dagger(v')}{v}_H \braket{g^\dagger(w')}{w}_J\\
+                &= \braket{(f^\dagger \otimes g^\dagger)(v' \otimes w')}{v \otimes w}_{H \otimes J},\notag
+            \end{align}
+            so we have \((f \otimes g)^\dagger = f^\dagger \otimes g^\dagger\).
+            
+            For unitarity first consider the left unitor, \(\lambda\).
+            Fixing some Hilbert space, \(H\), the left unitor gives an isomorphism \(\lambda_H \colon I \otimes H \to H\).
+            The dagger of this is defined as the unique morphisms such that
+            \begin{equation}
+                \braket{\lambda_H^\dagger(v)}{1 \otimes w}_{I \otimes H} = \braket{v}{\lambda_H(1 \otimes w)}_{H} = \braket{v}{w}_H.
+            \end{equation}
+            Clearly, this holds if \(\lambda_H^\dagger = \lambda_H^{-1}\) since
+            \begin{equation}
+                \braket{\lambda_H^{-1}(v)}{1 \otimes w}_{I \otimes H} = \braket{1 \otimes v}{1 \otimes w}_{I\otimes H} = \braket{1}{1}_{I} \braket{v}{w}_{H} = \braket{v}{w}_{H}.
+            \end{equation}
+            So by uniqueness we have \(\lambda_H^\dagger = \lambda_H^{-1}\), hence \(\lambda_H\) is unitary.
+            Unitarity of the right unitor follows similarly.
+            
+            Now consider the associator, \(\alpha\).
+            Fixing some Hilbert spaces \(H\), \(J\), and \(K\), we get an isomorphism \(\alpha_{H,J,K} \colon (H \otimes J) \otimes K \to H \otimes (J \otimes K)\).
+            Then \(\alpha_{H,J,K}^\dagger\) is defined as the unique morphism such that
+            \begin{align}
+                &\braket{\alpha_{H,J,K}^\dagger(u \otimes (v \otimes w))}{(u' \otimes v') \otimes w'}_{(H\otimes J)\otimes K}\\
+                &\qquad= \braket{u \otimes (v \otimes w)}{\alpha_{H,J,K}((u' \otimes v') \otimes w')}_{H\otimes(J\otimes K)}\\
+                &\qquad= \braket{u \otimes (v \otimes w)}{(u' \otimes (v' \otimes w'))}_{H\otimes(J\otimes K)}.
+            \end{align}
+            Clearly this holds if \(\alpha_{H,J,K}^\dagger = \alpha_{H,J,K}^{-1}\):
+            \begin{align}
+                &\braket{\alpha_{H,J,K}^{-1}(u \otimes (v \otimes w))}{(u' \otimes v') \otimes w'}_{(H\otimes J)\otimes K}\\
+                &\qquad= \braket{(u \otimes v) \otimes w}{(u' \otimes v') \otimes w'}_{(H\otimes J)\otimes K}\\
+                &\qquad= \braket{(u \otimes v)}{u' \otimes v'}_{H\otimes J}\braket{w}{w'}_K\\
+                &\qquad= \braket{u}{u'}_H \braket{v}{v'}_J \braket{w}{w'}_K\\
+                &\qquad= \braket{u}{u'}_{H} \braket{v \otimes w}{v' \otimes w'}_{J \otimes K}\\
+                &\qquad= \braket{u \otimes (v \otimes w)}{u' \otimes (v' \otimes w')}_{H\otimes(J\otimes K)}.
+            \end{align}
+            So by uniqueness \(\alpha_{H,J,K}^\dagger = \alpha_{H,J,K}^{-1}\), and so \(\alpha_{H,J,K}\) is unitary.
+        \end{proof}
+    \end{lma}
+    
+    \(\Rel\) is also a symmetric monoidal dagger category.
     
     
     % TODO: Cartesian category and terminal objects at same time as products, then later prove all Cartesian categories are monoidal
