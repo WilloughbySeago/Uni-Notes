@@ -58,6 +58,10 @@
 \tikzset{momentum injection/.style={->}}
 \tikzset{WZ boson/.style={photon}}
 \tikzset{higgs/.style={scalar}}
+\tikzset{ghost/.style={thick, dotted, postaction={decorate, decoration={markings, mark=at position #1 with {\arrow{Latex[width=1.5mm]}}}}}}
+\tikzset{ghost/.default=0.5}
+\tikzset{antighost/.style={thick, dotted, postaction={decorate, decoration={markings, mark=at position #1 with {\arrowreversed{Latex[width=1.5mm]}}}}}}
+\tikzset{antighost/.default=0.5}
 
 \usepackage[compat=1.1.0]{tikz-feynman}
 
@@ -205,6 +209,10 @@ noabbrev
 \newcommand{\bohrMagneton}{\mu_{\symrm{B}}}
 \DeclarePairedDelimiterX{\anticommutator}[2]{\{}{\}}{#1, #2}
 \DeclarePairedDelimiterX{\commutator}[2]{[}{]}{#1, #2}
+\newcommand{\action}{\mathbin{.}}
+\newcommand{\adj}{\symrm{adj}}
+\newcommand{\adjointRep}{\symrm{A}}
+
 
 % RDB
 \newcommand{\chargeConjugation}{\symsf{C}}
@@ -3653,6 +3661,562 @@ noabbrev
     Interactions between gauge bosons is not something we see in QED, which is fundamentally due to \(\unitary(1)\) being Abelian and so these terms cancel out.
     
     
+    \chapter{Group Theory}
+    For more details see \course{Symmetries of Quantum Mechanics} and \course{Symmetries of Particles and Fields}.
+    
+    \section{Basics of \texorpdfstring{\(\specialUnitary(N)\)}{SU(N)}}
+    Yang--Mills theory is defined by the existence of a gauge symmetry.
+    We will restrict ourselves to \(\specialUnitary(N)\) gauge symmetries, since this is the case for QCD, which is the \(\specialUnitary(3)\) case.
+    
+    Our first definition is \define{\(\specialUnitary(N)\)}\index{SU(N)@\(\specialUnitary(N)\)} itself, this is the group of \(N \times N\) unitary matrices with unit determinant.
+    Strictly this is only one representation of \(\specialUnitary(N)\), called the defining or fundamental representation.
+    Any \(U \in \specialUnitary(N)\) can be written as\footnote{mathematicians follow a different convention and write \(U = \e^{\vartheta^a t^a}\)} \(U = \e^{i\vartheta^a t^a}\) for \(\vartheta^a \in \complex\) where \(t^a\) are the \define{generators}\index{generator} of \define{\(\specialUnitaryLie(N)\)}\index{su(N)@\(\specialUnitaryLie(N)\)}, the Lie algebra of \(\specialUnitary(N)\).
+    In the defining representation \(t^a\) are \(N \times N\) matrices over \(\complex\).
+    The conditions upon \(\specialUnitary(N)\) enforce conditions at the level of the Lie algebra:
+    \begin{itemize}
+        \item Unitarity, \(U^\hermit = U^{-1}\) forces the generators to be Hermitian\footnote{in the mathematics convention the generators are instead anti-Hermitian}, \((t^a)^\hermit = t^a\), to see this expand \((\e^{i\vartheta^a t^a})^\hermit = \e^{-i\vartheta^a t^{a\hermit}} = \e^{-i\vartheta^a t^a} = (\e^{-i\vartheta^a t^a})^{-1}\) to linear order.
+        \item Unit determinant, \(\det U = 1\), enforces \(\tr t^a = 0\), through the identity \(\det(\e^A) = \e^{\tr A}\).
+    \end{itemize}
+    
+    There are \(2N^2\) linearly independent complex \(N \times N\) matrices, since there are \(N^2\) entries each with two degrees of freedom.
+    Imposing Hermiticity restricts the entries on the diagonal to be real, removing \(N\) degrees of freedom, and fixes the entries below the diagonal to be complex conjugates of those above the diagonal, fixing \(N(N - 1)/2\) complex values, so removing \(N(N - 1)\) degrees of freedom.
+    We are therefore left with \(2N^2 - N - N(N - 1) = N^2\) degrees of freedom.
+    So there are \(N^2\) linearly independent Hermitian \(N \times N\) matrices.
+    Imposing tracelessness fixes one more degree of freedom, since given all but the first element in the diagonal we can deduce this value by requiring that the diagonal sums to zero, and recalling that all values on the diagonal are real for a Hermitian matrix.
+    Thus there are \(N^2 - 1\) generators of \(\specialUnitaryLie(N)\).
+    This means that \(\dim \specialUnitary(N) = N^2 - 1\) as a manifold also.
+    
+    The generators of \(\specialUnitaryLie(2)\) are the Pauli matrices, of which there are \(2^2 - 1 = 3\).
+    The generators of \(\specialUnitaryLie(3)\) are the Gell-Mann matrices, of which there are \(3^2 - 1 = 8\).
+    The standard choice in both cases is actually to include an extra factor of \(1/2\), for reasons we'll see later.
+    
+    \section{Structure Constants}
+    The \define{structure constants}\index{structure constant}, \(f^{abc}\), are defined by\footnote{the \(i\) here is only present in the physics convention of \(U = \e^{i\vartheta^a t^a}\).}
+    \begin{equation}
+        \commutator{t^a}{t^b} = if^{abc}t^c.
+    \end{equation}
+    Here \(\commutator{-}{-}\) is the commutator, or more generally a Lie bracket.
+    It is simple to show that the following holds for commutators, and it holds by definition for a Lie bracket:
+    \begin{equation}
+        \commutator{\commutator{t^a}{t^b}}{t^c} + \commutator{\commutator{t^b}{t^c}}{t^a} + \commutator{\commutator{t^c}{t^a}}{t^b} = 0.
+    \end{equation}
+    From this it is possible to show that
+    \begin{equation}
+        f^{abd}f^{dce} + f^{bcd}f^{dae} + f^{cad}f^{dbe} = 0.
+    \end{equation}
+    Both of these results are known as the \defineindex{Jacobi identity}.
+    
+    \section{Other Representations}
+    So far we have thought of \(\specialUnitary(N)\) as acting on \(\complex^N\) through the group action
+    \begin{equation}
+        U \action v = Uv
+    \end{equation}
+    for \(U \in \specialUnitary(N)\) in the fundamental representation and \(v \in \complex^N\).
+    
+    Other representations act on different representation spaces.
+    We'll often work with an arbitrary representation, \(R\).
+    In this representation we'll denote the generators by \(t_R^a\).
+    Note that the structure constants are representation independent, since the Lie bracket is representation independent as part of the definition of a Lie group.
+    So we have
+    \begin{equation}
+        \commutator{t_R^a}{t_R^b} = if^{abc}t_R^c
+    \end{equation}
+    in any representation.
+    It is common to label a representation by its dimension, so the fundamental representation is \(N\).
+    
+    One particularly important representation is the \defineindex{adjoint representation} in which \(\specialUnitaryLie(N)\) acts on itself by taking the generators, \(t_{\adj}^b\), to have components
+    \begin{equation}
+        (t_{\adj}^b)^{ac} = if^{abc}.
+    \end{equation}
+    
+    In an arbitrary representation, \(R\), the group action on some vector \(v\) is
+    \begin{equation}
+        g \action v = \e^{i\vartheta^at_R^a}v = (1 + i\vartheta^at_R^a)v
+    \end{equation}
+    for infinitesimal \(\vartheta^a\).
+    We can define the conjugate representation, \(\overline{R}\), through the action
+    \begin{equation}
+        g \action v^* = (1 - i\vartheta^a(t_R^a)^*)v^*,
+    \end{equation}
+    so \(t_{\overline{R}}^a = -(t_R^a)^*\).
+    
+    Two relations are \defineindex{equivalent} if they are related by a change of basis of the representation space.
+    That is, two representation, \(R_1\) and \(R_2\), are equivalent if
+    \begin{equation}
+        t_{R_1}^a = Xt_{R_2}^aX^\hermit
+    \end{equation}
+    for some fixed matrix \(X\).
+    A representation which is equivalent to its conjugate is called a \defineindex{real representation}.
+    The adjoint representation is always real.
+    So is the fundamental representation of \(\specialUnitary(2)\), but the fundamental representation of \(\specialUnitary(3)\) is not.
+    
+    \section{Casimirs}
+    In the fundamental representation, writing \(t^a\) for the generators, we are free to choose the normalisation of the generators such that
+    \begin{equation}
+        \tr(t^at^b) = \frac{1}{2}\delta^{ab}.
+    \end{equation}
+    In a general representation, we can define the trace, \(T(R)\), through
+    \begin{equation}
+        \tr(t_R^at_R^b) = T(R)\delta^{ab}.
+    \end{equation}
+    We cannot in general take \(T(R) = 1/2\), since this is in conflict with \(\commutator{t_R^a}{t_R^b} = if^{abc}t_R^c\), where the normalisation of the structure constants is fixed by taking \(T(N) = 1/2\).
+    
+    Now consider the operator \(t_R^a t_R^a\).
+    This commutes with all of the generators, which we can show by commuting each \(t_R^a\) with the generator individually, picking up a commutator term, and then using the structure constants:
+    \begin{align}
+        t_R^at_R^at_R^b &= t_R^at_R^bt_R^a + t_R^a\commutator{t_R^a}{t_R^b} = t_R^bt_R^at_R^a + \commutator{t_R^a}{t_R^b}t_R^a + t_R^a\commutator{t_R^a}{t_R^b}\\
+        &= t_R^bt_R^at_R^a + if^{abc}t_R^ct_R^a + if^{abc}t_R^at_R^c = t_R^bt_R^at_R^a + if^{abc}(t_R^ct_R^a + t_R^at_R^c) = t_R^bt_R^at_R^a \notag
+    \end{align}
+    having used the fact that \(f^{abc}\) is totally antisymmetric and \((t_R^ct_R^a + t_R^at_R^c)\) is symmetric in \(a\) and \(c\), so their product vanishes.
+    
+    In group theory language we say that \(t_R^at_R^a\) is a \defineindex{Casimir operator}, it commutes with all generators, and hence all elements of \(\specialUnitaryLie(N)\).
+    More specifically, \(t_R^at_R^a\) is the \defineindex{quadratic Casimir}, since it is quadratic in the generators, but it is common to refer to it simply as \emph{the} Casimir, since we aren't interested in any of the other Casimirs, apart from trivial things like scalars which commute with everything.
+    A basic result of Lie theory, Schur's lemma, says that all Casimir operators are simply a (representation dependent) scalar times the identity, so we have
+    \begin{equation}
+        (t_R^a)_{ik}(t_R^a)_{kj} = C_2(R)\delta_{ij} \iff t_R^at_R^a = C_2(R)1
+    \end{equation}
+    where the \(i\) and \(j\) indices run from \(1\) to \(d(R)\), where \(d(R)\) is the dimension of representation \(R\).
+    Note that \(a\) runs from \(1\) to \(N^2 - 1\), regardless of the representation.
+    Taking traces we have
+    \begin{equation}
+        \tr_R(t_R^at_R^a) = C_2(R)\delta_{ii} = C_2(R)d(R) = T(R)\delta^{aa} = T(R)\dim G.
+    \end{equation}
+    Using \(T(N) = 1/2\) we have
+    \begin{equation}
+        C_2(N)N = \frac{1}{2}(N^2 - 1) \implies C_2(N) = \frac{1}{2N}(N^2 - 1).
+    \end{equation}
+    
+    We denote the adjoint representation by \(\adjointRep\), and it can be shown that \(T(\adjointRep) = C_2(\adjointRep) = N\).
+    
+    \section{Representations and Yang--Mills Theory}
+    Recall that the gauge transformation of \(A_\mu\) is
+    \begin{equation}
+        A'^a_\mu = A^a_\mu + i\vartheta^a \commutator{t^a}{t^b}A^b_\mu + \frac{1}{g}(\partial_\mu \vartheta^a)t^a.
+    \end{equation}
+    If we consider a global transformation, where \(\vartheta^a\) is constant, then the derivative vanishes and we are left with
+    \begin{align}
+        A'^a_\mu &= A^a_\mu + i\vartheta^a \commutator{t^a}{t^b}A^b_\mu\\
+        &= A^a_\mu - f^{abc}\vartheta^b A^c_\mu\\
+        &= (\delta^{ca} - f^{abc}\vartheta^b)A^c_\mu.
+    \end{align}
+    This is the condition for the gauge fields to transform in the adjoint representation for global transformations.
+    In turn this means that the gauge fields are elements of the Lie algebra, \(\specialUnitaryLie(N)\), or \enquote{Lie algebra valued}.
+    This is quite hand wavy and will annoy mathematicians, who will insist on talking about fibre bundles here.
+    
+    Under a global transformation we get an extra term from the derivative called an \defineindex{affine transformation}.
+    This extra term cancels in \(F^{a\mu\nu}\), so \(F^{a\mu\nu}\) is always in the adjoint representation for both global and local transformations.
+    
+    Recall that for matter we have the Lagrangian
+    \begin{equation}
+        \lagrangianDensity = \diracadjoint{\psi} (i\slashed{\covariantDerivative} - m) \psi
+    \end{equation}
+    where now \(\psi\) and \(\diracadjoint{\psi}\) transform under some representation, \(R\), of \(\specialUnitary(N)\).
+    Note that
+    \begin{equation}
+        \covariantDerivative_\mu = \partial_\mu - igA^a_\mu t_R^a
+    \end{equation}
+    is representation dependent.
+    Note that here \(t_R^a\) are operators on spinor space.
+    If we introduce spinor indices, \(i\) and \(j\), then we have
+    \begin{equation}
+        (\covariantDerivative_\mu\psi)_i = (\delta_{ij}\partial_\mu - igA^a_\mu(t_R^a)_{ij})\psi_j.
+    \end{equation}
+    
+    Including the gauge fields we get the Lagrangian
+    \begin{equation}
+        \lagrangianDensity = -\frac{1}{2}\tr(F^{\mu\nu}F_{\mu\nu}) + \diracadjoint{\psi}(i \slashed{\covariantDerivative} - m) \psi = -\frac{1}{4}F^a_{\mu\nu}F^{a\mu\nu} + \diracadjoint{\psi}(i\slashed{\covariantDerivative} - m)\psi.
+    \end{equation}
+    
+    We can also add in scalar matter, again transforming under an arbitrary, potentially different, representation.
+    We arrange these scalars into a column matrix, \(\varphi\), of size \(d(R)\).
+    The most general renormalisable Lagrangian including a single fermion and and a single scalar, without interactions between them, is
+    \begin{equation}
+        \lagrangianDensity = -\frac{1}{2}\tr(F^{\mu\nu}F_{\mu\nu}) + \diracadjoint{\psi}(i \slashed{\covariantDerivative} - m) \psi + (\covariantDerivative_\mu \varphi)^\hermit (\covariantDerivative^\mu \varphi) - M^2 \varphi^\hermit \varphi + \frac{\lambda}{4}(\varphi^\hermit \varphi)^2.
+    \end{equation}
+    
+    A Yang--Mills theory is completely specified by the following information:
+    \begin{itemize}
+        \item the gauge group, \(G\);
+        \item the matter fields, \(\psi\) and/or \(\varphi\);
+        \item the interactions of the matter fields, terms like \(\lambda(\varphi^\hermit \varphi)^2/4\) or \(g\varphi\diracadjoint{\psi}\psi\);
+        \item the masses of the particles;
+    \end{itemize}
+    
+    QCD is a Yang--Mills theory with the gauge group \(G = \specialUnitary(3)\).
+    There are no scalar fields and six fermion fields, the quarks, \(\Pq_{f}\) with \(f = 1, \dotsc, 6\), which we take to all be the same mass.
+    The Lagrangian is then
+    \begin{equation}
+        \lagrangianDensity_{\symrm{QCD}} = -\frac{1}{4}F^a_{\mu\nu}F^{a\mu\nu} + \sum_{f=1}^{6} \diracadjoint{\Pq}_f(i\slashed{\covariantDerivative} - m) \Pq_f.
+    \end{equation}
+    
+    \section{Feynman Rules for Yang--Mills Theory}
+    Given how similar the Yang--Mills Lagrangian is to the QED Lagrangian it should not be too surprising that the Feynman rules for Yang--Mills theory are similar to the Feynman rules for QED.
+    We won't derive most of them here, the process is very similar to the process for deriving the QED Feynman rules.
+    We'll state the rules, and derive one example.
+    
+    First, we have the fermion propagator, this is exactly the same as in QED, although now the mass is a quark mass:
+    \begin{equation}
+        \tikzsetnextfilename{yang-mills-feynman-rules-fermion-propagator}
+        \begin{tikzpicture}[baseline=(current bounding box), font=\scriptsize]
+            \draw[electron] (0, 0) -- (1, 0);
+            \draw[->] (0.2, -0.2) -- (0.8, -0.2) node [midway, below, yshift=0.05cm] {\(p\)};
+        \end{tikzpicture}
+        = \frac{i(\slashed{p} + m)}{p^2 - m^2 + i\epsilon}.
+    \end{equation}
+    
+    Next, we have the gluon propagator.
+    This is very similar to the photon propagator, but we have these extra \(a\) indices hanging about.
+    Since the gluon doesn't change colour when propagating the colour at either end of a gluon propagator must be the same, so we just have an extra \(\delta^{ab}\) to include:
+    \begin{equation}
+        \tikzsetnextfilename{yang-mills-feynman-rules-gluon-propagator}
+        \begin{tikzpicture}[baseline=(current bounding box), font=\scriptsize]
+            \draw[gluon] (0, 0) node [left] {\(\mu, a\)} -- (1, 0) node [right] {\(\nu, b\)};
+            \draw[->] (0.2, -0.2) -- (0.8, -0.2) node [midway, below, yshift=0.05cm] {\(k\)};
+        \end{tikzpicture}
+        = -\frac{i\delta^{ab}}{k^2 + i\epsilon}\left( \minkowskiMetric^{\mu\nu} - (1 - \xi) \frac{k^\mu k^\nu}{k^2} \right).
+    \end{equation}
+    Here, as in QED, \(\xi\) is a gauge parameter, which we'll often take to be 1.
+    
+    We'll see at the end of the next chapter that in the gauge fixing process we are forced to introduce another particle, and that these are massless scalars with a colour index, \(a\), which we call Faddeev--Popov ghosts.
+    They enter the Lagrangian through the term \(-\diracadjoint{c}^a\partial_\mu\covariantDerivative^\mu c^a\).
+    The propagator for these ghosts, coming from the \(-\diracadjoint{c}^a\partial_\mu\partial^\mu c^a\) term, is very similar to the usual scalar propagator, but with an extra \(\delta^{ab}\), since the ghosts don't change colour as they propagate.
+    We then have the Feynman rule
+    \begin{equation}
+        \tikzsetnextfilename{yang-mills-feynman-rules-ghost-propagator}
+        \begin{tikzpicture}[baseline=(current bounding box), font=\scriptsize]
+            \draw[gluon] (0, 0) node [left] {\(a\)} -- (1, 0) node [right] {\(b\)};
+            \draw[->] (0.2, -0.2) -- (0.8, -0.2) node [midway, below, yshift=0.05cm] {\(k\)};
+        \end{tikzpicture}
+        = \frac{i\delta^{ab}}{k^2 + i\epsilon}.
+    \end{equation}
+    
+    Now we get to the interactions.
+    The most familiar is the three point quark and gluon vertex, which is very similar to the QED vertex, and indeed differs only by a colour factor, \(t_R^a\):
+    \begin{equation}
+        \tikzsetnextfilename{yang-mills-feynman-rules-quark-gluon-vertex}
+        \begin{tikzpicture}[baseline=(current bounding box), font=\scriptsize]
+            \draw[gluon] (-1, 0) node [left] {\(\mu, a\)} -- (0, 0);
+            \draw[electron=0.6] (0, 0) -- (40:1);
+            \draw[positron=0.4] (0, 0) -- (-40:1);
+        \end{tikzpicture}
+        = ig\mu^\varepsilon \gamma^\mu t_R^a.
+    \end{equation}
+    Note that this depends on the representation under which our fermions transform.
+    The generators included through this vertex usually reduce to \(T(R)\) and \(C(R)\) or \(T(\adjointRep)\) and \(C(\adjointRep)\).
+    These are known as \define{colour factors}\index{colour factor}.
+    
+    As well as this familiar interaction we also have an interaction coming from the cubic and quartic terms in \(A^a_\mu\) contained in \(F^a_{\mu\nu}F^{a\mu\nu}\).
+    These give three-point and four-point interactions between gluons, for which the Feynman rules are
+    \begin{equation}
+        \tikzsetnextfilename{yang-mills-feynman-rules-gluon-3-point-vertex}
+        \begin{tikzpicture}[baseline=(current bounding box), font=\scriptsize]
+            \draw[gluon] (0, 0) -- (90:1) node [above] {\(\mu, a\)};
+            \draw[gluon] (0, 0) -- (330:1) node [right] {\(\nu, b\)};
+            \draw[gluon] (0, 0) -- (210:1) node [left] {\(\rho, c\)};
+            \draw[->, shift={(0.15, 0.15)}] (330:0.8) -- (330:0.2) node [midway, above right] {\(p_2\)};
+            \draw[->, shift={(0.15, -0.15)}] (210:0.8) -- (210:0.2) node [midway, below right] {\(p_3\)};
+            \draw[->, xshift=-0.21cm] (90:0.8) -- (90:0.2) node [midway, left] {\(p_1\)};
+        \end{tikzpicture}
+        =
+        \begin{aligned}[t]
+            gf^{abc}[&(p_{1\rho} - p_{2\rho})\minkowskiMetric_{\mu\nu}\\
+            &+ (p_{2\mu} - p_{3\mu})\minkowskiMetric_{\nu\rho}\\
+            &+ (p_{3\nu} - p_{1\nu})\minkowskiMetric_{\rho\mu}],
+        \end{aligned}
+    \end{equation}
+    and
+    \begin{equation}
+        \tikzsetnextfilename{yang-mills-feynman-rules-gluon-4-point-vertex}
+        \begin{tikzpicture}[baseline=(current bounding box), font=\scriptsize]
+            \draw[gluon] (0, 0) -- (135:1) node [above] {\(\mu, a\)};
+            \draw[gluon] (0, 0) -- (45:1) node [right] {\(\nu, b\)};
+            \draw[gluon] (0, 0) -- (225:1) node [left] {\(\rho, c\)};
+            \draw[gluon] (0, 0) -- (315:1) node [left] {\(\sigma, c\)};
+        \end{tikzpicture}
+        =
+        \begin{aligned}[t]
+            -ig^2[&f^{abe}f^{cde}(\minkowskiMetric_{\mu\rho}\minkowskiMetric_{\nu\sigma} - \minkowskiMetric_{\mu\sigma}\minkowskiMetric_{\nu\rho})\\
+            &+ f^{ace}f^{dbe}(\minkowskiMetric_{\mu\sigma}\minkowskiMetric_{\rho\nu} - \minkowskiMetric_{\mu\nu}\minkowskiMetric_{\rho\sigma})\\
+            &+ f^{ade}f^{bce}(\minkowskiMetric_{\mu\nu}\minkowskiMetric_{\sigma\rho} - \minkowskiMetric_{\mu\rho}\minkowskiMetric_{\sigma\nu})].
+        \end{aligned}
+    \end{equation}
+    
+    The final interaction is the interaction of gluons with the ghosts.
+    This arises from the \(-\diracadjoint{c}^a\partial_\mu (igA^{b\mu}t_R^ac^a)\) term, which is very similar to the \(\varphi A^\mu \varphi\) term appearing in scalar QED\footnote{see tutorials} and the Feynman rule for this term is
+    \begin{equation}
+        \tikzsetnextfilename{yant-mills-feynman-rules-ghost-interaction}
+        \begin{tikzpicture}[baseline=(current bounding box), font=\scriptsize]
+            \draw[gluon] (-1, 0) node [left] {\(\mu, b\)} -- (0, 0);
+            \draw[ghost=0.6] (0, 0) -- (40:1) node [right] {\(a\)};
+            \draw[antighost=0.4] (0, 0) -- (-40:1) node [right] {\(c\)};
+            \draw[->, shift={(130:0.2)}] (40:0.2) -- (40:0.8) node [midway, above left] {\(p'\)};
+            \draw[<-, shift={(-130:0.2)}] (-40:0.2) -- (-40:0.8) node [midway, below left] {\(p\)};
+        \end{tikzpicture}
+        = -gf^{abc}p'_\mu.
+    \end{equation}
+    Note that it is the momentum of the outgoing ghost that appears on the right hand side.
+    
+    \subsection{Derivation of the Three Gluon Interaction}
+    Consider the \(F^a_{\mu\nu}F^{a\mu\nu}\) term in the Lagrangian.
+    Expanding this we have
+    \begin{equation}
+        -\frac{1}{4}F^a_{\mu\nu}F^{a\mu\nu} = -\frac{1}{4}(\partial_\mu A^a_\nu - \partial_\nu A^a_\mu + gf^{abc}A^b_\mu A^c_\nu)(\partial^\mu A^{a\nu} - \partial^\mu A^{a\mu} + gf^{ade}A^{d\mu}A^{e\nu}).
+    \end{equation}
+    Partially expanding this one of the terms we get is
+    \begin{equation}
+        -\frac{1}{4}(\partial_\mu A^a_\nu - \partial_\nu A^a_\mu)gf^{ade}A^{d\mu}A^{e\nu}.
+    \end{equation}
+    Notice that \(f^{ade}A^{d\mu}A^{e\nu}\) is antisymmetric in \(\mu\) and \(\nu\), since we can swap \(\mu\) and \(\nu\) to get
+    \begin{equation}
+        f^{ade}A^{d\nu}A^{e\mu} = f^{ade}A^{e\mu}A^{d\nu} = -f^{aed}A^{e\mu}A^{d\nu} = -f^{ade}A^{d\mu}A^{e\nu},
+    \end{equation}
+    where the last step is just renaming the indices \(d \leftrightarrow e\).
+    We can therefore use
+    \begin{equation}
+        \partial_\mu A^a_\nu - \partial_\nu A^a_\mu = 2 \partial_{(\mu} A^a_{\nu)}
+    \end{equation}
+    to replace \(\partial_\mu A^a_\nu - \partial_\nu A^a_\mu\) with \(\partial_\mu A^a_\nu\), which when antisymmetrised over \(\mu\) and \(\nu\) reproduces \(\partial_\mu A^a_\nu - \partial_\nu A^a_\mu\), and this antisymmetrising is enforced by the antisymmetry of \(f^{ade}A^{e\mu}A^{d\nu}\), which kills the symmetric part of \(\partial_\mu A^a_\nu\).
+    Therefore we have the term
+    \begin{equation}
+        -\frac{1}{2} g f^{abc} (\partial_\mu A^a_\nu)A^{b\mu}A^{c\nu},
+    \end{equation}
+    having renamed the colour indices \(d \to b\) and \(e \to c\).
+    
+    The Feynman rule corresponding to this, which is cubic in the gauge field so corresponds to a three-point gluon interaction, is given by considering an amputated correlator for three incoming particles, which expanded to first order gives
+    \begin{equation}
+        \bra{0} i \int \dl{^4x} \, (-g)f^{ABC}(\partial_\mu A^A_\nu)A^{B\mu}A^{C\nu}\ket{p_1 \, \alpha \, a, p_2 \, \beta \, b, p_3 \, \gamma \, c}.
+    \end{equation}
+    The other factor of 2 is removed by the antisymmetry of exchanging the two gauge fields which we aren't taking the derivative of.
+    Note that in the initial state we place the momenta, colour indices, and also the Lorentz indices which are attached to the external polarisation states.
+    This means that a contraction between, for example, \(A^{B\mu}\) and \(p_1 \, \alpha \, a\) gives \(\varepsilon^\mu \varepsilon^\alpha\), and a contraction between \(\partial_\mu A^A_\nu\) and \(p_1 \, \alpha \, A\) gives \(-ip_1 \varepsilon_\nu \varepsilon^\alpha\), as the derivative brings down a factor of \(-i\) from the plane wave in the mode expansion.
+    
+    One particular contraction which we have to consider is
+    \begin{equation}
+        \wick{\\bra{0} i \int \dl{^4x} \, (-g)f^{ABC}(\partial_\mu \c3{A}^A_\nu)\c2{A}^{B\mu}\c1{A}^{C\nu}\ket{\c3{p}_1 \, \alpha \, a, \c2{p}_2 \, \beta \, b, \c1{p}_3 \, \gamma \, c}}.
+    \end{equation}
+    The contractions are the same as in QED, but with an extra Kronecker delta on the colour indices, so this contraction sets \(A = a\), \(B = b\), and \(C = c\).
+    The derivative brings down an \(-ip_{1\mu}\), but then since the \(\mu\) index is contracted (as in indices match across) with \(A^{B\mu}\) and \(A^{B\mu}\) is contracted (as in Wick contractions) with \(p_2 \, \beta \, b\), so this \(\mu\) becomes a \(\beta\).
+    The other Lorentz indices are contracted together and there is only really one reasonable result, \(\minkowskiMetric_{\gamma\alpha}\).
+    Overall this contraction gives the term
+    \begin{equation}
+        (-ig) f^{abc}(-ip_{1\beta}\minkowskiMetric_{\gamma\alpha})
+    \end{equation}
+    There are then two other contractions which preserve the cyclic order of \(f^{ABC}\), and these are just cyclic permutations of the above.
+    There are then three terms which change the cyclic order of \(f^{ABC}\), these are just the contraction we've considered swapping which of the two contractions goes into \(p_2 \, \beta \, b\) and which goes into \(p_3 \, \gamma \, c\), so they're quite similar, and these can then be made negative to return to the same cyclic order of \(f^{ABC}\).
+    Overall this gives us six terms which give the result quoted above.
+    
+    
+    
+    
+    \chapter{Faddeev--Popov Gauge Fixing}
+    In this chapter we discuss gauge fixing through the Faddeev--Popov procedure.
+    We followed this same procedure in \course{Quantum Field Theory} for QED, here we follow it for the more general Yang--Mills theory, but the idea is the same.
+    
+    \section{Setup and the Problem}
+    The pure Yang--Mills action is
+    \begin{equation}
+        S_{\symrm{YM}} = \int \dl{^Dx} \left[ -\frac{1}{4} F^a_{\mu\nu}F^{a\mu\nu} \right]
+    \end{equation}
+    where
+    \begin{equation}
+        F^a_{\mu\nu}(x) = \partial_\mu A^a_\nu(x) - \partial_\nu A^a_\mu(x) + g f^{abc}A^b_\mu(x)A^c_\nu(x).
+    \end{equation}
+    The gauge transformation law for the gauge field under an infinitesimal transformation is
+    \begin{align}
+        A'^a_\mu(x) &= A^a_\mu(x) + f^{abc}A^b_\mu(x)\vartheta^c(x) + \frac{1}{g}\partial_\mu \vartheta^a(x)\\
+        &= A_\mu^a(x) + \frac{1}{g}\covariantDerivative_\mu \vartheta^a(x).
+    \end{align}
+    
+    The problem we face is that the naive Yang--Mills path integral with this action is undefined.
+    This is because it includes an integral over all gauge fields, which includes an integral over \(A^a_\mu\) and also every \(\tensor[^\vartheta]{A}{^a_\mu}\) related to \(A^a_\mu\) by a gauge transformation parametrised by \(\vartheta^a(x)\).
+    
+    In the language of group theory we are integrating over all gauge fields, and also the result of any \(\specialUnitary(N)\) group action on a gauge field.
+    Given some gauge field \(A^a_\mu\) and some \(g \in \specialUnitary(N)\) we can construct the \defineindex{orbit} of \(A^a_\mu\) to be 
+    \begin{equation}
+        \{g^n \mathbin{.} A^a_\mu \mid n \in \naturals\}
+    \end{equation}
+    which consists of all fields related to \(A^a_\mu\) by the gauge transformation \(g\).
+    The solution is to somehow limit our integral to include only one gauge field from each orbit.
+    
+    The problem is evident on the level of the free action, with \(g = 0\), where we have
+    \begin{align}
+        \frac{1}{2}F^a_{\mu\nu}F^a_{\mu\nu} &= (\partial_\mu A^a_\nu)(\partial^\mu A^{a\nu} - \partial^\nu A^{a\mu})\\
+        &= (\partial_\mu A^a_\nu)(\partial^\mu A^{a\nu}) - (\partial_\mu A^a_\nu)(\partial^\nu A^{a\mu})\\
+        &= \partial_\mu (A^a_\nu \partial^\mu A^{a\nu}) - A^a_\nu \partial_\mu \partial^\mu A^{a\nu} - \partial_\mu(A^a_\nu \partial^\nu A^{a\mu}) + A^a_\nu(\partial_\mu \partial^\nu A^{a\mu}) \notag\\
+        &= \partial_\mu(A^a_\nu \partial^\mu A^{a\nu} - A^a_\nu \partial^\nu A^{a\mu}) - A^a_\nu \dalembertian A^{a\nu} + A^a_\nu \partial_\mu \partial^\nu A^{a\mu}\\
+        &= \partial_\mu(A^a_\nu \partial^\mu A^{a\nu} - A^a_\nu \partial^\nu A^{a\mu}) - A^a_\mu [\minkowskiMetric^{\mu\nu}\dalembertian - \partial^\mu \partial^\nu] A^a_\mu.
+    \end{align}
+    The first term here is just a surface term, so doesn't contribute to the action.
+    So the free action is
+    \begin{equation}
+        S_0 = \int \dl{^Dx} \, \frac{1}{2}A^a_\mu(x)[\minkowskiMetric^{\mu\nu}\dalembertian - \partial^\mu \partial^\nu] A^a_\nu(x).
+    \end{equation}
+    The problem comes when trying to compute path integrals of \(\e^{iS_0[A]}\), since the general answer requires the inverse of the kernel, which here is \(\minkowskiMetric^{\mu\nu}\dalembertian - \partial^\mu\partial^\nu\), but this isn't invertible.
+    
+    Geometrically, if we fix some value of \(x\) then we can consider a volume defined by all possible values of \(A^a_\mu(x)\) for fixed \(a\) and \(\mu\).
+    For simplicity we'll assume that this defines a two-dimensional surface.
+    The orbits are then lines on this surface generated by acting with some fixed gauge transformation on \(A^a_\mu\) repeatedly.
+    We want to impose a gauge fixing constraint which picks out one value of \(A^a_\mu\) for each orbit, that is one point on each line.
+    These orbit lines are dense in the surface, and so the collection of points chosen after gauge fixing define another line.
+    We assume that there is a single solution to the gauge fixing condition for each orbit.
+    
+    \begin{figure}
+        \tikzsetnextfilename{gauge-fixing-condition}
+        \begin{tikzpicture}[baseline=(current bounding box), font=\scriptsize]
+            \draw[thick] (0, 0) .. controls (2, 1) and (3, 0.75)  .. (4, 0.5) .. controls (3.8, 2) .. (4, 4.8) .. controls (3, 5.05) and (2, 5.3) .. (0, 4.3) .. controls (0, 4.3) and (-0.2, 2) .. cycle;
+            \node[below left] at (4, 4.8) {\(A^a_\mu(x)\)};
+            \foreach \y in {0.5, 1, ..., 4} {
+                \draw[thick, Purple] (0.5, \y) .. controls (1, \y+0.25+0.3*rand) and (2, \y+1+0.3*rand) .. (3, \y+0.5);
+            }
+            \draw[Blue, thick] (1, 0.5) -- (2.5, 5);
+        \end{tikzpicture}
+        \caption{All possible values of \(A^a_\mu(x)\) related by gauge transformations at fixed \(x\), \(a\), and \(\mu\). The purple lines represent orbits, all points on the line are given by acting on one point of the line with a fixed gauge transformation. The other gauge transformations will move points between lines. The blue line is a gauge fixing condition, we assume that it crosses each orbit once, and we choose the point it crosses the orbit to be the one included in the path integral.}
+    \end{figure}
+    
+    \section{The Faddeev--Popov Procedure}
+    We use the gauge fixing constraint
+    \begin{equation}
+        G^a(A) = \partial_\mu \tensor[^\vartheta]{A}{^{a\mu}}(x) - \omega^a(x) = 0
+    \end{equation}
+    for some function \(\omega^a\).
+    This is a generalisation of the Lorenz gauge condition, \(\partial_\mu A^{a\mu} = 0\), and indeed choosing \(\omega^a(x) = 0\) recovers the Lorenz gauge.
+    
+    Now consider the correlator of some gauge invariant observable \(\symcal{O}\).
+    This is given by
+    \begin{equation}
+        \correlator{\symcal{O}} = \frac{\int \! \DL{A} \, \symcal{O}\e^{iS[A]}}{\int \! \DL{A} \, \e^{iS[A]}}.
+    \end{equation}
+    The denominator is just the normalisation, which normally we leave off, but we want it here as it will simplify things later.
+    
+    As with QED in \course{Quantum Field Theory} we aim to get this in the form
+    \begin{equation}
+        \frac{\int \! \DL{A} \, \delta(G(A)) \symcal{O} \e^{iS[A]}}{\int \! \DL{A} \, \delta(G(A)) \e^{iS[A]}}.
+    \end{equation}
+    We won't quite succeed but we'll get close enough.
+    Here \(\delta\) is a functional Dirac delta given by
+    \begin{equation}
+        \delta(G(A)) = \prod_{x, a} \delta(G(A^a_\mu(x)))
+    \end{equation}
+    where on the right \(\delta\) is just a normal Dirac delta.
+    We use this to impose that \(\partial^\mu A^a_\mu(x) = \omega^a(x)\) for all \(a\) and all \(x\).
+    
+    To proceed we insert unity.
+    First notice that for a function \(g\) with \(g(\vartheta) > 0\) we have
+    \begin{equation}
+        1 = \int \dl{g} \, \delta(g) = \int \dl{\vartheta} \, \diffp{g}{\vartheta} \delta(g(\vartheta)).
+    \end{equation}
+    If \(g(\vartheta) < 0\) we instead get \(-1\), but the sign will cancel out in the normalisation, so it doesn't really matter.
+    We can generalise this to multiple dimensions with
+    \begin{equation}
+        1 = \int \dl{^ng} \, \delta(g) = \int \dl{^n\vartheta} \, \det\left( \diffp{g^i}{\vartheta^j} \right) \delta(g(\vartheta)).
+    \end{equation}
+    Further generalising to a functional identity we get
+    \begin{equation}
+        1 = \int \DL{\vartheta} \, \det\left( \diffd{G}{\vartheta} \right) \delta(G(\vartheta)).
+    \end{equation}
+    
+    We will use
+    \begin{align}
+        G(A^a(x)) &= \partial_\mu \tensor[^\vartheta]{A}{^{a\mu}}(x) - \omega^a(x)\\
+        &= \partial_\mu A^{a\mu}(x) + \frac{1}{g} \partial_\mu \covariantDerivative^\mu \vartheta^a(x) - \omega^a(x).
+    \end{align}
+    We then have
+    \begin{equation}
+        \diffd{G(A^a(x))}{\vartheta^b(y)} = \frac{1}{g} \partial_\mu \covariantDerivative^\mu \delta^{ab} \delta(x - y).
+    \end{equation}
+    Importantly this value depends on \(A^{a\mu}\) through \(\covariantDerivative^\mu\).
+    This wasn't the case in QED.
+    Expanding the definition of \(\covariantDerivative^\mu\) we have
+    \begin{equation}
+        \diffd{G(A^a(x))}{\vartheta^b(y)} = \frac{1}{g}\partial_\mu (\partial^\mu \delta^{ab} - gf^{abc}A^{c\mu}(x)) \delta(x - y) \eqqcolon \symcal{F}[A^{a\mu}(x)].
+    \end{equation}
+    
+    Intuitively, the difference between Yang--Mills theory and QED in this respect is that in QED the orbits are all parallel, in the sense that if a gauge transformation takes you between two orbits then it doesn't matter where you start on one of those orbits, you'll always move to the same orbit.
+    In Yang--Mills this is not the case, to move from orbit one to orbit two at one point requires a different gauge transformation than moving between orbit one and orbit two at another point.
+    
+    We can proceed to insert unity into the path integral:
+    \begin{align}
+        \int \DL{A} \, 1 \symcal{O} \e^{iS[A]} &= \int \DL{A} \int \DL{\vartheta} \, \det(\symcal{F}[A]) \delta(G(\tensor[^\vartheta]{A}{})) \symcal{O} \e^{iS[A]}\\
+        &= \int \DL{\vartheta} \int \DL{A} \, \det(\symcal{F}[A]) \delta(G(\tensor[^\vartheta]{A}{})) \symcal{O} \e^{iS[A]}.
+    \end{align}
+    We can swap the integrals because we aren't worrying about convergence and both \(\vartheta\) and \(A\) are bosonic, so commute.
+    
+    Most gauge fields in this integral don't contribute, because of the \(\delta(G(\tensor[^\vartheta]{A}{}))\) term.
+    A given gauge field only contributes if it satisfies \(G(\tensor[^\vartheta]{A}{}) = 0\), that is if
+    \begin{equation}
+        \partial_\mu A^{a\mu}(x) + \frac{1}{g} \partial_\mu \covariantDerivative^\mu \vartheta^a(x) - \omega^a(x) = 0.
+    \end{equation}
+    Now define \(A'\) to be
+    \begin{equation}
+        A'^{a\mu}(x) = A^{a\mu}(x) + \frac{1}{g}\covariantDerivative^\mu \vartheta^a(x).
+    \end{equation}
+    We can change \(A\) to \(A'\) in the integral, assuming that \(\DL{A} = \DL{A'}\), and using the gauge invariance of the observable, \(\symcal{O}\), and the action.
+    We then have
+    \begin{equation}
+        \int\DL{A} \, \symcal{O} \e^{iS[A]} = \int \DL{\vartheta} \int \DL{A'} \det(\symcal{F}[A']) \delta(G(A')) \symcal{O} \e^{iS[A']}.
+    \end{equation}
+    Now the only \(\vartheta\) dependence is in the \(\int\DL{\vartheta}\) part.
+    Doing exactly the same with the denominator of \(\correlator{\symcal{O}}\) we can cancel these two integrals with \(\vartheta\) dependence.
+    Dropping the primes we then have
+    \begin{equation}
+        \correlator{\symcal{O}} = \frac{\int \! \DL{A} \, \det(\symcal{F}[A]) \delta(G(A)) \e^{iS[A]}}{\int \! \DL{A} \, \det(\symcal{F}[A]) \delta(G(A)) \e^{iS[A]}}.
+    \end{equation}
+    In QED \(\symcal{F}[A]\) is actually independent of \(A\), and so we can bring it outside of the integral and it cancels.
+    This isn't the case in Yang--Mills, so we won't quite get the desired form, but we continue anyway.
+    
+    Now use
+    \begin{equation}
+        1 = \frac{1}{N} \int \DL{\omega} \, \exp\left\{ -i \int \dl{^Dx} \frac{1}{2\xi} \omega^a(x)\omega^a(x) \right\}
+    \end{equation}
+    where \(N\) is a normalisation factor chosen to make this true.
+    This is a Gaussian integral.
+    We can use it, as well as \(G(A^a(x)) = \partial_\mu A^{a\mu}(x) - \omega^a(x)\), to rewrite our result as
+    \begin{align}
+        \int \DL{A} \, &\det(\symcal{F}[A]) \delta(\partial_\mu A^{a\mu}(x) - \omega^a(x)) \symcal{O} \e^{iS[A]}\\
+        &= \frac{1}{N} \int \DL{A} \int \DL{\omega} \, \det(\symcal{F}[A]) \delta(\partial_\mu A^{a\mu}(x) - \omega^a(x)) \notag\\
+        &\qquad\qquad \times \exp\left\{ -i\int \dl{^Dx} \frac{1}{2\xi} \omega^b(x)\omega^b(x) \right\} \symcal{O} \e^{iS[A]}\\
+        &= \frac{1}{N} \int \DL{A} \, \det(\symcal{F}[A]) \symcal{O} \exp\left\{ iS[A] - i\int \dl{^Dx} \frac{1}{2\xi} (\partial_\mu A^{b\mu})(\partial_\nu A^{b\nu}) \right\} \notag
+    \end{align}
+    where in the last step we've used the \(\delta\) to perform the \(\omega\) integral.
+    
+    We can interpret this as modifying the original Lagrangian to contain a gauge fixing term
+    \begin{equation}
+        \lagrangianDensity = -\frac{1}{4}F^a_{\mu\nu}F^{a\mu\nu} - \frac{1}{2\xi}(\partial_\mu A^{a\mu})(\partial_\nu A^{a\nu}).
+    \end{equation}
+    What this tells us is that the gluon propagator is exactly the photon propagator with an extra \(\delta^{ab}\) factor coming from this term.
+    
+    We still have to deal with the \(\det(\symcal{F}[A])\) term.
+    To do this we can recognise that determinants can arise from Gaussian path integrals.
+    In particular, we know that if \(M\) is an operator on spinors we have
+    \begin{equation}
+        \int \DL{\psi} \DD{\diracadjoint{\psi}} \, \exp\left\{ -i\int\dl{^Dx} \, \diracadjoint{\psi} M \psi \right\} = N' \det M
+    \end{equation}
+    where \(N'\) is another not-important normalisation constant which will cancel in the ratio.
+    Note that we need anticommuting variables in order to get the correct power of the determinant.
+    We can thus get an appearance of the desired determinant by taking 
+    \begin{equation}
+        M = \frac{1}{g}\partial_\mu \covariantDerivative^\mu.
+    \end{equation}
+    Then the Lagrangian can be written as
+    \begin{equation}
+        \lagrangianDensity = -\frac{1}{4}F^a_{\mu\nu}F^{a\mu\nu} - \frac{1}{2\xi}(\partial_\mu A^{a\mu})(\partial_\nu A^{a\nu}) - \diracadjoint{c}^a \partial_\mu \covariantDerivative^\mu c^a.
+    \end{equation}
+    Here \(c\) replaces \(\psi\) in the above.
+    First note that we just absorbed the \(1/g\) factor into the two \(c\)s, changing the normalisation \(N'\) appropriately, but \(N'\) will cancel in the ratio so we don't worry about it.
+    Next note that \(c\)s must carry an adjoint index, since \(\partial_\mu \covariantDerivative^\mu\) is an operator in the adjoint representation.
+    Now notice that the \(c\)s don't carry a Lorentz index, since the Lorentz index in the operator is already contracted.
+    This means that the \(c\)s are scalars.
+    But they anticommute.
+    This seems to violate the spin-statistics theorem, which says that fermionic states are the anticommuting ones.
+    The solution is that the \(c\)s aren't physical states.
+    In fact it is possible to show that there is no process starting without \(c\)s which can produces \(c\)s in the final state.
+    For this reason the \(c\)s are called \defineindex{Faddeev--Popov ghosts}.
+    
+    We can't see the ghosts in external states, but have to allow for ghost loops in our expansions.
+    The purpose of the ghosts is to remove a degree of freedom, since for each \(a\) we have two helicities, but four degrees of freedom in \(A^a_\mu\).
+    In QED we fixed two degrees of freedom by requiring that \(\varepsilon \cdot k = 0\) and the gauge symmetry \(\varepsilon \mapsto \varepsilon' = \varepsilon + \alpha k\), which satisfies \(\varepsilon' \cdot k = \varepsilon \cdot k + \alpha k^2 = 0 + \alpha k^2\), and \(k^2 = 0\) is just the Fourier transformed equation of motion, \(\dalembertian A^\mu = 0\).
+    In Yang--Mills the equation of motion is more complicated, so we can't fix the degrees of freedom as simply and are forced to introduce these ghost particles.
+    
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
@@ -5130,7 +5694,7 @@ noabbrev
     The solution to this problem is due to Nicola Cabbibo, and finally explains the primes in the current.
     He posited that the correct hadronic current was instead
     \begin{equation}
-        \frac{1}{2}J_\mu^{\symrm{h}} = \diracadjoint{\Pu}_{\Left}\gamma_\mu(\cos \cabibboangle \Pd_{\Left} + \sin \cabibboangle \Ps_{\Left}) + \dotsb.
+        \frac{1}{2}J_\mu^{\symrm{h}} = \diracadjoint{\Pu}_{\Left}\gamma_\mu(\Pd_{\Left} \cos \cabibboangle + \Ps_{\Left} \sin \cabibboangle) + \dotsb.
     \end{equation}
     We allowed for this before by including primes, so we have
     \begin{equation}
