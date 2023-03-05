@@ -23,7 +23,7 @@
 \undef{\eth}
 \undef{\digamma}
 \undef{\backepsilon}
-\usetikzlibrary{positioning, decorations.pathreplacing, calligraphy, calc, shapes.geometric}
+\usetikzlibrary{positioning, decorations.pathreplacing, calligraphy, calc, shapes.geometric, decorations.markings}
 \usepackage{tikz-cd}
 
 \BeforeBeginEnvironment{tikzcd}{\tikzexternaldisable}
@@ -44,6 +44,64 @@
 \tikzset{over wire/.default={1.5mm}}
 \tikzset{daggerable morphism/.style={morphism, trapezium, trapezium left angle=90, trapezium right angle=70}}
 \tikzset{daggered morphism/.style={morphism, trapezium, trapezium left angle=70, trapezium right angle=90, shape border rotate=180}}
+\tikzset{left dual/.style={wire, postaction={decoration={markings, mark=at position #1 with {\arrow{>}}}, decorate}}}
+\tikzset{right dual/.style={wire, postaction={decoration={markings, mark=at position #1 with {\arrow{<}}}, decorate}}}
+\tikzset{left dual/.default={0.5}}
+\tikzset{right dual/.default={0.5}}
+\tikzset{dual morphism/.style={daggerable morphism, trapezium, trapezium left angle=90, trapezium right angle=70, shape border rotate=180}}
+\tikzset{monoid dot/.style={circle, fill, inner sep=0pt, minimum width=2mm}}
+\tikzset{comonoid dot/.style={circle, draw, fill=background color, inner sep=0pt, minimum width=2mm}}
+
+\newcommand{\monoidProduct}{%
+    \tikzexternaldisable%
+    \begin{tikzpicture}[monoid product/.style={circle, fill, inner sep=0pt, minimum width=1.25mm}]
+        \node[monoid product] {};
+        \draw[wire] (0, 0) -- ++ (0, 0.15);
+        \draw[wire] (-0.15, -0.15) arc (180:0:0.15);
+    \end{tikzpicture}%
+    \tikzexternalenable%
+}
+\newcommand{\monoidIdentity}{%
+    \tikzexternaldisable%
+    \begin{tikzpicture}[monoid product/.style={circle, fill, inner sep=0pt, minimum width=1.25mm}]
+        \node[monoid product] {};
+        \draw[wire] (0, 0) -- ++ (0, 0.25);
+    \end{tikzpicture}%
+    \tikzexternalenable%
+}
+\newcommand{\comonoidProduct}{%
+    \tikzexternaldisable%
+    \begin{tikzpicture}[monoid product/.style={circle, draw, fill=background color, inner sep=0pt, minimum width=1.25mm}]
+        \draw[wire] (0, 0) -- ++ (0, -0.15);
+        \draw[wire] (-0.15, 0.15) arc (180:360:0.15);
+        \node[monoid product] {};
+    \end{tikzpicture}%
+    \tikzexternalenable%
+}
+\newcommand{\comonoidIdentity}{%
+    \tikzexternaldisable%
+    \begin{tikzpicture}[monoid product/.style={circle, draw, fill=background color, inner sep=0pt, minimum width=1.25mm}]
+        \draw[wire] (0, 0) -- ++ (0, -0.25);
+        \node[monoid product] {};
+    \end{tikzpicture}%
+    \tikzexternalenable%
+}
+\newcommand{\pairofpantsProduct}{%
+    \tikzexternaldisable%
+    \begin{tikzpicture}[scale=0.5, >={Classical TikZ Rightarrow[scale=0.5, line width=0.15mm]}, every line/.style]
+        \draw[left dual, rounded corners] (0, 0) -- ++ (0, 0.2) -- ++ (0.5, 0.2) -- ++ (0, 0.2);
+        \draw[right dual, rounded corners] (1.5, 0) -- ++ (0, 0.2) -- ++ (-0.5, 0.2) -- ++ (0, 0.2);
+        \draw[left dual=0.55] (0.5, 0) arc (180:0:0.25);
+    \end{tikzpicture}%
+    \tikzexternalenable%
+}
+\newcommand{\pairofpantsIdentity}{%
+    \tikzexternaldisable%
+    \begin{tikzpicture}[scale=0.5, >={Classical TikZ Rightarrow[scale=0.5, line width=0.15mm]}, every line/.style]
+        \draw[left dual=0.55, rounded corners] (-0.25, 0.25) arc (180:360:0.25);
+    \end{tikzpicture}%
+    \tikzexternalenable%
+}
 
 \RequirePackage[%
 sorting=none,  % Don't sort the references, they will appear in the order they are first cited
@@ -100,12 +158,16 @@ noabbrev
 \colorlet{background color}{white}  % normal background is white
 % background in lemma
 \colorlet{lemma background}{black!5}
+% backgroundd in definitions
+\colorlet{definition background}{beige!35}
 \AtBeginEnvironment{lma}{\colorlet{background color}{lemma background}}
 \AtEndEnvironment{lma}{\colorlet{background color}{white}}
 \colorlet{example background}{azure(web)(azuremist)!45}
 \AtBeginEnvironment{exm}{\colorlet{background color}{example background}}
 \AtEndEnvironment{exm}{\colorlet{background color}{white}}
 \tikzcdset{background color=background color}
+\AtBeginEnvironment{dfn}{\colorlet{background color}{definition background}}
+\AtEndEnvironment{dfn}{\colorlet{background color}{white}}
 
 % Text
 \newcommand*{\course}[1]{\textit{#1}}
@@ -139,10 +201,12 @@ noabbrev
 \newcommand{\LieGrp}{\c@egory{LieGrp}}
 \newcommand{\LieAlg}{\c@egory{LieAlg}}
 \newcommand{\one}{\c@egory{1}}
+\newcommand{\Hask}{\c@egory{Hask}}
 \makeatother
 \DeclareMathOperator{\Ob}{Ob}
 \DeclareMathOperator{\id}{id}
 \newcommand{\isomorphic}{\cong}
+\newcommand{\op}{\symrm{op}}
 \renewcommand{\ve}[1]{e_{#1}}
 \newcommand{\topology}{\symcal{T}}
 \newcommand{\powerset}{\symcal{P}}
@@ -156,6 +220,12 @@ noabbrev
 \newcommand{\true}{\symtt{true}}
 \newcommand{\false}{\symtt{false}}
 \DeclarePairedDelimiter{\cardinality}{\lvert}{\rvert}
+\newcommand{\leftdual}{\dashv}
+\newcommand{\name}[1]{\ulcorner #1 \urcorner}
+\newcommand{\coname}[1]{\llcorner #1 \lrcorner}
+\newcommand{\equaliso}{\stackrel{\mathrm{iso}}{=}}
+\newcommand{\notequaliso}{\stackrel{\mathrm{iso}}{\ne}}
+\DeclareMathOperator{\tr}{tr}
 
 \includeonly{parts/maths-defs}
 
@@ -1976,7 +2046,7 @@ noabbrev
             \item The category \(\Ring\)\index{Ring@\(\Ring\)} has rings as objects and ring homomorphisms as morphisms.
             \item The category \(\CRing\)\index{CRing@\(\CRing\)} has commutative rings as objects and ring homomorphisms as morphisms.
             \item The category \(\Field\)\index{Field@\(\Field\)} has fields as objects and field homomorphisms as morphisms.
-            \item The category \(\RMod\)\index{R-Mod@\(\RMod\)} for a fixed ring \(R\) has left modules over \(R\) as objects and module homomorphisms as morphisms.
+            \item The category \(\RMod\)\index{R-Mod@\(\RMod\)}\index{Mod@\makeatletter\(\c@egory{Mod}\)\makeatother} for a fixed ring \(R\) has left modules over \(R\) as objects and module homomorphisms as morphisms.
             Note that the special case where \(R\) is a field is \(\Vect[R]\).
             \item The category \(\Top\) has topological spaces as objects and continuos maps as morphisms.
             \item The category \(\pointedTop\) has pointed topological spaces, \((X, \bullet)\), as objects, that is topological spaces with some special point, \(\bullet\), and based maps as morphisms, that is continuous maps preserving this special point, that is \(f \colon (X, \bullet) \to (Y, \ast)\) is continuous and \(f(\bullet) = \ast\).
@@ -1999,7 +2069,7 @@ noabbrev
         So a monoidoid is a category.
         
         Given a group, \(G\), we can interpret it as a single object category where all morphisms are isomorphisms (\cref{def:isomorphism and others}).
-        This extra condition is simply reflecting the condition that a group has all inverses.
+        This extra condition simply reflects the condition that a group has all inverses.
         A \defineindex{groupoid} is then a category in which all morphisms are isomorphisms.
         
         Note that we can proceed in the opposite direction, given a category with a single object (with all morphisms being isomorphisms) this can be interpreted as a monoid (group).
@@ -2432,6 +2502,34 @@ noabbrev
     commutes.
     This diagram is exactly what we get if we specialise the diagram defining a natural transformation to functors \(G \to \Set\) (\(G \to \Vect\)).
     
+    \section{Initial and Terminal Objects}
+    \epigraph{A comathematician is a comachine for turning cotheorems into ffee.}{}
+    \begin{dfn}{Initial and Terminal Objects}{}
+        Let \(\cat{C}\) be a category.
+        An \defineindex{initial object}, \(I \in \Ob(\cat{C})\) is an object which has a unique morphism into every other object.
+        That is for all \(A \in \Ob(\cat{C})\) there is a unique morphism \(I \to A\).
+        
+        A \defineindex{terminal object}, \(T \in \Ob(\cat{C})\) is an object which has a unique morphism out of every other object.
+        That is for all \(A \in \Ob(\cat{C})\) there is a unique morphism \(A \to T\).
+    \end{dfn}
+    
+    Notice that these two concepts are related by turning the arrows around.
+    We say that the two concepts are opposite or dual.
+    This is common in category theory, that we have two such definitions, and as such it motivates the following definition.
+    
+    \begin{dfn}{Opposite Category}{}
+        Given a category, \(\cat{C}\), the \defineindex{opposite category}, \(\cat{C}^{\op}\), has the same objects, that is \(\Ob(\cat{C}) = \Ob(\cat{C}^{\op})\), but all morphisms are reversed, that is if we have a morphism \(f\colon A \to B\) in \(\cat{C}\) then there is a morphism \(f^{\op}\colon B \to A\) in \(\cat{C}^{\op}\), so \(\cat{C}(A, B) = \cat{C}^{\op}(B, A)\).
+    \end{dfn}
+    
+    With this definition we can reformulate the definition of initial and terminal objects into an initial object is an object with a unique morphism into every other object, and a terminal object is an initial object in the opposite category.
+    
+    Another concept that we can reformulate with opposite categories is contravariant functors.
+    A contravariant functor, \(F \colon \cat{C} \to \cat{D}\), which is such that \(F(g \circ f) = Ff \circ Fg\), is exactly a covariant functor from the opposite category, \(F\colon \cat{C}^{\op} \to \cat{D}\), or equivalently, into the opposite category, \(F\colon \cat{C} \to \cat{D}^{\op}\).
+    
+    In general if we define some property, \(x\), in a category we can often find the same property in the opposite category, and we prefix this property, viewed in the original category, with \enquote{co}.
+    For example, in the next section we will define products, and a product in the opposite category is a coproduct.
+    Given a property the coproperty is defined by reversing all of the arrows, so an initial object is a coterminal object, and a terminal object is a coinitial object, and so on.
+    
     \section{Products}
     We want to generalise the Cartesian product of sets, which is defined as
     \begin{equation}
@@ -2478,15 +2576,30 @@ noabbrev
             \end{tikzcd}
         \end{equation}
         commutes for all \(X\) with morphisms to \(f \colon X \to A\) and \(g \colon X \to B\).
+        
+        The \defineindex{coproduct} is the product in the opposite category.
     \end{dfn}
     
     \begin{exm}{Products}{}
         \begin{itemize}
+            \item In \(\Set\) the product is the Cartesian product, and the coproduct is the disjoint union.
             \item In \(\Top\) the product of two topological spaces is the topological space formed from the Cartesian product of the two topological spaces equipped with the product topology, which is the coarsest topology for which all projections are continuous.
             \item In \(\RMod\) the product is the Cartesian product of the modules with addition defined componentwise and multiplication defined to be distributive.
             \item In \(\Grp\) the product is the direct product of groups, that is the Cartesian product of the underlying sets and then componentwise multiplication.
             \item In \(\Rel\) products are disjoint unions.
             \item In a poset viewed as a single object category the product of two elements is the greatest lower bound.
+            \item In \(\Hask\)\footnote{\(\Hask\) can be thought of as a subcategory of \(\Set\), where the only objects are the \Haskell{} types, viewed as sets with all values of that type as their elements. There are some tricky things about \Haskell{}, such as the existence of bottom, \lstinline[mathescape]|$\bot$|, which represents an error. This also causes problems when trying to take products and coproducts, but typically we just ignore these issues.}, the category of \Haskell{} types with \Haskell{} functions as morphisms, a product type is one defined as follows:
+            \begin{lstlisting}[gobble=16, style=haskell]
+                data Product a b = Product a b
+            \end{lstlisting}
+            This can be thought of as the Cartesian product, so here we have pairs, or tuples, of type \lstinline|(a, b)|.
+            On the other hand a sum type, or coproduct type, is defined as:
+            \begin{lstlisting}[gobble=16, style=haskell]
+                data Sum a b = A a | B b
+            \end{lstlisting}
+            This can be thought of as the disjoint union, which is can defined for sets by \enquote{tagging} each element with the set it comes from, then taking the usual union, here we \enquote{tag} the element by using one of the constructors, \lstinline|A| or \lstinline|B|, and then our final type allows for either of these constructors to be used, taking their union.
+            
+            Notice that we need something of both type \lstinline|a| and \lstinline|b| to define a product, corresponding to the \enquote{and} nature of the product, and only something of type \lstinline|a| or type \lstinline|b| to define the sum type, corresponding to the \enquote{or} nature of the sum.
         \end{itemize}
     \end{exm}
     
@@ -2648,14 +2761,14 @@ noabbrev
         This data must be such that the \defineindex{triangle equation} holds, which is that 
         \begin{equation}
             \begin{tikzcd}
-                (A \otimes I) \otimes B \arrow[rr, "\alpha_{A, I, B}"] \arrow[dr, "\rho_A \otimes \id_B"'] && A \otimes (I \otimes B) \arrow[dl, "\id_A \otimes \lambda_B"]\\
+                (A \otimes I) \otimes B \arrow[rr, "\alpha_{A, I, B}"] \arrow[dr, "\rho_A \otimes \id_B"'] && A \otimes (I \otimes B) \arrow[dl, "{\id_A} \otimes \lambda_B"]\\
                 & A \otimes B &
             \end{tikzcd}
         \end{equation}
         commutes for all \(A, B \in \Ob(\cat{C})\), and the \defineindex{pentagon equation} holds, which is that
         \begin{equation}
             \begin{tikzcd}[column sep=-1cm]
-                & (A \otimes (B \otimes C)) \otimes D \arrow[rr, "\alpha_{A, B \otimes C, D}"] && A \otimes ((B \otimes C) \otimes D) \arrow[dr, "\id_A \otimes \alpha_{B,C,D}", pos=0.6] & \\
+                & (A \otimes (B \otimes C)) \otimes D \arrow[rr, "\alpha_{A, B \otimes C, D}"] && A \otimes ((B \otimes C) \otimes D) \arrow[dr, "{\id_A} \otimes \alpha_{B,C,D}", pos=0.6] & \\
                 ((A \otimes B) \otimes C) \otimes D \arrow[ur, "\alpha_{A,B,C} \otimes \id_D", pos=0.4] \arrow[drr, "\alpha_{A\otimes B,C,D}"'] &&&& A \otimes (B \otimes (C \otimes D)) \\
                 && (A \otimes B) \otimes (C \otimes D) \arrow[urr, "\alpha_{A,B,C\otimes D}"'] && 
             \end{tikzcd}
@@ -2685,23 +2798,23 @@ noabbrev
     The naturality conditions for \(\lambda\) and \(\rho\) can be combined into the following commuting diagram
     \begin{equation}
         \begin{tikzcd}
-            I \otimes A \arrow[r, "\lambda_A"] \arrow[d, "\id_I \otimes f"'] & A \arrow[d, "f"'] & A \otimes I \arrow[l, "\rho_A"'] \arrow[d, "f \otimes \id_{I}"]\\
+            I \otimes A \arrow[r, "\lambda_A"] \arrow[d, "{\id_I} \otimes f"'] & A \arrow[d, "f"'] & A \otimes I \arrow[l, "\rho_A"'] \arrow[d, "f \otimes \id_{I}"]\\
             I \otimes B \arrow[r, "\lambda_B"] & B & B \otimes I \arrow[l, "\rho_B"]
         \end{tikzcd}
     \end{equation}
     for all \(f \colon A \to B\).
     In other words, we can remove the identity and then apply \(f\), or we can do nothing to the identity while applying \(f\) and then remove the identity.
-    Note that it is common to write \(I\) for \(\id_I\), there should be no confusion as \(I \otimes f\) can only mean \(\id_I \otimes f\), there is no way to take the tensor product of an object and a morphism.
-    Thus, we could write the naturality condition for \(\lambda\), the left square, as either \(f \circ \lambda_A = \lambda_B \circ (\id_I \otimes f)\) or the slightly more succinct \(f \circ \lambda_A = \lambda_B \circ (I \otimes f)\).
+    Note that it is common to write \(I\) for \(\id_I\), there should be no confusion as \(I \otimes f\) can only mean \({\id_I} \otimes f\), there is no way to take the tensor product of an object and a morphism.
+    Thus, we could write the naturality condition for \(\lambda\), the left square, as either \(f \circ \lambda_A = \lambda_B \circ ({\id_I} \otimes f)\) or the slightly more succinct \(f \circ \lambda_A = \lambda_B \circ (I \otimes f)\).
     In fact, this is sometimes done for all objects, not just the unit.
 
     Now lets look at the triangle equation.
     It tells us how the unitors and associator combine.
     Starting at the top left, with \((A \otimes I) \otimes B\) there are two ways to get to \(A \otimes B\).
-    We can either remove \(I\) by applying \(\rho_A\) to the \(A \otimes I\) bit, which means applying \(\rho_A \otimes \id_B\) to \((A \otimes I) \otimes B\), or we can reassociate, by applying \(\alpha_{A,I,B}\) to get \(A \otimes (I \otimes B)\) then remove the unit by applying \(\lambda_B\) to the \(I \otimes B\) bit, which means applying \(\id_A \otimes \lambda_B\) to \(A \otimes (I \otimes B)\).
+    We can either remove \(I\) by applying \(\rho_A\) to the \(A \otimes I\) bit, which means applying \(\rho_A \otimes \id_B\) to \((A \otimes I) \otimes B\), or we can reassociate, by applying \(\alpha_{A,I,B}\) to get \(A \otimes (I \otimes B)\) then remove the unit by applying \(\lambda_B\) to the \(I \otimes B\) bit, which means applying \({\id_A} \otimes \lambda_B\) to \(A \otimes (I \otimes B)\).
     The triangle equality says that both of these are actually the same, that is
     \begin{equation}
-        \rho_A \otimes \id_B = (\id_A \otimes \lambda_A) \circ \alpha_{A,I,B}.
+        \rho_A \otimes \id_B = ({\id_A} \otimes \lambda_A) \circ \alpha_{A,I,B}.
     \end{equation}
 
     Finally, lets look at the pentagon equation.
@@ -2709,12 +2822,12 @@ noabbrev
     Starting on the left we have the completely left associated \(((A \otimes B) \otimes C) \otimes D\).
     One path we can take to reassociate is to ignore \(D\) and reassociate \((A \otimes B) \otimes C\) to \((A \otimes (B \otimes C))\), this is done using \(\alpha_{A, B, C} \otimes \id_D\).
     Next we can ignore the fact that \(B \otimes C\) is the product of two objects and think of it as a single object, \(X\), so we have \((A \otimes X) \otimes D\), which we can reassociate using \(\alpha_{A, X, D} = \alpha_{A, B \otimes C, D}\) to get \(A \otimes ((B \otimes C) \otimes D)\).
-    Finally we can ignore \(A\) and reassociate \((B \otimes C) \otimes D\) using \(\id_A \otimes \alpha_{B, C, D}\) to get \(A \otimes (B \otimes (C \otimes D))\).
+    Finally we can ignore \(A\) and reassociate \((B \otimes C) \otimes D\) using \({\id_A} \otimes \alpha_{B, C, D}\) to get \(A \otimes (B \otimes (C \otimes D))\).
     Alternatively, if we start with \(((A \otimes B) \otimes C) \otimes D\) we can treat \(A \otimes B\) as a single object, \(Y\), and reassociate \((Y \otimes C) \otimes D\) with \(\alpha_{Y, C, D} = \alpha_{A \otimes B, C, D}\) to get \((A \otimes B) \otimes (C \otimes D)\).
     Then we treat \(C \otimes D\) as a single object, \(Z\), and reassociate \((A \otimes B) \otimes Z\) using \(\alpha_{A, B, Z} = \alpha_{A, B, C \otimes D}\) to get \(A \otimes (B \otimes (C \otimes D))\).
     The pentagon equation tells us that both of these ways of reassociating from left to right give are the same, that is
     \begin{equation}
-        (\id_A \otimes \, \alpha_{B, C, D}) \circ (\alpha_{A, B \otimes C, D}) \circ (\alpha_{A, B, C} \otimes \id_D) = \alpha_{A, B, C\otimes D} \circ \alpha_{A\otimes B, C, D}.
+        ({\id_A} \otimes \, \alpha_{B, C, D}) \circ (\alpha_{A, B \otimes C, D}) \circ (\alpha_{A, B, C} \otimes \id_D) = \alpha_{A, B, C\otimes D} \circ \alpha_{A\otimes B, C, D}.
     \end{equation}
     
     To summarise, the triangle equation says that all ways of removing \(I\) from \((A \otimes I) \otimes B\) to get \(A \otimes B\) are the same, and the pentagon equation says that all ways of reassociating \(((A \otimes B) \otimes C) \otimes D\) to get \(A \otimes (B \otimes (C \otimes D))\) are the same.
@@ -2769,10 +2882,10 @@ noabbrev
     \end{wrn}
     
     This common definition of \(\Set\) as a monoidal category is an example of a more general idea.
-    In some category \(\cat{C}\) a \defineindex{terminal object}, \(T \in \Ob(\cat{C})\), is an object such that for any object \(A \in \Ob(\cat{C})\) there exists exactly one morphism \(A \to T\).
-    Similarly a \defineindex{initial object}, \(I \in \Ob(\cat{C})\), is an object such that for any object \(A \in \Ob(\cat{C})\) there exists exactly one morphism \(I \to A\).
+    Recall that in a category \(\cat{C}\) a terminal object, \(T \in \Ob(\cat{C})\), is an object such that for any object \(A \in \Ob(\cat{C})\) there exists exactly one morphism \(A \to T\).
+    Similarly an initial object, \(I \in \Ob(\cat{C})\), is an object such that for any object \(A \in \Ob(\cat{C})\) there exists exactly one morphism \(I \to A\).
     Any category, \(\cat{C}\), with terminal objects and products can be made into a monoidal category by taking the monoidal product to be the categorical product and the unit to be the terminal object.
-    Similarly and category with initial objects and coproducts\footnote{A \defineindex{coproduct} is defined similarly to a categorical product, but with the arrows reversed.} can be made into a monoidal category by taking the tensor product to be the coproduct and the unit to be the initial object.
+    Similarly any category with initial objects and coproducts\footnote{A \defineindex{coproduct} is defined similarly to a categorical product, but with the arrows reversed.} can be made into a monoidal category by taking the tensor product to be the coproduct and the unit to be the initial object.
     An example of a coproduct/initial object monoidal category is \(\Set\) with disjoint union as a monoidal product.
     
     \begin{lma}{}{}
@@ -3085,7 +3198,7 @@ noabbrev
             \draw[wire] ($(g.south) + (0.5, 0)$) -- ++ (0, -1.5);
             \draw[wire] ($(f.north) + (-0.5, 0)$) -- ++ (0, 1.5);
             \draw[lightgray] (-1.5, -0.75) rectangle (2, 1.75);
-            \node (equals) at (2.5, 0.5) {\(\stackrel{\mathrm{iso}}{=}\)};
+            \node (equals) at (2.5, 0.5) {\(\equaliso\)};
             \begin{scope}[xshift=4.1cm]
                 \node[morphism] at (1, 0.5) {\(h\)};
                 \node[morphism, minimum width=1.5cm] (f) at (0, 0) {\(f\)};
@@ -3111,7 +3224,7 @@ noabbrev
             \draw[wire] ($(g.south) + (0.5, 0)$) -- ++ (0, -1.5);
             \draw[wire] ($(f.north) + (-0.5, 0)$) -- ++ (0, 1.5);
             \draw[lightgray] (-1.5, -0.75) rectangle (2, 1.75);
-            \node (equals) at (2.5, 0.5) {\(\stackrel{\mathrm{iso}}{\ne}\)};
+            \node (equals) at (2.5, 0.5) {\(\notequaliso\)};
             \begin{scope}[xshift=4cm]
                 \node[morphism] at (2.3, 0.25) {\(h\)};
                 \node[morphism, minimum width=1.5cm] (f) at (0, 0) {\(f\)};
@@ -3382,7 +3495,7 @@ noabbrev
             The naturality square for the left unitor, \(\lambda\), is
             \begin{equation}
                 \begin{tikzcd}
-                    I \otimes A \arrow[r, "\lambda_A"] \arrow[d, "\id_I \otimes f"'] & A \arrow[d, "f"]\\
+                    I \otimes A \arrow[r, "\lambda_A"] \arrow[d, "{\id_I} \otimes f"'] & A \arrow[d, "f"]\\
                     I \otimes B \arrow[r, "\lambda_B"'] & B.
                 \end{tikzcd}
             \end{equation}
@@ -3390,7 +3503,7 @@ noabbrev
             Consider this square specialised to the case where \(A = B = I\):
             \begin{equation}
                 \begin{tikzcd}
-                    I \otimes I \arrow[r, "\lambda_I"] \arrow[d, "\id_I \otimes f"'] & I \arrow[d, "f"]\\
+                    I \otimes I \arrow[r, "\lambda_I"] \arrow[d, "{\id_I} \otimes f"'] & I \arrow[d, "f"]\\
                     I \otimes I \arrow[r, "\lambda_I"'] & I.
                 \end{tikzcd}
             \end{equation}
@@ -3399,7 +3512,7 @@ noabbrev
             We can the write this diagram as
             \begin{equation}
                 \begin{tikzcd}
-                    I \otimes I \arrow[d, "\id_I \otimes f"'] & I \arrow[l, "\lambda_I^{-1}"'] \arrow[d, "f"]\\
+                    I \otimes I \arrow[d, "{\id_I} \otimes f"'] & I \arrow[l, "\lambda_I^{-1}"'] \arrow[d, "f"]\\
                     I \otimes I \arrow[r, "\lambda_I"'] & I.
                 \end{tikzcd}
             \end{equation}
@@ -3407,7 +3520,7 @@ noabbrev
             \begin{equation}
                 \begin{tikzcd}
                     I \arrow[r, "f"] \arrow[d, "\lambda_I^{-1}"'] & I\\
-                    I \otimes I \arrow[r, "\id_I \otimes f"'] & I \otimes I. \arrow[u, "\lambda_I"']
+                    I \otimes I \arrow[r, "{\id_I} \otimes f"'] & I \otimes I. \arrow[u, "\lambda_I"']
                 \end{tikzcd}
             \end{equation}
             Also note that by the coherence theorem we have \(\lambda_I = \rho_I\).
@@ -3443,14 +3556,14 @@ noabbrev
             This implies commutativity of the following diagram
             \begin{equation}
                 \begin{tikzcd}
-                    A \otimes D \arrow[r, "f \otimes h"] \arrow[d, "\id_A \otimes (j \circ h)"'] & B \otimes E \arrow[d, "g \otimes j"]\\
+                    A \otimes D \arrow[r, "f \otimes h"] \arrow[d, "{\id_A} \otimes (j \circ h)"'] & B \otimes E \arrow[d, "g \otimes j"]\\
                     A \otimes F \arrow[r, "(g \circ f) \otimes \id_F"'] & C \otimes F.
                 \end{tikzcd}
             \end{equation}
             Now specialise this to the case where \(A = B = C = D = E = F = I\), \(h = g = \id_I\), then we have
             \begin{equation}
                 \begin{tikzcd}
-                    I \otimes I \arrow[r, "f \otimes \id_I"] \arrow[d, "\id_I \otimes j"'] & I \otimes I \arrow[d, "\id_I \otimes j"]\\
+                    I \otimes I \arrow[r, "f \otimes \id_I"] \arrow[d, "{\id_I} \otimes j"'] & I \otimes I \arrow[d, "{\id_I} \otimes j"]\\
                     I \otimes I \arrow[r, "f \otimes \id_I"'] & I \otimes I.
                 \end{tikzcd}
             \end{equation}
@@ -3461,7 +3574,7 @@ noabbrev
                 \begin{tikzcd}
                     I \arrow[rr, "a"] \arrow[dd, "\lambda_I^{-1}"', "\rho_I^{-1}"] \arrow[dr, "b"] & & I \arrow[dd, "\lambda_I^{-1}"', "\rho_I^{-1}", pos=0.75] \arrow[dr, "b"] &\\
                     & I \arrow[rr, "a", pos=0.3, crossing over] & & I \arrow[dd, "\lambda_I"', "\rho_I", pos=0.4]\\
-                    I \otimes I \arrow[dr, "\id_I \otimes b"'] \arrow[rr, "a \otimes \id_I", pos=0.2] & & I \otimes I \arrow[dr, "\id_I \otimes b", pos=0.3] & \\
+                    I \otimes I \arrow[dr, "{\id_I} \otimes b"'] \arrow[rr, "a \otimes \id_I", pos=0.2] & & I \otimes I \arrow[dr, "{\id_I} \otimes b", pos=0.3] & \\
                     & I \otimes I \arrow[uu, "\lambda_I", "\rho_I"', crossing over, pos=0.3] \arrow[rr, "a \otimes \id_I"'] & & I \otimes I.
                 \end{tikzcd}
             \end{equation}
@@ -3628,11 +3741,11 @@ noabbrev
         \begin{proof}
             This follows by commutativity of \cref{eqn:scalar multiplication cube}, which starting at the top back left, moving forward then right gives \(a \circ b\), but going down, forward, right, and up gives
             \begin{equation}
-                \lambda_I \circ (a \otimes \id_I) \circ (\id_I \otimes b) \circ \lambda_I^{-1}.
+                \lambda_I \circ (a \otimes \id_I) \circ ({\id_I} \otimes b) \circ \lambda_I^{-1}.
             \end{equation}
             Applying the interchange law to the middle of this morphism we have
             \begin{equation}
-                (a \otimes \id_I) \circ (\id_I \otimes b) = (a \circ \id_I) \otimes (\id_I \circ b) = a \otimes b.
+                (a \otimes \id_I) \circ ({\id_I} \otimes b) = (a \circ \id_I) \otimes (\id_I \circ b) = a \otimes b.
             \end{equation}
             Hence, we have
             \begin{equation}
@@ -3680,8 +3793,8 @@ noabbrev
             \begin{equation}
                 \begin{tikzcd}[sep=large]
                     A \arrow[r, "\id_A", color=Green, text=black] \arrow[d, "\lambda_A^{-1}"', color=Blue, text=black] & A \arrow[r, "a \cdot (b \cdot f)"] \arrow[d, "\lambda_A^{-1}", color=Green, text=black] & B \arrow[r, "\id_B", color=Green, text=black] & B\\
-                    I \otimes A \arrow[r, "\id_{I \otimes A}"] \arrow[ddr, "\lambda_I^{-1} \otimes \id_A"', color=Blue, text=black] & I \otimes A \arrow[r, "a \otimes (b \cdot f)"] \arrow[d, "\id_I \otimes \lambda_A^{-1}", color=Green, text=black] & I \otimes B \arrow[r, "\id_{I \otimes B}"] \arrow[u, "\lambda_B", color=Green, text=black] & I \otimes B \arrow[u, "\lambda_B"', color=Blue, text=black]\\
-                    & I \otimes (I \otimes A) \arrow[r, "a \otimes (b \otimes f)", color=Green, text=black] \arrow[d, "\alpha_{I,I,A}^{-1}"] & I \otimes (I \otimes B) \arrow[u, "\id_I \otimes \lambda_B", color=Green, text=black] & \\
+                    I \otimes A \arrow[r, "\id_{I \otimes A}"] \arrow[ddr, "\lambda_I^{-1} \otimes \id_A"', color=Blue, text=black] & I \otimes A \arrow[r, "a \otimes (b \cdot f)"] \arrow[d, "{\id_I} \otimes \lambda_A^{-1}", color=Green, text=black] & I \otimes B \arrow[r, "\id_{I \otimes B}"] \arrow[u, "\lambda_B", color=Green, text=black] & I \otimes B \arrow[u, "\lambda_B"', color=Blue, text=black]\\
+                    & I \otimes (I \otimes A) \arrow[r, "a \otimes (b \otimes f)", color=Green, text=black] \arrow[d, "\alpha_{I,I,A}^{-1}"] & I \otimes (I \otimes B) \arrow[u, "{\id_I} \otimes \lambda_B", color=Green, text=black] & \\
                     & (I \otimes I) \otimes A \arrow[r, "(a \otimes b) \otimes f"', color=Blue, text=black] & (I \otimes I) \otimes B \arrow[u, "\alpha_{I,I,B}"] \arrow[uur, "\lambda_I \otimes \id_B"', color=Blue, text=black]
                 \end{tikzcd}
             \end{equation}
@@ -3856,14 +3969,14 @@ noabbrev
             \begin{tikzcd}[column sep=1cm]
                 & A \otimes (B \otimes C) \arrow[r, "\sigma_{A,B\otimes C}"] \arrow[dl, "\alpha_{A,B,C}^{-1}"'] & (B \otimes C) \otimes A & \\
                 (A \otimes B) \otimes C \arrow[dr, "\sigma_{A,B} \otimes \id_C"'] \hspace{-1cm} &&& \hspace{-1cm} B \otimes (C \otimes A) \arrow[ul, "\alpha_{B,C,A}^{-1}"']\\
-                & (B \otimes A) \otimes C \arrow[r, "\alpha_{B,A,C}"'] & B \otimes (A \otimes C), \arrow[ur, "\id_B \otimes \sigma_{A,C}"']
+                & (B \otimes A) \otimes C \arrow[r, "\alpha_{B,A,C}"'] & B \otimes (A \otimes C), \arrow[ur, "{\id_B} \otimes \sigma_{A,C}"']
             \end{tikzcd}
         \end{equation}
         and
         \begin{equation}
             \begin{tikzcd}[column sep=1cm]
                 & (A \otimes B) \otimes C \arrow[r, "\sigma_{A\otimes B,C}"] \arrow[dl, "\alpha_{A,B,C}"'] & B \otimes (C \otimes A) & \\
-                A \otimes (B \otimes C) \arrow[dr, "\id_A \otimes \sigma_{B,C}"'] \hspace{-1cm} &&& \hspace{-1cm} (C \otimes A) \otimes B \arrow[ul, "\alpha_{C,A,B}"']\\
+                A \otimes (B \otimes C) \arrow[dr, "{\id_A} \otimes \sigma_{B,C}"'] \hspace{-1cm} &&& \hspace{-1cm} (C \otimes A) \otimes B \arrow[ul, "\alpha_{C,A,B}"']\\
                 & A \otimes (C \otimes B) \arrow[r, "\alpha_{A,C,B}^{-1}"'] & (A \otimes C) \otimes B. \arrow[ur, "\sigma_{A,C} \otimes \id_B"']
             \end{tikzcd}
         \end{equation}
@@ -3982,7 +4095,7 @@ noabbrev
     \end{dfn}
     Note that we now drop the requirement on wires entering in the same order, since we can always cross the wires over, it doesn't really make sense as a definition anyway as we don't have an order defined on the plane, and wires now enter in the rectangle at the bottom of the cuboidal region.
     
-    That \(\sigma_{A,B}\) and \(\sigma_{A,B}^{-1}\) are inverses, tells us that \(\sigma_{A,B}^{-1} \circ \sigma_{A,B} = \id_{A \otimes B}\), graphically\footnote{note that the right hand side here can be read as \(\id_A \otimes \id_B\), but functoriality of \(\otimes\) means that \(\id_A \otimes \id_B = \id_{A\otimes B}\), which is perhaps clearer with function notation: \(\otimes(\id_A, \id_B) = \id_{\otimes(A,B)}\).},
+    That \(\sigma_{A,B}\) and \(\sigma_{A,B}^{-1}\) are inverses, tells us that \(\sigma_{A,B}^{-1} \circ \sigma_{A,B} = \id_{A \otimes B}\), graphically\footnote{note that the right hand side here can be read as \({\id_A} \otimes \id_B\), but functoriality of \(\otimes\) means that \({\id_A} \otimes \id_B = \id_{A\otimes B}\), which is perhaps clearer with function notation: \(\otimes(\id_A, \id_B) = \id_{\otimes(A,B)}\).},
     \begin{equation}
         \tikzsetnextfilename{braid-sym-mon-cat-braid-braid-inverse}
         \begin{tikzpicture}[baseline=(current bounding box)]
@@ -4093,7 +4206,7 @@ noabbrev
     \begin{exm}{}{}
         Consider the following equation of morphisms \(B \to A \otimes B \otimes C\):
         \begin{equation}
-            (\sigma_{A,B} \otimes \id_B) \circ (\id_A \otimes f)  = (\id_A \otimes \sigma_{B,C}^{-1}) \circ (f \otimes \id_B)
+            (\sigma_{A,B} \otimes \id_B) \circ ({\id_A} \otimes f)  = ({\id_A} \otimes \sigma_{B,C}^{-1}) \circ (f \otimes \id_B)
         \end{equation}
         where \(f \colon I \to A \otimes C\).
         This holds in a genera braided monoidal category as we can express this equation as the following equation of diagrams
@@ -4158,11 +4271,11 @@ noabbrev
             .
         \end{equation}
         We can then just read from the bottom up.
-        Starting on the left region 1 is swapping \(A\) and \(B\) and leaving \(C\) alone, so it corresponds to \(\sigma_{A,B} \otimes \id_C\), region 2 then leaves \(B\) alone (which is now the left most wire) and swaps \(A\) and \(C\), so it is \(\id_B \otimes \sigma_{A,C}\), and region 3 swaps \(B\) and \(C\) leaving \(A\) alone, so it is \(\sigma_{B,C} \otimes \id_A\).
+        Starting on the left region 1 is swapping \(A\) and \(B\) and leaving \(C\) alone, so it corresponds to \(\sigma_{A,B} \otimes \id_C\), region 2 then leaves \(B\) alone (which is now the left most wire) and swaps \(A\) and \(C\), so it is \({\id_B} \otimes \sigma_{A,C}\), and region 3 swaps \(B\) and \(C\) leaving \(A\) alone, so it is \(\sigma_{B,C} \otimes \id_A\).
         Doing the same for the diagram on the right we get the equation
         \begin{multline}
-            (\sigma_{B,C} \otimes \id_A) \circ (\id_B \otimes \sigma_{A,C}) \circ (\sigma_{A,B} \otimes \id_C)\\
-            = (\id_C \otimes \sigma_{A,C}) \circ (\sigma_{A,C} \otimes \id_B) \circ (\id_A \otimes \sigma_{B,C}).
+            (\sigma_{B,C} \otimes \id_A) \circ ({\id_B} \otimes \sigma_{A,C}) \circ (\sigma_{A,B} \otimes \id_C)\\
+            = ({\id_C} \otimes \sigma_{A,C}) \circ (\sigma_{A,C} \otimes \id_B) \circ ({\id_A} \otimes \sigma_{B,C}).
         \end{multline}
     \end{exm}
     
@@ -4283,7 +4396,7 @@ noabbrev
     We can encode this information into a functor, which is what the next definition does.
     
     \begin{dfn}{Dagger Functor}{}
-        The \define{dagger functor}\index{dagger!Hilb@dagger!\(\Hilb\)} on \(\Hilb\) is the contravariant endofunctor \((-)^\dagger \colon \Hilb \to \Hilb\) which takes objects to themselves and morphisms to their adjoints as bounded linear maps.
+        The \define{dagger functor}\index{dagger functor!\(\Hilb\)} on \(\Hilb\) is the contravariant endofunctor \((-)^\dagger \colon \Hilb \to \Hilb\) which takes objects to themselves and morphisms to their adjoints as bounded linear maps.
     \end{dfn}
     
     Contravariance means that \(F(g \circ f) = Ff \circ Fg\), which in this case means \((g \circ f)^\dagger = f^\dagger \circ g^\dagger\), which is certainly true.
@@ -4311,7 +4424,7 @@ noabbrev
     \section{Dagger Categories: The Definition}
     \begin{dfn}{}{}
         Let \(\cat{C}\) be a category.
-        A \defineindex{dagger} on \(\cat{C}\) is an involutive contravariant endofunctor \((-)^\dagger \colon \cat{C} \to \cat{C}\) which acts as the identity on objects.
+        A \defineindex{dagger functor} on \(\cat{C}\) is an involutive contravariant endofunctor \((-)^\dagger \colon \cat{C} \to \cat{C}\) which acts as the identity on objects.
         
         A \defineindex{dagger category} is a category equipped with a dagger.
     \end{dfn}
@@ -4574,11 +4687,2119 @@ noabbrev
     
     \(\Rel\) is also a symmetric monoidal dagger category.
     
+    \part{Duals}
+    \chapter{Duals}
+    \section{Duals: The Idea}
+    Consider some Hilbert space, \(H\).
+    We can construct its dual space, \(H^* \coloneqq \Hilb(H, \complex)\).
+    This is also a Hilbert space with vector addition given by pointwise addition, so for \(\varphi, \psi \in \Hilb(H, \complex)\) we define \(\varphi + \psi \in \Hilb(H, \complex)\) to be the bounded linear map
+    \begin{equation}
+        (\varphi + \psi)(v) = \varphi(v) + \psi(v)
+    \end{equation}
+    and for \(z \in \complex\) we define \(z\varphi \in \Hilb(H, \complex)\) to be the bounded linear map
+    \begin{equation}
+        (z\varphi)(v) = z\varphi(v).
+    \end{equation}
+    The inner product on \(H^*\) follows from the Riesz representation theorem, which states that for all \(\varphi \in H^*\) there exists a unique \(f_\varphi \in H\) such that
+    \begin{equation}
+        \varphi(v) = \braket{f_\varphi}{v}
+    \end{equation}
+    for all \(v \in H\).
+    Using this we define an inner product on \(H^*\) according to
+    \begin{equation}
+        \braket{\varphi}{\psi}_{H^*} = \braket{f_{\varphi}}{f_{\psi}}_{H}.
+    \end{equation}
+    
+    This idea generalises to monoidal categories, although it is not particularly obvious from the definition.
+    
+    \section{Duals: The Definition}
+    \begin{dfn}{Dual}{}
+        Let \((\cat{C}, \otimes, I, \lambda, \rho, \alpha)\) be a monoidal category.
+        An object \(L \in \Ob(\cat{C})\) is \define{left dual}\index{left dual!object} to an object \(R \in \Ob(\cat{C})\), and \(R\) is \defineindex{right dual}\index{right dual!object} to \(L\), which we write as \(L \leftdual R\), when there exist morphisms
+        \begin{itemize}
+            \item \(\eta \colon I \to R \otimes L\), called the \defineindex{unit morphism}; and
+            \item \(\varepsilon \colon L \otimes R \to I\), called the \defineindex{counit morphism}
+        \end{itemize}
+        such that the following diagrams commute
+        \begin{gather}
+            \begin{tikzcd}[ampersand replacement=\&]
+                L \arrow[r, "\rho_L^{-1}"] \arrow[d, "\id_L"'] \& L \otimes I \arrow[r, "{\id_L} \otimes \eta"] \& L \otimes (R \otimes L) \arrow[d, "\alpha_{L,R,L}^{-1}"]\\
+                L \& I \otimes L \arrow[l, "\lambda_L"] \& (L \otimes R) \otimes R, \arrow[l, "\varepsilon \otimes \id_L"]
+            \end{tikzcd}
+            \\
+            \begin{tikzcd}[ampersand replacement=\&]
+                R \arrow[r, "\lambda_R^{-1}"] \arrow[d, "\id_R"'] \& I \otimes R \arrow[r, "\eta \otimes \id_R"] \& (R \otimes L) \otimes R \arrow[d, "\alpha_{R,L,R}"]\\
+                R \& R \otimes I \arrow[l, "\rho_R"] \& R \otimes (L \otimes R). \arrow[l, "{\id_R} \otimes \varepsilon"]
+            \end{tikzcd}
+        \end{gather}
+                
+        If \(L\) is both left and right-dual to \(R\) we call \(L\) the \define{dual}\index{dual!object} of \(R\).
+    \end{dfn}
+    
+    Consider the first diagram here.
+    It says that we can add \(R \otimes L\) on the right of \(L\) and then remove \(L \otimes R\) from the left and this is the same as doing nothing.
+    The second diagram is similar but swapping \(R\) and \(L\).
+    
+    Notice that \(\eta\) is a state of \(R\otimes L\).
+    We will later show that it is an entangled state, which is useful for quantum mechanics stuff.
+    
+    \section{Graphical Notation}
+    Suppose we have a category and two objects \(L\) and \(R\) with \(L \leftdual R\).
+    In the graphical notation we draw \(L\) as a wire with an arrow pointing upwards, and we draw \(R\) as a wire with an arrow pointing down:
+    \begin{equation}
+        \tikzsetnextfilename{duals-graphical-notation-dual-objects}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[left dual] (0, 0) node [below] {\(L\)} -- (0, 1);
+            \draw[right dual] (2, 0) node [below] {\(R\)} -- (2, 1);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    We draw the unit morphism, \(\eta \colon I \to R \otimes L\), as a bent wire:
+    \begin{equation}
+        \tikzsetnextfilename{duals-graphical-notation-unit-morphism}
+        \begin{tikzpicture}
+            \node[morphism, minimum width=1.5cm] (eta) {\(\eta\)};
+            \draw[wire] ($(eta.north) + (-0.5, 0)$) -- ++ (0, 0.75) node [above] {\(R\)} coordinate (top);
+            \draw[wire] ($(eta.north) + (0.5, 0)$) -- ++ (0, 0.75) node [above] {\(L\)};
+            \draw[right dual] (2, 0 |- eta.north) coordinate (A) -- (2, 0 |- top);
+            \draw[wire] (A) arc (180:360:0.5);
+            \draw[left dual] (3, 0 |- eta.north) -- (3, 0 |- top);
+            \node (equal) at (1.3, 0) {\(=\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    Similarly, the counit morphism, \(\varepsilon \colon L \otimes R \to I\) is drawn as
+    \begin{equation}
+        \tikzsetnextfilename{duals-graphcial-notation-counit-morphism}
+        \begin{tikzpicture}
+            \node[morphism, minimum width=1.5cm] (epsilon) {\(\varepsilon\)};
+            \draw[wire] ($(epsilon.south) + (-0.5, 0)$) -- ++ (0, -0.75) node [below] {\(L\)} coordinate (bottom);
+            \draw[wire] ($(epsilon.south) + (0.5, 0)$) -- ++ (0, -0.75) node [below] {\(R\)};
+            \draw[left dual] (2, 0 |- bottom) -- (2, 0 |- epsilon.south) coordinate (A);
+            \draw[wire] (A) arc (180:0:0.5);
+            \draw[right dual] (3, 0 |- bottom) -- (3, 0 |- epsilon.south);
+            \node (equal) at (1.3, 0) {\(=\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    The duality conditions then becomes
+    \begin{equation}
+        \tikzsetnextfilename{duals-graphical-notation-snake-1}
+        \begin{tikzpicture}[baseline=(equal.base)]
+            \draw[left dual] (0, 0) -- (0, 1);
+            \draw[wire] (0, 1) arc (180:0:0.5) coordinate (A);
+            \draw[left dual] (A) -- ++ (0, -0.2) coordinate (B);
+            \draw[wire] (B) arc (180:360:0.5) coordinate (C);
+            \draw[left dual] (C) -- ++ (0, 1.2);
+            \node (equal) at (2.5, 1) {\(=\)};
+            \draw[left dual] (3, 0) -- (3, 2);
+        \end{tikzpicture}
+        \qqand
+        \tikzsetnextfilename{duals-graphical-notation-snake-2}
+        \begin{tikzpicture}[baseline=(equal.base)]
+            \draw[left dual] (0, 2) -- (0, 1);
+            \draw[wire] (0, 1) arc (180:360:0.5) coordinate (A);
+            \draw[left dual] (A) -- ++ (0, 0.2) coordinate (B);
+            \draw[wire] (B) arc (180:0:0.5) coordinate (C);
+            \draw[left dual] (C) -- ++ (0, -1.2);
+            \node (equal) at (2.5, 1) {\(=\)};
+            \draw[right dual] (3, 0) -- (3, 2);
+        \end{tikzpicture}
+    \end{equation}
+    which are known as the \defineindex{snake equations}.
+    
+    It can be a bit difficult to see how this is the same as the duality condition at first.
+    Consider the first snake equation.
+    At the bottom we have a single wire with an arrow pointing up, so \(L\), the space next to this can represent the unit, so we have \(L \otimes I\).
+    Then we're applying \(\eta\) to this identity, giving \(L \otimes (R \otimes L)\).
+    Next we reassociate, giving \((L \otimes R) \otimes L\), then apply \(\varepsilon\), giving \(I \otimes L\), and finally we remove the unit, leaving us with just \(L\), and the line on the right hand side is just \(\id_L\).
+    It can be helpful to break the diagram up into the following sections:
+    \begin{equation}
+        \tikzsetnextfilename{duals-graphical-notation-snake-breakdown}
+        \begin{tikzpicture}[baseline=(current bounding box), font=\scriptsize]
+            \draw[left dual] (0, 0) -- (0, 1) node [midway, left, text=highlight] {\(L\)};
+            \draw[wire] (0, 1) arc (180:0:0.5) coordinate (A);
+            \draw[left dual] (A) -- ++ (0, -0.2) coordinate (B)  node [pos=0.7, left, text=highlight, xshift=0.075cm] {\(R\)};
+            \draw[wire] (B) arc (180:360:0.5) coordinate (C);
+            \draw[left dual] (C) -- ++ (0, 1.2) node [midway, right, text=highlight] {\(L\)};
+            \draw[thick, Red] (0.5, -0.2) -- (0.5, 1);
+            \draw[thick, Red] (0.5, 0.2) -- (2.2, 0.2);
+            \draw[thick, Red] (-0.2, 1) -- (2.2, 1);
+            \draw[thick, Red] (1.5, 1) -- (1.5, 2.2);
+            \draw[thick, Red] (1.5, 1.6) -- (-0.2, 1.6);
+            \node[Red] at (0.5, 1.3) {\(\varepsilon\)};
+            \node[Red] at (1.5, 0.5) {\(\eta\)};
+            \node[Navy!50] at (1.5, 0) {\(I\)};
+            \node[Navy!50] at (0.5, 1.8) {\(I\)};
+            \node[Blue] at (0.25, 0.2) {1};
+            \node[Blue] at (0.8, 0) {2};
+            \node[Blue] at (0.8, 0.4) {3};
+            \node[Blue] at (1.2, 1.3) {4};
+            \node[Blue] at (1.2, 1.8) {5};
+            \node[Blue] at (1.7, 1.6) {8};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    We can also draw this as
+    \begin{equation}
+        \tikzsetnextfilename{duals-graphical-notation-snake-rewrite}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \node[morphism, minimum width=1.5cm] (eta) at (1.5, 0.5) {\(\eta\)};
+            \draw[wire, dashed] (1.5, 0) -- (eta);
+            \node[morphism, minimum width=1.5cm] (epsilon) at (0.5, 1.5) {\(\phantomrlap{\varepsilon}{\eta}\)};
+            \draw[wire, dashed] (epsilon) -- (0.5, 2);
+            \draw[wire] (0, 0) node [below] {\(L\)} -- (0, 0 |- epsilon.south);
+            \draw[wire] (1, 0 |- epsilon.south) -- (1, 0 |- eta.north) node [midway, left] {\(R\)};
+            \draw[wire] (2, 0 |- eta.north) -- (2, 2) node [above] {\(L\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    \section{Duals: The Examples}
+    \subsection{\texorpdfstring{\(\FHilb\)}{Hilb}}
+    The monoidal category \(\FHilb\) has all duals.
+    Every finite-dimensional Hilbert space is both left and right dual to its dual space, \(H^*\) in a canonical way.
+    The counit of the duality \(H \leftdual H^*\) is given by the map
+    \begin{align}
+        \varepsilon \colon H \otimes H^* &\to \complex\\
+        \ket{\varphi} \otimes \bra{\psi} &\mapsto \braket{\varphi}{\psi}.
+    \end{align}
+    Given an orthonormal basis, \(\{\ket{i}\}\), the unit is given by the map
+    \begin{align}
+        \eta \colon \complex \to H^* \otimes H\\
+        1 \mapsto \sum_i \bra{i} \otimes \ket{i}
+    \end{align}
+    extended by linearity to all of \(\complex\).
+    We'll show later that despite using a basis in this definition the unit morphism is basis independent.
+    
+    We now need to show that the snake equations hold.
+    We'll do the first one here, using the version split into different regions above.
+    Region 1 consists of just \(L\), which in this case is \(H\).
+    We can show that the snake equation holds on the basis vectors, and then by linearity it holds for all vectors, so consider some specific basis vector \(\ket{j}\) for fixed \(j\).
+    The first thing we do is affix the unit on the right, using \(\rho_H^{-1}\), which gives us \(\ket{j} \otimes 1\), having now accounted for region 2.
+    Region 3 says to apply \({\id_H} \otimes \eta\), which gives
+    \begin{equation}
+        \ket{j} \otimes \left( \sum_i \bra{i} \otimes \ket{i} \right) = \sum_i \ket{j} \otimes (\bra{i} \otimes \ket{i}) \isomorphic \sum_i (\ket{j} \otimes \bra{i}) \otimes \ket{i}
+    \end{equation}
+    having used linearity of the tensor product to pull the sum out, and then the associator to move the brackets.
+    Now region 5 tells us to apply \(\varepsilon \otimes \id_H\), which gives
+    \begin{equation}
+        \sum_i \braket{i}{j} \otimes \ket{i} = \sum_i \delta_{ij} \otimes \ket{i} = 1 \otimes \ket{j}
+    \end{equation}
+    having used the orthonormality of the basis and then the fact that \(0 \otimes \ket{i}\) gives zero when we act on it with the left unitor, and so the final step, region 6, of applying the left unitor gives us \(\ket{j}\).
+    So we see that this is indeed the identity.
+    
+    Infinite dimensional Hilbert spaces don't have duals.
+    The issue is with the sum
+    \begin{equation}
+        \sum_i \bra{i} \otimes \ket{i},
+    \end{equation}
+    which is not defined in the infinite dimensional case.
+    
+    \subsection{\texorpdfstring{\(\Mat\)}{Mat}}
+    Recall that the category \(\Mat\) has natural numbers as objects and \(\Mat(n, m)\) consists of all \(m \times n\) matrices with entries in \(\field\).
+    This is a monoidal category with the monoidal product on morphisms given by the Kronecker product of matrices and on objects by the normal product of natural numbers.
+    The unit object is the natural number \(1\).
+    
+    In this category every object is self-dual with the canonical choice of unit and counit being
+    \begin{equation}
+        \eta \colon 1 \mapsto \sum_i \ket{i} \otimes \ket{i}, \qqand \varepsilon \colon \ket{i} \otimes \ket{j} \mapsto \delta_{ij}1
+    \end{equation}
+    where we give linear maps to be interpreted as matrices.
+    
+    \subsection{\texorpdfstring{\(\Rel\)}{Rel}}
+    In \(\Rel\) every object is self-dual.
+    The unit morphism, \(\colon 1 \mapsto S \times S\), and counit morphism, \(S \times S \to 1\), with \(1 = \{\bullet\}\) being the singleton set, and \(S\) an arbitrary set, are defined to be the relations
+    \begin{itemize}
+        \item \(\bullet \sim_\eta (s, s)\) for all \(s \in S\); and
+        \item \((s, s) \sim_\varepsilon \bullet\) for all \(s \in S\)
+    \end{itemize}
+    respectively.
+    
+    We should check that the snake equations hold, again we'll check the first here.
+    We start with \(s \in S\), acting with the right unitor we have that \(s \sim_{\rho_S} (s, s)\).
+    Acting with \({\id_S} \otimes \eta\) we get \((s, s) \sim_{{\id_S} \otimes \eta} (s, (t, t))\) for all \(t \in S\).
+    Reassociating we have \((s, (t, t)) \sim_\alpha ((s, t), t)\).
+    Acting with \(\varepsilon \otimes \id_S\) we have \(((s, t), t) \sim_{\varepsilon \otimes \id_S} (\bullet, t)\) where we now fix \(t = s\), since if this is not the case then there is no relation here, compare this with the use of \(\delta_{ij}\) in the case of \(\Hilb\).
+    Finally, using the left unitor we have \((\bullet, t) \sim_{\lambda_S} t\), with \(t = s\), so this is indeed the identity relation as chaining these relations together we get \(s \sim s\).
+    
+    \subsection{\texorpdfstring{\(\Set\)}{Set}}
+    The category of sets is quite boring when it comes to duals, only singletons have duals, and up to isomorphism there's only one singleton, and it is self dual.
+    To show this we make the following definitions.
+    
+    \begin{dfn}{Names and Conames}{}
+        Consider some monoidal category with dualities \(A \leftdual A^*\) and \(B \leftdual B^*\).
+        Given a morphism \(f \colon A \to B\) its
+        \begin{itemize}
+            \item \defineindex{name}, \(\name{f} \colon I \to A^* \otimes B\); and
+            \item \defineindex{coname}, \(\coname{f} \colon A \otimes B^* \to I\),
+        \end{itemize}
+        are the morphisms
+        \begin{equation}
+            \tikzsetnextfilename{duals-name}
+            \begin{tikzpicture}[baseline=(f.base)]
+                \node[daggerable morphism] (f) {\(f\)};
+                \draw[left dual=0.7] (f) -- ++ (0, 0.75) node [above] {\(B\)};
+                \draw[right dual] (-1, 0.75) node [above] {\(A^*\)} -- ++ (0, -1.5);
+                \draw[wire] (-1, -0.75) arc (180:360:0.5);
+                \draw[left dual=0.6] (0, -0.75) -- (f) node [midway, right] {\(A\)};
+            \end{tikzpicture}
+        \end{equation}
+        and
+        \begin{equation}
+            \tikzsetnextfilename{duals-coname}
+            \begin{tikzpicture}[baseline=(f.base)]
+                \node[daggerable morphism] (f) {\(f\)};
+                \draw[right dual] (f) -- ++ (0, -0.75) node [below] {\(A\)};
+                \draw[left dual=0.6] (f) -- ++ (0, 0.75) node [midway, left] {B};
+                \draw[wire] (0, 0.75) arc (180:0:0.5);
+                \draw[left dual] (1, 0.75) -- (1, -0.75) node [below] {\(B^*\)};
+            \end{tikzpicture}
+        \end{equation}
+        respectively.
+    \end{dfn}
+    
+    Note that the name is defined using the unit of the duality \(A \leftdual A^*\), and the coname is defined using the counit of the duality \(B \leftdual B^*\).
+    
+    The useful thing about names/conames is that we can recover the morphism from them.
+    To recover the morphism from the coname we just have to add in a unit (and an associator) forming the morphism
+    \begin{equation}
+        \tikzsetnextfilename{duals-coname-recover-morphism}
+        \begin{tikzpicture}[baseline=(f.base)]
+            \node[daggerable morphism] (f) {\(f\)};
+            \draw[right dual] (f) -- ++ (0, -0.75) node [below] {\(A\)};
+            \draw[left dual=0.6] (f) -- ++ (0, 0.75) node [midway, left] {B};
+            \draw[wire] (0, 0.75) arc (180:0:0.5);
+            \draw[left dual] (1, 0.75) -- (1, 0) node [midway, right] {\(B^*\)};
+            \draw[wire] (1, 0) arc (180:360:0.5);
+            \draw[left dual] (2, 0) -- (2, 1.5) node [above] {\(B\)};
+            \node at (2.5, 0) {\(=\)};
+            \node[daggerable morphism] (f2) at (3.1, 0) {\(f\)};
+            \draw[right dual] (f2) -- ++ (0, -0.75) node [below] {\(A\)};
+            \draw[left dual=0.6] (f2) -- ++ (0, 1.5) node [above] {\(B\)};
+        \end{tikzpicture}
+    \end{equation}
+    having applied one of the snake equations of \(B \leftdual B^*\) to straighten out the wire.
+    Similarly to recover the morphism from the name we just have to add in a counit (and an associator) forming the morphism
+    \begin{equation}
+        \tikzsetnextfilename{duals-name-recover-morphism}
+        \begin{tikzpicture}[baseline=(f.base)]
+            \node[daggerable morphism] (f) {\(f\)};
+            \draw[left dual=0.7] (f) -- ++ (0, 0.75) node [above] {\(B\)};
+            \draw[right dual] (-1, 0) -- ++ (0, -0.75) node [midway, left] {\(A^*\)};
+            \draw[wire] (-1, -0.75) arc (180:360:0.5);
+            \draw[left dual=0.6] (0, -0.75) -- (f) node [midway, right] {\(A\)};
+            \draw[wire] (-1, 0) arc (0:180:0.5);
+            \draw[right dual] (-2, 0) -- ++ (0, -1.5) node [below] {\(A\)};
+            \node at (0.75, 0) {\(=\)};
+            \node[daggerable morphism] (f2) at (1.4, 0) {\(f\)};
+            \draw[left dual] (f2) -- ++ (0, 0.75) node [above] {\(B\)};
+            \draw[right dual] (f2) -- ++ (0, -1.5) node [below] {\(A\)};
+        \end{tikzpicture}
+    \end{equation}
+    having applied one of the snake equations of \(A \leftdual A^*\) to straighten out the wire.
+    
+    In \(\Set\) the unit object, the singleton, \(1\), is terminal, meaning all morphisms into \(1\) from the same object are equal.
+    This means that all conames \(\coname{f} \colon A \otimes B^* \to 1\) must be equal.
+    Thus by the above construction all morphisms \(f \colon A \to B\) are equal.
+    This can only be the case if \(A \isomorphic B \isomorphic 1\), or if \(B = \emptyset\), but \(\emptyset\) does not have a dual since there is no function \(1 \to \emptyset \times \emptyset^*\) for any set \(\emptyset^*\), since \(\emptyset \times X = \emptyset\) for any set \(X\), and there are no functions into \(\emptyset\), apart from the identity \(\emptyset \to \emptyset\), which isn't useful here as the domain we're interested in is 1.
+    
+    \chapter{Properties of Duals} 
+    \section{Duals are Unique up to Isomorphism}
+    Often in maths after making a definition one of the first things we ask is about the uniqueness of the thing that we are defining.
+    Strict uniqueness is too strong a condition when it comes to uniqueness of many categorical definitions.
+    Instead we look at the weaker condition of uniqueness up to isomorphism.
+    That is, if some property defines an object up to isomorphism and both \(A\) and \(B\) have this property then we must have \(A \isomorphic B\).
+    Duals are unique up to isomorphism.
+    
+    \begin{lma}{Duals are Unique up to Isomorphism}{}
+        Let \(\cat{C}\) be a monoidal category with a duality \(L \leftdual R\), then, \(L \leftdual R'\) if and only if \(R \isomorphic R'\).
+        Similarly \(L' \leftdual R\) if and only if \(L \isomorphic L'\).
+        
+        \begin{proof}
+            We start with the forwards implication.
+            Suppose that we have the dualities \((L, R, \eta, \varepsilon)\) and \((L, R', \eta', \varepsilon')\).
+            We then want to define a map \(R \to R'\) and show that this map is an isomorphism.
+            It is possible to construct a map \(R \to R'\) using the unit \(\eta'\) of \(L \leftdual R'\), and the counit \(\varepsilon\) of \(L \leftdual R\):
+            \begin{equation}
+                \tikzsetnextfilename{duals-unique-proof-1}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[left dual] (0, 2) node [above] {\(R'\)} -- (0, 1);
+                    \draw[wire] (0, 1) arc (180:360:0.5) coordinate (A);
+                    \draw[left dual] (A) -- ++ (0, 0.2) coordinate (B) node [midway, right] {\(L\)};
+                    \draw[wire] (B) arc (180:0:0.5) coordinate (C);
+                    \draw[left dual] (C) -- ++ (0, -1.2) node [below] {\(R\)};
+                    \node[above] at (1.5, 1.75) {\(\varepsilon\)};
+                    \node[below] at (0.5, 0.5) {\(\eta'\)};
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Similarly, we can define a map \(R' \to R\) using \(\eta\) and \(\varepsilon'\):
+            \begin{equation}
+                \tikzsetnextfilename{duals-unique-proof-2}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[left dual] (0, 2) node [above] {\(R\)} -- (0, 1);
+                    \draw[wire] (0, 1) arc (180:360:0.5) coordinate (A);
+                    \draw[left dual] (A) -- ++ (0, 0.2) coordinate (B) node [midway, right] {\(L\)};
+                    \draw[wire] (B) arc (180:0:0.5) coordinate (C);
+                    \draw[left dual] (C) -- ++ (0, -1.2) node [below] {\(R'\)};
+                    \node[above] at (1.5, 1.75) {\(\varepsilon'\)};
+                    \node[below] at (0.5, 0.5) {\(\eta\)};
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Now computing the composite we have
+            \begin{equation*}
+                \tikzsetnextfilename{duals-unique-proof-3}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[left dual] (0, 2) node [above] {\(R\)} coordinate (top) -- (0, 1);
+                    \draw[wire] (0, 1) arc (180:360:0.5) coordinate (A);
+                    \draw[left dual] (A) -- ++ (0, 0.2) coordinate (B) node [midway, right] {\(L\)};
+                    \draw[wire] (B) arc (180:0:0.5) coordinate (C);
+                    \draw[left dual] (C) -- ++ (0, -2.2) node [midway, left] (Rprime) {\(R'\)};
+                    \node[above] at (1.5, 1.75) {\(\varepsilon'\)};
+                    \node[below] at (0.5, 0.5) {\(\eta\)};
+                    \begin{scope}[xshift=2cm, yshift=-2cm]
+                        \draw[wire] (0, 1) arc (180:360:0.5) coordinate (A);
+                        \draw[left dual] (A) -- ++ (0, 0.2) coordinate (B) node [midway, right] {\(L\)};
+                        \draw[wire] (B) arc (180:0:0.5) coordinate (C);
+                        \draw[left dual] (C) -- ++ (0, -1.2) node [below] {\(R\)} coordinate (bottom);
+                        \node[above] at (1.5, 1.75) {\(\varepsilon\)};
+                        \node[below] at (0.5, 0.5) {\(\eta'\)};
+                    \end{scope}
+                    \node[right= 2.25cm of Rprime] {\(\equaliso\)};
+                    \fill[highlight!50] (6, -1) rectangle (9, 1);
+                    \draw[right dual] (5.5, -1) -- (5.5, 0 |- top) node [above] {\(R'\)};
+                    \draw[wire] (5.5, -1) arc (180:360:0.5);
+                    \draw[left dual] (6.5, -1) -- (6.5, 0.25);
+                    \draw[wire] (6.5, 0.25) arc (180:0:0.5);
+                    \draw[left dual] (7.5, 0.25) -- (7.5, -0.25);
+                    \draw[wire] (7.5, -0.25) arc (180:360:0.5);
+                    \draw[left dual] (8.5, -0.25) -- (8.5, 1);
+                    \draw[wire] (8.5, 1) arc (180:0:0.5);
+                    \draw[left dual] (9.5, 1) -- (9.5, 0 |- bottom) node [below] {\(R\)};
+                \end{tikzpicture}
+                .
+            \end{equation*}
+            We can identify the shaded region as the snake equation for the duality \(L \leftdual R\), and so we can replace it with \(\id_L\).
+            This leaves us with
+            \begin{equation}
+                \tikzsetnextfilename{duals-unique-proof-4}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[right dual] (5.5, -1) -- (5.5, 2) node [above] {\(R\)};
+                    \draw[wire] (5.5, -1) arc (180:360:0.5);
+                    \draw[left dual] (6.5, -1) -- (6.5, 1);
+                    \draw[wire] (6.5, 1) arc (180:0:0.5);
+                    \draw[right dual] (7.5, 1) -- (7.5, -2) node [below] {\(R\)};
+                    \node at (8, 0) {=};
+                    \draw[right dual] (9.5, -2) node [below] {\(R\)} -- (9.5, 2) node [above] {\(R\)};
+                \end{tikzpicture}
+                ,
+            \end{equation}
+            which is the snake equation for the duality \(L \leftdual R\).
+            The composite the other way around can be worked out similarly, and is \(\id_{R'}\).
+            This proves the forward direction, that dualities \(L \leftdual R\) and \(L \leftdual R'\) can only exist if \(R \isomorphic R'\).
+            
+            Now suppose that we have a duality \(L \leftdual R\) and an isomorphism \(f \colon R \to R'\).
+            We can construct a duality \(L \leftdual R'\).
+            In order to define a unit for this duality, \(\eta' \colon I \to R' \otimes L\), we need a way to produce \(R' \otimes L\).
+            With the given data there is only one way to do this, we first produce \(R \otimes L\) with \(\eta\), then produce \(R' \otimes L\) by acting on this with \(f \otimes \id_L\).
+            Thus, we define the unit of the duality \(L \leftdual R'\) to be
+            \begin{equation}
+                \tikzsetnextfilename{duals-unique-proof-5}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[wire] (0, 0) arc (180:360:0.5);
+                    \draw[left dual] (1, 0) -- ++ (0, 1.5) node [above] {\(L\)};
+                    \node[daggerable morphism] (f) at (0, 0.75) {\(f\)};
+                    \draw[right dual] (0, 0) -- (f) node [midway, left] {\(R\)};
+                    \draw[right dual] (f) -- (f |- 0, 1.5) node [above] {\(R'\)};
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Similarly, we can define the counit of the dual \(L \leftdual R'\) to be
+            \begin{equation}
+                \tikzsetnextfilename{duals-unique-proof-6}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[wire] (0, 1) arc (180:0:0.5);
+                    \draw[left dual] (0, -0.5) node [below] {\(L\)} -- (0, 1);
+                    \node[daggerable morphism] (finv) at (1, 0.25) {\(f^{-1}\)};
+                    \draw[right dual] (finv) -- (1, 1) node [midway, right] {\(R\)};
+                    \draw[left dual] (finv) -- (1, -0.5) node [below] {\(R'\)};
+                \end{tikzpicture}
+            \end{equation}
+            Computing the composite of this we have
+            \begin{equation}
+                \tikzsetnextfilename{duals-unique-proof-7}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \begin{scope}[xshift=1cm, yshift=-2cm]
+                        \draw[wire] (0, 0) arc (180:360:0.5);
+                        \draw[left dual] (1, 0) -- ++ (0, 3.75) node [above] {\(L\)};
+                        \node[daggerable morphism] (f) at (0, 0.75) {\(f\)};
+                        \draw[right dual] (0, 0) -- (f) node [midway, left] {\(R\)};
+                    \end{scope}
+                    \draw[wire] (0, 1) arc (180:0:0.5);
+                    \draw[left dual] (0, -2.75) node [below] {\(L\)} -- (0, 1);
+                    \node[daggerable morphism] (finv) at (1, 0.25) {\(f^{-1}\)};
+                    \draw[right dual] (finv) -- (1, 1) node [midway, right] {\(R\)};
+                    \draw[right dual] (f) -- (finv) node [midway, left] {\(R'\)};
+                    \node at (2.5, -0.5) {\(=\)};
+                    \begin{scope}[xshift=3cm]
+                        \begin{scope}[xshift=1cm, yshift=-2cm]
+                            \draw[wire] (0, 0) arc (180:360:0.5);
+                            \draw[left dual] (1, 0) -- ++ (0, 3.75) node [above] {\(L\)};
+                        \end{scope}
+                        \draw[wire] (0, 1) arc (180:0:0.5);
+                        \draw[left dual] (0, -2.75) node [below] {\(L\)} -- (0, 1);
+                        \draw[right dual] (1, -2) -- (1, 1) node [midway, left] {\(R\)};
+                    \end{scope}
+                    \node at (5.5, -0.5) {\(=\)};
+                    \draw[left dual] (6, -2.75) node [below] {\(L\)} -- (6, 1.75) node [above] {\(L\)};
+                \end{tikzpicture}
+            \end{equation}
+            having used \(f^{-1} \circ f = \id_R\) and then the snake equation.
+            Similarly, the composite in the opposite order is \(\id_{R'}\), we just use the snake equation and then inverses.
+            
+            The proof that \(L \leftdual R\) and \(L' \leftdual R\) if and only \(L \isomorphic L'\) follows the same steps.
+        \end{proof}
+    \end{lma}
+    
+    \section{Unit Determines Counit}
+    Everything in this section holds if we swap unit and counit around, an example of duality in the broader sense of reversing morphisms.
+    
+    The definition of a dual is actually somewhat overdetermined, if we know the unit of a duality then this uniquely determines the counit.
+    However, finding the counit is not always trivial, so we specify both the unit and counit when we specify a duality.
+    
+    The proof that the unit uniquely defines the counit is reminiscent of the proof of uniqueness of the inverse in a group, just using the snake equations in place of the group laws.
+    This proof is as follows.
+    Take a group, \(G\), and some element \(g \in G\).
+    Then suppose that both \(h\) and \(h'\) are inverses of \(g\).
+    In particular, we then have \(gh' = 1 = hg\).
+    Hence,
+    \begin{equation}
+        h = h1 = hgh' = 1h' = h'.
+    \end{equation}
+    
+    \begin{lma}{Unit Determines Counit}{}
+        Let \(\cat{C}\) be a monoidal category with dualities \((L, R, \eta, \varepsilon)\) and \((L, R, \eta, \varepsilon')\).
+        Then \(\varepsilon = \varepsilon'\).
+        
+        Similarly if we have dualities \((L, R, \eta, \varepsilon)\) and \((L, R, \eta', \varepsilon)\) then \(\eta = \eta'\).
+        
+        \begin{proof}
+            First consider the counit \(\varepsilon\), we can take one leg of this and treat it as the identity, which we can then use the snake equation on.
+            Rearranging the diagram allows us to apply the snake equation again, leaving us with just the counit \(\varepsilon'\).
+            That is,
+            \begin{equation}
+                \tikzsetnextfilename{duals-unit-determines-counit}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \node[morphism, minimum width=1.5cm] (A) {\(\phantomrlap{\varepsilon}{\varepsilon'}\)};
+                    \draw[right dual] ($(A.south) + (-0.5, -1)$) -- ($(A.south) + (-0.5, 0)$);
+                    \draw[left dual] ($(A.south) + (0.5, -1)$) -- ($(A.south) + (0.5, 0)$);
+                    \node (equal) at (1.25, -0.5) {\(=\)};
+                    \node[morphism, minimum width=1.5cm] (B) at (2.5, -0.5) {\(\varepsilon'\)};
+                    \node[morphism, minimum width=1.5cm] (C) at (4.5, 0) {\(\phantomrlap{\varepsilon}{\varepsilon'}\)};
+                    \draw[right dual] ($(B.south) + (-0.5, -0.5)$) -- ($(B.south) + (-0.5, 0)$);
+                    \draw[wire] ($(B.south) + (0.5, 0)$) arc (180:360:0.5);
+                    \draw[right dual] ($(C.south) + (-0.5, -0.5)$) -- ($(C.south) + (-0.5, 0)$);
+                    \draw[left dual] ($(C.south) + (0.5, -1)$) -- ($(C.south) + (0.5, 0)$);
+                    \node at (1.25, -2.25) {\(\equaliso\)};
+                    \begin{scope}[yshift=-2cm]
+                        \node[morphism, minimum width=1.5cm] (B) at (2.5, 0) {\(\varepsilon'\)};
+                        \node[morphism, minimum width=1.5cm] (C) at (4.5, -0.5) {\(\phantomrlap{\varepsilon}{\varepsilon'}\)};
+                        \draw[right dual] ($(B.south) + (-0.5, -1)$) -- ($(B.south) + (-0.5, 0)$);
+                        \draw[left dual] ($(B.south) + (0.5, -0.5)$) -- ($(B.south) + (0.5, 0)$);
+                        \draw[wire] ($(B.south) + (0.5, -0.5)$) arc (180:360:0.5);
+                        \draw[left dual] ($(C.south) + (0.5, -0.5)$) -- ($(C.south) + (0.5, 0)$);
+                    \end{scope}
+                    \node at (1.25, -4.5) {\(=\)};
+                    \begin{scope}[xshift=2.5cm, yshift=-4cm]
+                        \node[morphism, minimum width=1.5cm] (A) {\(\varepsilon'\)};
+                        \draw[right dual] ($(A.south) + (-0.5, -1)$) -- ($(A.south) + (-0.5, 0)$);
+                        \draw[left dual] ($(A.south) + (0.5, -1)$) -- ($(A.south) + (0.5, 0)$);
+                        \node at (1, -1) {\(.\)};
+                    \end{scope}
+                \end{tikzpicture}
+            \end{equation}
+        \end{proof}
+    \end{lma}
+    
+    Note that if we have dualities \((L, R, \eta, \varepsilon)\) and \((L, R, \eta', \varepsilon')\) we cannot say whether \(\eta = \eta'\) or \(\varepsilon = \varepsilon'\).
+    
+    \section{Duals Respect Tensor Products}
+    In a monoidal category we can take tensor products and sometimes find dualities.
+    We should check if these are compatible, that is, is a duality of tensor products a tensor product of dualities?
+    The answer is yes.
+    
+    \begin{lma}{Duals Respect Tensor Products}{}
+        Let \(\cat{C}\) be a monoidal category with dualities \(L \leftdual R\) and \(L' \leftdual R'\), then \(L \otimes L' \leftdual R' \otimes R\).
+        
+        \begin{proof}
+            Suppose \(L \leftdual R\) and \(L' \leftdual R'\).
+            We can define a duality \(L \otimes L' \leftdual R' \otimes R\) by defining the unit using the two units of \(L \leftdual R\) and \(L' \leftdual R'\):
+            \begin{equation}
+                \tikzsetnextfilename{duals-product-unit}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \draw[right dual] (0, 0) -- (0, 0.5) node [above] {\(R\mathrlap{'}\)} coordinate (top);
+                    \draw[right dual] (0.5, 0) -- (0.5, 0.5) node [above] {\(R\)};
+                    \draw[left dual] (1.5, 0) -- (1.5, 0.5) node [above] {\(L\)};
+                    \draw[left dual] (2, 0) -- (2, 0.5) node [above] {\(L\mathrlap{'}\)};
+                    \draw[wire] (0.5, 0) arc (180:360:0.5);
+                    \draw[wire] (0, 0) arc (180:360:1);
+                    \node (equal) at (-0.75, 0) {\(=\)};
+                    \begin{scope}[xshift=-2.5cm]
+                        \node[morphism, minimum width=2cm] (unit) at (0, -0.75) {\(\eta\)};
+                        \draw[right dual] ($(unit.north) + (-0.75, 0)$) coordinate (here) -- (here |- top) node [above] {\(R\mathrlap{'} \otimes R\)};
+                        \draw[left dual] ($(unit.north) + (0.75, 0)$) coordinate (here) -- (here |- top) node [above] {\(L \otimes L\mathrlap{'}\)};
+                    \end{scope}
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Similarly, we an define the counit using the two units of \(L \leftdual R\) and \(L' \leftdual R'\):
+            \begin{equation}
+                \tikzsetnextfilename{duals-product-counit}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \draw[left dual] (0, 0) coordinate (bottom)  node [below] {\(L\)} -- (0, 0.5);
+                    \draw[left dual] (0.5, 0) node [below] {\(L\smash{\mathrlap{'}}\)} -- (0.5, 0.5);
+                    \draw[right dual] (1.5, 0)  node [below] {\(R\smash{\mathrlap{'}}\)} -- (1.5, 0.5);
+                    \draw[right dual] (2, 0) node [below] {\(R\)} -- (2, 0.5);
+                    \draw[wire] (0.5, 0.5) arc (180:0:0.5);
+                    \draw[wire] (0, 0.5) arc (180:0:1);
+                    \node (equal) at (-0.75, 0.5) {\(=\)};
+                    \begin{scope}[xshift=-2.5cm]
+                        \node[morphism, minimum width=2cm] (counit) at (0, 1) {\(\varepsilon\)};
+                        \draw[right dual] ($(counit.south) + (-0.75, 0)$) coordinate (here) -- (here |- bottom) node [below] {\(L \otimes L\mathrlap{'}\)};
+                        \draw[right dual] ($(counit.south) + (0.75, 0)$) coordinate (here) -- (here |- bottom) node [below] {\(R\mathrlap{'} \otimes R\)};
+                    \end{scope}
+                \end{tikzpicture}
+            \end{equation}
+            
+            We can prove the snake equations using the graphical notation and the snake equations for the two individual dualities:
+            \begin{equation}
+                \tikzsetnextfilename{duals-product-snakes}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \draw[left dual] (0, -1.25) node [below] {\(L\)} -- (0, 1);
+                    \draw[wire] (0, 1) arc (180:0:0.5);
+                    \draw[left dual] (1, 1) -- (1, 0.5) node [midway, left] {\(R\)};
+                    \draw[wire] (1, 0.5) arc (180:360:1);
+                    \draw[left dual] (3, 0.5) -- (3, 2.5);
+                    
+                    \draw[left dual] (-0.5, -1.25) node [below] {\(L\smash{\mathrlap{'}}\)} -- (-0.5, 1);
+                    \draw[wire] (-0.5, 1) arc (180:0:1);
+                    \draw[left dual] (1.5, 1) -- (1.5, 0.5) node [midway, right] {\(R\smash{'}\)};
+                    \draw[wire] (1.5, 0.5) arc (180:360:0.5);
+                    \draw[left dual] (2.5, 0.5) -- (2.5, 2.5);
+                    
+                    \node (equal) at (3.5, 0.75) {\(\equaliso\)};
+                    
+                    \begin{scope}[xshift=4.5cm]
+                        \draw[left dual] (0, -1.25) node [below] {\(L\)} -- (0, 0);
+                        \draw[wire] (0, 0) arc (180:0:0.5);
+                        \draw[left dual] (1, 0) -- (1, -0.1) node [midway, right] {\(R\)};
+                        \draw[wire] (1, -0.1) arc (180:360:1);
+                        \draw[left dual] (3, -0.1) -- (3, 2.5);
+                        
+                        \draw[left dual] (-0.5, -1.25) node [below] {\(L\smash{\mathrlap{'}}\)} -- (-0.5, 1.3);
+                        \draw[wire] (-0.5, 1.3) arc (180:0:1);
+                        \draw[left dual] (1.5, 1.3) -- (1.5, 1.2) node [midway, left] {\(R\smash{'}\)};
+                        \draw[wire] (1.5, 1.2) arc (180:360:0.5);
+                        \draw[left dual] (2.5, 1.2) -- (2.5, 2.5);
+                        
+                        \node at (3.5, 0.75) {\(=\)};
+                    \end{scope}
+                    
+                    \draw[left dual] (8.5, -1.25) node [below] {\(L\)} -- (8.5, 2.5);
+                    \draw[left dual] (9, -1.25) node [below] {\(L\smash{\mathrlap{'}}\)}  -- (9, 2.5);
+                \end{tikzpicture}
+            \end{equation}
+            The other snake equation can be proved in the same way.
+        \end{proof}
+    \end{lma}
+    
+    Along with the tensor product we also get the unit object, this is always self dual.
+    \begin{lma}{The Unit Object is Self Dual}{}
+        Let \(\cat{C}\) be a monoidal category and \(I\) the monoidal unit.
+        Then \(I \leftdual I\).
+        \begin{proof}
+            First, notice that we have morphisms \(\lambda_I^{-1} \colon I \to I \otimes I\) and \(\lambda_I \colon I \otimes I \to I\), which have the correct domain and codomain to be candidates for the unit, \(\eta\), and counit, \(\varepsilon\), respectively.
+            If we consider the commuting diagrams defining duals then taking the unit to be \(\eta = \lambda_I^{-1}\) and the counit to be \(\varepsilon = \lambda_I\) these diagrams are formed entirely from unitors, identities, and associators, and so commute by the coherence theorem.
+            Hence, \((I, I, \lambda_I^{-1}, \lambda_I)\) is a duality.
+        \end{proof}
+    \end{lma}
+    
+    \section{Duals Respect Braidings}
+    In a braided monoidal category as well as the monoidal structure of the last section we also have a braiding.
+    We should check if this is compatible with dualities.
+    Since braidings are about swapping the orders of objects in a tensor product duality respecting braiding would mean that if we have a duality and we swap left and right using a braiding we should still have a duality.
+    
+    
+    \begin{lma}{Duals Respect Braidings}{}
+        Let \(\cat{C}\) be a braided monoidal category with duality \(L \leftdual R\) then there is a duality \(R \leftdual L\).
+        \begin{proof}
+            Given a duality \(L \leftdual R\) and a braiding, \(\sigma\), we can construct a new duality \(R \leftdual L\) by defining the new unit and counit as
+            \begin{equation}
+                \tikzsetnextfilename{duals-braiding-unit}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \draw[left dual=1] (1, 1.25) coordinate (top) -- (1, 1);
+                    \draw[wire, rounded corners] (1, 1) -- (1, 0.75) -- (0, 0.25) -- (0, 0);
+                    \draw[left dual=1] (0, 0) -- (0, -0.25);
+                    \draw[wire] (0, -0.25) arc (180:360:0.5);
+                    \draw[left dual] (1, -0.25) -- (1, 0);
+                    \draw[over wire, rounded corners] (1, 0) -- (1, 0.25) -- (0, 0.75) -- (0, 1);
+                    \draw[left dual=0] (0, 1) -- (0, 1.25);
+                    \node (equal) at (-0.5, 0.5) {\(=\)};
+                    \begin{scope}[xshift=-1.6cm]
+                        \node[morphism, minimum width=1.5cm] (unit) at (0, -0.5) {\(\eta\)};
+                        \draw[left dual] ($(unit.north) + (-0.5, 0)$) coordinate (here) -- (here |- top);
+                        \draw[right dual] ($(unit.north) + (0.5, 0)$) coordinate (here) -- (here |- top);
+                    \end{scope}
+                \end{tikzpicture}
+                \quad\text{and}\quad
+                \tikzsetnextfilename{duals-braiding-counit}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \begin{scope}[yscale=-1]
+                        \draw[left dual=1] (1, 1.25) coordinate (bottom) -- (1, 1);
+                        \draw[wire, rounded corners] (1, 1) -- (1, 0.75) -- (0, 0.25) -- (0, 0);
+                        \draw[left dual=1] (0, 0) -- (0, -0.25);
+                        \draw[wire] (0, -0.25) arc (180:360:0.5);
+                        \draw[left dual] (1, -0.25) -- (1, 0);
+                        \draw[over wire, rounded corners] (1, 0) -- (1, 0.25) -- (0, 0.75) -- (0, 1);
+                        \draw[left dual=0] (0, 1) -- (0, 1.25);
+                    \end{scope}
+                    \node (equal) at (-0.5, 0) {\(=\)};
+                    \begin{scope}[xshift=-1.6cm]
+                        \node[morphism, minimum width=1.5cm] (counit) at (0, 0.5) {\(\phantomrlap{\varepsilon}{\eta}\)};
+                        \draw[left dual] ($(counit.south) + (-0.5, 0)$) coordinate (here) -- (here |- bottom);
+                        \draw[right dual] ($(counit.south) + (0.5, 0)$) coordinate (here) -- (here |- bottom);
+                    \end{scope}
+                \end{tikzpicture}
+                .
+            \end{equation}
+            We can prove the snake equations using the graphical notation and the snake equations for the original duality:
+            \begin{equation}
+                \tikzsetnextfilename{duals-braiding-snakes}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \draw[left dual] (0, -0.25) -- (0, 1.75);
+                    \draw[wire, rounded corners] (1, 1.75) -- (1, 2) -- (0, 2.5) -- (0, 2.75);
+                    \draw[over wire, rounded corners] (0, 1.75) -- (0, 2) -- (1, 2.5) -- (1, 2.75);
+                    \draw[left dual=1] (1, 2.75) -- (1, 2.8);
+                    \draw[wire] (0, 2.8) arc (180:0:0.5);
+                    \draw[left dual=1] (0, 2.8) -- (0, 2.75);
+                    \draw[left dual] (1, 1.75) -- (1, 1.5);
+                    \draw[wire, rounded corners] (2, 1.5) -- (2, 1.25) -- (1, 0.75) -- (1, 0.5);
+                    \draw[over wire, rounded corners] (1, 1.5) -- (1, 1.25) -- (2, 0.75) -- (2, 0.5);
+                    \draw[left dual=1] (1, 0.4) -- (1, 0.5);
+                    \draw[left dual=1] (2, 0.5) -- (2, 0.4);
+                    \draw[wire] (1, 0.4) arc (180:360:0.5);
+                    \draw[left dual] (2, 1.5) -- (2, 3.55);
+                    
+                    \node (equal) at (2.5, 1.65) {\(\equaliso\)};
+                    
+                    \begin{scope}[xshift=3cm]
+                        \draw[left dual] (2, -0.25) -- (2, 1.9);
+                        \draw[wire] (2, 1.9) arc (0:180:0.5);
+                        \draw[left dual] (1, 1.9) -- (1, 1.4);
+                        \draw[wire] (1, 1.4) arc (0:-180:0.5);
+                        \draw[left dual] (0, 1.4) -- (0, 3.55);
+                    \end{scope}
+                    
+                    \node at (5.5, 1.65) {\(=\)};
+                    
+                    \draw[left dual] (6, -0.26) -- (6, 3.55);
+                \end{tikzpicture}
+                .
+            \end{equation}
+            The other snake equation can be proved in the same way.
+        \end{proof}
+    \end{lma}
+    
+    This allows us to be a bit less careful with what is left and right in a duality in any braided monoidal category, which is most of the categories we're interested in.
+    
+    \section{Dual Morphisms}
+    If we have a morphism, say \(f \colon A \to B\), in which \(A\) and \(B\) happen to have duals, \(A \leftdual A^*\) and \(B \leftdual B^*\), then it makes sense to ask if we can find a morphism between the right duals.
+    We might initially look for a morphism \(A^* \to B^*\), but we won't find one in general that works nicely with the duality.
+    Instead we find a morphism \(B^* \to A^*\) instead.
+    
+    \begin{dfn}{Dual Morphism}{}
+        Given a morphism \(f \colon A \to B\) with dualities \(A \leftdual A^*\) and \(B \leftdual B^*\) the \define{right dual}\index{right dual!morphism}, \(f^* \colon B^* \to A^*\), is defined as
+        \begin{equation}
+            \tikzsetnextfilename{duals-morphism-dual}
+            \begin{tikzpicture}
+                \node[daggerable morphism] (f dual) {\(f^*\)};
+                \draw[right dual] (0, -1) node [below] {\(B\mathrlap{^*}\)} -- (f dual);
+                \draw[right dual] (f dual) -- (0, 1) node [above] {\(A\mathrlap{^*}\)};
+                \node (equal) at (1.1, 0) {\(\coloneqq\)};
+                \node[daggerable morphism] (f) at (3, 0) {\(\phantomrlap{f}{f^*}\)};
+                \draw[right dual] (2, 1) node [above] {\(A\mathrlap{^*}\)} -- (2, -0.3);
+                \draw[wire] (2, -0.3) arc (180:360:0.5);
+                \draw[left dual] (3, -0.3) -- (f);
+                \draw[left dual=1] (f) -- (3, 0.4);
+                \draw[wire] (3, 0.4) arc (180:0:0.5);
+                \draw[right dual] (4, -1) node [below] {\(B\mathrlap{^*}\)} --(4, 0.4);
+                \node at (4.9, 0) {\(\eqqcolon\)};
+                \node[dual morphism] (f) at (6, 0) {\(\phantomrlap{f}{f^*}\)};
+                \draw[right dual] (6, -1) node [below] {\(B\mathrlap{^*}\)} -- (f);
+                \draw[right dual] (f) -- (6, 1) node [above] {\(A\mathrlap{^*}\)};
+            \end{tikzpicture}
+        \end{equation}
+        where the first equality defines \(f^*\) and the second defines the graphical notation for \(f^*\), we rotate the box, as opposed to \(f^{\dagger}\), where we reflect the box.
+    \end{dfn}
+    
+    The idea behind duals is that as well as sliding morphisms along wires we can also slide them through units and counits, and in doing so they are rotated.
+    This is the next lemma.
+    
+    \begin{lma}{Sliding}{lma:sliding duals}
+        For all morphisms \(f \colon A \to B\) in a monoidal category with chosen duals \(A \leftdual A^*\) and \(B \leftdual B^*\) we have
+        \begin{equation}
+            \tikzsetnextfilename{duals-slide-1}
+            \begin{tikzpicture}[baseline=(equal.base)]
+                \node[daggerable morphism] (f) at (0, 0) {\(f\)};
+                \draw[left dual] (0, -1) -- (f);
+                \draw[left dual=1] (f) -- (0, 0.5);
+                \draw[wire] (0, 0.5) arc (180:0:0.5);
+                \draw[right dual] (1, -1) -- (1, 0.5);
+                \node (equal) at (1.5, 0) {\(=\)};
+                \node[dual morphism] (f) at (3, 0) {\(f\)};
+                \draw[left dual] (2, -1) -- (2, 0.5);
+                \draw[wire] (2, 0.5) arc (180:0:0.5);
+                \draw[right dual=1] (f) -- (3, 0.5);
+                \draw[right dual] (3, -1) -- (f);
+            \end{tikzpicture}
+            \qquad\text{and}\qquad
+            \tikzsetnextfilename{duals-slide-2}
+            \begin{tikzpicture}[baseline=(equal.base)]
+                \draw[right dual] (0, -0.5) -- (0, 1);
+                \draw[wire] (0, -0.5) arc (180:360:0.5);
+                \node[daggerable morphism] (f) at (1, 0) {\(f\)};
+                \draw[left dual] (1, -0.5) -- (f);
+                \draw[left dual] (f) -- (1, 1);
+                \node (equal) at (1.75, 0) {\(=\)};
+                \node[dual morphism] (f) at (2.5, 0) {\(f\)};
+                \draw[right dual] (2.5, 1) -- (f);
+                \draw[right dual] (f) -- (2.5, -0.5);
+                \draw[wire] (2.5, -0.5) arc (180:360:0.5);
+                \draw[left dual] (3.5, -0.5) -- (3.5, 1);
+            \end{tikzpicture}
+        \end{equation}
+        \begin{proof}
+            We'll prove the first of these.
+            It follows immediately in the graphical notation by expanding the definition of \(f^*\) and applying the snake equations:
+            \begin{equation}
+                \tikzsetnextfilename{duals-sliding-proof}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \node[dual morphism] (f) at (1, 0) {\(f\)};
+                    \draw[left dual] (0, -1) -- (0, 0.5);
+                    \draw[wire] (0, 0.5) arc (180:0:0.5);
+                    \draw[right dual=1] (f) -- (1, 0.5);
+                    \draw[right dual] (1, -1) -- (f);
+                    
+                    \node (equal) at (1.55, 0) {\(=\)};
+                    
+                    \draw[left dual] (2, -1) -- (2, 0.5);
+                    \draw[wire] (2, 0.5) arc (180:0:0.5);
+                    \draw[left dual] (3, 0.5) -- (3, -0.3);
+                    \draw[wire] (3, -0.3) arc (180:360:0.5);
+                    \node[daggerable morphism] (f) at (4, 0) {\(f\)};
+                    \draw[left dual=0] (4, -0.3) -- (f);
+                    \draw[left dual=1] (f) -- (4, 0.4);
+                    \draw[wire] (4, 0.4) arc (180:0:0.5);
+                    \draw[left dual] (5, 0.4) -- (5, -1);
+                    
+                    \node at (5.5, 0) {\(=\)};
+                    
+                    \begin{scope}[xshift=4.1cm]
+                        \node[daggerable morphism] (f) at (2, 0) {\(f\)};
+                        \draw[left dual] (2, -1) -- (f);
+                        \draw[left dual=1] (f) -- (2, 0.5);
+                        \draw[wire] (2, 0.5) arc (180:0:0.5);
+                        \draw[right dual] (3, -1) -- (3, 0.5);
+                    \end{scope}
+                \end{tikzpicture}
+                .
+            \end{equation}	
+            The other equation can be proved similarly.
+        \end{proof}
+    \end{lma}
+    
+    Now we have defined duals of objects and morphisms it makes sense to ask if taking duals defines a functor, and indeed it does.
+    
+    \begin{dfn}{Dual Functor}{}
+        In a monoidal category, \(\cat{C}\), with chosen right duals, that is where we have made a choice for every object, \(A\), of some \(A^*\) such that \(A \leftdual A^*\), there is a contravariant functor
+        \begin{align}
+            (-)^* \colon \cat{C} &\to \cat{C}\\
+            A &\mapsto A^*\\
+            f &\mapsto f^*
+        \end{align}
+        where \(A \leftdual A^*\) is the chosen duality, and \(f^*\colon B^* \to A^*\) is the right dual of the morphism \(f\colon A \to B\).
+        This is the \defineindex{dual functor}.
+    \end{dfn}
+    
+    \begin{lma}{}{}
+        The dual functor is a functor.
+        \begin{proof}
+            We start by proving that \((\id_A)^* = \id_{A^*}\) for all objects \(A\).
+            This is immediately clear from the definition of \(\id_{A^*}\) in graphical notation and the equations:
+            \begin{equation}
+                (\id_A)^* = 
+                \tikzsetnextfilename{duals-dual-id}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \node[daggerable morphism] (id) at (0, 0) {\((\id_{A})^*\)};
+                    \draw[right dual] (0, -1) node [below] {\(A\mathrlap{^*}\)} -- (id);
+                    \draw[right dual] (id) -- (0, 1) node [above] {\(A\mathrlap{^*}\)};
+                    \node (equal) at (1, 0) {\(=\)};
+                    \node[daggerable morphism] (id) at (2.5, 0) {\(\id_{A}\)};
+                    \draw[left dual] (1.5, 1) node [above] {\(A\mathrlap{^*}\)} -- (1.5, -0.3);
+                    \draw[wire] (1.5, -0.3) arc (180:360:0.5);
+                    \draw[left dual=0] (2.5, -0.3) -- (id);
+                    \draw[left dual=1] (id) -- (2.5, 0.4);
+                    \draw[wire] (2.5, 0.4) arc (180:0:0.5);
+                    \draw[left dual] (3.5, 0.4) -- (3.5, -1) node [below] {\(A\mathrlap{^*}\)};
+                    \node at (4.25, 0) {\(=\)};
+                    \draw[left dual] (5, 1) node [above] {\(A\mathrlap{^*}\)} -- (5, -0.3);
+                    \draw[wire] (5, -0.3) arc (180:360:0.5);
+                    \draw[left dual] (6, -0.3) -- (6, 0.4);
+                    \draw[wire] (6, 0.4) arc (180:0:0.5);
+                    \draw[left dual] (7, 0.4) -- (7, -1) node [below] {\(A\mathrlap{^*}\)};
+                    \node at (7.75, 0) {\(=\)};
+                    \draw[right dual] (8.5, -1) node [below] {\(A\mathrlap{^*}\)} -- (8.5, 1) node [above] {\(A\mathrlap{^*}\)};
+                \end{tikzpicture}
+                .
+            \end{equation}
+            This proves \((\id_A)^* = \id_{A^*}\), as required for a functor.
+            
+            Given morphisms \(f \colon A \to B\) and \(g \colon B \to C\) we can form \((g \circ f) \colon A \to C\) and consider \((g \circ f)^* \colon C^* \to A^*\).
+            We can then prove that \((g \circ f)^* = f^* \circ g^*\), as required for a contravariant functor.
+            To do so we insert the identity, using the snake equation, between \(f\) and \(g\):
+            \begin{equation}
+                \tikzsetnextfilename{duals-dual-composite}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \pgfdeclarelayer{behind}
+                    \pgfsetlayers{behind, main}
+                    \node[daggerable morphism] (gf star) at (0, 0) {\((g \circ f)^*\)};
+                    \draw[right dual] (0, -1.8) node [below] {\(C\mathrlap{^*}\)} -- (gf star);
+                    \draw[right dual] (gf star) -- (0, 1.8) node [above] {\(A\mathrlap{^*}\)};
+                    \node (equal) at (1, 0) {\(=\)};
+                    \node[daggerable morphism] (f) at (2.5, -0.5) {\(f\)};
+                    \node[daggerable morphism] (g) at (2.5, 0.5) {\(\phantomrlap{g}{f}\)};
+                    \draw[left dual=0.6] (f) -- (g);
+                    \draw[left dual=0] (2.5, -1) -- (f);
+                    \draw[left dual=1] (g) -- (2.5, 1);
+                    \draw[wire] (1.5, -1) arc (180:360:0.5);
+                    \draw[wire] (2.5, 1) arc (180:0:0.5);
+                    \draw[right dual] (1.5, -1) -- (1.5, 1.8) node [above] {\(A\mathrlap{^*}\)};
+                    \draw[right dual] (3.5, -1.8) node [below] {\(C\mathrlap{^*}\)} -- (3.5, 1);
+                    \node at (4, 0) {\(=\)};
+                    \node[daggerable morphism] (f) at (5.5, 0) {\(f\)};
+                    \node[daggerable morphism] (g) at (7.5, 0) {\(g\)};
+                    \draw[left dual] (4.5, 1.8) -- (4.5, -0.5);
+                    \draw[wire] (4.5, -0.5) arc (180:360:0.5);
+                    \draw[left dual] (5.5, -0.5) -- (f);
+                    \draw[left dual=1] (f) -- (5.5, 0.5);
+                    \draw[wire] (5.5, 0.5) arc (180:0:0.5);
+                    \draw[left dual] (6.5, 0.5) -- (6.5, -0.5);
+                    \draw[wire] (6.5, -0.5) arc (180:360:0.5);
+                    \draw[left dual] (7.5, -0.5) -- (g);
+                    \draw[left dual=1] (g) -- (7.5, 0.5);
+                    \draw[wire] (7.5, 0.5) arc (180:0:0.5);
+                    \draw[left dual] (8.5, 0.5) -- (8.5, -1.8);
+                    \node at (9, 0) {\(=\)};
+                    \node[daggerable morphism] (g) at (9.5, -0.5) {\(\phantomrlap{g^*}{f^*}\)};
+                    \node[daggerable morphism] (f) at (9.5, 0.5) {\(f^*\)};
+                    \draw[left dual=0.6] (g) -- (f);
+                    \draw[left dual] (9.5, -1.8) -- (g);
+                    \draw[left dual] (f) -- (9.5, 1.8);
+                    \begin{pgfonlayer}{behind}
+                        \filldraw[Blue!50] (4.2, 1.2) -- (4.2, -1.2) -- (6, -1.2) -- (7, 1.2);
+                        \filldraw[Navy!50] (6, -1.2) -- (7, 1.2) -- (8.7, 1.2) -- (8.7, -1.2);
+                        \node[Blue, above left] at (6.2, -1.2) {\(f^*\)};
+                        \node[Navy, above right] at (6.05, -1.2) {\(g^*\)};
+                    \end{pgfonlayer}
+                \end{tikzpicture}
+                .
+            \end{equation}
+            This proves that \((g \circ f)^* = f^* \circ g^*\).
+            Hence, \((-)^*\) is a contravariant functor.
+        \end{proof}
+    \end{lma}
+    
+    \subsection{Examples}
+    In \(\FVect\) and \(\FHilb\) a morphism is a linear map \(f \colon V \to W\), and the dual spaces are spaces of linear maps into \(\field\) or \(\complex\) respectively.
+    The dual of \(f\) is the map of linear maps \(f \colon W^* \to V^*\) defined by \(f^*(e) = e \circ f\) where \(e \colon W \to \field\) or \(e \colon W \to \complex\) respectively is an arbitrary linear map.
+    This is sometimes called the \defineindex{pullback}.
+    
+    In \(\Mat\) the morphisms are matrices, and the dual is just the transpose.
+    
+    In \(\Rel\) the dual of a relation is its converse.
+    This means the right duals functor, \((-)^*\), and the dagger functor, \((-)^\dagger\), are the same, since both act as identities on objects since all objects are self dual in \(\Rel\) and the dagger acts as an identity on objects by definition.
+    
+    \section{Double Duals}
+    We've already seen that every vector space is canonically isomorphic to its double dual, that is \(V \isomorphic V^{**} = (V^*)^*\).
+    In fact this holds in an arbitrary category with chosen right duals.
+    Further, the action of taking double duals is compatible with the monoidal product.
+    
+    \begin{lma}{}{}
+        In a monoidal category with chosen right duals \(A^{**} \otimes B^{**} \isomorphic (A \otimes B)^{**}\).
+        
+        \begin{proof}
+            To prove this we need to witness an isomorphism \(A^{**} \otimes B^{**} \to (A \otimes B)^{**}\).
+            One such isomorphism is
+            \begin{equation}
+                \tikzsetnextfilename{duals-double-dual-tensor-product}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \node[morphism, minimum width=2cm] (counit) at (0, 0) {\(\varepsilon_{A\otimes B}\)};
+                    \draw[right dual=0.6] ($(counit.south) + (-0.5, 0)$) -- ++ (0, -0.3) coordinate (A);
+                    \draw[right dual=0.6] (counit.south) -- ++ (0, -0.3) coordinate (B);
+                    \draw[wire] (A) arc (360:180:0.5) coordinate (C);
+                    \draw[wire] (B) arc (360:180:1) coordinate (D);
+                    \draw[right dual] (C) -- ++ (0, 1) coordinate (E);
+                    \draw[right dual] (D) -- ++ (0, 1) coordinate (F);
+                    \draw[wire, xscale=3] (E) arc (180:0:0.5) coordinate (G);
+                    \draw[wire, xscale=2] (F) arc (180:0:1) coordinate (H);
+                    \draw[right dual] (G) -- ++ (0, -3.8) node [below] {\(A\mathrlap{^{**}}\;\)};
+                    \draw[right dual] (H) -- ++ (0, -3.8) node [below] {\(B\mathrlap{^{**}}\)};
+                    \node[morphism, minimum width=2cm] (unit) at (-1, -3) {\(\eta_{(A\otimes B)^*}\)};
+                    \coordinate (I) at ($(unit.north) + (0.5, 0)$);
+                    \draw[left dual, rounded corners] ($(counit.south) + (0.5, 0)$) coordinate (here) -- (here |- 0, -1) -- (I |- 0, -2) -- (I);
+                    \draw[left dual=0.61, rounded corners] ($(unit.north) + (-0.5, 0)$) coordinate (here) -- (here |- 0, -2) -- (-2.5, -1) -- (-2.5, 1.7) node [above] {\((A \otimes B)\mathrlap{^{**}}\)};
+                \end{tikzpicture}
+                .
+            \end{equation}
+            The inverse to this morphism, proving it is an isomorphism, is
+            \begin{equation}
+                \tikzsetnextfilename{duals-double-dual-tensor-product-inverse}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \node[morphism, minimum width=2cm] (counit) at (1, 2) {\(\varepsilon_{(A\otimes B)^*}\)};
+                    \draw[right dual=0.57, rounded corners] ($(counit.south) + (0.5, 0)$) coordinate (here) -- (here |- 0, 1) -- ++ (1, -1) coordinate (here) -- (here |- 0, -3.3) node [below] {\((A \otimes B)^{**}\)};
+                    \node[morphism, minimum width=2cm] (unit) at (0, -1) {\(\eta_{A \otimes B}\)};
+                    \coordinate (A) at ($(unit.north) + (-0.5, 0)$);
+                    \draw[left dual, rounded corners] ($(counit.south) + (-0.5, 0)$) coordinate (here) -- (here |- 0, 1) -- (A |- 0, 0) -- (A);
+                    \draw[left dual=1] ($(unit.north) + (0.5, 0)$) -- ++ (0, 0.3) coordinate (C);
+                    \draw[left dual=1] ($(unit.north)$) -- ++ (0, 0.3) coordinate (D);
+                    \draw[wire] (C) arc (180:0:0.5) coordinate (E);
+                    \draw[wire] (D) arc (180:0:1) coordinate (F);
+                    \draw[left dual] (E) -- ++ (0, -1) coordinate (G);
+                    \draw[left dual] (F) -- ++ (0, -1) coordinate (H);
+                    \draw[wire, xscale=3] (G) arc (360:180:0.5) coordinate (I);
+                    \draw[wire, xscale=2] (H) arc (360:180:1) coordinate (J);
+                    \draw[left dual] (I) -- ++ (0, 4) node [above] {\(B\mathrlap{^{**}}\)};
+                    \draw[left dual] (J) -- ++ (0, 4) node [above] {\(A\mathrlap{^{**}}\)};
+                \end{tikzpicture}
+            \end{equation}
+            where the cups and caps are the units and counits of the relevant dualities.
+            To show these are inverses compose them and then apply the appropriate snake equations for each unit-counit pair which appears.
+        \end{proof}
+    \end{lma}
+    
+    \chapter{Teleportation}
+    \section{Quantum Teleportation}
+    \begin{rmk}
+        For more details see my notes from \course{Principles of Quantum Mechanics}.
+    \end{rmk}
+    Suppose Alice is in possession of a quantum state, which for simplicity we take to be a single qubit, \(\ket{\psi}\).
+    Quantum teleportation is a protocol by which Alice and Bob can prepare a joint set of states and then by communicating only classical information manipulate a system in Bob's presence into the state \(\ket{\psi}\).
+    Alice's state is necessarily destroyed in this process, otherwise the no cloning theorem is violated, and so this process makes a state disappear from Alice's possession and appear in Bob's possession, i.e.\@ it teleports.
+    
+    The process is as follows.
+    Alice and Bob prepare ahead of time an extra two qubits in the Bell state
+    \begin{equation}
+        \ket{\Psi^-} = \frac{1}{\sqrt{2}}[\ket{{+}{-}} - \ket{{-}{+}}].
+    \end{equation}
+    Alice then takes the first qubit here into her possession, and Bob takes the second qubit into their possession.
+    This creates a \enquote{quantum channel} between Alice and Bob.
+    
+    Alice now has two qubits, the original qubit \(\ket{\psi}\), and her qubit from the entangled pair.
+    In general Alice's qubit will be in the state
+    \begin{equation}
+        \ket{\psi} = a\ket{+} + b\ket{-}
+    \end{equation}
+    for some \(a, b \in \complex\) with \(a^2 + b^2 = 1\).
+    
+    If we then consider the joint system of all three qubits the state of this system is
+    \begin{align}
+        \ket{\varphi} &= \ket{\psi} \otimes \ket{\Psi^-}\\
+        &= [a\ket{+} + b\ket{-}] \otimes \frac{1}{\sqrt{2}}[\ket{+-} - \ket{-+}]\\
+        &= \frac{c}{\sqrt{2}}[\ket{{+}{+}{-}} - \ket{{+}{-}{+}}] + \frac{d}{\sqrt{2}}[\ket{{-}{+}{-}} - \ket{{-}{-}{+}}].
+    \end{align}
+    The four Bell states form a basis for the space \(\complex^2 \otimes \complex^2\), so we can write Alice's pair of states as a superposition of Bell states.
+    For example,
+    \begin{equation}
+        \ket{{+}{+}} = \frac{1}{\sqrt{2}}[\ket{\Phi^+} + \ket{\Phi^-}].
+    \end{equation}
+    If we do this with all of Alice's states then we find that
+    \begin{multline}
+        \ket{\varphi} = \frac{1}{2}[\ket{\Psi^-}\otimes (-a\ket{+} - b\ket{-}) + \ket{\Psi^+}\otimes (-a\ket{+} + b\ket{-})\\
+        + \ket{\Phi^-}\otimes (a\ket{-} + b\ket{+}) + \ket{\Phi^+}\otimes (a\ket{-} - b\ket{+})].
+    \end{multline}
+    Thus when Alice measures her states, changing them in the process, she will measure them to be in one of the Bell states.
+    There are four of these, so by sending two classical bits to Bob, establishing a \enquote{classical channel}, Alice can inform Bob of the result of her measurement.
+    
+    This tells Bob what their state is, since the wavefunction collapses\footnote{or insert your favourite interpretation of quantum mechanics here} to leave just one of the terms above.
+    For example, if Alice measures \(\ket{\Phi^+}\) then Bob knows that their qubit is in the state \(a\ket{-} - b\ket{+}\).
+    Bob knows that they can then put their qubit into the state \(\ket{\psi}\) by applying a unitary transformation, in this example,
+    \begin{equation}
+        \begin{pmatrix}
+            0 & 1\\
+            -1 & 0
+        \end{pmatrix}
+        .
+    \end{equation}
+    This can be done regardless of which state Alice measures, and so Bob can always put their qubit in the state \(\ket{\psi}\).
+    
+    \section{Abstract Teleportation}
+    We will now define a general notion of teleportation, which becomes quantum teleportation in \(\Hilb\).
+    
+    \begin{dfn}{Teleportation}{}
+        Consider a monoidal dagger category with right duals.
+        A \defineindex{teleportation procedure} is a finite family of effects, \(e_i \colon A \otimes A^* \to I\), and unitary morphisms \(U_i \colon A \to A\) such that
+        \begin{equation}
+            \tikzsetnextfilename{teleportation-teleportation-procedure}
+            \begin{tikzpicture}[baseline=(equal.base)]
+                \node[daggerable morphism] (e) at (0, 0) {\(\vphantom{e_i}\ooalign{\hspace{2cm} \cr \hfill \(e_i\) \hfill}\)};
+                \coordinate (A) at ($(e.south) + (-0.5, 0)$);
+                \coordinate (B) at ($(e.south) + (0.5, 0)$);
+                \draw[left dual] (A |- 0, -1.5) node [below] {\(A\)} coordinate (bottom) -- (A);
+                \draw[left dual=1] (B) -- ++ (0, -0.3) coordinate (C);
+                \draw[wire] (C) arc (180:360:0.7) coordinate (D);
+                \draw[left dual] (D) -- ++ (0, 1) coordinate (E);
+                \node[daggered morphism, above] (U) at (E) {\(U_i\)};
+                \draw[left dual] (U) -- ++ (0, 1) node [above] {\(A\)} coordinate (top);
+                \node (equal) at (2.75, 0) {\(=\)};
+                \draw[left dual] (3.5, 0 |- bottom) node [below] {\(A\)} -- (3.5, 0 |- top) node [above] {\(A\)};
+            \end{tikzpicture}
+        \end{equation}
+        for all \(i\).
+    \end{dfn}
+    
+    This definition actually carries more information than required, since given unitary morphisms \(U_i\) we can always take \(e_i\) to be
+    \begin{equation}
+        \tikzsetnextfilename{teleportation-e-in-terms-of-U}
+        \begin{tikzpicture}[baseline=(U.base)]
+            \node[dual morphism] (U) {\(U_i\)};
+            \draw[left dual] (-1, -1) -- (-1, 0.5);
+            \draw[wire] (-1, 0.5) arc (180:0:0.5) coordinate (A);
+            \draw[left dual] (A) -- (U);
+            \draw[left dual] (U) -- (0, -1);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    This works since
+    \begin{equation}
+        \tikzsetnextfilename{teleportation-solve-teleporatation-procedure}
+        \begin{tikzpicture}[baseline=(equal.base)]
+            \node[dual morphism] (U) {\(U_i\)};
+            \draw[left dual] (-1, -1.3) coordinate (bottom) -- (-1, 0.5);
+            \draw[wire] (-1, 0.5) arc (180:0:0.5) coordinate (A);
+            \draw[left dual] (A) -- (U);
+            \draw[left dual=1] (U) -- (0, -0.5);
+            \draw[wire] (0, -0.5) arc (180:360:0.5);
+            \draw[left dual] (1, -0.5) -- (1, 0.5);
+            \node[daggered morphism, above] (U2) at (1, 0.5) {\(U_i\)};
+            \draw[left dual] (U2) -- (1, 1.5) coordinate (top);
+            \node (equal) at (1.75, 0) {\(=\)};
+            \draw[left dual] (2.5, 0 |- bottom) -- (2.5, 0.5);
+            \draw[wire] (2.5, 0.5) arc (180:0:0.5);
+            \draw[left dual] (3.5, 0.5) -- (3.5, -0.5);
+            \draw[wire] (3.5, -0.5) arc (180:360:0.5);
+            \draw[left dual] (4.5, -0.5) -- (4.5, -0.25);
+            \node[above, daggerable morphism] (U3) at (4.5, -0.25) {\(U_i\)};
+            \draw[left dual=0.8] (U3) -- ++ (0, 0.5) coordinate (B);
+            \node[above, daggered morphism] (U4) at (B) {\(U_i\)};
+            \draw[left dual] (U4) -- (U4 |- top);
+            \node (equal) at (5.25, 0) {\(=\)};
+            \draw[left dual] (6, 0 |- bottom) -- (6, -0.25);
+            \node[above, daggerable morphism] (U5) at (6, -0.25) {\(U_i\)};
+            \draw[left dual=0.8] (U5) -- ++ (0, 0.5) coordinate (C);
+            \node[above, daggered morphism] (U6) at (C) {\(U_i\)};
+            \draw[left dual] (U6) -- (U6 |- top);
+            \node at (6.75, 0) {\(=\)};
+            \draw[left dual] (7.25, 0 |- bottom) -- (7.25, 0 |- top);
+        \end{tikzpicture}
+        \,.
+    \end{equation}
+    This uses the sliding of \cref{lma:sliding duals}, then the snake equation, and then the definition of unitarity, namely \(U_i \circ U_i^\dagger = \id_A\).
+    
+    Consider the first diagram above, we can interpret this as a procedure as follows:
+    \begin{enumerate}
+        \item Start with a single system, \(A\).
+        \item Independently prepare a joint system, \(A^* \otimes A\), in the state \(\eta\), so the combined system is \(A \otimes (A^* \otimes A)\).
+        \item Reassociate, so that we consider the initial system and one of the two systems in the joint system, \((A \otimes A^*) \otimes A\).
+        \item Perform a joint measurement on the first two systems, with the result given by the effect \(\varepsilon \circ ({\id_L} \otimes U_i^*)\).
+        \item Perform a unitary operation, \(U_i^\dagger\), on the remaining system.
+    \end{enumerate}
+    
+    \section{Quantum Teleportation Again}
+    In \(\Hilb\) a teleportation procedure is exactly the process of quantum teleportation.
+    We can see this by considering the steps listed above and comparing to the qubit teleportation procedure at the start of the chapter.
+    \begin{enumerate}
+        \item Start with Alice's system that she wants to send to Bob.
+        This is some state in in a Hilbert space \(A = \complex^2\).
+        \item Prepare a state in the Bell state, this is an element of the joint system \(\complex^2 \otimes \complex^2\) (note that \(\complex^2 \isomorphic (\complex^2)^*\)).
+        \item Reassociate, which means considering the pair of qubits in Alice's possession.
+        \item Alice performs a measurement.
+        \item Bob can then perform a unitary operation to get their qubit into the same state as Alice's at the start of the process.
+    \end{enumerate}
+    
+    We can be more explicit for the case of teleporting a qubit.
+    We have \(A = \complex^2\) and \(A \isomorphic \complex^2\).
+    We can represent morphisms with matrices after choosing some orthonormal basis.
+    Then we have
+    \begin{equation}
+        \eta^\dagger = \varepsilon = 
+        \begin{pmatrix}
+            1 & 0 & 0 & 1
+        \end{pmatrix}
+        .
+    \end{equation}
+    If we choose the unitary operators
+    \begin{equation}
+        \begin{pmatrix}
+            1 & 0\\
+            0 & 1
+        \end{pmatrix}
+        , \qquad
+        \begin{pmatrix}
+            1 & 0\\
+            0 & -1
+        \end{pmatrix}
+        , \qquad 
+        \begin{pmatrix}
+            0 & 1\\
+            1 & 0
+        \end{pmatrix}
+        , \qqand 
+        \begin{pmatrix}
+            0 & 1\\
+            -1 & 0
+        \end{pmatrix}
+        ,
+    \end{equation}
+    which we might recognise as the identity, \(I\), and the Pauli matrices, \(\sigma^3\), \(\sigma^1\), and \(i\sigma^2\) respectively.
+    The family of effects are then given by \(\varepsilon \circ (I \otimes U_i^*)\), which gives
+    \begin{equation*}
+        \begin{pmatrix}
+            1 & 0 & 0 & 1
+        \end{pmatrix}
+        , \quad 
+        \begin{pmatrix}
+            1 & 0 & 0 & -1
+        \end{pmatrix}
+        , \quad 
+        \begin{pmatrix}
+            0 & 1 & 1 & 0
+        \end{pmatrix}
+        , \qand
+        \begin{pmatrix}
+            0 & 1 & -1 & 0
+        \end{pmatrix}
+        .
+    \end{equation*}
+    This is a complete set of effects, since it is a basis for \(\Hilb(\complex^2 \otimes \complex^2, \complex) = (\complex^2 \otimes \complex^2)^* \isomorphic \complex^2 \otimes \complex^2 \isomorphic \complex^4\), and so this teleportation procedure is guaranteed to work no matter which result we produce at the measurement step.
+    
+    \section{One Time Pads}
+    Consider an implementation of the teleportation procedure in \(\Rel\).
+    We'll take the simple case of \(L = R = \{0, 1\}\) and
+    \begin{equation}
+        \eta^\dagger = \varepsilon = 
+        \begin{pmatrix}
+            1 & 0 & 0 & 1
+        \end{pmatrix}
+        .
+    \end{equation}
+    There are only two unitary relations \(\{0, 1\} \to \{0, 1\}\), and they are represented by the matrices
+    \begin{equation}
+        U_1 = 
+        \begin{pmatrix}
+            1 & 0\\
+            0 & 1
+        \end{pmatrix}
+        , \qqand U_3 = 
+        \begin{pmatrix}
+            0 & 1\\
+            1 & 0
+        \end{pmatrix}
+        .
+    \end{equation}
+    Taking these as our family of unitary morphisms, \(U_i\), we get the effects
+    \begin{equation}
+        \begin{pmatrix}
+            1 & 0 & 0 & 1
+        \end{pmatrix}
+        , \qqand
+        \begin{pmatrix}
+            0 & 1 & 1 & 0
+        \end{pmatrix}
+        .
+    \end{equation}
+    These form a complete set of effects.
+    
+    The teleportation procedure is then as follows.
+    \begin{enumerate}
+        \item Alice starts with a single bit she wishes to communicate to Bob.
+        \item Alice and Bob each take one bit from a preprepared joint state of \(\{0, 1\} \times \{0, 1\}\).
+        This state, \(\eta\), is \(\{(0, 0), (1, 1)\}\), so they will both take the same bit.
+        \item Reassociate, which means considering the pair of bits in Alice's possession.
+        \item Alice looks at the shared bit and sees it either matches the bit she wants to send or it doesn't.
+        \item Alice tells Bob which of these outcomes and if it matches he does nothing, \(U_1\), and if it doesn't match he swaps it, \(U_2\).
+        Bob's bit from the shared system will now be the bit that Alice wanted to send in the first place.
+    \end{enumerate}
+    
+    This is how a one time pad works.
+    The joint state is the one time pad, Alice then communicates information about the one time pad, and Bob can turn this into information about the state that Alice is trying to communicate.
+    One can imagine a one time pad containing all messages Alice could possibly have reason to send, generating a shared message and a set of unitary operations swapping that message with a message at a different position on the one time pad.
+    These are unitary since they are transpositions and so square to the identity.
+    In reality at some point it becomes easier to have a fixed number of possible messages, say the 26 letters, and then break down longer messages into these.
+    To do so securely Alice and Bob should use a different one time pad for each letter they send.
+    
+    
+    \chapter{Compact Categories}
+    \section{Compact Categories}
+    \begin{dfn}{Compact Category}{}
+        A \defineindex{compact category} is a symmetric monoidal category where every object has a dual.
+    \end{dfn}
+    
+    All of \(\FVect\), \(\FHilb\), \(\Mat\), and \(\Rel\) are compact categories.
+    
+    In the graphical notation wires now come with arrows, this gives us a new notion of the orientation of a wire, and we have to preserve this property.
+    This leads to us updating what it means for two diagrams to be equal.
+    
+    \begin{thm}{Correctness of the Graphical Calculus for Compact Categories}{}
+        Any well-formed equation of the form \(f = g\) for morphisms \(f\) and \(g\) in a compact category follows from the axioms of a compact category if and only if it holds in the graphical notation up to four-dimensional oriented isotopy.
+    \end{thm}
+    
+    Intuitively this just means that we can't turn arrows around, which shouldn't happen when manipulating a diagram anyway.
+    
+    \section{Dagger Compact Category}
+    \begin{lma}{}{}
+        In a monoidal dagger category if \(L \leftdual R\) then \(R \leftdual L\).
+        \begin{proof}
+            Suppose \(\eta \colon I \to R \otimes L\) and \(\varepsilon \colon L \otimes R \to I\) are the unit and counit of the \(L \leftdual R\) duality.
+            Then \(\eta' = \varepsilon^\dagger \colon L \otimes R \to I\) and \(\varepsilon' = \eta^\dagger \colon R \otimes L \to I\) can be taken as the unit and counit of the \(R \leftdual L\) duality.
+            It is possible to show that the diagrams defining a duality commute by taking one, and applying the dagger functor, flipping all the arrows, and then using \((f \otimes g)^\dagger = f^\dagger \otimes g^\dagger\), which turns one of these diagrams into the other but with \(L\) and \(R\) exchanged.
+        \end{proof}
+    \end{lma}
+    
+    \begin{dfn}{Dagger Dual}{}
+        In a monoidal dagger category a \defineindex{dagger dual} is a duality \(A \leftdual A^*\) witnessed by morphisms \(\eta \colon I \to A^* \otimes A\) and \(\varepsilon \colon A \otimes A^* \to I\) satisfying
+        \begin{equation}
+            \tikzsetnextfilename{compact-categories-dagger-dual}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \node[daggerable morphism] (unit) {\vphantom{\eta}\ooalign{\hspace{1.5cm} \cr \hfil \(\eta\) \hfil}};
+                \draw[left dual] ($(unit.north) + (-0.5, 0)$) -- ++ (0, 1);
+                \draw[right dual] ($(unit.north) + (0.5, 0)$) -- ++ (0, 1);
+                \node at (1.75, 0) {\(=\)};
+                \begin{scope}[xshift=4cm]
+                    \node[daggered morphism] (counit) {\vphantom{\eta}\ooalign{\hspace{1.5cm} \cr \hfil \(\varepsilon\) \hfil}};
+                    \draw[left dual] ($(counit.north) + (-0.5, 0)$) -- ++ (0, 1) coordinate (top);
+                    \draw[left dual] ($(top) + (-1, 0)$) -- ++ (0, -2) coordinate (A);
+                    \draw[wire, xscale=3] (A) arc (180:360:0.5) coordinate (B);
+                    \draw[left dual] (B) -- ++ (0, 1.3) coordinate (C);
+                    \draw[wire] (C) arc (0:180:0.5) coordinate (D);
+                    \draw[left dual] (D) -- ++ (0, -0.3);
+                \end{scope}
+            \end{tikzpicture}
+            ,
+        \end{equation}
+        
+        A \defineindex{compact dagger category} is a symmetric dagger category which can be made into a compact category by taking all duals to be dagger duals.
+    \end{dfn}
+    
+    \(\FHilb\), \(\Mat\), and \(\Rel\) are all compact dagger categories.
+    
+    \section{Trace}
+    \begin{dfn}{Trace}{def:trace}
+        In a compact dagger category the \defineindex{trace} of an endomorphism, \(f \colon A \to A\), is the scalar
+        \begin{equation}
+            \tr_A f \coloneqq 
+            \tikzsetnextfilename{compact-categories-trace}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \node[daggerable morphism] (f) {\(f\)};
+                \draw[left dual=1] (f) -- ++ (0, 0.5) coordinate (A);
+                \draw[wire] (A) arc (180:0:0.5) coordinate (B);
+                \draw[left dual] (B) -- ++ (0, -1) coordinate (C);
+                \draw[wire] (C) arc (360:180:0.5) coordinate (D);
+                \draw[left dual] (D) -- (f);
+            \end{tikzpicture}
+            ,
+        \end{equation}
+        that is
+        \begin{equation}
+            \tr_A f = \varepsilon \circ (f \otimes \id_A^*) \circ \eta.
+        \end{equation}
+    \end{dfn}
+    
+    \begin{dfn}{Dimension}{}
+        In a compact dagger category the \defineindex{dimension} of an object, \(A\), is the trace of the identity on that object, \(\dim A \coloneqq \tr_A(\id_A)\).
+    \end{dfn}
+    
+    The names trace and dimension are used as these generalise these concepts from \(\FHilb\).
+    
+    \begin{lma}{}{}
+        In \(\FHilb\) the trace as defined in \cref{def:trace} is the ordinary trace and the dimension is the ordinary dimension.
+        
+        \begin{proof}
+            Recall that in \(\FHilb\) the unit is given by
+            \begin{align}
+                \eta \colon \complex &\to H^* \otimes H\\
+                1 &\mapsto \sum_i \bra{i} \otimes \ket{i}
+            \end{align}
+            where \(\{i\}\) is a basis for \(H\).
+            The counit is defined by
+            \begin{align}
+                \varepsilon \colon H \otimes H^* &\to \complex\\
+                \ket{i} \otimes \bra{j} &\mapsto \braket{i}{j}.
+            \end{align}
+            Then the trace of \(f\) in \(H\) is
+            \begin{align}
+                \tr_H f &= (\varepsilon \circ (f \otimes \id_{H^*}) \circ \eta)(f)\\
+                &= (\varepsilon \circ (f \otimes \id_{H^*})) \left( \sum_i \bra{i} \otimes \ket{i} \right)\\
+                &= \varepsilon\left( \sum_i \bra{f(i)} \otimes \ket{i} \right)\\
+                &= \braket{i}{f(i)}\\
+                &= \bra{i} f \ket{i}
+            \end{align}
+            which is just the usual definition of the trace.
+            
+            The trace of an identity matrix, and hence an identity linear transformation, is just the number of rows/columns in the matrix, and hence is the dimension of the vector space.
+            So since the trace in \(\FHilb\) is just the usual trace the dimension is just the usual dimension.
+        \end{proof}
+    \end{lma}
+    
+    The trace has many of the expected properties.
+    For example, it is cyclic.
+    
+    \begin{lma}{Trace is Cyclic}{}
+        The trace is cyclic, that is \(\tr_A(g \circ f) = \tr_B(f \circ g)\) for all morphisms \(f \colon A \to B\) and \(g \colon B \to A\) in a compact category.
+        
+        \begin{proof}
+            \begin{equation*}
+                \tr_A (g \circ f) = 
+                \tikzsetnextfilename{compact-categories-trace-cyclic-1}
+                \begin{tikzpicture}[baseline=(b.base)]
+                    \node[daggerable morphism] (f) at (0, -0.5) {\(f\)};
+                    \node[daggerable morphism] (g) at (0, 0.5) {\(\phantomrlap{g}{f}\)};
+                    \draw[left dual=0.6] (f) -- (g) node [midway, left, font=\scriptsize] (b) {\(B\)};
+                    \draw[left dual=1] (g) -- ++ (0, 0.5) coordinate (A) node [midway, left, font=\scriptsize] {\(A\)};
+                    \draw[wire] (A) arc (180:0:0.5) coordinate (B);
+                    \draw[left dual] (B) -- ++ (0, -2) coordinate (C) node [midway, right, font=\scriptsize] {\(A^*\)};
+                    \draw[wire] (C) arc (360:180:0.5) coordinate (D);
+                    \draw[left dual] (D) -- (f) node [midway, left, font=\scriptsize] {\(A\)};
+                \end{tikzpicture}
+                =
+                \tikzsetnextfilename{compact-categories-trace-cyclic-2}
+                \begin{tikzpicture}[baseline=(f.base)]
+                    \node[daggerable morphism] (f) at (0, 0) {\(f\)};
+                    \node[dual morphism] (g) at (1, 0) {\(\phantomrlap{g}{f}\)};
+                    \draw[left dual=1] (f) -- ++ (0, 0.5) coordinate (A) node [pos=0.6, left, font=\scriptsize] {\(B\)};
+                    \draw[wire] (A) arc (180:0:0.5) coordinate (B);
+                    \draw[left dual] (B) -- (g) node [pos=0.4, right, font=\scriptsize] {\(B^*\)};
+                    \draw[left dual=1] (g) -- ++ (0, -0.5) coordinate (C) node [pos=0.6, right, font=\scriptsize] {\(A^*\)};
+                    \draw[wire] (C) arc (360:180:0.5) coordinate (D);
+                    \draw[left dual] (D) -- (f) node [pos=0.4, left, font=\scriptsize] {\(A\)};
+                \end{tikzpicture}
+                =
+                \tikzsetnextfilename{compact-categories-trace-cyclic-3}
+                \begin{tikzpicture}[baseline=(b.base)]
+                    \node[daggerable morphism] (g) at (0, 0.5) {\(f\)};
+                    \node[daggerable morphism] (f) at (0, -0.5) {\(\phantomrlap{g}{f}\)};
+                    \draw[right dual=0.6] (g) -- (f) node [midway, left, font=\scriptsize] (b) {\(A\)};
+                    \draw[left dual=1] (g) -- ++ (0, 0.5) coordinate (A) node [midway, left, font=\scriptsize] {\(B\)};
+                    \draw[wire] (A) arc (180:0:0.5) coordinate (B);
+                    \draw[left dual] (B) -- ++ (0, -2) coordinate (C) node [midway, right, font=\scriptsize] {\(B^*\)};
+                    \draw[wire] (C) arc (360:180:0.5) coordinate (D);
+                    \draw[left dual] (D) -- (f) node [midway, left, font=\scriptsize] {\(B\)};
+                \end{tikzpicture}
+                = \tr_B (f \circ g). \qedhere
+            \end{equation*}
+        \end{proof}
+    \end{lma}
+    
+    \begin{lma}{}{lma:trace of scalar is that scalar}
+        The trace of a scalar is that scalar, that is \(\tr_I s = s\).
+        \begin{proof}
+            The identity is self dual with the unit and counit given by \(\lambda_I^{-1}\) and \(\lambda_I\) respectively.
+            We don't draw these in the diagram, and the objects are all unit objects, which we also don't draw.
+            Hence, the diagram defining the trace is simply the diagram consisting of the scalar \(s\).
+        \end{proof}
+    \end{lma}
+    
+    \begin{lma}{}{lma:trace of tensor product}
+        In a compact category with morphisms \(f \colon A \to A\) and \(g \colon B \to B\) we have \(\tr_{A\otimes B}(f \otimes g) = \tr_A(f) \circ \tr_B(g)\).
+        \begin{proof}
+            \begin{equation*}
+                \tr_{A \otimes B} (f \otimes g) = 
+                \tikzsetnextfilename{compact-categories-trace-tensor-product-1}
+                \begin{tikzpicture}[baseline=(f.base)]
+                    \node[daggerable morphism] (f) at (0, 0) {\(f\)};
+                    \node[daggerable morphism] (g) at (1, 0) {\(\phantomrlap{g}{f}\)};
+                    \draw[left dual=1] (f) -- ++ (0, 0.5) coordinate (A1);
+                    \draw[left dual=1] (g) -- ++ (0, 0.5) coordinate (A2);
+                    \draw[wire] (A2) arc (180:0:0.5) coordinate (B2);
+                    \draw[wire, xscale=2] (A1) arc (180:0:0.75) coordinate (B1);
+                    \draw[left dual] (B1) -- ++ (0, -1) coordinate (C1);
+                    \draw[left dual] (B2) -- ++ (0, -1) coordinate (C2);
+                    \draw[wire] (C2) arc (360:180:0.5) coordinate (D2);
+                    \draw[wire, xscale=2]{} (C1) arc (360:180:0.75) coordinate (D1);
+                    \draw[left dual] (D1) -- (f);
+                    \draw[left dual] (D2) -- (g);
+                \end{tikzpicture}
+                =
+                \tikzsetnextfilename{compact-categories-trace-tensor-product-2}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \node[daggerable morphism] (f) {\(f\)};
+                    \draw[left dual=1] (f) -- ++ (0, 0.5) coordinate (A);
+                    \draw[wire] (A) arc (180:0:0.5) coordinate (B);
+                    \draw[left dual] (B) -- ++ (0, -1) coordinate (C);
+                    \draw[wire] (C) arc (360:180:0.5) coordinate (D);
+                    \draw[left dual] (D) -- (f);
+                    \begin{scope}[yshift=2.2cm]
+                        \node[daggerable morphism] (f) {\(g\)};
+                        \draw[left dual=1] (f) -- ++ (0, 0.5) coordinate (A);
+                        \draw[wire] (A) arc (180:0:0.5) coordinate (B);
+                        \draw[left dual] (B) -- ++ (0, -1) coordinate (C);
+                        \draw[wire] (C) arc (360:180:0.5) coordinate (D);
+                        \draw[left dual] (D) -- (f);
+                    \end{scope}
+                \end{tikzpicture}
+                = \tr_A(f) \circ \tr_B(g) \qedhere
+            \end{equation*}
+        \end{proof}
+    \end{lma}
+    
+    \begin{lma}{}{}
+        In a compact dagger category with morphism \(f \colon A \to A\) we have \((\tr_A f)^\dagger = \tr_A(f^\dagger)\).
+        \begin{proof}
+            Take the diagram defining the trace, flip it upside-down to take the dagger, this is the diagram defining the trace of \(f^\dagger\).
+        \end{proof}
+    \end{lma}
+    
+    \begin{lma}{}{}
+        In a compact dagger category with unit object \(I\) we have \(\dim I = \id_I\).
+        \begin{proof}
+            Using \cref{lma:trace of scalar is that scalar} we have
+            \begin{equation*}
+                \dim I = \tr_I \id_I = \id_I. \qedhere
+            \end{equation*}
+        \end{proof}
+    \end{lma}
+    
+    \begin{lma}{}{}
+        In a compact dagger category with objects \(A\) and \(B\) we have \(\dim(A \otimes B) = \dim(A) \circ \dim(B)\).
+        \begin{proof}
+            Using the functoriality of the tensor product and \cref{lma:trace of tensor product}
+            \begin{multline*}
+                \dim(A \otimes B) = \tr_{A \otimes B}(\id_{A \otimes B}) = \tr_{A \otimes B}(\id_A \circ \id_B)\\
+                = \tr_A(\id_A) \circ \tr_B(\id_B) = \dim(A) \circ \dim(B). \qedhere
+            \end{multline*}
+        \end{proof}
+    \end{lma}
+    
+    We can now show that any infinite-dimensional space does not have a dual.
+    To do so we need to accept a few facts first.
+    To start with given two vector spaces, \(V\) and \(W\), we can form their direct sum, the vector space
+    \begin{equation}
+        V \oplus W \coloneqq \{(v, w) \mid v \in V \text{ and } w \in W\}
+    \end{equation}
+    with pairwise vector addition:
+    \begin{equation}
+        (v, w) + (v', w') = (v + v', w + w'),
+    \end{equation}
+    and scalar multiplication according to
+    \begin{equation}
+        z(v, w) = (zv, zw).
+    \end{equation}
+    Writing \(v + w\) for \((v, w)\) and treating this sum as a formal (non-commutative) sum of vectors these operations naturally become
+    \begin{equation}
+        (v + w) + (v' + w') = (v + v') + (w + w'), \qqand z(v + w) = zv + zw.
+    \end{equation}
+    The dimension of \(V \oplus W\) is simply
+    \begin{equation}
+        \dim(V \oplus W) = \dim V + \dim W,
+    \end{equation}
+    which is clear for the traditional definition of the dimension and finite dimensional vector spaces, but holds for the generalised definition and infinite dimensional vector spaces.
+    
+    For an infinite dimensional vector space \(V\) we have an isomorphism \(V \oplus \field \isomorphic V\).
+    An explicit construction is to take a basis\footnote{assuming the axiom of choice} \(\{v_i\}\) for \(V\) and then \(\{v_i \oplus 1\}\) is a basis for \(V \oplus \field\), which clearly has the same cardinality.
+    This can then be extended linearly to all elements of \(V \oplus \field\).
+    
+    \begin{lma}{}{}
+        Infinite dimensional Hilbert spaces don't have duals.
+        
+        \begin{proof}
+            Suppose \(H\) is an infinite dimensional vector space with dual.
+            Then we can construct a scalar \(\dim H\).
+            We have an isomorphism \(H \oplus \complex \isomorphic H\), and hence \(\dim(H \oplus \complex) = \dim(H) + 1\).
+            But isomorphic vector spaces have the same dimension, so \(\dim(H \oplus \complex) = \dim H\).
+            This is not possible since in \(\Hilb\) the scalars can be identified with the complex numbers, and there is no complex number, \(z\) making \(z + 1 = z\) true, so there is no way to identify \(\dim H\) with a complex number, a contradiction since \(\dim H\) is by assumption a scalar.
+        \end{proof}
+    \end{lma}
+    
+    \part{Structures Within Categories}
+    \chapter{(Co)Monoids}
+    \textit{I'm going to diverge from the order in which things were approached in lectures, because I think it makes more sense to define monoids before comonoids.}
+    
+    \section{Universal Algebra}
+    \textit{This section will be a bit technical, and is beyond the scope of the course, the important parts will be covered again at the start of the next section.}
+    
+    In category theory we aim to work with morphisms between objects, rather than with \enquote{elements} of the objects, which isn't even a meaningful concept in some categories.
+    Something like a group is defined as a set, \(G\), a binary operation, \(G \times G \to G\), a distinguished element, \(1\), and for every element, \(g\), another element, \(g^{-1}\).
+    This is too much talk about elements for category theory.
+    Let's have a look at an alternative characterisation without reference to elements.
+    
+    A set, \(G\), and binary operation, \(G \times G \to G\) is fine, no mention of elements here.
+    A binary operation is a 2-ary operation, taking two things to one, we might think of a binary operation as a map \(m \colon G^2 \to G\).
+    Next we need to define the identity.
+    We can do so by introducing a 0-ary operation \(e \colon G^0 \to G\)?
+    This takes in no things and produces one thing, which we can take to be \(1\), the identity.
+    Finally, we need the inverse, we can characterise this as a map \(i \colon G \to G\) taking in one element, \(g\), and returning one element, \(i(g) = g^{-1}\).
+    
+    The axioms of a group then become requirements on these operations, namely for all \(g, h, k \in G\)
+    \begin{itemize}
+        \item \(m(e(), g) = m(g, e()) = g\), writing \(e()\) to remind us that \(e\) is an operation with no arguments
+        \item \(m(g, i(g)) = m(i(g), g) = e()\),
+        \item \(m(g, m(h, k)) = m(m(g, h), k)\).
+    \end{itemize}
+    Notice that there are no quantifiers here apart from the \enquote{for all} at the start, this is a desirable feature.
+    
+    Universal algebra studies algebraic structures by characterising them as a set and some collection of operations on that set.
+    The signature of an algebraic structure is just a list of the arity of the operations.
+    We can then define a variety of algebras as a collection of all sets with some fixed signature and all satisfying some set of equational laws, like those above for a group, with only outermost quantifiers.
+    
+    Examples are
+    \begin{itemize}
+        \item The variety of groups which has signature \((2, 1, 0)\) and satisfy the equational laws above.
+        \item The variety of abelian groups which has the signature \((2, 1, 0)\) and the additional equational law that for all \(g, h \in G\) we have \(m(g, h) = m(h, g)\)
+        \item The variety of monoids which has signature \((2, 0)\) and satisfies the equational laws above, apart from the second one with inverses.
+        \item The variety of rings, which has the signature \((2, 2, 0, 0, 1)\) and satisfies the mononoid and abelian group laws for appropriately chosen operations.
+        \item The variety of vector spaces, which has the signature \((2, 1, 1, 1, \dotsc)\) with one unary operation for each scalar, namely multiplication by that scalar.
+        These satisfy equational laws like \(m_\lambda(p(v, w)) = p(m_\lambda(v), m_\lambda(w))\) where \(m_\lambda \colon V \to V\) is multiplication by the scalar \(\lambda\) and \(p\colon V^2 \to V\) is vector addition.
+    \end{itemize}
+    
+    One of the nice things about varieties of algebras is once we've defined one we can generalise it by replacing the set with an object in some other category, so long as it has finite products (to form \(G^2\) etc.) and an initial object (to take the place of \(G^0\)), and functions with morphisms of this category.
+    This is what we will do here, focusing on varieties of monoids.
+    
+    An example of this is group objects, which are objects of the variety of groups.
+    \begin{itemize}
+        \item Interpreted in \(\Set\) we just get normal groups.
+        \item Interpreted in \(\Grp\) we instead get Abelian groups
+        This follows since we require the inverse to be a homomorphism, that is \(g \mapsto g^{-1}\) is a homomorphism, and this is only the case in an Abelian group.
+        \item Interpreting in \(\Top\) we get topological groups, which are topological spaces with a group structure in which the product and inversion maps are continuous, this isn't that interesting and is basically spelling out the definition of a group object in the specific context of \(\Top\).
+        \item Interpreting in \(\makeatletter\c@egory{SmthMan}\makeatother\), the category of smooth manifolds, with smooth functions as morphisms, a group object is exactly a Lie group.
+    \end{itemize}
+    
+    \section{Monoids: The Idea}
+    A monoid can be characterised without reference to explicit elements as follows.
+    \begin{dfn}{Monoid}{}
+        A \defineindex{monoid}, \((M, m, e)\), is a set, \(M\), equipped with a binary operation, \(m \colon M \times M \to M\), and a 0-ary operation, \(e \colon \{\bullet\} \to M\) satisfying the following axioms for all \(x, y, z \in M\):
+        \begin{itemize}
+            \item \(m(e(\bullet), x) = m(x, e(\bullet)) = x\),
+            \item \(m(x, m(y, z)) = m(m(x, y), z)\).
+        \end{itemize}
+    \end{dfn}
+    
+    Clearly we can identify this with the usual definition of a monoid by taking \(m(x, y) = xy\), multiplication, and \(e(\bullet) = 1\), the identity, and then the laws become \(1x = x1 = 1\), the identity law, and \(x(yz) = (xy)z\), the associativity law.
+    
+    The nice thing about this definition is that removing explicit reference to elements\footnote{apart from \(\bullet \in \{\bullet\}\), but this is characterised as being the initial object in \(\Set\) and so is unique up to isomorphism and doesn't really count as talking about an element} we can make this more general by interpreting it in any monoidal category making the following replacements:
+    \begin{itemize}
+        \item Replace \enquote{a set, \(M\)} with \enquote{an object, \(M\)}.
+        \item Replace \(M \times M\) with \(M \otimes M\).
+        \item Replace functions with morphisms.
+        \item Replace \(\{\bullet\}\) with the unit object.
+    \end{itemize}
+    
+    Before we give the more general definition of a monoid lets look at the monoid laws in the graphical notation.
+    First, the identity is characterised by a morphism \(e \colon I \to M\), so this is exactly a state,
+    \begin{equation}
+        \tikzsetnextfilename{monoid-identity-state}
+        \begin{tikzpicture}[baseline=(e.base)]
+            \node[state] (e) {\(e\)};
+            \draw[wire] (e) -- ++ (0, 1);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    Multiplication is then characterised by a morphism \(M \otimes M \to M\), so this can be drawn as
+    \begin{equation}
+        \tikzsetnextfilename{monoid-multiplication-map}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \node[morphism, minimum width=1cm] (m) {\(m\)};
+            \draw[wire] ($(m.south) + (-0.25, 0)$) -- ++ (0, -1);
+            \draw[wire] ($(m.south) + (0.25, 0)$) -- ++ (0, -1);
+            \draw[wire] (m.north) -- ++ (0, 1);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    Rather than give a name to these morphisms we can just represent them with a dot with the appropriate number of inputs.
+    
+    \section{Monoids: The Definition}
+    \begin{dfn}{Monoid}{}
+        A \defineindex{monoid} in a monoidal category, \(\cat{C}\), is a triple, \((A, \monoidProduct, \monoidIdentity)\), consisting of an object, \(A \in \Ob(\cat{C})\), a morphism, \(\monoidProduct \colon A \otimes A \to A\), and a state, \(\monoidIdentity\colon I \to A\), satisfying the \defineindex{associativity} and \defineindex{unitality} equations,
+        \begin{equation}
+            \tikzsetnextfilename{monoid-associativity-law}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \draw[wire] (0, 0) node [below] {\(A\)} arc (180:0:0.5) node [below] {\(A\)};
+                \node[monoid dot] at (0.5, 0.5) {};
+                \draw[wire] (0.5, 0.5) arc (180:0:0.75) -- (2, 0) node [below] {\(A\)};
+                \node[monoid dot] at (1.25, 1.25) {};
+                \draw[wire] (1.25, 1.25) -- (1.25, 2) node [above] {\(A\)};
+                \begin{scope}[xshift=5cm, xscale=-1]
+                    \draw[wire] (0, 0) node [below] {\(A\)} arc (180:0:0.5) node [below] {\(A\)};
+                    \node[monoid dot] at (0.5, 0.5) {};
+                    \draw[wire] (0.5, 0.5) arc (180:0:0.75) -- (2, 0) node [below] {\(A\)};
+                    \node[monoid dot] at (1.25, 1.25) {};
+                    \draw[wire] (1.25, 1.25) -- (1.25, 2) node [above] {\(A\)};
+                \end{scope}
+                \node at (current bounding box) {\(=\)};
+            \end{tikzpicture}
+            ,
+        \end{equation}
+        and
+        \begin{equation}
+            \tikzsetnextfilename{monoid-unitality-law}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \draw[wire] (0, 0) node [below] {\(A\)} -- (0, 0.5) arc (180:0:0.5) node [monoid dot] {};
+                \draw[wire] (0.5, 1) node [monoid dot] {} -- (0.5, 1.75) node [above] {\(A\)};
+                \node at (current bounding box -| 1.5, 0) {\(=\)};
+                \node at (current bounding box -| 2.5, 0) {\(=\)};
+                \draw[wire] (2, 0) node [below] {\(A\)} -- (2, 1.75) node [above] {\(A\)};
+                \begin{scope}[xscale=-1, xshift=-4cm]
+                    \draw[wire] (0, 0) node [below] {\(A\)} -- (0, 0.5) arc (180:0:0.5) node [monoid dot] {};
+                    \draw[wire] (0.5, 1) node [monoid dot] {} -- (0.5, 1.75) node [above] {\(A\)};
+                \end{scope}
+            \end{tikzpicture}
+        \end{equation}
+        respectively.
+        
+        These relations can also be expressed as commutative diagrams for a monoid \((A, m, e)\) we require
+        \begin{equation}
+            \begin{tikzcd}[row sep=small]
+                A \otimes (A \otimes A) \arrow[dd, "\alpha_{A,A,A}"'] \arrow[r, "{\id_A} \otimes m"] & A \otimes A \arrow[dr, "m"]\\
+                && A,\\
+                (A \otimes A) \otimes A \arrow[r, "m \otimes \id_A"'] & A \otimes A \arrow[ur, "m"']
+            \end{tikzcd}
+        \end{equation}
+        and
+        \begin{equation}
+            \begin{tikzcd}
+                A \otimes I \arrow[d, "{\id_A} \otimes e"'] & A \arrow[l, "\rho_A^{-1}"'] \arrow[d, "\id_A"'] \arrow[r, "\lambda_A^{-1}"] & I \otimes A \arrow[d, "{\id_A} \otimes e"] \\
+                A \otimes A \arrow[r, "m"'] & A & A \otimes A. \arrow[l, "m"]
+            \end{tikzcd}
+        \end{equation}
+    \end{dfn}
+    
+    \begin{dfn}{Commutative Monoid}{}
+        A \defineindex{commutative monoid} in a braided monoidal category, \(\cat{C}\), is a monoid, \((A, \monoidProduct, \monoidIdentity)\), satisfying the \defineindex{commutativity} equation
+        \begin{equation}
+            \tikzsetnextfilename{monoid-commutativity-law}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \draw[wire] (0, 0) node [below] {\(A\)} -- ++ (0, 0.5) arc (180:0:0.5) -- ++ (0, -0.5) node [below] {\(A\)};
+                \draw[wire] (0.5, 1) node [monoid dot] {} -- ++ (0, 0.75) node [above] {\(A\)};
+                \draw[wire, rounded corners] (3, 0) node [below] {\(A\)} -- ++ (0, 0.2) -- ++ (-1, 0.2) -- ++ (0, 0.1);
+                \draw[over wire, rounded corners] (2, 0) node [below] {\(A\)} -- ++ (0, 0.2) -- ++ (1, 0.2) -- ++ (0, 0.1);
+                \draw[wire] (2, 0.5) arc (180:0:0.5);
+                \draw[wire] (2.5, 1) node [monoid dot] {} -- ++ (0, 0.75) node [above] {\(A\)};
+                \node at (current bounding box -| 1.5, 0) {\(=\)};
+            \end{tikzpicture}
+            .
+        \end{equation}
+        This can also be expressed as a commutative diagram for the monoid \((A, m, e)\):
+        \begin{equation}
+            \begin{tikzcd}
+                A \otimes A \arrow[r, "m"] \arrow[d, "\sigma_{A,A}"'] & A\\
+                A \otimes A. \arrow[ur, "m"']
+            \end{tikzcd}
+        \end{equation}
+    \end{dfn}
+    
+    \section{Monoids: The Examples}
+    In any monoidal category \((I, \lambda_I, \id_I)\) is trivially a monoid, all diagrams in monoid laws are empty.
+    
+    A monoid in \(\Set\) is exactly the normal definition of a monoid.
+    
+    A monoid in \(\Mon\) is a commutative monoid.
+    To see this note that if \(((M, \cdot), m, u)\) is a monoid object in \(\Mon\) then \(m\) must be a monoid homomorphism between \(M \otimes M \to M\), and elements of \(M \otimes M\) are of the form \((a, b)\).
+    Then for \(a, b, a', b' \in M\) we have
+    \begin{equation}
+        aba'b' = m(a, b)m(a', b') = m((a,b), (a',b')) = m(aa',bb') = aa'bb'.
+    \end{equation}
+    Cancelling the \(a\) and \(b'\), which can be done without requiring inverses, we have \(ba' = a'b\).
+    
+    A monoid \((G, \otimes_{\integers}, \integers)\) in the category of Abelian groups, \(\Ab\), is a ring.
+    That is, if we treat Abelian groups as \(\integers\)-modules and use the tensor product of \(\integers\)-modules as the product in our monoid then we already have addition, the Abelian group operation, and now we have multiplication, which follows the monoid laws, so this is both an Abelian group, \((G, +)\) and a monoid, \((G, \otimes_{\integers})\), and it is possible to demonstrate distributivity from distributivity of the tensor product, so this is a ring.
+    
+    A monoid \((V, \times, 1)\) in the category of vector spaces, \(\Vect\), is a unital (associative) algebra.
+    The monoid product in this case gives us a way of multiplying two vectors and is such that \(1\times v = v = v\times 1\) for all vectors \(v \in V\).
+    This is exactly a unital (associative) algebra.
+    Examples of algebras are \(\complex^n\) under pointwise multiplication (\((a, \dotsc, z) \times (a', \dotsc, z') = (aa', \dotsc, zz')\), with the unit \((1, \dotsc, 1)\)) and \(n \times n\) matrices, \(\matrices{n}{\field}\) with the usual matrix multiplication and the identity matrix as the unit.
+    
+    A monoid \((\lstinline[style=Haskell]|a|, \lstinline[style=Haskell]|mappend|, \lstinline[style=Haskell]|mempty|)\) in the category \(\Hask\) of \Haskell{} types and functions is exactly an instance of the \lstinline[style=Haskell]|Monoid| typeclass.
+    
+    A monoid \((T, \mu, \eta)\) in the category of endofunctors, \(\functorCategory{\cat{C}}{\cat{C}}\), is a monad.
+    That is, \(T \colon \cat{C} \to \cat{C}\) is a functor for some category \(\cat{C}\), and \(\mu \colon T \otimes T \to T\) and \(\eta \colon \id_{\cat{C}} \naturalTransformation T\) are natural transformations.
+    This leads to the famously confusing statement
+    \begin{important}
+        A \defineindex{monad} is a monoid in the category of endofunctors.
+    \end{important}
+    
+    \subsection{Pair of Pants Monoid}
+    \begin{dfn}{Pair of Pants Monoid}{}
+        In a category in which every object has a chosen dual \((A^* \otimes A, \pairofpantsProduct, \pairofpantsIdentity)\) is a monoid.
+    \end{dfn}
+    
+    \begin{lma}{Pair of Pants is Monoid}{}\index{pair of pants}
+        In a category where every object has a chosen dual \((A^* \otimes A, \pairofpantsProduct, \pairofpantsIdentity)\) is a monoid.
+        
+        \begin{proof}
+            First we demonstrate unitality:
+            \begin{equation}
+                \tikzsetnextfilename{monoids-pair-of-pants-unitality}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[right dual, rounded corners] (0, 0) -- ++ (0, 0.9) -- ++ (1, 1) -- ++ (0, 0.3) coordinate (top);
+                    \draw[left dual] (1, 0) -- ++ (0, 0.7);
+                    \draw[wire] (1, 0.7) arc (180:0:0.5);
+                    \draw[left dual=0] (2, 0.7) arc (180:360:0.5);
+                    \draw[left dual, rounded corners] (3, 0.7) -- ++ (0, 0.2) -- ++ (-1, 1) -- ++ (0, 0.3);
+                    \node at (3.5, 0 |- current bounding box) {\(=\)};
+                    \draw[right dual] (4, 0) -- (4, 0 |- top);
+                    \draw[left dual] (4.5, 0) -- (4.5, 0 |- top);
+                    \node at (5, 0 |- current bounding box) {\(=\)};
+                    \draw[left dual, rounded corners] (9, 0) -- ++ (0, 0.9) -- ++ (-1, 1) -- ++ (0, 0.3);
+                    \draw[right dual] (8, 0) -- ++ (0, 0.7);
+                    \draw[wire] (8, 0.7) arc (0:180:0.5);
+                    \draw[right dual=0] (7, 0.7) arc (360:180:0.5);
+                    \draw[right dual, rounded corners] (6, 0.7) -- ++ (0, 0.2) -- ++ (1, 1) -- ++ (0, 0.3);
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Next we demonstrate associativity:
+            \begin{equation}
+                \tikzsetnextfilename{monoids-pair-of-pants-associativity}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[right dual, rounded corners] (0, 0) -- ++ (0, 0.2) -- ++ (1, 1) -- ++ (0, 0.4) -- ++ (1, 1) -- ++ (0, 0.3);
+                    \draw[left dual, rounded corners] (1, 0) -- ++ (0, 0.2) -- ++ (1, 1) -- ++ (0, 0.2) coordinate (A);
+                    \draw[wire] (A) arc (180:0:0.5) coordinate (B);
+                    \draw[left dual, rounded corners] (B) -- ++ (0, -0.2) -- ++ (-1, -1) -- ++ (0, -0.2);
+                    \draw[left dual=0.55] (3, 0) arc (180:0:0.5);
+                    \draw[left dual, rounded corners] (5, 0) -- ++ (0, 0.2) -- ++ (-1, 1) -- ++ (0, 0.4) -- ++ (-1, 1) -- ++ (0, 0.3);
+                    \node at (5.5, 0 |- current bounding box) {\(=\)};
+                    \begin{scope}[xshift=6cm]
+                        \draw[right dual, rounded corners] (0, 0) -- ++ (0, 0.2) -- ++ (1, 1) -- ++ (0, 0.4) -- ++ (1, 1) -- ++ (0, 0.3);
+                        \draw[left dual=0.55] (1, 0) arc (180:0:0.5);
+                        \draw[left dual, rounded corners] (4, 0) -- ++ (0, 0.2) -- ++ (-1, 1) -- ++ (0, 0.2) coordinate (A);
+                        \draw[wire] (A) arc (0:180:0.5) coordinate (B);
+                        \draw[left dual, rounded corners] (B) -- ++ (0, -0.2) -- ++ (1, -1) -- ++ (0, -0.2);
+                        \draw[left dual, rounded corners] (5, 0) -- ++ (0, 0.2) -- ++ (-1, 1) -- ++ (0, 0.4) -- ++ (-1, 1) -- ++ (0, 0.3);
+                    \end{scope}
+                \end{tikzpicture}
+                .
+            \end{equation}
+        \end{proof}
+    \end{lma}
+    
+    Note that this monoid is not, in general, commutative.
+    
+    It turns out that lots of monoids can be recast as monoids of this form.
+    For example, consider the algebra \(\matrices{n}{\complex}\) viewed as a monoid object in \(\FHilb\).
+    A matrix can be considered as linear map, so can be interpreted as an element of \(\FHilb(\complex^n, \complex^n)\), which can be shown to be isomorphic to \((\complex^n)^* \otimes \complex^n\), and more generally \(\FVect(V, V) \isomorphic V^* \otimes V\).
+    Making this identification leads to the following lemma.
+    
+    \begin{lma}{Pair of Pants on {\normalsize\(\FHilb\)}}{}
+        The pair of pants monoid \(\FHilb\) is simply the matrix algebra \(\matrices{n}{\complex}\).
+        \begin{proof}
+            Let \(A = \complex^n\), then \(A^* = (\complex^n)^{*} \isomorphic \complex^n\).
+            Fix some orthonormal basis \(\{\ket{i}\}\) for \(\complex^n\), then \(\{\bra{i}\}\) is a basis for \((\complex^n)^*\).
+            Define a map
+            \begin{align}
+                \varphi\colon(\complex^n)^* \otimes \complex^n &\to \matrices{n}{\complex}\\
+                \bra{i} \otimes \ket{j} &\mapsto e_{ij}
+            \end{align}
+            where \(e_{ij} \in \matrices{n}{\complex}\) is defined as the matrix with zeros everywhere except a single entry on row \(i\) and column \(j\) which is 1.
+            
+            This map is clearly a bijection, and it respects multiplication.
+            Recall that the cap on \(\FHilb\) is defined by
+            \begin{equation}
+                \tikzsetnextfilename{monoids-cap-FHilb}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[left dual=0.55] (0, 0) node [below] {\(\ket{j}\)} arc (180:0:0.5) node [below] {\(\bra{k}\)};
+                \end{tikzpicture}
+                = \varepsilon(\ket{j} \otimes \ket{k}) = \braket{k}{j} = \delta_{kj}.
+            \end{equation}
+            Then we have
+            \begin{equation}
+                \tikzsetnextfilename{monoids-pair-of-pants-FHilb}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[left dual=0.55] (0, 0) node [below] {\(\ket{j}\)} arc (180:0:0.5) node [below] {\(\bra{k}\)};
+                    \draw[right dual, rounded corners] (-1, 0) node [below] {\(\bra{i}\)}-- ++ (0, 0.2) -- ++ (1, 1) -- ++ (0, 0.2) node [above] {\(\bra{i}\)};
+                    \draw[left dual, rounded corners] (2, 0) node [below] {\(\ket{l}\)} -- ++ (0, 0.2) -- ++ (-1, 1) -- ++ (0, 0.2) node [above] {\(\ket{l}\)};
+                \end{tikzpicture}
+                = \delta_{jk} \bra{i} \otimes \ket{l} = 
+                \begin{cases}
+                    \bra{i} \otimes \ket{\ell} & j = k,\\
+                    0 & j \ne k.
+                \end{cases}
+            \end{equation}
+            Applying the map \(\varphi\) this result becomes
+            \begin{equation}
+                \begin{cases}
+                    e_{il} & j = k\\
+                    0 & j \ne k
+                \end{cases}
+                = e_{ij} e_{kl}
+            \end{equation}
+            where \(e_{ij}e_{kl}\) is the product of these two matrices (note that \(i\), \(j\), \(k\), and \(l\) are not indexing particular components of the matrix, they label the matrices).
+            This shows that \(\varphi\) preserves multiplication.
+            
+            The identity in the pair of pants monoid is \(\sum_i \bra{i} \otimes \ket{i}\).
+            This is just the usual completeness relation for Hilbert spaces, but with the order of the bras and kets swapped.
+            We then have \(\sum_i \bra{i} \otimes \ket{i} \mapsto \sum_i e_{ii}\), which is just the identity matrix.
+            So \(\varphi\) also preserves identities, and so is a bijective monoid homomorphism, and hence is a monoid isomorphism.
+        \end{proof}
+    \end{lma}
+    
+    \section{Comonoids: The Idea}
+    Consider a process which takes an object and copies it.
+    This should give a copying operation of type \(c \colon A \to A \otimes A\).
+    We can draw this as
+    \begin{equation}
+        \tikzsetnextfilename{monoids-comultiplication}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \node[morphism, minimum width=1cm] (c) {\(c\)};
+            \draw[wire] ($(c.north) + (-0.25, 0)$) -- ++ (0, 1);
+            \draw[wire] ($(c.north) + (0.25, 0)$) -- ++ (0, 1);
+            \draw[wire] (c.south) -- ++ (0, -1);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    What other properties should this copying have?
+    The first thing we might look for is that this is really copying.
+    One way to test this is to take an object, copy it, then throw away one of the copies, the result should be the original object, and it shouldn't matter which of the two objects we delete.
+    That is, we should have
+    \begin{equation}
+        \tikzsetnextfilename{monoiods-counitality}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \node[morphism, minimum width=1cm] (c) {\(c\)};
+            \draw[wire] ($(c.north) + (-0.25, 0)$) -- ++ (0, 1.2) coordinate (top);
+            \draw[wire] ($(c.north) + (0.25, 0)$) -- ++ (0, 0.5) coordinate (A);
+            \draw[wire] (c.south) -- ++ (0, -1) coordinate (bottom);
+            \node[effect, minimum width=0.7cm, inner sep=0pt, above] at (A) {\smash{\raisebox{-0.5ex}{\(d\)}}};
+            \node at (current bounding box -| 1, 0) {\(=\)};
+            \draw[wire] (1.5, 0 |- bottom) -- (1.5, 0 |- top);
+            \node at (current bounding box -| 2, 0) {\(=\)};
+            \begin{scope}[xshift=3cm, xscale=-1]
+                \node[morphism, minimum width=1cm] (c) {\(c\)};
+                \draw[wire] ($(c.north) + (-0.25, 0)$) -- ++ (0, 1.2);
+                \draw[wire] ($(c.north) + (0.25, 0)$) -- ++ (0, 0.5) coordinate (A);
+                \draw[wire] (c.south) -- ++ (0, -1);
+                \node[effect, minimum width=0.7cm, inner sep=0pt, above] at (A) {\smash{\raisebox{-0.5ex}{\(d\)}}};
+            \end{scope}
+        \end{tikzpicture}
+    \end{equation}
+    where \(d \colon A \to I\) can be thought of as deletion.
+    
+    Another property that we should consider is what happens if we make multiple copies?
+    It shouldn't matter which of the two copies from the first copying process we use to make the copies, the result should be the same both ways.
+    That is,
+    \begin{equation}
+        \tikzsetnextfilename{monoids-coassociativity}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \node[morphism, minimum width=1cm] (c) {\(c\)};
+            \draw[wire] ($(c.north) + (-0.25, 0)$) -- ++ (0, 2) coordinate (top);
+            \draw[wire] ($(c.north) + (0.25, 0)$) -- ++ (0, 0.5) coordinate (A);
+            \draw[wire] (c.south) -- ++ (0, -1) coordinate (bottom);
+            \node[morphism, minimum width=0.7cm, above] (c2) at (A) {\(c\)};
+            \draw[wire] ($(c2.north) + (-0.25, 0)$) coordinate (here) -- (here |- top);
+            \draw[wire] ($(c2.north) + (0.25, 0)$) coordinate (here) -- (here |- top);
+            \node at (1, 0 |- current bounding box) {\(=\)};
+            \begin{scope}[xshift=2cm, xscale=-1]
+                \node[morphism, minimum width=1cm] (c) {\(c\)};
+                \draw[wire] ($(c.north) + (-0.25, 0)$) -- ++ (0, 2) coordinate (top);
+                \draw[wire] ($(c.north) + (0.25, 0)$) -- ++ (0, 0.5) coordinate (A);
+                \draw[wire] (c.south) -- ++ (0, -1) coordinate (bottom);
+                \node[morphism, minimum width=0.7cm, above] (c2) at (A) {\(c\)};
+                \draw[wire] ($(c2.north) + (-0.25, 0)$) coordinate (here) -- (here |- top);
+                \draw[wire] ($(c2.north) + (0.25, 0)$) coordinate (here) -- (here |- top);
+            \end{scope}
+        \end{tikzpicture}
+        .
+    \end{equation}
+    
+    Sometimes, but not always, swapping the two objects after we copy won't matter, if this is the case then we have
+    \begin{equation}
+        \tikzsetnextfilename{monoids-cocommutativity}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \node[morphism, minimum width=1cm] (c) {\(c\)};
+            \draw[wire, rounded corners] ($(c.north) + (0.25, 0)$) -- ++ (0, 0.2) -- ++ (-0.5, 0.5) -- ++ (0, 0.2);
+            \draw[over wire, rounded corners] ($(c.north) + (-0.25, 0)$) -- ++ (0, 0.2) -- ++ (0.5, 0.5) -- ++ (0, 0.2);
+            \draw[wire] (c.south) -- ++ (0, -0.9);
+            \node at (1, 0 |- current bounding box) {\(=\)};
+            \begin{scope}[xshift=2cm]
+                \node[morphism, minimum width=1cm] (c) {\(c\)};
+                \draw[wire] ($(c.north) + (0.25, 0)$) -- ++ (0, 0.9);
+                \draw[wire] ($(c.north) + (-0.25, 0)$) -- ++ (0, 0.9);
+                \draw[wire] (c.south) -- ++ (0, -0.9);
+            \end{scope}
+        \end{tikzpicture}
+        .
+    \end{equation}
+
+    Now consider the monoid laws, and we see that
+    \begin{itemize}
+        \item the \enquote{true copy rule} is just the unitality law upside-down,
+        \item the \enquote{multiple copy rule} is just the associativity law upside-down,
+        \item the \enquote{copy then swap rule} is just the commutativity rule upside-down.
+    \end{itemize}
+    More formally, by upside-down we mean that the direction of the morphisms has been reversed, so we're in the opposite category.
+    We can therefore consider these rules to be counitality, coassociativity, and cocommutativity respectively, and define a comonoid as a monoid in the opposite category.
+    Expanding this definition leads to the definition of the comonoid.
+    
+    \section{Comonoids: The Definition}
+    \begin{dfn}{Comonoid}{}
+        A \defineindex{comonoid} in a monoidal category, \(\cat{C}\), is a triple, \((A, \comonoidProduct, \comonoidIdentity)\), consisting of an object, \(A \in \Ob(\cat{C})\), a morphism, \(\comonoidProduct \colon A \to A \otimes A\), and an effect, \(\comonoidIdentity\colon A \to I\), satisfying the \defineindex{coassociativity} and \defineindex{counitality} equations,
+        \begin{equation}
+            \tikzsetnextfilename{monoids-coassociativity-law}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \draw[wire] (0, 0) node [above] {\(A\)} arc (180:360:0.5) node [above] {\(A\)};
+                \draw[wire] (0.5, -0.5) arc (180:360:0.75) -- ++ (0, 0.5) node [above] {\(A\)};
+                \draw[wire] (1.25, -1.25) -- ++ (0, -0.75) node [below] {\(A\)};
+                \node[comonoid dot] at (0.5, -0.5) {};
+                \node[comonoid dot] at (1.25, -1.25) {};
+                \begin{scope}[xshift=5cm, xscale=-1]
+                    \draw[wire] (0, 0) node [above] {\(A\)} arc (180:360:0.5) node [above] {\(A\)};
+                    \draw[wire] (0.5, -0.5) arc (180:360:0.75) -- ++ (0, 0.5) node [above] {\(A\)};
+                    \draw[wire] (1.25, -1.25) -- ++ (0, -0.75) node [below] {\(A\)};
+                    \node[comonoid dot] at (0.5, -0.5) {};
+                    \node[comonoid dot] at (1.25, -1.25) {};
+                \end{scope}
+                \node at (current bounding box) {\(=\)};
+            \end{tikzpicture}
+            ,
+        \end{equation}
+        and
+        \begin{equation}
+            \tikzsetnextfilename{monoids-counitality-law}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \draw[wire] (0, 0) node [above] {\(A\)} -- ++ (0, -0.5) arc (180:360:0.5) node [comonoid dot] {};
+                \draw[wire] (0.5, -1) node [comonoid dot] {} -- ++ (0, -1) node [below] {\(A\)} coordinate (bottom);
+                \node at (1.5, 0 |- current bounding box) {\(=\)};
+                \draw[wire] (2, 0 |- bottom) node [below] {\(A\)} -- (2, 0) node [above] {\(A\)};
+                \node at (2.5, 0 |- current bounding box) {\(=\)};
+                \begin{scope}[xshift=4cm, xscale=-1]
+                    \draw[wire] (0, 0) node [above] {\(A\)} -- ++ (0, -0.5) arc (180:360:0.5) node [comonoid dot] {};
+                    \draw[wire] (0.5, -1) node [comonoid dot] {} -- ++ (0, -1) node [below] {\(A\)};
+                \end{scope}
+            \end{tikzpicture}
+        \end{equation}
+        respectively.
+        
+        These relations can also be expressed as commutative diagrams for a comonoid \((A, c, d)\) we require
+        \begin{equation}
+            \begin{tikzcd}[row sep=small]
+                & A \otimes A \arrow[r, "c \otimes \id_A"] & (A \otimes A) \otimes A \arrow[dd, "\alpha_{A,A,A}"]\\
+                A \arrow[ur, "c"] \arrow[dr, "c"']\\
+                & A \otimes A \arrow[r, "{\id_A} \otimes c"'] & A \otimes (A \otimes A),
+            \end{tikzcd}
+        \end{equation}
+        and
+        \begin{equation}
+            \begin{tikzcd}
+               A \otimes I \arrow[r, "\rho_A"] & A \arrow[d, "\id_A"] & I \otimes A \arrow[l, "\lambda_A"'] \\
+               A \otimes A \arrow[u, "{\id_A} \otimes d"] & A \arrow[l, "c"] \arrow[r, "c"'] & A \otimes A \arrow[u, "d \otimes \id_A"']
+            \end{tikzcd}
+        \end{equation}
+    \end{dfn}
+    
+    \begin{dfn}{Cocommutative Comonoid}{}
+        A \defineindex{cocommutative comonoid} in a braided monoidal category, \(\cat{C}\), is a comonoid, \((A, \comonoidProduct, \comonoidIdentity)\), satisfying the \defineindex{cocommutativity} equation
+        \begin{equation}
+            \tikzsetnextfilename{monoids-cocommutativity-law}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \draw[wire] (0, 0) node [below] {\(A\)} -- (0, 1);
+                \draw[wire] (-0.5, 1.5) arc (180:360:0.5);
+                \node[comonoid dot] at (0, 1) {};
+                \draw[wire, rounded corners] (0.5, 1.5) -- ++ (0, 0.2) -- ++ (-1, 0.5) -- ++ (0, 0.2) node [above] {\(A\)};
+                \draw[over wire, rounded corners] (-0.5, 1.5) -- ++ (0, 0.2) -- ++ (1, 0.5) -- ++ (0, 0.2) node [above] {\(A\)};
+                \begin{scope}[xshift=2cm]
+                    \draw[wire] (0, 0) node [below] {\(A\)} -- (0, 1);
+                    \draw[wire] (-0.5, 1.5) arc (180:360:0.5);
+                    \node[comonoid dot] at (0, 1) {};
+                    \draw[wire] (0.5, 1.5) -- ++ (0, 0.9) node [above] {\(A\)};
+                    \draw[wire] (-0.5, 1.5) -- ++ (0, 0.9) node [above] {\(A\)};
+                \end{scope}
+                \node at (current bounding box) {\(=\)};
+            \end{tikzpicture}
+            .
+        \end{equation}
+        This can also be expressed as a commutative diagram for the comonoid \((A, c, d)\):
+        \begin{equation}
+            \begin{tikzcd}
+                A \arrow[r, "c"] \arrow[d, "c"'] & A \otimes A\\
+                A \otimes A. \arrow[ur, "\sigma_{A,A}"']
+            \end{tikzcd}
+        \end{equation}
+    \end{dfn}
+    
+    \section{Comonoids: The Examples}
+    In \(\Set\) any given nonempty set, \(A\), forms exactly one comonoid, \((A, c, d)\), with \(c(a) = (a, a)\) and \(d(a) = \bullet\).
+    This is cocommutative.
+    Since there is only one monoid we can define for any set there is no \enquote{a comonoid is a set with\dots} definition of a comonoid.
+    
+    Take some group, \(G\), and we can form a comonoid in \(\Rel\) by defining a comultiplication with the relation \(g \sim (h, h^{-1}g)\) for any \(g, h \in G\) and the counit as the relation \(1 \sim \bullet\).
+    Here \(\{\bullet\}\) is the unit object in \(\Rel\).
+    We can check that this is a comonoid:
+    \begin{itemize}
+        \item Counitality: Take some \(g \in G\), and apply \(c\), so now we have \(g \sim (h, h^{-1}g)\) for any \(h \in G\).
+        Now apply \({\id_G} \otimes d\), the result depends on \(h^{-1}g\).
+        If \(h^{-1}g = 1\) then we get \((h, h^{-1}g) = (h, 1) \sim (h, \bullet)\), on the other hand if \(h^{-1}g \ne 1\) then there is no relation.
+        So, we must have \(h^{-1}g = 1\), which we can rearrange to get \(g = h\).
+        Finally applying \(\rho_I\) we get \((h, \bullet) \sim h = g\).
+        Chaining these relations we have \(g \sim g\), which is to say that this chain is the identity relation, as required.
+        Counitality on the other side can be demonstrated similarly.
+        \item Coassociativity: Take some \(g \in G\), and apply \(c\), we get \(g \sim (h, h^{-1}g)\) for any \(h \in G\).
+        Now apply \(c \otimes \id_A\) and we get \((h, h^{-1}g) \sim ((k, k^{-1}h), h^{-1}g)\) for any \(k \in G\).
+        Reassociating gives \(((k, k^{-1}h), h^{-1}g) \sim (k, (k^{-1}h, h^{-1}g))\), so \(g \sim (k, (k^{-1}h, h^{-1}g))\).
+        If instead we had applied \({\id_A} \otimes c\) we would get \((h, h^{-1}g) \sim (h, (k, k^{-1}h^{-1}g))\).
+        Chaining these relations together we have \(g \sim (h, (k, k^{-1}h^{-1}g))\).
+        Now set \(h \to k\) and \(k \to k^{-1}h\), then we get \(g \sim (k, (k^{-1}h, (k^{-1}h)^{-1}k^{-1}g)) = (k, (k^{-1}h, h^{-1}kk^{-1}g)) = (k, (k^{-1}h, h^{-1}g))\), which is exactly the result we got before.
+        \item Cocommutativity: Take some \(g \in G\) and apply \(c\), giving \(g \sim (h, h^{-1}g)\).
+        If we apply \(\sigma_{A,A}\) we get \((h, h^{-1}g) \sim (h^{-1}g, h)\).
+        This comonoid will be cocommutative if and only if \((h, h^{-1}g) = (k^{-1}g, k)\).
+        Clearly this holds if and only if \(k = h^{-1}g\), that is \(hk = g\), but we also require \(h = k^{-1}g\), so \(kh = g\).
+        Thus, in order for this to be a cocommutative monoid we need to have \(hk = g = kh\), so the group must be Abelian.
+    \end{itemize}
+    
+    In \(\FHilb\) choose some basis, \(\{e_i\}\) for a Hilbert space \(H\).
+    We can define a cocommutative comonoid by defining comultiplication according to \(e_i \mapsto e_i \otimes e_i\) and the counit according to \(e_i \mapsto 1\), and extending these by linearity to all of \(H\).
+    We can check that this defines a cocommutative comonoid, and thanks to linearity we need only check the laws hold on each basis vectors:
+    \begin{itemize}
+        \item Coassociativity: Going one way around the diagram we have
+        \begin{equation}
+            e_i \xmapsto{c} e_i \otimes e_i \xmapsto{c \otimes \id_H} (e_i \otimes e_i) \otimes e_i \xmapsto{\alpha_{H,H,H}} e_i \otimes (e_i \otimes e_i)
+        \end{equation}
+        and going the other way we get
+        \begin{equation}
+            e_i \xmapsto{c} e_i \otimes e_i \xmapsto{{\id_H} \otimes c} e_i \otimes (e_i \otimes e_i),
+        \end{equation}
+        which are both the same so coassociativity is satisfied.
+        \item Counitality: Going one way around the diagram we have
+        \begin{equation}
+            e_i \xmapsto{c} e_i \otimes e_i \xmapsto{{\id_H} \otimes d} e_i \otimes 1 \xmapsto{\rho_H} e_i
+        \end{equation}
+        so this chain is simply the identity.
+        The other counitality law can be checked similarly.
+        \item Cocommutativity: We have
+        \begin{equation}
+            e_i \xmapsto{c} e_i \otimes e_i \xmapsto{\sigma_{H,H}} e_i \otimes e_i
+        \end{equation}
+        so clearly this is cocommutative.
+    \end{itemize}
+    
+    
+    
     
     % TODO: Cartesian category and terminal objects at same time as products, then later prove all Cartesian categories are monoidal
     % TODO: Coherence theorems and strictification
     % TODO: Adjoints
-    
+    % TODO: Fill in skipped bits on dagger duals
     
     %   Appdendix
     \appendixpage
