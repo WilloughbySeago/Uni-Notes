@@ -202,6 +202,7 @@ noabbrev
 \newcommand{\LieAlg}{\c@egory{LieAlg}}
 \newcommand{\one}{\c@egory{1}}
 \newcommand{\Hask}{\c@egory{Hask}}
+\newcommand{\Graph}{\c@egory{Graph}}
 \makeatother
 \DeclareMathOperator{\Ob}{Ob}
 \DeclareMathOperator{\id}{id}
@@ -226,6 +227,8 @@ noabbrev
 \newcommand{\equaliso}{\stackrel{\mathrm{iso}}{=}}
 \newcommand{\notequaliso}{\stackrel{\mathrm{iso}}{\ne}}
 \DeclareMathOperator{\tr}{tr}
+\newcommand{\const}{\mathrm{const}}
+\newcommand{\leftadjoint}{\vdash}
 
 \includeonly{parts/maths-defs}
 
@@ -2342,8 +2345,9 @@ noabbrev
     
     \begin{exm}{Functors}{}
         \begin{itemize}
-            \item The constant functor, \(C_X \colon \cat{C} \to \cat{D}\), maps every object of \(\cat{C}\) to \(X \in \Ob(\cat{D})\) and every morphism \(f \colon A \to B\) in \(\cat{C}\) to the identity morphism \(\id_X \colon X \to X\) in \(\cat{D}\).
-            \item The identity functor, \(\id_{\cat{C}} \colon \cat{C} \to \cat{C}\) maps every object and morphism in \(\cat{C}\) to itself.
+            \item The \defineindex{constant functor}, \(\const_X \colon \cat{C} \to \cat{D}\), maps every object of \(\cat{C}\) to \(X \in \Ob(\cat{D})\) and every morphism \(f \colon A \to B\) in \(\cat{C}\) to the identity morphism \(\id_X \colon X \to X\) in \(\cat{D}\).
+            \item The \defineindex{identity functor}, \(\id_{\cat{C}} \colon \cat{C} \to \cat{C}\) maps every object and morphism in \(\cat{C}\) to itself.
+            \item If \(\cat{C}\) has products we can define the \defineindex{diagonal functor}, \(\Delta \colon \cat{C} \to \cat{C} \times \cat{C}\), such that \(\Delta(A) = A \times A\) for all objects \(A\) and \(\Delta(f) = f \times f\) for all morphisms \(f\).
             \item The power set can be regarded as a functor \(\powerset\colon \Set \to \Set\), sending each set to its power set and each function \(f \colon A \to B\) to the map sending \(U \in \powerset(A)\) to its image
             \begin{equation}
                 f(U) \coloneqq \{f(u) \mid u \in U\}.
@@ -6290,14 +6294,14 @@ noabbrev
     \section{Monoids: The Idea}
     A monoid can be characterised without reference to explicit elements as follows.
     \begin{dfn}{Monoid}{}
-        A \defineindex{monoid}, \((M, m, e)\), is a set, \(M\), equipped with a binary operation, \(m \colon M \times M \to M\), and a 0-ary operation, \(e \colon \{\bullet\} \to M\) satisfying the following axioms for all \(x, y, z \in M\):
+        A \defineindex{monoid}, \((M, m, u)\), is a set, \(M\), equipped with a binary operation, \(m \colon M \times M \to M\), and a 0-ary operation, \(u \colon \{\bullet\} \to M\) satisfying the following axioms for all \(x, y, z \in M\):
         \begin{itemize}
-            \item \(m(e(\bullet), x) = m(x, e(\bullet)) = x\),
+            \item \(m(u(\bullet), x) = m(x, u(\bullet)) = x\),
             \item \(m(x, m(y, z)) = m(m(x, y), z)\).
         \end{itemize}
     \end{dfn}
     
-    Clearly we can identify this with the usual definition of a monoid by taking \(m(x, y) = xy\), multiplication, and \(e(\bullet) = 1\), the identity, and then the laws become \(1x = x1 = 1\), the identity law, and \(x(yz) = (xy)z\), the associativity law.
+    Clearly we can identify this with the usual definition of a monoid by taking \(m(x, y) = xy\), multiplication, and \(u(\bullet) = 1\), the identity, and then the laws become \(1x = x1 = 1\), the identity law, and \(x(yz) = (xy)z\), the associativity law.
     
     The nice thing about this definition is that removing explicit reference to elements\footnote{apart from \(\bullet \in \{\bullet\}\), but this is characterised as being the initial object in \(\Set\) and so is unique up to isomorphism and doesn't really count as talking about an element} we can make this more general by interpreting it in any monoidal category making the following replacements:
     \begin{itemize}
@@ -6311,9 +6315,9 @@ noabbrev
     First, the identity is characterised by a morphism \(e \colon I \to M\), so this is exactly a state,
     \begin{equation}
         \tikzsetnextfilename{monoid-identity-state}
-        \begin{tikzpicture}[baseline=(e.base)]
-            \node[state] (e) {\(e\)};
-            \draw[wire] (e) -- ++ (0, 1);
+        \begin{tikzpicture}[baseline=(u.base)]
+            \node[state] (u) {\(u\)};
+            \draw[wire] (u) -- ++ (0, 1);
         \end{tikzpicture}
         .
     \end{equation}
@@ -6380,7 +6384,7 @@ noabbrev
         and
         \begin{equation}
             \begin{tikzcd}
-                A \otimes I \arrow[d, "{\id_A} \otimes e"'] & A \arrow[l, "\rho_A^{-1}"'] \arrow[d, "\id_A"'] \arrow[r, "\lambda_A^{-1}"] & I \otimes A \arrow[d, "{\id_A} \otimes e"] \\
+                A \otimes I \arrow[d, "{\id_A} \otimes u"'] & A \arrow[l, "\rho_A^{-1}"'] \arrow[d, "\id_A"'] \arrow[r, "\lambda_A^{-1}"] & I \otimes A \arrow[d, "{\id_A} \otimes u"] \\
                 A \otimes A \arrow[r, "m"'] & A & A \otimes A. \arrow[l, "m"]
             \end{tikzcd}
         \end{equation}
@@ -6411,7 +6415,7 @@ noabbrev
     \end{dfn}
     
     \section{Monoids: The Examples}
-    In any monoidal category \((I, \lambda_I, \id_I)\) is trivially a monoid, all diagrams in monoid laws are empty.
+    In any monoidal category \((I, \lambda_I, \id_I)\) is trivially a monoid, all diagrams we write for the monoid laws are empty.
     
     A monoid in \(\Set\) is exactly the normal definition of a monoid.
     
@@ -6499,7 +6503,9 @@ noabbrev
     
     It turns out that lots of monoids can be recast as monoids of this form.
     For example, consider the algebra \(\matrices{n}{\complex}\) viewed as a monoid object in \(\FHilb\).
-    A matrix can be considered as linear map, so can be interpreted as an element of \(\FHilb(\complex^n, \complex^n)\), which can be shown to be isomorphic to \((\complex^n)^* \otimes \complex^n\), and more generally \(\FVect(V, V) \isomorphic V^* \otimes V\).
+    A matrix can be considered as linear map, so it can be interpreted as an element of \(\FHilb(\complex^n, \complex^n)\).
+    This is isomorphic to \((\complex^n)^* \otimes \complex^n\).
+    More generally, \(\FVect(V, V) \isomorphic V^* \otimes V\).
     Making this identification leads to the following lemma.
     
     \begin{lma}{Pair of Pants on {\normalsize\(\FHilb\)}}{}
@@ -6521,7 +6527,7 @@ noabbrev
                 \begin{tikzpicture}[baseline=(current bounding box)]
                     \draw[left dual=0.55] (0, 0) node [below] {\(\ket{j}\)} arc (180:0:0.5) node [below] {\(\bra{k}\)};
                 \end{tikzpicture}
-                = \varepsilon(\ket{j} \otimes \ket{k}) = \braket{k}{j} = \delta_{kj}.
+                = \varepsilon(\ket{j} \otimes \bra{k}) = \braket{k}{j} = \delta_{kj}.
             \end{equation}
             Then we have
             \begin{equation}
@@ -6557,15 +6563,15 @@ noabbrev
     
     \section{Comonoids: The Idea}
     Consider a process which takes an object and copies it.
-    This should give a copying operation of type \(c \colon A \to A \otimes A\).
+    This should give a copying, or duplication, operation \(d \colon A \to A \otimes A\).
     We can draw this as
     \begin{equation}
         \tikzsetnextfilename{monoids-comultiplication}
         \begin{tikzpicture}[baseline=(current bounding box)]
-            \node[morphism, minimum width=1cm] (c) {\(c\)};
-            \draw[wire] ($(c.north) + (-0.25, 0)$) -- ++ (0, 1);
-            \draw[wire] ($(c.north) + (0.25, 0)$) -- ++ (0, 1);
-            \draw[wire] (c.south) -- ++ (0, -1);
+            \node[morphism, minimum width=1cm] (d) {\(d\)};
+            \draw[wire] ($(d.north) + (-0.25, 0)$) -- ++ (0, 1);
+            \draw[wire] ($(d.north) + (0.25, 0)$) -- ++ (0, 1);
+            \draw[wire] (d.south) -- ++ (0, -1);
         \end{tikzpicture}
         .
     \end{equation}
@@ -6577,24 +6583,24 @@ noabbrev
     \begin{equation}
         \tikzsetnextfilename{monoiods-counitality}
         \begin{tikzpicture}[baseline=(current bounding box)]
-            \node[morphism, minimum width=1cm] (c) {\(c\)};
-            \draw[wire] ($(c.north) + (-0.25, 0)$) -- ++ (0, 1.2) coordinate (top);
-            \draw[wire] ($(c.north) + (0.25, 0)$) -- ++ (0, 0.5) coordinate (A);
-            \draw[wire] (c.south) -- ++ (0, -1) coordinate (bottom);
-            \node[effect, minimum width=0.7cm, inner sep=0pt, above] at (A) {\smash{\raisebox{-0.5ex}{\(d\)}}};
+            \node[morphism, minimum width=1cm] (d) {\(d\)};
+            \draw[wire] ($(d.north) + (-0.25, 0)$) -- ++ (0, 1.2) coordinate (top);
+            \draw[wire] ($(d.north) + (0.25, 0)$) -- ++ (0, 0.5) coordinate (A);
+            \draw[wire] (d.south) -- ++ (0, -1) coordinate (bottom);
+            \node[effect, minimum width=0.7cm, inner sep=0pt, above] at (A) {\smash{\raisebox{-0.5ex}{\(e\)}}};
             \node at (current bounding box -| 1, 0) {\(=\)};
             \draw[wire] (1.5, 0 |- bottom) -- (1.5, 0 |- top);
             \node at (current bounding box -| 2, 0) {\(=\)};
             \begin{scope}[xshift=3cm, xscale=-1]
-                \node[morphism, minimum width=1cm] (c) {\(c\)};
-                \draw[wire] ($(c.north) + (-0.25, 0)$) -- ++ (0, 1.2);
-                \draw[wire] ($(c.north) + (0.25, 0)$) -- ++ (0, 0.5) coordinate (A);
-                \draw[wire] (c.south) -- ++ (0, -1);
-                \node[effect, minimum width=0.7cm, inner sep=0pt, above] at (A) {\smash{\raisebox{-0.5ex}{\(d\)}}};
+                \node[morphism, minimum width=1cm] (d) {\(d\)};
+                \draw[wire] ($(d.north) + (-0.25, 0)$) -- ++ (0, 1.2);
+                \draw[wire] ($(d.north) + (0.25, 0)$) -- ++ (0, 0.5) coordinate (A);
+                \draw[wire] (d.south) -- ++ (0, -1);
+                \node[effect, minimum width=0.7cm, inner sep=0pt, above] at (A) {\smash{\raisebox{-0.5ex}{\(e\)}}};
             \end{scope}
         \end{tikzpicture}
     \end{equation}
-    where \(d \colon A \to I\) can be thought of as deletion.
+    where \(e \colon A \to I\) can be thought of as deletion.
     
     Another property that we should consider is what happens if we make multiple copies?
     It shouldn't matter which of the two copies from the first copying process we use to make the copies, the result should be the same both ways.
@@ -6602,22 +6608,22 @@ noabbrev
     \begin{equation}
         \tikzsetnextfilename{monoids-coassociativity}
         \begin{tikzpicture}[baseline=(current bounding box)]
-            \node[morphism, minimum width=1cm] (c) {\(c\)};
-            \draw[wire] ($(c.north) + (-0.25, 0)$) -- ++ (0, 2) coordinate (top);
-            \draw[wire] ($(c.north) + (0.25, 0)$) -- ++ (0, 0.5) coordinate (A);
-            \draw[wire] (c.south) -- ++ (0, -1) coordinate (bottom);
-            \node[morphism, minimum width=0.7cm, above] (c2) at (A) {\(c\)};
-            \draw[wire] ($(c2.north) + (-0.25, 0)$) coordinate (here) -- (here |- top);
-            \draw[wire] ($(c2.north) + (0.25, 0)$) coordinate (here) -- (here |- top);
+            \node[morphism, minimum width=1cm] (d) {\(d\)};
+            \draw[wire] ($(d.north) + (-0.25, 0)$) -- ++ (0, 2) coordinate (top);
+            \draw[wire] ($(d.north) + (0.25, 0)$) -- ++ (0, 0.5) coordinate (A);
+            \draw[wire] (d.south) -- ++ (0, -1) coordinate (bottom);
+            \node[morphism, minimum width=0.7cm, above] (d2) at (A) {\(d\)};
+            \draw[wire] ($(d2.north) + (-0.25, 0)$) coordinate (here) -- (here |- top);
+            \draw[wire] ($(d2.north) + (0.25, 0)$) coordinate (here) -- (here |- top);
             \node at (1, 0 |- current bounding box) {\(=\)};
             \begin{scope}[xshift=2cm, xscale=-1]
-                \node[morphism, minimum width=1cm] (c) {\(c\)};
-                \draw[wire] ($(c.north) + (-0.25, 0)$) -- ++ (0, 2) coordinate (top);
-                \draw[wire] ($(c.north) + (0.25, 0)$) -- ++ (0, 0.5) coordinate (A);
-                \draw[wire] (c.south) -- ++ (0, -1) coordinate (bottom);
-                \node[morphism, minimum width=0.7cm, above] (c2) at (A) {\(c\)};
-                \draw[wire] ($(c2.north) + (-0.25, 0)$) coordinate (here) -- (here |- top);
-                \draw[wire] ($(c2.north) + (0.25, 0)$) coordinate (here) -- (here |- top);
+                \node[morphism, minimum width=1cm] (d) {\(d\)};
+                \draw[wire] ($(d.north) + (-0.25, 0)$) -- ++ (0, 2) coordinate (top);
+                \draw[wire] ($(d.north) + (0.25, 0)$) -- ++ (0, 0.5) coordinate (A);
+                \draw[wire] (d.south) -- ++ (0, -1) coordinate (bottom);
+                \node[morphism, minimum width=0.7cm, above] (d2) at (A) {\(d\)};
+                \draw[wire] ($(d2.north) + (-0.25, 0)$) coordinate (here) -- (here |- top);
+                \draw[wire] ($(d2.north) + (0.25, 0)$) coordinate (here) -- (here |- top);
             \end{scope}
         \end{tikzpicture}
         .
@@ -6691,19 +6697,19 @@ noabbrev
         \end{equation}
         respectively.
         
-        These relations can also be expressed as commutative diagrams for a comonoid \((A, c, d)\) we require
+        These relations can also be expressed as commutative diagrams for a comonoid \((A, d, e)\) we require
         \begin{equation}
             \begin{tikzcd}[row sep=small]
-                & A \otimes A \arrow[r, "c \otimes \id_A"] & (A \otimes A) \otimes A \arrow[dd, "\alpha_{A,A,A}"]\\
-                A \arrow[ur, "c"] \arrow[dr, "c"']\\
-                & A \otimes A \arrow[r, "{\id_A} \otimes c"'] & A \otimes (A \otimes A),
+                & A \otimes A \arrow[r, "d \otimes \id_A"] & (A \otimes A) \otimes A \arrow[dd, "\alpha_{A,A,A}"]\\
+                A \arrow[ur, "d"] \arrow[dr, "d"']\\
+                & A \otimes A \arrow[r, "{\id_A} \otimes d"'] & A \otimes (A \otimes A),
             \end{tikzcd}
         \end{equation}
         and
         \begin{equation}
             \begin{tikzcd}
                A \otimes I \arrow[r, "\rho_A"] & A \arrow[d, "\id_A"] & I \otimes A \arrow[l, "\lambda_A"'] \\
-               A \otimes A \arrow[u, "{\id_A} \otimes d"] & A \arrow[l, "c"] \arrow[r, "c"'] & A \otimes A \arrow[u, "d \otimes \id_A"']
+               A \otimes A \arrow[u, "{\id_A} \otimes e"] & A \arrow[l, "d"] \arrow[r, "d"'] & A \otimes A \arrow[u, "e \otimes \id_A"']
             \end{tikzcd}
         \end{equation}
     \end{dfn}
@@ -6729,10 +6735,10 @@ noabbrev
             \end{tikzpicture}
             .
         \end{equation}
-        This can also be expressed as a commutative diagram for the comonoid \((A, c, d)\):
+        This can also be expressed as a commutative diagram for the comonoid \((A, d, e)\):
         \begin{equation}
             \begin{tikzcd}
-                A \arrow[r, "c"] \arrow[d, "c"'] & A \otimes A\\
+                A \arrow[r, "d"] \arrow[d, "d"'] & A \otimes A\\
                 A \otimes A. \arrow[ur, "\sigma_{A,A}"']
             \end{tikzcd}
         \end{equation}
@@ -6793,6 +6799,249 @@ noabbrev
         so clearly this is cocommutative.
     \end{itemize}
     
+    \chapter{Uniform Copying and Deleting}
+    \section{Uniform Deleting}
+    Consider a comonoid, \((A, d, e)\).
+    The counit, \(e \colon A \to I\) gives us a way to \enquote{delete} copies of the system, \(A\).
+    Suppose we have a way of systematically deleting every object.
+    Such a process must respect the tenor product, leading to the following definition.
+    
+    \begin{dfn}{Uniform Deleting}{}
+        Consider a monoidal category, \(\cat{C}\), with unit object \(I\).
+        This category has \defineindex{uniform deleting} if there exists a natural transformation \(e \colon \id_{\cat{C}} \naturalTransformation \const_I\), with components \(e_A \colon A \to I\), such that \(e_I = \id_I\) and
+        \begin{equation}
+            \begin{tikzcd}
+                & A \otimes B \arrow[dl, "e_A \otimes e_B"'] \arrow[dr, "e_{A\otimes B}"] &\\
+                I \otimes I \arrow[rr, "\lambda_I"'] && I
+            \end{tikzcd}
+        \end{equation}
+        commutes.
+    \end{dfn}
+    
+    Writing out the naturality condition for \(e\) the diagram
+    \begin{equation}
+        \begin{tikzcd}
+            A \arrow[r, "e_A"] \arrow[d, "f"'] & I \arrow[d, "\id_I"]\\
+            B \arrow[r, "e_B"'] & I
+        \end{tikzcd}
+    \end{equation}
+    must commute.
+    
+    This definition states that uniform deleting is a collection of isomorphisms deleting systems, that is sending them to the empty system, \(I\).
+    The commutativity definition is simply that deleting both systems independently, then combining the two empty systems, is the same as deleting the combined system.
+    
+    \begin{lma}{}{lma:uniform deleting iff terminal unit}
+        Let \(\cat{C}\) be a monoidal category with unit object \(I\).
+        Then \(\cat{C}\) has uniform deleting if and only if \(I\) is terminal.
+        \begin{proof}
+            Suppose that \(\cat{C}\) has uniform deleting
+            Then for each object \(A\) we have a morphism \(e_A \colon A \to I\).
+            We need to show that this is unique.
+            The naturality condition for \(e\), specialised to the case where the second object is \(I\), becomes the commuting square
+            \begin{equation}
+                \begin{tikzcd}
+                    A \arrow[r, "e_A"] \arrow[d, "f"'] & I \arrow[d, "\id_I"]\\
+                    I \arrow[r, "e_I = \id_I"'] \arrow[ur, equal] & I.
+                \end{tikzcd}
+            \end{equation}
+            which commutes if and only if \(f = e_A\), proving that there is a \emph{unique} morphism \(A \to I\) for all objects \(A\).
+            
+            Conversely, suppose that \(I\) is terminal.
+            Then simply define \(e\) such that \(e_A \colon A \to I\) is the unique morphism \(A \to I\).
+            The commutativity property is satisfied by uniqueness of morphisms into \(I\).
+        \end{proof}
+    \end{lma}
+    
+    Deleting causes problems in quantum mechanics.
+    To delete a state we must lose information, which is not generally possible.
+    A quantum system can be modelled as a monoidal category with duals.
+    The way that this issue with deleting arises in category theory is that any quantum system with uniform deleting will be boring, in the sense it will be a preorder.
+    
+    \begin{dfn}{Preorder}{}
+        A \defineindex{preorder} is a category with at most one morphism \(A \to B\) for each pair of objects \(A\) and \(B\).
+    \end{dfn}
+    
+    Note that a preorder can be defined similarly to a poset, but relaxing the requirement of antisymmetry, and then interpreted as a category in the same way we think of a preorder as a category.
+    
+    Viewed as processes preorders are particularly boring categories, there is at any one point at most one process which can occur.
+    
+    \begin{thm}{No Deleting}{}
+        If a monoidal category with duals has uniform deleting then it is a preorder.
+        
+        \begin{proof}
+            Let \(f, g \colon A \to B\) be morphisms in this category.
+            We will show that \(f = g\).
+            Recall that we can define the coname, \(\coname{f} \colon A \otimes B^* \to I\).
+            Naturality of \(e\) for this morphism gives
+            \begin{equation}
+                \begin{tikzcd}
+                    A \otimes B^* \arrow[r, "e_{A\otimes B^*}"] \arrow[d, "\coname{f}"'] & I \arrow[d, "\id_I"]\\
+                    I \arrow[r, "e_I = \id_I"'] & I.
+                \end{tikzcd}
+            \end{equation}
+            Terminality of the unit (\cref{lma:uniform deleting iff terminal unit}) implies that \(\coname{f} = e_{A\otimes B^*}\).
+            
+            Exactly the same logic implies that \(\coname{g} = e_{A \otimes B^*}\).
+            Since the coname uniquely specifies the morphism we must have that \(f = g\).
+            Hence this category is a preorder.
+        \end{proof}
+    \end{thm}
+    
+    \section{Uniform Copying}
+    Consider a comonoid, \((A, d, e)\).
+    The comultiplication, \(d \colon A \to A \otimes A\) gives us a way to create an extra copy of our system.
+    Suppose we have a way of systematically copying every object.
+    Such a process must respect the tensor product, leading to the following definition.
+    A subtlety in this is that if we copy \(A \otimes B\) as a single object we get \((A \otimes B) \otimes (A \otimes B)\), but if we copy each part independently we get \((A \otimes A) \otimes (B \otimes B)\), so we must work in a braided monoidal category.
+    
+    \begin{dfn}{Uniform Copying}{}
+        Consider a braided monoidal category, \(\cat{C}\), with unit object \(I\).
+        This category has \defineindex{uniform copying} if there exists a natural transformation \(d \colon \id_{\cat{C}} \naturalTransformation \Delta\), with components \(d \colon A \to A \otimes A\), satisfying coassociativity and cocommutativity, with \(d_I = \rho_I^{-1}\) and 
+        \begin{equation}
+            \tikzsetnextfilename{uniform-copying-respects-tensor-products}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \node[morphism, minimum width=1.3cm] (dA) at (0, 0) {\(d_A\)};
+                \node[morphism, minimum width=1.3cm] (dB) at (2, 0) {\(d_B\)};
+                \draw[wire] (dA) -- ++ (0, -1) node [below] {\(A\)};
+                \draw[wire] (dB) -- ++ (0, -1) node [below] {\(B\)};
+                \draw[wire] ($(dA.north) + (-0.5, 0)$) -- ++ (0, 1) node [above] {\(A\)};
+                \draw[wire] ($(dB.north) + (0.5, 0)$) -- ++ (0, 1) node [above] {\(B\)};
+                \draw[wire, rounded corners] ($(dB.north) + (-0.5, 0)$) -- ++ (0, 0.2) -- ++ (-1, 0.6) -- ++ (0, 0.2) node [above] {\(B\)};
+                \draw[over wire, rounded corners] ($(dA.north) + (0.5, 0)$) -- ++ (0, 0.2) -- ++ (1, 0.6) -- ++ (0, 0.2) node [above] {\(A\)};
+                \node at (3, 0) {\(=\)};
+                \node[morphism, minimum width=3.3cm] (d) at (5, 0) {\(d_{A \otimes B}\)};
+                \draw[wire] ($(d.south) + (-0.5, 0)$) -- ++ (0, -1) node [below] {\(A\)};
+                \draw[wire] ($(d.south) + (0.5, 0)$) -- ++ (0, -1) node [below] {\(B\)};
+                \draw[wire] ($(d.north) + (-0.5, 0)$) -- ++ (0, 1) node [above] {\(B\)};
+                \draw[wire] ($(d.north) + (-1.5, 0)$) -- ++ (0, 1) node [above] {\(A\)};
+                \draw[wire] ($(d.north) + (0.5, 0)$) -- ++ (0, 1) node [above] {\(A\)};
+                \draw[wire] ($(d.north) + (1.5, 0)$) -- ++ (0, 1) node [above] {\(B\)};
+            \end{tikzpicture}
+        \end{equation}
+        that is
+        \begin{equation*}
+            \begin{tikzcd}
+                A \otimes B \arrow[dd, "d_{A \otimes B}"'] \arrow[r, "d_A \otimes d_B"] & (A \otimes A) \otimes (B \otimes B) \arrow[r, "\alpha_{A,A,B\otimes B}"{yshift=0.1cm}] & A \otimes (A \otimes (B \otimes B)) \arrow[d, "\id_A \otimes \alpha_{A,B,B}^{-1}"] \\
+                && A \otimes ((A \otimes B) \otimes B) \arrow[d, "\id_A \otimes (\sigma_{A,B} \otimes B)"]\\
+                (A \otimes B) \otimes (A \otimes B) & A \otimes (B \otimes (A \otimes B)) \arrow[l, "\alpha_{A,B,A\otimes B}"{yshift=-0.1cm}] & A \otimes ((B \otimes A) \otimes B) \arrow[l, "\id_A \otimes \alpha_{B,A,B}"{yshift=-0.1cm}]
+            \end{tikzcd}
+        \end{equation*}
+        commutes.
+    \end{dfn}
+    
+    The naturality condition for \(d\), commutativity of
+    \begin{equation}
+        \begin{tikzcd}
+            A \arrow[r, "d_A"] \arrow[d, "f"'] & A \otimes A \arrow[d, "f \otimes f"]\\
+            B \arrow[r, "d_B"'] & B \otimes B,
+        \end{tikzcd}
+    \end{equation}
+    can be expressed as
+    \begin{equation}
+        \tikzsetnextfilename{uniform-copying-naturality-condition}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \node[morphism, minimum width=1.3cm] (dA) {\(d_A\)};
+            \draw[wire] (dA) -- ++ (0, -1) node [below] {\(A\)};
+            \draw[wire] ($(dA.north) + (-0.5, 0)$) -- ++ (0, 0.5) coordinate (f1);
+            \draw[wire] ($(dA.north) + (0.5, 0)$) -- ++ (0, 0.5) coordinate (f2);
+            \node[morphism, above] (f3) at (f1) {\(f\)};
+            \node[morphism, above] (f4) at (f2) {\(f\)};
+            \draw[wire] (f3.north) -- ++ (0, 0.5) node [above] {\(B\)};
+            \draw[wire] (f4.north) -- ++ (0, 0.5) node [above] {\(B\)} coordinate (top);
+            \node at (1.25, 0) {\(=\)};
+            \node[morphism] (f) at (2, 0) {\(f\)};
+            \node[morphism, above] (dA) at (2, 0.75) {\(d_A\)};
+            \draw[wire] (f) -- (dA);
+            \draw[wire] (f) -- ++ (0, -1) node [below] {\(A\)};
+            \draw[wire] ($(dA.north) + (-0.2, 0)$) coordinate (here) -- (here |- top) node [above] {\(B\)};
+            \draw[wire] ($(dA.north) + (0.2, 0)$) coordinate (here) -- (here |- top) node [above] {\(B\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    That \(d_I = \id_I\) can be expressed as
+    \begin{equation}
+        \tikzsetnextfilename{uniform-copying-copy-unit}
+        \begin{tikzpicture}[baseline=(d.base)]
+            \node[morphism] (d) {\(d_I\)};
+            \node[right=0.1cm of d] {\(=\)};
+            \draw[thick, dashed] (1, -0.25) rectangle (1.5, 0.25);
+        \end{tikzpicture}
+        \,.
+    \end{equation}
+    
+    \begin{exm}{}{}
+        \(\Set\) has uniform copying defined by the maps \(a \mapsto (a, a)\).
+        Writing \(1 = \{\bullet\}\) for the singleton set, which is the unit of \(\Set\), we have \(d_1(\bullet) = (\bullet, \bullet) = \rho_1^{-1}(\bullet)\).
+    \end{exm}
+    
+    \begin{dfn}{Copyable}{}
+        In a braided monoidal category a state, \(u \colon I \to A\), is \defineindex{copyable} with respect to a map \(d_A \colon A \to A \otimes A\) when
+        \begin{equation}
+            \tikzsetnextfilename{uniform-copying-copyable}
+            \begin{tikzpicture}[baseline=(equal.base)]
+                \node[morphism] (d) {\(d_A\)};
+                \node[state, below=0.5cm of d] (u) {\(u\)};
+                \draw[wire] (d) -- (u);
+                \draw[wire] (d.north) -- ++ (0, 0.5) coordinate (top);
+                \node[state, right=of u] (u1) {\(u\)};
+                \node[state, right=0.5cm of u1] (u2) {\(u\)};
+                \draw[wire] (u1) -- (u1 |- top);
+                \draw[wire] (u2) -- (u2 |- top);
+                \node (equal) at (0.8, -0.4) {\(=\)};
+            \end{tikzpicture}
+            ,
+        \end{equation}
+        that is, \(d_A \circ u = (u \otimes u) \circ \rho_I\).
+    \end{dfn}
+    
+    \begin{clm}{}{}
+        In a braided monoidal category with uniform copying all states are copyable.
+        
+        \begin{proof}
+            Naturality of the uniform copying map specialised to morphisms \(u \colon I \to A\) gives the commuting square
+            \begin{equation}
+                \begin{tikzcd}
+                    I \arrow[r, "d_I = \rho_I"] \arrow[d, "u"'] & I \otimes I \arrow[d, "u \otimes u"]\\
+                    A \arrow[r, "d_A"'] & A \otimes A.
+                \end{tikzcd}
+            \end{equation}
+            That is \(d_A \circ u = (u \otimes u) \circ \rho_I\), which is exactly the requirement for \(u\) to be copyable.
+        \end{proof}
+    \end{clm}
+    
+    We saw that uniform deleting rendered a quantum theory trivial, in the sense that we lost all but one process per system and were left with a preorder.
+    We will similarly show that uniform copying renders a quantum theory trivial, although this time in the sense that all maps simply become scalar multiplies of the identity, so we can't do anything interesting, especially since we usually normalise states and ignore overall phases, so these scalings don't change the physics.
+    Before we show this we'll need a couple of lemmas, which already start to show that if we have duals and uniform copying then things are intuitively not quite right.
+    
+    \begin{lma}{}{}
+        In a braided monoidal category with duals and uniform copying
+        \begin{equation}
+            \tikzsetnextfilename{uniform-copying-duals}
+            \begin{tikzpicture}[baseline=(equal.base)]
+                \draw[left dual] (0, 0) node [above] {\(A\mathrlap{^*}\)} arc (180:360:0.5) node [above] {\(A\)};
+                \draw[left dual] (2, 0) node [above] {\(A\mathrlap{^*}\)} arc (180:360:0.5) node [above] {\(A\)};
+                \node (equal) at (3.5, -0.25) {\(=\)};
+                \draw[left dual, xshift=4cm, xscale=3] (0, 0) node [above] {\(A\mathrlap{^*}\)} -- ++ (0, -1.1) arc (180:360:0.5) -- ++ (0, 1.1) node [above] {\(A\)};
+                \draw[wire] (5, -0.9) arc (180:360:0.5);
+                \draw[wire, rounded corners] (5, 0) -- (5, -0.35) -- (6, -0.6) -- ++ (0, -0.3);
+                \draw[over wire, rounded corners] (6, 0) -- (6, -0.35) -- (5, -0.6) -- ++ (0, -0.3);
+                \draw[right dual=1] (5, 0) node [above] {\(A\)} -- ++ (0, -0.2);
+                \draw[left dual=1] (6, 0) node [above] {\(A\mathrlap{^*}\)} -- ++ (0, -0.2);
+            \end{tikzpicture}
+            .
+        \end{equation}
+    \end{lma}
+    
+    This is intuitively not quite right because on the left hand side we have the second system, \(A\), and the third system, \(A^*\), unconnected, but on the right they become connected.
+    This makes it hard to create independent states.
+    
+    \begin{lma}{}{}
+        
+    \end{lma}
+    
+    So exchanging two identical systems is the same as doing nothing.
+    From a quantum mechanical point of view this means that exchanging two electrons is the same as doing nothing, but we know that exchanging two electrons should result in an overall minus sign, since electrons are fermions and so their wave functions are antisymmetric.
+    Thus we cannot have duals and uniform copying if we want fermions, and we most certainly want fermions as they make up all matter.
     
     
     
@@ -6800,11 +7049,202 @@ noabbrev
     % TODO: Coherence theorems and strictification
     % TODO: Adjoints
     % TODO: Fill in skipped bits on dagger duals
+    % TODO: FIll in skipped bits on (co)monoid homomorphisms & products of (co)monoids & universality of pair of pants & Cayley
     
     %   Appdendix
     \appendixpage
     \begin{appendices}
         \include{parts/maths-defs}
+        \chapter{Adjoint Functors}
+        Adjoint functors are, strictly, beyond the scope of this course, although we have already seen several examples.
+        Broadly adjoint functors are to categories as dual objects are to objects in a monoidal category.
+        
+        \section{Adjoint Functors: The Definition}
+        There are multiple equivalent definitions of functors, we'll look at two here.
+        The first is easier to use but the second makes the relation to dual objects more explicit.
+        
+        Before we can give the first definition we need to introduce a special collection of functors.
+        \begin{dfn}{Hom-Functor}{}
+            Given a category, \(\cat{C}\), then for objects \(A\) and \(B\) there are functors \(\cat{C} \to \Set\), namely the covariant and contravariant \define{hom-functors}\index{hom-functor}
+            \begin{equation}
+                \cat{C}(A, -) \colon \cat{C} \to \Set, \qqand \cat{C}(-, B) \colon \cat{C} \to \Set.
+            \end{equation}
+            The first sends the object \(B \in \Ob(\cat{C})\) to the set of morphisms \(\cat{C}(A, B)\), and the second sends the object \(A \in \Ob(\cat{C})\) to the set of morphisms \(\cat{C}(A, B)\).
+            
+            The covariant hom-functor acts on maps \(f \colon X \to Y\) by sending them to maps
+            \begin{align}
+                \cat{C}(A, f) \colon \cat{C}(A, X) &\to \cat{C}(A, Y)\\
+                g &\mapsto f\circ g.
+            \end{align}
+            The contravariant hom-functor acts on maps \(h \colon X \to Y\) by sending them to maps
+            \begin{align}
+                \cat{C}(h, B) \colon \cat{C}(X, B) &\to \cat{C}(Y, B)\\
+                g &d\mapsto g \circ h.
+            \end{align}
+        \end{dfn}
+        
+        It is simple enough to check that these define functors, we'll do it here for the covariant hom-functor.
+        First, \(\cat{C}(A, \id_X)\), is the map which sends \(g\) to \(g \circ \id_X = g\), so it is the identity.
+        Second, \(\cat{C}(A, f \circ f')\) is the map which sends \(g\) to \(f \circ f' \circ g\), which is the map that \(\cat{C}(A, f)\) sends \(f' \circ g\) to.
+        
+        \begin{dfn}{Adjoint Functors}{}
+            Let \(\cat{C}\) and \(\cat{D}\) be categories.
+            Fix two functors \(F \colon \cat{C} \to \cat{D}\) and \(G \colon \cat{D} \to \cat{C}\).
+            An \defineindex{adjunction} between \(F\) and \(G\) is a natural isomorphism
+            \begin{equation}
+                \Phi \colon \cat{D}(F-, -) \naturalTransformation \cat{C}(-, G-).
+            \end{equation}
+            That is, a collection of bijections
+            \begin{equation}
+                \Phi_{A,B} \colon \cat{D}(FA, B) \to \cat{C}(A, GC)
+            \end{equation}
+            for \(A \in \Ob(\cat{C})\) and \(B \in \Ob(\cat{D})\) such that the following diagram commutes
+            \begin{equation}
+                \begin{tikzcd}
+                    \cat{D}(FA, B) \arrow[r, "\Phi_{A,B}"] \arrow[d, "{\cat{C}(Fg, f)}"'] & \cat{C}(A, GB) \arrow[d, "{\cat{D}(g, Gf)}"]\\
+                    \cat{D}(FA', B') \arrow[r, "\Phi_{A',B'}"'] & \cat{C}(A', GB').
+                \end{tikzcd}
+            \end{equation}
+            for all objects \(A, A' \in \Ob(\cat{C})\) and \(B, B' \in \Ob(\cat{D})\) and morphisms \(f \colon A \to A'\) and \(g \colon B \to B'\).
+            
+            We say that \(F\) is \defineindex{left adjoint} to \(G\) and \(G\) is \defineindex{right adjoint} to \(F\).
+            We write \(F \leftadjoint G\)
+        \end{dfn}
+    
+        This definition is a bit complex, but essentially it comes down to the existence of a bijection
+        \begin{equation}
+            \cat{D}(FA, B) \isomorphic \cat{C}(A, GB)
+        \end{equation}
+        for all objects in such a way that this bijection defines a natural isomorphism.
+        We'll explore this with lots of examples.
+        
+        The idea is that adjoint functors translate between categories without changing the structure of the categories too much.
+        In particular an equivalence of categories can be defined as an adjunction with a few more requirements.
+        Consider categories as countries, with the objects being citizens and morphisms conversations in the countries language.
+        Then functors are translations from one language to another preserving meaning.
+        Then \(F\) and \(G\) are adjoints if it doesn't matter if Alice travel's to Bob's country and speaks Bob's language or Bob travel's to Alice's country and speaks Alice's language.
+        
+        \section{Adjoint Functors: The Examples}
+        \subsection{Free-Forgetful Adjunction}
+        Recall that a forgetful functor interprets objects of one category in another category by \enquote{forgetting} some of the details, such as the forgetful functor \(\Grp \to \Set\), which interprets each group as its underlying set, or the forgetful functor \(\CRing \to \Ring\) which forgets that a given ring is commutative.
+        Often it is possible to go the other way, to add in some structure to turn a set into a group, or a ring into a commutative ring.
+        There are usually many ways to do this, but often there is only one minimal way to do it, to add in only the strictly necessary structure in order for a set to become a group or a ring to become a commutative ring.
+        Minimal here refers to the added structure, not the size of the free objects we produce, which tend to be much larger than the object we started with.
+        Such a minimal addition of structure is called a free construction.
+        
+        \begin{exm}{Free Vector Space}{}
+            Fix some field \(\field\).
+            Write \(U \colon \Vect \to \Set\) for the forgetful functor which sends a vector space to its underlying set of vectors, simply forgetting the existence of the scalars and forgetting anything about adding vectors.
+            This functor sends a linear map to the underlying function, which is all it really can do since we've forgotten about scalars and vector addition.
+            
+            Write \(F \colon \Set \to \Vect\) for the functor sending a set, \(A\), to the vector space of all formal linear combinations of elements of \(A\), that is
+            \begin{equation}
+                F(A) = \{\varphi \colon A \to \complex \mid \varphi(a) \ne 0 \text{ for only finitely many } a \in A\}.
+            \end{equation}
+            Taking \(A\) as the basis for \(F(A)\) we can interpret \(\varphi(a)\) as the \(a\) component of some vector \(\varphi\), in more standard notation we might write \(\varphi_a\).
+            That is, a vector of \(F(A)\) is of the form
+            \begin{equation}
+                \sum_{a \in A} \varphi(a) a = \sum_{a \in A} \varphi_a a.
+            \end{equation}
+            The second part, that \(\varphi(a)\) is nonzero for a finitely many \(a \in A\), is a technical requirement for the vector space to be well-defined.
+            
+            Addition in this vector space \(F(A)\) is given by \((\varphi + \psi)(a) = \varphi(a) + \psi(a)\), and scalar multiplication by \((z\varphi)(a) = z[\varphi(a)]\).
+            The zero vector is the zero map, \(a \mapsto 0\) for all \(a \in A\).
+            For a finite set, \(A\), we have that \(F(A) \isomorphic \field^{\abs{A}}\).
+            
+            We also need to define how \(F\) acts on functions.
+            Given a function (of sets) \(f \colon A \to B\) we need a linear map \(F(f) \colon F(A) \colon F(B)\).
+            We can construct such a map: \(\varphi \mapsto \varphi \circ f\).
+            
+            We will show that \(F\) is left adjoint to \(U\).
+            To do this we need to construct a one-to-one correspondence
+            \begin{equation}
+                (\text{Linear functions } g\colon F(A) \to V) \leftrightarrow (\text{Functions } f\colon A \to U(V)).
+            \end{equation}
+            Given some function \(f\colon A \to U(V)\) define \(g_f\) by \(\varphi \mapsto \sum_{a\in A} \varphi(a)f(a)\).
+            Then the map \(f \mapsto g_f\) evaluates a formal linear combination in \(F(A)\) as a (not-necessarily-formal) linear combination in \(V\).
+            Conversely, given a linear map \(g \colon F(A) \to V\) define \(f_g\) by sending \(a \in A\) to \(g(\delta_{a-})\) where \(\delta_{a-} \in F(A)\) is the characteristic function \(c \mapsto \delta_{ac}\), that is \(\delta_{a-}(b) = 1\) if \(a = b\) and \(\delta_{a-}(b) = 0\) otherwise.
+            
+            Then we have \(f_{g_f} = f\) and \(g_{f_g} = g\), so these two constructions are inverses.
+            To see this notice that \(f_{g_f}\) takes in an element \(a \in A\), sends it to \(g_f(\delta_{a-})\), which according to the definition of \(g_f\) is the map sending \(\delta_{a-}\) to \(\sum_{a' \in A} \delta_{aa'} f(a') = f(a)\).
+            
+            Similarly, \(g_{f_g}\), which is linear, takes a basis vector, \(a \in A\), and sends it to \(f_g(\delta_{a-})\), which is by definition \(\sum_{a' \in A} \delta_{aa'}g(a') = g(a)\), which we can then extend by linearity to all of \(F(A)\).
+            
+            It is also possible to show that this defines a natural transformation, but we won't do so here.
+        \end{exm}
+        
+        \begin{exm}{Free Monoid}{}
+            Write \(U \colon \Mon \to \Set\) for the forgetful functor sending a monoid to its underlying set.
+            
+            Write \(F \colon \Set \to \Mon\) for the functor which takes a set, \(A\), to the free monoid on \(A\).
+            The free monoid on \(A\) being the monoid made form all formal combinations of \enquote{letters} in \(A\) with string concatenation as the monoid product and the empty string as the identity.
+            For example, the free monoid on one object is simply (isomorphic to) the natural numbers, \(F(\{\bullet\}) \isomorphic \naturals\).
+            The free monoid on two generators has set of elements
+            \begin{equation}
+                F(\{0, 1\}) = \{\emptyset, 0, 1, 00, 01, 10, 11, 000, 001, 010, 011, 100, 110, 101, 111, 0000, \dotsc\}.
+            \end{equation}
+            Given a function (of sets) \(f \colon A \to B\) the free monoid functor sends this to the function \(F(f)\colon F(A) \to F(B)\) given by acting on each element of one of these \enquote{words} at a time, for example, \(F(f)(001) = f(0)f(0)f(1)\), and sending the empty string to the empty string.
+            This is clearly a monoid homomorphism.
+            
+            To show that \(F \leftadjoint U\) we need to establish a one-to-one correspondence
+            \begin{equation}
+                (\text{monoid homomorphisms } g\colon F(A) \to M) \leftrightarrow (\text{functions } f \colon A \to U(M)).
+            \end{equation}
+            Given \(f\) define \(g_f\) to send the word \(a_1 \dotsm a_n\) to the product \(f(a_1)\dotsm f(a_2)\) in \(M\), and the empty string to \(1\), the identity of \(M\).
+            Conversely, given \(g\) define \(f_g\) by applying \(g\) to the one-letter word \(a \in A\).
+            Then we have \(f_{g_f} = f\) and \(g_{f_g} = g\), so these two constructions are inverses.
+            
+            To see this simply unwrap the definitions and we see that \(f_{g_f}(a) = g_f(a) = f(a)\) and \(g_{f_g}(a_1 \dotsm a_n) = f_g(a_1)\dotsm f_g(a_n) = g(a_1)\dotsm g(a_n) = g(a_1 \dotsm a_n)\), the last equality following as \(g\) is a monoid homomorphism.
+            
+            This construction is also natural.
+        \end{exm}
+        
+        \begin{exm}{Free Category}{}
+            Write \(\Graph\) for the category of directed graphs.
+            For a graph \(G\) if \(V(G)\) is the set of vertices and \(E(G)\) the set of edges then morphisms \(f\colon G \to G'\) in \(\Graph\) are pairs of functions \(f_V \colon V(G) \to V(G')\) and \(f_E \colon E(G) \to E(G')\) such that the source and target of an edge is preserved.
+            That is, given an edge \(e = (v_1, v_2)\), recall an edge of a directed graph is just an ordered pair of vertices, we have an edge \(f_E(e) = (f_V(v_1), f_V(v_2))\).
+            
+            Write \(\Cat\) for the category of all (small) categories with functors as morphisms.
+            Then we can write down a directed graph \(U(\cat{C})\) whose vertex set is the objects of \(\cat{C}\), \(V(U(\cat{C})) = \Ob(\cat{C})\), with an edge between two vertices if there is a morphism between these vertices.
+            Then \(U\) is a forgetful functor \(U \colon \Cat \to \Graph\).
+            
+            Write \(F \colon \Graph \to \Cat\) for the functor taking a graph, \(G\) to the category whose objects are elements of \(V(G)\) and morphisms \(v \to w\) are paths between the two vertices, \(v \xrightarrow{e_1} \dotso \xrightarrow{e_n} w\).
+            Composition is concatenation of paths, and the identity is the path of length zero from a vertex to itself.
+            
+            On a graph morphisms, \(f \colon G \to G'\), the functor \(F\) acts to give a functor \(F(f) \colon F(G) \to F(G')\) sending objects \(v \in \Ob(F(G))\) to \(f(v)\), and morphisms \(v \xrightarrow{e_1} \dotso \xrightarrow{e_n} w\) to the morphism \(f(v) \xrightarrow{f(e_1)} \dotso \xrightarrow{f(e_n)} f(w)\).
+            
+            We will show that \(F \leftadjoint U\).
+            To do so we need to establish a one-to-one correspondence
+            \begin{equation}
+                (\text{functors } G \colon F(H) \to \cat{C} \to) \leftrightarrow (\text{graph morphisms } f \colon H \to U(\cat{C}))
+            \end{equation}
+            for a graph \(H\).
+            
+            Given \(f \colon H \to U(\cat{C})\) define \(G_f\) as follows: send an object \(v\) to \(f(v)\) and a morphism \(v \xrightarrow{e_1} \dotso \xrightarrow{e_n} w\) to the composite \(f(e_n) \circ \dotsm \circ f(e_1)\).
+            Conversely, given \(G\) define \(f_G\) as follows: send a vertex \(v\) to the object \(G(v)\), and send an edge \(e\) to the morphism \(G(e)\).
+            Then \(f_{G_f} = f\) and \(G_{f_G} = G\), so these constructions are inverses.
+            This is also natural.
+        \end{exm}
+        
+        In general, given a category, \(\cat{C}\), of algebraic structures and structure preserving morphisms we can define a forgetful functor \(U \colon \cat{C} \to \Set\).
+        If that functor has a left adjoint, \(F \colon \Set \to \cat{C}\), then this has a natural interpretation of constructing a free object from a set.
+        
+        This construction is useful because free objects are, as the name suggests, the most free objects of a given type of structure.
+        We can then define more interesting objects as quotients of these free ones, basically imposing some other property by quotienting out by the equivalence relation it defines.
+        For example, we can construct the free algebra on a vector space, \(V\), and the result is the tensor algebra,
+        \begin{equation}
+            T(V) = \bigoplus_{k=0}^{\infty} V^{\otimes k}.
+        \end{equation}
+        Then we can define other algebras of interest as quotients of this:
+        \begin{itemize}
+            \item \(T(V)/(x \otimes y - y \otimes x)\) is the symmetric algebra, the state space for a boson.
+            \item \(T(V) / (x \otimes y + y \otimes x)\) is the exterior algebra, the state space for a fermion.
+            \item If \(Q\colon V \to \field\) is a quadratic form, that is a map such that \(Q(zv) = z^2Q(v)\) for all \(v \in V\) and \(z \in \field\), then we can define the Clifford algebra associated with this quadratic form to be \(T(V) / (v \otimes v - Q(v)1)\) where \((v \otimes v - Q(v)1)\) is the ideal generated by all elements of the form \(v \otimes v - Q(v)1\) for all elements \(v \in V\), where 1 is the unit of the tensor algebra.
+            \item If \(\lie{g}\) is a Lie algebra then we can define a bracket \(\lie{g} \otimes \lie{g} \to \lie{g}\) as \([a, b] = a \otimes b - b \otimes a\).
+            We can then generalise this recursively to \(\lie{g}^{\otimes n}\) through \([a \otimes b, c] = a\otimes [b, c] + [a, c] \otimes b\) and \([a, b \otimes c] = [a, b] \otimes c + b \otimes [a, c]\).
+            Then we can define the universal enveloping algebra to be the algebra \(U(\lie{g}) = T(\lie{g}) / (a \otimes b - b \otimes a - [a, b])\).
+        \end{itemize}
+        
     \end{appendices}
     
     \backmatter
