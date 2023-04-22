@@ -69,6 +69,23 @@
     \end{tikzpicture}%
     \tikzexternalenable%
 }
+\newcommand{\monoidProductAdjoint}{%
+    \tikzexternaldisable%
+    \begin{tikzpicture}[monoid product/.style={circle, fill, inner sep=0pt, minimum width=1.25mm}]
+        \draw[wire] (0, 0) -- ++ (0, -0.15);
+        \draw[wire] (-0.15, 0.15) arc (180:360:0.15);
+        \node[monoid product] {};
+    \end{tikzpicture}%
+    \tikzexternalenable%
+}
+\newcommand{\monoidIdentityAdjoint}{%
+    \tikzexternaldisable%
+    \begin{tikzpicture}[monoid product/.style={circle, fill, inner sep=0pt, minimum width=1.25mm}]
+        \draw[wire] (0, 0) -- ++ (0, -0.25);
+        \node[monoid product] {};
+    \end{tikzpicture}%
+    \tikzexternalenable%
+}
 \newcommand{\comonoidProduct}{%
     \tikzexternaldisable%
     \begin{tikzpicture}[monoid product/.style={circle, draw, fill=background color, inner sep=0pt, minimum width=1.25mm}]
@@ -78,11 +95,28 @@
     \end{tikzpicture}%
     \tikzexternalenable%
 }
+\newcommand{\comonoidProductAdjoint}{%
+    \tikzexternaldisable%
+    \begin{tikzpicture}[monoid product/.style={circle, draw, fill=background color, inner sep=0pt, minimum width=1.25mm}]
+        \draw[wire] (0, 0) -- ++ (0, 0.15);
+        \draw[wire] (-0.15, -0.15) arc (180:0:0.15);
+        \node[monoid product] {};
+    \end{tikzpicture}%
+    \tikzexternalenable%
+}
 \newcommand{\comonoidIdentity}{%
     \tikzexternaldisable%
     \begin{tikzpicture}[monoid product/.style={circle, draw, fill=background color, inner sep=0pt, minimum width=1.25mm}]
         \draw[wire] (0, 0) -- ++ (0, -0.25);
         \node[monoid product] {};
+    \end{tikzpicture}%
+    \tikzexternalenable%
+}
+\newcommand{\comonoidIdentityAdjoint}{%
+    \tikzexternaldisable%
+    \begin{tikzpicture}[monoid product/.style={circle, draw, fill=background color, inner sep=0pt, minimum width=1.25mm}]
+        \node[monoid product] {};
+        \draw[wire] (0, 0) -- ++ (0, 0.25);
     \end{tikzpicture}%
     \tikzexternalenable%
 }
@@ -100,6 +134,22 @@
     \begin{tikzpicture}[scale=0.5, >={Classical TikZ Rightarrow[scale=0.5, line width=0.15mm]}, every line/.style]
         \draw[left dual=0.55, rounded corners] (-0.25, 0.25) arc (180:360:0.25);
     \end{tikzpicture}%
+    \tikzexternalenable%
+}
+\newcommand{\swapMorphism}{%
+    \tikzexternaldisable%
+    \begin{tikzpicture}[scale=0.25]
+        \draw[wire] (0, 0) arc (180:90:0.5) arc (270:360:0.5);
+        \draw[wire] (1, 0) arc (0:90:0.5) arc (270:180:0.5);
+    \end{tikzpicture}
+    \tikzexternalenable%
+}
+\newcommand{\braidMorphism}{%
+    \tikzexternaldisable%
+    \begin{tikzpicture}[scale=0.25]
+        \draw[wire] (0, 0) arc (180:90:0.5) arc (270:360:0.5);
+        \draw[over wire=1mm] (1, 0) arc (0:90:0.5) arc (270:180:0.5);
+    \end{tikzpicture}
     \tikzexternalenable%
 }
 
@@ -158,8 +208,10 @@ noabbrev
 \colorlet{background color}{white}  % normal background is white
 % background in lemma
 \colorlet{lemma background}{black!5}
-% backgroundd in definitions
+% background in definitions
 \colorlet{definition background}{beige!35}
+% background in theorems
+\colorlet{theorem background}{black!5}
 \AtBeginEnvironment{lma}{\colorlet{background color}{lemma background}}
 \AtEndEnvironment{lma}{\colorlet{background color}{white}}
 \colorlet{example background}{azure(web)(azuremist)!45}
@@ -168,6 +220,8 @@ noabbrev
 \tikzcdset{background color=background color}
 \AtBeginEnvironment{dfn}{\colorlet{background color}{definition background}}
 \AtEndEnvironment{dfn}{\colorlet{background color}{white}}
+\AtBeginEnvironment{thm}{\colorlet{background color}{theorem background}}
+\AtEndEnvironment{thm}{\colorlet{background color}{white}}
 
 % Text
 \newcommand*{\course}[1]{\textit{#1}}
@@ -2019,7 +2073,7 @@ noabbrev
     
     \begin{dfn}{Bras and Kets}{def:bras and kets}
         Let \(H\) be a Hilbert space.
-        Given some \(v \in H\) its \defineindex{ket} is the map \(\ket{v} \colon \complex \to H\) defined by \(z \mapsto zv\) and its bra is the map \(\bra{v} \colon H \to \complex\) defined bg \(w \mapsto \braket{v}{w}\).
+        Given some \(v \in H\) its \defineindex{ket} is the map \(\ket{v} \colon \complex \to H\) defined by \(z \mapsto zv\) and its bra is the map \(\bra{v} \colon H \to \complex\) defined by \(w \mapsto \braket{v}{w}\).
     \end{dfn}
     
     This definition is rather formal and doesn't correspond to how we usually think about bras and kets.
@@ -3621,7 +3675,7 @@ noabbrev
     \section{Scalar Multiplication}
     \begin{dfn}{Scalar Multiplication}{}
         Let \(\cat{C}\) be a monoidal category with unit \(I\), left unitor \(\lambda\), right unitor \(\rho\), and monoidal product \(\otimes\).
-        Given a morphism \(f \colon A \to B\), and a scalar \(a \colon I \to I\) both in \(\cat{C}\) then we define the \defineindex{left scalar multiplication} of \(f\) by \(a\), denoted \(a \cdot f \colon A \to B\), to be the morphism
+        Given a morphism \(f \colon A \to B\), and a scalar \(a \colon I \to I\) both in \(\cat{C}\) then we define the \defineindex{left scalar multiplication}\index{scalar multiplication} of \(f\) by \(a\), denoted \(a \cdot f \colon A \to B\), to be the morphism
         \begin{equation}
             \lambda_B \circ (a \otimes f) \circ \lambda_A^{-1} \colon A \to B.
         \end{equation}
@@ -6744,6 +6798,16 @@ noabbrev
         \end{equation}
     \end{dfn}
     
+    It doesn't matter if we use the swap or the inverse swap in a cocommutative monoid, things work out the same as the next lemma shows.
+    
+    \begin{lma}{}{}
+        In a cocommutative monoid \(\sigma_{A,A}^{-1} \circ d = d\),
+        \begin{proof}
+            In a cocommutative monoid by definition \(\sigma_{A,A} \circ d = d\).
+            Applying this to the equation \(\sigma_{A,A}^{-1} \circ \sigma_{A,A} \circ d = \id_A \circ d = d\) we are left with \(\sigma_{A,A}^{-1} \circ d = d\).
+        \end{proof}
+    \end{lma}
+    
     \section{Comonoids: The Examples}
     In \(\Set\) any given nonempty set, \(A\), forms exactly one comonoid, \((A, c, d)\), with \(c(a) = (a, a)\) and \(d(a) = \bullet\).
     This is cocommutative.
@@ -6897,7 +6961,7 @@ noabbrev
     \begin{dfn}{Uniform Copying}{}
         Consider a braided monoidal category, \(\cat{C}\), with unit object \(I\).
         This category has \defineindex{uniform copying} if there exists a natural transformation \(d \colon \id_{\cat{C}} \naturalTransformation \Delta\), with components \(d \colon A \to A \otimes A\), satisfying coassociativity and cocommutativity, with \(d_I = \rho_I^{-1}\) and 
-        \begin{equation}
+        \begin{equation}\label{eqn:uniform copying definition}
             \tikzsetnextfilename{uniform-copying-respects-tensor-products}
             \begin{tikzpicture}[baseline=(current bounding box)]
                 \node[morphism, minimum width=1.3cm] (dA) at (0, 0) {\(d_A\)};
@@ -6971,7 +7035,7 @@ noabbrev
     
     \begin{exm}{}{}
         \(\Set\) has uniform copying defined by the maps \(a \mapsto (a, a)\).
-        Writing \(1 = \{\bullet\}\) for the singleton set, which is the unit of \(\Set\), we have \(d_1(\bullet) = (\bullet, \bullet) = \rho_1^{-1}(\bullet)\).
+        Writing \(1 = \{\bullet\}\) for the singleton set, which is the unit of \(\Set\), and recalling that \(\rho_A(a, \bullet) = a\) for all sets \(A\), we have \(d_1(\bullet) = (\bullet, \bullet) = \rho_1^{-1}(\bullet)\).
     \end{exm}
     
     \begin{dfn}{Copyable}{}
@@ -7001,7 +7065,7 @@ noabbrev
             Naturality of the uniform copying map specialised to morphisms \(u \colon I \to A\) gives the commuting square
             \begin{equation}
                 \begin{tikzcd}
-                    I \arrow[r, "d_I = \rho_I"] \arrow[d, "u"'] & I \otimes I \arrow[d, "u \otimes u"]\\
+                    I \arrow[r, "d_I = \rho_I^{-1}"] \arrow[d, "u"'] & I \otimes I \arrow[d, "u \otimes u"]\\
                     A \arrow[r, "d_A"'] & A \otimes A.
                 \end{tikzcd}
             \end{equation}
@@ -7013,7 +7077,7 @@ noabbrev
     We will similarly show that uniform copying renders a quantum theory trivial, although this time in the sense that all maps simply become scalar multiplies of the identity, so we can't do anything interesting, especially since we usually normalise states and ignore overall phases, so these scalings don't change the physics.
     Before we show this we'll need a couple of lemmas, which already start to show that if we have duals and uniform copying then things are intuitively not quite right.
     
-    \begin{lma}{}{}
+    \begin{lma}{}{lma:double cup braided mon cat duals and copying}
         In a braided monoidal category with duals and uniform copying
         \begin{equation}
             \tikzsetnextfilename{uniform-copying-duals}
@@ -7030,18 +7094,1080 @@ noabbrev
             \end{tikzpicture}
             .
         \end{equation}
+        \begin{proof}
+            Recalling that \(d_I = \rho_I^{-1}\) we can insert the scalar \(d_I\) into our diagram without changing anything, since it's really the empty diagram.
+            This gives
+            \begin{equation}\label{eqn:proving uniform copying duals 1}
+                \tikzsetnextfilename{uniform-copying-duals-proof-1}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \draw[left dual] (0, 0) node [above] {\(A\mathrlap{^*}\)} arc (180:360:0.5) node [above] {\(A\)};
+                    \draw[left dual] (2, 0) node [above] {\(A\mathrlap{^*}\)} arc (180:360:0.5) node [above] {\(A\)};
+                    \node (equal) at (3.5, -0.25) {\(=\)};
+                    \begin{scope}[xshift=4cm]
+                        \draw[left dual] (0, 0) node [above] {\(A\mathrlap{^*}\)} arc (180:360:0.5) node [above] {\(A\)};
+                        \draw[left dual] (2, 0) node [above] {\(A\mathrlap{^*}\)} arc (180:360:0.5) node [above] {\(A\)};
+                        \node[morphism] at (1.5, -1) {\(d_I\)};
+                    \end{scope}
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Naturality tells us that we can copy and then perform a process on each copy or perform the process and then copy.
+            In this case the process is creating the system \(A^* \otimes A\).
+            As written above we are copying the empty system then applying the process to create \(A^* \otimes A\).
+            Instead, we can create \(A^* \otimes A\) from the empty system and then copy it.
+            In terms of diagrams this gives
+            \begin{equation}
+                \tikzsetnextfilename{uniform-copying-duals-proof-2}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \draw[left dual] (0, 0) node [above] {\(A\mathrlap{^*}\)} arc (180:360:0.5) node [above] {\(A\)} coordinate (top);
+                    \draw[left dual] (2, 0) node [above] {\(A\mathrlap{^*}\)} arc (180:360:0.5) node [above] {\(A\)};
+                    \node[morphism] at (1.5, -1) {\(d_I\)};
+                    \node (equal) at (3.5, -0.25) {\(=\)};
+                    \node[morphism, minimum width=3.3cm] (d) at (5.6, -1) {\(d_{A^* \otimes A}\)};
+                    \draw[left dual=0.5] ($(d.south) - (0.5, 0)$) arc (180:360:0.5);
+                    \draw[right dual] ($(d.north) - (1.5, 0)$) coordinate (here) -- (here |- top) node [above] {\(A\mathrlap{^*}\)};
+                    \draw[left dual] ($(d.north) - (0.5, 0)$) coordinate (here) -- (here |- top) node [above] {\(A\)};
+                    \draw[right dual] ($(d.north) + (0.5, 0)$) coordinate (here) -- (here |- top) node [above] {\(A\mathrlap{^*}\)};
+                    \draw[left dual] ($(d.north) + (1.5, 0)$) coordinate (here) -- (here |- top) node [above] {\(A\)};
+                \end{tikzpicture}
+                .
+            \end{equation}
+            We can now apply the definition of uniform copying (\cref{eqn:uniform copying definition}) to write
+            \begin{equation}\label{eqn:proving uniform copying duals 2}
+                \tikzsetnextfilename{uniform-copying-duals-proof-3}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \coordinate (top) at (0, 0.2);
+                    \node[morphism, minimum width=3.3cm] (d) at (0, -1) {\(d_{A^* \otimes A}\)};
+                    \draw[left dual=0.5] ($(d.south) - (0.5, 0)$) arc (180:360:0.5);
+                    \draw[right dual] ($(d.north) - (1.5, 0)$) coordinate (here) -- (here |- top) node [above] {\(A\mathrlap{^*}\)};
+                    \draw[left dual] ($(d.north) - (0.5, 0)$) coordinate (here) -- (here |- top) node [above] {\(A\)};
+                    \draw[right dual] ($(d.north) + (0.5, 0)$) coordinate (here) -- (here |- top) node [above] {\(A\mathrlap{^*}\)};
+                    \draw[left dual] ($(d.north) + (1.5, 0)$) coordinate (here) -- (here |- top) node [above] {\(A\)};
+                    \node (equal) at (2, -0.25) {\(=\)};
+                    \node[morphism, minimum width=1.2cm] (d1) at (3, -1) {\(d_{A^*}\)};
+                    \node[morphism, minimum width=1.2cm] (d2) at (5, -1) {\(\phantomrlap{d_A}{d_{A^*}}\)};
+                    \draw[left dual, xscale=2] (d1.south) arc (180:360:0.5);
+                    \draw[right dual] ($(d1.north) - (0.5, 0)$) coordinate (here) -- (here |- top) node [above] {\(A\mathrlap{^*}\)};
+                    \draw[left dual=0.3, rounded corners] ($(d2.north) - (0.5, 0)$) -- ++ (0, 0.2) -- ++ (-1, 0.5) coordinate (here) -- (here |- top) node [above] {\(A\mathrlap{^*}\)};
+                    \draw[over wire, right dual=0.3, rounded corners] ($(d1.north) + (0.5, 0)$) -- ++ (0, 0.2) -- ++ (1, 0.5) coordinate (here) -- (here |- top) node [above] {\(A\)};
+                    \draw[right dual] ($(d2.north) + (0.5, 0)$) coordinate (here) -- (here |- top) node [above] {\(A\)};
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Applying cocommutativity of \(d_{A^*}\), using the inverse swap, we have
+            \begin{equation}
+                \tikzsetnextfilename{uniform-copying-duals-proof-4}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \coordinate (top) at (0, 1);
+                    \node[morphism, minimum width=1.2cm] (d1) at (0, -1) {\(d_{A^*}\)};
+                    \node[morphism, minimum width=1.2cm] (d2) at (2, -1) {\(\phantomrlap{d_A}{d_{A^*}}\)};
+                    \draw[left dual, xscale=2] (d1.south) arc (180:360:0.5);
+                    \draw[right dual] ($(d1.north) - (0.5, 0)$) coordinate (here) -- (here |- top) node [above] {\(A\mathrlap{^*}\)};
+                    \draw[left dual=0.8, rounded corners] ($(d2.north) - (0.5, 0)$) -- ++ (0, 0.2) -- ++ (-1, 0.5) coordinate (here) -- (here |- top) node [above] {\(A\)};
+                    \draw[over wire, right dual=0.8, rounded corners] ($(d1.north) + (0.5, 0)$) -- ++ (0, 0.2) -- ++ (1, 0.5) coordinate (here) -- (here |- top) node [above] {\(A\mathrlap{^*}\)};
+                    \draw[right dual] ($(d2.north) + (0.5, 0)$) coordinate (here) -- (here |- top) node [above] {\(A\)};
+                    \node (equal) at (3, -0.25) {\(=\)};
+                    \node[morphism, minimum width=1.2cm] (d1) at (4, -1) {\(d_{A^*}\)};
+                    \node[morphism, minimum width=1.2cm] (d2) at (6, -1) {\(\phantomrlap{d_A}{d_{A^*}}\)};
+                    \draw[left dual, xscale=2] (d1.south) arc (180:360:0.5);
+                    \draw[left dual=0.24, rounded corners] ($(d2.north) - (0.5, 0)$) -- ++ (0, 1) -- ++ (-1, 0.5) coordinate (here) -- (here |- top) node [above] {\(A\)};
+                    \draw[right dual, rounded corners, over wire] ($(d1.north) - (0.5, 0)$) -- ++ (0, 0.2) -- ++ (1, 0.5) -- ++ (0, 0.3) -- ++ (1, 0.5) coordinate (here) -- (here |- top) node [above] {\(A\mathrlap{^*}\)};
+                    \draw[over wire, right dual=0.8, rounded corners] ($(d1.north) + (0.5, 0)$) -- ++ (0, 0.2) -- ++ (-1, 0.5) coordinate (here) -- (here |- top) node [above] {\(A\mathrlap{^*}\)};
+                    \draw[left dual] ($(d2.north) + (0.5, 0)$) coordinate (here) -- (here |- top) node [above] {\(A\)};
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Redrawing this diagram we have
+            \begin{equation}
+                \tikzsetnextfilename{uniform-copying-duals-proof-5}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \coordinate (top) at (0, 1.5);
+                    \node[morphism, minimum width=1.2cm] (d1) at (0, -1) {\(d_{A^*}\)};
+                    \node[morphism, minimum width=1.2cm] (d2) at (2, -1) {\(\phantomrlap{d_A}{d_{A^*}}\)};
+                    \draw[left dual, xscale=2] (d1.south) arc (180:360:0.5);
+                    \draw[left dual=0.24, rounded corners] ($(d2.north) - (0.5, 0)$) -- ++ (0, 1) -- ++ (-1, 0.5) coordinate (here) -- (here |- top) node [above] {\(A\)};
+                    \draw[right dual=0.5, rounded corners, over wire] ($(d1.north) - (0.5, 0)$) -- ++ (0, 0.2) -- ++ (1, 0.5) -- ++ (0, 0.3) -- ++ (1, 0.5) coordinate (here) -- (here |- top) node [above] {\(A\mathrlap{^*}\)};
+                    \draw[over wire, right dual=0.8, rounded corners] ($(d1.north) + (0.5, 0)$) -- ++ (0, 0.2) -- ++ (-1, 0.5) coordinate (here) -- (here |- top) node [above] {\(A\mathrlap{^*}\)};
+                    \draw[left dual] ($(d2.north) + (0.5, 0)$) coordinate (here) -- (here |- top) node [above] {\(A\)};
+                    \node (equal) at (3, 0) {\(\equaliso\)};
+                    \node[morphism, minimum width=1.2cm] (d1) at (4, -1) {\(d_{A^*}\)};
+                    \node[morphism, minimum width=1.2cm] (d2) at (6, -1) {\(\phantomrlap{d_A}{d_{A^*}}\)};
+                    \draw[left dual, xscale=2] (d1.south) arc (180:360:0.5);
+                    \draw[left dual=0.9, rounded corners] ($(d2.north) - (0.5, 0)$) -- ++ (0, 0.2) -- ++ (-1, 0.5) coordinate (here) -- (here |- top) node [above] {\(A\)};
+                    \draw[right dual=0.4, rounded corners, over wire] ($(d1.north) - (0.5, 0)$) -- ++ (0, 0.7) -- ++ (2, 1) coordinate (here) -- (here |- top) node [above] {\(A\mathrlap{^*}\)};
+                    \draw[over wire, right dual=0.8, rounded corners] ($(d1.north) + (0.5, 0)$) -- ++ (0, 0.2) -- ++ (1, 0.5) -- ++ (0, 0.3) -- ++ (-2, 1) coordinate (here) -- (here |- top) node [above] {\(A\mathrlap{^*}\)};
+                    \draw[left dual] ($(d2.north) + (0.5, 0)$) coordinate (here) -- (here |- top) node [above] {\(A\)};
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Now notice that the lower half of this diagram is exactly the right hand side of \cref{eqn:proving uniform copying duals 2}, so we can replace it with the double cup making up the left hand side of \cref{eqn:proving uniform copying duals 1}.
+            This gives
+            \begin{equation}
+                \tikzsetnextfilename{uniform-copying-duals-proof-6}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \coordinate (top) at (0, 1.5);
+                    \node[morphism, minimum width=1.2cm] (d1) at (0, -1) {\(d_{A^*}\)};
+                    \node[morphism, minimum width=1.2cm] (d2) at (2, -1) {\(\phantomrlap{d_A}{d_{A^*}}\)};
+                    \draw[left dual, xscale=2] (d1.south) arc (180:360:0.5);
+                    \draw[left dual=0.9, rounded corners] ($(d2.north) - (0.5, 0)$) -- ++ (0, 0.2) -- ++ (-1, 0.5) coordinate (here) -- (here |- top) node [above] {\(A\)};
+                    \draw[right dual=0.4, rounded corners, over wire] ($(d1.north) - (0.5, 0)$) -- ++ (0, 0.7) -- ++ (2, 1) coordinate (here) -- (here |- top) node [above] {\(A\mathrlap{^*}\)};
+                    \draw[over wire, right dual=0.8, rounded corners] ($(d1.north) + (0.5, 0)$) -- ++ (0, 0.2) -- ++ (1, 0.5) -- ++ (0, 0.3) -- ++ (-2, 1) coordinate (here) -- (here |- top) node [above] {\(A\mathrlap{^*}\)};
+                    \draw[left dual] ($(d2.north) + (0.5, 0)$) coordinate (here) -- (here |- top) node [above] {\(A\)};
+                    \node (equal) at (3, 0) {\(=\)};
+                    \begin{scope}[xshift=-0.5cm]
+                        \draw[right dual=0.2, rounded corners] (5, 1.5) node [above] {\(A\)} -- ++ (0, -1.7);
+                        \draw[over wire, left dual=0.7, rounded corners] (6, 1.5) node [above] {\(A\mathrlap{^*}\)} -- ++ (0, -0.5) -- ++ (-2, -1) -- ++ (0, -0.2) coordinate (A);
+                        \draw[over wire, left dual=0.3, rounded corners] (4, 1.5) node [above] {\(A\mathrlap{^*}\)} -- ++ (0, -0.2) -- ++ (2, -1) -- ++ (0, -0.5) coordinate (B);
+                        \draw[right dual] (7, 1.5) node [above] {\(A\)} -- ++ (0, -1.7);
+                        \draw[wire] (A) arc (180:360:0.5);
+                        \draw[wire] (B) arc (180:360:0.5);
+                    \end{scope}
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Finally, we can rewrite this with an isotopy of diagrams giving
+            \begin{equation}
+                \tikzsetnextfilename{uniform-copying-duals-proof-7}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \coordinate (top) at (0, 1.5);
+                    \draw[right dual=0.2, rounded corners] (1, 1.5) node [above] {\(A\)} -- ++ (0, -1.7);
+                    \draw[over wire, left dual=0.7, rounded corners] (2, 1.5) node [above] {\(A\mathrlap{^*}\)} -- ++ (0, -0.5) -- ++ (-2, -1) -- ++ (0, -0.2) coordinate (A);
+                    \draw[over wire, left dual=0.3, rounded corners] (0, 1.5) node [above] {\(A\mathrlap{^*}\)} -- ++ (0, -0.2) -- ++ (2, -1) -- ++ (0, -0.5) coordinate (B);
+                    \draw[right dual] (3, 1.5) node [above] {\(A\)} -- ++ (0, -1.7);
+                    \draw[wire] (A) arc (180:360:0.5);
+                    \draw[wire] (B) arc (180:360:0.5);
+                    \node (equal) at (3.5, 0) {\(=\)};
+                    \draw[left dual, xscale=3] (4/3, 0 |- top) node [above] {\(A\mathrlap{^*}\)} -- ++ (0, -1.7) arc (180:360:0.5) -- ++ (0, 1.7) node [above] {\(A\)};
+                    \draw[wire, rounded corners] (5, 0 |- top) node [above] {\(A\)} -- ++ (0, -0.5) -- ++ (1, -0.5) -- ++ (0, -0.4);
+                    \draw[over wire, rounded corners] (6, 0 |- top) node [above] {\(A\mathrlap{^*}\)} -- ++ (0, -0.5) -- ++ (-1, -0.5) -- ++ (0, -0.4) coordinate (A);
+                    \draw[left dual] (A) arc (180:360:0.5);
+                \end{tikzpicture}
+                .\qedhere
+            \end{equation}
+        \end{proof}
     \end{lma}
     
     This is intuitively not quite right because on the left hand side we have the second system, \(A\), and the third system, \(A^*\), unconnected, but on the right they become connected.
     This makes it hard to create independent states.
     
-    \begin{lma}{}{}
-        
+    \begin{lma}{}{lma:swap trivial in braided mon cat duals uniform copying}
+        In a braided monoidal category with duals and uniform copying the swap is trivial, that is
+        \begin{equation}
+            \tikzsetnextfilename{uniform-copying-trivial-swap}
+            \begin{tikzpicture}[baseline=(equal.base)]
+                \draw[wire, rounded corners] (1, 0) node [below] {\(A\)} -- ++ (0, 0.25) -- ++ (-1, 0.5) -- ++ (0, 0.25) node [above] {\(A\)};
+                \draw[over wire, rounded corners] (0, 0) node [below] {\(A\)} -- ++ (0, 0.25) -- ++ (1, 0.5) -- ++ (0, 0.25) node [above] {\(A\)};
+                \node (equal) at (1.5, 0.5) {\(=\)};
+                \draw[wire] (2, 0) node [below] {\(A\)} -- ++ (0, 1) node [above] {\(A\)};
+                \draw[wire] (3, 0) node [below] {\(A\)} -- ++ (0, 1) node [above] {\(A\)};
+            \end{tikzpicture}
+            .
+        \end{equation}
+        \begin{proof}
+            Start with the left hand side above and deform it according to the snake equation:
+            \begin{equation}
+                \tikzsetnextfilename{uniform-copying-swap-to-snakes}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \draw[wire, rounded corners] (1, 0) node [below] {\(A\)} -- ++ (0, 0.5) -- ++ (-1, 0.5) -- ++ (0, 0.5) node [above] {\(A\)};
+                    \draw[over wire, rounded corners] (0, 0) node [below] {\(A\)} -- ++ (0, 0.5) -- ++ (1, 0.5) -- ++ (0, 0.5) node [above] {\(A\)};
+                    \node (equal) at (1.5, 0.5) {\(\equaliso\)};
+                    \draw[wire] (2, 1.5) node [above] {\(A\)} -- ++ (0, -0.75) arc (180:360:0.25) coordinate (A);
+                    \draw[wire, xscale=2.5] (A) arc (180:0:0.5) coordinate (B);
+                    \draw[wire] (B) -- ++ (0, -0.75) node [below] {\(A\)};
+                    \draw[over wire] (3, 1.5) node [above] {\(A\)} -- ++ (0, -0.75) arc (180:360:0.25) arc (180:0:0.25) -- ++ (0, -0.75) node [below] {\(A\)};
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Now apply \cref{lma:double cup braided mon cat duals and copying} to get
+            \begin{equation}
+                \tikzsetnextfilename{uniform-copying-swap-to-tangled-snakes}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \draw[wire, rounded corners] (1, 0) node [below] {\(A\)} -- ++ (0, 0.5) -- ++ (-1, 0.5) -- ++ (0, 0.5) node [above] {\(A\)};
+                    \draw[over wire, rounded corners] (0, 0) node [below] {\(A\)} -- ++ (0, 0.5) -- ++ (1, 0.5) -- ++ (0, 0.5) node [above] {\(A\)};
+                    \node (equal) at (1.5, 0.75) {\(=\)};
+                    \draw[wire] (2, 1.5) node [above] {\(A\)} -- ++ (0, -1.2) coordinate (A);
+                    \draw[wire, xscale=3] (A) arc (180:360:0.3) coordinate (B);
+                    \draw[wire] (B) -- ++ (0, 0.3) arc (180:0:0.3) -- ++ (0, -0.6) node [below] {\(A\)};
+                    \draw[wire, rounded corners] (2.6, 1.5) node [above] {\(A\)} -- ++ (0, -0.5) -- ++ (0.6, -0.3) -- ++ (0, -0.1) coordinate (C);
+                    \draw[wire] (C) arc (360:180:0.3) coordinate (D);
+                    \draw[over wire, rounded corners] (D) -- ++ (0, 0.1) -- ++ (0.6, 0.3) -- ++ (0, 0.2) coordinate (E);
+                    \draw[wire, xscale=3] (E) arc (180:0:0.3) -- ++ (0, -1.2) node [below] {\(A\)};
+                    \node at (5.5, 0.9) {\(\equaliso\)};
+                    \draw[wire] (6, 0) node [below] {\(A\)} -- ++ (0, 1.5) node [above] {\(A\)};
+                    \draw[wire] (7, 0) node [below] {\(A\)} -- ++ (0, 1.5) node [above] {\(A\)};
+                \end{tikzpicture}
+                . \qedhere
+            \end{equation}
+        \end{proof}
     \end{lma}
     
     So exchanging two identical systems is the same as doing nothing.
     From a quantum mechanical point of view this means that exchanging two electrons is the same as doing nothing, but we know that exchanging two electrons should result in an overall minus sign, since electrons are fermions and so their wave functions are antisymmetric.
     Thus we cannot have duals and uniform copying if we want fermions, and we most certainly want fermions as they make up all matter.
+    
+    The failure of these structures to model reality results in the \defineindex{no cloning theorem}, which says that a system modelling quantum reality cannot have uniform copying.
+    Rephrased in the following theorem it says that if we do have uniform copying then the only endomorphisms are multiplies of the identity.
+    From a quantum mechanical perspective this means that all observables are simply defined by a single eigenvalue and take the same value on all states, so there are no interesting observables.
+    
+    \begin{thm}{No Cloning Theorem}{}
+        In a braided monoidal category with duals and uniform copying every endomorphism is a multiple of the identity.
+        In particular, if \(f \colon A \to A\) is an endomorphism in this category then \(f = \tr(f) \cdot \id_A\), that is
+        \begin{equation}
+            \tikzsetnextfilename{uniform-copying-no-cloning-theorem}
+            \begin{tikzpicture}[baseline=(equal.base)]
+                \node[morphism] (f) {\(f\)};
+                \draw[wire] (f) -- ++ (0, 1) node [above] {\(A\)};
+                \draw[wire] (f) -- ++ (0, -1) node [below] {\(A\)};
+                \node (equal) at (0.75, 0) {\(=\)};
+                \draw[wire] (1.4, -1) node [below] {\(A\)} -- ++ (0, 2) node [above] {\(A\)};
+                \node[morphism] (f2) at (2, 0.3) {\(f\)};
+                \draw[wire] (f2) -- ++ (0, 0.2) arc (180:0:0.5) -- ++ (0, -0.4) coordinate (A);
+                \path[rounded corners] (A) -- ++ (0, -0.2) -- ++ (-1, -0.3) -- ++ (0, -0.2) coordinate (B);
+                \draw[wire] (B) arc (180:360:0.5) coordinate (C);
+                \draw[wire, rounded corners] (C) -- ++ (0, 0.2) -- ++ (-1, 0.3) -- (f2);
+                \draw[over wire, rounded corners] (A) -- ++ (0, -0.2) -- ++ (-1, -0.3) -- ++ (0, -0.2) coordinate (B);
+            \end{tikzpicture}
+            .
+        \end{equation}
+        \begin{proof}
+            Start by applying the snake equation to \(f\), then sliding the lower wire over \(f\):
+            \begin{equation}
+                \tikzsetnextfilename{uniform-copying-no-cloning-proof}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \node[morphism] (f) {\(f\)};
+                    \draw[wire] (f) -- ++ (0, 1) node [above] {\(A\)} coordinate (top);
+                    \draw[wire] (f) -- ++ (0, -1) node [below] {\(A\)};
+                    \node (equal) at (0.75, 0) {\(=\)};
+                    \draw[wire] (1.4, -1) node [below] {\(A\)} -- ++ (0, 0.75) arc (180:0:0.5) arc (180:360:0.5) -- ++ (0, 0.3) coordinate (A);
+                    \node[morphism, above] (f2) at (A) {\(f\)};
+                    \draw[wire] (f2) -- (top -| f2) node [above] {\(A\)};
+                    \node at (4.2, 0.15) {\(\equaliso\)};
+                    \draw[wire] (4.85, -1) node [below] {\(A\)} -- ++ (0, 1.25) coordinate (B);
+                    \draw[wire, xscale=2] (B) arc (180:0:0.5) coordinate (C);
+                    \node[morphism] (f3) at (5.85, 0.25) {\(f\)};
+                    \draw[over wire] (f3) -- (f3 |- top) node [above] {\(A\)};
+                    \draw[wire, rounded corners] (f3.south) -- ++ (0, -0.2) -- ++ (1, -0.5) -- ++ (0, -0.15) coordinate (D);
+                    \draw[wire] (D) arc (360:180:0.5) coordinate (E);
+                    \draw[over wire, rounded corners] (E) -- ++ (0, 0.15) -- ++ (1, 0.5) -- (C);
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Now apply \cref{lma:swap trivial in braided mon cat duals uniform copying} to the swap and we are left with \(\tr(f) \cdot \id_A\).
+        \end{proof}
+    \end{thm}
+    
+    \chapter{Frobenius Structures}
+    \section{Frobenius Structures: The Idea}
+    While quantum mechanics doesn't allow for copying of states there is nothing preventing us copying classically.
+    In this way classical mechanics can be phrased as quantum mechanics plus the ability to copy and delete.
+    We take \(\FHilb\) as our motivation.
+    Fix some Hilbert space with orthogonal basis \(\{e_i\}\).
+    Then copying is the map defined by
+    \begin{equation}
+        d = \comonoidProduct \colon e_i \mapsto e_i \otimes e_i
+    \end{equation}
+    extended by linearity to all inputs.
+    The adjoint to this copying map is the \defineindex{comparison map}
+    \begin{equation}
+        d^\hermit = \comonoidProductAdjoint \colon e_i \otimes e_j \mapsto
+        \begin{cases}
+            e_i & i = j,\\
+            0 & \text{otherwise}.
+        \end{cases}
+    \end{equation}
+    This map defines a monoid on this Hilbert space.
+    These two structures can be combined to give
+    \begin{equation}
+        \tikzsetnextfilename{FS-frobenius-law-in-FHilb}
+        \begin{tikzpicture}[baseline=(equal.base)]
+            \draw[wire] (0, 0) -- ++ (0, 1) arc (180:0:0.5) arc (180:360:0.5) -- ++ (0, 1);
+            \draw[wire] (0.5, 1.5) -- ++ (0, 0.5);
+            \draw[wire] (1.5, 0.5) -- ++ (0, -0.5);
+            \node[comonoid dot] at (0.5, 1.5) {};
+            \node[comonoid dot] at (1.5, 0.5) {};
+            \node[state, below, minimum width=0.75cm] (here) at (0, 0) {};
+            \node at (here) {\(e_i\)};
+            \node[state, below, minimum width=0.75cm] (here) at (1.5, 0) {};
+            \node at (here) {\(e_j\)};
+            \node (equal) at (2.4, 0.75) {\(=\)};
+            \node[state, below, minimum width=0.75cm] (here) at (3.25, 1) {};
+            \node at (here) {\(e_i\)};
+            \draw[wire] (here) -- ++ (0, 0.75);
+            \node[state, below, minimum width=0.75cm] (here) at (4, 1) {};
+            \node at (here) {\(e_j\)};
+            \draw[wire] (here) -- ++ (0, 0.75);
+            \node at (3.25, 0) {\(0\)};
+            \node at (5.25, 1) {\(i = j\)};
+            \node at (5.25, 0) {\(i \ne j\)};
+            \draw[decorate, decoration={calligraphic brace}, thick] (2.8, -0.25) -- (2.8, 1.7);
+            \draw[decorate, decoration={calligraphic brace, mirror}, thick] (5.75, -0.25) -- (5.75, 1.7);
+            \node (equal) at (6.1, 0.75) {\(=\)};
+            \begin{scope}[xshift=8.5cm, xscale=-1]
+                \draw[wire] (0, 0) -- ++ (0, 1) arc (180:0:0.5) arc (180:360:0.5) -- ++ (0, 1);
+                \draw[wire] (0.5, 1.5) -- ++ (0, 0.5);
+                \draw[wire] (1.5, 0.5) -- ++ (0, -0.5);
+                \node[comonoid dot] at (0.5, 1.5) {};
+                \node[comonoid dot] at (1.5, 0.5) {};
+                \node[state, below, minimum width=0.75cm] (here) at (0, 0) {};
+                \node at (here) {\(e_j\)};
+                \node[state, below, minimum width=0.75cm] (here) at (1.5, 0) {};
+                \node at (here) {\(e_i\)};
+            \end{scope}
+        \end{tikzpicture}
+        .
+    \end{equation}
+    The shape of this equation motivates our next definition.
+    
+    \section{Frobenius Structures: The Definition}
+    \begin{dfn}{Frobenius Structure}{}
+        In a monoidal category a \defineindex{Frobenius structure} is formed from a monoid, \((A, \monoidProduct, \monoidIdentity)\), and comonoid, \((A, \comonoidProduct, \comonoidIdentity)\), on some object \(A\), such that the product and coproduct satisfy the \defineindex{Frobenius law}
+        \begin{equation}
+            \tikzsetnextfilename{FS-frobenius-law}
+            \begin{tikzpicture}[baseline=(equal.base)]
+                \draw[wire] (0, 0) -- ++ (0, 1) arc (180:0:0.5) arc (180:360:0.5) -- ++ (0, 1);
+                \draw[wire] (0.5, 1.5) -- ++ (0, 0.5);
+                \draw[wire] (1.5, 0.5) -- ++ (0, -0.5);
+                \node[monoid dot] at (0.5, 1.5) {};
+                \node[comonoid dot] at (1.5, 0.5) {};
+                \node (equal) at (2.5, 1) {\(=\)};
+                \begin{scope}[xshift=5cm, xscale=-1]
+                    \draw[wire] (0, 0) -- ++ (0, 1) arc (180:0:0.5) arc (180:360:0.5) -- ++ (0, 1);
+                    \draw[wire] (0.5, 1.5) -- ++ (0, 0.5);
+                    \draw[wire] (1.5, 0.5) -- ++ (0, -0.5);
+                    \node[monoid dot] at (0.5, 1.5) {};
+                    \node[comonoid dot] at (1.5, 0.5) {};
+                \end{scope}
+            \end{tikzpicture}
+            .
+        \end{equation}
+        If \(\monoidProduct = \comonoidProductAdjoint\) then we call this a \defineindex{dagger Frobenius structure}.
+    \end{dfn}
+
+    \section{Frobenius Structures: The Examples}
+    \subsection{Group Algebra}
+    We've seen that in \(\FHilb\) we get a Frobenius structure by taking the comparison monoid and copying comonoid.
+    There is another way to form a Frobenius structures in \(\FHilb\).
+    Start with a finite group, \(G\), and define the \defineindex{group algebra}, \(\complex[G]\), to be the Hilbert space spanned by the elements of the group.
+    A vector in this space is of the form \(\sum_i z_i g_i\) where \(g_i \in G\) and \(z_i \in \complex\).
+    The sum of two such vectors is \(\sum_{i}z_i g_i + \sum_{i}w_i g_i = \sum_i (z_i + w_i)g_i\), scalar multiplication is given by \(w\sum_i z_i g_i = \sum_i (wz_i)g_i\), the product of two vectors is \(\left( \sum_i z_ig_i \right) \left( \sum_j w_jg_j \right) = \sum_{i,j}(z_iw_j)(g_ig_j)\), and the scalar product is \(\braket{\sum_iz_ig_i}{\sum_jw_jg_j} = \sum_i z_i^*w_i\).
+    These sums are purely formal, we don't try to evaluate them.
+    
+    The group algebra comes equipped with a natural Frobenius structure.
+    Define a monoid on \(\complex[G]\) in the obvious way using the fact that every group is a monoid and defining
+    \begin{equation}
+        m = \monoidProduct\colon g \otimes h \mapsto gh, \qquad \monoidIdentity \colon z \mapsto z 1_G
+    \end{equation}
+    for \(g, h \in G\) and \(1_G \in G\) the group identity, and extending this by linearity to all of \(\complex[G]\).
+    The adjoint of this monoid is the comonoid defined by
+    \begin{equation}
+        d = \monoidProductAdjoint \colon g \mapsto \sum_{h\in G} gh^{-1}\otimes h, \qquad \monoidIdentityAdjoint \colon 
+        \begin{cases}
+            1_G \mapsto 1 & g = 1_G,\\
+            g \mapsto 0 & g \ne 1_G.
+        \end{cases}
+    \end{equation}
+    again, extending this by linearity to all of \(\complex[G]\).
+    
+    The left hand side of the Frobenius law takes in two vectors in \(\complex[G]\), but we can simplify the analysis by acting just on the basis vectors, which are elements of the group, \(G\), embedded in the group algebra.
+    So consider the input \(g \otimes h\).
+    Algebraically the left hand side of the Frobenius law is
+    \begin{equation}
+        f = (m \otimes \id_A) \circ \alpha_{A,A,A}^{-1} \circ ({\id_A} \otimes d)
+    \end{equation}
+    where \(m\) and \(d\) are the monoid multiplication and comonoid copy maps.
+    Applying this to \(g \otimes h\) we get
+    \begingroup\allowdisplaybreaks
+    \begin{align}
+        f(g \otimes h) &= [(m \otimes \id_A) \circ \alpha_{A,A,A}^{-1}]\left( g \otimes \left[ \sum_{k\in G} hk^{-1} \otimes k \right] \right)\\
+        &= \sum_{k\in G} [(m \otimes \id_A) \circ \alpha_{A,A,A}^{-1}](g \otimes (hk^{-1} \otimes k))\\
+        &= \sum_{k\in G} [(m \otimes \id_A)]((g \otimes hk^{-1}) \otimes k)\\
+        &= \sum_{k\in G} ghk^{-1} \otimes k\\
+        &= \sum_{k\in G} gk^{-1} \otimes kh.
+    \end{align}
+    \endgroup
+    In the last step here we've used Cayley's theorem to recognise that if \(k\) takes on all values in \(G\) then so does \(kh\) as this is simply the group acting on itself by permutation.
+    Thus, these two sums are equal but the order of terms in the sum may change.
+    The right hand side of the Frobenius law is
+    \begin{equation}
+        \tilde{f} = ({\id_A} \otimes m) \circ \alpha_{A,A,A} \circ (d \otimes \id_A).
+    \end{equation}
+    Applying this to \(g \otimes h\) we get
+    \begin{align}
+        \tilde{f}(g \otimes h) &= [({\id_A} \otimes m) \circ \alpha_{A,A,A}]\left( \left[ \sum_{k\in G} gk^{-1} \otimes k \right] \otimes h \right)\\
+        &= \sum_{k\in G} [({\id_A} \otimes m) \circ \alpha_{A,A,A}]( (gk^{-1} \otimes k) \otimes h )\\
+        &= \sum_{k\in G} [({\id_A} \otimes m)](gk^{-1} \otimes (k \otimes h))\\
+        &= \sum_{k\in G} [gk^{-1} \otimes kh].
+    \end{align}
+    These are equal, so the Frobenius law holds.
+    
+    \subsection{Groupoids}
+    Recall that a \defineindex{groupoid} is a category in which all morphisms are invertible.
+    In order to work with groupoids it is often easier to work with a slightly different, but completely equivalent, definition of a category.
+    \begin{dfn}{Category}{}
+        A \defineindex{category}, \(\cat{C}\), consists of the following data:
+        \begin{itemize}
+            \item a class, \(\Ob(\cat{C})\), of objects;
+            \item a class, \(\hom(\cat{C})\), of morphisms;
+            \item two maps \(s, t \colon \hom(\cat{C}) \to \Ob(\cat{C})\), called the \defineindex{source} and \defineindex{target} maps;
+            \item for all pairs of morphisms \(f, g \in \hom(\cat{C})\) with \(t(f) = s(g)\) a morphism \(g \circ f \in \hom(\cat{C})\);
+            \item for every object \(A \in \Ob(\cat{C})\) a morphism \(\id_A \in \hom(\cat{C})\).
+        \end{itemize}
+        This data is constrained by the following:
+        \begin{itemize}
+            \item source and target respect composition: \(s(g \circ f) = s(f)\) and \(t(g\circ f) = t(g)\);
+            \item source and target respect identities: \(s(\id_A) = t(\id_A) = A\);
+            \item associativity: \((h \circ g) \circ f = h \circ (g \circ f)\) whenever these maps are defined;
+            \item unit laws: \(\id_{t(f)} \circ f = f = f \circ \id_{s(f)}\).
+        \end{itemize}
+    \end{dfn}
+    
+    Basically, take the definition we usually use of a category, do away with individual hom-sets and put all morphisms into one bag, \(\hom(\cat{C})\), and then define functions \(s\) and \(t\) which give the domain and codomain.
+    To map back to the original definition of a category simply define \(\hom(A, B) = \{f \in \hom(\cat{C}) \mid s(f) = A \text{ and } t(f) = B\}\).
+    With this new definition of a category a groupoid, \(\cat{G}\), consists of objects, \(\Ob(\cat{G})\), and isomorphisms \(\hom(\cat{G})\).
+    
+    In \(\Rel\) we can construct a Frobenius structure on a groupoid, \(\cat{G}\).
+    First, let \(G = \hom(\cat{G})\) and we can then construct relations on this set (assuming that \(\cat{G}\) is a small category).
+    Then define multiplication:
+    \begin{align}
+        \monoidProduct \colon G \times G &\to G\\
+        (g, h) &\sim g \circ h \text{ if } s(g) = t(h).
+    \end{align}
+    That is, identify the pair of isomorphisms \((h, g)\) with their composite \(h \circ g\) if this is defined, and with nothing if this composite doesn't exist.
+    The unit is then defined as
+    \begin{align}
+        \monoidIdentity \colon 1 &\to G\\
+        \bullet &\sim \id_A \text{ for all } A \in \Ob(\cat{G})
+    \end{align}
+    where \(1 = \{\bullet\}\) is the singleton set.
+    That is, we identify the element of the singleton set with identities and nothing else.
+    
+    The adjoint of these maps are defined by the converse relations, in particular,
+    \begin{equation}
+        \monoidProductAdjoint \colon g \sim (h, h^{-1} \circ g) \text{ for all } h \in G \text{ with } t(g) = s(h^{-1}) = t(h)
+    \end{equation}
+    and
+    \begin{equation}
+        \monoidIdentityAdjoint \colon \id_A \sim \bullet \text{ for all } A \in \Ob(\cat{G}).
+    \end{equation}
+    This defines a Frobenius structure on \(G\).
+    
+    \subsection{Pair of Pants}
+    In a dagger monoidal category with duality \(A \leftdual A^*\) the pair of pants monoid on \(A^* \otimes A\) forms a dagger Frobenius structure.
+    This can be seen directly as the left and right hand sides of the Frobenius law are isotopic for the pair of pants monoid:
+    \begin{equation}
+        \tikzsetnextfilename{FS-pair-of-pants-frobenius-law}
+        \begin{tikzpicture}[baseline=(equal.base)]
+            \draw[left dual, rounded corners] (1, -0.5) -- ++ (0, 1) arc (180:90:0.5) -- ++ (1, -1) -- ++ (0, -0.5);
+            \draw[left dual, rounded corners] (3.5, 2) -- ++ (0, -1) arc (0:-90:0.5) -- ++ (-1, 1) -- ++ (0, 0.5);
+            \draw[right dual, rounded corners] (0, -0.5) -- ++ (0, 1.3) -- ++ (1, 1) -- ++ (0, 0.2);
+            \draw[left dual, rounded corners] (3.5, -0.5) -- ++ (0, 0.2) -- ++ (1, 1) -- ++ (0, 1.3);
+            \node (equal) at (5, 0.65) {\(\equaliso\)};
+            \begin{scope}[xshift=6.5cm]
+                \draw[right dual, rounded corners] (0, 2) -- ++ (0, -1) arc (180:270:0.5) -- ++ (1, 1) -- ++ (0, 0.5);
+                \draw[right dual, rounded corners] (2.5, -0.5) -- ++ (0, 1) arc (0:90:0.5) -- ++ (-1, -1) -- ++ (0, -0.5);
+                \draw[right dual, rounded corners] (0, -0.5) -- ++ (0, 0.2) -- ++ (-1, 1) -- ++ (0, 1.3);
+                \draw[left dual, rounded corners] (3.5, -0.5) -- ++ (0, 1.3) -- ++ (-1, 1) -- ++ (0, 0.2);
+            \end{scope}
+        \end{tikzpicture}
+        .
+    \end{equation}
+    Notice that both sides here are isotopic to
+    \begin{equation}
+        \tikzsetnextfilename{FS-extended-frobenius-law-pair-of-pants}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[left dual] (0.5, 0) arc (180:0:0.5);
+            \draw[left dual] (1.5, 2) arc (360:180:0.5);
+            \draw[right dual, rounded corners] (0, 0) -- ++ (0, 0.2) -- ++ (0.3, 0.3) -- ++ (0, 1) -- ++ (-0.3, 0.3) -- ++ (0, 0.2);
+            \draw[left dual, rounded corners] (2, 0) -- ++ (0, 0.2) -- ++ (-0.3, 0.3) -- ++ (0, 1) -- ++ (0.3, 0.3) -- ++ (0, 0.2);
+        \end{tikzpicture}
+    \end{equation}
+    which motivates the following lemma.
+    
+    \section{Extended Frobenius Law}
+    \begin{lma}{Extended Frobenius Law}{}
+        Any Frobenius structure satisfies
+        \begin{equation}
+            \tikzsetnextfilename{FS-extended-frobenius-law}
+            \begin{tikzpicture}[baseline=(equal.base)]
+                \draw[wire] (0, 0) -- ++ (0, 1) arc (180:0:0.5) arc (180:360:0.5) -- ++ (0, 1);
+                \draw[wire] (0.5, 1.5) -- ++ (0, 0.5);
+                \draw[wire] (1.5, 0.5) -- ++ (0, -0.5);
+                \node[monoid dot] at (0.5, 1.5) {};
+                \node[comonoid dot] at (1.5, 0.5) {};
+                \node (equal) at (2.5, 1) {\(=\)};
+                \draw[wire] (3, 0) arc (180:0:0.5);
+                \draw[wire] (3, 2) arc (180:360:0.5);
+                \draw[wire] (3.5, 0.5) -- ++ (0, 1);
+                \node[monoid dot] at (3.5, 0.5) {};
+                \node[comonoid dot] at (3.5, 1.5) {};
+                \node at (4.5, 1) {\(=\)};
+                \draw[wire] (5, 2) -- ++ (0, -1) arc (180:360:0.5) arc (180:0:0.5) -- ++ (0, -1);
+                \draw[wire] (5.5, 0.5) -- ++ (0, -0.5);
+                \draw[wire] (6.5, 1.5) -- ++ (0, 0.5);
+                \node[comonoid dot] at (5.5, 0.5) {};
+                \node[monoid dot] at (6.5, 1.5) {};
+            \end{tikzpicture}
+            \,.
+        \end{equation}
+        \begin{proof}
+            Start with the middle term above and apply the counitality law to the bottom left leg.
+            Then identify a subdiagram we can apply the Frobenius law to.
+            This gives
+            \begin{equation}
+                \tikzsetnextfilename{FS-extended-frobenius-law-proof-1}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \pgfdeclarelayer{behind}
+                    \pgfsetlayers{behind, main}
+                    \draw[wire] (0, -1) -- ++ (0, 1) arc (180:0:0.5) -- ++ (0, -1);
+                    \draw[wire] (0, 2) arc (180:360:0.5);
+                    \draw[wire] (0.5, 0.5) -- ++ (0, 1);
+                    \node[monoid dot] at (0.5, 0.5) {};
+                    \node[comonoid dot] at (0.5, 1.5) {};
+                    \node (equal) at (1.4, 1) {\(=\)};
+                    \draw[wire] (2.5, -1) -- ++ (0, 0.5);
+                    \draw[wire] (2, 1) -- ++ (0, -1) arc (180:360:0.5) arc (180:0:0.5) -- ++ (0, -1);
+                    \draw[wire] (3.5, 0.5) -- ++ (0, 1);
+                    \draw[wire] (3, 2) arc (180:360:0.5);
+                    \node[comonoid dot] at (2.5, -0.5) {};
+                    \node[comonoid dot] at (2, 1) {};
+                    \node[monoid dot] at (3.5, 0.5) {};
+                    \node[comonoid dot] at (3.5, 1.5) {};
+                    \begin{pgfonlayer}{behind}
+                        \fill[Blue!50] (1.8, -0.8) rectangle (4.2, 0.8);
+                    \end{pgfonlayer}
+                    \node at (4.5, 1) {\(=\)};
+                    \draw[wire] (5.5, 1) -- ++ (0, -0.5);
+                    \draw[wire] (5, -1) -- ++ (0, 1) arc (180:0:0.5) arc (180:360:0.5) -- ++ (0, 1.5);
+                    \draw[wire] (6.5, 2) arc (180:360:0.5);
+                    \draw[wire] (6.5, -0.5) -- ++ (0, -0.5);
+                    \node[comonoid dot] at (5.5, 1) {};
+                    \node[monoid dot] at (5.5, 0.5) {};
+                    \node[comonoid dot] at (6.5, -0.5) {};
+                    \node[comonoid dot] at (7, 1.5) {};
+                    \begin{pgfonlayer}{behind}
+                        \fill[Blue!50] (4.8, -0.8) rectangle (7.2, 0.8);
+                    \end{pgfonlayer}
+                \end{tikzpicture}
+                \,.
+            \end{equation}
+            We can now apply coassociativity to the right hand side of this diagram and then again identify a subdiagram to which we can apply the Frobenius law:
+            \begin{equation}
+                \tikzsetnextfilename{FS-extended-frobenius-law-proof-2}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \pgfdeclarelayer{behind}
+                    \pgfsetlayers{behind, main}
+                    \draw[wire] (0, -1) -- ++ (0, 1) arc (180:0:0.5) -- ++ (0, -1);
+                    \draw[wire] (0, 2) arc (180:360:0.5);
+                    \draw[wire] (0.5, 0.5) -- ++ (0, 1);
+                    \node[monoid dot] at (0.5, 0.5) {};
+                    \node[comonoid dot] at (0.5, 1.5) {};
+                    \node (equal) at (1.5, 1) {\(=\)};
+                    \draw[wire] (2, -1) -- ++ (0, 1.5) arc (180:0:0.5) arc (180:360:0.5) -- ++ (0, 1.5);
+                    \draw[wire] (3.5, 0) node [comonoid dot] {} arc (180:360:0.5) -- ++ (0, 2);
+                    \draw[wire] (4, -0.5) node [comonoid dot] {} -- ++ (0, -0.5);
+                    \draw[wire] (2.5, 1) node [monoid dot] {} -- ++ (0, 0.5) node [comonoid dot] {};
+                    \begin{pgfonlayer}{behind}
+                        \fill[Blue!50] (1.8, -0.25) rectangle (4.2, 1.25);
+                    \end{pgfonlayer}
+                    \node at (5, 1) {\(=\)};
+                    \draw[wire] (5.5, 1.5) node [comonoid dot] {} -- ++ (0, -1) {} arc (180:360:0.5) arc (180:0:0.5) arc (180:360:0.5) -- ++ (0, 1.5);
+                    \draw[wire] (6, 0) node [comonoid dot] {} -- ++ (0, -1);
+                    \draw[wire] (7, 1) node [monoid dot] {} -- ++ (0, 1);
+                    \draw[wire] (8, 0) node [comonoid dot] {} -- ++ (0, -1);
+                    \begin{pgfonlayer}{behind}
+                        \fill[Blue!50] (5.3, -0.25) rectangle (7.5, 1.25);
+                    \end{pgfonlayer}
+                \end{tikzpicture}
+                \,.
+            \end{equation}
+            Finally, apply counitality to the left hand side of this diagram and we are left with
+            \begin{equation}
+                \tikzsetnextfilename{FS-extended-frobenius-law-proof-3}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \draw[wire] (2, 0) -- ++ (0, 1) arc (180:0:0.5) arc (180:360:0.5) -- ++ (0, 1);
+                    \draw[wire] (2.5, 1.5) -- ++ (0, 0.5);
+                    \draw[wire] (3.5, 0.5) -- ++ (0, -0.5);
+                    \node[monoid dot] at (2.5, 1.5) {};
+                    \node[comonoid dot] at (3.5, 0.5) {};
+                    \node (equal) at (1.5, 1) {\(=\)};
+                    \draw[wire] (0, 0) arc (180:0:0.5);
+                    \draw[wire] (0, 2) arc (180:360:0.5);
+                    \draw[wire] (0.5, 0.5) -- ++ (0, 1);
+                    \node[monoid dot] at (0.5, 0.5) {};
+                    \node[comonoid dot] at (0.5, 1.5) {};
+                \end{tikzpicture}
+                \,.
+            \end{equation}
+            
+            Proving the second equality is done in exactly the same way but starting with the other leg.
+        \end{proof}
+    \end{lma}
+    
+    \section{Special Frobenius Structure}
+    Consider the Frobenius structure given by an orthogonal basis, \(\{e_i\}\), on some Hilbert space.
+    The norm squared of a basis vector is given by
+    \begin{equation}
+        \norm{e_i}^2 = \,
+        \tikzsetnextfilename{FS-square-norm-of-unit-vector}
+        \begin{tikzpicture}[baseline=11.5pt]
+            \node[state, minimum width=0.75cm] (A) at (0, 0) {};
+            \node[effect, minimum width=0.75cm] (B) at (0, 1) {};
+            \draw[wire] (A) -- (B);
+            \node at (A) {\(e_i\)};
+            \node at (B) {\(e_i\)};
+        \end{tikzpicture}
+        .
+    \end{equation}
+    Since the comonoid in this case copies the basis we have
+    \begin{equation}
+        \tikzsetnextfilename{FS-motivating-speciality-in-FHilb}
+        \begin{tikzpicture}[baseline=(equal.base)]
+            \node[state, minimum width=0.75cm] (A) at (0, 0) {};
+            \node[effect, minimum width=0.75cm] (B) at (0, 2) {};
+            \draw[wire] (0, 1) circle [radius=0.4];
+            \draw[wire] (A) -- ++ (0, 0.6) node [comonoid dot] {};
+            \draw[wire] (B) -- ++ (0, -0.6) node [comonoid dot] {};
+            \node at (A) {\(e_i\)};
+            \node at (B) {\(e_i\)};
+            \node (equal) at (0.75, 1) {\(=\)};
+            \node[state, minimum width=0.75cm] (A) at (1.5, 0) {};
+            \node[state, minimum width=0.75cm] (B) at (2.25, 0) {};
+            \node[effect, minimum width=0.75cm] (C) at (1.5, 2) {};
+            \node[effect, minimum width=0.75cm] (D) at (2.25, 2) {};
+            \node at (A) {\(e_i\)};
+            \node at (B) {\(e_i\)};
+            \node at (C) {\(e_i\)};
+            \node at (D) {\(e_i\)};
+            \draw[wire] (A) -- (C);
+            \draw[wire] (B) -- (D);
+        \end{tikzpicture}
+        \, = \norm{e_i}^4.
+    \end{equation}
+    From this we see that
+    \begin{equation}
+        \tikzsetnextfilename{FS-speciality-in-FHilb}
+        \begin{tikzpicture}[baseline=(equal.base)]
+            \draw[wire] (0, 1) circle [radius=0.4];
+            \draw[wire] (0, 0) -- ++ (0, 0.6) node [comonoid dot] {};
+            \draw[wire] (0, 2) -- ++ (0, -0.6) node [comonoid dot] {};
+            \node (equal) at (0.8, 1) {\(=\)};
+            \draw[wire] (1.25, 0) -- ++ (0, 2);
+        \end{tikzpicture}
+    \end{equation}
+    if and only if \(\norm{e_i} = 1\).
+    This motivates the following definition.
+    
+    \begin{dfn}{Special Frobenius Structure}{}
+        A Frobenius structure is special if
+        \begin{equation}
+            \tikzsetnextfilename{FS-speciality-definition}
+            \begin{tikzpicture}[baseline=(equal.base)]
+                \draw[wire] (0, 1) circle [radius=0.4];
+                \draw[wire] (0, 0) -- ++ (0, 0.6) node [comonoid dot] {};
+                \draw[wire] (0, 2) -- ++ (0, -0.6) node [monoid dot] {};
+                \node (equal) at (0.8, 1) {\(=\)};
+                \draw[wire] (1.25, 0) -- ++ (0, 2);
+            \end{tikzpicture}
+            \,,
+        \end{equation}
+        that is \(m = d^{-1}\) where \(m\) is monoid multiplication and \(d\) is comonoid comultiplication.
+    \end{dfn}
+    
+    As stated before the orthogonal basis Frobenius structure in \(\FHilb\) is special exactly when the basis is orthonormal.
+    
+    The group algebra Frobenius structure in \(\FHilb\) is only special for the trivial group, in which case \(\complex[\{1\}] \isomorphic \complex\).
+    This whole example is trivial though, since \(m(1_G \otimes 1_G) = 1_G 1_G = 1_G\) and \(d(1_G) = 1_G \otimes 1_G\) are the only operations, neither of which allows any interesting computations.
+    
+    The groupoid Frobenius structure in \(\Rel\) is always special.
+    
+    \section{Classical Structures}
+    A classical structure, which we shall define shortly, captures all of the structure of a classical computation, which is roughly speaking a quantum computation with the ability to copy and delete.
+    
+    \begin{dfn}{Classical Structure}{}
+        A \defineindex{classical structure} in a braided monoidal dagger category is a special commutative dagger Frobenius structure.
+    \end{dfn}
+    
+    The (second) \enquote{dagger} part of this definition means that the comonoid and monoid forming the Frobenius structure are adjoints, so we typically only specify one of them.
+    The commutative part applies to the monoid, it is a commutative monoid, which then means that the comonoid is cocommutative.
+    
+    A classical structure in \(\FHilb\) corresponds to an orthonormal basis.
+    A classical structure in \(\Rel\) corresponds to an Abelian group.
+    
+    The definition of a classical turns out to have several redundancies.
+    It can be shown that \((A, \monoidProduct, \monoidIdentity)\) is a classical structure if all of the following hold:
+    \begin{equation}
+        \tikzsetnextfilename{FS-classical-structure-minimal-definition}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[wire] (0, 0) -- ++ (0, 1) arc (180:0:0.5) -- ++ (0, -1);
+            \draw[wire] (0.5, 1.5) node [monoid dot] {} -- ++ (0, 1);
+            \node at (1.5, 1.5) {\(=\)};
+            \draw[wire, rounded corners] (2, 0) -- ++ (0, 0.2) -- ++ (1, 0.6) -- ++ (0, 0.2) coordinate (A);
+            \draw[wire] (A) arc (0:180:0.5) coordinate (B);
+            \draw[over wire, rounded corners] (B) -- ++ (0, -0.2) -- ++ (1, -0.6) -- ++ (0, -0.2) node [right] {\(,\)};
+            \draw[wire] (2.5, 1.5) node [monoid dot] {} -- ++ (0, 1);
+            \begin{scope}[xshift=4cm]
+                \draw[wire] (0, 0) -- ++ (0, 2.5);
+                \draw[wire] (1.5, 1.25) circle [radius=0.5];
+                \draw[wire] (1.5, 0) node [right, xshift=0.5cm] {\(,\)} -- ++ (0, 0.75) node [monoid dot] {};
+                \draw[wire] (1.5, 2.5) -- ++ (0, -0.75) node [monoid dot] {};
+                \node at (0.5, 1.5) {\(=\)};
+            \end{scope}
+            \begin{scope}[xshift=1cm, yshift=-3cm]
+                \node at (-0.75, 1.5) {and};
+                \draw[wire] (0, 0) -- ++ (0, 1.25) arc (180:0:0.5) arc (180:360:0.5) -- ++ (0, 1.25);
+                \draw[wire] (0.5, 1.75) node [monoid dot] {} -- ++ (0, 0.75);
+                \draw[wire] (1.5, 0.75) node [monoid dot] {} -- ++ (0, -0.75) node [right] {\(.\)};
+                \draw[wire] (3, 0) arc (180:0:0.5);
+                \draw[wire] (3, 2.5) arc (180:360:0.5);
+                \draw[wire] (3.5, 0.5) node [monoid dot] {} -- ++ (0, 1.5) node [monoid dot] {};
+                \node at (2.5, 1.5) {\(=\)};
+            \end{scope}
+        \end{tikzpicture}
+    \end{equation}
+    
+    That is, a classical structure is a commutative map \(\monoidProduct \colon A \otimes A \to A\) in a dagger category such that the speciality condition holds and half of the extended Frobenius law holds.
+    The other requirements from these.
+    For example, combining speciality and the Frobenius law gives us associativity
+    
+    \section{Self Duality}
+    \begin{lma}{Frobenius Structures are Self Dual}{lma:FS self dual}
+        If \((A, \comonoidProduct, \comonoidIdentity, \monoidProduct, \monoidIdentity)\) is a Frobenius structure in some monoidal category then \(A\) is self dual with this duality expressed through
+        \begin{equation}
+            \tikzsetnextfilename{FS-self-duality}
+            \begin{tikzpicture}[baseline=(equal.base)]
+                \draw[wire] (0, 0) node [above] {\(A\)} arc (180:360:0.5) node [above] {\(A\)};
+                \draw[wire] (2, 0) node [above] {\(A\)} arc (180:360:0.5) node [above] {\(A\)};
+                \draw[wire] (2.5, -0.5) node [comonoid dot] {} -- ++ (0, -0.5) node [monoid dot] {};
+                \node (equal) at (1.5, -0.5) {\(=\)};
+                \node at (4, -0.5) {and};
+                \begin{scope}[xshift=5cm, yshift=-1cm]
+                    \draw[wire] (0, 0) node [below] {\(A\)} arc (180:0:0.5) node [below] {\(A\)};
+                    \draw[wire] (2, 0) node [below] {\(A\)} arc (180:0:0.5) node [below] {\(A\)};
+                    \draw[wire] (2.5, 0.5) node [monoid dot] {} -- ++ (0, 0.5) node [comonoid dot] {};
+                    \node at (1.5, 0.5) {\(=\)};
+                \end{scope}
+            \end{tikzpicture}
+            .
+        \end{equation}
+        \begin{proof}
+            We need to demonstrate that the snake equations hold with this definition.
+            This follows immediately by the extended Frobenius law and the definition of the (co)unit:
+            \begin{equation}
+                \tikzsetnextfilename{FS-self-dual-proof}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \draw[wire] (0, 0) -- ++ (0, 1) arc (180:0:0.5) arc (180:360:0.5) -- ++ (0, 1);
+                    \node (equal) at (2.5, 1) {\(=\)};
+                    \draw[wire] (3, 0) -- ++ (0, 1) arc (180:0:0.5) arc (180:360:0.5) -- ++ (0, 1);
+                    \draw[wire] (3.5, 1.5) node [monoid dot] {} -- ++ (0, 0.5) node [comonoid dot] {};
+                    \draw[wire] (4.5, 0.5) node [comonoid dot] {} -- ++ (0, -0.5) node [monoid dot] {};
+                    \node at (5.5, 1) {\(=\)};
+                    \draw[wire] (6, 0) arc (180:0:0.5) node [monoid dot] {};
+                    \draw[wire] (6, 2) node [comonoid dot] {} arc (180:360:0.5);
+                    \draw[wire] (6.5, 0.5) node [monoid dot] {} -- ++ (0, 1) node [comonoid dot] {};
+                    \node at (7.5, 1) {\(=\)};
+                    \draw[wire] (8, 0) -- ++ (0, 2);
+                \end{tikzpicture}
+                .
+            \end{equation}
+            The other snake equation is proven similarly.
+        \end{proof}
+    \end{lma}
+    
+    To state the next theorem we'll need a few definitions first.
+    \begin{dfn}{Zero Object}{}
+        An object, \(0\), is a \defineindex{zero object} if it is both initial and terminal.
+        A \defineindex{zero morphism} \(0_{A,B} \colon A \to B\) is the unique morphism \(A \to 0 \to B\) factoring through the zero object.
+    \end{dfn}
+    
+    Note that uniqueness of \(0_{A,B}\) follows since by the definition of an initial object the morphism \(A \to 0\) is unique and by the definition of a terminal object the morphism \(0 \to B\) is unique.
+    
+    \begin{dfn}{Dagger Kernel}{}
+        In a dagger category with a zero object given a map \(f \colon A \to B\) a \defineindex{dagger kernel} of this map is a pair \((K, k)\) consisting of an object \(K\) and an isometry\footnote{recall that \(k\) is an isometry if \(k^\dagger \circ k = \id_K\)} \(k \colon K \to A\) such that when \(f \circ k = 0_{K,B}\) every morphism satisfying \(x \colon X \to A\) factors through \(k\) so that the following commutes:
+        \begin{equation}
+            \begin{tikzcd}
+                K \arrow[r, "k"] & A \arrow[r, shift left, "f"] \arrow[r, shift right, "0_{A,B}"'] & B\\
+                X\mathrlap{.} \arrow[ur, "x"'] \arrow[u, dashed]
+            \end{tikzcd}
+        \end{equation}
+    \end{dfn}
+    
+    The morphism \(m \colon X \to K\) posited by this commuting diagram is unique, and must by equal to \(k^\dagger \circ x\) since \(k\) is an isometry so
+    \begin{equation}
+        m = \id_K \circ m = k^\dagger \circ k \circ m = k^\dagger \circ x
+    \end{equation}
+    
+    The intuition here is to generalise the notion of the kernel of a linear map as the subspace which is mapped to the zero vector, since the zero-dimensional subspace \(\{0\}\) is exactly the zero object in the category of vector spaces.
+    The extra map \(k\) that we have to introduce here is simply the inclusion map from this zero-dimensional space into the space on which \(f\) is defined.
+    
+    \begin{dfn}{Nondegenerate}{}
+        Fix some object \(A\) in a dagger monoidal category.
+        A state \(a \colon I \to A\) is \defineindex{nondegenerate} if \(a \ne 0_{I,A}\) implies \(a^\dagger \circ a \ne 0_{I,I}\).
+        A nondegenerate form is an effect \(\alpha \colon A \to I\) such that \(\alpha^\dagger\) is a nondegenerate state.
+    \end{dfn}
+    
+    In the language of geometry a \defineindex{form} (aka a covariant vector in physics) is something which takes in a vector (aka a contravariant vector in physics) and returns a scalar, the interpretation here being that a nondegenerate form \(\alpha \colon A \to I\) takes in a state \(a \colon I \to A\) and returns the scalar \(\alpha \circ a \colon I \to I\).
+    
+    It can be shown that all morphisms in a category with zero objects and arbitrary dagger kernels are nondegenerate or identically zero.
+    
+    These definitions are quite a lot, so just think in terms of Hilbert spaces where a zero morphism is a map sending everything to the zero vector and a nondegenerate form is a linear map \(\alpha\colon V \to \complex\) such that \(\alpha(v) = 0 \implies v = 0\).
+    In more familiar notation, \(\braket{\alpha}{v} = 0\) if and only if \(v = 0\) (assuming \(\alpha \ne 0\)).
+    Don't worry too much about these concepts, they're just technicalities required for the following theorem.
+    
+    \begin{thm}{}{}
+        Given a monoid \((A, \monoidProduct, \monoidIdentity)\) we can define a Frobenius structure with comonoid \((A, \comonoidProduct, \comonoidIdentity)\) (to be specified in the proof) if and only if \(A\) admits a nondegenerate form \(\comonoidIdentity \colon A \to I\) such that
+        \begin{equation}
+            \tikzsetnextfilename{FS-nondegenerate-form-implies-FS}
+            \begin{tikzpicture}
+                \draw[wire] (0, 0) arc (180:0:0.5);
+                \draw[wire] (0.5, 0.5) node [monoid dot] {} -- ++ (0, 0.5) node [comonoid dot] {};
+            \end{tikzpicture}
+        \end{equation}
+        is the cap of the self duality \(A \leftdual A\).
+        
+        \begin{proof}
+            \Cref{lma:FS self dual} proves that all Frobenius structures give rise to a self duality with the required cap.
+            So we need only show that the existence of such a self duality with unspecified cup \(\eta \colon I \to A \otimes A\) ensures this monoid-comonoid pair is a Frobenius structure.
+            The snake equations for this self duality take the form
+            \begin{equation}
+                \tikzsetnextfilename{FS-snake-for-nondegenerate-counit}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \draw[wire] (0, 0) -- ++ (0, 1) arc (180:0:0.5);
+                    \draw[wire] (0.5, 1.5) node [monoid dot] {} -- ++ (0, 0.5) node [comonoid dot] {};
+                    \node[morphism, minimum width=1cm, below, xshift=0.3cm] (cup1) at (1, 1) {\(\eta\)};
+                    \draw[wire] ($(cup1.north) + (0.3, 0)$) -- ++ (0, 1.25);
+                    \node (equal) at (2.25, 1) {\(=\)};
+                    \draw[wire] (2.75, 0) -- ++ (0, 2.25);
+                    \node at (3.25, 1) {\(=\)};
+                    \draw[wire] (5.5, 0) -- ++ (0, 1) arc (0:180:0.5);
+                    \draw[wire] (5, 1.5) node [monoid dot] {} -- ++ (0, 0.5) node [comonoid dot] {};
+                    \node[morphism, minimum width=1cm, below, xshift=-0.3cm] (cup2) at (4.5, 1) {\(\eta\)};
+                    \draw[wire] ($(cup2.north) + (-0.3, 0)$) -- ++ (0, 1.25);
+                \end{tikzpicture}
+                .
+            \end{equation}
+            We can then define comultiplication through
+            \begin{equation}
+                \tikzsetnextfilename{FS-nondegenerate-form-comultiplication}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \draw[wire] (-0.5, 2.25) -- ++ (0, -0.75) arc (180:360:0.5) -- ++ (0, 0.75);
+                    \draw[wire] (0, 0) -- (0, 1) node [comonoid dot] {};
+                    \node (equal) at (1, 1) {\(=\)};
+                    \draw[wire] (3.5, 0) -- ++ (0, 1) arc (0:180:0.5);
+                    \draw[wire] (3, 1.5) node [monoid dot] {} -- ++ (0, 0.75);
+                    \node[morphism, minimum width=1cm, below, xshift=-0.3cm] (cup2) at (2.5, 1) {\(\eta\)};
+                    \draw[wire] ($(cup2.north) + (-0.3, 0)$) -- ++ (0, 1.25);
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Note that we could have defined comultiplication with \(\eta\) on the other side since applying the snake equation to the line leaving the monoid product dot and then applying associativity of the monoid product we can exchange one of these diagrams for the other:
+            \begin{equation}
+                \tikzsetnextfilename{FS-nondegenerate-form-comultiplication-def-doesnt-matter}
+                \begin{tikzpicture}[baseline=(equal.base), scale=0.7]
+                    \draw[wire] (1, 0) -- ++ (0, 0.5) arc (0:180:0.5);
+                    \draw[wire] (0.5, 1) node [monoid dot] {} -- ++ (0, 1.25);
+                    \node[morphism, minimum width=1cm, below, xshift=-0.3cm] (cup2) at (0, 0.5) {\(\eta\)};
+                    \draw[wire] ($(cup2.north) + (-0.3, 0)$) -- ++ (0, 1.75);
+                    \node (equal) at (1.25, 1) {\(=\)};
+                    \begin{scope}[xshift=2.75cm]
+                        \draw[wire] (1, 0) -- ++ (0, 0.5) arc (0:180:0.5);
+                        \draw[wire] (0.5, 1) node [monoid dot] {} arc (180:0:0.5);
+                        \draw[wire] (1, 1.5) node [monoid dot] {} -- ++ (0, 0.4) node [comonoid dot] {};
+                        \node[morphism, minimum width=1cm, below, xshift=0.3cm] (cup2) at (1.5, 1) {\(\eta\)};
+                        \node[morphism, minimum width=1cm, below, xshift=-0.3cm] (cup1) at (0, 0.5) {\(\eta\)};
+                        \draw[wire] ($(cup1.north) + (-0.3, 0)$) -- ++ (0, 1.75);
+                        \draw[wire] ($(cup2.north) + (0.3, 0)$) -- ++ (0, 1.25);
+                    \end{scope}
+                    \node at (5.75, 1) {\(=\)};
+                    \begin{scope}[xshift=7.25cm]
+                        \draw[wire] (0.5, 0) -- ++ (0, 0.5) arc (180:0:0.5);
+                        \draw[wire] (1, 1) node [monoid dot] {} arc (0:180:0.5);
+                        \draw[wire] (0.5, 1.5) node [monoid dot] {} -- ++ (0, 0.4) node [comonoid dot] {};
+                        \node[morphism, minimum width=1cm, below, xshift=0.3cm] (cup2) at (1.5, 0.5) {\(\eta\)};
+                        \node[morphism, minimum width=1cm, below, xshift=-0.3cm] (cup1) at (0, 1) {\(\eta\)};
+                        \draw[wire] ($(cup1.north) + (-0.3, 0)$) -- ++ (0, 1.25);
+                        \draw[wire] ($(cup2.north) + (0.3, 0)$) -- ++ (0, 1.75);
+                    \end{scope}
+                    \node at (10, 1) {\(=\)};
+                    \begin{scope}[xshift=10.5cm]
+                        \draw[wire] (0, 0) -- ++ (0, 0.5) arc (180:0:0.5);
+                        \draw[wire] (0.5, 1) node [monoid dot] {} -- ++ (0, 1.25);
+                        \node[morphism, minimum width=1cm, below, xshift=0.3cm] (cup) at (1, 0.5) {\(\eta\)};
+                        \draw[wire] ($(cup.north) + (0.3, 0)$) -- ++ (0, 1.75);
+                    \end{scope}
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Counitality is then simply the snake equation:
+            \begin{equation}
+                \tikzsetnextfilename{FS-nondegenerate-form-counitality}
+                \begin{tikzpicture}[baseline=(equal.base)]
+                    \draw[wire] (0.5, 1.5) node [comonoid dot] {} arc (360:180:0.5) -- ++ (0, 0.75);
+                    \draw[wire] (0, 0) -- ++ (0, 1) node [comonoid dot] {};
+                    \node (equal) at (0.8, 1) {\(=\)};
+                    \begin{scope}[xshift=2cm]
+                        \draw[wire] (1, 0) -- ++ (0, 0.75) arc (0:180:0.5);
+                        \draw[wire] (0.5, 1.25) node [monoid dot] {} -- ++ (0, 0.5) node [comonoid dot] {};
+                        \node[morphism, minimum width=1cm, below, xshift=-0.3cm] (cup2) at (0, 0.75) {\(\eta\)};
+                        \draw[wire] ($(cup2.north) + (-0.3, 0)$) -- ++ (0, 1.5);
+                    \end{scope}
+                    \node at (3.5, 1) {\(=\)};
+                    \draw[wire] (4, 0) -- ++ (0, 2.25);
+                \end{tikzpicture}
+            \end{equation}
+            Coassociativity follows similarly using the symmetry of the definition of comultiplication in terms of the cup.
+            The Frobenius law holds by applying associativity of the multiplication after writing the comultiplication in terms of the cup.
+        \end{proof}
+    \end{thm}
+    Nondegneracy was implicitly used at several points in this proof.
+    Without this assumption we would have been doing the equivalent of dividing by zero.
+    
+    \chapter{Normal Forms}
+    There are two ways to think about diagrams in the graphical notation.
+    The first is as a representation of a morphism.
+    The second is to treat the diagram as an object in its own right, in which case diagrams are just graphs, although not all graphs are valid diagrams.
+    The morphisms are nodes and the objects are edges.
+    This way of thinking about diagrams allows us to do things like consider subdiagrams, and replace them with other equivalent diagrams, which we've been doing already without thinking too much about the details.
+    
+    If two diagrams are different when viewed as graphs they may still be equal as morphisms.
+    We've seen already that really we want to consider homotopy classes of diagrams, which is just a fancy way of saying we can move things around and the morphism is the same so long as the connectivity stays the same.
+    There are other operations we can perform on diagrams-as-graphs without changing the morphisms they represent.
+    We can define an equivalence relation on graphs where two graphs are equivalent if they represent the same morphism.
+    The particularly nice thing about this, which we shall prove shortly, is it is possible to define a normal form for a graph such that any equivalent graph can be manipulated into this normal form without changing the morphism it represents.
+    This allows us to work with a fixed form for the representatives of the equivalence classes of diagrams representing morphisms.
+    
+    Similar to the coherence theorem, which says that given the data of a monoidal category there is a unique morphism between any two objects we will show that given the ability to copy, discard, fuse, and create data there is a unique way to do so if we start and finish with a fixed amount of data.
+    This, stated formally, is the spider theorem.
+    
+    \section{Spider Theorem}
+    \begin{thm}{Spider Theorem}{}
+        Let \((A, \monoidProduct, \monoidIdentity, \comonoidProduct, \comonoidIdentity)\) be a special Frobenius structure.
+        Any connected\footnote{By connected we mean that any diagram representing it is a connected graph, if this isn't the case we can treat the disconnected parts separately, so this isn't an issue.} morphism \(A ^{\otimes m} \to A^{\otimes n}\) built from finitely many pieces \(\monoidProduct\), \(\monoidIdentity\), \(\comonoidProduct\), \(\comonoidIdentity\), and \(\id_A\), using only \(\circ\) and \(\otimes\) is equal to the morphism represented by the diagram
+        \begin{equation}
+            \tikzsetnextfilename{spider-theorem-spider}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \draw[wire, xscale=2] (0, 0) arc (180:0:0.25);
+                \draw[wire, xscale=2] (-0.25, 0) -- ++ (0, 0.25) arc (180:0:0.25) node [monoid dot] {};
+                \draw[wire, xscale=2] (-0.5, 0) -- ++ (0, 0.5) arc (180:90:0.25) coordinate (A);
+                \draw[wire, dashed, xscale=2] (A) arc (90:0:0.25) node [monoid dot] {};
+                \draw[wire] (A) node [monoid dot] {} -- ++ (0, 0.5) coordinate (E);
+                \draw[wire, xscale=2] (0, 2) arc (180:360:0.25);
+                \draw[wire, xscale=2] (-0.25, 2) -- ++ (0, -0.25) arc (180:360:0.25) coordinate (D);
+                \draw[wire, xscale=2] (-0.5, 2) -- ++ (0, -0.5) arc (180:270:0.25) coordinate (B);
+                \draw[wire, dashed, xscale=2] (B) arc (270:360:0.25) coordinate (C);
+                \node[comonoid dot, thick] at (C) {};
+                \node[comonoid dot, thick] at (D) {};
+                \node[comonoid dot, thick] at (E) {};
+                \draw[decorate, thick, decoration={calligraphic brace, mirror}] (-1.1, -0.2) -- (1.1, -0.2) node [midway, below] {\(m\)};
+                \draw[decorate, thick, decoration={calligraphic brace}] (-1.1, 2.2) -- (1.1, 2.2) node [midway, above] {\(n\)};
+            \end{tikzpicture}
+        \end{equation}
+        \begin{proof}
+            The proof proceeds by (strong) induction on the number of dots, that is the total number of multiplications, units, comultiplications, and counits.
+            The base case of \(N = 1\) dots is trivial, since the diagram must simply be one of \(\monoidProduct\), \(\monoidIdentity\), \(\comonoidProduct\), or \(\comonoidIdentity\), all of which are already in this normal form.
+            
+            Now suppose that all diagrams with at most \(N\) dots can be brought into normal form.
+            Consider a diagram with \(N + 1\) dots.
+            We can use naturality to write this diagram in a form where one of the dots is physically higher than all other dots.
+            We then proceed casewise.
+            \begin{itemize}
+                \item First, suppose that the topmost dot is the counit, \(\comonoidIdentity\).
+                Then we can take the subdiagram consisting of the \(N\) lower dots and put this into normal form.
+                There are two subcases:
+                \begin{itemize}
+                    \item If there are any other white dots in the diagram after placing it in normal form then they  will be a comultiplications, and the counit will be directly connected to one of these comultiplications, in which case it can be eliminated, leaving an \(N\) dot diagram which can be placed into normal form.
+                    \item If there are no other white dots after placing the lower diagram into normal form then this diagram is already in normal form, specifically, the counit corresponds to the white dot on top of the vertical line in the middle of the normal form.
+                \end{itemize}
+                \item If the topmost dot is instead comultiplication, \(\comonoidProduct\), then place the \(N\) lower dots into normal form and use coassociativity repeatedly to move the topmost dot all the way to the right.
+                Since the diagram is finite in extent this process terminates.
+                This process will also result in the final diagram being in normal form.
+                \item If the topmost dot is the unit, \(\monoidIdentity\), then the connectivity requirement tells us that this is the only dot present in the diagram, and hence the diagram is already in normal form.
+                \item If the topmost dot is the multiplication, \(\monoidProduct\), then put the lower \(N\) dots into normal form.
+                There are then two subcases, imagine removing the topmost dot and the wires leading into it.
+                There are two possibilities, first, we could end up with two disconnected parts to the diagram, or we could have just one connected part if there were other connections between the two halves of the diagram
+                \begin{itemize}
+                    \item Suppose we are left one connected diagram after removing the topmost dot.
+                    Then we can repeatedly us coassociativity and speciality to move the multiplication dot down until it is below all comultiplications and counits.
+                    Then repeatedly use associativity to more it all the way to the right and the diagram will be in normal form.
+                    \item If instead we are left with two disconnected diagrams then we can put these individually in normal form.
+                    Then applying the extended Frobenius law will allow us to push the multiplication dot downwards.
+                    Doing so repeatedly we move the multiplication to be below all comultiplications and counits, and then we can use associativity to pus it all the way to the right, placing the diagram in normal form.
+                \end{itemize}
+            \end{itemize}
+        \end{proof}
+    \end{thm}
+    
+    There are many variants of the spider theorem which we can obtain by allowing slight modifications on the initial set up.
+    
+    \begin{thm}{Non-special Spider Theorem}{}
+        Let \((A, \monoidProduct, \monoidIdentity, \comonoidProduct, \comonoidIdentity)\) be a not-necessarily special Frobenius structure.
+        Any connected morphism \(A^{\otimes m} \to A^{\otimes n}\) built out of finitely many pieces \(\monoidProduct\), \(\monoidIdentity\), \(\comonoidProduct\), \(\comonoidIdentity\), and \(\id_A\) using only \(\circ\) and \(\otimes\) is equal to the morphism represented by the diagram
+        \begin{equation}\label{eqn:non-special normal form}
+            \tikzsetnextfilename{spider-theorem-non-special}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \draw[wire, xscale=2] (0, 0) arc (180:0:0.25);
+                \draw[wire, xscale=2] (-0.25, 0) -- ++ (0, 0.25) arc (180:0:0.25) node [monoid dot] {};
+                \draw[wire, xscale=2] (-0.5, 0) -- ++ (0, 0.5) arc (180:90:0.25) coordinate (A);
+                \draw[wire, dashed, xscale=2] (A) arc (90:0:0.25) node [monoid dot] {};
+                \draw[wire] (A) node [monoid dot] {} -- ++ (0, 0.5) coordinate (E);
+                \draw[wire] ($(A) + (0, 0.75)$) circle [radius=0.25];
+                \draw[wire, dashed] ($(A) + (0, 1)$) -- ++ (0, 0.5);
+                \draw[wire] ($(A) + (0, 1.75)$) circle [radius=0.25];
+                \draw[wire] ($(A) + (0, 2)$) -- ++ (0, 0.5);
+                \node[comonoid dot, thick] at ($(A) + (0, 0.5)$) {};
+                \node[monoid dot] at ($(A) + (0, 1)$) {};
+                \node[comonoid dot] at ($(A) + (0, 1.5)$) {};
+                \node[monoid dot] at ($(A) + (0, 2)$) {};
+                \draw[wire, xscale=2] (0, 4) arc (180:360:0.25);
+                \draw[wire, xscale=2] (-0.25, 4) -- ++ (0, -0.25) arc (180:360:0.25) coordinate (D);
+                \draw[wire, xscale=2] (-0.5, 4) -- ++ (0, -0.5) arc (180:270:0.25) coordinate (B);
+                \draw[wire, dashed, xscale=2] (B) arc (270:360:0.25) coordinate (C);
+                \node[comonoid dot, thick] at (C) {};
+                \node[comonoid dot, thick] at (D) {};
+                \node[comonoid dot, thick] at (E) {};
+                \draw[decorate, thick, decoration={calligraphic brace, mirror}] (-1.1, -0.2) -- (1.1, -0.2) node [midway, below] {\(m\)};
+                \draw[decorate, thick, decoration={calligraphic brace}] (-1.1, 4.2) -- (1.1, 4.2) node [midway, above] {\(n\)};
+                \draw[decorate, thick, decoration={calligraphic brace, mirror}] (-0.1, 1) -- (-0.1, 3) node [midway, right] {\(k\)};
+            \end{tikzpicture}
+            .
+        \end{equation}
+    \end{thm}
+    
+    \begin{thm}{Symmetric Spider Theorem}{}
+        Let \((A, \monoidProduct, \monoidIdentity, \comonoidProduct, \comonoidIdentity)\) be a symmetric Frobenius structure.
+        Any connected morphism \(A^{\otimes m} \to A^{\otimes n}\) built out of finitely many pieces \(\monoidProduct\), \(\monoidIdentity\), \(\comonoidProduct\), \(\comonoidIdentity\), \(\swapMorphism\), \(\id_A\) using only \(\circ\) and \(\otimes\) is equal to the morphism represented by the diagram in \cref{eqn:non-special normal form}.
+    \end{thm}
+    
+    However, a general Frobenius structure does not allow for a normal form.
+    
+    \begin{thm}{No Braided Spider Theorem}{}
+        Let \((A, \monoidProduct, \monoidIdentity, \comonoidProduct, \comonoidIdentity)\) be a commutative Frobenius structure.
+        There is no normal form for a connected morphism \(A^{\otimes m} \to A^{\otimes n}\) built out of finitely many pieces \(\monoidProduct\), \(\monoidIdentity\), \(\comonoidProduct\), \(\comonoidIdentity\), \(\braidMorphism\), \(\id_A\) using only \(\circ\) and \(\otimes\).
+        \begin{proof}
+            Consider the following diagram representing a morphism \(A \to A\):
+            \begin{equation}
+                \tikzsetnextfilename{knot-no-spider-theorem}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \pgfdeclarelayer{behind}
+                    \pgfsetlayers{behind, main}
+                    \draw[over wire, rounded corners] (0, 4.5) -- ++ (0, -1.5) -- ++ (-1, -0.5) -- ++ (0, -0.25) -- ++ (-1, -0.5) -- ++ (0, -1) coordinate (A);
+                    \draw[wire] (A) arc (180:360:0.5) coordinate (B);
+                    \draw[over wire, rounded corners] (B) -- ++ (0, 0.25) -- ++ (1, 0.5) -- ++ (0, 1) -- ++ (-1, 0.5) -- ++ (0, 0.25) coordinate (C);
+                    \draw[wire] (C) arc (0:180:0.5) coordinate (D);
+                    \begin{pgfonlayer}{behind}
+                        \draw[wire, rounded corners] (D) -- ++ (0, -1) -- ++ (1, -0.5) -- ++ (0, -0.25) -- ++ (1, -0.5) -- ++ (0, -1.5);
+                    \end{pgfonlayer}
+                    \draw[wire] ($(A) + (0.5, -0.5)$) node [comonoid dot, thick] {} -- ++ (0, -0.5) node [monoid dot] {};
+                    \draw[wire] ($(C) + (-0.5, 0.5)$) node [monoid dot, thick] {} -- ++ (0, 0.5) node [comonoid dot] {};
+                \end{tikzpicture}
+                .
+            \end{equation}
+            This is a knot (once we connect up the free ends).
+            The Frobenius axioms, without the addition of speciality or symmetry, induce homotopy equivalences on diagrams.
+            By definition a knot is \emph{not} homotopy equivalent to the circle, but clearly, for example, the identity \(\id_A \colon A \to A\), after connecting the ends, is homotopy equivalent to the circle.
+            Hence, these two diagrams do not correspond to the same morphism.
+        \end{proof}
+    \end{thm}
+    
     
     
     
