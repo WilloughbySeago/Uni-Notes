@@ -51,6 +51,7 @@
 \tikzset{dual morphism/.style={daggerable morphism, trapezium, trapezium left angle=90, trapezium right angle=70, shape border rotate=180}}
 \tikzset{monoid dot/.style={circle, fill, inner sep=0pt, minimum width=2mm}}
 \tikzset{comonoid dot/.style={circle, draw, fill=background color, inner sep=0pt, minimum width=2mm}}
+\tikzset{phase/.style={thick, draw, circle, fill=lightgray}}
 
 \newcommand{\monoidProduct}{%
     \tikzexternaldisable%
@@ -283,6 +284,7 @@ noabbrev
 \DeclareMathOperator{\tr}{tr}
 \newcommand{\const}{\mathrm{const}}
 \newcommand{\leftadjoint}{\vdash}
+\DeclareMathOperator{\Sym}{Sym}
 
 \includeonly{parts/maths-defs}
 
@@ -6562,7 +6564,7 @@ noabbrev
     More generally, \(\FVect(V, V) \isomorphic V^* \otimes V\).
     Making this identification leads to the following lemma.
     
-    \begin{lma}{Pair of Pants on {\normalsize\(\FHilb\)}}{}
+    \begin{lma}{Pair of Pants on {\normalsize\(\FHilb\)}}{lma:pair of pants FHilb}
         The pair of pants monoid \(\FHilb\) is simply the matrix algebra \(\matrices{n}{\complex}\).
         \begin{proof}
             Let \(A = \complex^n\), then \(A^* = (\complex^n)^{*} \isomorphic \complex^n\).
@@ -8167,6 +8169,953 @@ noabbrev
             Hence, these two diagrams do not correspond to the same morphism.
         \end{proof}
     \end{thm}
+    
+    \chapter{Classification of Frobenius Structures}
+    \section{Cayley's Theorem}
+    \begin{dfn}{Symmetric Group}{}
+        Let \(A\) be a set, then the \defineindex{symmetric group} on \(A\) is defined to be the following group under composition
+        \begin{equation}
+            \Sym(A) \coloneqq \{\sigma \colon A \to A \mid \sigma \text{is a bijection}\}.
+        \end{equation}
+    \end{dfn}
+    
+    For the purposes of finite groups an \defineindex{embedding} of \(H\) in \(G\) is an injective group homomorphism \(H \to G\).
+    The existence of such an embedding is equivalent to \(H\) being (isomorphic to) a subgroup of \(G\).
+    
+    \begin{thm}{Cayley's Theorem}{}
+        Any finite group \(G\) is a subgroup of a symmetric group.
+        Equivalently, there exists an embedding \(G \to \Sym(A)\) for some set \(A\).
+        \begin{proof}
+            Consider the function \(R \colon G \to \Sym(G)\) defined by \(g \mapsto R_g\) where \(R_g \colon G \to G\) is the function given by left multiplication by \(g\), \(R_g(h) = gh\).
+            Notice that this defines a group action of \(G\) on itself.
+            To show that \(R\) is a homomorphism simply consider \(R_{gh}(k) = (gh)k = g(hk) = R_g(R_h(k)) = (R_g \circ R_h)(k)\), so \(R\) is a homomorphism.
+            Suppose that \(R_g = R_h\), then we must have \(R_g(k) = gk = hk = R_h(k)\) for all \(k \in G\).
+            Multiplying on the right by \(k^{-1}\) we get \(g = h\), and so \(R\) is injective, and hence an embedding.
+            
+            We can also prove the first statement directly, rather than showing that \(R\) is an embedding, by recognising that \(R_g\) has an inverse, namely \(R_{g^{-1}}\), since \(R_g \circ R_{g^{-1}} = R_{gg^{-1}} = R_e\) which is clearly the identity.
+            Thus, \(R_g \in \Sym(G)\), and clearly the set \(\{R_g \mid g \in G\}\) is a group, so it is a subgroup of \(\Sym(G)\).
+        \end{proof}
+    \end{thm}
+    
+    Cayley's theorem has an analogue for a monoid, \(M\).
+    In particular, rather than the symmetric group, which carries a notion of invertibility by considering only bijective functions, we consider all functions, in particular, we have that \(M\) is a submonoid of \(\Set(M, M)\), which is a monoid under function composition\footnote{\(\Set\) can be enriched over \(\Mon\) in fancy language.}.
+    Instead of considering an embedding \(R \colon M \to \Set(M, M)\) we can consider a relation \(M \to M^* \times M\) where \(M^* \times M\) is equipped with the pair of pants monoid\footnote{This is an application of the tensor-hom adjunction}.
+    That is, given a monoid \((M, \monoidProduct, \monoidIdentity)\), we can embed this into \(M^* \times M\) via
+    \begin{equation}
+        \tikzsetnextfilename{classification-of-FS-monoid-embedding}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \node[morphism] (R) {\(R\)};
+            \draw[left dual=0.6] ($(R.north) + (0.15, 0)$) -- ++ (0, 0.5) coordinate (top);
+            \draw[right dual=0.6] ($(R.north) + (-0.15, 0)$) -- ++ (0, 0.5);
+            \draw[right dual=0.6] (R.south) -- ++ (0, -0.5) coordinate (bottom);
+            \node at (0.6, 0) {\(=\)};
+            \draw[left dual] (1, 0 |- top) -- ++ (0, -0.75) coordinate (A);
+            \draw[wire] (A) arc (180:360:0.3) arc (180:0:0.3) coordinate (B);
+            \draw[left dual] (B) --  (2.2, 0 |- bottom);
+            \draw[left dual=0.7] (1.9, 0.25) node [monoid dot] {} -- ++ (0, 0.5);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    This is a monoid homomorphism, to show this we need to show it preserves units:
+    \begin{equation}
+        \tikzsetnextfilename{classification-of-FS-monoid-embedding-preserves-units}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+        \node[morphism] (R) {\(R\)};
+        \draw[left dual=0.6] ($(R.north) + (0.15, 0)$) -- ++ (0, 0.5) coordinate (top);
+        \draw[right dual=0.6] ($(R.north) + (-0.15, 0)$) -- ++ (0, 0.5);
+        \draw[right dual=0.6] (R.south) -- ++ (0, -0.5) coordinate (bottom) node [monoid dot] {};
+        \node at (0.6, 0) {\(=\)};
+        \draw[left dual] (1, 0 |- top) -- ++ (0, -0.75) coordinate (A);
+        \draw[wire] (A) arc (180:360:0.3) arc (180:0:0.3) coordinate (B);
+        \draw[left dual] (B) --  (2.2, 0 |- bottom) node [monoid dot] {};
+        \draw[left dual=0.7] (1.9, 0.25) node [monoid dot] {} -- ++ (0, 0.5);
+        \node at (2.6, 0) {\(=\)};
+        \draw[left dual] (3, 0 |- top) -- ++ (0, -0.5) arc (180:360:0.3) -- ++ (0, 0.5);
+    \end{tikzpicture}
+    \end{equation}
+    and preserves multiplication:
+    \begin{equation}
+        \tikzsetnextfilename{classification-of-FS-monoid-embedding-preserves-multiplication}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \node[morphism] (R) {\(R\)};
+            \draw[left dual=0.6] ($(R.north) + (0.15, 0)$) -- ++ (0, 0.5) coordinate (top);
+            \draw[right dual=0.6] ($(R.north) + (-0.15, 0)$) -- ++ (0, 0.5);
+            \draw[right dual=0.6] (R.south) -- ++ (0, -0.5) coordinate (multiplication) node [monoid dot] {};
+            \draw[left dual] ($(multiplication) + (-0.3, -0.5)$) coordinate (bottom) -- ++ (0, 0.2) arc (180:90:0.3);
+            \draw[left dual] ($(multiplication) + (0.3, -0.5)$) -- ++ (0, 0.2) arc (0:90:0.3);
+            \node at (0.6, 0) {\(=\)};
+            \draw[left dual] (1, 0 |- top) -- ++ (0, -0.75) coordinate (A);
+            \draw[wire] (A) arc (180:360:0.3) arc (180:0:0.3) coordinate (B);
+            \draw[left dual] (B) --  (2.2, 0 |- multiplication) node [monoid dot] {} coordinate (multiplication2);
+            \draw[left dual] ($(multiplication2) + (-0.3, -0.5)$) -- ++ (0, 0.2) arc (180:90:0.3);
+            \draw[left dual] ($(multiplication2) + (0.3, -0.5)$) -- ++ (0, 0.2) arc (0:90:0.3);
+            \draw[left dual=0.7] (1.9, 0.25) node [monoid dot] {} -- ++ (0, 0.5);
+            \node at (2.6, 0) {\(=\)};
+            \draw[left dual=0.4] (3.5, 0 |- top) arc (0:-90:0.3) arc (90:180:0.3) -- ++ (0, -0.5) arc (180:360:0.3) arc (180:0:0.3) coordinate (here) -- (here |- bottom) coordinate (C);
+            \draw[left dual=0.45] ($(C) + (-0.3, 1.1)$) node [monoid dot] {} arc (180:0:0.3) -- ++ (0, -0.3) arc (180:360:0.3) arc (180:90:0.3) coordinate (D) node [monoid dot] {};
+            \draw[right dual] (D) arc (90:0:0.3) coordinate (here) -- (here |- bottom);
+            \draw[left dual] (D) -- (D |- top);
+            \node at (6, 0) {\(=\)};
+            \node[morphism] (R2) at (6.5, 0) {\(R\)};
+            \node[morphism] (R3) at (7.5, 0) {\(R\)};
+            \draw[left dual=0.6] ($(R3.north) + (0.15, 0)$) -- ++ (0, 0.5) coordinate (top);
+            \draw[right dual=0.6] ($(R2.north) + (-0.15, 0)$) -- ++ (0, 0.5);
+            \draw[right dual=0.6] (R2.south) coordinate (here) -- (here |- bottom);
+            \draw[right dual=0.6] (R3.south) coordinate (here) -- (here |- bottom);
+            \draw[left dual=0.55] ($(R2.north) + (0.15, 0)$) arc (180:90:0.3) -- ++ (0.1, 0) arc (90:0:0.3);
+        \end{tikzpicture}
+        .
+    \end{equation}
+    This embedding, \(R\), also has a left inverse, namely
+    \begin{equation}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \draw[left dual] (0, 0) node [monoid dot] {} arc (180:0:0.3);
+            \draw[right dual] (0.9, 0) -- ++ (0, 0.5);
+        \end{tikzpicture}
+        ,
+    \end{equation}
+    which we can show by composing this on the left with \(R\), so it is applied after \(R\), and so appears above \(R\) in the diagram:
+    \begin{equation}
+        \tikzsetnextfilename{classification-of-FS-embedding-is-monomorphism}
+        \begin{tikzpicture}[baseline=(current bounding box)]
+            \node[morphism] (R) {\(R\)};
+            \draw[left dual=0.6] ($(R.north) + (0.15, 0)$) -- ++ (0, 0.5) coordinate (top);
+            \draw[right dual=0.6] ($(R.north) + (-0.15, 0)$) arc (0:180:0.3) node [monoid dot] {};
+            \draw[right dual=0.6] (R.south) -- ++ (0, -0.5) coordinate (bottom);
+            \node at (0.6, 0) {\(=\)};
+            \draw[left dual=0.9] (R.north -| 1, 0) node [monoid dot] {} arc (180:0:0.3) -- ++ (0, -0.25) coordinate (A);
+            \draw[left dual=0.85] (A) arc (180:360:0.3) arc (180:0:0.3) coordinate (here) -- (here |- bottom);
+            \draw[left dual=0.7] (2.5, 0.25) node [monoid dot] {} -- ++ (0, 0.5);
+            \node at (3.1, 0) {\(=\)};
+            \draw[left dual=0.6] (3.5, -0.5) node [monoid dot] {} -- (3.5, -0.15) arc (180:90:0.3) node [monoid dot] {} coordinate (C);
+            \draw[right dual=0.4] (C) arc (90:0:0.3) coordinate (here) -- (here |- bottom);
+            \draw[left dual=0.7] (C) coordinate (here) -- (here |- top);
+            \node at (4.5, 0) {\(=\)};
+            \draw[left dual] (5, 0 |- bottom) -- (5, 0 |- top);
+        \end{tikzpicture}
+    \end{equation}
+    Hence \(R\) is a monomorphism, which is the generalisation of injective to arbitrary categories.
+    
+    \section{Classification of Frobenius Structures in \texorpdfstring{\(\FHilb\)}{FHilb}}
+    Recall \cref{lma:pair of pants FHilb} which says that in \(\FHilb\) the pair of pants monoid is isomorphic\footnote{another application of the tensor-hom adjunction} to the matrix algebra \(\matrices{n}{\complex}\).
+    Applying this to the monoid defining a Frobenius structure on \(\FHilb\) combined with the embedding of a monoid in the last section leads to the following theorem, although a full proof uses more linear algebra than we are prepared to develop here, so we simply quote a result.
+    \begin{thm}{}{thm:special FS = sum of matrix algebras}
+        All special Frobenius structures in \(\FHilb\) are of the form
+        \begin{equation}
+            \bigoplus_{i=1}^{k} \matrices{n_i}{\complex} = \matrices{n_1}{\complex} \oplus \dotsb \oplus \matrices{n_k}{\complex}
+        \end{equation}
+        for some \(n_i \in \naturals\).
+        \begin{proof}
+            Using the work of the previous section the monoid defining a Frobenius structure on \(H\) in \(\FHilb\) embeds into \(H^* \otimes H\), which is isomorphic to \(\matrices{\dim H}{\complex}\).
+            Hence \(H\) is an involutive subalgebra of \(\matrices{\dim H}{\complex}\), called a \(C^*\)-algebra.
+            A theorem of Artin and Wedderburn states any finite dimensional \(C^*\)-algebra over \(\complex\) is of the form \(\bigoplus_{i=1}^k \matrices{n_i}{\complex}\).
+        \end{proof}
+    \end{thm}
+    
+    \begin{crl}{}{}
+        Classical structures in \(\FHilb\) copy orthonormal states.
+        \begin{proof}
+            A classical structure is formed from a commutative monoid.
+            Then by \cref{thm:special FS = sum of matrix algebras} this classical structure must be a sum of commutative matrix algebras over \(\complex\).
+            The only commutative matrix algebra over \(\complex\) is \(\matrices{1}{\complex} \isomorphic \complex\), so any classical structure in \(\FHilb\) is of the form \(\bigoplus_{i=0}^k \complex = \complex \oplus \dotsb \oplus \complex\).
+            If \(A\) and \(B\) are matrices then recall that their direct product is given by
+            \begin{equation}
+                A \oplus B = 
+                \begin{pmatrix}
+                    A & 0\\
+                    0 & B
+                \end{pmatrix}
+            \end{equation}
+            where the \(0\)s are zero matrices of the appropriate dimensions.
+            This extends to sums of an arbitrary (finite) number of matrices.
+            In particular, this means that \(\bigoplus_{i=1}^{k} \complex\) consists of diagonal matrices with entries in \(\complex\).
+            These form a \(k\)-dimensional vector space over \(\complex\).
+            Hence \(\oplus_{i=1}^{k} \complex \isomorphic \complex^k\).
+            The standard basis then is the basis of diagonal matrices with all entries on the diagonal 0 except a single entry which is 1.
+            This is an orthonormal basis.
+        \end{proof}
+    \end{crl}
+    
+    \begin{lma}{}{}
+        A Frobenius structure on  \(\FHilb\) which copies bases is a dagger Frobenius structure if and only if the basis is orthogonal.
+        \begin{proof}
+            Recall that a state \(x \colon \complex \to H\) is copyable with respect to comultiplication if
+            \begin{equation}
+                \tikzsetnextfilename{classification-of-FS-copyable-state}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \node[state, minimum width=8mm] (state1) at (0, 0) {};
+                    \node[state, minimum width=8mm] (state2) at (1.5, 0) {};
+                    \node[state, minimum width=8mm] (state3) at (2.5, 0) {};
+                    \node at (state1) {\(x\)};
+                    \node at (state2) {\(x\)};
+                    \node at (state3) {\(x\)};
+                    \draw[wire] (state1.north) -- (state1.north |- 0, 0.75) node [monoid dot] {};
+                    \draw[wire] (-0.5, 1.25) arc (180:360:0.5);
+                    \node at (0.75, 0.3) {\(=\)};
+                    \draw[wire] (state2.north) -- (state2 |- 0, 1.25);
+                    \draw[wire] (state3.north) -- (state3 |- 0, 1.25);
+                \end{tikzpicture}
+                .
+            \end{equation}
+            In a dagger Frobenius structure this means that we also have the dagger of this statement:
+            \begin{equation}
+                \tikzsetnextfilename{classification-of-FS-copyable-effect}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \node[effect, minimum width=8mm] (effect1) at (0, 0) {};
+                    \node[effect, minimum width=8mm] (effect2) at (1.5, 0) {};
+                    \node[effect, minimum width=8mm] (effect3) at (2.5, 0) {};
+                    \node at (effect1) {\(x\)};
+                    \node at (effect2) {\(x\)};
+                    \node at (effect3) {\(x\)};
+                    \draw[wire] (effect1.south) -- (effect1.north |- 0, -0.75) node [monoid dot] {};
+                    \draw[wire] (-0.5, -1.25) arc (180:0:0.5);
+                    \node at (0.75, -0.3) {\(=\)};
+                    \draw[wire] (effect2.south) -- (effect2 |- 0, -1.25);
+                    \draw[wire] (effect3.south) -- (effect3 |- 0, -1.25);
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Using this if we have non-zero copyable states \(x\) and \(y\) then we can use the copyability of states to remove a state, and then the copyability of effects to remove an effect, giving
+            \begin{equation}
+                \tikzsetnextfilename{classification-of-FS-reducing-number-of-states}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \node[state, minimum width=8mm] (state1) at (0, 0) {};
+                    \node[state, minimum width=8mm] (state2) at (1, 0) {};
+                    \node[state, minimum width=8mm] (state3) at (2, 0) {};
+                    \node[effect, minimum width=8mm] (effect1) at (0, 2) {};
+                    \node[effect, minimum width=8mm] (effect2) at (1, 2) {};
+                    \node[effect, minimum width=8mm] (effect3) at (2, 2) {};
+                    \node at (state1) {\(x\)};
+                    \node at (state2) {\(x\)};
+                    \node at (state3) {\(x\)};
+                    \node at (effect1) {\(x\)};
+                    \node at (effect2) {\(x\)};
+                    \node at (effect3) {\(y\)};
+                    \draw[wire] (state1) -- (effect1);
+                    \draw[wire] (state2) -- (effect2);
+                    \draw[wire] (state3) -- (effect3);
+                    \node at (2.5, 1) {\(=\)};
+                    \begin{scope}[xshift=3cm]
+                        \node[state, minimum width=8mm] (state1) at (0, 0) {};
+                        \node[state, minimum width=8mm] (state2) at (1.5, 0) {};
+                        \node[effect, minimum width=8mm] (effect1) at (0, 2) {};
+                        \node[effect, minimum width=8mm] (effect2) at (1, 2) {};
+                        \node[effect, minimum width=8mm] (effect3) at (2, 2) {};
+                        \node at (state1) {\(x\)};
+                        \node at (state2) {\(x\)};
+                        \node at (effect1) {\(x\)};
+                        \node at (effect2) {\(x\)};
+                        \node at (effect3) {\(y\)};
+                        \draw[wire] (state2) -- ++ (0, 1.275) node [monoid dot] {};
+                        \draw[wire] (effect2.south) arc (180:360:0.5);
+                        \draw[wire] (state1) -- (effect1);
+                        \node at (2.5, 1) {\(=\)};
+                    \end{scope}
+                    \begin{scope}[xshift=6cm]
+                        \node[state, minimum width=8mm] (state1) at (0, 0) {};
+                        \node[state, minimum width=8mm] (state2) at (1.5, 0) {};
+                        \node[effect, minimum width=8mm] (effect1) at (0.5, 2) {};
+                        \node[effect, minimum width=8mm] (effect3) at (2, 2) {};
+                        \node at (state1) {\(x\)};
+                        \node at (state2) {\(x\)};
+                        \node at (effect1) {\(x\)};
+                        \node at (effect3) {\(y\)};
+                        \draw[wire] (state1.north) -- ++ (0, 0.75) arc (180:90:0.5) arc (90:0:0.5) arc (180:270:0.5) arc (270:360:0.5) -- (effect3);
+                        \draw[wire] (0.5, 1.45) node [monoid dot] {} -- (effect1);
+                        \draw[wire] (1.5, 0.45) node [monoid dot] {} -- (state2);
+                    \end{scope}
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Applying the Frobenius law and then reversing the copying we get
+            \begin{equation}
+                \tikzsetnextfilename{classification-of-FS-increasing-number-of-states}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \node[state, minimum width=8mm] (state1) at (0, 0) {};
+                    \node[state, minimum width=8mm] (state2) at (1, 0) {};
+                    \node[state, minimum width=8mm] (state3) at (2, 0) {};
+                    \node[effect, minimum width=8mm] (effect1) at (0, 2) {};
+                    \node[effect, minimum width=8mm] (effect2) at (1, 2) {};
+                    \node[effect, minimum width=8mm] (effect3) at (2, 2) {};
+                    \node at (state1) {\(x\)};
+                    \node at (state2) {\(x\)};
+                    \node at (state3) {\(x\)};
+                    \node at (effect1) {\(x\)};
+                    \node at (effect2) {\(x\)};
+                    \node at (effect3) {\(y\)};
+                    \draw[wire] (state1) -- (effect1);
+                    \draw[wire] (state2) -- (effect2);
+                    \draw[wire] (state3) -- (effect3);
+                    \node at (2.5, 1) {\(=\)};
+                    \begin{scope}[xshift=3cm]
+                        \node[state, minimum width=8mm] (state1) at (0.5, 0) {};
+                        \node[state, minimum width=8mm] (state2) at (2, 0) {};
+                        \node[effect, minimum width=8mm] (effect1) at (0, 2) {};
+                        \node[effect, minimum width=8mm] (effect3) at (1.5, 2) {};
+                        \node at (state1) {\(x\)};
+                        \node at (state2) {\(x\)};
+                        \node at (effect1) {\(x\)};
+                        \node at (effect3) {\(y\)};
+                        \draw[wire] (effect1.south) -- ++ (0, -0.75) arc (180:360:0.5) arc (180:0:0.5) -- (state2);
+                        \draw[wire] (0.5, 0.55) node [monoid dot] {} -- (state1);
+                        \draw[wire] (1.5, 1.55) node [monoid dot] {} -- (effect3);
+                        \node at (2.5, 1) {\(=\)};
+                    \end{scope}
+                    \begin{scope}[xshift=6cm]
+                        \node[state, minimum width=8mm] (state1) at (0, 0) {};
+                        \node[state, minimum width=8mm] (state2) at (1, 0) {};
+                        \node[state, minimum width=8mm] (state3) at (2, 0) {};
+                        \node[effect, minimum width=8mm] (effect1) at (0, 2) {};
+                        \node[effect, minimum width=8mm] (effect2) at (1, 2) {};
+                        \node[effect, minimum width=8mm] (effect3) at (2, 2) {};
+                        \node at (state1) {\(x\)};
+                        \node at (state2) {\(x\)};
+                        \node at (state3) {\(x\)};
+                        \node at (effect1) {\(x\)};
+                        \node at (effect2) {\(y\)};
+                        \node at (effect3) {\(y\)};
+                        \draw[wire] (state1) -- (effect1);
+                        \draw[wire] (state2) -- (effect2);
+                        \draw[wire] (state3) -- (effect3);
+                    \end{scope}
+                \end{tikzpicture}
+                .
+            \end{equation}
+            What this tells us is that
+            \begin{equation}
+                (\braket{x}{x})^2\braket{x}{y} = \braket{x}{x}(\braket{x}{y})^2.
+            \end{equation}
+            If \(\braket{x}{y} = 0\) then this is satisfied.
+            If \(\braket{x}{y} \ne 0\) then we must have \(\braket{x}{x} = \braket{x}{y}\).
+            Similarly by exchanging \(x\) and \(y\) we must have \(\braket{y}{x} = \braket{y}{y}\).
+            Using the linearity of the inner product we have
+            \begin{equation}
+                \braket{x - y}{x - y} = \braket{x}{x} - \braket{x}{y} - \braket{y}{x} + \braket{y}{y} = 0.
+            \end{equation}
+            The inner product vanishes only for the zero vector, so \(x - y = 0\), in other words, \(x = y\).
+            Hence, either \(\braket{x}{y} = 0\) or \(x = y\), so \(x\) and \(y\) are orthogonal.
+        \end{proof}
+    \end{lma}
+    
+    \section{Classification of Frobenius Structures in \texorpdfstring{\(\Rel\)}{Rel}}
+    \begin{thm}{}{}
+        Special Dagger structures in \(\Rel\) correspond exactly to groupoids.
+        \begin{proof}
+            Write \(M \colon A \times A \to A\) for the multiplication relation and \(U \colon \{\textbullet\} \to A\) for the unit.
+            Notice then that \(U \subseteq \{\textbullet\} \times A\), which means that elements of \(U\) are of the form \((\textbullet, a)\) for some (but not necessarily all) \(a \in A\), so \(U\) is (isomorphic to) a subset of \(A\) given by projecting out \(a\) from this pair.
+            
+            First, we note that \(M\) is single valued, by which we mean that given \((a, b)\) there is a unique \(c\) such that \((a, b) M c\).
+            This follows by speciality since we have \(a (M \circ M^\hermit) b\) if and only if \(a = b\), since \(M \circ M^\hermit\) is a relation on \(A \times A\) given by \(a (M \circ M^\hermit) b\) if and only if there exists some \((d, e) \in M^2\) such that \(a M (d, e)\) and \((d, e) M^\hermit b\), or using annotated diagrams speciality tells us that
+            \begin{equation}
+                \tikzsetnextfilename{classification-of-FS-M-single-valued}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[wire] (0, 0) node [below] {\(a\)} -- ++ (0, 0.5) node [monoid dot] {};
+                    \draw[wire] (0, 1) circle [radius=0.5];
+                    \draw[wire] (0, 1.5) node [monoid dot] {} -- ++ (0, 0.5) node [above] {\(b\)};
+                    \node[left] at (-0.5, 1) {\(d\)};
+                    \node[right] at (0.5, 1) {\(e\)};
+                    \draw[wire] (2, 0) node [below] {\(a\)} -- (2, 2) node [above] {\(b\)};
+                    \node at (1.4, 1) {\(=\)};
+                \end{tikzpicture}
+            \end{equation}
+            and since \(\id_A = \{(a, a) \mid a \in A\}\) we must have \(a = b\) if they are related by the identity.
+            Write \(ab\) for the unique \(c\) such that \((a, b) M c\).
+            Note that it is possible that no such \(c\) exists, not every pair \((a, b) \in A^2\) needs to also be related to something in \(M\).
+            So, we have a partially defined multiplication, which is on the way to defining a groupoid.
+            
+            We need to demonstrate associativity and unitality for products when they are defined.
+            Starting with associativity let \(a, b, c \in A\) be such that \(ab\) and \((ab)c\) are defined.
+            Then we can annotate one side of the associativity law and the other side must also be defined:
+            \begin{equation}
+                \tikzsetnextfilename{classifcation-of-FS-associativity-in-Rel-monoid}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[wire] (0, 0) arc (180:0:0.5);
+                    \draw[wire] (0.5, 0.5) node [monoid dot] {} arc (180:0:0.5) -- (1.5, 0);
+                    \node[above] at (0, -0.5) {\(a\)};
+                    \node[above] at (1, -0.5) {\(b\)};
+                    \node[above] at (1.5, -0.5) {\(c\)};
+                    \draw[wire] (1, 1) node [monoid dot] {} -- ++ (0, 1) node [above] {\((ab)c\)};
+                    \node at (2, 1) {\(=\)};
+                    \draw[wire] (3, 0) arc (180:0:0.5);
+                    \draw[wire] (2.5, 0) -- ++ (0, 0.5) arc (180:0:0.5) node [monoid dot] {};
+                    \draw[wire] (3, 1) node [monoid dot] {} -- ++ (0, 1) node [above] {\(a(bc)\)};
+                    \node[above] at (2.5, -0.5) {\(a\)};
+                    \node[above] at (3, -0.5) {\(b\)};
+                    \node[above] at (4, -0.5) {\(c\)};
+                \end{tikzpicture}
+            \end{equation}
+            This means that \(bc\) and \(a(bc)\) are also defined and \((ab)c = a(bc)\).
+            
+            For unitality suppose that \(x\) and \(y\) are units, that is elements of \(U\) viewed as a subset of \(A\), such that the following decorated unitality laws hold:
+            \begin{equation}
+                \tikzsetnextfilename{classification-of-FS-unitality-in-Rel-monoid}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[wire] (0.5, 0.5) node [monoid dot] {} node [left] {\(x\)} arc (180:0:0.5) -- (1.5, 0) node [below] {\(a\)};
+                    \draw[wire] (1, 1) node [monoid dot] {} -- ++ (0, 1) node [above] {\(b\)};
+                    \node at (2, 1) {\(=\)};
+                    \draw[wire] (2.5, 0) node [below] {\(a\)} -- (2.5, 2) node [above] {\(b\)};
+                    \node at (3, 1) {\(=\)};
+                    \draw[wire] (3.5, 0) node [below] {\(a\)} -- ++ (0, 0.5) arc (180:0:0.5) node [monoid dot] {} node [right] {\(y\)};
+                    \draw[wire] (4, 1) node [monoid dot] {} -- ++ (0, 1) node [above] {\(b\)};
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Then since \(\id_A = \{(a, a) \mid a \in A\}\) we have \(xa = b\) if and only if \(a = b\) and \(ay = b\) if and only if \(a = b\).
+            Then if \(z \in U\) is such that \(xz = x\) for some \(x \in U\) we must have \(x = z\) using the unitality of \(x\).
+            This shows that the units are idempotent as required, and that multiplication of incompatible units is undefined, as required.
+            If \(xa = a = x'a\) then \(a = xa = x(x'a) = (xx')a\) and so \(x = x'\) so every element has a uniquely defined left and right identity, as is required for a groupoid.
+            
+            We can construct a category, with set of objects \(U\), and set of morphisms \(A\).
+            Then if \(fg\) and \(gh\) are defined we want \((fg)h = f(gh)\) for associativity.
+            This holds based on the annotated extended Frobenius law, if the left hand side is defined then the Frobenius law says it must be equal to the right hand side, which leads to associativity:
+            \begin{equation}
+                \tikzsetnextfilename{classification-of-FS-associativity-in-groupoid}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[wire] (0, 0) node [below] {\(f\)} -- ++ (0, 1) arc (180:0:0.5) node [left] {\(g\)} arc (180:360:0.5) -- ++ (0, 1) node [above] {\(h\)};
+                    \draw[wire] (0.5, 1.5) node [monoid dot] {} -- ++ (0, 0.5) node [above] {\(fg\)};
+                    \draw[wire] (1.5, 0.5) node [monoid dot] {} -- ++ (0, -0.5) node [below] {\(gh\)};
+                    \node at (2.5, 1) {\(=\)};
+                    \draw[wire] (3, 0) node [below] {\(f\)} arc (180:0:0.5) node [below] {\(gh\)};
+                    \draw[wire] (3, 2) node [above] {\(fg\)} arc (180:360:0.5) node [above] {\(h\)};
+                    \draw[wire] (3.5, 0.5) node [monoid dot] {} -- (3.5, 1.5) node [monoid dot] {} node [midway, right] {\(f(gh) = (fg)h\)};
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Finally, we need to show that identities exist, this follows from the same diagram, but with different annotations:
+            \begin{equation}
+                \tikzsetnextfilename{classification-of-FS-identities-in-groupoid}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[wire] (0, 0) node [below] {\(f\)} -- ++ (0, 1) arc (180:0:0.5) node [left] {\(g\)} arc (180:360:0.5) -- ++ (0, 1) node [above] {\(h\)};
+                    \draw[wire] (0.5, 1.5) node [monoid dot] {} -- ++ (0, 0.5) node [above] {\(x\)};
+                    \draw[wire] (1.5, 0.5) node [monoid dot] {} -- ++ (0, -0.5) node [below] {\(y\)};
+                    \node at (2.5, 1) {\(=\)};
+                    \draw[wire] (3, 0) node [below] {\(f\)} arc (180:0:0.5) node [below] {\(y\)};
+                    \draw[wire] (3, 2) node [above] {\(x\)} arc (180:360:0.5) node [above] {\(h\)};
+                    \draw[wire] (3.5, 0.5) node [monoid dot] {} -- (3.5, 1.5) node [monoid dot] {} node [midway, right] {\(f\)};
+                \end{tikzpicture}
+            \end{equation}
+            which shows that \(x\) is a left identity for \(f\) and \(y\) a right identity.
+        \end{proof}
+    \end{thm}
+    
+    \chapter{Phases}
+    \section{Phases: The Idea}
+    In quantum mechanics we usually don't care about an overall phase.
+    If our system can be described by the state \(\ket{\psi}\) then it can just as well be described by the state \(\e^{i\varphi}\ket{\psi}\) for some \(\varphi \in [0, 2\pi)\).
+    This works because we only really care about \(\abs{\braket{n}{\psi}}^2\), where \(\ket{n}\) is some state we wish to measure.
+    This value, \(\abs{\braket{n}{\psi}}^2\) doesn't change if we replace \(\ket{\psi}\) with \(\e^{i\varphi}\ket{\psi}\).
+    This means that while we work with a Hilbert space of states there is a certain redundancy in our description of states, and this comes with a certain symmetry, namely a \(\unitary(1)\) symmetry allowing us to multiply a state by an overall phase.
+    The important thing about phases is that they cancel out in squares, since \(\abs{\e^{i\varphi}}^2 = \e^{-i\varphi}\e^{i\varphi} = \e^0 = 1\).
+    
+    \section{Phases: The Definition}
+    \begin{dfn}{Phase}{}
+        Consider a dagger Frobenius structure, \((A, \monoidProduct, \monoidIdentity)\), in a monoidal dagger category.
+        A state \(a \colon I \to A\) is a \defineindex{phase} when
+        \begin{equation}
+            \tikzsetnextfilename{phases-phases}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \node[state] (state) at (0, -1) {\(a\)};
+                \draw[wire] (state) -- (0, 0) node [monoid dot] {};
+                \draw[wire] (0.5, 2) -- ++ (0, -1.5) arc (360:180:0.5) -- ++ (0, 0.5) node [above, effect] {\(a\)};
+                \node at (1, 0) {\(=\)};
+                \draw[wire] (1.75, 0) node [monoid dot] {} -- (1.75, 2);
+                \node at (2.5, 0) {\(=\)};
+                \node[state] (state) at (3.5, -1) {\(a\)};
+                \draw[wire] (state) -- (3.5, 0) node [monoid dot] {};
+                \draw[wire] (3, 2) -- ++ (0, -1.5) arc (180:360:0.5) -- ++ (0, 0.5) node [above, effect] {\(a\)};
+            \end{tikzpicture}
+            .
+        \end{equation}
+        
+        Given a phase \(a\) the \define{right phase shift}\index{phase shift} is defined to be the following morphism \(A \to A\):
+        \begin{equation}
+            \tikzsetnextfilename{phases-phase-shift-right}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \node[phase] (a) at (0, 0) {\(a\)};
+                \draw[wire] (a) -- ++ (0, 1);
+                \draw[wire] (a) -- ++ (0, -1);
+                \node at (0.75, 0) {\(=\)};
+                \draw[wire] (1.5, -1) -- ++ (0, 0.5) arc (180:0:0.5) node [below, state, inner sep=1pt] {\(a\)};
+                \draw[wire] (2, 0) node [monoid dot] {} -- ++ (0, 1);
+            \end{tikzpicture}
+        \end{equation}
+    \end{dfn}
+    
+    \section{Phases: The Examples}
+    For a classical structure in \(\FHilb\) copying an orthonormal basis \(\{\ve{i}\}\) the vector \(a = a_i\ve{i}\) is a phase if and only if each \(a_i\) is on the unit circle, that is \(\abs{a_i} = 1\) for all \(i\).
+    This is because in \(\FHilb\) copying the basis has the effect of squaring each coefficient along with the basis vector, so in order to recover \(a\), although as an effect, after copying we need to have \(\abs{a_i}^2 = 1\).
+    
+    The unit, \(\monoidIdentity\), of a dagger Frobenius structure is always a phase, which follows immediately from the counitality law.
+    
+    \begin{lma}{}{}
+        In a compact dagger category phases for a pair of pants monoid \((A^* \otimes A, \pairofpantsProduct, \pairofpantsIdentity)\) correspond to unitary morphisms.
+        \begin{proof}
+            Let \(f \colon A \to A\) be an endomorphism.
+            Consider the name of this morphism, which is a state \(I \to A^* \otimes A\) given by
+            \begin{equation}
+                \tikzsetnextfilename{phases-name-for-pair-of-pants-phase}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \node[daggerable morphism] (f) {\(f\)};
+                    \draw[left dual=0.6] (f.north) -- ++ (0, 0.5) coordinate (top);
+                    \draw[right dual=0.75] (f.south) -- ++ (0, -0.25) arc (360:180:0.5) coordinate (here) -- (here |- top);
+                \end{tikzpicture}
+                .
+            \end{equation}
+            If this is to be a phase then we require that the following holds:
+            \begin{equation}
+                \tikzsetnextfilename{phases-phases-for-pair-of-pants}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[left dual] (0, 1) -- ++ (0, -1) arc (180:360:0.5) -- ++ (0, 1);
+                    \node at (1.5, 0.25) {\(=\)};
+                    \begin{scope}[xshift=1cm]
+                        \node[daggered morphism] (f1) at (2, 1) {\(f\)};
+                        \node[daggerable morphism] (f2) at (3, -1) {\(f\)};
+                        \draw[left dual=0.54] (f1.north) arc (0:180:0.5) -- ++ (0, -1) arc (180:270:0.5) arc (90:0:0.5) -- ++ (0, -0.5) arc (180:360:0.5) -- (f2);
+                        \draw[left dual] (f2.north) arc (180:90:0.5) arc (270:360:0.5) -- ++ (0, 1.5) coordinate (top);
+                        \draw[right dual] (f1.south) arc (180:360:0.5) coordinate (here) -- (here |- top);
+                    \end{scope}
+                    \node at (5.5, 0.38) {\(\equaliso\)};
+                    \node[daggerable morphism] (f1) at (7, 0.5) {\(f\)};
+                    \node[daggered morphism] (f2) at (7, -0.5) {\(f\)};
+                    \draw[left dual] (f1.north) -- ++ (0, 0.5) coordinate (top);
+                    \draw[left dual] (f2) -- (f1);
+                    \draw[left dual] (6, 0 |- top) -- ++ (0, -2) arc (180:360:0.5) -- (f2);
+                \end{tikzpicture}
+                .
+            \end{equation}
+            This holds if and only if \(f \circ f^\hermit = \id_A\), and one can similarly show that \(f^\hermit \circ f = \id_A\) using the other part of the definition of a phase, and hence \(f\) is unitary.
+            Since states correspond exactly to names of endomorphisms this shows that unitary endomorphisms correspond to phases in the pair of pants Frobenius structure.
+        \end{proof}
+    \end{lma}
+    
+    \section{Phase Group}
+    Phases of the Frobenius structures given by the matrix algebra \(\matrices{n}{\complex}\) in \(\FHilb\) form the group \(\unitary(n)\) of \(n \times n\) unitary matrices.
+    Phases of a general Frobenius structure, \(\bigoplus_{i=1}^k \matrices{n_i}{\complex}\), then form the group \(\bigotimes_{i=1}^{k} U(n_i)\), where \(\otimes\) is the direct product of groups.
+    
+    Classical structures on \(\complex^n\) copy an orthonormal basis \(\{\ve{1}, \dotsc, \ve{n}\}\).
+    They act individually on each basis vector and leave it normalised, so must work as the map \(\ve{i} \mapsto \e^{i\varphi_i}\) for each index \(i\).
+    That is they act on each basis vector as \(\unitary(1)\), and hence on the entire space as \(\bigotimes_{i=1}^{n} \unitary(1)\).
+    
+    \begin{lma}{}{}
+        The phases of a Frobenius structure in \(\Rel\) induced by a group \(G\) are the elements of the group \(G\).
+        \begin{proof}
+            Consider some subset \(H \subseteq G\), which we view as a relation \(\{\bullet\} \to G\), that is as a subset of \(\{\bullet\} \times G\).
+            The definition of a phase in \(\Rel\) is
+            \begin{equation}
+                \{g^{-1} h \mid g, h \in A\} = \{1_G\} = \{hg^{-1} \mid g, h \in A\}.
+            \end{equation}
+            So for all \(g \in G\) we clearly have a phase \(A = \{g\}\).
+            However, if \(A\) contains distinct elements, \(A = \{g, h\}\) with \(g \ne h\), then it is not a phase.
+            Similarly, \(A = \emptyset\) is not a phase, hence the phases are exactly the singletons \(\{g\}\), so correspond to elements of \(G\).
+            Of course, by singletons we really mean singleton pairs \(\{(\textbullet, g)\}\).
+        \end{proof}
+    \end{lma}
+    
+    In all of these examples we've seen that the phases collected together naturally form a group.
+    This turns out to always be the case.
+    
+    \begin{dfn}{Phase Group}{}
+        In a monoidal dagger category the phases of a dagger Frobenius structure form a group whose elements are the phases equipped with the operation \(+\) defined by
+        \begin{equation}
+            \tikzsetnextfilename{phases-phase-group}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \node[state, xscale=2.3, minimum width=0.8cm] (aplusb) {};
+                \node at (aplusb) {\(a + b\)};
+                \draw[wire] (aplusb) -- ++ (0, 1.5) coordinate (top);
+                \node at (1.5, 0) {\(=\)};
+                \node[state, minimum width=0.5cm] (a) at (2, 0) {};
+                \node[state, minimum width=0.5cm] (b) at (3, 0) {};
+                \node at (a) {\(a\)};
+                \node at (b) {\(b\)};
+                \draw[wire] (a.north) arc (180:0:0.5);
+                \draw[wire] (2.5, 0.65) node [monoid dot] {} coordinate (here) -- (here |- top);
+            \end{tikzpicture}
+            .
+        \end{equation}
+    \end{dfn}
+    
+    \begin{thm}{}{}
+        The phase group is a group.
+        \begin{proof}
+            First we need to show that the definition does yield a binary operation, that is that the sum of two phases is again a phase.
+            To do so we simply expand the definition of \(+\) inside the phase definition, then applying the extended Frobenius law twice to give
+            \begin{equation}
+                \tikzsetnextfilename{phases-phase-group-well-defined-1}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \node[state, xscale=2.3, minimum width=0.8cm, below] (aplusb) {};
+                    \node at (aplusb) {\(a + b\)};
+                    \draw[wire] (aplusb) -- (0, 1) node [monoid dot] {};
+                    \draw[wire] (-0.5, 1.5) arc (180:360:0.5) -- ++ (0, 0.75);
+                    \node[effect, xscale=2.3, minimum width=0.8cm, above] (aplusb2) at (-0.5, 1.5) {};
+                    \node at (aplusb2) {\(a + b\)};
+                    \node at (1.1, 1) {\(=\)};
+                    \begin{scope}[xshift=2.4cm, yshift=1cm]
+                        \draw[wire] (0, 0) node [monoid dot] {} -- ++ (0, -0.5) node [monoid dot] {};
+                        \draw[wire] (-0.3, -0.8) node [below, state, minimum width=0.5cm] (a) {} arc (180:0:0.3) node [below, state, minimum width=0.5cm] (b) {};
+                        \node at (a) {\(a\)};
+                        \node at (b) {\(b\)};
+                        \draw[wire] (-0.5, 0.5) node [monoid dot] {} arc (180:360:0.5) -- ++ (0, 0.75);
+                        \draw[wire] (-0.8, 0.8) node [above, effect, minimum width=0.5cm] (a) {} arc (180:360:0.3) node [above, effect, minimum width=0.5cm] (b) {};
+                        \node at (a) {\(a\)};
+                        \node at (b) {\(b\)};
+                        \node at (0.8, 0) {\(=\)};
+                    \end{scope}
+                    \begin{scope}[xshift=4.5cm, yshift=1cm]
+                        \draw[wire] (-0.5, 0.5) node [monoid dot] {} -- ++ (0, -0.5) node [monoid dot] {};
+                        \draw[wire] (-0.8, -0.9) node [below, state, minimum width=0.5cm] (a) {} -- ++ (0, 0.6) arc (180:0:0.3) arc (180:360:0.3) -- ++ (0, 1.5);
+                        \draw[wire] (0.1, -0.6) node [monoid dot] {} -- ++ (0, -0.3) node [below, state, minimum width=0.5cm] (b) {};
+                        \node at (a) {\(a\)};
+                        \node at (b) {\(b\)};
+                        \draw[wire] (-0.8, 0.8) node [above, effect, minimum width=0.5cm] (a) {} arc (180:360:0.3) node [above, effect, minimum width=0.5cm] (b) {};
+                        \node at (a) {\(a\)};
+                        \node at (b) {\(b\)};
+                        \node at (0.8, 0) {\(=\)};
+                    \end{scope}
+                    \begin{scope}[xshift=7cm, yshift=1cm]
+                        \draw[wire] (-0.8, -0.9) node [below, state, minimum width=0.5cm] (a) {} -- ++ (0, 0.8) node [monoid dot] {};
+                        \draw[wire] (0.4, -0.9) node [below, state, minimum width=0.5cm] (b) {} -- ++ (0, 0.8) node [monoid dot] {};
+                        \node at (a) {\(a\)};
+                        \node at (b) {\(b\)};
+                        \draw[wire] (-1.1, 0.8) node [above, effect, minimum width=0.5cm] (a) {} -- ++ (0, -0.6) arc (180:360:0.3) arc (180:0:0.3) arc (180:360:0.3) -- ++ (0, 0.95);
+                        \draw[wire] (-0.2, 0.5) node [monoid dot] {} -- ++ (0, 0.3) node [above, effect, minimum width=0.5cm] (b) {};
+                        \node at (a) {\(a\)};
+                        \node at (b) {\(b\)};
+                    \end{scope}
+                \end{tikzpicture}
+                .
+            \end{equation}
+            From here we can apply the fact that \(a\) is a phase to remove \(a\), then counitality, then the fact that \(b\) is a phase to remove \(b\) leaving just the unit:
+            \begin{equation}
+                \tikzsetnextfilename{phases-phase-group-well-defined-2}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \node[state, xscale=2.3, minimum width=0.8cm, below] (aplusb) {};
+                    \node at (aplusb) {\(a + b\)};
+                    \draw[wire] (aplusb) -- (0, 1) node [monoid dot] {};
+                    \draw[wire] (-0.5, 1.5) arc (180:360:0.5) -- ++ (0, 0.75);
+                    \node[effect, xscale=2.3, minimum width=0.8cm, above] (aplusb2) at (-0.5, 1.5) {};
+                    \node at (aplusb2) {\(a + b\)};
+                    \node at (1, 1) {\(=\)};
+                    \begin{scope}[xshift=2.7cm, yshift=1cm]
+                        \draw[wire] (-0.8, -0.9) node [below, state, minimum width=0.5cm] (a) {} -- ++ (0, 0.8) node [monoid dot] {};
+                        \draw[wire] (0.4, -0.9) node [below, state, minimum width=0.5cm] (b) {} -- ++ (0, 0.8) node [monoid dot] {};
+                        \node at (a) {\(a\)};
+                        \node at (b) {\(b\)};
+                        \draw[wire] (-1.1, 0.8) node [above, effect, minimum width=0.5cm] (a) {} -- ++ (0, -0.6) arc (180:360:0.3) arc (180:0:0.3) arc (180:360:0.3) -- ++ (0, 0.95);
+                        \draw[wire] (-0.2, 0.5) node [monoid dot] {} -- ++ (0, 0.3) node [above, effect, minimum width=0.5cm] (b) {};
+                        \node at (a) {\(a\)};
+                        \node at (b) {\(b\)};
+                        \node at (1, 0) {\(=\)};
+                    \end{scope}
+                    \begin{scope}[xshift=4.7cm, yshift=1cm]
+                        \draw[wire] (0.4, -0.9) node [below, state, minimum width=0.5cm] (b) {} -- ++ (0, 0.8) node [monoid dot] {};
+                        \node at (b) {\(b\)};
+                        \draw[wire] (-0.5, 0.2) node [monoid dot] {} arc (180:0:0.3) arc (180:360:0.3) -- ++ (0, 0.95);
+                        \draw[wire] (-0.2, 0.5) node [monoid dot] {} -- ++ (0, 0.3) node [above, effect, minimum width=0.5cm] (b) {};
+                        \node at (b) {\(b\)};
+                        \node at (1, 0) {\(=\)};
+                    \end{scope}
+                    \begin{scope}[xshift=6cm, yshift=1cm]
+                        \draw[wire] (0.4, -0.9) node [below, state, minimum width=0.5cm] (b) {} -- ++ (0, 0.8) node [monoid dot] {};
+                        \node at (b) {\(b\)};
+                        \draw[wire] (0.1, 0.8) node [above, effect, minimum width=0.5cm] (b) {} -- ++ (0, -0.6) arc (180:360:0.3) -- ++ (0, 0.95);
+                        \node at (b) {\(b\)};
+                        \node at (1, 0) {\(=\)};
+                    \end{scope}
+                    \draw[wire] (7.5, 1) node [monoid dot] {} -- ++ (0, 1.25);
+                \end{tikzpicture}
+                .
+            \end{equation}
+            This shows that \(a + b\) is indeed a phase.
+            
+            Associativity follows immediately from associativity of the monoid multiplication.
+            
+            The identity phase is the unit, since \(\monoidIdentity + a = a\) is demonstrated by the following
+            \begin{equation}
+                \tikzsetnextfilename{phases-phase-group-identity}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[wire] (0, 0) node [monoid dot] {} arc (180:0:0.5) node [below, state, minimum width=0.5cm] (a) {};
+                    \node at (a) {\(a\)};
+                    \draw[wire] (0.5, 0.5) node [monoid dot] {} -- ++ (0, 0.5);
+                    \node at (1.5, 0.5) {\(=\)};
+                    \draw[wire] (2, 0) node [below, state, minimum width=0.5cm] (a) {} -- ++ (0, 1);
+                    \node at (a) {\(a\)};
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Similarly, we can show that \(a + \monoidIdentity = a\).
+            
+            Given a phase, \(a\), the left inverse, denoted \(-a\), is the phase
+            \begin{equation}
+                \tikzsetnextfilename{phases-phase-group-inverse}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[wire] (0, 0) node [below, state, minimum width=0.9cm] (minusa) {} -- ++ (0, 1);
+                    \node[font=\scriptsize] at (minusa) {\(-a\)};
+                    \node at (1, 0) {\(=\)};
+                    \draw[wire] (1.5, 0.5) node [above, effect, minimum width=0.5cm] (a) {} arc (180:360:0.5) -- ++ (0, 0.5);
+                    \node at (a) {\(a\)};
+                    \draw[wire] (2, 0) node [monoid dot] {} -- ++ (0, -0.5) node [monoid dot] {};
+                \end{tikzpicture}
+                .
+            \end{equation}
+            We can show that this is indeed the left inverse:
+            \begin{equation}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \draw[wire] (0, 0) node [below, state, minimum width=0.9cm, xscale=2] (zero) {} -- ++ (0, 1);
+                    \node[font=\tiny] at ($(zero) + (0, 0.1)$) {\((-a) + a\)};
+                    \node at (1.25, 0) {\(=\)};
+                    \draw[wire] (1.75, 0.5) node [above, effect, minimum width=0.5cm] (a) {} -- ++ (0, -0.3) arc (180:360:0.3) arc (180:0:0.3) -- ++ (0, -0.3) node [below, state, minimum width=0.5cm] (a2) {};
+                    \node at (a) {\(a\)};
+                    \node at (a2) {\(a\)};
+                    \draw[wire] (2.05, -0.1) node [monoid dot] {} -- ++ (0, -0.5) node [monoid dot] {};
+                    \draw[wire] (2.65, 0.5) node [monoid dot] {} -- ++ (0, 0.5);
+                    \node at (3.5, 0) {\(=\)};
+                    \draw[wire] (4, 0.5) node [above, effect, minimum width=0.5cm] (a) {} arc (180:360:0.3) -- ++ (0, 0.3);
+                    \node at (a) {\(a\)};
+                    \draw[wire] (4.3, 0.2) node [monoid dot] {} -- ++ (0, -0.4) node [monoid dot] {};
+                    \draw[wire] (4, -0.5) node [monoid dot] {} arc (180:0:0.3) node [below, state, minimum width=0.5cm] (a) {};
+                    \node at (a) {\(a\)};
+                    \node at (5, 0) {\(=\)};
+                    \draw[wire] (5.5, 0.5) node [above, effect, minimum width=0.5cm] (a) {} arc (180:360:0.3) -- ++ (0, 0.3);
+                    \node at (a) {\(a\)};
+                    \draw[wire] (5.8, 0.2) node [monoid dot] {} -- ++ (0, -0.5) node [below, state, minimum width=0.5cm] (a) {};
+                    \node at (a) {\(a\)};
+                    \node at (6.5, 0) {\(=\)};
+                    \draw[wire] (7, 0) node [monoid dot] {} -- ++ (0, 0.8);
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Here, after replacing \(+\) with its definition and \(-a\) with its definition, we've used the extended Frobenius law, then unitality, then the fact that \(a\) is a phase.
+            
+            Similarly, one can construct a right identity by taking the effect \(a\) to be on the right leg of the comultiplication instead.
+            However, in an associative structure if we have left and right inverses \(l\) and \(r\) then we have \(l = l(gr) = (lg)r = r\) and so left and right inverses are equal, if they exist, and hence two sided.
+        \end{proof}
+    \end{thm}
+    
+    We have seen already that in \(\FHilb\) the phase group for the pair of pants Frobenius structure is the unitary group.
+    Similarly, for a Frobenius structure \(\bigoplus_{i=1}^k \matrices{n_i}{\complex}\) in \(\FHilb\) phase addition is entrywise multiplication in \(\bigotimes_{i=1}^k \unitary(n_i)\).
+    In particular, phase addition in a classical structure in \(\FHilb\) is multiplication of diagonal matrices.
+    In \(\Rel\) the phase group induced by a group is just the group itself.
+    
+    \section{Phased Spider Theorem}
+    We can generalise the spider theorem to allow phases.
+    To do so we need to restrict ourselves to a dagger Frobenius structure in a dagger category, which is where it makes sense to define phases.
+    If we include the requirements of the original spider theorem, namely a special Frobenius structure, then adding in the requirement of commutativity we have a classical structure, so we'll do this.
+    In a dagger category we should also allow the dagger to be used to build morphisms.
+    \begin{thm}{Phased Spider Theorem}{}
+        Let \((A, \monoidProduct, \monoidIdentity)\) be a classical structure in a braided monoidal dagger category.
+        Any connected morphism \(A^{\otimes m} \to A^{\otimes n}\) built from finitely many pieces \(\monoidProduct\), \(\monoidIdentity\), \(\id\), \(\swapMorphism\), and phases using \(\circ\), \(\otimes\), and \(\dagger\) is equal to the morphism represented by the diagram
+        \begin{equation}
+            \tikzsetnextfilename{phases-phased-spider}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \draw[wire, xscale=2] (0, 0) arc (180:0:0.25);
+                \draw[wire, xscale=2] (-0.25, 0) -- ++ (0, 0.25) arc (180:0:0.25) node [monoid dot] {};
+                \draw[wire, xscale=2] (-0.5, 0) -- ++ (0, 0.5) arc (180:90:0.25) coordinate (A);
+                \draw[wire, dashed, xscale=2] (A) arc (90:0:0.25) node [monoid dot] {};
+                \draw[wire] (A) node [monoid dot] {} -- ++ (0, 0.75) coordinate (E) node [phase, inner sep=1pt, font=\tiny] (a) {\(\sum a\)};
+                \draw[wire] (a) -- ++ (0, 0.77) node [monoid dot] {};
+                \begin{scope}[yshift=1cm]
+                    \draw[wire, xscale=2] (0, 2) arc (180:360:0.25);
+                    \draw[wire, xscale=2] (-0.25, 2) -- ++ (0, -0.25) arc (180:360:0.25) coordinate (D);
+                    \draw[wire, xscale=2] (-0.5, 2) -- ++ (0, -0.5) arc (180:270:0.25) coordinate (B);
+                    \draw[wire, dashed, xscale=2] (B) arc (270:360:0.25) coordinate (C);
+                    \node[monoid dot, thick] at (C) {};
+                    \node[monoid dot, thick] at (D) {};
+                    \draw[decorate, thick, decoration={calligraphic brace}] (-1.1, 2.2) -- (1.1, 2.2) node [midway, above] {\(n\)};
+                \end{scope}
+                \draw[decorate, thick, decoration={calligraphic brace, mirror}] (-1.1, -0.2) -- (1.1, -0.2) node [midway, below] {\(m\)};
+            \end{tikzpicture}
+        \end{equation}
+        where \(\sum a\) is a sum over all phases \(a\) appearing anywhere in the diagram.
+        \begin{proof}
+            Move all the phases to the bottom.
+            Apply the spider theorem to the diagram above the phases.
+            We can then use the phase sum to reduce the phases to a single phase, \(\sum a\).
+            We can then apply the spider theorem again, and in the process the single phase can be manipulated to the middle of the diagram.
+        \end{proof}
+    \end{thm}
+    
+    \chapter{Complementarity}
+    \section{Complementarity: The Idea}
+    Suppose we have a qubit.
+    We might measure it in the \(Z\) basis,
+    \begin{equation}
+        \left\{
+            \begin{pmatrix}
+                1\\ 0
+            \end{pmatrix}
+            ,
+            \begin{pmatrix}
+                0\\ 1
+            \end{pmatrix}
+        \right\},
+    \end{equation}
+    or in the \(X\) basis,
+    \begin{equation}
+        \left\{ \frac{1}{\sqrt{2}}
+        \begin{pmatrix}
+            1\\ 1
+        \end{pmatrix}
+        , \frac{1}{\sqrt{2}}
+        \begin{pmatrix}
+            1\\ -1
+        \end{pmatrix}
+        \right\}.
+    \end{equation}
+    The probability of any measurement outcome in either of these bases is, if we know nothing about the state, \(1/2\).
+    Further, if we measure in the \(Z\) basis, suppose measuring the first state, then measure in the \(X\) basis the probability of getting either result is still \(1/2\)\footnote{In the lectures this was attributed to the Heisenberg uncertainty principle. I disagree with this, this is simply a separate weird quirk of quantum measurements, unrelated to the Heisenberg uncertainty principle which is a result of the reciprocal relation between real space widths and Fourier space widths.}.
+    
+    \begin{dfn}{Complementary Bases}{}
+        Let \(\{a_i\}\) and \(\{b_i\}\) be orthogonal bases.
+        We say that these bases are \define{complementary}\index{complementary!bases} or \define{unbiased}\index{unbiased bases} if
+        \begin{equation}
+            \abs{\braket{a_i}{b_j}}^2 = c \qquad (\text{no sum on \(i\) or \(j\)})
+        \end{equation}
+        for some constant \(c \in \complex\).
+    \end{dfn}
+    
+    \section{Complementarity: The Definition}
+    \begin{dfn}{Complementary}{}
+        In a braided monoidal dagger category let \((A, \monoidProduct, \monoidIdentity)\) and \((A, \comonoidProductAdjoint, \comonoidIdentityAdjoint)\) be symmetric dagger Frobenius structures on the same object \(A\).
+        We say that these are \defineindex{complementary} if
+        \begin{equation}
+            \tikzsetnextfilename{complementarity-complementary-FS-definition}
+            \begin{tikzpicture}[baseline=(current bounding box)]
+                \draw[wire] (0, 0) coordinate (A) arc (180:360:0.5) arc (180:0:0.5) arc (180:360:0.5) coordinate (B);
+                \draw[wire] (A) to [out=90, in=180] (1.5, 2);
+                \draw[wire] (B) to [out=90, in=0] (1.5, 2);
+                \draw[wire] (1.5, 2) node [monoid dot] {} -- ++ (0, 1);
+                \draw[wire] (0.5, -0.5) node [monoid dot] {} -- ++ (0, -0.5) node [monoid dot] {};
+                \draw[wire] (1.5, 0.5) node [comonoid dot] {} -- ++ (0, 0.5) node [comonoid dot] {};
+                \draw[wire] (2.5, -0.5) node [comonoid dot] {} -- ++ (0, -1);
+                \node at (3.5, 0.5) {\(=\)};
+                \draw[wire] (4, 0) node [comonoid dot] {} -- ++ (0, -1.5);
+                \draw[wire] (4, 1.5) node [monoid dot] {} -- ++ (0, 1.5);
+                \node at (4.5, 0.5) {\(=\)};
+                \begin{scope}[xshift=5cm]
+                    \draw[wire] (0, 0) coordinate (A) arc (180:360:0.5) arc (180:0:0.5) arc (180:360:0.5) coordinate (B);
+                    \draw[wire] (A) to [out=90, in=180] (1.5, 2);
+                    \draw[wire] (B) to [out=90, in=0] (1.5, 2);
+                    \draw[wire] (1.5, 2) node [monoid dot] {} -- ++ (0, 1);
+                    \draw[wire] (2.5, -0.5) node [monoid dot] {} -- ++ (0, -0.5) node [monoid dot] {};
+                    \draw[wire] (1.5, 0.5) node [comonoid dot] {} -- ++ (0, 0.5) node [comonoid dot] {};
+                    \draw[wire] (0.5, -0.5) node [comonoid dot] {} -- ++ (0, -1);
+                \end{scope}
+            \end{tikzpicture}
+        \end{equation}
+        and the same with the two colours of dots exchanged.
+    \end{dfn}
+    
+    \section{Complementarity: The Examples}
+    \begin{lma}{}{}
+        Commutative dagger Frobenius structures in \(\FHilb\) are complementary if and only if they copy complementary bases with \(c = 1\).
+        \begin{proof}
+            Consider two bases formed from states
+            \begin{equation}
+                \tikzsetnextfilename{complementary-basis-1}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \node[state, minimum width=5mm] (a) {};
+                    \node at (a) {\(a\)};
+                    \draw[wire] (a.north) -- ++ (0, 0.5);
+                \end{tikzpicture}
+                , \qqand
+                \tikzsetnextfilename{complementary-basis-2}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \node[state, minimum width=5mm, fill=lightgray] (b) {};
+                    \node at (b) {\(b\)};
+                    \draw[wire] (b.north) -- ++ (0, 0.5);
+                \end{tikzpicture}
+                .
+            \end{equation}
+            Then using the snake equation and apply the dagger, then copying both bases, and finally using complementarity we get
+            \begin{equation}
+                \tikzsetnextfilename{complementarity-in-FHilb}
+                \begin{tikzpicture}[baseline=(current bounding box)]
+                    \node[state, minimum width=5mm, fill=lightgray] (b1) at (0, 0) {};
+                    \node at (b1) {\(b\)};
+                    \node[state, minimum width=5mm] (a1) at (0.75, 0) {};
+                    \node at (a1) {\(a\)};
+                    \node[effect, minimum width=5mm] (a2) at (0, 1) {};
+                    \node at (a2) {\(a\)};
+                    \node[effect, minimum width=5mm, fill=lightgray] (b2) at (0.75, 1) {};
+                    \node at (b2) {\(b\)};
+                    \draw[wire] (a1) -- (b2);
+                    \draw[wire] (a2) -- (b1);
+                    \node at (1.4, 0.6) {\(=\)};
+                    \begin{scope}[xshift=2cm]
+                        \node[effect, minimum width=5mm, fill=lightgray] (b) at (0, 1) {};
+                        \node at (b) {\(b\)};
+                        \node[state, minimum width=5mm] (a) at (1.2, 0) {};
+                        \node at (a) {\(a\)};
+                        \draw[wire] (b) -- ++ (0, -0.5) arc (180:360:0.3) arc (180:0:0.3) -- (a);
+                        \draw[wire] (0.3, 0.2) node [monoid dot] {} -- ++ (0, -0.3) node [monoid dot] {};
+                        \draw[wire] (0.9, 0.8) node [comonoid dot] {} -- ++ (0, 0.3) node [comonoid dot] {};
+                        \node[state, minimum width=5mm] (a1) at (1.95, 0) {};
+                        \node at (a1) {\(a\)};
+                        \node[effect, minimum width=5mm, fill=lightgray] (b2) at (1.95, 1) {};
+                        \node at (b2) {\(b\)};
+                        \draw[wire] (a1) -- (b2);
+                        \node at (2.6, 0.6) {\(=\)};
+                    \end{scope}
+                    \begin{scope}[xshift=5cm]
+                        \draw[wire] (0, 0) arc (180:360:0.3) arc (180:0:0.3) arc (180:360:0.3) coordinate (A);
+                        \draw[wire] (0, 0) to [out=90, in=180] (0.9, 1.2);
+                        \draw[wire] (A) to [out=90, in=0] (0.9, 1.2);
+                        \draw[wire] (0.3, -0.3) node [monoid dot] {} -- ++ (0, -0.3) node [monoid dot] {};
+                        \draw[wire] (0.9, 0.3) node [comonoid dot] {} -- ++ (0, 0.3) node [comonoid dot] {};
+                        \draw[wire] (1.5, -0.3) node [comonoid dot] {} -- ++ (0, -0.3) node [below, state, minimum width=5mm] (a) {};
+                        \node at (a) {\(a\)};
+                        \draw[wire] (0.9, 1.2) node [monoid dot] {} -- ++ (0, 0.3) node [above, effect, minimum width=5mm, fill=lightgray] (b) {};
+                        \node at (b) {\(b\)};
+                        \node at (2.2, 0.6) {\(=\)};
+                    \end{scope}
+                    \begin{scope}[xshift=8cm]
+                        \node[state, minimum width=5mm] (a) at (0, -0.3) {};
+                        \node[effect, minimum width=5mm, fill=lightgray] (b) at (0, 1.5) {};
+                        \node at (a) {\(a\)};
+                        \node at (b) {\(b\)};
+                        \draw[wire] (a.north) -- ++ (0, 0.3) node [comonoid dot] {};
+                        \draw[wire] (b.south) -- ++ (0, -0.3) node [monoid dot] {};
+                        \node at (0.8, 0.6) {\({} = 1\)};
+                    \end{scope}
+                \end{tikzpicture}
+            \end{equation}
+        \end{proof}
+    \end{lma}
+    
+    \begin{lma}{Twisted Pair of Pants}{}
+        In a compact dagger category if \(A\) is self dual then the following Frobenius structure on \(A \otimes A\) is complementary to the pair of pants monoid:
+        \begin{equation}
+            \tikzsetnextfilename{complementarity-twisted-pants-multiplication}
+            \begin{tikzpicture}[baseline=(current bounding box), font=\scriptsize]
+                \draw[wire] (0, 0) node [below] {\(A \otimes A\)} -- ++ (0, 1) arc (180:0:0.5) -- ++ (0, -1) node [below] {\(A \otimes A\)};
+                \draw[wire] (0.5, 1.5) node [monoid dot] {} -- ++ (0, 1.5) node [above] {\(A \otimes A\)};
+                \node[font=\normalsize] at (1.5, 1) {\(=\)};
+                \draw[wire] (4, 0) node [below] {\(A\)} arc (180:90:0.5) arc (270:360:0.5) arc (0:90:0.5) arc (270:180:0.5) arc (0:90:0.5) arc (270:180:0.5) node [above] {\(A\)};
+                \draw[over wire] (2, 0) node [below] {\(A\)} arc (180:90:0.5) arc (270:360:0.5) arc (180:0:0.5) arc (180:270:0.5) arc (90:0:0.5) node [below] {\(A\)};
+                \draw[over wire] (3, 0) node [below] {\(A\)} arc (0:90:0.5) arc (270:180:0.5) arc (180:90:0.5) arc (270:360:0.5) arc (180:90:0.5) arc (270:360:0.5) node [above] {\(A\)};
+            \end{tikzpicture}
+        \end{equation}
+        and
+        \begin{equation}
+            \tikzsetnextfilename{complemetarity-twisted-pants-unit}
+            \begin{tikzpicture}[baseline=(current bounding box), font=\scriptsize]
+                \draw[wire] (0, -0.5) node [monoid dot] {} -- ++ (0, 1.5) node [above] {\(A\otimes A\)};
+                \node at (0.75, 0.5) {\(=\)};
+                \draw[wire] (2, -0.5) arc (270:360:0.5) arc (0:90:0.5) arc (270:180:0.5) node [above] {\(A\)};
+                \draw[over wire] (2.5, 1) node [above] {\(A\)} arc (360:270:0.5) arc (90:270:0.5);
+            \end{tikzpicture}
+        \end{equation}
+        \begin{proof}
+            Simply substitute the definitions into the complementarity definition and untangle the massive web that results to get the result.
+            Remember that the unit of the pair of pants monoid is \(\pairofpantsIdentity\).
+        \end{proof}
+    \end{lma}
+    
+    
+    
+    
+    
+    
     
     
     
