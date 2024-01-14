@@ -18,7 +18,7 @@
 \usetikzlibrary{positioning}
 
 % References, should be last things loaded
-\usepackage{hyperref}  % Should be loaded second last (cleveref last)
+\usepackage[pdfauthor={Willoughby Seago},pdftitle={Modelling and Visualisation in Physics Notes},pdfkeywords={Computational Physics, Computational Modelling, Ising Model, Monte Carlo, Metropolis, Glauber, Kawasaki, Cellular Automata, Game of Life, SIRS Model, PDEs, Cahn-Hilliard Equation},pdfsubject={Statistical Mechanics}]{hyperref}  % Should be loaded second last (cleveref last)
 \colorlet{hyperrefcolor}{blue!60!black}
 \hypersetup{colorlinks=true, linkcolor=hyperrefcolor, urlcolor=hyperrefcolor}
 \usepackage[
@@ -35,7 +35,7 @@ noabbrev
 % Title page info
 \title{Statistical Physics}
 \author{Willoughby Seago}
-\date{}
+\date{January 19, 2022}
 % \subtitle{}
 % \subsubtitle{}
 
@@ -59,7 +59,7 @@ noabbrev
 \begin{document}
     \frontmatter
     \titlepage
-    \innertitlepage{tikz-external/the-ising-model.pdf}
+    \innertitlepage{tikz-external/game-of-life-glider.pdf}
     \tableofcontents
     \listoffigures
     \mainmatter
@@ -1101,10 +1101,10 @@ noabbrev
     \section{Chemical Potential}
     In order to solve the Cahn--Hilliard equation we need to rewrite the chemical potential in terms of \(\varphi\).
     This can be done by identifying
-    \begin{equation}
-        \mu = \diffp{F}{N} = \diffp{\left( \tfrac{F}{N} \right)}{\left( \tfrac{N}{V} \right)} = \diffp{f}{\varphi},
+    \begin{equation}\label{eqn:chemical potential}
+        \mu = \diffp{F}{N} = \diffp{\left( \tfrac{F}{V} \right)}{\left( \tfrac{N}{V} \right)} = \diffp{f}{\varphi},
     \end{equation}
-    where \(f = F/N\) is the free energy density, and we identify that \(N/V\) is the value of \(\varphi\) in equilibrium.
+    where \(f = F/V\) is the free energy density\footnote{In my lecture notes I had \(f = F/N\) here and in equation \cref{eqn:chemical potential}, so number density instead of volume density. It was pointed out that this is probably wrong, so I've changed it here, but it's been too long since I took this course for me to be sure (2024-01-14),}, and we identify that \(N/V\) is the value of \(\varphi\) in equilibrium.
     
     This means that if we know the free energy as a function of \(\varphi\) we can find the chemical potential as a function of \(\varphi\).
     For example, consider the free energy density
@@ -1121,7 +1121,7 @@ noabbrev
         \diffp{\varphi}{t} = M\laplacian(-a\varphi + a\varphi^3).
     \end{equation}
     There is a problem with this, which is that it isn't numerically stable.
-    To solve this we notice that we haven't accounted for surface tension, which corresponds to adding \(-\kappa \varphi^2\varphi\) to the chemical potential.
+    To solve this we notice that we haven't accounted for surface tension, which corresponds to adding \(-\kappa \laplacian\varphi\) to the chemical potential.
     Hence we instead look to solve
     \begin{equation}
         \diffp{\varphi}{t} = M\laplacian (-a\varphi + a\varphi^3 - \kappa\laplacian\varphi).
@@ -1204,9 +1204,10 @@ noabbrev
     \end{align}
     
     In three dimensions the Jacobi algorithm is almost identical:
-    \begin{equation}
-        \varphi[i, j, k; n + 1] = \frac{1}{6}(\varphi[i + 1, j, k; n] + \varphi[i - 1, j, k; n] + \varphi[i, j + 1, k; n] + \varphi[i, j - 1, k; n] + \varphi[i, j, k + 1; n] + \varphi[i, j, k - 1; n] + \rho[i, j, k]).
-    \end{equation}
+    \begin{multline}
+        \varphi[i, j, k; n + 1] = \frac{1}{6}(\varphi[i + 1, j, k; n] + \varphi[i - 1, j, k; n] + \varphi[i, j + 1, k; n]\\
+        + \varphi[i, j - 1, k; n] + \varphi[i, j, k + 1; n] + \varphi[i, j, k - 1; n] + \rho[i, j, k]).
+    \end{multline}
     
     We need to decide when to stop iterating, that is how do we identify a steady state?
     The easiest way is to define the error to be
